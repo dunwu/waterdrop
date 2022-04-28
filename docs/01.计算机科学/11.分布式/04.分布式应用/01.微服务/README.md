@@ -35,4 +35,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 🎯 [我的博客](https://github.com/dunwu/blog) ◾
+◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾

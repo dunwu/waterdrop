@@ -28,7 +28,7 @@ hidden: true
 - [Java 容器之 Queue](05.Java容器之Queue.md) - 关键词：`Queue`、`Deque`、`ArrayDeque`、`LinkedList`、`PriorityQueue`
 - [Java 容器之 Stream](06.Java容器之Stream.md)
 
-## 📖 资料
+## 📚 资料
 
 - **书籍**
   - Java 四大名著
@@ -56,4 +56,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 🏠 [JAVACORE 首页](https://github.com/dunwu/javacore) ◾ 🎯 [我的博客](https://github.com/dunwu/blog) ◾
+◾ 🏠 [JAVACORE 首页](https://github.com/dunwu/javacore) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾

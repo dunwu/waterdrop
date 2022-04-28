@@ -48,4 +48,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 🏠 [JAVA-TUTORIAL 首页](https://github.com/dunwu/java-tutorial) ◾ 🎯 [我的博客](https://github.com/dunwu/blog) ◾
+◾ 💧 [我的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾
