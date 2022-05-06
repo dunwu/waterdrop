@@ -26,6 +26,18 @@ module.exports = {
   themeConfig: {
     nav: [
       {
+        text: 'Java',
+        link: '/10.Java/',
+        items: [
+          { text: 'JavaSE', link: '/10.Java/01.JavaSE/' },
+          { text: 'JavaEE', link: '/10.Java/02.JavaEE/' },
+          { text: '软件', link: '/10.Java/11.软件/' },
+          { text: '工具', link: '/10.Java/12.工具/' },
+          { text: '框架', link: '/10.Java/13.框架/' },
+          { text: '中间件', link: '/10.Java/14.中间件/' },
+        ],
+      },
+      {
         text: '数据结构和算法',
         link: '/01.计算机科学/01.数据结构和算法/',
       },
@@ -72,7 +84,6 @@ module.exports = {
       {
         text: '编程',
         link: '/02.编程/',
-        items: [{ text: 'Java', link: '/02.编程/03.Java/' }],
       },
       {
         text: '设计',
