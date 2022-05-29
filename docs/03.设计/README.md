@@ -1,9 +1,9 @@
 ---
 title: 设计
 date: 2022-04-27 17:26:27
-categories: 
+categories:
   - 设计
-tags: 
+tags:
   - 编程
 permalink: /pages/8ea43c/
 abbrlink: 4fcba313
@@ -110,4 +110,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 🏠 [我的知识图谱](https://github.com/dunwu/warterdrop) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾
+◾ 💧 [我的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾

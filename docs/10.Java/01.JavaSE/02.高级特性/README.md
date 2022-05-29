@@ -1,12 +1,11 @@
 ---
 title: Java 高级特性
 date: 2020-06-04 13:51:01
-categories: 
-  - 编程
+categories:
   - Java
   - JavaSE
   - 高级特性
-tags: 
+tags:
   - Java
   - JavaSE
 permalink: /pages/016137/
@@ -24,6 +23,7 @@ hidden: true
 - [Java 编码和加密](02.Java编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`、`MD5`、`SHA`、`HMAC`、`AES`、`DES`、`DESede`、`RSA`
 - [Java 本地化](03.Java本地化.md)
 - [Java JDK8](04.JDK8.md) - 关键词：`Stream`、`lambda`、`Optional`、`@FunctionalInterface`
+- [Java SPI](05.JavaSPI.md) - 关键词：`SPI`、`ClassLoader`
 
 ## 📚 资料
 

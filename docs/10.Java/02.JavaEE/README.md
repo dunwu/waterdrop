@@ -1,11 +1,10 @@
 ---
 title: JavaEE
 date: 2022-02-18 08:53:11
-categories: 
-  - 编程
+categories:
   - Java
   - JavaEE
-tags: 
+tags:
   - Java
   - JavaEE
 permalink: /pages/80a822/

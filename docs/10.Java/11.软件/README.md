@@ -1,11 +1,10 @@
 ---
 title: Java 软件
 date: 2022-02-18 08:53:11
-categories: 
-  - 编程
+categories:
   - Java
   - 软件
-tags: 
+tags:
   - Java
 permalink: /pages/2cb045/
 abbrlink: bd90f980

@@ -1,10 +1,10 @@
 ---
 title: UML
 date: 2020-08-10 10:59:18
-categories: 
+categories:
   - 设计
   - UML
-tags: 
+tags:
   - 设计
   - UML
 permalink: /pages/13ccb0/
@@ -33,4 +33,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 🏠 [我的知识图谱](https://github.com/dunwu/warterdrop) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾
+◾ 💧 [我的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾

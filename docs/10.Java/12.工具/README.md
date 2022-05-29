@@ -1,11 +1,10 @@
 ---
 title: Java 工具
 date: 2022-02-18 08:53:11
-categories: 
-  - 编程
+categories:
   - Java
   - 工具
-tags: 
+tags:
   - Java
   - 工具
 permalink: /pages/1123e1/

@@ -1,10 +1,10 @@
 ---
 title: 架构
 date: 2019-03-08 13:16:53
-categories: 
+categories:
   - 设计
   - 架构
-tags: 
+tags:
   - 架构
 permalink: /pages/d9e5d2/
 abbrlink: 2582d3b8
@@ -64,4 +64,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 🏠 [我的知识图谱](https://github.com/dunwu/warterdrop) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾
+◾ 💧 [我的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾

@@ -1,9 +1,9 @@
 ---
 title: DevOps
 date: 2022-04-27 20:26:27
-categories: 
+categories:
   - DevOps
-tags: 
+tags:
   - DevOps
 permalink: /pages/1883b8/
 abbrlink: a7787d29
@@ -30,4 +30,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 🏠 [我的知识图谱](https://github.com/dunwu/warterdrop) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾
+◾ 💧 [我的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾

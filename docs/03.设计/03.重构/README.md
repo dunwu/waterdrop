@@ -1,10 +1,10 @@
 ---
 title: 重构
 date: 2021-04-29 16:05:03
-categories: 
+categories:
   - 设计
   - 重构
-tags: 
+tags:
   - 设计
   - 重构
 permalink: /pages/d200c3/
@@ -38,4 +38,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 🏠 [我的知识图谱](https://github.com/dunwu/warterdrop) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾
+◾ 💧 [我的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [我的博客](https://dunwu.github.io/blog/) ◾

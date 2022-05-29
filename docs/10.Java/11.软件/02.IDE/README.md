@@ -1,12 +1,11 @@
 ---
 title: Java IDE
 date: 2022-02-18 08:53:11
-categories: 
-  - 编程
+categories:
   - Java
   - 软件
   - IDE
-tags: 
+tags:
   - Java
   - IDE
 permalink: /pages/8695a7/
