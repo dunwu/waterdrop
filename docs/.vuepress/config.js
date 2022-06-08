@@ -97,6 +97,10 @@ module.exports = {
         text: '工作',
         link: '/96.工作/',
       },
+      {
+        text: '笔记',
+        link: '/99.笔记/',
+      },
     ],
     sidebarDepth: 2, // 侧边栏显示深度，默认1，最大2（显示到h3标题）
     logo: 'https://raw.githubusercontent.com/dunwu/images/dev/common/dunwu-logo.png', // 导航栏logo

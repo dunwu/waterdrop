@@ -100,7 +100,7 @@ function integrateGitalk(router) {
     console.info(fullPath)
     const gitalk = new Gitalk({
       clientID: 'fc4fe65ebf0d9829e544',
-      clientSecret: '1927ca1d0473d93836f8e5e72c45f84e033e12e1zc', // come from github development
+      clientSecret: 'c026380eea4b4f1a308d39d6b556cdbd5e220139', // come from github development
       repo: 'waterdrop',
       owner: 'dunwu',
       admin: ['dunwu'],
