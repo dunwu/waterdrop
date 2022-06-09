@@ -12,15 +12,15 @@ module.exports = {
     // 注入到页面<head> 中的标签，格式[tagName, { attrName: attrValue }, innerHTML?]
     ['link', { rel: 'icon', href: '/img/favicon.ico' }], //favicons，资源放在public文件夹
     ['meta', { name: 'keywords', content: 'vuepress,theme,blog,vdoing' }],
-    ['meta', { name: 'theme-color', content: '#11a8cd' }], // 移动浏览器主题颜色
+    ['meta', { name: 'theme-color', content: '#11a8cd' }] // 移动浏览器主题颜色
   ],
   markdown: {
     // lineNumbers: true,
     extractHeaders: ['h2', 'h3', 'h4', 'h5', 'h6'], // 提取标题到侧边栏的级别，默认['h2', 'h3']
     externalLinks: {
       target: '_blank',
-      rel: 'noopener noreferrer',
-    },
+      rel: 'noopener noreferrer'
+    }
   },
   // 主题配置
   themeConfig: {
@@ -34,12 +34,12 @@ module.exports = {
           { text: '软件', link: '/10.Java/11.软件/' },
           { text: '工具', link: '/10.Java/12.工具/' },
           { text: '框架', link: '/10.Java/13.框架/' },
-          { text: '中间件', link: '/10.Java/14.中间件/' },
-        ],
+          { text: '中间件', link: '/10.Java/14.中间件/' }
+        ]
       },
       {
         text: '数据结构和算法',
-        link: '/01.计算机科学/01.数据结构和算法/',
+        link: '/01.计算机科学/01.数据结构和算法/'
       },
       {
         text: '数据库',
@@ -53,54 +53,54 @@ module.exports = {
             items: [
               { text: '综合', link: '/03.关系型数据库/01.综合/' },
               { text: 'Mysql', link: '/03.关系型数据库/02.Mysql/' },
-              { text: '其他', link: '/03.关系型数据库/99.其他/' },
-            ],
+              { text: '其他', link: '/03.关系型数据库/99.其他/' }
+            ]
           },
           {
             text: '文档数据库',
-            items: [{ text: 'MongoDB', link: '/01.计算机科学/02.数据库/04.文档数据库/01.MongoDB/' }],
+            items: [{ text: 'MongoDB', link: '/01.计算机科学/02.数据库/04.文档数据库/01.MongoDB/' }]
           },
           {
             text: 'KV数据库',
-            items: [{ text: 'Redis', link: '/01.计算机科学/02.数据库/05.KV数据库/01.Redis/' }],
+            items: [{ text: 'Redis', link: '/01.计算机科学/02.数据库/05.KV数据库/01.Redis/' }]
           },
           {
             text: '搜索引擎数据库',
             items: [
               { text: 'Elasticsearch', link: '/01.计算机科学/02.数据库/07.搜索引擎数据库/01.Elasticsearch/' },
-              { text: 'Elastic技术栈', link: '/01.计算机科学/02.数据库/07.搜索引擎数据库/02.Elastic/' },
-            ],
-          },
-        ],
+              { text: 'Elastic技术栈', link: '/01.计算机科学/02.数据库/07.搜索引擎数据库/02.Elastic/' }
+            ]
+          }
+        ]
       },
       {
         text: '网络',
-        link: '/01.计算机科学/03.网络/',
+        link: '/01.计算机科学/03.网络/'
       },
       {
         text: '分布式',
-        link: '/01.计算机科学/11.分布式/',
+        link: '/01.计算机科学/11.分布式/'
       },
       {
         text: '编程',
-        link: '/02.编程/',
+        link: '/02.编程/'
       },
       {
         text: '设计',
-        link: '/03.设计/',
+        link: '/03.设计/'
       },
       {
         text: 'DevOps',
-        link: '/04.DevOps/',
+        link: '/04.DevOps/'
       },
       {
         text: '工作',
-        link: '/96.工作/',
+        link: '/96.工作/'
       },
       {
         text: '笔记',
-        link: '/99.笔记/',
-      },
+        link: '/99.笔记/'
+      }
     ],
     sidebarDepth: 2, // 侧边栏显示深度，默认1，最大2（显示到h3标题）
     logo: 'https://raw.githubusercontent.com/dunwu/images/dev/common/dunwu-logo.png', // 导航栏logo
@@ -119,7 +119,7 @@ module.exports = {
     sidebarOpen: true, // 初始状态是否打开侧边栏，默认true
     updateBar: {
       // 最近更新栏
-      showToArticle: true, // 显示到文章页底部，默认true
+      showToArticle: true // 显示到文章页底部，默认true
       // moreArticle: '/archives' // “更多文章”跳转的页面，默认'/archives'
     },
     // titleBadge: false, // 文章标题前的图标是否显示，默认true
@@ -144,7 +144,7 @@ module.exports = {
     author: {
       // 文章默认的作者信息，可在md文件中单独配置此信息 String | {name: String, href: String}
       name: 'dunwu', // 必需
-      href: 'https://github.com/dunwu', // 可选的
+      href: 'https://github.com/dunwu' // 可选的
     },
     social: {
       // 社交图标，显示于博主信息栏和页脚栏
@@ -153,21 +153,21 @@ module.exports = {
         {
           iconClass: 'icon-youjian',
           title: '发邮件',
-          link: 'mailto:forbreak@163.com',
+          link: 'mailto:forbreak@163.com'
         },
         {
           iconClass: 'icon-github',
           title: 'GitHub',
-          link: 'https://github.com/dunwu',
-        },
-      ],
+          link: 'https://github.com/dunwu'
+        }
+      ]
     },
     footer: {
       // 页脚信息
       createYear: 2019, // 博客创建年份
-      copyrightInfo: '钝悟（dunwu） | CC-BY-SA-4.0', // 博客版权信息，支持a标签
+      copyrightInfo: '钝悟（dunwu） | CC-BY-SA-4.0' // 博客版权信息，支持a标签
     },
-    htmlModules,
+    htmlModules
   },
 
   // 插件
@@ -177,8 +177,8 @@ module.exports = {
       {
         // 鼠标点击爱心特效
         color: '#11a8cd', // 爱心颜色，默认随机色
-        excludeClassName: 'theme-vdoing-content', // 要排除元素的class, 默认空''
-      },
+        excludeClassName: 'theme-vdoing-content' // 要排除元素的class, 默认空''
+      }
     ],
 
     ['fulltext-search'], // 全文搜索
@@ -208,8 +208,8 @@ module.exports = {
         copySelector: ['div[class*="language-"] pre', 'div[class*="aside-code"] aside'], // String or Array
         copyMessage: '复制成功', // default is 'Copy successfully and then paste it for use.'
         duration: 1000, // prompt message display time.
-        showInMobile: false, // whether to display on the mobile side, default: false.
-      },
+        showInMobile: false // whether to display on the mobile side, default: false.
+      }
     ],
     [
       'demo-block',
@@ -221,18 +221,18 @@ module.exports = {
           // vue: 'https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js', // 在线示例中的vue依赖
           jsfiddle: false, // 是否显示 jsfiddle 链接
           codepen: true, // 是否显示 codepen 链接
-          horizontal: false, // 是否展示为横向样式
-        },
-      },
+          horizontal: false // 是否展示为横向样式
+        }
+      }
     ],
     [
       'vuepress-plugin-zooming', // 放大图片
       {
         selector: '.theme-vdoing-content img:not(.no-zoom)',
         options: {
-          bgColor: 'rgba(0,0,0,0.6)',
-        },
-      },
+          bgColor: 'rgba(0,0,0,0.6)'
+        }
+      }
     ],
     [
       '@vuepress/last-updated', // "上次更新"时间格式
@@ -240,11 +240,30 @@ module.exports = {
         transformer: (timestamp, lang) => {
           const dayjs = require('dayjs') // https://day.js.org/
           return dayjs(timestamp).format('YYYY/MM/DD, HH:mm:ss')
-        },
-      },
+        }
+      }
     ],
+    [
+      'vuepress-plugin-comment', // 评论
+      {
+        choosen: 'gitalk',
+        options: {
+          clientID: 'fc4fe65ebf0d9829e544',
+          clientSecret: 'c026380eea4b4f1a308d39d6b556cdbd5e220139',
+          repo: 'waterdrop', // GitHub 仓库
+          owner: 'dunwu', // GitHub仓库所有者
+          admin: ['dunwu'], // 对仓库有写权限的人
+          // distractionFreeMode: true,
+          pagerDirection: 'last', // 'first'正序 | 'last'倒序
+          id: '<%- (frontmatter.permalink || frontmatter.to.path).slice(-16) %>', //  页面的唯一标识,长度不能超过50
+          title: '「评论」<%- frontmatter.title %>', // GitHub issue 的标题
+          labels: ['Gitalk', 'Comment'], // GitHub issue 的标签
+          body: '页面：<%- window.location.origin + (frontmatter.to.path || window.location.pathname) %>' // GitHub issue 的内容
+        }
+      }
+    ]
   ],
 
   // 监听文件变化并重新构建
-  extraWatchFiles: ['.vuepress/config.js', '.vuepress/config/htmlModules.js'],
+  extraWatchFiles: ['.vuepress/config.js', '.vuepress/config/htmlModules.js']
 }
