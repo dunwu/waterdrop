@@ -24,7 +24,7 @@ hidden: true
 ### 分布式理论
 
 - **理论**
-  - [分布式理论](01.分布式理论/01.分布式基础理论.md) - 关键词：`拜占庭将军`、`CAP`、`BASE`、`错误的分布式假设`
+  - [分布式基础理论](01.分布式理论/01.分布式基础理论.md) - 关键词：`拜占庭将军`、`CAP`、`BASE`、`错误的分布式假设`
 - **算法**
   - [分布式算法 Paxos](01.分布式理论/11.Paxos算法.md) - 关键词：`共识性算法`
   - [分布式算法 Raft](01.分布式理论/12.Raft算法.md) - 关键词：`共识性算法`
@@ -32,12 +32,19 @@ hidden: true
 
 ### 分布式协同
 
-- 集群
-- [分布式复制](11.分布式协同/02.分布式复制.md)
-- [分布式分区](11.分布式协同/03.分布式分区.md)
-- 选主
-- [分布式事务](11.分布式协同/05.分布式事务.md) - 关键词：`2PC`、`3PC`、`TCC`、`本地消息表`、`MQ 消息`、`SAGA`
-- [分布式锁](11.分布式协同/06.分布式锁.md) - 关键词：`数据库`、`Redis`、`ZooKeeper`、`互斥`、`可重入`、`死锁`、`容错`、`自旋尝试`
+- **分布式协同综合**
+  - 集群
+  - [分布式复制](11.分布式协同/01.分布式协同综合/02.分布式复制.md)
+  - 分区
+  - 选主
+  - [分布式事务](11.分布式协同/01.分布式协同综合/05.分布式事务.md) - 关键词：`2PC`、`3PC`、`TCC`、`本地消息表`、`MQ 消息`、`SAGA`
+  - [分布式锁](11.分布式协同/01.分布式协同综合/06.分布式锁.md) - 关键词：`数据库`、`Redis`、`ZooKeeper`、`互斥`、`可重入`、`死锁`、`容错`、`自旋尝试`
+- **ZooKeeper**
+  - [ZooKeeper 原理](11.分布式协同/02.ZooKeeper/ZooKeeper原理.md)
+  - [ZooKeeper 命令](11.分布式协同/02.ZooKeeper/ZooKeeper命令.md)
+  - [ZooKeeper 运维](11.分布式协同/02.ZooKeeper/ZooKeeper运维.md)
+  - [ZooKeeper Java Api](11.分布式协同/02.ZooKeeper/ZooKeeperJavaApi.md)
+  - [ZooKeeper Acl](11.分布式协同/02.ZooKeeper/ZooKeeperAcl.md)
 
 ### 分布式调度
 
@@ -119,8 +126,8 @@ hidden: true
 
 #### Raft 资料
 
-- [Raft 一致性算法论文原文](https://ramcloud.atlassian.net/wiki/download/attachments/6586375/raft.pdf)
-- [Raft 一致性算法论文译文](https://github.com/maemual/raft-zh_cn/blob/master/raft-zh_cn.md)
+- [Raft 算法论文原文](https://ramcloud.atlassian.net/wiki/download/attachments/6586375/raft.pdf)
+- [Raft 算法论文译文](https://github.com/maemual/raft-zh_cn/blob/master/raft-zh_cn.md)
 - [Raft 作者讲解视频](https://www.youtube.com/watch?v=YbZ3zDzDnrw&feature=youtu.be)
 - [Raft 作者讲解视频对应的 PPT](http://www2.cs.uh.edu/~paris/6360/PowerPoint/Raft.ppt)
 - [Raft 算法详解](https://zhuanlan.zhihu.com/p/32052223)
