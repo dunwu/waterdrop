@@ -13,6 +13,8 @@ hidden: true
 
 ## 📖 内容
 
+- [RocketMQ 快速入门](01.RocketMQ快速入门.md)
+
 ## 📚 资料
 
 - [RocketMQ 官方文档](http://rocketmq.apache.org/docs/quick-start/)
