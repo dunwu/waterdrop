@@ -1,9 +1,11 @@
 ---
 title: RocketMQ
+date: 2022-07-07 21:12:25
 categories:
   - 分布式
   - 分布式通信
   - MQ
+  - RocketMQ
 tags:
   - MQ
 hidden: true
