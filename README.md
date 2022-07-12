@@ -390,9 +390,9 @@
   - [分布式锁](docs/15.分布式/11.分布式协同/01.分布式协同综合/06.分布式锁.md) - 关键词：`数据库`、`Redis`、`ZooKeeper`、`互斥`、`可重入`、`死锁`、`容错`、`自旋尝试`
 - **ZooKeeper**
   - [ZooKeeper 原理](docs/15.分布式/11.分布式协同/02.ZooKeeper/01.ZooKeeper原理.md)
-  - [ZooKeeper 命令](docs/15.分布式/11.分布式协同/02.ZooKeeper/02.ZooKeeper命令.md)
-  - [ZooKeeper 运维](docs/15.分布式/11.分布式协同/02.ZooKeeper/03.ZooKeeper运维.md)
-  - [ZooKeeper Java Api](docs/15.分布式/11.分布式协同/02.ZooKeeper/04.ZooKeeperJavaApi.md)
+  - [ZooKeeper Java Api](docs/15.分布式/11.分布式协同/02.ZooKeeper/02.ZooKeeperJavaApi.md)
+  - [ZooKeeper 命令](docs/15.分布式/11.分布式协同/02.ZooKeeper/03.ZooKeeper命令.md)
+  - [ZooKeeper 运维](docs/15.分布式/11.分布式协同/02.ZooKeeper/04.ZooKeeper运维.md)
   - [ZooKeeper Acl](docs/15.分布式/11.分布式协同/02.ZooKeeper/05.ZooKeeperAcl.md)
 
 #### 分布式调度
@@ -436,10 +436,15 @@
 - [Kafka 流式处理](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/07.Kafka流式处理.md)
 - [Kafka 运维](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/08.Kafka运维.md)
 
+##### RocketMQ
+
+- [RocketMQ 快速入门](docs/15.分布式/21.分布式通信/02.MQ/02.RocketMQ/01.RocketMQ快速入门.md)
+- [RocketMQ 基本原理](docs/15.分布式/21.分布式通信/02.MQ/02.RocketMQ/02.RocketMQ基本原理.md)
+- [RocketMQ Faq](docs/15.分布式/21.分布式通信/02.MQ/02.RocketMQ/99.RocketMQFaq.md)
+
 ##### 其他 MQ
 
 - [ActiveMQ](docs/15.分布式/21.分布式通信/02.MQ/99.其他MQ/01.ActiveMQ.md)
-- [RocketMQ](docs/15.分布式/21.分布式通信/02.MQ/99.其他MQ/02.RocketMQ.md)
 
 #### 分布式存储
 
