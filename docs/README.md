@@ -19,7 +19,7 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now Dunwu
   </a>
 
   <a href="https://github.com/dunwu/waterdrop/commits/master">
-      <img alt="commit" class="no-zoom" src="https://img.shields.io/github/workflow/status/dunwu/waterdrop/CI?style=for-the-badge">
+      <img alt="build" class="no-zoom" src="https://img.shields.io/github/actions/workflow/status/dunwu/waterdrop/deploy.yml?style=for-the-badge">
   </a>
 
   <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">
