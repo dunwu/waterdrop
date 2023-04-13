@@ -155,12 +155,16 @@ hidden: true
 
 ### HBase
 
-> [HBase](https://dunwu.github.io/bigdata-tutorial/hbase) 📚 因为常用于大数据项目，所以将其文档和源码整理在 [bigdata-tutorial](https://dunwu.github.io/bigdata-tutorial/) 项目中。
-
-- [HBase 原理](https://github.com/dunwu/bigdata-tutorial/blob/master/docs/hbase/HBase原理.md) ⚡
-- [HBase 命令](https://github.com/dunwu/bigdata-tutorial/blob/master/docs/hbase/HBase命令.md)
-- [HBase 应用](https://github.com/dunwu/bigdata-tutorial/blob/master/docs/hbase/HBase应用.md)
-- [HBase 运维](https://github.com/dunwu/bigdata-tutorial/blob/master/docs/hbase/HBase运维.md)
+- [HBase 快速入门](06.列式数据库/01.HBase/01.HBase快速入门.md)
+- [HBase 数据模型](06.列式数据库/01.HBase/02.HBase数据模型.md)
+- [HBase Schema 设计](06.列式数据库/01.HBase/03.HBaseSchema设计.md)
+- [HBase 架构](06.列式数据库/01.HBase/04.HBase架构.md)
+- [HBase Java API 基础特性](06.列式数据库/01.HBase/10.HBaseJavaApi基础特性.md)
+- [HBase Java API 高级特性之过滤器](06.列式数据库/01.HBase/11.HBaseJavaApi高级特性之过滤器.md)
+- [HBase Java API 高级特性之协处理器](06.列式数据库/01.HBase/12.HBaseJavaApi高级特性之协处理器.md)
+- [HBase Java API 其他高级特性](06.列式数据库/01.HBase/13.HBaseJavaApi其他高级特性.md)
+- [HBase 运维](06.列式数据库/01.HBase/21.HBase运维.md)
+- [HBase 命令](06.列式数据库/01.HBase/22.HBase命令.md)
 
 ## 搜索引擎数据库
 

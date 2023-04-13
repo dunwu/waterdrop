@@ -180,7 +180,7 @@
 #### Java IO
 
 - [JSON 序列化](docs/01.Java/12.工具/01.IO/01.JSON序列化.md) - [fastjson](https://github.com/alibaba/fastjson)、[Jackson](https://github.com/FasterXML/jackson)、[Gson](https://github.com/google/gson)
-- [二进制序列化](docs/01.Java/12.工具/01.IO/02.二进制序列化.md) - [Protobuf](https://developers.google.com/protocol-buffers)、[Thrift](https://thrift.apache.org/)、[Hessian](docs/02.编程/http://hessian.caucho.com/)、[Kryo](https://github.com/EsotericSoftware/kryo)、[FST](https://github.com/RuedigerMoeller/fast-serialization)
+- [二进制序列化](docs/01.Java/12.工具/01.IO/02.二进制序列化.md) - [Protobuf](https://developers.google.com/protocol-buffers)、[Thrift](https://thrift.apache.org/)、[Hessian](http://hessian.caucho.com/)、[Kryo](https://github.com/EsotericSoftware/kryo)、[FST](https://github.com/RuedigerMoeller/fast-serialization)
 
 #### JavaBean 工具
 
@@ -227,20 +227,35 @@
 - [Spring IoC](docs/01.Java/13.框架/01.Spring/01.Spring核心/02.SpringIoC.md)
 - [Spring 依赖查找](docs/01.Java/13.框架/01.Spring/01.Spring核心/03.Spring依赖查找.md)
 - [Spring 依赖注入](docs/01.Java/13.框架/01.Spring/01.Spring核心/04.Spring依赖注入.md)
+- [Spring IoC 依赖来源](docs/01.Java/13.框架/01.Spring/01.Spring核心/05.SpringIoC依赖来源.md)
+- [Spring Bean 作用域](docs/01.Java/13.框架/01.Spring/01.Spring核心/06.SpringBean作用域.md)
+- [Spring Bean 生命周期](docs/01.Java/13.框架/01.Spring/01.Spring核心/07.SpringBean生命周期.md)
+- [Spring 配置元数据](docs/01.Java/13.框架/01.Spring/01.Spring核心/08.Spring配置元数据.md)
 - [Spring AOP](docs/01.Java/13.框架/01.Spring/01.Spring核心/10.SpringAop.md)
-- [Spring 资源管理](docs/01.Java/13.框架/01.Spring/01.Spring核心/11.Spring资源管理.md)
-- [SpringBoot 教程之快速入门](docs/01.Java/13.框架/01.Spring/01.Spring核心/21.SpringBoot之快速入门.md)
-- [SpringBoot 之属性加载](docs/01.Java/13.框架/01.Spring/01.Spring核心/22.SpringBoot之属性加载.md)
-- [SpringBoot 之 Profile](docs/01.Java/13.框架/01.Spring/01.Spring核心/23.SpringBoot之Profile.md)
+- [Spring 资源管理](docs/01.Java/13.框架/01.Spring/01.Spring核心/20.Spring资源管理.md)
+- [Spring 校验](docs/01.Java/13.框架/01.Spring/01.Spring核心/21.Spring校验.md)
+- [Spring 数据绑定](docs/01.Java/13.框架/01.Spring/01.Spring核心/22.Spring数据绑定.md)
+- [Spring 类型转换](docs/01.Java/13.框架/01.Spring/01.Spring核心/23.Spring类型转换.md)
+- [Spring EL 表达式](docs/01.Java/13.框架/01.Spring/01.Spring核心/24.SpringEL.md)
+- [Spring 事件](docs/01.Java/13.框架/01.Spring/01.Spring核心/25.Spring事件.md)
+- [Spring 国际化](docs/01.Java/13.框架/01.Spring/01.Spring核心/26.Spring国际化.md)
+- [Spring 泛型处理](docs/01.Java/13.框架/01.Spring/01.Spring核心/27.Spring泛型处理.md)
+- [Spring 注解](docs/01.Java/13.框架/01.Spring/01.Spring核心/28.Spring注解.md)
+- [Spring Environment 抽象](docs/01.Java/13.框架/01.Spring/01.Spring核心/29.SpringEnvironment抽象.md)
+- [SpringBoot 教程之快速入门](docs/01.Java/13.框架/01.Spring/01.Spring核心/31.SpringBoot之快速入门.md)
+- [SpringBoot 之属性加载](docs/01.Java/13.框架/01.Spring/01.Spring核心/32.SpringBoot之属性加载.md)
+- [SpringBoot 之 Profile](docs/01.Java/13.框架/01.Spring/01.Spring核心/33.SpringBoot之Profile.md)
 
 ##### 数据
 
-- [Spring 连接数据源](docs/01.Java/13.框架/01.Spring/02.Spring数据/01.Spring连接数据源.md)
+- [Spring 之数据源](docs/01.Java/13.框架/01.Spring/02.Spring数据/01.Spring之数据源.md)
 - [Spring 之 JDBC](docs/01.Java/13.框架/01.Spring/02.Spring数据/02.Spring之JDBC.md)
 - [Spring 之事务](docs/01.Java/13.框架/01.Spring/02.Spring数据/03.Spring之事务.md)
-- [SpringBoot 之 Mybatis](docs/01.Java/13.框架/01.Spring/02.Spring数据/22.SpringBoot之Mybatis.md)
-- [SpringBoot 之 MongoDB](docs/01.Java/13.框架/01.Spring/02.Spring数据/23.SpringBoot之MongoDB.md)
-- [SpringBoot 之 Elasticsearch](docs/01.Java/13.框架/01.Spring/02.Spring数据/24.SpringBoot之Elasticsearch.md)
+- [Spring 之 JPA](docs/01.Java/13.框架/01.Spring/02.Spring数据/04.Spring之JPA.md)
+- [Spring 集成 Mybatis](docs/01.Java/13.框架/01.Spring/02.Spring数据/10.Spring集成Mybatis.md)
+- [Spring 访问 Redis](docs/01.Java/13.框架/01.Spring/02.Spring数据/21.Spring访问Redis.md)
+- [Spring 访问 MongoDB](docs/01.Java/13.框架/01.Spring/02.Spring数据/22.Spring访问MongoDB.md)
+- [Spring 访问 Elasticsearch](docs/01.Java/13.框架/01.Spring/02.Spring数据/23.Spring访问Elasticsearch.md)
 
 ##### Web
 
@@ -344,7 +359,7 @@
 
 > [关系型数据库](docs/12.数据库/03.关系型数据库) 整理主流关系型数据库知识点。
 
-##### 关系型数据库综合
+##### 公共知识
 
 - [关系型数据库面试总结](docs/12.数据库/03.关系型数据库/01.综合/01.关系型数据库面试.md) 💯
 - [SQL 语法基础特性](docs/12.数据库/03.关系型数据库/01.综合/02.SQL语法基础特性.md)
@@ -353,6 +368,8 @@
 - [SQL Cheat Sheet](docs/12.数据库/03.关系型数据库/01.综合/99.SqlCheatSheet.md)
 
 ##### Mysql
+
+![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200716103611.png)
 
 - [Mysql 应用指南](docs/12.数据库/03.关系型数据库/02.Mysql/01.Mysql应用指南.md) ⚡
 - [Mysql 工作流](docs/12.数据库/03.关系型数据库/02.Mysql/02.MySQL工作流.md) - 关键词：`连接`、`缓存`、`语法分析`、`优化`、`执行引擎`、`redo log`、`bin log`、`两阶段提交`
@@ -395,6 +412,8 @@
 
 ##### Redis
 
+![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200713105627.png)
+
 - [Redis 面试总结](docs/12.数据库/05.KV数据库/01.Redis/01.Redis面试总结.md) 💯
 - [Redis 应用指南](docs/12.数据库/05.KV数据库/01.Redis/02.Redis应用指南.md) ⚡ - 关键词：`内存淘汰`、`事件`、`事务`、`管道`、`发布与订阅`
 - [Redis 数据类型和应用](docs/12.数据库/05.KV数据库/01.Redis/03.Redis数据类型和应用.md) - 关键词：`STRING`、`HASH`、`LIST`、`SET`、`ZSET`、`BitMap`、`HyperLogLog`、`Geo`
@@ -404,6 +423,21 @@
 - [Redis 集群](docs/12.数据库/05.KV数据库/01.Redis/07.Redis集群.md) - 关键词：`CLUSTER MEET`、`Hash slot`、`MOVED`、`ASK`、`SLAVEOF no one`、`redis-trib`
 - [Redis 实战](docs/12.数据库/05.KV数据库/01.Redis/08.Redis实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
 - [Redis 运维](docs/12.数据库/05.KV数据库/01.Redis/20.Redis运维.md) 🔨 - 关键词：`安装`、`命令`、`集群`、`客户端`
+
+#### 列式数据库
+
+##### HBase
+
+- [HBase 快速入门](docs/12.数据库/06.列式数据库/01.HBase/01.HBase快速入门.md)
+- [HBase 数据模型](docs/12.数据库/06.列式数据库/01.HBase/02.HBase数据模型.md)
+- [HBase Schema 设计](docs/12.数据库/06.列式数据库/01.HBase/03.HBaseSchema设计.md)
+- [HBase 架构](docs/12.数据库/06.列式数据库/01.HBase/04.HBase架构.md)
+- [HBase Java API 基础特性](docs/12.数据库/06.列式数据库/01.HBase/10.HBaseJavaApi基础特性.md)
+- [HBase Java API 高级特性之过滤器](docs/12.数据库/06.列式数据库/01.HBase/11.HBaseJavaApi高级特性之过滤器.md)
+- [HBase Java API 高级特性之协处理器](docs/12.数据库/06.列式数据库/01.HBase/12.HBaseJavaApi高级特性之协处理器.md)
+- [HBase Java API 其他高级特性](docs/12.数据库/06.列式数据库/01.HBase/13.HBaseJavaApi其他高级特性.md)
+- [HBase 运维](docs/12.数据库/06.列式数据库/01.HBase/21.HBase运维.md)
+- [HBase 命令](docs/12.数据库/06.列式数据库/01.HBase/22.HBase命令.md)
 
 #### 搜索引擎数据库
 
@@ -485,10 +519,10 @@
 #### 分布式协同
 
 - **分布式协同综合**
-- 集群
+  - 集群
   - [分布式复制](docs/15.分布式/11.分布式协同/01.分布式协同综合/02.分布式复制.md)
   - 分区
-- 选主
+  - 选主
   - [分布式事务](docs/15.分布式/11.分布式协同/01.分布式协同综合/05.分布式事务.md) - 关键词：`2PC`、`3PC`、`TCC`、`本地消息表`、`MQ 消息`、`SAGA`
   - [分布式锁](docs/15.分布式/11.分布式协同/01.分布式协同综合/06.分布式锁.md) - 关键词：`数据库`、`Redis`、`ZooKeeper`、`互斥`、`可重入`、`死锁`、`容错`、`自旋尝试`
 - **ZooKeeper**
@@ -664,7 +698,7 @@
 ### 监控
 
 - [监控体系](docs/04.DevOps/03.监控/01.监控体系.md)
-- [链路监控](docs/04.DevOps/03.监控/02.链路监控.md)
+- [链路监控](docs/04.DevOps/03.监控/02.链路追踪.md)
 
 ### 工具
 

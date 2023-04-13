@@ -93,6 +93,10 @@ module.exports = {
             items: [{ text: 'Redis', link: '/12.数据库/05.KV数据库/01.Redis/' }]
           },
           {
+            text: '列式数据库',
+            items: [{ text: 'HBase', link: '/12.数据库/06.列式数据库/01.HBase/' }]
+          },
+          {
             text: '搜索引擎数据库',
             items: [
               { text: 'Elasticsearch', link: '/12.数据库/07.搜索引擎数据库/01.Elasticsearch/' },
