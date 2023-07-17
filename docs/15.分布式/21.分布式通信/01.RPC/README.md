@@ -22,7 +22,6 @@ hidden: true
 - [RPC 基础](00.RPC综合/01.RPC基础.md)
 - [RPC 进阶](00.RPC综合/02.RPC进阶.md)
 - [RPC 高级](00.RPC综合/03.RPC高级.md)
-- [服务注册和发现](00.RPC综合/11.服务注册和发现.md)
 
 ## 📚 资料
 
