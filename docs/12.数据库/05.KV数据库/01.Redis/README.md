@@ -23,7 +23,7 @@ hidden: true
 
 ## 📖 内容
 
-### [Redis 面试总结 💯](01.Redis面试总结.md)
+### [Redis 面试总结 💯](01.Redis面试.md)
 
 ### [Redis 应用指南 ⚡](02.Redis应用指南.md)
 

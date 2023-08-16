@@ -414,7 +414,7 @@
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200713105627.png)
 
-- [Redis 面试总结](docs/12.数据库/05.KV数据库/01.Redis/01.Redis面试总结.md) 💯
+- [Redis 面试总结](docs/12.数据库/05.KV数据库/01.Redis/01.Redis面试.md) 💯
 - [Redis 应用指南](docs/12.数据库/05.KV数据库/01.Redis/02.Redis应用指南.md) ⚡ - 关键词：`内存淘汰`、`事件`、`事务`、`管道`、`发布与订阅`
 - [Redis 数据类型和应用](docs/12.数据库/05.KV数据库/01.Redis/03.Redis数据类型和应用.md) - 关键词：`STRING`、`HASH`、`LIST`、`SET`、`ZSET`、`BitMap`、`HyperLogLog`、`Geo`
 - [Redis 持久化](docs/12.数据库/05.KV数据库/01.Redis/04.Redis持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
