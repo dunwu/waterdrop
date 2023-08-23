@@ -1,5 +1,5 @@
 ---
-title: 数据库
+title: DB-TUTORIAL
 date: 2022-02-22 21:01:01
 categories:
   - 数据库
@@ -139,17 +139,19 @@ hidden: true
 
 ### Redis
 
-![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200713105627.png)
+![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20230823225649.png)
 
-- [Redis 面试总结](05.KV数据库/01.Redis/01.Redis面试.md) 💯
-- [Redis 应用指南](05.KV数据库/01.Redis/02.Redis应用指南.md) ⚡ - 关键词：`内存淘汰`、`事件`、`事务`、`管道`、`发布与订阅`
-- [Redis 数据类型和应用](05.KV数据库/01.Redis/03.Redis数据类型和应用.md) - 关键词：`STRING`、`HASH`、`LIST`、`SET`、`ZSET`、`BitMap`、`HyperLogLog`、`Geo`
-- [Redis 持久化](05.KV数据库/01.Redis/04.Redis持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
-- [Redis 复制](05.KV数据库/01.Redis/05.Redis复制.md) - 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`REPLCONF ACK`
-- [Redis 哨兵](05.KV数据库/01.Redis/06.Redis哨兵.md) - 关键词：`Sentinel`、`PING`、`INFO`、`Raft`
-- [Redis 集群](05.KV数据库/01.Redis/07.Redis集群.md) - 关键词：`CLUSTER MEET`、`Hash slot`、`MOVED`、`ASK`、`SLAVEOF no one`、`redis-trib`
-- [Redis 实战](05.KV数据库/01.Redis/08.Redis实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
-- [Redis 运维](05.KV数据库/01.Redis/20.Redis运维.md) 🔨 - 关键词：`安装`、`命令`、`集群`、`客户端`
+- [Redis 面试](05.KV数据库/01.Redis/01.Redis面试.md) 💯
+- [Redis 数据类型](05.KV数据库/01.Redis/02.Redis数据类型.md) - 关键词：`String`、`Hash`、`List`、`Set`、`Zset`、`BitMap`、`HyperLogLog`、`Geo`、`Stream`
+- [Redis 数据结构](05.KV数据库/01.Redis/03.Redis数据结构.md) - 关键词：`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`、`对象`
+- [Redis 过期删除](05.KV数据库/01.Redis/04.Redis过期删除.md)
+- [Redis 持久化](05.KV数据库/01.Redis/05.Redis持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
+- [Redis 独立功能](05.KV数据库/01.Redis/06.Redis独立功能.md) - 关键词：`发布与订阅`、`事务`、`Lua`、`管道`
+- [Redis 复制](05.KV数据库/01.Redis/11.Redis复制.md) - 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`REPLCONF ACK`
+- [Redis 哨兵](05.KV数据库/01.Redis/12.Redis哨兵.md) - 关键词：`Sentinel`、`PING`、`INFO`、`Raft`
+- [Redis 集群](05.KV数据库/01.Redis/13.Redis集群.md) - 关键词：`CLUSTER MEET`、`Hash slot`、`MOVED`、`ASK`、`SLAVEOF no one`、`redis-trib`
+- [Redis 实战](05.KV数据库/01.Redis/21.Redis实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
+- [Redis 运维](05.KV数据库/01.Redis/20.Redis运维.md) 🔨 - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
 
 ## 列式数据库
 

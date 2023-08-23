@@ -23,62 +23,71 @@ hidden: true
 
 ## 📖 内容
 
-### [Redis 面试总结 💯](01.Redis面试.md)
+### [Redis 面试](01.Redis面试.md) 💯
 
-### [Redis 应用指南 ⚡](02.Redis应用指南.md)
+### [Redis 数据类型](02.Redis数据类型.md)
 
-> 关键词：`内存淘汰`、`事件`、`事务`、`管道`、`发布与订阅`
+> 关键词：`String`、`Hash`、`List`、`Set`、`Zset`、`BitMap`、`HyperLogLog`、`Geo`、`Stream`
 
-![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200713105627.png)
+![](https://raw.githubusercontent.com/dunwu/images/dev/snap/20230823230053.png)
 
-### [Redis 数据类型和应用](03.Redis数据类型和应用.md)
+### [Redis 数据结构](03.Redis数据结构.md)
 
-> 关键词：`STRING`、`HASH`、`LIST`、`SET`、`ZSET`、`BitMap`、`HyperLogLog`、`Geo`
+> 关键词：`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`、`对象`
 
-![Redis 数据类型](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200226113813.png)
+![](https://raw.githubusercontent.com/dunwu/images/dev/snap/20230824073719.png)
 
-### [Redis 持久化](04.Redis持久化.md)
+### [Redis 过期删除](04.Redis过期删除.md)
 
+### [Redis 持久化](05.Redis持久化.md)
+
+> Redis 是内存型数据库，为了保证数据在宕机后不会丢失，需要将内存中的数据持久化到硬盘上。
+>
+> Redis 支持两种持久化方式：RDB 和 AOF。
+>
 > 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200224214047.png)
 
-### [Redis 复制](05.Redis复制.md)
+### [Redis 独立功能](06.Redis独立功能.md)
+
+> 关键词：`发布与订阅`、`事务`、`Lua`、`管道`
+
+### [Redis 复制](11.Redis复制.md)
 
 > 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`REPLCONF ACK`
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200712182603.png)
 
-### [Redis 哨兵](06.Redis哨兵.md)
+### [Redis 哨兵](12.Redis哨兵.md)
 
-> Redis 哨兵（Sentinel）是 Redis 的高可用性（Hight Availability）解决方案。
->
-> Redis 哨兵是 Raft 算法 的具体实现。
+> Redis 哨兵（Sentinel）是 Redis 的高可用性（High Availability）解决方案，它是基于 Raft 协议实现的。哨兵可以监听主服务器，并在主服务器进入下线状态时，自动从从服务器中选举出新的主服务器。
 >
 > 关键词：`Sentinel`、`PING`、`INFO`、`Raft`
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200713072747.png)
 
-### [Redis 集群](07.Redis集群.md)
+### [Redis 集群](13.Redis集群.md)
 
 > 关键词：`CLUSTER MEET`、`Hash slot`、`MOVED`、`ASK`、`SLAVEOF no one`、`redis-trib`
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200713100613.png)
 
-### [Redis 实战](08.Redis实战.md)
+### [Redis 实战](21.Redis实战.md)
 
 > 关键词：`缓存`、`分布式锁`、`布隆过滤器`
 
-### [Redis 运维 🔨](20.Redis运维.md)
+### [Redis 运维](20.Redis运维.md) 🔨
 
-> 关键词：`安装`、`命令`、`集群`、`客户端`
+> 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
 
 ## 📚 资料
 
 - **官网**
   - [Redis 官网](https://redis.io/)
-  - [Redis github](https://github.com/antirez/redis)
+  - [Redis Github](https://github.com/antirez/redis)
   - [Redis 官方文档中文版](http://redis.cn/)
+  - [Redis 在线环境](https://try.redis.io/)
 - **书籍**
   - [《Redis 实战》](https://item.jd.com/11791607.html)
   - [《Redis 设计与实现》](https://item.jd.com/11486101.html)
@@ -93,10 +102,11 @@ hidden: true
   - [awesome-redis](https://github.com/JamzyWang/awesome-redis)
 - **Redis Client**
   - [spring-data-redis 官方文档](https://docs.spring.io/spring-data/redis/docs/1.8.13.RELEASE/reference/html/)
-  - [redisson 官方文档(中文,略有滞后)](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95)
-  - [redisson 官方文档(英文)](https://github.com/redisson/redisson/wiki/Table-of-Content)
+  - [Redisson 官方文档(中文,略有滞后)](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95)
+  - [Redisson 官方文档(英文)](https://github.com/redisson/redisson/wiki/Table-of-Content)
   - [CRUG | Redisson PRO vs. Jedis: Which Is Faster? 翻译](https://www.jianshu.com/p/82f0d5abb002)
   - [redis 分布锁 Redisson 性能测试](https://blog.csdn.net/everlasting_188/article/details/51073505)
+  - [RedisDesktopManager](https://github.com/uglide/RedisDesktopManager)
 
 ## 🚪 传送
 
