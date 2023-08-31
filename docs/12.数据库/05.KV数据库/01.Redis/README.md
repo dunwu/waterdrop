@@ -29,13 +29,13 @@ hidden: true
 
 > 关键词：`String`、`Hash`、`List`、`Set`、`Zset`、`BitMap`、`HyperLogLog`、`Geo`、`Stream`
 
-![](https://raw.githubusercontent.com/dunwu/images/dev/snap/20230823230053.png)
+![](https://raw.githubusercontent.com/dunwu/images/dev/snap/20230901071808.png)
 
 ### [Redis 数据结构](03.Redis数据结构.md)
 
-> 关键词：`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`、`对象`
+> 关键词：`对象`、`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`
 
-![](https://raw.githubusercontent.com/dunwu/images/dev/snap/20230824073719.png)
+![](https://raw.githubusercontent.com/dunwu/images/dev/snap/20230901071535.png)
 
 ### [Redis 过期删除](04.Redis过期删除.md)
 
