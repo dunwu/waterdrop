@@ -144,7 +144,7 @@ hidden: true
 - [Redis 面试](05.KV数据库/01.Redis/01.Redis面试.md) 💯
 - [Redis 数据类型](05.KV数据库/01.Redis/02.Redis数据类型.md) - 关键词：`String`、`Hash`、`List`、`Set`、`Zset`、`BitMap`、`HyperLogLog`、`Geo`、`Stream`
 - [Redis 数据结构](05.KV数据库/01.Redis/03.Redis数据结构.md) - 关键词：`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`、`对象`
-- [Redis 过期删除](05.KV数据库/01.Redis/04.Redis过期删除.md)
+- [Redis 过期删除和内存淘汰](05.KV数据库/01.Redis/04.Redis过期删除和内存淘汰.md) - 关键词：`定时删除`、`惰性删除`、`定期删除`、`LRU`、`LFU`
 - [Redis 持久化](05.KV数据库/01.Redis/05.Redis持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
 - [Redis 独立功能](05.KV数据库/01.Redis/06.Redis独立功能.md) - 关键词：`发布与订阅`、`事务`、`Lua`、`管道`
 - [Redis 复制](05.KV数据库/01.Redis/11.Redis复制.md) - 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`REPLCONF ACK`

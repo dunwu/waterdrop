@@ -37,7 +37,9 @@ hidden: true
 
 ![](https://raw.githubusercontent.com/dunwu/images/dev/snap/20230901071535.png)
 
-### [Redis 过期删除](04.Redis过期删除.md)
+### [Redis 过期删除和内存淘汰](04.Redis过期删除和内存淘汰.md)
+
+> 关键词：`定时删除`、`惰性删除`、`定期删除`、`LRU`、`LFU`
 
 ### [Redis 持久化](05.Redis持久化.md)
 
