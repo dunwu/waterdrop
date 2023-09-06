@@ -57,7 +57,7 @@ hidden: true
 
 ### [Redis 复制](11.Redis复制.md)
 
-> 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`REPLCONF ACK`
+> 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`命令传播`、`心跳`
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200712182603.png)
 
@@ -65,7 +65,7 @@ hidden: true
 
 > Redis 哨兵（Sentinel）是 Redis 的高可用性（High Availability）解决方案，它是基于 Raft 协议实现的。哨兵可以监听主服务器，并在主服务器进入下线状态时，自动从从服务器中选举出新的主服务器。
 >
-> 关键词：`Sentinel`、`PING`、`INFO`、`Raft`
+> 关键词：`高可用`、`监控`、`选主`、`故障转移`、`Raft`
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200713072747.png)
 
