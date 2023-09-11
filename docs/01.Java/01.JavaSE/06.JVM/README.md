@@ -11,6 +11,7 @@ tags:
   - JVM
 permalink: /pages/51172b/
 hidden: true
+index: false
 ---
 
 # JVM 教程

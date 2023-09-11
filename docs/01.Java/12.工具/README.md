@@ -9,6 +9,7 @@ tags:
   - 工具
 permalink: /pages/1123e1/
 hidden: true
+index: false
 ---
 
 # Java 工具

@@ -10,6 +10,7 @@ tags:
   - 解决方案
 permalink: /pages/c38eff/
 hidden: true
+index: false
 ---
 
 # 解决方案

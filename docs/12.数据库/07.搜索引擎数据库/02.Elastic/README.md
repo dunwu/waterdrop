@@ -11,6 +11,7 @@ tags:
   - Elastic
 permalink: /pages/7bf7f7/
 hidden: true
+index: false
 ---
 
 # Elastic 技术栈

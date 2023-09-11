@@ -11,6 +11,7 @@ tags:
   - ORM
 permalink: /pages/fe879a/
 hidden: true
+index: false
 ---
 
 # Java ORM 框架

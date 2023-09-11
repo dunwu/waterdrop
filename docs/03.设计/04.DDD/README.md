@@ -9,6 +9,7 @@ tags:
   - DDD
 permalink: /pages/833925/
 hidden: true
+index: false
 ---
 
 # 领域驱动设计

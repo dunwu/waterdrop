@@ -12,6 +12,7 @@ tags:
   - SpringBoot
 permalink: /pages/a1a3d3/
 hidden: true
+index: false
 ---
 
 # SPRING-TUTORIAL

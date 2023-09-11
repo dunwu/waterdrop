@@ -10,6 +10,7 @@ tags:
   - HBase
 permalink: /pages/417be6/
 hidden: true
+index: false
 ---
 
 # HBase 教程

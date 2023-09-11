@@ -7,6 +7,7 @@ tags:
   - 分布式
 permalink: /pages/f21e8c/
 hidden: true
+index: false
 ---
 
 # 分布式
@@ -109,35 +110,56 @@ hidden: true
 
 #### 分布式理论综合资料
 
-- [The Google File System](https://static.googleusercontent.com/media/research.google.com/en//archive/gfs-sosp2003.pdf)：Google 三大经典论文之一
-- [Bigtable: A Distributed Storage System for Structured Data](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)：Google 三大经典论文之一
-- [MapReduce: Simplifed Data Processing on Large Clusters](https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf)：Google 三大经典论文之一
-- [分布式系统原理与范型](https://book.douban.com/subject/11691266/)：书原名 Distributed Systems Principles and Paradigms。经典分布式教程，介绍了分布式系统的七大核心原理，并给出了大量的例子；系统讲述了分布式系统的概念和技术，包括通信、进程、命名、同步化、一致性和复制、容错以及安全等。
-- [The fallacies of distributed computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing)
-- [Distributed Systems for fun and profit](http://book.mixu.net/distsys/single-page.html)：全书分为五章，讲述了扩展性、可用性、性能和容错等基础知识，FLP 不可能性和 CAP 定理，探讨了大量的一致性模型；讨论了时间和顺序，及时钟的各种用法。随后，探讨了复制问题，如何防止差异，以及如何接受差异。此外，每章末尾都给出了针对本章内容的扩展阅读资源列表，这些资料是对本书内容的很好补充。
-- [分布式技术原理与算法解析](https://time.geekbang.org/column/intro/100036401) - 极客时间教程
-- [分布式协议与算法实战](https://time.geekbang.org/column/intro/100046101) - 极客时间教程
+- **教程**
+  - [分布式技术原理与算法解析](https://time.geekbang.org/column/intro/100036401) - 极客时间教程
+  - [分布式协议与算法实战](https://time.geekbang.org/column/intro/100046101) - 极客时间教程
+  - [Distributed Systems for fun and profit](http://book.mixu.net/distsys/single-page.html)：分为五章，讲述了扩展性、可用性、性能和容错等基础知识，FLP 不可能性和 CAP 定理，探讨了大量的一致性模型；讨论了时间和顺序，及时钟的各种用法。随后，探讨了复制问题，如何防止差异，以及如何接受差异。此外，每章末尾都给出了针对本章内容的扩展阅读资源列表，这些资料是对本书内容的很好补充。
+- **书籍**
+  - [分布式系统原理与范型](https://book.douban.com/subject/11691266/)：书原名 Distributed Systems Principles and Paradigms。经典分布式教程，介绍了分布式系统的七大核心原理，并给出了大量的例子；系统讲述了分布式系统的概念和技术，包括通信、进程、命名、同步化、一致性和复制、容错以及安全等。
+- **文章**
+  - [The Google File System](https://static.googleusercontent.com/media/research.google.com/en//archive/gfs-sosp2003.pdf)：Google 三大经典论文之一
+  - [Bigtable: A Distributed Storage System for Structured Data](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)：Google 三大经典论文之一
+  - [MapReduce: Simplifed Data Processing on Large Clusters](https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf)：Google 三大经典论文之一
+  - [Time, Clocks, and the Ordering of Events in a Distributed System](https://lamport.azurewebsites.net/pubs/time-clocks.pdf)
+  - [The Byzantine Generals Problem](https://lamport.azurewebsites.net/pubs/byz.pdf)
+  - [Brewer’s Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services](https://www.comp.nus.edu.sg/~gilbert/pubs/BrewersConjecture-SigAct.pdf) - CAP 论文
+  - CAP Twelve Years Later: How the “Rules” Have Changed
+  - BASE: An Acid Alternative
+  - A Simple Totally Ordered Broadcast Protocol
+  - Virtual Time and Global States of Distributed Systems
+  - [The fallacies of distributed computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing)
 
-#### Paxos 资料
+#### 分布式一致性算法
 
-- [Part-time Parliament 论文](https://research.microsoft.com/en-us/um/people/lamport/pubs/lamport-paxos.pdf) - Lamport 的 Paxos 论文。这篇论文很权威，但较为晦涩难懂。
-- [Paxos Made Simple 论文](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf)
-- [Paxos 算法详解](https://zhuanlan.zhihu.com/p/31780743)
-- Neat Algorithms - Paxos
-- [Wiki - Paxos 算法](https://zh.wikipedia.org/w/index.php?title=Paxos%E7%AE%97%E6%B3%95)
-- [一致性算法（Paxos、Raft、Zab）](https://www.bilibili.com/video/BV1TW411M7Fx?from=search&seid=11524608198747599965)
-- [Raft 作者讲解 Paxos 视频](https://www.bilibili.com/video/av36556594)
-- [Paxos 算法讲解视频](https://www.youtube.com/watch?v=d7nAGI_NZPk)
+- **教程**
+  - [Raft: Understandable Distributed Consensus](http://thesecretlivesofdata.com/raft) - 一个动画教程
+  - [The Raft Consensus Algorithm](https://raft.github.io/) - 一个交互式动画教程
+- **视频**
+  - [Raft 作者讲解 Paxos 视频](https://www.bilibili.com/video/av36556594)
+  - [Paxos 算法讲解视频](https://www.youtube.com/watch?v=d7nAGI_NZPk)
+  - [Raft 作者讲解视频](https://www.youtube.com/watch?v=YbZ3zDzDnrw&feature=youtu.be)
+  - [Raft 作者讲解视频对应的 PPT](http://www2.cs.uh.edu/~paris/6360/PowerPoint/Raft.ppt)
+- 文章
 
-#### Raft 资料
+  - [Part-time Parliament 论文](https://research.microsoft.com/en-us/um/people/lamport/pubs/lamport-paxos.pdf)
+  - [Paxos Made Simple 论文](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf)
+  - Paxos Made Practical
+  - Paxos Made Live: An Engineering Perspective
+  - Using Paxos to Build a Scalable, Consistent, and Highly Available Datastore
+    Impossibility of Distributed Consensus With One Faulty Process
+  - [Paxos 算法详解](https://zhuanlan.zhihu.com/p/31780743)
+  - [一致性算法（Paxos、Raft、Zab）](https://www.bilibili.com/video/BV1TW411M7Fx?from=search&seid=11524608198747599965)
+  - [分布式协议与算法实战](https://time.geekbang.org/column/intro/100046101)
 
-- [Raft 算法论文原文](https://ramcloud.atlassian.net/wiki/download/attachments/6586375/raft.pdf)
-- [Raft 算法论文译文](https://github.com/maemual/raft-zh_cn/blob/master/raft-zh_cn.md)
-- [Raft 作者讲解视频](https://www.youtube.com/watch?v=YbZ3zDzDnrw&feature=youtu.be)
-- [Raft 作者讲解视频对应的 PPT](http://www2.cs.uh.edu/~paris/6360/PowerPoint/Raft.ppt)
-- [Raft 算法详解](https://zhuanlan.zhihu.com/p/32052223)
-- [Raft: Understandable Distributed Consensus](http://thesecretlivesofdata.com/raft) - 一个动画教程
-- [The Raft Consensus Algorithm](https://raft.github.io/) - 一个交互式动画教程
+  - [Raft: In Search of an Understandable Consensus Algorithm](https://ramcloud.atlassian.net/wiki/download/attachments/6586375/raft.pdf)
+  - [Raft 算法论文译文](https://github.com/maemual/raft-zh_cn/blob/master/raft-zh_cn.md)
+  - [分布式系统的 Raft 算法](https://www.jdon.com/artichect/raft.html)
+  - [Raft 算法详解](https://zhuanlan.zhihu.com/p/32052223)
+  - A Brief History of Consensus, 2PC and Transaction Commit
+  - Consensus in the Presence of Partial Synchrony
+
+- 工具
+  - [sofa-jraft](https://github.com/sofastack/sofa-jraft) - 蚂蚁金服的 Raft 算法实现库（Java 版）
 
 #### Goosip 资料
 
@@ -158,15 +180,16 @@ hidden: true
 
 #### MQ 资料
 
-##### MQ 综合资料
-
 - **教程**
   - [消息队列高手课](https://time.geekbang.org/column/intro/100032301)
+  - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
+  - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/100029201)
+  - [Kafka 核心源码解读](https://time.geekbang.org/column/intro/304)
 - **文章**
+
   - [The Log: What every software engineer should know about real-time data’s unifying abstraction](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)
   - [《日志：每个软件工程师都应该知道的有关实时数据的统一抽象》](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying) - 上面文章的译文
-
-##### Kafka 资料
+  - [Introduction and Overview of Apache Kafka](https://www.slideshare.net/mumrah/kafka-talk-tri-hug)
 
 - **官方**
   - [Kafka 官网](http://kafka.apache.org/)
@@ -178,16 +201,43 @@ hidden: true
   - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
   - [《深入理解 Kafka：核心设计与实践原理》](https://item.jd.com/12489649.html)
   - [《Kafka 技术内幕》](https://item.jd.com/12234113.html)
-- **教程**
-  - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
-  - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/100029201)
-  - [Kafka 核心源码解读](https://time.geekbang.org/column/intro/304)
-- **文章**
-  - [Introduction and Overview of Apache Kafka](https://www.slideshare.net/mumrah/kafka-talk-tri-hug)
 
 ### 分布式存储资料
 
-- [《数据密集型应用系统设计》](https://book.douban.com/subject/30329536/) - 这可能是目前最好的分布式存储书籍，强力推荐【进阶】
+- **书籍**
+  - [《数据密集型应用系统设计》](https://book.douban.com/subject/30329536/) - 这可能是目前最好的分布式存储书籍，强力推荐【进阶】
+- **文章**
+  - Chord: A Scalable Peer-to-Peer Lookup Service for Internet Applications
+  - Pastry: Scalable, Distributed Object Location, and Routing for Large-Scale Peerto-Peer Systems
+  - Kademlia: A Peer-to-Peer Information System Based on the XOR Metric
+  - A Scalable Content-Addressable Network
+  - Ceph: A Scalable, High-Performance Distributed File System
+  - [The Log-Structured-Merge-Tree](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.cs.umb.edu/~poneil/lsmtree.pdf)
+  - [HBase: A NoSQL Database](https://www.researchgate.net/publication/317399857_HBase_A_NoSQL_Database)
+  - Tango: Distributed Data Structure over a Shared Log
+
+### 分布式系统实战
+
+- The Google File System
+- BigTable: A Distributed Storage System for Structured Data
+- The Chubby Lock Service for Loosely-Coupled Distributed Systems
+- Finding a Needle in Haystack: Facebook’s Photo Storage
+- Windows Azure Storage: A Highly Available Cloud Storage Service with Strong Consistency
+- Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing
+- Scaling Distributed Machine Learning with the Parameter Server
+- Dremel: Interactive Analysis of Web-Scale Datasets
+- Pregel: A System for Large-Scale Graph Processing
+- Spanner: Google’s Globally-Distributed Database
+- Dynamo: Amazon’s Highly Available Key-value Store
+- S4: Distributed Stream Computing Platform
+- Storm @Twitter
+- Large-scale Cluster Management at Google with Borg
+- F1 - The Fault-Tolerant Distributed RDBMS Supporting Google’s Ad Business
+- Cassandra: A Decentralized Structured Storage System
+- MegaStore: Providing Scalable, Highly Available Storage for Interactive Services
+- Dapper, a Large-Scale Distributed Systems Tracing Infrastructure
+- Kafka: A distributed Messaging System for Log Processing
+- Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases
 
 ## 🚪 传送
 

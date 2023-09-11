@@ -11,6 +11,7 @@ tags:
   - IO
 permalink: /pages/e285c8/
 hidden: true
+index: false
 ---
 
 # Java IO

@@ -9,6 +9,7 @@ tags:
   - 理论
 permalink: /pages/86cdf2/
 hidden: true
+index: false
 ---
 
 # 分布式理论

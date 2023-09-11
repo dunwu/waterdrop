@@ -10,6 +10,7 @@ tags:
   - Git
 permalink: /pages/d107ad/
 hidden: true
+index: false
 ---
 
 # Git 教程

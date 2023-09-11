@@ -10,6 +10,7 @@ tags:
   - 构建
 permalink: /pages/d1859b/
 hidden: true
+index: false
 ---
 
 # Java 构建

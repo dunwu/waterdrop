@@ -11,6 +11,7 @@ tags:
   - MongoDB
 permalink: /pages/b1a116/
 hidden: true
+index: false
 ---
 
 # MongoDB 教程

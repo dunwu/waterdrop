@@ -11,6 +11,7 @@ tags:
   - Elasticsearch
 permalink: /pages/74675e/
 hidden: true
+index: false
 ---
 
 # Elasticsearch 教程

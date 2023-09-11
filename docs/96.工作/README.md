@@ -7,6 +7,7 @@ tags:
   - 工作
 permalink: /pages/1cd051/
 hidden: true
+index: false
 ---
 
 # DevOps

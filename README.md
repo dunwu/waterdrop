@@ -28,8 +28,8 @@
 
 > 💧 waterdrop 是个人的技术文档归档仓库。
 >
-> - 🔁 项目同步维护：[Github](https://github.com/dunwu/waterdrop/) | [Gitee](https://gitee.com/turnon/waterdrop/)
-> - 📖 电子书阅读：[Github Pages](https://dunwu.github.io/waterdrop/) | [Gitee Pages](https://turnon.gitee.io/waterdrop/)
+> - 🔁 项目同步维护：[Github](https://github.com/dunwu/waterdrop/)
+> - 📖 电子书阅读：[Github Pages](https://dunwu.github.io/waterdrop/)
 
 ## Java
 
@@ -689,9 +689,9 @@
 
 ### UML
 
-- [UML 快速入门](docs/03.设计/11.UML/01.UML快速入门.md)
-- [UML 结构建模图](docs/03.设计/11.UML/02.UML结构建模图.md)
-- [UML 行为建模图](docs/03.设计/11.UML/03.UML行为建模图.md)
+- [UML 快速入门](docs/03.设计/05.UML/01.UML快速入门.md)
+- [UML 结构建模图](docs/03.设计/05.UML/02.UML结构建模图.md)
+- [UML 行为建模图](docs/03.设计/05.UML/03.UML行为建模图.md)
 
 ## DevOps
 

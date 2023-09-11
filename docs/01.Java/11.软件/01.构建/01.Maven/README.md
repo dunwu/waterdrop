@@ -12,6 +12,7 @@ tags:
   - Maven
 permalink: /pages/85f27a/
 hidden: true
+index: false
 ---
 
 # Maven 教程

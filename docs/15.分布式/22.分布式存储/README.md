@@ -9,6 +9,7 @@ tags:
   - 分布式通信
 permalink: /pages/42beb6/
 hidden: true
+index: false
 ---
 
 # 分布式存储

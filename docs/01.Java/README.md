@@ -7,6 +7,7 @@ tags:
   - Java
 permalink: /pages/0d2474/
 hidden: true
+index: false
 ---
 
 <p align="center">

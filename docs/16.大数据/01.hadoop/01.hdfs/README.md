@@ -11,6 +11,7 @@ tags:
   - HDFS
 permalink: /pages/8d798e/
 hidden: true
+index: false
 ---
 
 # HDFS 教程

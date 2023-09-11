@@ -9,6 +9,7 @@ tags:
   - 关系型数据库
 permalink: /pages/bb43eb/
 hidden: true
+index: false
 ---
 
 # 关系型数据库

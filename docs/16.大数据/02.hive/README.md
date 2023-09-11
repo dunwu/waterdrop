@@ -9,6 +9,7 @@ tags:
   - Hive
 permalink: /pages/a958fe/
 hidden: true
+index: false
 ---
 
 # Hive 教程

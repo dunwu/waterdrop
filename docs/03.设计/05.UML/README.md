@@ -9,6 +9,7 @@ tags:
   - UML
 permalink: /pages/13ccb0/
 hidden: true
+index: false
 ---
 
 # UML

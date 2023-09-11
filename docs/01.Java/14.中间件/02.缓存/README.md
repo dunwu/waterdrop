@@ -11,6 +11,7 @@ tags:
   - 缓存
 permalink: /pages/c4efe9/
 hidden: true
+index: false
 ---
 
 # Java 缓存

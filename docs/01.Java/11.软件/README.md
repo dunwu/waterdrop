@@ -8,6 +8,7 @@ tags:
   - Java
 permalink: /pages/2cb045/
 hidden: true
+index: false
 ---
 
 # Java 软件

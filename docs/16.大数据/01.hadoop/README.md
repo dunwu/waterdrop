@@ -9,6 +9,7 @@ tags:
   - Hadoop
 permalink: /pages/680e30/
 hidden: true
+index: false
 ---
 
 # Hadoop 教程

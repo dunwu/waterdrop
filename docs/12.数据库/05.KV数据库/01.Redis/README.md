@@ -11,6 +11,7 @@ tags:
   - Redis
 permalink: /pages/fe3808/
 hidden: true
+index: false
 ---
 
 # Redis 教程
@@ -51,9 +52,21 @@ hidden: true
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200224214047.png)
 
-### [Redis 独立功能](06.Redis独立功能.md)
+### [Redis 发布订阅](06.Redis发布订阅.md)
 
-> 关键词：`发布与订阅`、`事务`、`Lua`、`管道`
+> 关键词：`订阅`、`频道`、`模式`
+
+### [Redis 事务](07.Redis事务.md)
+
+> 关键词：`事务`、`ACID`
+
+### [Redis 管道](08.Redis管道.md)
+
+> 关键词：`Pipeline`
+
+### [Redis 脚本](09.Redis脚本.md)
+
+> 关键词：`Lua`
 
 ### [Redis 复制](11.Redis复制.md)
 
@@ -71,7 +84,7 @@ hidden: true
 
 ### [Redis 集群](13.Redis集群.md)
 
-> 关键词：`CLUSTER MEET`、`Hash slot`、`MOVED`、`ASK`、`SLAVEOF no one`、`redis-trib`
+> 关键词：`分区`、`重分区`、`寻址`、`故障转移`
 
 ![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200713100613.png)
 

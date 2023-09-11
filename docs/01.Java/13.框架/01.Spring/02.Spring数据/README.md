@@ -14,6 +14,7 @@ tags:
   - 数据库
 permalink: /pages/b912d1/
 hidden: true
+index: false
 ---
 
 # Spring 数据篇
@@ -71,4 +72,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [我的博客](https://github.com/dunwu/blog) ◾
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾ 🎯 [我的博客](https://github.com/dunwu/blog) ◾

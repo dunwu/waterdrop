@@ -10,6 +10,7 @@ tags:
   - 分布式协同
 permalink: /pages/2fe804/
 hidden: true
+index: false
 ---
 
 # 分布式协同

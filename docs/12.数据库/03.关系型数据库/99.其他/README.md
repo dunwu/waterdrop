@@ -10,6 +10,7 @@ tags:
   - 关系型数据库
 permalink: /pages/ca9888/
 hidden: true
+index: false
 ---
 
 # 关系型数据库其他知识

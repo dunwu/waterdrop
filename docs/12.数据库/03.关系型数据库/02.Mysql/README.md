@@ -11,6 +11,7 @@ tags:
   - Mysql
 permalink: /pages/a5b63b/
 hidden: true
+index: false
 ---
 
 # Mysql 教程

@@ -9,6 +9,7 @@ tags:
   - 重构
 permalink: /pages/d200c3/
 hidden: true
+index: false
 ---
 
 # 重构

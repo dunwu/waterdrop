@@ -10,6 +10,7 @@ tags:
   - 架构
 permalink: /pages/f3d238/
 hidden: true
+index: false
 ---
 
 # 架构综合

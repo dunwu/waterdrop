@@ -1,11 +1,45 @@
 ---
 home: true
-heroImage: img/bg.gif
-heroText: WATERDROP
-tagline: 💧 waterdrop 是个人的技术文档归档仓库。
-bannerBg: none
-postList: none
-footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now Dunwu
+layout: BlogHome
+icon: home
+title: 首页
+heroImage: /logo.svg
+heroText: 钝悟的博客
+heroFullScreen: true
+tagline: 大道至简，知易行难
+bgImage: https://raw.githubusercontent.com/dunwu/doc-project-template/master/assets/images/bg.jpg
+projects:
+  - icon: project
+    name: dunwu.github.io
+    desc: 个人的技术文档归档
+    link: https://github.com/dunwu/waterdrop
+
+  - icon: link
+    name: 链接名称
+    desc: 链接详细描述
+    link: https://链接地址
+
+  - icon: book
+    name: 书籍名称
+    desc: 书籍详细描述
+    link: https://你的书籍链接
+
+  - icon: article
+    name: 文章名称
+    desc: 文章详细描述
+    link: https://你的文章链接
+
+  - icon: friend
+    name: 伙伴名称
+    desc: 伙伴详细介绍
+    link: https://你的伙伴链接
+
+  - icon: /logo.svg
+    name: 自定义项目
+    desc: 自定义详细介绍
+    link: https://你的自定义链接
+
+footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 ---
 
 <p align="center">
@@ -28,12 +62,12 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now Dunwu
 
 </p>
 
-<h1 align="center">WATERDROP</h1>
+<h1 align="center">dunwu.github.io</h1>
 
-> 💧 waterdrop 是个人的技术文档归档仓库。
+> 💧 dunwu.github.io 是个人的技术文档归档仓库。
 >
-> - 🔁 项目同步维护：[Github](https://github.com/dunwu/waterdrop/) | [Gitee](https://gitee.com/turnon/waterdrop/)
-> - 📖 电子书阅读：[Github Pages](https://dunwu.github.io/waterdrop/) | [Gitee Pages](https://turnon.gitee.io/waterdrop/)
+> - 🔁 项目同步维护：[Github](https://github.com/dunwu/waterdrop/)
+> - 📖 电子书阅读：[Github Pages](https://dunwu.github.io/waterdrop/)
 
 ## Java
 
@@ -693,9 +727,9 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now Dunwu
 
 ### UML
 
-- [UML 快速入门](03.设计/11.UML/01.UML快速入门.md)
-- [UML 结构建模图](03.设计/11.UML/02.UML结构建模图.md)
-- [UML 行为建模图](03.设计/11.UML/03.UML行为建模图.md)
+- [UML 快速入门](03.设计/05.UML/01.UML快速入门.md)
+- [UML 结构建模图](03.设计/05.UML/02.UML结构建模图.md)
+- [UML 行为建模图](03.设计/05.UML/03.UML行为建模图.md)
 
 ## DevOps
 
