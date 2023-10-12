@@ -9,6 +9,7 @@ tags:
   - 理论
 permalink: /pages/86cdf2/
 hidden: true
+index: false
 ---
 
 # 分布式理论
@@ -32,14 +33,15 @@ hidden: true
 - [Bigtable: A Distributed Storage System for Structured Data](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)：Google 三大经典论文之一
 - [MapReduce: Simplifed Data Processing on Large Clusters](https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf)：Google 三大经典论文之一
 - [分布式系统原理与范型](https://book.douban.com/subject/11691266/)：书原名 Distributed Systems Principles and Paradigms。经典分布式教程，介绍了分布式系统的七大核心原理，并给出了大量的例子；系统讲述了分布式系统的概念和技术，包括通信、进程、命名、同步化、一致性和复制、容错以及安全等。
-- [The fallacies of distributed computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing)
-- [Distributed Systems for fun and profit](http://book.mixu.net/distsys/single-page.html)：全书分为五章，讲述了扩展性、可用性、性能和容错等基础知识，FLP 不可能性和 CAP 定理，探讨了大量的一致性模型；讨论了时间和顺序，及时钟的各种用法。随后，探讨了复制问题，如何防止差异，以及如何接受差异。此外，每章末尾都给出了针对本章内容的扩展阅读资源列表，这些资料是对本书内容的很好补充。
-- **CAP** 和 **BASE**
-  - [CAP Theorem](https://cryptographics.info/cryptographics/blockchain/cap-theorem/)
-  - [CAP twelve years later: How the "rules" have changed](https://www.semanticscholar.org/paper/CAP-twelve-years-later%3A-How-the-%22rules%22-have-Brewer/c9c73f5a1668b8bf12aae2efb6ac5a5a2c34002a)
-  - [CAP 定理的含义](https://www.ruanyifeng.com/blog/2018/07/cap.html) - by 阮一峰
-  - [神一样的 CAP 理论被应用在何方](https://juejin.im/post/5d720e86f265da03cc08de74)
-  - [BASE: An Acid Alternative](https://queue.acm.org/detail.cfm?id=1394128)
+- [The Eight Fallacies of Distributed Computing - Tech Talk](https://web.archive.org/web/20171107014323/http://blog.fogcreek.com/eight-fallacies-of-distributed-computing-tech-talk/) - 分布式系统新手常犯的 8 个错误，并探讨了其会带来的影响。
+- [Distributed Systems for Fun and Profit](http://book.mixu.net/distsys/) - 一本学习小册，涵盖了分布式系统中的关键问题，包括时间的作用和不同的复制策略。
+- [A Note on Distributed Systems](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.41.7628&rep=rep1&type=pdf) - 这是一篇经典的论文，讲述了为什么在分布式系统中，远程交互不能像本地对象那样进行。
+- [Amazon’s Highly Available Key-value Store](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)
+- [CAP Theorem](https://cryptographics.info/cryptographics/blockchain/cap-theorem/)
+- [CAP twelve years later: How the "rules" have changed](https://www.semanticscholar.org/paper/CAP-twelve-years-later%3A-How-the-%22rules%22-have-Brewer/c9c73f5a1668b8bf12aae2efb6ac5a5a2c34002a)
+- [CAP 定理的含义](https://www.ruanyifeng.com/blog/2018/07/cap.html) - by 阮一峰
+- [神一样的 CAP 理论被应用在何方](https://juejin.im/post/5d720e86f265da03cc08de74)
+- [BASE: An Acid Alternative](https://queue.acm.org/detail.cfm?id=1394128)
 
 ### 分布式算法
 
@@ -68,4 +70,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾

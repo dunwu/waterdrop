@@ -7,11 +7,12 @@ tags:
   - 数据结构和算法
 permalink: /pages/3ccbd4/
 hidden: true
+index: false
 ---
 
 <p align="center">
     <a href="https://dunwu.github.io/algorithm-tutorial/" target="_blank" rel="noopener noreferrer">
-        <img src="https://raw.githubusercontent.com/dunwu/images/dev/common/dunwu-logo.png" alt="logo" width="150px"/>
+        <img src="https://raw.githubusercontent.com/dunwu/images/master/common/dunwu-logo.png" alt="logo" width="150px"/>
     </a>
 </p>
 
@@ -26,7 +27,7 @@ hidden: true
   </a>
 
   <a href="https://github.com/dunwu/algorithm-tutorial/commits/master">
-      <img alt="commit" class="no-zoom" src="https://img.shields.io/github/workflow/status/dunwu/algorithm-tutorial/CI?style=for-the-badge">
+      <img alt="build" class="no-zoom" src="https://img.shields.io/github/actions/workflow/status/dunwu/algorithm-tutorial/deploy.yml?style=for-the-badge">
   </a>
 
   <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">
@@ -46,7 +47,7 @@ hidden: true
 
 ## 📖 内容
 
-![img](https://raw.githubusercontent.com/dunwu/images/dev/snap/20200702071922.png)
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200702071922.png)
 
 - 综合
   - [数据结构和算法指南](00.综合/01.数据结构和算法指南.md)
@@ -235,4 +236,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾

@@ -7,11 +7,12 @@ tags:
   - Java
 permalink: /pages/0d2474/
 hidden: true
+index: false
 ---
 
 <p align="center">
     <a href="https://dunwu.github.io/java-tutorial/" target="_blank" rel="noopener noreferrer">
-        <img src="https://raw.githubusercontent.com/dunwu/images/dev/common/dunwu-logo.png" alt="logo" width="150px"/>
+        <img src="https://raw.githubusercontent.com/dunwu/images/master/common/dunwu-logo.png" alt="logo" width="150px"/>
     </a>
 </p>
 
@@ -26,7 +27,7 @@ hidden: true
   </a>
 
   <a href="https://github.com/dunwu/java-tutorial/commits/master">
-      <img alt="commit" class="no-zoom" src="https://img.shields.io/github/workflow/status/dunwu/java-tutorial/CI?style=for-the-badge">
+      <img alt="build" class="no-zoom" src="https://img.shields.io/github/actions/workflow/status/dunwu/java-tutorial/deploy.yml?style=for-the-badge">
   </a>
 
   <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">
@@ -51,7 +52,79 @@ hidden: true
 
 ### JavaSE
 
-> 📚 [javacore](https://dunwu.github.io/javacore/) 是一个 Java 核心技术教程。内容包含：Java 基础特性、Java 高级特性、Java 并发、JVM、Java IO 等。
+#### [Java 基础特性](01.JavaSE/01.基础特性)
+
+- [Java 开发环境](01.JavaSE/01.基础特性/00.Java开发环境.md)
+- [Java 基础语法特性](01.JavaSE/01.基础特性/01.Java基础语法.md)
+- [Java 基本数据类型](01.JavaSE/01.基础特性/02.Java基本数据类型.md)
+- [Java 面向对象](01.JavaSE/01.基础特性/03.Java面向对象.md)
+- [Java 方法](01.JavaSE/01.基础特性/04.Java方法.md)
+- [Java 数组](01.JavaSE/01.基础特性/05.Java数组.md)
+- [Java 枚举](01.JavaSE/01.基础特性/06.Java枚举.md)
+- [Java 控制语句](01.JavaSE/01.基础特性/07.Java控制语句.md)
+- [Java 异常](01.JavaSE/01.基础特性/08.Java异常.md)
+- [Java 泛型](01.JavaSE/01.基础特性/09.Java泛型.md)
+- [Java 反射](01.JavaSE/01.基础特性/10.Java反射.md)
+- [Java 注解](01.JavaSE/01.基础特性/11.Java注解.md)
+- [Java String 类型](01.JavaSE/01.基础特性/42.JavaString类型.md)
+
+#### [Java 高级特性](01.JavaSE/02.高级特性)
+
+- [Java 正则从入门到精通](01.JavaSE/02.高级特性/01.Java正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`反向引用`、`零宽断言`、`贪婪与懒惰`、`元字符`、`DFA`、`NFA`
+- [Java 编码和加密](01.JavaSE/02.高级特性/02.Java编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`、`MD5`、`SHA`、`HMAC`、`AES`、`DES`、`DESede`、`RSA`
+- [Java 国际化](01.JavaSE/02.高级特性/03.Java国际化.md) - 关键词：`Locale`、`ResourceBundle`、`NumberFormat`、`DateFormat`、`MessageFormat`
+- [Java JDK8](01.JavaSE/02.高级特性/04.JDK8.md) - 关键词：`Stream`、`lambda`、`Optional`、`@FunctionalInterface`
+- [Java SPI](01.JavaSE/02.高级特性/05.JavaSPI.md) - 关键词：`SPI`、`ClassLoader`
+
+#### [Java 容器](01.JavaSE/03.容器)
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175550.png)
+
+- [Java 容器简介](01.JavaSE/03.容器/01.Java容器简介.md) - 关键词：`Collection`、`泛型`、`Iterable`、`Iterator`、`Comparable`、`Comparator`、`Cloneable`、`fail-fast`
+- [Java 容器之 List](01.JavaSE/03.容器/02.Java容器之List.md) - 关键词：`List`、`ArrayList`、`LinkedList`
+- [Java 容器之 Map](01.JavaSE/03.容器/03.Java容器之Map.md) - 关键词：`Map`、`HashMap`、`TreeMap`、`LinkedHashMap`、`WeakHashMap`
+- [Java 容器之 Set](01.JavaSE/03.容器/04.Java容器之Set.md) - 关键词：`Set`、`HashSet`、`TreeSet`、`LinkedHashSet`、`EmumSet`
+- [Java 容器之 Queue](01.JavaSE/03.容器/05.Java容器之Queue.md) - 关键词：`Queue`、`Deque`、`ArrayDeque`、`LinkedList`、`PriorityQueue`
+- [Java 容器之 Stream](01.JavaSE/03.容器/06.Java容器之Stream.md)
+
+#### [Java IO](01.JavaSE/04.IO)
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630205329.png)
+
+- [Java IO 模型](01.JavaSE/04.IO/01.JavaIO模型.md) - 关键词：`InputStream`、`OutputStream`、`Reader`、`Writer`、`阻塞`
+- [Java NIO](01.JavaSE/04.IO/02.JavaNIO.md) - 关键词：`Channel`、`Buffer`、`Selector`、`非阻塞`、`多路复用`
+- [Java 序列化](01.JavaSE/04.IO/03.Java序列化.md) - 关键词：`Serializable`、`serialVersionUID`、`transient`、`Externalizable`、`writeObject`、`readObject`
+- [Java 网络编程](01.JavaSE/04.IO/04.Java网络编程.md) - 关键词：`Socket`、`ServerSocket`、`DatagramPacket`、`DatagramSocket`
+- [Java IO 工具类](01.JavaSE/04.IO/05.JavaIO工具类.md) - 关键词：`File`、`RandomAccessFile`、`System`、`Scanner`
+
+#### [Java 并发](01.JavaSE/05.并发)
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175827.png)
+
+- [Java 并发简介](01.JavaSE/05.并发/01.Java并发简介.md) - 关键词：`进程`、`线程`、`安全性`、`活跃性`、`性能`、`死锁`、`饥饿`、`上下文切换`
+- [Java 线程基础](01.JavaSE/05.并发/02.Java线程基础.md) - 关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`
+- [Java 并发核心机制](01.JavaSE/05.并发/03.Java并发核心机制.md) - 关键词：`synchronized`、`volatile`、`CAS`、`ThreadLocal`
+- [Java 并发锁](01.JavaSE/05.并发/04.Java锁.md) - 关键词：`AQS`、`ReentrantLock`、`ReentrantReadWriteLock`、`Condition`
+- [Java 原子类](01.JavaSE/05.并发/05.Java原子类.md) - 关键词：`CAS`、`Atomic`
+- [Java 并发容器](01.JavaSE/05.并发/06.Java并发和容器.md) - 关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`
+- [Java 线程池](01.JavaSE/05.并发/07.Java线程池.md) - 关键词：`Executor`、`ExecutorService`、`ThreadPoolExecutor`、`Executors`
+- [Java 并发工具类](01.JavaSE/05.并发/08.Java并发工具类.md) - 关键词：`CountDownLatch`、`CyclicBarrier`、`Semaphore`
+- [Java 内存模型](01.JavaSE/05.并发/09.Java内存模型.md) - 关键词：`JMM`、`volatile`、`synchronized`、`final`、`Happens-Before`、`内存屏障`
+- [ForkJoin 框架](01.JavaSE/05.并发/10.ForkJoin框架.md)
+
+#### [Java 虚拟机](01.JavaSE/06.JVM)
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200628154803.png)
+
+- [JVM 体系结构](01.JavaSE/06.JVM/01.JVM体系结构.md)
+- [JVM 内存区域](01.JavaSE/06.JVM/02.JVM内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
+- [JVM 垃圾收集](01.JavaSE/06.JVM/03.JVM垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
+- [JVM 类加载](01.JavaSE/06.JVM/04.JVM类加载.md) - 关键词：`ClassLoader`、`双亲委派`
+- [JVM 字节码](01.JavaSE/06.JVM/05.JVM字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
+- [JVM 命令行工具](01.JavaSE/06.JVM/11.JVM命令行工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`
+- [JVM GUI 工具](01.JavaSE/06.JVM/12.JVM_GUI工具.md) - 关键词：`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
+- [JVM 实战](01.JavaSE/06.JVM/21.JVM实战.md) - 关键词：`配置`、`调优`
+- [Java 故障诊断](01.JavaSE/06.JVM/22.Java故障诊断.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
 
 ### JavaEE
 
@@ -156,33 +229,71 @@ hidden: true
 
 #### Spring
 
-📚 [spring-tutorial](https://dunwu.github.io/spring-tutorial/) 是一个 Spring 实战教程。
+##### 综合
 
-#### Spring Boot
+- [Spring 概述](13.框架/01.Spring/00.Spring综合/01.Spring概述.md)
+- [SpringBoot 知识图谱](13.框架/01.Spring/00.Spring综合/21.SpringBoot知识图谱.md)
+- [SpringBoot 基本原理](13.框架/01.Spring/00.Spring综合/22.SpringBoot基本原理.md)
+- [Spring 面试](13.框架/01.Spring/00.Spring综合/99.Spring面试.md)
 
-##### Spring Boot 基础篇
+##### 核心
 
-- [SpringBoot 知识图谱](13.框架/02.SpringBoot/00.SpringBoot综合/01.SpringBoot知识图谱.md)
-- [SpringBoot 基本原理](13.框架/02.SpringBoot/00.SpringBoot综合/02.SpringBoot基本原理.md)
+- [Spring Bean](13.框架/01.Spring/01.Spring核心/01.SpringBean.md)
+- [Spring IoC](13.框架/01.Spring/01.Spring核心/02.SpringIoC.md)
+- [Spring 依赖查找](13.框架/01.Spring/01.Spring核心/03.Spring依赖查找.md)
+- [Spring 依赖注入](13.框架/01.Spring/01.Spring核心/04.Spring依赖注入.md)
+- [Spring IoC 依赖来源](13.框架/01.Spring/01.Spring核心/05.SpringIoC依赖来源.md)
+- [Spring Bean 作用域](13.框架/01.Spring/01.Spring核心/06.SpringBean作用域.md)
+- [Spring Bean 生命周期](13.框架/01.Spring/01.Spring核心/07.SpringBean生命周期.md)
+- [Spring 配置元数据](13.框架/01.Spring/01.Spring核心/08.Spring配置元数据.md)
+- [Spring AOP](13.框架/01.Spring/01.Spring核心/10.SpringAop.md)
+- [Spring 资源管理](13.框架/01.Spring/01.Spring核心/20.Spring资源管理.md)
+- [Spring 校验](13.框架/01.Spring/01.Spring核心/21.Spring校验.md)
+- [Spring 数据绑定](13.框架/01.Spring/01.Spring核心/22.Spring数据绑定.md)
+- [Spring 类型转换](13.框架/01.Spring/01.Spring核心/23.Spring类型转换.md)
+- [Spring EL 表达式](13.框架/01.Spring/01.Spring核心/24.SpringEL.md)
+- [Spring 事件](13.框架/01.Spring/01.Spring核心/25.Spring事件.md)
+- [Spring 国际化](13.框架/01.Spring/01.Spring核心/26.Spring国际化.md)
+- [Spring 泛型处理](13.框架/01.Spring/01.Spring核心/27.Spring泛型处理.md)
+- [Spring 注解](13.框架/01.Spring/01.Spring核心/28.Spring注解.md)
+- [Spring Environment 抽象](13.框架/01.Spring/01.Spring核心/29.SpringEnvironment抽象.md)
+- [SpringBoot 教程之快速入门](13.框架/01.Spring/01.Spring核心/31.SpringBoot之快速入门.md)
+- [SpringBoot 之属性加载](13.框架/01.Spring/01.Spring核心/32.SpringBoot之属性加载.md)
+- [SpringBoot 之 Profile](13.框架/01.Spring/01.Spring核心/33.SpringBoot之Profile.md)
 
-##### Spring Boot 基础篇
+##### 数据
 
-- [SpringBoot 教程之快速入门](13.框架/02.SpringBoot/01.SpringBoot基础/01.SpringBoot之快速入门.md)
-- [SpringBoot 之属性加载](13.框架/02.SpringBoot/01.SpringBoot基础/02.SpringBoot之属性加载.md)
-- [SpringBoot 之 Profile](13.框架/02.SpringBoot/01.SpringBoot基础/03.SpringBoot之Profile.md)
+- [Spring 之数据源](13.框架/01.Spring/02.Spring数据/01.Spring之数据源.md)
+- [Spring 之 JDBC](13.框架/01.Spring/02.Spring数据/02.Spring之JDBC.md)
+- [Spring 之事务](13.框架/01.Spring/02.Spring数据/03.Spring之事务.md)
+- [Spring 之 JPA](13.框架/01.Spring/02.Spring数据/04.Spring之JPA.md)
+- [Spring 集成 Mybatis](13.框架/01.Spring/02.Spring数据/10.Spring集成Mybatis.md)
+- [Spring 访问 Redis](13.框架/01.Spring/02.Spring数据/21.Spring访问Redis.md)
+- [Spring 访问 MongoDB](13.框架/01.Spring/02.Spring数据/22.Spring访问MongoDB.md)
+- [Spring 访问 Elasticsearch](13.框架/01.Spring/02.Spring数据/23.Spring访问Elasticsearch.md)
 
-##### Spring Boot 数据篇
+##### Web
 
-- [SpringBoot 之 JDBC](13.框架/02.SpringBoot/03.SpringBoot数据/01.SpringBoot之JDBC.md)
-- [SpringBoot 之 Mybatis](13.框架/02.SpringBoot/03.SpringBoot数据/11.SpringBoot之Mybatis.md)
-- [SpringBoot 之 Elasticsearch](13.框架/02.SpringBoot/03.SpringBoot数据/22.SpringBoot之Elasticsearch.md)
-- [SpringBoot 之 MongoDB](13.框架/02.SpringBoot/03.SpringBoot数据/23.SpringBoot之MongoDB.md)
+- [Spring WebMvc](13.框架/01.Spring/03.SpringWeb/01.SpringWebMvc.md)
+- [SpringBoot 之应用 EasyUI](13.框架/01.Spring/03.SpringWeb/21.SpringBoot之应用EasyUI.md)
 
-##### Spring Boot IO 篇
+##### IO
 
-- [SpringBoot 之异步请求](13.框架/02.SpringBoot/04.SpringBootIO/01.SpringBoot之异步请求.md)
-- [SpringBoot 之 Json](13.框架/02.SpringBoot/04.SpringBootIO/02.SpringBoot之Json.md)
-- [SpringBoot 之邮件](13.框架/02.SpringBoot/04.SpringBootIO/03.SpringBoot之邮件.md)
+- [SpringBoot 之异步请求](13.框架/01.Spring/04.SpringIO/01.SpringBoot之异步请求.md)
+- [SpringBoot 之 Json](13.框架/01.Spring/04.SpringIO/02.SpringBoot之Json.md)
+- [SpringBoot 之邮件](13.框架/01.Spring/04.SpringIO/03.SpringBoot之邮件.md)
+
+##### 集成
+
+- [Spring 集成缓存中间件](13.框架/01.Spring/05.Spring集成/01.Spring集成缓存.md)
+- [Spring 集成定时任务中间件](13.框架/01.Spring/05.Spring集成/02.Spring集成调度器.md)
+- [Spring 集成 Dubbo](13.框架/01.Spring/05.Spring集成/03.Spring集成Dubbo.md)
+
+##### 其他
+
+- [Spring4 升级](13.框架/01.Spring/99.Spring其他/01.Spring4升级.md)
+- [SpringBoot 之 banner](13.框架/01.Spring/99.Spring其他/21.SpringBoot之banner.md)
+- [SpringBoot 之 Actuator](13.框架/01.Spring/99.Spring其他/22.SpringBoot之Actuator.md)
 
 #### ORM
 
@@ -212,9 +323,7 @@ hidden: true
 >
 > 如果想深入学习缓存，建议先了解一下 [缓存基本原理](https://dunwu.github.io/design/distributed/分布式缓存.html)，有助于理解缓存的特性、原理，使用缓存常见的问题及解决方案。
 
-- [缓存面试题](14.中间件/02.缓存/01.缓存面试题.md)
 - [Java 缓存中间件](14.中间件/02.缓存/02.Java缓存中间件.md)
-- [Memcached 快速入门](14.中间件/02.缓存/03.Memcached.md)
 - [Ehcache 快速入门](14.中间件/02.缓存/04.Ehcache.md)
 - [Java 进程内缓存](14.中间件/02.缓存/05.Java进程内缓存.md)
 - [Http 缓存](14.中间件/02.缓存/06.Http缓存.md)
@@ -255,4 +364,4 @@ hidden: true
 
 ## 🚪 传送
 
-◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾

@@ -12,7 +12,10 @@ module.exports = {
     // 注入到页面<head> 中的标签，格式[tagName, { attrName: attrValue }, innerHTML?]
     ['link', { rel: 'icon', href: '/img/favicon.ico' }], //favicons，资源放在public文件夹
     ['meta', { name: 'keywords', content: 'vuepress,theme,blog,vdoing' }],
-    ['meta', { name: 'theme-color', content: '#11a8cd' }] // 移动浏览器主题颜色
+    ['meta', { name: 'theme-color', content: '#11a8cd' }], // 移动浏览器主题颜色
+
+    ['meta', { name: 'wwads-cn-verify', content: 'mxqWx62nfQQ9ocT4e5DzISHzOWyF4s' }], // 广告相关，你可以去掉
+    ['script', { src: 'https://cdn.wwads.cn/js/makemoney.js', type: 'text/javascript' }], // 广告相关，你可以去掉
   ],
   markdown: {
     // lineNumbers: true,
@@ -43,7 +46,23 @@ module.exports = {
       },
       {
         text: '设计',
-        link: '/03.设计/'
+        link: '/03.设计/',
+        items: [
+          {
+            text: '架构',
+            link: '/03.设计/01.架构/',
+            items: [
+              { text: '综合', link: '/03.设计/01.架构/00.综合/' },
+              { text: '微服务', link: '/03.设计/01.架构/01.微服务/' },
+              { text: '安全', link: '/03.设计/01.架构/02.安全/' },
+              { text: '解决方案', link: '/03.设计/01.架构/99.解决方案/' }
+            ]
+          },
+          { text: '设计模式', link: '/03.设计/02.设计模式/' },
+          { text: '重构', link: '/03.设计/03.重构/' },
+          { text: 'DDD', link: '/03.设计/04.DDD/' },
+          { text: 'UML', link: '/03.设计/05.UML/' }
+        ]
       },
       {
         text: 'DevOps',
@@ -75,6 +94,10 @@ module.exports = {
           {
             text: 'KV数据库',
             items: [{ text: 'Redis', link: '/12.数据库/05.KV数据库/01.Redis/' }]
+          },
+          {
+            text: '列式数据库',
+            items: [{ text: 'HBase', link: '/12.数据库/06.列式数据库/01.HBase/' }]
           },
           {
             text: '搜索引擎数据库',
