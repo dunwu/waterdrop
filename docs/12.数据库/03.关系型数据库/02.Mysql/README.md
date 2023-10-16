@@ -37,8 +37,6 @@ index: false
 
 ### [Mysql 运维](20.Mysql运维.md)
 
-### [Mysql 配置](21.Mysql配置.md)
-
 ### [Mysql 面试](99.Mysql面试.md)
 
 ## 📚 资料
@@ -59,7 +57,8 @@ index: false
   - [《MySQL 技术内幕：InnoDB 存储引擎》](https://book.douban.com/subject/24708143/)
   - [《MySQL 必知必会》](https://book.douban.com/subject/3354490/) - Mysql 的基本概念和语法【入门】
 - **教程**
-  - [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
+  - [SQL 必知必会](https://time.geekbang.org/column/intro/192) - 极客 SQL 教程
+  - [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139) - 极客 Mysql 教程
   - [runoob.com MySQL 教程](http://www.runoob.com/mysql/mysql-tutorial.md) - 入门级 SQL 教程
   - [mysql-tutorial](https://github.com/jaywcjlove/mysql-tutorial)
 - **文章**

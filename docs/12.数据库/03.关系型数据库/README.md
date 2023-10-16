@@ -34,7 +34,6 @@ index: false
 - [Mysql 高可用](02.Mysql/06.Mysql高可用.md)
 - [Mysql 优化](02.Mysql/07.Mysql优化.md)
 - [Mysql 运维](02.Mysql/20.Mysql运维.md)
-- [Mysql 配置](02.Mysql/21.Mysql配置.md)
 - [Mysql 面试](02.Mysql/99.Mysql面试.md)
 
 ### 其他
