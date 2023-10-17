@@ -1,0 +1,23 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+skinparam style strictuml
+
+database 数据库 as db #F5F5F5
+database 缓存 as cache #F5F5F5
+control 应用 as app #DAE8FC
+
+participant app order 1
+participant db order 2
+participant cache order 3
+
+group 更新数据库
+app -[#6C8EBF]> db: update val = 1
+app -[#82B366]> db: update val = 2
+end
+group 更新缓存
+app -[#82B366]> cache: set val = 1
+app -[#6C8EBF]> cache: set val = 2
+end
+@enduml

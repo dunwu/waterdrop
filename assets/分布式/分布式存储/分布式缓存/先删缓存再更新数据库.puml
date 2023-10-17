@@ -1,0 +1,23 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+skinparam style strictuml
+
+database 数据库 as db #F5F5F5
+database 缓存 as cache #F5F5F5
+control 应用 as app #DAE8FC
+
+participant app order 1
+participant cache order 2
+participant db order 3
+
+app -[#6C8EBF]> cache: del val
+app -[#82B366]> cache: get val
+app <[#82B366]- cache: return val = null
+app -[#82B366]> db: select val
+app <[#82B366]- db: return val = 1
+app -[#82B366]> cache: set val = 1
+app -[#6C8EBF]> db: update val = 2
+
+@enduml
