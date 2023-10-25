@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+participant 事务A as TA order 1
+database test表 as db order 2
+participant 事务B as TB order 3
+
+TA -> TA: begin;
+TA -> db: select * from test where id = 4;\n结果：无输出
+TB -> TB: begin;
+TB -> db: insert into test values(5, 5);
+TB -> TB: commit;
+TA -> db: update test set value = 0 where id = 4;
+TA -> db: select * from test where id = 4;\n结果：id=4的记录
+TA -> TA: commit;
+
+@enduml
