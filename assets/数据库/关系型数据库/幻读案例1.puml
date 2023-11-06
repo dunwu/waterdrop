@@ -1,7 +1,63 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 
-participant 事务A as TA order 1
+'样式设置 Begin
+
+skinparam style strictuml
+skinparam BackgroundColor #E3FDFD
+skinparam Shadowing true
+skinparam defaultFontColor #0F4C75
+skinparam defaultFontSize 14
+skinparam ArrowColor #607D8B
+skinparam Padding 5
+
+'参与者样式设置
+
+skinparam ActorFontStyle Bold
+skinparam ActorFontColor #0F4C75
+skinparam ActorBorderColor #0F4C75
+skinparam ActorBackgroundColor #0F4C75
+
+skinparam BoundaryFontStyle Bold
+skinparam BoundaryFontColor #0F4C75
+skinparam BoundaryBorderColor #0F4C75
+skinparam BoundaryBackgroundColor #0F4C75
+
+skinparam CollectionsFontStyle Bold
+skinparam CollectionsFontColor #FFFFFF
+skinparam CollectionsBorderColor #FFFFFF
+skinparam CollectionsBackgroundColor #0F4C75
+
+skinparam ControlFontStyle Bold
+skinparam ControlFontColor #0F4C75
+skinparam ControlBorderColor #FFFFFF
+skinparam ControlBackgroundColor #0F4C75
+
+skinparam DatabaseFontStyle Bold
+skinparam DatabaseFontColor #0F4C75
+skinparam DatabaseBorderColor #FFFFFF
+skinparam DatabaseBackgroundColor #0F4C75
+
+skinparam EntityFontStyle Bold
+skinparam EntityFontColor #0F4C75
+skinparam EntityBorderColor #FFFFFF
+skinparam EntityBackgroundColor #0F4C75
+
+skinparam ParticipantFontStyle Bold
+skinparam ParticipantFontColor #FFFFFF
+skinparam ParticipantBorderColor #FFFFFF
+skinparam ParticipantBackgroundColor #0F4C75
+
+skinparam QueueFontStyle Bold
+skinparam QueueFontColor #FFFFFF
+skinparam QueueBorderColor #607D8B
+skinparam QueueBackgroundColor #0F4C75
+
+skinparam SequenceGroupBorderColor #607D8B
+
+'样式设置 End
+
+Queue 事务A as TA order 1
 database test表 as db order 2
 participant 事务B as TB order 3
 
