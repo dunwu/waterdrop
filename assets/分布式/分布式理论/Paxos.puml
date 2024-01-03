@@ -1,0 +1,72 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+'样式设置 Begin
+
+skinparam style strictuml
+skinparam BackgroundColor #E3FDFD
+skinparam Shadowing true
+skinparam defaultFontColor #0F4C75
+skinparam defaultFontSize 14
+skinparam ArrowColor #607D8B
+skinparam Padding 5
+
+'参与者样式设置
+
+skinparam ActorFontStyle Bold
+skinparam ActorFontColor #0F4C75
+skinparam ActorBorderColor #0F4C75
+skinparam ActorBackgroundColor #0F4C75
+
+skinparam BoundaryFontStyle Bold
+skinparam BoundaryFontColor #0F4C75
+skinparam BoundaryBorderColor #0F4C75
+skinparam BoundaryBackgroundColor #0F4C75
+
+skinparam CollectionsFontStyle Bold
+skinparam CollectionsFontColor #FFFFFF
+skinparam CollectionsBorderColor #FFFFFF
+skinparam CollectionsBackgroundColor #0F4C75
+
+skinparam ControlFontStyle Bold
+skinparam ControlFontColor #0F4C75
+skinparam ControlBorderColor #FFFFFF
+skinparam ControlBackgroundColor #0F4C75
+
+skinparam DatabaseFontStyle Bold
+skinparam DatabaseFontColor #0F4C75
+skinparam DatabaseBorderColor #FFFFFF
+skinparam DatabaseBackgroundColor #0F4C75
+
+skinparam EntityFontStyle Bold
+skinparam EntityFontColor #0F4C75
+skinparam EntityBorderColor #FFFFFF
+skinparam EntityBackgroundColor #0F4C75
+
+skinparam ParticipantFontStyle Bold
+skinparam ParticipantFontColor #FFFFFF
+skinparam ParticipantBorderColor #FFFFFF
+skinparam ParticipantBackgroundColor #0F4C75
+
+skinparam QueueFontStyle Bold
+skinparam QueueFontColor #FFFFFF
+skinparam QueueBorderColor #607D8B
+skinparam QueueBackgroundColor #0F4C75
+
+skinparam SequenceGroupBorderColor #607D8B
+
+'样式设置 End
+
+autonumber
+
+客户端 -> 提议者: 客户端请求
+group 准备阶段
+提议者 -> 接受者: 准备请求 [提案号, ]
+接受者 -> 提议者: 准备响应 [已接受提案号]
+end
+group 接受阶段
+提议者 -> 接受者: 接受请求 [提案号, 值]
+提议者 <-> 学习者: 接受响应
+end
+提议者 -> 客户端: 服务器响应
+@enduml
