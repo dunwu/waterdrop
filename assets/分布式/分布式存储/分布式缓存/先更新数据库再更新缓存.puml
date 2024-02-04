@@ -1,23 +1,78 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 
-autonumber
-skinparam style strictuml
+'样式设置 Begin
 
-database 数据库 as db #F5F5F5
-database 缓存 as cache #F5F5F5
-control 应用 as app #DAE8FC
+skinparam style strictuml
+skinparam BackgroundColor #E3FDFD
+skinparam Shadowing true
+skinparam defaultFontColor #0F4C75
+skinparam defaultFontSize 14
+skinparam ArrowColor #607D8B
+skinparam Padding 5
+
+'参与者样式设置
+
+skinparam ActorFontStyle Bold
+skinparam ActorFontColor #0F4C75
+skinparam ActorBorderColor #0F4C75
+skinparam ActorBackgroundColor #0F4C75
+
+skinparam BoundaryFontStyle Bold
+skinparam BoundaryFontColor #0F4C75
+skinparam BoundaryBorderColor #0F4C75
+skinparam BoundaryBackgroundColor #0F4C75
+
+skinparam CollectionsFontStyle Bold
+skinparam CollectionsFontColor #FFFFFF
+skinparam CollectionsBorderColor #FFFFFF
+skinparam CollectionsBackgroundColor #0F4C75
+
+skinparam ControlFontStyle Bold
+skinparam ControlFontColor #0F4C75
+skinparam ControlBorderColor #FFFFFF
+skinparam ControlBackgroundColor #0F4C75
+
+skinparam DatabaseFontStyle Bold
+skinparam DatabaseFontColor #0F4C75
+skinparam DatabaseBorderColor #FFFFFF
+skinparam DatabaseBackgroundColor #0F4C75
+
+skinparam EntityFontStyle Bold
+skinparam EntityFontColor #0F4C75
+skinparam EntityBorderColor #FFFFFF
+skinparam EntityBackgroundColor #0F4C75
+
+skinparam ParticipantFontStyle Bold
+skinparam ParticipantFontColor #FFFFFF
+skinparam ParticipantBorderColor #FFFFFF
+skinparam ParticipantBackgroundColor #0F4C75
+
+skinparam QueueFontStyle Bold
+skinparam QueueFontColor #FFFFFF
+skinparam QueueBorderColor #607D8B
+skinparam QueueBackgroundColor #0F4C75
+
+skinparam SequenceGroupBorderColor #607D8B
+
+'样式设置 End
+
+autonumber
+
+database 数据库 as db
+database 缓存 as cache
+control 应用 as app
 
 participant app order 1
 participant db order 2
 participant cache order 3
 
 group 更新数据库
-app -[#6C8EBF]> db: update val = 1
-app -[#82B366]> db: update val = 2
+app -[#29B6F6]> db: update val = 1
+app -[#00ADB5]> db: update val = 2
 end
 group 更新缓存
-app -[#82B366]> cache: set val = 1
-app -[#6C8EBF]> cache: set val = 2
+app -[#00ADB5]> cache: set val = 1
+app -[#29B6F6]> cache: set val = 2
 end
 @enduml
