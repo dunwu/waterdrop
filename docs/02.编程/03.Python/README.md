@@ -6,6 +6,8 @@ tags:
   - Python
 hidden: true
 index: false
+date: 2024-03-28 08:20:21
+permalink: /pages/fa5650/
 ---
 
 # Python 教程
