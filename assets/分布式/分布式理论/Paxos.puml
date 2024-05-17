@@ -4,7 +4,6 @@
 '样式设置 Begin
 
 skinparam style strictuml
-skinparam BackgroundColor #E3FDFD
 skinparam Shadowing true
 skinparam defaultFontColor #0F4C75
 skinparam defaultFontSize 14
