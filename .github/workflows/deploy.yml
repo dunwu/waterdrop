@@ -1,36 +1,45 @@
-name: CI
 
-# 在master分支发生push事件时触发。
+name: 部署文档
+
 on:
   push:
     branches:
+      # 确保这是你正在使用的分支名称
       - main
 
-env: # 设置环境变量
-  TZ: Asia/Shanghai # 时区（设置时区可使页面中的`最近更新时间`使用时区时间）
+permissions:
+  contents: write
 
 jobs:
-  build: # 自定义名称
-    runs-on: ubuntu-latest # 运行在虚拟机环境ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-
+  deploy-gh-pages:
+    runs-on: ubuntu-latest
     steps:
-      # 使用的动作。格式：userName/repoName。作用：检出仓库，获取源码。 官方actions库：https://github.com/actions
       - name: Checkout
-        uses: actions/checkout@main
-
-      # 指定 nodejs 版本
-      - name: Use Nodejs ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/checkout@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          fetch-depth: 0
+          # 如果你文档需要 Git 子模块，取消注释下一行
+          # submodules: true
 
-      # 部署
-      - name: Deploy
-        env: # 设置环境变量
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
-        run: npm install && npm run deploy
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.19
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建文档
+        env:
+          NODE_OPTIONS: --max_old_space_size=8192
+        run: |-
+          npm run build
+          > docs/.vuepress/dist/.nojekyll
+
+      - name: 部署文档
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          # 这是文档部署到的分支名称
+          branch: gh-pages
+          folder: docs/.vuepress/dist

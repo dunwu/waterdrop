@@ -7,7 +7,7 @@ title: 首页
 heroText: 钝悟的博客
 heroFullScreen: true
 tagline: 大道至简，知易行难
-bannerBg: https://raw.githubusercontent.com/dunwu/doc-project-template/master/assets/images/bg.jpg
+bgImage: https://raw.githubusercontent.com/dunwu/doc-project-template/master/assets/images/bg.jpg
 projects:
   - icon: project
     name: dunwu.github.io
