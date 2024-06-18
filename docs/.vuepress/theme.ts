@@ -1,22 +1,22 @@
-import { hopeTheme } from "vuepress-theme-hope";
-import navbar from "./navbar.js";
-import sidebar from "./sidebar.js";
+import { hopeTheme } from 'vuepress-theme-hope'
+import navbar from './navbar.js'
+import sidebar from './sidebar.js'
 
 export default hopeTheme({
-  hostname: "https://dunwu.github.io/waterdrop",
+  hostname: 'https://dunwu.github.io/waterdrop',
 
   author: {
-    name: "钝悟",
-    url: "https://dunwu.github.io/waterdrop",
+    name: '钝悟',
+    url: 'https://dunwu.github.io/waterdrop'
   },
 
-  iconAssets: "iconify",
+  iconAssets: 'iconify',
 
-  logo: "/logo.svg",
+  logo: '/logo.svg',
 
-  repo: "dunwu/waterdrop",
+  repo: 'dunwu/waterdrop',
 
-  docsDir: "docs",
+  docsDir: 'docs',
 
   // navbar
   navbar,
@@ -29,8 +29,8 @@ export default hopeTheme({
   displayFooter: true,
 
   blog: {
-    description: "10年+程序员",
-    intro: "/intro.html",
+    description: '10年+程序员',
+    intro: '/intro.html',
     medias: {
       // Baidu: "https://example.com",
       // BiliBili: "https://example.com",
@@ -38,12 +38,12 @@ export default hopeTheme({
       // Dingding: "https://example.com",
       // Discord: "https://example.com",
       // Dribbble: "https://example.com",
-      Email: "mailto:info@example.com",
+      Email: 'mailto:info@example.com',
       // Evernote: "https://example.com",
       // Facebook: "https://example.com",
       // Flipboard: "https://example.com",
       // Gitee: "https://example.com",
-      GitHub: "https://github.com/dunwu",
+      GitHub: 'https://github.com/dunwu'
       // Gitlab: "https://example.com",
       // Gmail: "mailto:info@example.com",
       // Instagram: "https://example.com",
@@ -64,18 +64,18 @@ export default hopeTheme({
       // Youtube: "https://example.com",
       // Zhihu: "https://example.com",
       // MrHope: ["https://dunwu.com", MR_HOPE_AVATAR],
-    },
+    }
   },
 
   encrypt: {
     config: {
-      "/demo/encrypt.html": ["1234"],
-    },
+      '/demo/encrypt.html': ['1234']
+    }
   },
 
   // page meta
   metaLocales: {
-    editLink: "在 GitHub 上编辑此页",
+    editLink: '在 GitHub 上编辑此页'
   },
 
   plugins: {
@@ -83,8 +83,8 @@ export default hopeTheme({
 
     comment: {
       // You should generate and use your own comment service
-      provider: "Waline",
-      serverURL: "https://waline-comment.vuejs.press",
+      provider: 'Waline',
+      serverURL: 'https://waline-comment.vuejs.press'
     },
 
     // all features are enabled for demo, only preserve features you need here
@@ -105,28 +105,28 @@ export default hopeTheme({
       mark: true,
       mermaid: true,
       playground: {
-        presets: ["ts", "vue"],
+        presets: ['ts', 'vue']
       },
-      presentation: ["highlight", "math", "search", "notes", "zoom"],
+      presentation: ['highlight', 'math', 'search', 'notes', 'zoom'],
       stylize: [
         {
-          matcher: "Recommended",
+          matcher: 'Recommended',
           replacer: ({ tag }) => {
-            if (tag === "em")
+            if (tag === 'em')
               return {
-                tag: "Badge",
-                attrs: { type: "tip" },
-                content: "Recommended",
-              };
-          },
-        },
+                tag: 'Badge',
+                attrs: { type: 'tip' },
+                content: 'Recommended'
+              }
+          }
+        }
       ],
       sub: true,
       sup: true,
       tabs: true,
       vPre: true,
-      vuePlayground: true,
-    },
+      vuePlayground: true
+    }
 
     // uncomment these if you want a PWA
     // pwa: {
@@ -184,5 +184,5 @@ export default hopeTheme({
     //     ],
     //   },
     // },
-  },
-});
+  }
+})

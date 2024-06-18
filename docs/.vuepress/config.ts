@@ -1,13 +1,12 @@
-import { defineUserConfig } from "vuepress";
-import { searchProPlugin } from "vuepress-plugin-search-pro";
-import theme from "./theme.js";
+import { defineUserConfig } from 'vuepress'
+import { searchProPlugin } from 'vuepress-plugin-search-pro'
+import theme from './theme.js'
 
 export default defineUserConfig({
-  base: "/",
-
-  lang: "zh-CN",
-  title: "钝悟",
-  description: "钝悟的博客",
+  base: '/waterdrop/',
+  lang: 'zh-CN',
+  title: '钝悟',
+  description: '钝悟的博客',
 
   theme,
 
@@ -19,16 +18,16 @@ export default defineUserConfig({
       customFields: [
         {
           getter: (page) => page.frontmatter.category,
-          formatter: "分类：$content",
+          formatter: '分类：$content'
         },
         {
           getter: (page) => page.frontmatter.tag,
-          formatter: "标签：$content",
-        },
-      ],
+          formatter: '标签：$content'
+        }
+      ]
     })
-  ],
+  ]
 
   // Enable it with pwa
   // shouldPrefetch: false,
-});
+})
