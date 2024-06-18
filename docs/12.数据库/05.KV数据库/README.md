@@ -7,7 +7,7 @@ categories:
 tags:
   - 数据库
   - KV数据库
-permalink: /pages/85202a/
+permalink: /pages/c6629edb/
 hidden: true
 index: false
 ---

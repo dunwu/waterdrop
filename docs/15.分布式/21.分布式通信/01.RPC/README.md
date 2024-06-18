@@ -9,7 +9,7 @@ tags:
   - 分布式
   - 分布式通信
   - RPC
-permalink: /pages/a03b7b/
+permalink: /pages/2af2f5a6/
 hidden: true
 index: false
 ---

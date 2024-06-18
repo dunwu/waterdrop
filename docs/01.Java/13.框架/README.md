@@ -7,7 +7,7 @@ categories:
 tags:
   - Java
   - 框架
-permalink: /pages/e373d7/
+permalink: /pages/4fdc7a8d/
 hidden: true
 index: false
 ---

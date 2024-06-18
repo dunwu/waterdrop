@@ -9,9 +9,12 @@ tags:
   - Java
   - JavaSE
   - IO
-permalink: /pages/e285c8/
+permalink: /pages/c629e4d3/
 hidden: true
 index: false
+dir:
+  order: 4
+  link: true
 ---
 
 # Java IO

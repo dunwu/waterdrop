@@ -9,7 +9,7 @@ categories:
 tags:
   - MQ
   - Kafka
-permalink: /pages/328f1c/
+permalink: /pages/260fb327/
 hidden: true
 index: false
 ---

@@ -9,9 +9,12 @@ tags:
   - Java
   - JavaSE
   - 容器
-permalink: /pages/9eb49b/
+permalink: /pages/48218364/
 hidden: true
 index: false
+dir:
+  order: 3
+  link: true
 ---
 
 # Java 容器

@@ -1,5 +1,5 @@
 ---
-title: JVM 教程
+title: Java JVM
 date: 2020-06-04 13:51:01
 categories:
   - Java
@@ -9,9 +9,12 @@ tags:
   - Java
   - JavaSE
   - JVM
-permalink: /pages/51172b/
+permalink: /pages/5f839231/
 hidden: true
 index: false
+dir:
+  order: 6
+  link: true
 ---
 
 # JVM 教程

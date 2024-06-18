@@ -7,7 +7,7 @@ categories:
 tags:
   - 分布式
   - 分布式协同
-permalink: /pages/52c8b1/
+permalink: /pages/d8a785a7/
 hidden: true
 index: false
 ---

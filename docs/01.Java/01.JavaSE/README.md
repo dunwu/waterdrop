@@ -7,7 +7,7 @@ categories:
 tags:
   - Java
   - JavaSE
-permalink: /pages/69d2f8/
+permalink: /pages/59dfa2f5/
 hidden: true
 index: false
 ---
@@ -16,9 +16,7 @@ index: false
 
 ## 📖 内容
 
-> [Java 面试总结](99.Java面试.md) 💯
-
-### [Java 基础特性](01.基础特性)
+### [Java 基础特性](01.基础特性/)
 
 - [Java 开发环境](01.基础特性/00.Java开发环境.md)
 - [Java 基础语法特性](01.基础特性/01.Java基础语法.md)
@@ -34,7 +32,7 @@ index: false
 - [Java 注解](01.基础特性/11.Java注解.md)
 - [Java String 类型](01.基础特性/42.JavaString类型.md)
 
-### [Java 高级特性](02.高级特性)
+### [Java 高级特性](02.高级特性/)
 
 - [Java 正则从入门到精通](02.高级特性/01.Java正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`反向引用`、`零宽断言`、`贪婪与懒惰`、`元字符`、`DFA`、`NFA`
 - [Java 编码和加密](02.高级特性/02.Java编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`、`MD5`、`SHA`、`HMAC`、`AES`、`DES`、`DESede`、`RSA`
@@ -42,7 +40,7 @@ index: false
 - [Java JDK8](02.高级特性/04.JDK8.md) - 关键词：`Stream`、`lambda`、`Optional`、`@FunctionalInterface`
 - [Java SPI](02.高级特性/05.JavaSPI.md) - 关键词：`SPI`、`ClassLoader`
 
-### [Java 容器](03.容器)
+### [Java 容器](03.容器/)
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175550.png)
 
@@ -53,7 +51,7 @@ index: false
 - [Java 容器之 Queue](03.容器/05.Java容器之Queue.md) - 关键词：`Queue`、`Deque`、`ArrayDeque`、`LinkedList`、`PriorityQueue`
 - [Java 容器之 Stream](03.容器/06.Java容器之Stream.md)
 
-### [Java IO](04.IO)
+### [Java IO](04.IO/)
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630205329.png)
 
@@ -63,7 +61,7 @@ index: false
 - [Java 网络编程](04.IO/04.Java网络编程.md) - 关键词：`Socket`、`ServerSocket`、`DatagramPacket`、`DatagramSocket`
 - [Java IO 工具类](04.IO/05.JavaIO工具类.md) - 关键词：`File`、`RandomAccessFile`、`System`、`Scanner`
 
-### [Java 并发](05.并发)
+### [Java 并发](05.并发/)
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175827.png)
 
@@ -78,7 +76,7 @@ index: false
 - [Java 内存模型](05.并发/09.Java内存模型.md) - 关键词：`JMM`、`volatile`、`synchronized`、`final`、`Happens-Before`、`内存屏障`
 - [ForkJoin 框架](05.并发/10.ForkJoin框架.md)
 
-### [Java 虚拟机](06.JVM)
+### [Java 虚拟机](06.JVM/)
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200628154803.png)
 

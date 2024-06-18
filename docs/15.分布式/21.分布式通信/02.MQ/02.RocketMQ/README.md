@@ -8,7 +8,7 @@ categories:
   - RocketMQ
 tags:
   - MQ
-permalink: /pages/13dc3a/
+permalink: /pages/4b74671e/
 hidden: true
 index: false
 ---

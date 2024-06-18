@@ -1,13 +1,14 @@
 ---
 title: Python
+date: 2024-03-28 08:20:21
 categories:
+  - 编程
   - Python
 tags:
   - Python
+permalink: /pages/3c3ccf24/
 hidden: true
 index: false
-date: 2024-03-28 08:20:21
-permalink: /pages/fa5650/
 ---
 
 # Python 教程

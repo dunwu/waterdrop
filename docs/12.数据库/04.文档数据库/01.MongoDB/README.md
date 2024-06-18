@@ -9,7 +9,7 @@ tags:
   - 数据库
   - 文档数据库
   - MongoDB
-permalink: /pages/b1a116/
+permalink: /pages/4b8aff19/
 hidden: true
 index: false
 ---

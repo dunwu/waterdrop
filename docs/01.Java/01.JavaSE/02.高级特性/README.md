@@ -1,5 +1,5 @@
 ---
-title: Java 高级特性
+title: Java 高级
 date: 2020-06-04 13:51:01
 categories:
   - Java
@@ -8,9 +8,12 @@ categories:
 tags:
   - Java
   - JavaSE
-permalink: /pages/016137/
+permalink: /pages/718f90aa/
 hidden: true
 index: false
+dir:
+  order: 2
+  link: true
 ---
 
 # Java 高级特性

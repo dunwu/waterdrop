@@ -7,7 +7,7 @@ categories:
 tags:
   - 分布式
   - 理论
-permalink: /pages/86cdf2/
+permalink: /pages/2716904b/
 hidden: true
 index: false
 ---

@@ -10,7 +10,7 @@ tags:
   - 框架
   - Spring
   - SpringBoot
-permalink: /pages/a1a3d3/
+permalink: /pages/bf8b7d5a/
 hidden: true
 index: false
 ---

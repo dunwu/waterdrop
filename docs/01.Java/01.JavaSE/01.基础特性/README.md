@@ -1,5 +1,5 @@
 ---
-title: Java 基础特性
+title: Java 基础
 date: 2020-06-04 13:51:01
 categories:
   - Java
@@ -8,9 +8,12 @@ categories:
 tags:
   - Java
   - JavaSE
-permalink: /pages/8ea213/
+permalink: /pages/9c4855f3/
 hidden: true
 index: false
+dir:
+  order: 1
+  link: true
 ---
 
 # Java 基础特性

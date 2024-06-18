@@ -7,7 +7,7 @@ categories:
 tags:
   - 数据库
   - 文档数据库
-permalink: /pages/d1dc5f/
+permalink: /pages/4b2d2f5c/
 hidden: true
 index: false
 ---

@@ -5,7 +5,7 @@ categories:
   - 分布式
 tags:
   - 分布式
-permalink: /pages/f21e8c/
+permalink: /pages/5bfcdcbe/
 hidden: true
 index: false
 ---

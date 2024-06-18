@@ -9,7 +9,7 @@ tags:
   - 数据库
   - 搜索引擎数据库
   - Elasticsearch
-permalink: /pages/74675e/
+permalink: /pages/f457d8c3/
 hidden: true
 index: false
 ---

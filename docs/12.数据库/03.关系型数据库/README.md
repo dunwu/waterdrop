@@ -7,7 +7,7 @@ categories:
 tags:
   - 数据库
   - 关系型数据库
-permalink: /pages/bb43eb/
+permalink: /pages/97156163/
 hidden: true
 index: false
 ---

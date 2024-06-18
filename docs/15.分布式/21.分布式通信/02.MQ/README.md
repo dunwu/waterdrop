@@ -9,7 +9,7 @@ tags:
   - Java
   - 中间件
   - MQ
-permalink: /pages/dfe847/
+permalink: /pages/001529b0/
 hidden: true
 index: false
 ---
@@ -20,7 +20,7 @@ index: false
 >
 > 消息队列主要解决应用耦合，异步消息，流量削锋等问题，实现高性能，高可用，可伸缩和最终一致性架构。是大型分布式系统不可缺少的中间件。
 >
-> 如果想深入学习各种消息队列产品，建议先了解一下 [消息队列基本原理](https://dunwu.github.io/waterdrop/pages/1fd240/) ，有助于理解消息队列特性的实现和设计思路。
+> 如果想深入学习各种消息队列产品，建议先了解一下 [消息队列基本原理](https://dunwu.github.io/waterdrop/pages/214c1fa6/) ，有助于理解消息队列特性的实现和设计思路。
 
 ## 内容
 
