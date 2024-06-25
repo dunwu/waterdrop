@@ -12,7 +12,7 @@ export default navbar([
     icon: 'mdi:language-java',
     prefix: '/01.Java/',
     children: [
-      { text: 'JavaSE', link: '01.JavaSE/' },
+      { text: 'JavaCore', link: '01.JavaCore/' },
       { text: 'JavaEE', link: '02.JavaEE/' },
       { text: '软件', link: '11.软件/' },
       { text: '工具', link: '12.工具/' },
