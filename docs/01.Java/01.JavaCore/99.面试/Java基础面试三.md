@@ -20,7 +20,7 @@ tags:
 
 编译器可以对泛型参数进行检测，并且通过泛型参数可以指定传入的对象类型。比如 `ArrayList<Person> persons = new ArrayList<Person>()` 这行代码就指明了该 `ArrayList` 对象只能传入 `Person` 对象，如果传入其他类型的对象就会报错。
 
-```
+```java
 ArrayList<E> extends AbstractList<E>
 ```
 
@@ -28,13 +28,13 @@ ArrayList<E> extends AbstractList<E>
 
 ### 泛型的使用方式有哪几种？
 
-泛型一般有三种使用方式:**泛型类**、**泛型接口**、**泛型方法**。
+泛型一般有三种使用方式：**泛型类**、**泛型接口**、**泛型方法**。
 
-**1.泛型类**：
+**1. 泛型类**：
 
 ```
-//此处T可以随便写为任意标识，常见的如T、E、K、V等形式的参数常用于表示泛型
-//在实例化泛型类时，必须指定T的具体类型
+//此处 T 可以随便写为任意标识，常见的如 T、E、K、V 等形式的参数常用于表示泛型
+//在实例化泛型类时，必须指定 T 的具体类型
 public class Generic<T>{
 
     private T key;
@@ -55,7 +55,7 @@ public class Generic<T>{
 Generic<Integer> genericInteger = new Generic<Integer>(123456);
 ```
 
-**2.泛型接口**：
+**2. 泛型接口**：
 
 ```
 public interface Generator<T> {
@@ -85,7 +85,7 @@ class GeneratorImpl<T> implements Generator<String>{
 }
 ```
 
-**3.泛型方法**：
+**3. 泛型方法**：
 
 ```
    public static < E > void printArray( E[] inputArray )
@@ -107,7 +107,7 @@ printArray( intArray  );
 printArray( stringArray  );
 ```
 
-> 注意: `public static < E > void printArray( E[] inputArray )` 一般被称为静态泛型方法;在 java 中泛型只是一个占位符，必须在传递类型后才能使用。类在实例化时才能真正的传递类型参数，由于静态方法的加载先于类的实例化，也就是说类中的泛型还没有传递真正的类型参数，静态的方法的加载就已经完成了，所以静态泛型方法是没有办法使用类上声明的泛型的。只能使用自己声明的 `<E>`
+> 注意：`public static < E > void printArray( E[] inputArray )` 一般被称为静态泛型方法；在 java 中泛型只是一个占位符，必须在传递类型后才能使用。类在实例化时才能真正的传递类型参数，由于静态方法的加载先于类的实例化，也就是说类中的泛型还没有传递真正的类型参数，静态的方法的加载就已经完成了，所以静态泛型方法是没有办法使用类上声明的泛型的。只能使用自己声明的 `<E>`
 
 ## 反射
 
@@ -115,7 +115,7 @@ printArray( stringArray  );
 
 如果说大家研究过框架的底层原理或者咱们自己写过框架的话，一定对反射这个概念不陌生。反射之所以被称为框架的灵魂，主要是因为它赋予了我们在运行时分析类以及执行类中方法的能力。通过反射你可以获取任意一个类的所有属性和方法，你还可以调用这些方法和属性。
 
-反射(Reflection)是 Java 程序开发语言的特征之一，它允许运行中的 Java 程序获取自身的信息，并且可以操作类或对象的内部属性。
+反射 (Reflection) 是 Java 程序开发语言的特征之一，它允许运行中的 Java 程序获取自身的信息，并且可以操作类或对象的内部属性。
 
 **通过反射机制，可以在运行时访问 Java 对象的属性，方法，构造方法等。**
 
@@ -256,7 +256,7 @@ JDK 提供了很多内置的注解（比如 `@Override`、`@Deprecated`），同
 注解只有被解析之后才会生效，常见的解析方法有两种：
 
 - **编译期直接扫描**：编译器在编译 Java 代码的时候扫描对应的注解并处理，比如某个方法使用`@Override` 注解，编译器在编译的时候就会检测当前的方法是否重写了父类对应的方法。
-- **运行期通过反射处理**：像框架中自带的注解(比如 Spring 框架的 `@Value`、`@Component`)都是通过反射来进行处理的。
+- **运行期通过反射处理**：像框架中自带的注解（比如 Spring 框架的 `@Value`、`@Component`) 都是通过反射来进行处理的。
 
 ## SPI
 
@@ -274,7 +274,7 @@ SPI 将服务接口和具体的服务实现分离开来，将服务调用方和�
 
 ## 序列化
 
-### 什么是序列化?什么是反序列化?
+### 什么是序列化？什么是反序列化？
 
 如果我们需要持久化 Java 对象比如将 Java 对象保存在文件中，或者在网络传输 Java 对象，这些场景都需要用到序列化。
 
@@ -283,7 +283,7 @@ SPI 将服务接口和具体的服务实现分离开来，将服务调用方和�
 - **序列化**：将数据结构或对象转换成二进制字节流的过程
 - **反序列化**：将在序列化过程中所生成的二进制字节流转换成数据结构或者对象的过程
 
-对于 Java 这种面向对象编程语言来说，我们序列化的都是对象（Object）也就是实例化后的类(Class)，但是在 C++这种半面向对象的语言中，struct(结构体)定义的是数据结构类型，而 class 对应的是对象类型。
+对于 Java 这种面向对象编程语言来说，我们序列化的都是对象（Object）也就是实例化后的类 (Class)，但是在 C++这种半面向对象的语言中，struct（结构体）定义的是数据结构类型，而 class 对应的是对象类型。
 
 下面是序列化和反序列化常见应用场景：
 
@@ -308,7 +308,7 @@ SPI 将服务接口和具体的服务实现分离开来，将服务调用方和�
 
 - `transient` 只能修饰变量，不能修饰类和方法。
 - `transient` 修饰的变量，在反序列化后变量值将会被置成类型的默认值。例如，如果是修饰 `int` 类型，那么反序列后结果就是 `0`。
-- `static` 变量因为不属于任何对象(Object)，所以无论有没有 `transient` 关键字修饰，均不会被序列化。
+- `static` 变量因为不属于任何对象 (Object)，所以无论有没有 `transient` 关键字修饰，均不会被序列化。
 
 ### 常见序列化协议有哪些？
 
@@ -332,7 +332,7 @@ JDK 自带的序列化方式一般不会用 ，因为序列化效率低并且存
 
 举个例子，Java 中的 `for-each` 就是一个常用的语法糖，其原理其实就是基于普通的 for 循环和迭代器。
 
-```
+```java
 String[] strs = {"JavaGuide", "公众号：JavaGuide", "博客：https://javaguide.cn/"};
 for (String s : strs) {
     System.out.println(s);
@@ -346,3 +346,59 @@ for (String s : strs) {
 Java 中最常用的语法糖主要有泛型、自动拆装箱、变长参数、枚举、内部类、增强 for 循环、try-with-resources 语法、lambda 表达式等。
 
 ## IO
+
+### Java 提供了哪些 IO 方式？
+
+- **BIO** - 优点是代码比较简单、直观；缺点则是 IO 效率和扩展性存在局限性，容易成为应用性能的瓶颈。
+  - 传统的 java.io 包，它基于流模型实现，提供了我们最熟知的一些 IO 功能，如：字节流（InputStream/OutputStream）、字符流（Reader/Writer）、File、RandomAccessFile 等。交互方式是同步、阻塞的方式，也就是说，在读取输入流或者写入输出流时，在读、写动作完成之前，线程会一直阻塞在那里，它们之间的调用是可靠的线性顺序。
+  - 很多时候，人们也把 java.net 下面提供的部分网络 API，比如 Socket、ServerSocket、HttpURLConnection 也归类到同步阻塞 IO 类库，因为网络通信同样是 IO 行为。
+  - BufferedOutputStream 等带缓冲区的实现，可以避免频繁的磁盘读写，进而提高 IO 处理效率。这种设计利用了缓冲区，将批量数据进行一次操作，但在使用中千万别忘了 flush。
+  - 很多 IO 工具类都实现了 Closeable 接口，因为需要进行资源的释放。需要利用 try-with-resources、 try-finally 等机制保证资源被明确关闭，否则将导致资源无法被释放。
+- **NIO** - java.nio 包，提供了 Channel、Selector、Buffer 等新的抽象，可以构建多路复用的、同步非阻塞 IO 程序，同时提供了更接近操作系统底层的高性能数据操作方式。
+  - Buffer，高效的数据容器，除了布尔类型，所有原始数据类型都有相应的 Buffer 实现。
+  - Channel，类似在 Linux 之类操作系统上看到的文件描述符，是 NIO 中被用来支持批量式 IO 操作的一种抽象。
+    - File 或者 Socket，通常被认为是比较高层次的抽象，而 Channel 则是更加底层的一种抽象，这也使得 NIO 得以充分利用现代操作系统底层机制，获得特定场景的性能优化，例如，DMA（Direct Memory Access）等。不同层次的抽象是相互关联的，我们可以通过 Socket 获取 Channel，反之亦然。
+  - Selector，是 NIO 实现多路复用的基础，它提供了一种高效的机制，可以检测到注册在 Selector 上的多个 Channel 中，是否有 Channel 处于就绪状态，进而实现了单线程对多 Channel 的高效管理。Selector 同样是基于底层操作系统机制，不同模式、不同版本都存在区别。Linux 上依赖于 [epoll](http://hg.openjdk.java.net/jdk/jdk/file/d8327f838b88/src/java.base/linux/classes/sun/nio/ch/EPollSelectorImpl.java)，Windows 上 NIO2（AIO）模式则是依赖于 [iocp](http://hg.openjdk.java.net/jdk/jdk/file/d8327f838b88/src/java.base/windows/classes/sun/nio/ch/Iocp.java)。
+- **AIO** - 在 Java 7 中，NIO 有了进一步的改进，也就是 NIO 2，引入了异步非阻塞 IO 方式，也有很多人叫它 AIO（Asynchronous IO）。异步 IO 操作基于事件和回调机制，可以简单理解为，应用操作直接返回，而不会阻塞在那里，当后台处理完成，操作系统会通知相应线程进行后续工作。
+
+### NIO 如何实现多路复用？
+
+```java
+    public class NIOServer extends Thread {
+        public void run() {
+            try (Selector selector = Selector.open();
+                 ServerSocketChannel serverSocket = ServerSocketChannel.open();) {// 创建 Selector 和 Channel
+                serverSocket.bind(new InetSocketAddress(InetAddress.getLocalHost(), 8888));
+                serverSocket.configureBlocking(false);
+                // 注册到 Selector，并说明关注点
+                serverSocket.register(selector, SelectionKey.OP_ACCEPT);
+                while (true) {
+                    selector.select();// 阻塞等待就绪的 Channel，这是关键点之一
+                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                    Iterator<SelectionKey> iter = selectedKeys.iterator();
+                    while (iter.hasNext()) {
+                        SelectionKey key = iter.next();
+                       // 生产系统中一般会额外进行就绪状态检查
+                        sayHelloWorld((ServerSocketChannel) key.channel());
+                        iter.remove();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        private void sayHelloWorld(ServerSocketChannel server) throws IOException {
+            try (SocketChannel client = server.accept();) {          client.write(Charset.defaultCharset().encode("Hello world!"));
+            }
+        }
+       // 省略了与前面类似的 main
+    }
+```
+
+这个非常精简的样例掀开了 NIO 多路复用的流程
+
+- 首先，通过 Selector.open() 创建一个 Selector，作为类似调度员的角色。
+- 然后，创建一个 ServerSocketChannel，并且向 Selector 注册，通过指定 SelectionKey.OP_ACCEPT，告诉调度员，它关注的是新的连接请求。
+  - **注意**，为什么我们要明确配置非阻塞模式呢？这是因为阻塞模式下，注册操作是不允许的，会抛出 IllegalBlockingModeException 异常。
+- Selector 阻塞在 select 操作，当有 Channel 发生接入请求，就会被唤醒。
+- 在 sayHelloWorld 方法中，通过 SocketChannel 和 Buffer 进行数据操作，在本例中是发送了一段字符串。

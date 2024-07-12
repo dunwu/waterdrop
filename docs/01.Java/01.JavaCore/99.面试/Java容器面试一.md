@@ -134,17 +134,17 @@ System.out.println(listOfStrings);
 这里简单列举一个例子：
 
 ```
-// ArrayList的底层数组大小为10，此时存储了7个元素
+// ArrayList 的底层数组大小为 10，此时存储了 7 个元素
 +---+---+---+---+---+---+---+---+---+---+
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |   |   |   |
 +---+---+---+---+---+---+---+---+---+---+
   0   1   2   3   4   5   6   7   8   9
-// 在索引为1的位置插入一个元素8，该元素后面的所有元素都要向右移动一位
+// 在索引为 1 的位置插入一个元素 8，该元素后面的所有元素都要向右移动一位
 +---+---+---+---+---+---+---+---+---+---+
 | 1 | 8 | 2 | 3 | 4 | 5 | 6 | 7 |   |   |
 +---+---+---+---+---+---+---+---+---+---+
   0   1   2   3   4   5   6   7   8   9
-// 删除索引为1的位置的元素，该元素后面的所有元素都要向左移动一位
+// 删除索引为 1 的位置的元素，该元素后面的所有元素都要向左移动一位
 +---+---+---+---+---+---+---+---+---+---+
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |   |   |   |
 +---+---+---+---+---+---+---+---+---+---+
@@ -180,9 +180,9 @@ System.out.println(listOfStrings);
 - **是否保证线程安全：** `ArrayList` 和 `LinkedList` 都是不同步的，也就是不保证线程安全；
 - **底层数据结构：** `ArrayList` 底层使用的是 **`Object` 数组**；`LinkedList` 底层使用的是 **双向链表** 数据结构（JDK1.6 之前为循环链表，JDK1.7 取消了循环。注意双向链表和双向循环链表的区别，下面有介绍到！）
 - 插入和删除是否受元素位置的影响：
-  - `ArrayList` 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。 比如：执行`add(E e)`方法的时候， `ArrayList` 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是 O(1)。但是如果要在指定位置 i 插入和删除元素的话（`add(int index, E element)`），时间复杂度就为 O(n)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。
+  - `ArrayList` 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。 比如：执行`add(E e)`方法的时候， `ArrayList` 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是 O(1)。但是如果要在指定位置 i 插入和删除元素的话（`add(int index, E element)`），时间复杂度就为 O(n)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的 (n-i) 个元素都要执行向后位/向前移一位的操作。
   - `LinkedList` 采用链表存储，所以在头尾插入或者删除元素不受元素位置的影响（`add(E e)`、`addFirst(E e)`、`addLast(E e)`、`removeFirst()`、 `removeLast()`），时间复杂度为 O(1)，如果是要在指定位置 `i` 插入和删除元素的话（`add(int index, E element)`，`remove(Object o)`,`remove(int index)`）， 时间复杂度为 O(n) ，因为需要先移动到指定位置再插入和删除。
-- **是否支持快速随机访问：** `LinkedList` 不支持高效的随机元素访问，而 `ArrayList`（实现了 `RandomAccess` 接口） 支持。快速随机访问就是通过元素的序号快速获取元素对象(对应于`get(int index)`方法)。
+- **是否支持快速随机访问：** `LinkedList` 不支持高效的随机元素访问，而 `ArrayList`（实现了 `RandomAccess` 接口） 支持。快速随机访问就是通过元素的序号快速获取元素对象（对应于`get(int index)`方法）。
 - **内存空间占用：** `ArrayList` 的空间浪费主要体现在在 list 列表的结尾会预留一定的容量空间，而 LinkedList 的空间花费则体现在它的每一个元素都需要消耗比 ArrayList 更多的空间（因为要存放直接后继和直接前驱以及数据）。
 
 ## Set
@@ -202,20 +202,19 @@ System.out.println(listOfStrings);
 ArrayList<Integer> arrayList = new ArrayList<Integer>();
 arrayList.add(-1);
 arrayList.add(3);
-arrayList.add(3);
 arrayList.add(-5);
 arrayList.add(7);
 arrayList.add(4);
 arrayList.add(-9);
 arrayList.add(-7);
-System.out.println("原始数组:");
+System.out.println("原始数组：");
 System.out.println(arrayList);
 // void reverse(List list)：反转
 Collections.reverse(arrayList);
 System.out.println("Collections.reverse(arrayList):");
 System.out.println(arrayList);
 
-// void sort(List list),按自然排序的升序排序
+// void sort(List list), 按自然排序的升序排序
 Collections.sort(arrayList);
 System.out.println("Collections.sort(arrayList):");
 System.out.println(arrayList);
@@ -233,7 +232,7 @@ System.out.println(arrayList);
 Output:
 
 ```
-原始数组:
+原始数组：
 [-1, 3, 3, -5, 7, 4, -9, -7]
 Collections.reverse(arrayList):
 [-7, -9, 4, 7, -5, 3, 3, -1]
@@ -246,9 +245,9 @@ Collections.sort(arrayList):
 #### 重写 compareTo 方法实现按年龄来排序
 
 ```
-// person对象没有实现Comparable接口，所以必须实现，这样才不会出错，才可以使treemap中的数据按顺序排列
-// 前面一个例子的String类已经默认实现了Comparable接口，详细可以查看String类的API文档，另外其他
-// 像Integer类等都已经实现了Comparable接口，所以不需要另外实现了
+// person 对象没有实现 Comparable 接口，所以必须实现，这样才不会出错，才可以使 treemap 中的数据按顺序排列
+// 前面一个例子的 String 类已经默认实现了 Comparable 接口，详细可以查看 String 类的 API 文档，另外其他
+// 像 Integer 类等都已经实现了 Comparable 接口，所以不需要另外实现了
 public  class Person implements Comparable<Person> {
     private String name;
     private int age;
@@ -276,7 +275,7 @@ public  class Person implements Comparable<Person> {
     }
 
     /**
-     * T重写compareTo方法实现按年龄来排序
+     * T 重写 compareTo 方法实现按年龄来排序
      */
     @Override
     public int compareTo(Person o) {
@@ -298,7 +297,7 @@ public  class Person implements Comparable<Person> {
         pdata.put(new Person("李四", 20), "lisi");
         pdata.put(new Person("王五", 10), "wangwu");
         pdata.put(new Person("小红", 5), "xiaohong");
-        // 得到key的值的同时得到key所对应的值
+        // 得到 key 的值的同时得到 key 所对应的值
         Set<Person> keys = pdata.keySet();
         for (Person key : keys) {
             System.out.println(key.getAge() + "-" + key.getName());
@@ -333,7 +332,7 @@ Output：
 
 `Queue` 是单端队列，只能从一端插入元素，另一端删除元素，实现上一般遵循 **先进先出（FIFO）** 规则。
 
-`Queue` 扩展了 `Collection` 的接口，根据 **因为容量问题而导致操作失败后处理方式的不同** 可以分为两类方法: 一种在操作失败后会抛出异常，另一种则会返回特殊值。
+`Queue` 扩展了 `Collection` 的接口，根据 **因为容量问题而导致操作失败后处理方式的不同** 可以分为两类方法：一种在操作失败后会抛出异常，另一种则会返回特殊值。
 
 | `Queue` 接口 | 抛出异常  | 返回特殊值 |
 | ------------ | --------- | ---------- |
@@ -343,7 +342,7 @@ Output：
 
 `Deque` 是双端队列，在队列的两端均可以插入或删除元素。
 
-`Deque` 扩展了 `Queue` 的接口, 增加了在队首和队尾进行插入和删除的方法，同样根据失败后处理方式的不同分为两类：
+`Deque` 扩展了 `Queue` 的接口，增加了在队首和队尾进行插入和删除的方法，同样根据失败后处理方式的不同分为两类：
 
 | `Deque` 接口 | 抛出异常      | 返回特殊值      |
 | ------------ | ------------- | --------------- |
@@ -363,13 +362,13 @@ Output：
 - `ArrayDeque` 是基于可变长的数组和双指针来实现，而 `LinkedList` 则通过链表来实现。
 - `ArrayDeque` 不支持存储 `NULL` 数据，但 `LinkedList` 支持。
 - `ArrayDeque` 是在 JDK1.6 才被引入的，而`LinkedList` 早在 JDK1.2 时就已经存在。
-- `ArrayDeque` 插入时可能存在扩容过程, 不过均摊后的插入操作依然为 O(1)。虽然 `LinkedList` 不需要扩容，但是每次插入数据时均需要申请新的堆空间，均摊性能相比更慢。
+- `ArrayDeque` 插入时可能存在扩容过程，不过均摊后的插入操作依然为 O(1)。虽然 `LinkedList` 不需要扩容，但是每次插入数据时均需要申请新的堆空间，均摊性能相比更慢。
 
 从性能的角度上，选用 `ArrayDeque` 来实现队列要比 `LinkedList` 更好。此外，`ArrayDeque` 也可以用于实现栈。
 
 ### 说一说 PriorityQueue
 
-`PriorityQueue` 是在 JDK1.5 中被引入的, 其与 `Queue` 的区别在于元素出队顺序是与优先级相关的，即总是优先级最高的元素先出队。
+`PriorityQueue` 是在 JDK1.5 中被引入的，其与 `Queue` 的区别在于元素出队顺序是与优先级相关的，即总是优先级最高的元素先出队。
 
 这里列举其相关的一些要点：
 

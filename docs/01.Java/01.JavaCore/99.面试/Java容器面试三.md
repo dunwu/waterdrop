@@ -130,14 +130,14 @@ public static <T> T requireNonNull(T obj) {
 >
 > 相关阅读：[什么是 fail-fast](https://www.cnblogs.com/54chensongxia/p/12470446.html) 。
 
-Java8 开始，可以使用 `Collection#removeIf()`方法删除满足特定条件的元素,如
+Java8 开始，可以使用 `Collection#removeIf()`方法删除满足特定条件的元素，如
 
 ```
 List<Integer> list = new ArrayList<>();
 for (int i = 1; i <= 10; ++i) {
     list.add(i);
 }
-list.removeIf(filter -> filter % 2 == 0); /* 删除list中的所有偶数 */
+list.removeIf(filter -> filter % 2 == 0); /* 删除 list 中的所有偶数 */
 System.out.println(list); /* [1, 3, 5, 7, 9] */
 ```
 
@@ -256,8 +256,8 @@ JDK 源码对于这个方法的说明：
 
 ```
 /**
-  *返回由指定数组支持的固定大小的列表。此方法作为基于数组和基于集合的API之间的桥梁，
-  * 与 Collection.toArray()结合使用。返回的List是可序列化并实现RandomAccess接口。
+  *返回由指定数组支持的固定大小的列表。此方法作为基于数组和基于集合的 API 之间的桥梁，
+  * 与 Collection.toArray() 结合使用。返回的 List 是可序列化并实现 RandomAccess 接口。
   */
 public static <T> List<T> asList(T... a) {
     return new ArrayList<>(a);
@@ -286,9 +286,9 @@ public static <T> List<T> asList(T... a) {
 
 直接遍历这样的 List 必然会出现 Bug。
 
-**问题二、使用集合的修改方法: `add()`、`remove()`、`clear()`会抛出异常。**
+**问题二、使用集合的修改方法：`add()`、`remove()`、`clear()`会抛出异常。**
 
-Arrays.asList 返回的 List 并不是我们期望的 java.util.ArrayList，而是 Arrays 的内部类。这个内部类继承自 AbstractList 类，但没有覆写父类的 add、remove、clear 方法，而父类中的这几个方法默认会抛出UnsupportedOperationException。
+Arrays.asList 返回的 List 并不是我们期望的 java.util.ArrayList，而是 Arrays 的内部类。这个内部类继承自 AbstractList 类，但没有覆写父类的 add、remove、clear 方法，而父类中的这几个方法默认会抛出 UnsupportedOperationException。
 
 ```java
 String[] arr = { "1", "2", "3" };
@@ -384,7 +384,6 @@ static <T> List<T> arrayToList(final T[] array) {
   return l;
 }
 
-
 Integer [] myArray = { 1, 2, 3 };
 System.out.println(arrayToList(myArray).getClass());//class java.util.ArrayList
 ```
@@ -395,26 +394,26 @@ System.out.println(arrayToList(myArray).getClass());//class java.util.ArrayList
 List list = new ArrayList<>(Arrays.asList("a", "b", "c"))
 ```
 
-3、使用 Java8 的 `Stream`(推荐)
+3、使用 Java8 的 `Stream`（推荐）
 
 ```
 Integer [] myArray = { 1, 2, 3 };
 List myList = Arrays.stream(myArray).collect(Collectors.toList());
-//基本类型也可以实现转换（依赖boxed的装箱操作）
+//基本类型也可以实现转换（依赖 boxed 的装箱操作）
 int [] myArray2 = { 1, 2, 3 };
 List myList = Arrays.stream(myArray2).boxed().collect(Collectors.toList());
 ```
 
 4、使用 Guava
 
-对于不可变集合，你可以使用[`ImmutableList`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java)类及其[`of()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java#L101)与[`copyOf()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java#L225)工厂方法：（参数不能为空）
+对于不可变集合，你可以使用 [`ImmutableList`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java) 类及其 [`of()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java#L101) 与 [`copyOf()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java#L225) 工厂方法：（参数不能为空）
 
 ```
 List<String> il = ImmutableList.of("string", "elements");  // from varargs
 List<String> il = ImmutableList.copyOf(aStringArray);      // from array
 ```
 
-对于可变集合，你可以使用[`Lists`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Lists.java)类及其[`newArrayList()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Lists.java#L87)工厂方法：
+对于可变集合，你可以使用 [`Lists`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Lists.java) 类及其 [`newArrayList()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Lists.java#L87) 工厂方法：
 
 ```
 List<String> l1 = Lists.newArrayList(anotherListOrCollection);    // from collection
@@ -438,7 +437,7 @@ List<Integer> list = List.of(array);
 
 ## 使用 List.subList 进行切片操作居然会导致 OOM
 
-List.subList 返回的子List 不是一个普通的 ArrayList。这个子 List 可以认为是原始 List 的视图，会和原始 List 相互影响。如果不注意，很可能会因此产生 OOM 问题。
+List.subList 返回的子 List 不是一个普通的 ArrayList。这个子 List 可以认为是原始 List 的视图，会和原始 List 相互影响。如果不注意，很可能会因此产生 OOM 问题。
 
 如下代码所示，定义一个名为 data 的静态 List 来存放 Integer 的 List，[也就是说 data 的成员本身是包含了多个数字的 List。循环 1000 次，每次都从一个具有 10 万个 Integer 的 List 中，使用 subList 方法获得一个只包含一个数字的子 List，并把这个子 List 加入 data 变量：
 

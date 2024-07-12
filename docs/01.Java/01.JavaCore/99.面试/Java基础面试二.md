@@ -14,258 +14,177 @@ tags:
 
 ## 面向对象
 
-### 面向对象和面向过程的区别
+### 面向对象和面向过程
 
-两者的主要区别在于解决问题的方式不同：
+**典型问题**
+
+面向对象编程和面向过程编程有什么区别？
+
+**知识点**
+
+二者的主要区别在于解决问题的方式不同：
 
 - 面向过程把解决问题的过程拆成一个个方法，通过一个个方法的执行解决问题。
 - 面向对象会先抽象出对象，然后用对象执行方法的方式解决问题。
 
 另外，面向对象开发的程序一般更易维护、易复用、易扩展。
 
-相关 issue : [面向过程：面向过程性能比面向对象高？？](https://github.com/Snailclimb/JavaGuide/issues/431) 。
+### 类和对象
 
-下面是一个求圆的面积和周长的示例，简单分别展示了面向对象和面向过程两种不同的解决方案。
+**典型问题**
 
-**面向对象**：
+（1）什么是对象？
 
-```
-public class Circle {
-    // 定义圆的半径
-    private double radius;
+（2）什么是类？
 
-    // 构造函数
-    public Circle(double radius) {
-        this.radius = radius;
-    }
+（3）对象实体与对象引用有何不同？
 
-    // 计算圆的面积
-    public double getArea() {
-        return Math.PI * radius * radius;
-    }
+**知识点**
 
-    // 计算圆的周长
-    public double getPerimeter() {
-        return 2 * Math.PI * radius;
-    }
+（1）**对象是用来描述客观事物的一个抽象**。一个对象由一组属性和对这组属性进行操作的一组服务组成。
 
-    public static void main(String[] args) {
-        // 创建一个半径为3的圆
-        Circle circle = new Circle(3.0);
+（2）**类是具有相同属性和方法的一组对象的集合**，它为属于该类的所有对象提供了统一的抽象描述，其内部包括属性和方法两个主要部分。
 
-        // 输出圆的面积和周长
-        System.out.println("圆的面积为：" + circle.getArea());
-        System.out.println("圆的周长为：" + circle.getPerimeter());
-    }
-}
-```
+（3）对象实体与对象引用的不同之处在于：
 
-我们定义了一个 `Circle` 类来表示圆，该类包含了圆的半径属性和计算面积、周长的方法。
-
-**面向过程**：
-
-```
-public class Main {
-    public static void main(String[] args) {
-        // 定义圆的半径
-        double radius = 3.0;
-
-        // 计算圆的面积和周长
-        double area = Math.PI * radius * radius;
-        double perimeter = 2 * Math.PI * radius;
-
-        // 输出圆的面积和周长
-        System.out.println("圆的面积为：" + area);
-        System.out.println("圆的周长为：" + perimeter);
-    }
-}
-```
-
-我们直接定义了圆的半径，并使用该半径直接计算出圆的面积和周长。
-
-### 创建一个对象用什么运算符?对象实体与对象引用有何不同?
-
-new 运算符，new 创建对象实例（对象实例在堆内存中），对象引用指向对象实例（对象引用存放在栈内存中）。
-
+- new 创建对象实例（对象实例在堆内存中），对象引用指向对象实例（对象引用存放在栈内存中）
 - 一个对象引用可以指向 0 个或 1 个对象（一根绳子可以不系气球，也可以系一个气球）；
 - 一个对象可以有 n 个引用指向它（可以用 n 条绳子系住一个气球）。
 
-### 对象的相等和引用相等的区别
+### 构造方法
 
-- 对象的相等一般比较的是内存中存放的内容是否相等。
-- 引用相等一般比较的是他们指向的内存地址是否相等。
+**典型问题**
 
-这里举一个例子：
+（1）构造方法有什么用？
 
-```
-String str1 = "hello";
-String str2 = new String("hello");
-String str3 = "hello";
-// 使用 == 比较字符串的引用相等
-System.out.println(str1 == str2);
-System.out.println(str1 == str3);
-// 使用 equals 方法比较字符串的相等
-System.out.println(str1.equals(str2));
-System.out.println(str1.equals(str3));
-```
+（2）构造方法有哪些特点？
 
-输出结果：
+（3）如果一个类没有声明构造方法，该程序能正确执行吗？
 
-```
-false
-true
-true
-true
-```
+（4）构造方法能否可被重写（Override）？
 
-从上面的代码输出结果可以看出：
+**知识点**
 
-- `str1` 和 `str2` 不相等，而 `str1` 和 `str3` 相等。这是因为 `==` 运算符比较的是字符串的引用是否相等。
-- `str1`、 `str2`、`str3` 三者的内容都相等。这是因为`equals` 方法比较的是字符串的内容，即使这些字符串的对象引用不同，只要它们的内容相等，就认为它们是相等的。
+（1）构造方法是一种特殊的方法，主要作用是完成对象的初始化工作。
 
-### 如果一个类没有声明构造方法，该程序能正确执行吗?
-
-构造方法是一种特殊的方法，主要作用是完成对象的初始化工作。
-
-如果一个类没有声明构造方法，也可以执行！因为一个类即使没有声明构造方法也会有默认的不带参数的构造方法。如果我们自己添加了类的构造方法（无论是否有参），Java 就不会添加默认的无参数的构造方法了。
-
-我们一直在不知不觉地使用构造方法，这也是为什么我们在创建对象的时候后面要加一个括号（因为要调用无参的构造方法）。如果我们重载了有参的构造方法，记得都要把无参的构造方法也写出来（无论是否用到），因为这可以帮助我们在创建对象的时候少踩坑。
-
-### 构造方法有哪些特点？是否可被 override?
-
-构造方法特点如下：
+（2）构造方法特点如下：
 
 - 名字与类名相同。
 - 没有返回值，但不能用 void 声明构造函数。
 - 生成类的对象时自动执行，无需调用。
 
-构造方法不能被 override（重写）,但是可以 overload（重载）,所以你可以看到一个类中有多个构造函数的情况。
+（3）如果一个类没有声明构造方法，也可以执行！因为一个类即使没有声明构造方法也会有默认的不带参数的构造方法。如果我们自己添加了类的构造方法（无论是否有参），Java 就不会添加默认的无参数的构造方法了。
 
-### 面向对象三大特征
+（4）构造方法不能被重写（Override），但可以重载（Overload）。
 
-封装、继承和多态是面向对象编程的三大特征。
+### 接口和抽象类
 
-#### 封装
+**典型问题**
 
-封装就是把抽象出的数据（**属性**）和对数据的操作（**方法**）封装在一起，数据被保护在内部，程序的其他部分只有通过被授权的操作（**方法**）才能对数据进行操作。
+（1）什么是接口？接口有什么特性？
 
-#### 继承
+（2）什么是抽象类？抽象类有什么特性？
 
-继承可以提高代码的复用性，让编程更加靠近人类思维。当多个类存在相同的属性（变量）和方法时，可以从这些类中**抽象出父类**，在父类中定义**相同的属性和方法**，所有的**子类不需要重新定义这些属性和方法**，只需要通过extends关键字来声明继承父类即可。
+（3）接口和抽象类有什么相同点和不同点？
 
-#### 多态
+（4）类支持多继承吗？接口支持多继承吗？
 
-多态，顾名思义，表示一个对象具有多种的状态，具体表现为父类的引用指向子类的实例。
+**知识点**
 
-**多态的特点:**
+（1）接口是对行为的抽象，它是抽象方法的集合，利用接口可以达到 API 定义和实现分离的目的。
 
-- 对象类型和引用类型之间具有继承（类）/实现（接口）的关系；
-- 引用类型变量发出的方法调用的到底是哪个类中的方法，必须在程序运行期间才能确定；
-- 多态不能调用“只在子类存在但在父类不存在”的方法；
-- 如果子类重写了父类的方法，真正执行的是子类重写的方法，如果子类没有重写父类的方法，执行的是父类的方法。
+接口的主要特性有：
 
-### 抽象类和接口的共性和差异
+- 接口不能实例化。
+- 接口不能包含任何非常量成员，任何字段都隐式的被 `public static final` 修饰。
+- 接口中没有非静态方法，也就是说要么是抽象方法，要么是静态方法。
+- 从 Java8 开始，接口增加了 `default` 方法特性，可以定义方法的默认实现；Java 9 以后，甚至可以定义私有的 `default` 方法。
 
-引申问题：在 Java 中，类可以继承多个类么？接口可以继承多个接口么？类可以实现多个接口么？
+（2）抽象类是不能实例化的类，用 abstract 关键字修饰 class，其目的主要是代码重用。除了不能实例化，形式上和一般的 Java 类并没有太大区别，可以有一个或者多个抽象方法，也可以没有抽象方法。抽象类大多用于抽取相关 Java 类的共用方法实现或者是共同成员变量，然后通过继承的方式达到代码复用的目的。
 
-结论：在 Java 中，类只能继承一个类，但是可以实现多个接口。接口可以继承多个接口。
+（3）接口和抽象类有什么相同点和不同点？
 
-抽象类和接口的**共性**：
+Java 中的类可以实现多个接口。
 
-- 都不能被实例化。
-- 都可以包含抽象方法。
-- 都可以有默认实现的方法（Java 8 可以用 `default` 关键字在接口中定义默认方法）。
+（4）与 C++ 等语言不一样，Java 类不支持多继承。这意味着，Java 不能通过继承多个抽象类来重用逻辑。那么，如何来实现重用呢？Java 的解决方案是：接口支持多继承，准确的说，接口支持扩展多个接口，而接口也支持实现多个接口。
 
-抽象类和接口的**差异**：
+### 深拷贝和浅拷贝
 
-- 接口主要用于对类的行为进行约束，你实现了某个接口就具有了对应的行为。抽象类主要用于代码复用，强调的是所属关系。
-- 一个类只能继承一个类，但是可以实现多个接口。
-- 接口中的成员变量只能是 `public static final` 类型的，不能被修改且必须有初始值，而抽象类的成员变量默认 default，可在子类中被重新定义，也可被重新赋值。
+**典型问题**
 
-### 深拷贝和浅拷贝区别了解吗？什么是引用拷贝？
+（1）什么是深拷贝？什么是浅拷贝？深拷贝和浅拷贝有什么区别？
 
-关于深拷贝和浅拷贝区别，我这里先给结论：
+（2）如何实现深拷贝？
 
-- **浅拷贝**：浅拷贝会在堆上创建一个新的对象（区别于引用拷贝的一点），不过，如果原对象内部的属性是引用类型的话，浅拷贝会直接复制内部对象的引用地址，也就是说拷贝对象和原对象共用同一个内部对象。
-- **深拷贝**：深拷贝会完全复制整个对象，包括这个对象所包含的内部对象。
+**知识点**
 
-上面的结论没有完全理解的话也没关系，我们来看一个具体的案例！
+（1）深拷贝和浅拷贝的区别：
 
-#### 浅拷贝
+- **浅拷贝** - 只拷贝栈内存中的数据，不拷贝堆内存中数据。
+- **深拷贝** - 既拷贝栈内存中的数据，又拷贝堆内存中的数据。
 
-浅拷贝的示例代码如下，我们这里实现了 `Cloneable` 接口，并重写了 `clone()` 方法。
+（2）深拷贝的实现方式
 
-`clone()` 方法的实现很简单，直接调用的是父类 `Object` 的 `clone()` 方法。
+- 构造方法
+- 重写 `Cloneable` 接口的 `clone()` 方法
+- Apache Commons Lang 序列化
+- JSON 序列化
 
-```
-public class Address implements Cloneable{
-    private String name;
-    // 省略构造函数、Getter&Setter方法
-    @Override
-    public Address clone() {
-        try {
-            return (Address) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
-}
+### 面向对象设计
 
-public class Person implements Cloneable {
-    private Address address;
-    // 省略构造函数、Getter&Setter方法
-    @Override
-    public Person clone() {
-        try {
-            Person person = (Person) super.clone();
-            return person;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
-}
-```
+**典型问题**
 
-测试：
+（1）面向对象三大特征是什么？
 
-```
-Person person1 = new Person(new Address("武汉"));
-Person person1Copy = person1.clone();
-// true
-System.out.println(person1.getAddress() == person1Copy.getAddress());
-```
+（2）面向对象的五大原则是什么？
 
-从输出结构就可以看出， `person1` 的克隆对象和 `person1` 使用的仍然是同一个 `Address` 对象。
+**知识点**
 
-#### 深拷贝
+（1）封装、继承和多态是面向对象编程的三大特征。
 
-这里我们简单对 `Person` 类的 `clone()` 方法进行修改，连带着要把 `Person` 对象内部的 `Address` 对象一起复制。
+- **封装** - **封装**的目的是隐藏事务内部的实现细节，以便提高安全性和简化编程。封装提供了合理的边界，避免外部调用者接触到内部的细节。
+- **继承** - **继承**是代码复用的基础机制。当多个类存在相同的属性（变量）和方法时，可以从这些类中**抽象出父类**，在父类中定义**相同的属性和方法**，所有的**子类不需要重新定义这些属性和方法**，只需要通过 extends 关键字来声明继承父类即可。
+- **多态** - 你可能立即会想到重写（override）和重载（overload）、向上转型。简单说，重写是父子类中相同名字和参数的方法，不同的实现；重载则是相同名字的方法，但是不同的参数，本质上这些方法签名是不一样的。
 
-```
-@Override
-public Person clone() {
-    try {
-        Person person = (Person) super.clone();
-        person.setAddress(person.getAddress().clone());
-        return person;
-    } catch (CloneNotSupportedException e) {
-        throw new AssertionError();
-    }
-}
-```
+（2）面向对象的五大原则也就是所谓的 S.O.L.I.D 原则：
 
-测试：
+- **单一职责原则（Single Responsibility）** - 类或者对象最好是只有单一职责，在程序设计中如果发现某个类承担着多种义务，可以考虑进行拆分。
+- **开闭原则（Open-Close）** - 设计要对扩展开放，对修改关闭。换句话说，程序设计应保证平滑的扩展性，尽量避免因为新增同类功能而修改已有实现，这样可以少产出些回归（regression）问题。
+- **里氏替换原则（Liskov Substitution）** - 这是面向对象的基本要素之一，进行继承关系抽象时，凡是可以用父类或者基类的地方，都可以用子类替换。
+- **接口分离原则** - 我们在进行类和接口设计时，如果在一个接口里定义了太多方法，其子类很可能面临两难，就是只有部分方法对它是有意义的，这就破坏了程序的内聚性。- 对于这种情况，可以通过拆分成功能单一的多个接口，将行为进行解耦。在未来维护中，如果某个接口设计有变，不会对使用其他接口的子类构成影响。
+- **依赖反转原则** - 实体应该依赖于抽象而不是实现。也就是说高层次模块，不应该依赖于低层次模块，而是应该基于抽象。实践这一原则是保证产品代码之间适当耦合度的法宝。
 
-```
-Person person1 = new Person(new Address("武汉"));
-Person person1Copy = person1.clone();
-// false
-System.out.println(person1.getAddress() == person1Copy.getAddress());
-```
+### 设计模式
 
-从输出结构就可以看出，显然 `person1` 的克隆对象和 `person1` 包含的 `Address` 对象已经是不同的了。
+**典型问题**
 
-**那什么是引用拷贝呢？** 简单来说，引用拷贝就是两个不同的引用指向同一个对象。
+（1）你知道哪些设计模式？
+
+（2）你知道哪些设计模式在 Java 源码中的应用案例？
+
+（3）你知道哪些设计模式在主流框架中的应用案例？
+
+**知识点**
+
+（1）23 种经典设计模式分类如下：
+
+- 创建型模式，是对对象创建过程的各种问题和解决方案的总结，包括各种工厂模式（Factory、Abstract Factory）、单例模式（Singleton）、构建器模式（Builder）、原型模式（ProtoType）。
+- 结构型模式，是针对软件设计结构的总结，关注于类、对象继承、组合方式的实践经验。常见的结构型模式，包括桥接模式（Bridge）、适配器模式（Adapter）、装饰者模式（Decorator）、代理模式（Proxy）、组合模式（Composite）、外观模式（Facade）、享元模式（Flyweight）等。
+- 行为型模式，是从类或对象之间交互、职责划分等角度总结的模式。比较常见的行为型模式有策略模式（Strategy）、解释器模式（Interpreter）、命令模式（Command）、观察者模式（Observer）、迭代器模式（Iterator）、模板方法模式（Template Method）、访问者模式（Visitor）。
+
+（2）设计模式在 Java 源码中应用的经典案例：
+
+InputStream 是一个抽象类，标准类库中提供了 FileInputStream、ByteArrayInputStream 等各种不同的子类，分别从不同角度对 InputStream 进行了功能扩展，这是典型的装饰器模式应用案例。
+
+（3）设计模式在主流框架中应用的经典案例：
+
+如 Spring 等如何在 API 设计中使用设计模式。你至少要有个大体的印象，如：
+
+- [BeanFactory](https://github.com/spring-projects/spring-framework/blob/master/spring-beans/src/main/java/org/springframework/beans/factory/BeanFactory.java) 和 [ApplicationContext](https://github.com/spring-projects/spring-framework/blob/master/spring-context/src/main/java/org/springframework/context/ApplicationContext.java) 应用了工厂模式。
+- 在 Bean 的创建中，Spring 也为不同 scope 定义的对象，提供了单例和原型等模式实现。
+- Spring Aop 使用了代理模式、装饰器模式、适配器模式等。
+- 各种事件监听器，是观察者模式的典型应用。
+- 类似 JdbcTemplate 等则是应用了模板模式。
 
 ## Object
 
@@ -273,13 +192,13 @@ System.out.println(person1.getAddress() == person1Copy.getAddress());
 
 Object 类是一个特殊的类，是所有类的父类。它主要提供了以下 11 个方法：
 
-```
+```java
 /**
  * native 方法，用于返回当前运行时对象的 Class 对象，使用了 final 关键字修饰，故不允许子类重写。
  */
 public final native Class<?> getClass()
 /**
- * native 方法，用于返回对象的哈希码，主要使用在哈希表中，比如 JDK 中的HashMap。
+ * native 方法，用于返回对象的哈希码，主要使用在哈希表中，比如 JDK 中的 HashMap。
  */
 public native int hashCode()
 /**
@@ -295,7 +214,7 @@ protected native Object clone() throws CloneNotSupportedException
  */
 public String toString()
 /**
- * native 方法，并且不能重写。唤醒一个在此对象监视器上等待的线程(监视器相当于就是锁的概念)。如果有多个线程在等待只会任意唤醒一个。
+ * native 方法，并且不能重写。唤醒一个在此对象监视器上等待的线程（监视器相当于就是锁的概念）。如果有多个线程在等待只会任意唤醒一个。
  */
 public final native void notify()
 /**
@@ -303,15 +222,15 @@ public final native void notify()
  */
 public final native void notifyAll()
 /**
- * native方法，并且不能重写。暂停线程的执行。注意：sleep 方法没有释放锁，而 wait 方法释放了锁 ，timeout 是等待时间。
+ * native 方法，并且不能重写。暂停线程的执行。注意：sleep 方法没有释放锁，而 wait 方法释放了锁 ，timeout 是等待时间。
  */
 public final native void wait(long timeout) throws InterruptedException
 /**
- * 多了 nanos 参数，这个参数表示额外时间（以纳秒为单位，范围是 0-999999）。 所以超时的时间还需要加上 nanos 纳秒。。
+ * 多了 nanos 参数，这个参数表示额外时间（以纳秒为单位，范围是 0-999999）。 所以超时的时间还需要加上 nanos 纳秒。
  */
 public final void wait(long timeout, int nanos) throws InterruptedException
 /**
- * 跟之前的2个wait方法一样，只不过该方法一直等待，没有超时时间这个概念
+ * 跟之前的 2 个 wait 方法一样，只不过该方法一直等待，没有超时时间这个概念
  */
 public final void wait() throws InterruptedException
 /**
@@ -340,7 +259,7 @@ protected void finalize() throws Throwable { }
 
 `Object` 类 `equals()` 方法：
 
-```
+```java
 public boolean equals(Object obj) {
      return (this == obj);
 }
@@ -349,13 +268,13 @@ public boolean equals(Object obj) {
 `equals()` 方法存在两种使用情况：
 
 - **类没有重写 `equals()`方法**：通过`equals()`比较该类的两个对象时，等价于通过“==”比较这两个对象，使用的默认是 `Object`类`equals()`方法。
-- **类重写了 `equals()`方法**：一般我们都重写 `equals()`方法来比较两个对象中的属性是否相等；若它们的属性相等，则返回 true(即，认为这两个对象相等)。
+- **类重写了 `equals()`方法**：一般我们都重写 `equals()`方法来比较两个对象中的属性是否相等；若它们的属性相等，则返回 true（即，认为这两个对象相等）。
 
 举个例子（这里只是为了举例。实际上，你按照下面这种写法的话，像 IDEA 这种比较智能的 IDE 都会提示你将 `==` 换成 `equals()` ）：
 
-```
+```java
 String a = new String("ab"); // a 为一个引用
-String b = new String("ab"); // b为另一个引用,对象的内容一样
+String b = new String("ab"); // b 为另一个引用，对象的内容一样
 String aa = "ab"; // 放在常量池中
 String bb = "ab"; // 从常量池中查找
 System.out.println(aa == bb);// true
@@ -370,7 +289,7 @@ System.out.println(42 == 42.0);// true
 
 `String`类`equals()`方法：
 
-```
+```java
 public boolean equals(Object anObject) {
     if (this == anObject) {
         return true;
@@ -400,16 +319,16 @@ public boolean equals(Object anObject) {
 
 `hashCode()` 定义在 JDK 的 `Object` 类中，这就意味着 Java 中的任何类都包含有 `hashCode()` 函数。另外需要注意的是：`Object` 的 `hashCode()` 方法是本地方法，也就是用 C 语言或 C++ 实现的。
 
-> ⚠️ 注意：该方法在 **Oracle OpenJDK8** 中默认是 "使用线程局部状态来实现 Marsaglia's xor-shift 随机数生成", 并不是 "地址" 或者 "地址转换而来", 不同 JDK/VM 可能不同在 **Oracle OpenJDK8** 中有六种生成方式 (其中第五种是返回地址), 通过添加 VM 参数: -XX:hashCode=4 启用第五种。参考源码:
+> ⚠️ 注意：该方法在 **Oracle OpenJDK8** 中默认是 "使用线程局部状态来实现 Marsaglia's xor-shift 随机数生成", 并不是 "地址" 或者 "地址转换而来", 不同 JDK/VM 可能不同在 **Oracle OpenJDK8** 中有六种生成方式 （其中第五种是返回地址）, 通过添加 VM 参数：-XX:hashCode=4 启用第五种。参考源码：
 >
 > - https://hg.openjdk.org/jdk8u/jdk8u/hotspot/file/87ee5ee27509/src/share/vm/runtime/globals.hpp（1127 行）
 > - https://hg.openjdk.org/jdk8u/jdk8u/hotspot/file/87ee5ee27509/src/share/vm/runtime/synchronizer.cpp（537 行开始）
 
-```
+```java
 public native int hashCode();
 ```
 
-散列表存储的是键值对(key-value)，它的特点是：**能根据“键”快速的检索出对应的“值”。这其中就利用到了散列码！（可以快速找到所需要的对象）**
+散列表存储的是键值对 (key-value)，它的特点是：**能根据“键”快速的检索出对应的“值”。这其中就利用到了散列码！（可以快速找到所需要的对象）**
 
 ### 为什么要有 hashCode？
 
@@ -456,7 +375,7 @@ public native int hashCode();
 - `equals` 方法判断两个对象是相等的，那这两个对象的 `hashCode` 值也要相等。
 - 两个对象有相同的 `hashCode` 值，他们也不一定是相等的（哈希碰撞）。
 
-更多关于 `hashCode()` 和 `equals()` 的内容可以查看：[Java hashCode() 和 equals()的若干问题解答](https://www.cnblogs.com/skywang12345/p/3324958.html)
+更多关于 `hashCode()` 和 `equals()` 的内容可以查看：[Java hashCode() 和 equals() 的若干问题解答](https://www.cnblogs.com/skywang12345/p/3324958.html)
 
 ### finalize 有什么用？
 
@@ -504,11 +423,11 @@ abstract class AbstractStringBuilder implements Appendable, CharSequence {
 
 **对于三者使用的总结：**
 
-- 操作少量的数据: 适用 `String`
-- 单线程操作字符串缓冲区下操作大量数据: 适用 `StringBuilder`
-- 多线程操作字符串缓冲区下操作大量数据: 适用 `StringBuffer`
+- 操作少量的数据：适用 `String`
+- 单线程操作字符串缓冲区下操作大量数据：适用 `StringBuilder`
+- 多线程操作字符串缓冲区下操作大量数据：适用 `StringBuffer`
 
-### String 为什么是不可变的?
+### String 为什么是不可变的？
 
 `String` 类中使用 `final` 关键字修饰字符数组来保存字符串，是典型的 Immutable 类。由于它的不可变性，类似拼接、裁剪字符串等动作，都会产生新的 String 对象。
 
@@ -528,7 +447,7 @@ public final class String implements java.io.Serializable, Comparable<String>, C
 >
 > 相关阅读：[如何理解 String 类型值的不可变？ - 知乎提问](https://www.zhihu.com/question/20618891/answer/114125846)
 >
-> 补充（来自[issue 675](https://github.com/Snailclimb/JavaGuide/issues/675)）：在 Java 9 之后，`String`、`StringBuilder` 与 `StringBuffer` 的实现改用 `byte` 数组存储字符串。
+> 补充（来自 [issue 675](https://github.com/Snailclimb/JavaGuide/issues/675)）：在 Java 9 之后，`String`、`StringBuilder` 与 `StringBuffer` 的实现改用 `byte` 数组存储字符串。
 >
 > ```
 > public final class String implements java.io.Serializable,Comparable<String>, CharSequence {
@@ -545,7 +464,7 @@ public final class String implements java.io.Serializable, Comparable<String>, C
 >
 > **Java 9 为何要将 `String` 的底层实现由 `char[]` 改成了 `byte[]` ?**
 >
-> 新版的 String 其实支持两个编码方案：Latin-1 和 UTF-16。如果字符串中包含的汉字没有超过 Latin-1 可表示范围内的字符，那就会使用 Latin-1 作为编码方案。Latin-1 编码方案下，`byte` 占一个字节(8 位)，`char` 占用 2 个字节（16），`byte` 相较 `char` 节省一半的内存空间。
+> 新版的 String 其实支持两个编码方案：Latin-1 和 UTF-16。如果字符串中包含的汉字没有超过 Latin-1 可表示范围内的字符，那就会使用 Latin-1 作为编码方案。Latin-1 编码方案下，`byte` 占一个字节 (8 位），`char` 占用 2 个字节（16），`byte` 相较 `char` 节省一半的内存空间。
 >
 > JDK 官方就说了绝大部分字符串对象只包含 Latin-1 可表示的字符。
 >
@@ -589,7 +508,7 @@ System.out.println(s);
 
 如果直接使用 `StringBuilder` 对象进行字符串拼接的话，就不会存在这个问题了。
 
-```
+```java
 String[] arr = {"he", "llo", "world"};
 StringBuilder s = new StringBuilder();
 for (String value : arr) {
@@ -612,7 +531,7 @@ System.out.println(s);
 
 **字符串常量池** 是 JVM 为了提升性能和减少内存消耗针对字符串（String 类）专门开辟的一块区域，主要目的是为了避免字符串的重复创建。
 
-```
+```java
 // 在堆中创建字符串对象”ab“
 // 将字符串对象”ab“的引用保存在字符串常量池中
 String aa = "ab";
@@ -623,7 +542,7 @@ System.out.println(aa==bb);// true
 
 更多关于字符串常量池的介绍可以看一下 [Java 内存区域详解](https://javaguide.cn/java/jvm/memory-area.html) 这篇文章。
 
-### String s1 = new String("abc");这句话创建了几个字符串对象？
+### String s1 = new String("abc"); 这句话创建了几个字符串对象？
 
 会创建 1 或 2 个字符串对象。
 
@@ -631,7 +550,7 @@ System.out.println(aa==bb);// true
 
 示例代码（JDK 1.8）：
 
-```
+```java
 String s1 = new String("abc");
 ```
 
@@ -645,7 +564,7 @@ String s1 = new String("abc");
 
 示例代码（JDK 1.8）：
 
-```
+```java
 // 字符串常量池中已存在字符串对象“abc”的引用
 String s1 = "abc";
 // 下面这段代码只会在堆中创建 1 个字符串对象“abc”
@@ -670,7 +589,7 @@ String 在 Java 6 以后提供了 intern() 方法，目的是提示 JVM 把相�
 
 先来看字符串不加 `final` 关键字拼接的情况（JDK1.8）：
 
-```
+```java
 String str1 = "str";
 String str2 = "ing";
 String str3 = "str" + "ing";
@@ -687,17 +606,17 @@ System.out.println(str4 == str5);//false
 
 **对于编译期可以确定值的字符串，也就是常量字符串 ，jvm 会将其存入字符串常量池。并且，字符串常量拼接得到的字符串常量在编译阶段就已经被存放字符串常量池，这个得益于编译器的优化。**
 
-在编译过程中，Javac 编译器（下文中统称为编译器）会进行一个叫做 **常量折叠(Constant Folding)** 的代码优化。《深入理解 Java 虚拟机》中是也有介绍到：
+在编译过程中，Javac 编译器（下文中统称为编译器）会进行一个叫做 **常量折叠 (Constant Folding)** 的代码优化。《深入理解 Java 虚拟机》中是也有介绍到：
 
 [![img](https://camo.githubusercontent.com/0c22c82bb7b2e76aa639af321b67774bb5a7bed3efb284d7d55aa8bc5337dd2c/68747470733a2f2f6f73732e6a61766167756964652e636e2f6a61766167756964652f696d6167652d32303231303831373134323731353339362e706e67)](https://camo.githubusercontent.com/0c22c82bb7b2e76aa639af321b67774bb5a7bed3efb284d7d55aa8bc5337dd2c/68747470733a2f2f6f73732e6a61766167756964652e636e2f6a61766167756964652f696d6167652d32303231303831373134323731353339362e706e67)
 
-常量折叠会把常量表达式的值求出来作为常量嵌在最终生成的代码中，这是 Javac 编译器会对源代码做的极少量优化措施之一(代码优化几乎都在即时编译器中进行)。
+常量折叠会把常量表达式的值求出来作为常量嵌在最终生成的代码中，这是 Javac 编译器会对源代码做的极少量优化措施之一（代码优化几乎都在即时编译器中进行）。
 
 对于 `String str3 = "str" + "ing";` 编译器会给你优化成 `String str3 = "string";` 。
 
 并不是所有的常量都会进行折叠，只有编译器在程序编译期就可以确定值的常量才可以：
 
-- 基本数据类型( `byte`、`boolean`、`short`、`char`、`int`、`float`、`long`、`double`)以及字符串常量。
+- 基本数据类型 ( `byte`、`boolean`、`short`、`char`、`int`、`float`、`long`、`double`) 以及字符串常量。
 - `final` 修饰的基本数据类型和字符串变量
 - 字符串通过 “+”拼接得到的字符串、基本数据类型之间算数运算（加减乘除）、基本数据类型的位运算（<<、>>、>>> ）
 
@@ -705,7 +624,7 @@ System.out.println(str4 == str5);//false
 
 对象引用和“+”的字符串拼接方式，实际上是通过 `StringBuilder` 调用 `append()` 方法实现的，拼接完成之后调用 `toString()` 得到一个 `String` 对象 。
 
-```
+```java
 String str4 = new StringBuilder().append(str1).append(str2).toString();
 ```
 
@@ -715,7 +634,7 @@ String str4 = new StringBuilder().append(str1).append(str2).toString();
 
 示例代码：
 
-```
+```java
 final String str1 = "str";
 final String str2 = "ing";
 // 下面两个表达式其实是等价的
@@ -730,7 +649,7 @@ System.out.println(c == d);// true
 
 示例代码（`str2` 在运行时才能确定其值）：
 
-```
+```java
 final String str1 = "str";
 final String str2 = getStr();
 String c = "str" + "ing";// 常量池中的对象
@@ -740,25 +659,3 @@ public static String getStr() {
       return "ing";
 }
 ```
-
-## 参考资料
-
-- **书籍**
-  - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
-  - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
-  - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
-- **文章**
-  - [Java 线程面试题 Top 50](http://www.importnew.com/12773.html)
-  - [Java 多线程和并发基础面试问答](http://ifeve.com/java-multi-threading-concurrency-interview-questions-with-answers/)
-  - [进程和线程关系及区别](https://blog.csdn.net/yaosiming2011/article/details/44280797)
-  - [JavaThread Methods and Thread States](https://www.w3resource.com/java-tutorial/java-threadclass-methods-and-threadstates.php)
-  - [Java 线程的 5 种状态及切换(透彻讲解)](https://blog.csdn.net/pange1991/article/details/53860651)
-  - [Java 中守护线程的总结](https://blog.csdn.net/shimiso/article/details/8964414)
-  - [Java 创建线程的三种方式及其对比](https://blog.csdn.net/longshengguoji/article/details/41126119)
-  - [Java 线程的 5 种状态及切换(透彻讲解)](https://blog.csdn.net/pange1991/article/details/53860651)
-  - [Java 线程方法 join 的简单总结](https://www.cnblogs.com/lcplcpjava/p/6896904.html)
-  - [Java 并发编程：线程间协作的两种方式：wait、notify、notifyAll 和 Condition](http://www.cnblogs.com/dolphin0520/p/3920385.html)
-  - [Java 并发编程：volatile 关键字解析](http://www.cnblogs.com/dolphin0520/p/3920373.html)
-  - [Java 并发编程：Callable、Future 和 FutureTask](http://www.cnblogs.com/dolphin0520/p/3949310.html)
-  - [Java 并发编程：线程池的使用](http://www.cnblogs.com/dolphin0520/p/3932921.html)
-  - [Java 并发编程](https://www.jianshu.com/p/0256c2995cec)

@@ -28,13 +28,13 @@ HashMap 是应用更加广泛的哈希表实现，行为上大致上与 HashTabl
 | 线程安全     | 非线程安全                    | 线程安全（主要方法都用 `synchronized` 修饰） |
 | 效率         | 性能好                        | 性能差：互斥锁，势必影响性能                 |
 | 初始化容量   | 初始容量为 16                 | 初始容量为 11                                |
-| 扩容方式     | 2N（N为当前容量）             | 2N + 1                                       |
+| 扩容方式     | 2N（N 为当前容量）             | 2N + 1                                       |
 | 是否允许空值 | 允许存储 null 的 key 和 value | 不允许存储 null 的 key 和 value              |
 
-- **线程是否安全：** `HashMap` 是非线程安全的，`Hashtable` 是线程安全的,因为 `Hashtable` 内部的方法基本都经过`synchronized` 修饰。（如果你要保证线程安全的话就使用 `ConcurrentHashMap` 吧！）；
+- **线程是否安全：** `HashMap` 是非线程安全的，`Hashtable` 是线程安全的，因为 `Hashtable` 内部的方法基本都经过`synchronized` 修饰。（如果你要保证线程安全的话就使用 `ConcurrentHashMap` 吧！）；
 - **效率：** 因为线程安全的问题，`HashMap` 要比 `Hashtable` 效率高一点。另外，`Hashtable` 基本被淘汰，不要在代码中使用它；
 - **对 Null key 和 Null value 的支持：** `HashMap` 可以存储 null 的 key 和 value，但 null 作为键只能有一个，null 作为值可以有多个；Hashtable 不允许有 null 键和 null 值，否则会抛出 `NullPointerException`。
-- **初始容量大小和每次扩充容量大小的不同：** ① 创建时如果不指定容量初始值，`Hashtable` 默认的初始大小为 11，之后每次扩充，容量变为原来的 2n+1。`HashMap` 默认的初始化大小为 16。之后每次扩充，容量变为原来的 2 倍。② 创建时如果给定了容量初始值，那么 `Hashtable` 会直接使用你给定的大小，而 `HashMap` 会将其扩充为 2 的幂次方大小（`HashMap` 中的`tableSizeFor()`方法保证，下面给出了源代码）。也就是说 `HashMap` 总是使用 2 的幂作为哈希表的大小,后面会介绍到为什么是 2 的幂次方。
+- **初始容量大小和每次扩充容量大小的不同：** ① 创建时如果不指定容量初始值，`Hashtable` 默认的初始大小为 11，之后每次扩充，容量变为原来的 2n+1。`HashMap` 默认的初始化大小为 16。之后每次扩充，容量变为原来的 2 倍。② 创建时如果给定了容量初始值，那么 `Hashtable` 会直接使用你给定的大小，而 `HashMap` 会将其扩充为 2 的幂次方大小（`HashMap` 中的`tableSizeFor()`方法保证，下面给出了源代码）。也就是说 `HashMap` 总是使用 2 的幂作为哈希表的大小，后面会介绍到为什么是 2 的幂次方。
 - **底层数据结构：** JDK1.8 以后的 `HashMap` 在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）时，将链表转化为红黑树（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树），以减少搜索时间（后文中我会结合源码对这一过程进行分析）。`Hashtable` 没有这样的机制。
 
 **`HashMap` 中带有初始容量的构造函数：**
@@ -56,8 +56,6 @@ HashMap 是应用更加广泛的哈希表实现，行为上大致上与 HashTabl
         this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 ```
-
-
 
 下面这个方法保证了 `HashMap` 总是使用 2 的幂作为哈希表的大小。
 
@@ -101,7 +99,7 @@ LinkedHashMap 和 TreeMap 都可以保证某种顺序，但二者还是非常不
 - LinkedHashMap 通常提供的是遍历顺序符合插入顺序，它的实现是通过为条目（键值对）维护一个双向链表。注意，通过特定构造函数，我们可以创建反映访问顺序的实例，所谓的 put、get、compute 等，都算作“访问”。
 - 对于 TreeMap，它的整体顺序是由键的顺序关系决定的，通过 Comparator 或 Comparable（自然顺序）来决定。
 
-### HashSet 如何检查重复?
+### HashSet 如何检查重复？
 
 以下内容摘自我的 Java 启蒙书《Head first java》第二版：
 
@@ -121,7 +119,7 @@ public boolean add(E e) {
 
 ```
 // Returns : previous value, or null if none
-// 返回值：如果插入位置没有元素返回null，否则返回上一个元素
+// 返回值：如果插入位置没有元素返回 null，否则返回上一个元素
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
 ...
@@ -138,21 +136,21 @@ JDK1.8 之前 `HashMap` 底层是 **数组和链表** 结合在一起使用也�
 
 所谓扰动函数指的就是 HashMap 的 `hash` 方法。使用 `hash` 方法也就是扰动函数是为了防止一些实现比较差的 `hashCode()` 方法 换句话说使用扰动函数之后可以减少碰撞。
 
-**JDK 1.8 HashMap 的 hash 方法源码:**
+**JDK 1.8 HashMap 的 hash 方法源码：**
 
 JDK 1.8 的 hash 方法相比于 JDK 1.7 hash 方法更加简化，但是原理不变。
 
 ```
     static final int hash(Object key) {
       int h;
-      // key.hashCode()：返回散列值也就是hashcode
+      // key.hashCode()：返回散列值也就是 hashcode
       // ^：按位异或
-      // >>>:无符号右移，忽略符号位，空位都以0补齐
+      // >>>: 无符号右移，忽略符号位，空位都以 0 补齐
       return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
   }
 ```
 
-对比一下 JDK1.7 的 HashMap 的 hash 方法源码.
+对比一下 JDK1.7 的 HashMap 的 hash 方法源码。
 
 ```
 static int hash(int h) {
@@ -187,7 +185,7 @@ for (int binCount = 0; ; ++binCount) {
     // 遍历到链表最后一个节点
     if ((e = p.next) == null) {
         p.next = newNode(hash, key, value, null);
-        // 如果链表元素个数大于TREEIFY_THRESHOLD（8）
+        // 如果链表元素个数大于 TREEIFY_THRESHOLD（8）
         if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
             // 红黑树转换（并不会直接转换成红黑树）
             treeifyBin(tab, hash);
@@ -237,7 +235,7 @@ final void treeifyBin(Node<K,V>[] tab, int hash) {
 
 **这个算法应该如何设计呢？**
 
-我们首先可能会想到采用 % 取余的操作来实现。但是，重点来了：“**取余(%)操作中如果除数是 2 的幂次则等价于与其除数减一的与(&)操作**（也就是说 hash%length==hash&(length-1)的前提是 length 是 2 的 n 次方；）。” 并且 **采用二进制位操作 & 相对于 % 能够提高运算效率**，这就解释了 HashMap 的长度为什么是 2 的幂次方。
+我们首先可能会想到采用 % 取余的操作来实现。但是，重点来了：“**取余 (%) 操作中如果除数是 2 的幂次则等价于与其除数减一的与 (&) 操作**（也就是说 hash%length==hash&(length-1) 的前提是 length 是 2 的 n 次方；）。” 并且 **采用二进制位操作 & 相对于 % 能够提高运算效率**，这就解释了 HashMap 的长度为什么是 2 的幂次方。
 
 ### HashMap 多线程操作导致死循环问题
 
@@ -270,10 +268,10 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
     // ...
     // 判断是否出现 hash 碰撞
-    // (n - 1) & hash 确定元素存放在哪个桶中，桶为空，新生成结点放入桶中(此时，这个结点是放在数组中)
+    // (n - 1) & hash 确定元素存放在哪个桶中，桶为空，新生成结点放入桶中（此时，这个结点是放在数组中）
     if ((p = tab[i = (n - 1) & hash]) == null)
         tab[i] = newNode(hash, key, value, null);
-    // 桶中已经存在元素（处理hash冲突）
+    // 桶中已经存在元素（处理 hash 冲突）
     else {
     // ...
 }
@@ -309,9 +307,9 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 - **底层数据结构：** JDK1.7 的 `ConcurrentHashMap` 底层采用 **分段的数组+链表** 实现，JDK1.8 采用的数据结构跟 `HashMap1.8` 的结构一样，数组+链表/红黑二叉树。`Hashtable` 和 JDK1.8 之前的 `HashMap` 的底层数据结构类似都是采用 **数组+链表** 的形式，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的；
 - 实现线程安全的方式（重要）：
-  - 在 JDK1.7 的时候，`ConcurrentHashMap` 对整个桶数组进行了分割分段(`Segment`，分段锁)，每一把锁只锁容器其中一部分数据（下面有示意图），多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。
+  - 在 JDK1.7 的时候，`ConcurrentHashMap` 对整个桶数组进行了分割分段 (`Segment`，分段锁），每一把锁只锁容器其中一部分数据（下面有示意图），多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。
   - 到了 JDK1.8 的时候，`ConcurrentHashMap` 已经摒弃了 `Segment` 的概念，而是直接用 `Node` 数组+链表+红黑树的数据结构来实现，并发控制使用 `synchronized` 和 CAS 来操作。（JDK1.6 以后 `synchronized` 锁做了很多优化） 整个看起来就像是优化过且线程安全的 `HashMap`，虽然在 JDK1.8 中还能看到 `Segment` 的数据结构，但是已经简化了属性，只是为了兼容旧版本；
-  - **`Hashtable`(同一把锁)** :使用 `synchronized` 来保证线程安全，效率非常低下。当一个线程访问同步方法时，其他线程也访问同步方法，可能会进入阻塞或轮询状态，如使用 put 添加元素，另一个线程不能使用 put 添加元素，也不能使用 get，竞争会越来越激烈效率越低。
+  - **`Hashtable`（同一把锁）** : 使用 `synchronized` 来保证线程安全，效率非常低下。当一个线程访问同步方法时，其他线程也访问同步方法，可能会进入阻塞或轮询状态，如使用 put 添加元素，另一个线程不能使用 put 添加元素，也不能使用 get，竞争会越来越激烈效率越低。
 
 下面，我们再来看看两者底层数据结构的对比图。
 
@@ -361,7 +359,7 @@ static final class TreeBin<K,V> extends Node<K,V> {
 
 **`ConcurrentHashMap` 是由 `Segment` 数组结构和 `HashEntry` 数组结构组成**。
 
-`Segment` 继承了 `ReentrantLock`,所以 `Segment` 是一种可重入锁，扮演锁的角色。`HashEntry` 用于存储键值对数据。
+`Segment` 继承了 `ReentrantLock`, 所以 `Segment` 是一种可重入锁，扮演锁的角色。`HashEntry` 用于存储键值对数据。
 
 ```
 static class Segment<K,V> extends ReentrantLock implements Serializable {
@@ -413,7 +411,7 @@ Java 8 中，锁粒度更细，`synchronized` 只锁定当前链表或红黑二�
 public static final Object NULL = new Object();
 ```
 
-最后，再分享一下 `ConcurrentHashMap` 作者本人 (Doug Lea)对于这个问题的回答：
+最后，再分享一下 `ConcurrentHashMap` 作者本人 (Doug Lea) 对于这个问题的回答：
 
 > The main reason that nulls aren't allowed in ConcurrentMaps (ConcurrentHashMaps, ConcurrentSkipListMaps) is that ambiguities that may be just barely tolerable in non-concurrent maps can't be accommodated. The main one is that if `map.get(key)` returns `null`, you can't detect whether the key explicitly maps to `null` vs the key isn't mapped. In a non-concurrent map, you can check this via `map.contains(key)`, but in a concurrent one, the map might have changed between calls.
 
@@ -423,7 +421,7 @@ public static final Object NULL = new Object();
 
 `ConcurrentHashMap` 是线程安全的，意味着它可以保证多个线程同时对它进行读写操作时，不会出现数据不一致的情况，也不会导致 JDK1.7 及之前版本的 `HashMap` 多线程操作导致死循环问题。但是，这并不意味着它可以保证所有的复合操作都是原子性的，一定不要搞混了！
 
-复合操作是指由多个基本操作(如`put`、`get`、`remove`、`containsKey`等)组成的操作，例如先判断某个键是否存在`containsKey(key)`，然后根据结果进行插入或更新`put(key, value)`。这种操作在执行过程中可能会被其他线程打断，导致结果不符合预期。
+复合操作是指由多个基本操作（如`put`、`get`、`remove`、`containsKey`等）组成的操作，例如先判断某个键是否存在`containsKey(key)`，然后根据结果进行插入或更新`put(key, value)`。这种操作在执行过程中可能会被其他线程打断，导致结果不符合预期。
 
 例如，有两个线程 A 和 B 同时对 `ConcurrentHashMap` 进行复合操作，如下：
 
@@ -476,8 +474,8 @@ map.computeIfAbsent(key, k -> anotherValue);
 **`Collections` 工具类常用方法**:
 
 - 排序
-- 查找,替换操作
-- 同步控制(不推荐，需要线程安全的集合类型时请考虑使用 JUC 包下的并发集合)
+- 查找，替换操作
+- 同步控制（不推荐，需要线程安全的集合类型时请考虑使用 JUC 包下的并发集合）
 
 ### 排序操作
 
@@ -485,20 +483,20 @@ map.computeIfAbsent(key, k -> anotherValue);
 void reverse(List list)//反转
 void shuffle(List list)//随机排序
 void sort(List list)//按自然排序的升序排序
-void sort(List list, Comparator c)//定制排序，由Comparator控制排序逻辑
+void sort(List list, Comparator c)//定制排序，由 Comparator 控制排序逻辑
 void swap(List list, int i , int j)//交换两个索引位置的元素
-void rotate(List list, int distance)//旋转。当distance为正数时，将list后distance个元素整体移到前面。当distance为负数时，将 list的前distance个元素整体移到后面
+void rotate(List list, int distance)//旋转。当 distance 为正数时，将 list 后 distance 个元素整体移到前面。当 distance 为负数时，将 list 的前 distance 个元素整体移到后面
 ```
 
-### 查找,替换操作
+### 查找，替换操作
 
 ```
-int binarySearch(List list, Object key)//对List进行二分查找，返回索引，注意List必须是有序的
-int max(Collection coll)//根据元素的自然顺序，返回最大的元素。 类比int min(Collection coll)
-int max(Collection coll, Comparator c)//根据定制排序，返回最大元素，排序规则由Comparatator类控制。类比int min(Collection coll, Comparator c)
-void fill(List list, Object obj)//用指定的元素代替指定list中的所有元素
+int binarySearch(List list, Object key)//对 List 进行二分查找，返回索引，注意 List 必须是有序的
+int max(Collection coll)//根据元素的自然顺序，返回最大的元素。 类比 int min(Collection coll)
+int max(Collection coll, Comparator c)//根据定制排序，返回最大元素，排序规则由 Comparatator 类控制。类比 int min(Collection coll, Comparator c)
+void fill(List list, Object obj)//用指定的元素代替指定 list 中的所有元素
 int frequency(Collection c, Object o)//统计元素出现次数
-int indexOfSubList(List list, List target)//统计target在list中第一次出现的索引，找不到则返回-1，类比int lastIndexOfSubList(List source, list target)
+int indexOfSubList(List list, List target)//统计 target 在 list 中第一次出现的索引，找不到则返回-1，类比 int lastIndexOfSubList(List source, list target)
 boolean replaceAll(List list, Object oldVal, Object newVal)//用新元素替换旧元素
 ```
 
