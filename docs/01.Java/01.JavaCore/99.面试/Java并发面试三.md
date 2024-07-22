@@ -1158,3 +1158,256 @@ public int await() throws InterruptedException, BrokenBarrierException {
 虚拟线程在 Java 21 正式发布，这是一项重量级的更新。
 
 虽然目前面试中问的不多，但还是建议大家去简单了解一下，具体可以阅读这篇文章：[虚拟线程极简入门](https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/concurrent/virtual-thread.md) 。重点搞清楚虚拟线程和平台线程的关系以及虚拟线程的优势即可。
+
+## 案例
+
+### 生产者消费者模式
+
+**经典问题**
+
+（1）什么是生产者消费者模式
+
+（2）Java 中如何实现生产者消费者模式
+
+**知识点**
+
+（1）什么是生产者消费者模式
+
+生产者消费者模式是一个经典的并发设计模式。在这个模型中，有一个共享缓冲区；有两个线程，一个负责向缓冲区推数据，另一个负责向缓冲区拉数据。要让两个线程更好的配合，就需要一个阻塞队列作为媒介来进行调度，由此便诞生了生产者消费者模式。
+
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%2078%20%e8%ae%b2-%e5%ae%8c/assets/CgotOV3OJ3iAGcaiAAFrcv5xk9U160.png)
+
+（2）Java 中如何实现生产者消费者模式
+
+在 Java 中，实现生产者消费者模式有 3 种具有代表性的方式：
+
+- 基于 BlockingQueue 实现
+- 基于 Condition 实现
+- 基于 wait/notify 实现
+
+【示例】基于 BlockingQueue 实现生产者消费者模式
+
+```java
+public class ProducerConsumerDemo01 {
+
+    public static void main(String[] args) throws InterruptedException {
+        BlockingQueue<Object> queue = new ArrayBlockingQueue<>(10);
+        Thread producer1 = new Thread(new Producer(queue), "producer1");
+        Thread producer2 = new Thread(new Producer(queue), "producer2");
+        Thread consumer1 = new Thread(new Consumer(queue), "consumer1");
+        Thread consumer2 = new Thread(new Consumer(queue), "consumer2");
+        producer1.start();
+        producer2.start();
+        consumer1.start();
+        consumer2.start();
+    }
+
+    static class Producer implements Runnable {
+
+        private long count = 0L;
+        private final BlockingQueue<Object> queue;
+
+        public Producer(BlockingQueue<Object> queue) {
+            this.queue = queue;
+        }
+
+        @Override
+        public void run() {
+            while (count < 500) {
+                try {
+                    queue.put(new Object());
+                    System.out.println(Thread.currentThread().getName() + " 生产1条数据，已生产数据量：" + ++count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    static class Consumer implements Runnable {
+
+        private long count = 0L;
+        private final BlockingQueue<Object> queue;
+
+        public Consumer(BlockingQueue<Object> queue) {
+            this.queue = queue;
+        }
+
+        @Override
+        public void run() {
+            while (count < 500) {
+                try {
+                    queue.take();
+                    System.out.println(Thread.currentThread().getName() + " 消费1条数据，已消费数据量：" + ++count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+}
+```
+
+【示例】基于 Condition 实现生产者消费者模式
+
+```java
+public class ProducerConsumerDemo02 {
+
+    public static void main(String[] args) {
+
+        MyBlockingQueue<Object> queue = new MyBlockingQueue<>(10);
+        Runnable producer = () -> {
+            while (true) {
+                try {
+                    queue.put(new Object());
+                    System.out.println("生产1条数据，总数据量：" + queue.size());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(producer).start();
+        new Thread(producer).start();
+
+        Runnable consumer = () -> {
+            while (true) {
+                try {
+                    queue.take();
+                    System.out.println("消费1条数据，总数据量：" + queue.size());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(consumer).start();
+        new Thread(consumer).start();
+    }
+
+    public static class MyBlockingQueue<T> {
+
+        private final int max;
+        private final Queue<T> queue;
+
+        private final ReentrantLock lock = new ReentrantLock();
+        private final Condition notEmpty = lock.newCondition();
+        private final Condition notFull = lock.newCondition();
+
+        public MyBlockingQueue(int size) {
+            this.max = size;
+            queue = new LinkedList<>();
+        }
+
+        public void put(T o) throws InterruptedException {
+            lock.lock();
+            try {
+                while (queue.size() == max) {
+                    notFull.await();
+                }
+                queue.add(o);
+                notEmpty.signalAll();
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        public T take() throws InterruptedException {
+            lock.lock();
+            try {
+                while (queue.isEmpty()) {
+                    notEmpty.await();
+                }
+                T o = queue.remove();
+                notFull.signalAll();
+                return o;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        public int size() {
+            return queue.size();
+        }
+
+    }
+
+}
+```
+
+【示例】基于 wait/notify 实现生产者消费者模式
+
+```java
+public class ProducerConsumerDemo03 {
+
+    public static void main(String[] args) {
+
+        MyBlockingQueue<Object> queue = new MyBlockingQueue<>(10);
+        Runnable producer = () -> {
+            while (true) {
+                try {
+                    queue.put(new Object());
+                    System.out.println("生产1条数据，总数据量：" + queue.size());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(producer).start();
+        new Thread(producer).start();
+
+        Runnable consumer = () -> {
+            while (true) {
+                try {
+                    queue.take();
+                    System.out.println("消费1条数据，总数据量：" + queue.size());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(consumer).start();
+        new Thread(consumer).start();
+    }
+
+    public static class MyBlockingQueue<T> {
+
+        private final int max;
+        private final Queue<T> queue;
+
+        public MyBlockingQueue(int size) {
+            max = size;
+            queue = new LinkedList<>();
+        }
+
+        public synchronized void put(T o) throws InterruptedException {
+            while (queue.size() == max) {
+                wait();
+            }
+            queue.add(o);
+            notifyAll();
+        }
+
+        public synchronized T take() throws InterruptedException {
+            while (queue.isEmpty()) {
+                wait();
+            }
+            T o = queue.remove();
+            notifyAll();
+            return o;
+        }
+
+        public synchronized int size() {
+            return queue.size();
+        }
+
+    }
+
+}
+```
+

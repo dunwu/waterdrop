@@ -165,159 +165,6 @@ CAS 经常会用到自旋操作来进行重试，也就是不成功就一直循�
 
 CAS 只对单个共享变量有效，当操作涉及跨多个共享变量时 CAS 无效。但是从 JDK 1.5 开始，提供了 `AtomicReference` 类来保证引用对象之间的原子性，你可以把多个变量放在一个对象里来进行 CAS 操作。所以我们可以使用锁或者利用 `AtomicReference` 类把多个共享变量合并成一个共享变量来操作。
 
-## synchronized
-
-### synchronized 是什么？有什么用？
-
-`synchronized` 是 Java 中的一个关键字，翻译成中文是同步的意思，主要解决的是多个线程之间访问资源的同步性，可以保证被它修饰的方法或者代码块在任意时刻只能有一个线程执行。
-
-在 Java 早期版本中，`synchronized` 属于 **重量级锁**，效率低下。这是因为监视器锁（monitor）是依赖于底层的操作系统的 `Mutex Lock` 来实现的，Java 的线程是映射到操作系统的原生线程之上的。如果要挂起或者唤醒一个线程，都需要操作系统帮忙完成，而操作系统实现线程之间的切换时需要从用户态转换到内核态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高。
-
-不过，在 Java 6 之后， `synchronized` 引入了大量的优化如自旋锁、适应性自旋锁、锁消除、锁粗化、偏向锁、轻量级锁等技术来减少锁操作的开销，这些优化让 `synchronized` 锁的效率提升了很多。因此， `synchronized` 还是可以在实际项目中使用的，像 JDK 源码、很多开源框架都大量使用了 `synchronized` 。
-
-关于偏向锁多补充一点：由于偏向锁增加了 JVM 的复杂性，同时也并没有为所有应用都带来性能提升。因此，在 JDK15 中，偏向锁被默认关闭（仍然可以使用 `-XX:+UseBiasedLocking` 启用偏向锁），在 JDK18 中，偏向锁已经被彻底废弃（无法通过命令行打开）。
-
-### 如何使用 synchronized？
-
-`synchronized` 关键字的使用方式主要有下面 3 种：
-
-1. 修饰实例方法
-2. 修饰静态方法
-3. 修饰代码块
-
-**1、修饰实例方法** （锁当前对象实例）
-
-给当前对象实例加锁，进入同步代码前要获得 **当前对象实例的锁** 。
-
-```
-synchronized void method() {
-    // 业务代码
-}
-```
-
-**2、修饰静态方法** （锁当前类）
-
-给当前类加锁，会作用于类的所有对象实例 ，进入同步代码前要获得 **当前 class 的锁**。
-
-这是因为静态成员不属于任何一个实例对象，归整个类所有，不依赖于类的特定实例，被类的所有实例共享。
-
-```
-synchronized static void method() {
-    // 业务代码
-}
-```
-
-静态 `synchronized` 方法和非静态 `synchronized` 方法之间的调用互斥么？不互斥！如果一个线程 A 调用一个实例对象的非静态 `synchronized` 方法，而线程 B 需要调用这个实例对象所属类的静态 `synchronized` 方法，是允许的，不会发生互斥现象，因为访问静态 `synchronized` 方法占用的锁是当前类的锁，而访问非静态 `synchronized` 方法占用的锁是当前实例对象锁。
-
-**3、修饰代码块** （锁指定对象 / 类）
-
-对括号里指定的对象 / 类加锁：
-
-- `synchronized(object)` 表示进入同步代码库前要获得 **给定对象的锁**。
-- `synchronized（类。class)` 表示进入同步代码前要获得 **给定 Class 的锁**
-
-```
-synchronized(this) {
-    // 业务代码
-}
-```
-
-**总结：**
-
-- `synchronized` 关键字加到 `static` 静态方法和 `synchronized(class)` 代码块上都是是给 Class 类上锁；
-- `synchronized` 关键字加到实例方法上是给对象实例上锁；
-- 尽量不要使用 `synchronized(String a)` 因为 JVM 中，字符串常量池具有缓存功能。
-
-### 构造方法可以用 synchronized 修饰么？
-
-构造方法不能使用 synchronized 关键字修饰。不过，可以在构造方法内部使用 synchronized 代码块。
-
-另外，构造方法本身是线程安全的，但如果在构造方法中涉及到共享资源的操作，就需要采取适当的同步措施来保证整个构造过程的线程安全。
-
-### synchronized 底层原理了解吗？
-
-synchronized 关键字底层原理属于 JVM 层面的东西。
-
-#### synchronized 同步语句块的情况
-
-```
-public class SynchronizedDemo {
-    public void method() {
-        synchronized (this) {
-            System.out.println("synchronized 代码块");
-        }
-    }
-}
-```
-
-通过 JDK 自带的 `javap` 命令查看 `SynchronizedDemo` 类的相关字节码信息：首先切换到类的对应目录执行 `javac SynchronizedDemo.java` 命令生成编译后的 .class 文件，然后执行 `javap -c -s -v -l SynchronizedDemo.class`。
-
-[![synchronized 关键字原理](https://camo.githubusercontent.com/669b67b48f1e58c37ac12eb80239cc5df7df55d7d75f9187e1622ee401a0c230/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d7072696e6369706c652e706e67)](https://camo.githubusercontent.com/669b67b48f1e58c37ac12eb80239cc5df7df55d7d75f9187e1622ee401a0c230/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d7072696e6369706c652e706e67)
-
-从上面我们可以看出：**`synchronized` 同步语句块的实现使用的是 `monitorenter` 和 `monitorexit` 指令，其中 `monitorenter` 指令指向同步代码块的开始位置，`monitorexit` 指令则指明同步代码块的结束位置。**
-
-上面的字节码中包含一个 `monitorenter` 指令以及两个 `monitorexit` 指令，这是为了保证锁在同步代码块代码正常执行以及出现异常的这两种情况下都能被正确释放。
-
-当执行 `monitorenter` 指令时，线程试图获取锁也就是获取 **对象监视器 `monitor`** 的持有权。
-
-> 在 Java 虚拟机 (HotSpot) 中，Monitor 是基于 C++ 实现的，由 [ObjectMonitor](https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/runtime/objectMonitor.cpp) 实现的。每个对象中都内置了一个 `ObjectMonitor` 对象。
->
-> 另外，`wait/notify` 等方法也依赖于 `monitor` 对象，这就是为什么只有在同步的块或者方法中才能调用 `wait/notify` 等方法，否则会抛出 `java.lang.IllegalMonitorStateException` 的异常的原因。
-
-在执行 `monitorenter` 时，会尝试获取对象的锁，如果锁的计数器为 0 则表示锁可以被获取，获取后将锁计数器设为 1 也就是加 1。
-
-[![ 执行 monitorenter 获取锁](https://camo.githubusercontent.com/9b5986778b36cc58ea99abe6df0a892dc46acae65bbb73fba6b6dcfc4834da6b/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d6765742d6c6f636b2d636f64652d626c6f636b2e706e67)](https://camo.githubusercontent.com/9b5986778b36cc58ea99abe6df0a892dc46acae65bbb73fba6b6dcfc4834da6b/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d6765742d6c6f636b2d636f64652d626c6f636b2e706e67)
-
-对象锁的的拥有者线程才可以执行 `monitorexit` 指令来释放锁。在执行 `monitorexit` 指令后，将锁计数器设为 0，表明锁被释放，其他线程可以尝试获取锁。
-
-[![ 执行 monitorexit 释放锁](https://camo.githubusercontent.com/ff0fb002626c445b1adc69507f430bc0ffd1202c9e0decfc58749f71c8183587/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d72656c656173652d6c6f636b2d626c6f636b2e706e67)](https://camo.githubusercontent.com/ff0fb002626c445b1adc69507f430bc0ffd1202c9e0decfc58749f71c8183587/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d72656c656173652d6c6f636b2d626c6f636b2e706e67)
-
-如果获取对象锁失败，那当前线程就要阻塞等待，直到锁被另外一个线程释放为止。
-
-#### synchronized 修饰方法的的情况
-
-```
-public class SynchronizedDemo2 {
-    public synchronized void method() {
-        System.out.println("synchronized 方法");
-    }
-}
-```
-
-[![synchronized 关键字原理](https://camo.githubusercontent.com/0ac6ee1ed5d3ca201bd9243767f5a3d239419b6381c9053c7ccfba00890bd4b7/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f73796e6368726f6e697a6564254535253835254233254539253934254145254535254144253937254535253845253946254537253930253836322e706e67)](https://camo.githubusercontent.com/0ac6ee1ed5d3ca201bd9243767f5a3d239419b6381c9053c7ccfba00890bd4b7/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f73796e6368726f6e697a6564254535253835254233254539253934254145254535254144253937254535253845253946254537253930253836322e706e67)
-
-`synchronized` 修饰的方法并没有 `monitorenter` 指令和 `monitorexit` 指令，取得代之的确实是 `ACC_SYNCHRONIZED` 标识，该标识指明了该方法是一个同步方法。JVM 通过该 `ACC_SYNCHRONIZED` 访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用。
-
-如果是实例方法，JVM 会尝试获取实例对象的锁。如果是静态方法，JVM 会尝试获取当前 class 的锁。
-
-#### 总结
-
-`synchronized` 同步语句块的实现使用的是 `monitorenter` 和 `monitorexit` 指令，其中 `monitorenter` 指令指向同步代码块的开始位置，`monitorexit` 指令则指明同步代码块的结束位置。
-
-`synchronized` 修饰的方法并没有 `monitorenter` 指令和 `monitorexit` 指令，取得代之的确实是 `ACC_SYNCHRONIZED` 标识，该标识指明了该方法是一个同步方法。
-
-**不过两者的本质都是对对象监视器 monitor 的获取。**
-
-相关推荐：[Java 锁与线程的那些事 - 有赞技术团队](https://tech.youzan.com/javasuo-yu-xian-cheng-de-na-xie-shi/) 。
-
-🧗🏻 进阶一下：学有余力的小伙伴可以抽时间详细研究一下对象监视器 `monitor`。
-
-### JDK1.6 之后的 synchronized 底层做了哪些优化？锁升级原理了解吗？
-
-在 Java 6 之后， `synchronized` 引入了大量的优化如自旋锁、适应性自旋锁、锁消除、锁粗化、偏向锁、轻量级锁等技术来减少锁操作的开销，这些优化让 `synchronized` 锁的效率提升了很多（JDK18 中，偏向锁已经被彻底废弃，前面已经提到过了）。
-
-锁主要存在四种状态，依次是：无锁状态、偏向锁状态、轻量级锁状态、重量级锁状态，他们会随着竞争的激烈而逐渐升级。注意锁可以升级不可降级，这种策略是为了提高获得锁和释放锁的效率。
-
-`synchronized` 锁升级是一个比较复杂的过程，面试也很少问到，如果你想要详细了解的话，可以看看这篇文章：[浅析 synchronized 锁升级的原理与实现](https://www.cnblogs.com/star95/p/17542850.html)。
-
-### synchronized 和 volatile 有什么区别？
-
-`synchronized` 关键字和 `volatile` 关键字是两个互补的存在，而不是对立的存在！
-
-- `volatile` 关键字是线程同步的轻量级实现，所以 `volatile` 性能肯定比 `synchronized` 关键字要好 。但是 `volatile` 关键字只能用于变量而 `synchronized` 关键字可以修饰方法以及代码块 。
-- `volatile` 关键字能保证数据的可见性，但不能保证数据的原子性。`synchronized` 关键字两者都能保证。
-- `volatile` 关键字主要用于解决变量在多个线程之间的可见性，而 `synchronized` 关键字解决的是多个线程之间访问资源的同步性。
-
 ## ReentrantLock
 
 ### ReentrantLock 是什么？
@@ -537,3 +384,44 @@ public long tryOptimisticRead() {
 ## Atomic 原子类
 
 Atomic 原子类部分的内容我单独写了一篇文章来总结：[Atomic 原子类总结](https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/concurrent/atomic-classes.md) 。
+
+
+
+## 死锁（Deadlock）
+
+### 什么是死锁
+
+多个线程互相等待对方释放锁。
+
+死锁是当线程进入无限期等待状态时发生的情况，因为所请求的锁被另一个线程持有，而另一个线程又等待第一个线程持有的另一个锁。
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/deadlock.png">
+</p>
+
+### 避免死锁
+
+（1）按序加锁
+
+当多个线程需要相同的一些锁，但是按照不同的顺序加锁，死锁就很容易发生。
+
+如果能确保所有的线程都是按照相同的顺序获得锁，那么死锁就不会发生。
+
+按照顺序加锁是一种有效的死锁预防机制。但是，这种方式需要你事先知道所有可能会用到的锁(译者注：并对这些锁做适当的排序)，但总有些时候是无法预知的。
+
+（2）超时释放锁
+
+另外一个可以避免死锁的方法是在尝试获取锁的时候加一个超时时间，这也就意味着在尝试获取锁的过程中若超过了这个时限该线程则放弃对该锁请求。若一个线程没有在给定的时限内成功获得所有需要的锁，则会进行回退并释放所有已经获得的锁，然后等待一段随机的时间再重试。这段随机的等待时间让其它线程有机会尝试获取相同的这些锁，并且让该应用在没有获得锁的时候可以继续运行(译者注：加锁超时后可以先继续运行干点其它事情，再回头来重复之前加锁的逻辑)。
+
+（3）死锁检测
+
+死锁检测是一个更好的死锁预防机制，它主要是针对那些不可能实现按序加锁并且锁超时也不可行的场景。
+
+每当一个线程获得了锁，会在线程和锁相关的数据结构中（map、graph 等等）将其记下。除此之外，每当有线程请求锁，也需要记录在这个数据结构中。
+
+当一个线程请求锁失败时，这个线程可以遍历锁的关系图看看是否有死锁发生。
+
+如果检测出死锁，有两种处理手段：
+
+- 释放所有锁，回退，并且等待一段随机的时间后重试。这个和简单的加锁超时类似，不一样的是只有死锁已经发生了才回退，而不会是因为加锁的请求超时了。虽然有回退和等待，但是如果有大量的线程竞争同一批锁，它们还是会重复地死锁（编者注：原因同超时类似，不能从根本上减轻竞争）。
+- 一个更好的方案是给这些线程设置优先级，让一个（或几个）线程回退，剩下的线程就像没发生死锁一样继续保持着它们需要的锁。如果赋予这些线程的优先级是固定不变的，同一批线程总是会拥有更高的优先级。为避免这个问题，可以在死锁发生的时候设置随机的优先级。

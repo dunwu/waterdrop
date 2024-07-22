@@ -15,22 +15,38 @@ permalink: /pages/34836712/
 
 # Java 并发面试一
 
-## 并发简介
+## 并发术语
 
 ### 并发和并行
+
+**典型问题**
+
+- 什么是并发？
+- 什么是并行？
+- 并发和并行有什么区别？
+
+**知识点**
 
 并发和并行是最容易让新手费解的概念，那么如何理解二者呢？其最关键的差异在于：是否是**同时**发生：
 
 - **并发**：是指具备处理多个任务的能力，但不一定要同时。
 - **并行**：是指具备同时处理多个任务的能力。
 
-下面是我见过最生动的说明，摘自 [并发与并行的区别是什么？——知乎的高票答案](https://www.zhihu.com/question/33515481/answer/58849148)：
+下面是我见过最生动的说明，摘自 [并发与并行的区别是什么？——知乎的高票答案](https://www.zhihu.com/question/33515481/answer/58849148)
 
 - 你吃饭吃到一半，电话来了，你一直到吃完了以后才去接，这就说明你不支持并发也不支持并行。
 - 你吃饭吃到一半，电话来了，你停了下来接了电话，接完后继续吃饭，这说明你支持并发。
 - 你吃饭吃到一半，电话来了，你一边打电话一边吃饭，这说明你支持并行。
 
 ### 同步和异步
+
+**典型问题**
+
+- 什么是同步？
+- 什么是异步？
+- 同步和异步有什么区别？
+
+**知识点**
 
 - **同步**：是指在发出一个调用时，在没有得到结果之前，该调用就不返回。但是一旦调用返回，就得到返回值了。
 - **异步**：则是相反，调用在发出之后，这个调用就直接返回了，所以没有返回结果。换句话说，当一个异步过程调用发出后，调用者不会立刻得到结果。而是在调用发出后，被调用者通过状态、通知来通知调用者，或通过回调函数处理这个调用。
@@ -42,6 +58,13 @@ permalink: /pages/34836712/
 
 ### 阻塞和非阻塞
 
+**典型问题**
+
+- 什么是阻塞？
+- 阻塞和非阻塞有什么区别？
+
+**知识点**
+
 阻塞和非阻塞关注的是程序在等待调用结果（消息，返回值）时的状态：
 
 - **阻塞**：是指调用结果返回之前，当前线程会被挂起。调用线程只有在得到结果之后才会返回。
@@ -52,10 +75,23 @@ permalink: /pages/34836712/
 - 阻塞调用就像是打电话，通话不结束，不能放下。
 - 非阻塞调用就像是发短信，发完短信后，就可以做其他事，短信来了，手机会提醒。
 
-### 进程和线程
+### 进程、线程、协程、管程
+
+**典型问题**
+
+- 什么是进程？
+- 什么是线程？
+- 什么是协程？
+- 什么是管程？
+- 进程和线程有什么区别？
+
+**知识点**
 
 - **进程**：进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动。进程是操作系统进行资源分配的基本单位。进程可视为一个正在运行的程序。
 - **线程**：线程是操作系统进行调度的基本单位。
+- **管程**：管程（Monitor），是指管理共享变量以及对共享变量的操作过程，让他们支持并发。
+  - 管程和信号量是等价的，所谓等价指的是用管程能够实现信号量，也能用信号量实现管程。
+  - Java 通过 synchronized 关键字及 wait()、notify()、notifyAll() 这三个方法来支持管程。
 
 进程和线程的差异：
 
@@ -66,6 +102,7 @@ permalink: /pages/34836712/
 <p align="center">
   <img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/processes-vs-threads.jpg">
 </p>
+
 JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这就是为什么几个线程可以访问同一个对象。线程共享堆并拥有自己的堆栈空间。这是一个线程如何调用一个方法以及它的局部变量是如何保持线程安全的。但是堆不是线程安全的并且为了线程安全必须进行同步。
 
 **总结：** **线程是进程划分成的更小的运行单位。线程和进程最大的不同在于基本上各进程是独立的，而各线程则不一定，因为同一进程中的线程极有可能会相互影响。线程执行开销小，但不利于资源的管理和保护；而进程正相反。**
@@ -95,6 +132,8 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 #### 一句话简单了解堆和方法区
 
 堆和方法区是所有线程共享的资源，其中堆是进程中最大的一块内存，主要用于存放新创建的对象 （几乎所有对象都在这里分配内存），方法区主要用于存放已被加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。
+
+## 并发概念
 
 ### Java 线程和操作系统的线程有啥区别？
 
@@ -138,59 +177,146 @@ JDK 1.2 之前，Java 线程是基于绿色线程（Green Threads）实现的，
 
 Java 使用的线程调度是抢占式的。也就是说，JVM 本身不负责线程的调度，而是将线程的调度委托给操作系统。操作系统通常会基于线程优先级和时间片来调度线程的执行，高优先级的线程通常获得 CPU 时间片的机会更多。
 
-### 并发一定比串行更快吗？
+### 并发和性能
 
-答：否。
+**典型问题**
 
-要点：**创建线程和线程上下文切换有一定开销**。
+**并发一定比串行更快吗？**
 
-说明：即使是单核处理器也支持多线程。CPU 通过给每个线程分配时间切片的算法来循环执行任务，当前任务执行一个时间片后会切换到下一个任务。但是，在切换前会保持上一个任务的状态，以便下次切换回这个任务时，可以再加载这个任务的状态。所以**任务从保存到再加载的过程就是一次上下文切换**。
+**知识点**
 
-引申
+**并发不一定比串行更快！**
 
-- 如何减少上下文切换？
-  - 尽量少用锁
-  - CAS 算法
-  - 线程数要合理
-  - 协程：在单线程中实现多任务调度，并在单线程中维持多个任务的切换
+对于多线程而言，它不仅可能会带来线程安全问题，还有可能会带来性能问题。
 
-### 如何让正在运行的线程暂停一段时间？
+多线程会产生部分额外的开销：
 
-我们可以使用 `Thread` 类的 Sleep() 方法让线程暂停一段时间。
+- **线程调度**
+  - **上下文切换** - 在实际开发中，线程数往往是大于 CPU 核心数的，比如 CPU 核心数可能是 8 核、16 核，等等，但线程数可能达到成百上千个。这种情况下，操作系统就会按照一定的调度算法，给每个线程分配时间片，让每个线程都有机会得到运行。而在进行调度时就会引起上下文切换，上下文切换会挂起当前正在执行的线程并保存当前的状态，然后寻找下一处即将恢复执行的代码，唤醒下一个线程，以此类推，反复执行。但上下文切换带来的开销是比较大的，假设我们的任务内容非常短，比如只进行简单的计算，那么就有可能发生我们上下文切换带来的性能开销比执行线程本身内容带来的开销还要大的情况。
+  - **缓存失效** - 由于程序有很大概率会再次访问刚才访问过的数据，所以为了加速整个程序的运行，会使用缓存，这样我们在使用相同数据时就可以很快地获取数据。可一旦进行了线程调度，切换到其他线程，CPU就会去执行不同的代码，原有的缓存就很可能失效了，需要重新缓存新的数据，这也会造成一定的开销，所以线程调度器为了避免频繁地发生上下文切换，通常会给被调度到的线程设置最小的执行时间，也就是只有执行完这段时间之后，才可能进行下一次的调度，由此减少上下文切换的次数。
+- **线程协作** - 因为线程之间如果有共享数据，为了避免数据错乱，为了保证线程安全，就有可能禁止编译器和 CPU 对其进行重排序等优化，也可能出于同步的目的，反复把线程工作内存的数据 flush 到主存中，然后再从主内存 refresh 到其他线程的工作内存中，等等。这些问题在单线程中并不存在，但在多线程中为了确保数据的正确性，就不得不采取上述方法，因为线程安全的优先级要比性能优先级更高，这也间接降低了我们的性能。
 
-需要注意的是，这并不会让线程终止，一旦从休眠中唤醒线程，线程的状态将会被改变为 Runnable，并且根据线程调度，它将得到执行。
+### 并发安全
 
-### 什么是线程调度器 (Thread Scheduler) 和时间分片 (Time Slicing)？
+**经典问题**
 
-线程调度器是一个操作系统服务，它负责为 `Runnable` 状态的线程分配 CPU 时间。一旦我们创建一个线程并启动它，它的执行便依赖于线程调度器的实现。
+（1）有哪些线程不安全的情况
 
-时间分片是指将可用的 CPU 时间分配给可用的 `Runnable` 线程的过程。
+（2）哪些场景需要额外注意线程安全问题？
 
-分配 CPU 时间可以基于线程优先级或者线程等待的时间。线程调度并不受到 Java 虚拟机控制，所以由应用程序来控制它是更好的选择（也就是说不要让你的程序依赖于线程的优先级）。
+**知识点**
 
-### 在多线程中，什么是上下文切换 (context-switching)？
+（1）有哪些线程不安全的情况
 
-上下文切换是存储和恢复 CPU 状态的过程，它使得线程执行能够从中断点恢复执行。上下文切换是多任务操作系统和多线程环境的基本特征。
+1. 运行结果错误；
+2. 发布和初始化导致线程安全问题；
+3. 活跃性问题。典型的有：死锁、活锁和饥饿
+   1. 死锁是指两个以上的线程永远相互阻塞的情况。
+   2. 活锁 - 活锁是指两个或多个线程在执行各自的逻辑时，相互之间不断地做出反应和改变状态，从而陷入无限循环，而这种循环不会导致任何线程向前推进。
+   3. 饥饿 - 饥饿是指线程需要某些资源时始终得不到，尤其是 CPU 资源，就会导致线程一直不能运行而产生的问题。
 
-### 如何确保线程安全？
+【示例】运行结果错误
 
-- 原子类 (atomic concurrent classes)
-- 锁
-- `volatile` 关键字
-- 不变类和线程安全类
+```java
+public class WrongResult {
 
-### 什么是死锁 (Deadlock)？
+   volatile static int i;
 
-死锁是指两个以上的线程永远相互阻塞的情况，这种情况产生至少需要两个以上的线程和两个以上的资源。
+   public static void main(String[] args) throws InterruptedException {
 
-产生死锁的四个必要条件：
+       Runnable r = new Runnable() {
+
+           @Override
+
+           public void run() {
+
+               for (int j = 0; j < 10000; j++) {
+
+                   i++;
+
+               }
+
+           }
+
+       };
+
+       Thread thread1 = new Thread(r);
+
+       thread1.start();
+
+       Thread thread2 = new Thread(r);
+
+       thread2.start();
+
+       thread1.join();
+
+       thread2.join();
+
+       System.out.println(i);
+
+    }
+
+}
+```
+
+启动两个线程，分别对变量 i 进行 10000 次 i++ 操作。理论上得到的结果应该是 20000，但实际结果却远小于理论结果。这是因为 i 变量虽然被修饰为 volatile，但由于 i++  不是原子操作，而 volatile 无法保证原子性，这就导致两个线程在循环 ++ 操作时，无法及时感知 i 的数值变化，最终导致累加数值远小于预期值。
+
+【示例】发布和初始化导致线程安全问题
+
+```java
+public class WrongInit {
+
+    private Map<Integer, String> students;
+
+    public WrongInit() {
+        new Thread(() -> {
+            students = new HashMap<>();
+            students.put(1, "王小美");
+            students.put(2, "钱二宝");
+            students.put(3, "周三");
+            students.put(4, "赵四");
+        }).start();
+    }
+
+    public Map<Integer, String> getStudents() {
+        return students;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        WrongInit demo = new WrongInit();
+        System.out.println(demo.getStudents().get(1));
+    }
+
+}
+```
+
+（2）哪些场景需要额外注意线程安全问题？
+
+- **访问共享变量或资源** - 典型的场景有访问共享对象的属性，访问 static 静态变量，访问共享的缓存，等等。因为这些信息不仅会被一个线程访问到，还有可能被多个线程同时访问，那么就有可能在并发读写的情况下发生线程安全问题。
+- **依赖时序的操作** - 如果我们操作的正确性是依赖时序的，而在多线程的情况下又不能保障执行的顺序和我们预想的一致，这个时候就会发生线程安全问题。
+- **不同数据之间存在绑定关系** - 有时候，不同数据之间是成组出现的，存在着相互对应或绑定的关系，最典型的就是 IP 和端口号。有时候我们更换了 IP，往往需要同时更换端口号，如果没有把这两个操作绑定在一起，就有可能出现单独更换了 IP 或端口号的情况，而此时信息如果已经对外发布，信息获取方就有可能获取一个错误的 IP 与端口绑定情况，这时就发生了线程安全问题。
+- **对方没有声明自己是线程安全的** - 在我们使用其他类时，如果对方没有声明自己是线程安全的，那么这种情况下对其他类进行多线程的并发操作，就有可能会发生线程安全问题。举个例子，比如说我们定义了 ArrayList，它本身并不是线程安全的，如果此时多个线程同时对 ArrayList 进行并发读/写，那么就有可能会产生线程安全问题，造成数据出错，而这个责任并不在 ArrayList，因为它本身并不是并发安全的。
+
+### 死锁
+
+**典型问题**
+
+（1）什么是死锁？
+
+（2）如何预防和避免线程死锁？
+
+**知识点**
+
+（1）什么是死锁？
+
+**死锁是指两个以上的线程永远相互阻塞的情况**。产生死锁的四个必要条件：
 
 1. 互斥条件：该资源任意一个时刻只由一个线程占用。
 2. 请求与保持条件：一个线程因请求资源而阻塞时，对已获得的资源保持不放。
 3. 不剥夺条件：线程已获得的资源在未使用完之前不能被其他线程强行剥夺，只有自己使用完毕后才释放资源。
 4. 循环等待条件：若干线程之间形成一种头尾相接的循环等待资源关系。
 
-### 如何预防和避免线程死锁？
+（2）如何预防和避免线程死锁？
 
 **如何预防死锁？** 破坏死锁的产生的必要条件即可：
 
@@ -214,7 +340,7 @@ Java 线程生命周期中有哪些状态？各状态之间如何切换？
 
 **知识点**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202407120818668.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202407211143123.png)
 
 `java.lang.Thread.State` 中定义了 **6** 种不同的线程状态，在给定的一个时刻，线程只能处于其中的一个状态。
 
@@ -251,11 +377,16 @@ Java 线程生命周期中有哪些状态？各状态之间如何切换？
 
 **知识点**
 
-一般来说，创建线程有很多种方式，例如继承 `Thread` 类、实现 `Runnable` 接口、实现 `Callable` 接口、使用线程池、使用 `CompletableFuture` 类等等。
+一般来说，创建线程有很多种方式，例如：
 
-不过，这些方式其实并没有真正创建出线程。准确点来说，这些都属于是在 Java 代码中使用多线程的方法。
+- 实现 `Runnable` 接口
+- 实现 `Callable` 接口
+- 继承 `Thread` 类
+- 通过线程池创建线程
+- 使用 `CompletableFuture` 创建线程
+- ...
 
-严格来说，Java 就只有一种方式可以创建线程，那就是通过 `new Thread().start() `创建。不管是哪种方式，最终还是依赖于 `new Thread().start()`。
+虽然，看似有多种多样的创建线程方式。但是，从本质上来说，Java 就只有一种方式可以创建线程，那就是通过 `new Thread().start() ` 创建。不管是哪种方式，最终还是依赖于 `new Thread().start()`。
 
 > 👉 扩展阅读：[大家都说 Java 有三种创建线程的方式！并发编程中的惊天骗局！](https://mp.weixin.qq.com/s/NspUsyhEmKnJ-4OprRFp9g)。
 >
@@ -323,21 +454,25 @@ Java 线程生命周期中有哪些状态？各状态之间如何切换？
 
 （2）为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？
 
+（3） `Object.wait()` 和 `Thread.sleep` 有什么区别？
+
 **知识点**
 
 （1）为什么线程通信的方法 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？
 
+Java 的每个对象中都有一个称之为 monitor 监视器的锁，由于每个对象都可以上锁，这就要求在对象头中有一个用来保存锁信息的位置。这个锁是对象级别的，而非线程级别的，wait/notify/notifyAll 也都是锁级别的操作，它们的锁属于对象，所以把它们定义在 Object 类中是最合适，因为 Object 类是所有对象的父类。
+
+如果把 wait/notify/notifyAll 方法定义在 Thread 类中，会带来很大的局限性，比如一个线程可能持有多把锁，以便实现相互配合的复杂逻辑，假设此时 wait 方法定义在 Thread 类中，如何实现让一个线程持有多把锁呢？又如何明确线程等待的是哪把锁呢？既然我们是让当前线程去等待某个对象的锁，自然应该通过操作对象来实现，而不是操作线程。
+
 - `Object.wait()`
-  - `Object.wait()`方法用于使当前线程进入等待状态，直到其他线程调用相同对象的`notify()`或`notifyAll()`方法唤醒它。
-  - 在调用`wait()`方法时，线程会释放对象的锁，并进入等待状态。通常在使用`wait()`方法时需要放在一个循环中，以避免虚假唤醒（spurious wakeups）。
+  - `Object.wait()` 方法用于使当前线程进入等待状态，直到其他线程调用相同对象的 `notify()` 或 `notifyAll()` 方法唤醒它。
+  - 在调用 `wait()` 方法时，线程会释放对象的锁，并进入等待状态。通常在使用 `wait()` 方法时需要放在一个循环中，以避免虚假唤醒（spurious wakeups）。
 - `Object.notify()`
-  - `Object.notify()`方法用于唤醒正在等待该对象的锁的一个线程。
+  - `Object.notify()` 方法用于唤醒正在等待该对象的锁的一个线程。
   - 被唤醒的线程将会尝试重新获取对象的锁，一旦获取到锁，它将继续执行。
 - `Object.notifyAll()`
-  - `Object.notifyAll()`方法用于唤醒正在等待该对象的锁的所有线程。
+  - `Object.notifyAll()` 方法用于唤醒正在等待该对象的锁的所有线程。
   - 所有被唤醒的线程将会竞争对象的锁，一旦获取到锁，它们将继续执行。
-
-Java 的每个对象中都有一个对象锁 (monitor），并且 `wait()`、`notify()` 等方法用于等待对象的锁或者通知其他线程对象的监视器可用。在 Java 的线程中并没有可供任何对象使用的锁和同步器。这就是为什么这些方法是 `Object` 类的一部分，这样 Java 的每一个类都有用于线程间通信的基本方法
 
 （2）为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？
 
@@ -345,7 +480,169 @@ Java 的每个对象中都有一个对象锁 (monitor），并且 `wait()`、`no
 
 由于所有的这些方法都需要线程持有对象的锁，这样就只能通过 `synchronized` 来实现，所以他们只能在 `synchronized` 方法/块中被调用。
 
+（3） `Object.wait()` 和 `Thread.sleep` 有什么区别？
+
+相同点：
+
+1. 它们都可以让线程阻塞。
+2. 它们都可以响应 interrupt 中断：在等待的过程中如果收到中断信号，都可以进行响应，并抛出 InterruptedException 异常。
+
+不同点：
+
+1. wait 方法必须在 synchronized 保护的代码中使用，而 sleep 方法并没有这个要求。
+2. 在同步代码中执行 sleep 方法时，并不会释放 monitor 锁，但执行 wait 方法时会主动释放 monitor 锁。
+3. sleep 方法中会要求必须定义一个时间，时间到期后会主动恢复，而对于没有参数的 wait 方法而言，意味着永久等待，直到被中断或被唤醒才能恢复，它并不会主动恢复。
+4. wait/notify 是 Object 类的方法，而 sleep 是 Thread 类的方法。
+
 > 👉 扩展阅读：[Java 并发编程：线程间协作的两种方式：wait、notify、notifyAll 和 Condition](http://www.cnblogs.com/dolphin0520/p/3920385.html)
+
+### 线程停止
+
+**经典问题**
+
+（1）如何正确停止线程？
+
+（2）可以使用 `Thread.stop`，`Thread.suspend` 和 `Thread.resume` 停止线程吗？为什么？
+
+（3）使用 `volatile` 标记方式停止线程正确吗？
+
+**知识点**
+
+（1）如何正确停止线程？
+
+通常情况下，我们不会手动停止一个线程，而是允许线程运行到结束，然后让它自然停止。但是依然会有许多特殊的情况需要我们提前停止线程，比如：用户突然关闭程序，或程序运行出错重启等。
+
+**对于 Java 而言，最正确的停止线程的方式是：通过 `Thread.interrupt` 和 `Thread.isInterrupted` 配合来控制线程终止**。但 `Thread.interrupt` 仅仅起到通知被停止线程的作用。而对于被停止的线程而言，它拥有完全的自主权，它既可以选择立即停止，也可以选择一段时间后停止，也可以选择压根不停止。
+
+事实上，Java 希望程序间能够相互通知、相互协作地管理线程，因为如果不了解对方正在做的工作，贸然强制停止线程就可能会造成一些安全的问题，为了避免造成问题就需要给对方一定的时间来整理收尾工作。比如：线程正在写入一个文件，这时收到终止信号，它就需要根据自身业务判断，是选择立即停止，还是将整个文件写入成功后停止，而如果选择立即停止就可能造成数据不完整，不管是中断命令发起者，还是接收者都不希望数据出现问题。
+
+一旦调用某个线程的 `Thread.interrupt` 之后，这个线程的中断标记位就会被设置成 `true`。每个线程都有这样的标记位，当线程执行时，应该定期检查这个标记位，如果标记位被设置成 `true`，就说明有程序想终止该线程。回到源码，可以看到在 `while` 循环体判断语句中，首先通过 `Thread.currentThread().isInterrupt()` 判断线程是否被中断，随后检查是否还有工作要做。&& 逻辑表示只有当两个判断条件同时满足的情况下，才会去执行下面的工作。
+
+需要留意一个特殊场景：**`Thread.sleep` 后，线程依然可以感知 `Thread.interrupt`**。
+
+【示例】正确停止线程的方式——`Thread.interrupt`
+
+```java
+public class ThreadStopDemo {
+
+    public static void main(String[] args) throws Exception {
+        Thread thread = new Thread(new MyTask(), "MyTask");
+        thread.start();
+        TimeUnit.MILLISECONDS.sleep(10);
+        thread.interrupt();
+    }
+
+    private static class MyTask implements Runnable {
+
+        private long count = 0L;
+
+        @Override
+        public void run() {
+            System.out.println(Thread.currentThread().getName() + " 线程启动");
+            // 通过 Thread.interrupted 和 interrupt 配合来控制线程终止
+            while (!Thread.currentThread().isInterrupted() && count < 10000) {
+                System.out.println("count = " + count++);
+            }
+            System.out.println(Thread.currentThread().getName() + " 线程终止");
+        }
+
+    }
+
+}
+// 输出（count 未到 10000，线程就主动结束）：
+// MyTask 线程启动
+// count = 0
+// count = 1
+// ...
+// count = 840
+// count = 841
+// count = 842
+// MyTask 线程终止
+```
+
+（2）可以使用 `Thread.stop`，`Thread.suspend` 和 `Thread.resume` 停止线程吗？为什么？
+
+`Thread.stop`，`Thread.suspend` 和 `Thread.resume` 方法已经被 Java 标记为 `@Deprecated`。为什么废弃呢？
+
+- **`Thread.stop` 会直接把线程停止，这样就没有给线程足够的时间来处理想要在停止前保存数据的逻辑，任务戛然而止，会导致出现数据完整性等问题**。
+- 而对于`Thread.suspend` 和 `Thread.resume` 而言，它们的问题在于：**如果线程调用 `Thread.suspend`，它并不会释放锁，就开始进入休眠，但此时有可能仍持有锁，这样就容易导致死锁问题**。因为这把锁在线程被 `Thread.resume` 之前，是不会被释放的。假设线程 A 调用了 `Thread.suspend` 方法让线程 B 挂起，线程 B 进入休眠，而线程 B 又刚好持有一把锁，此时假设线程 A 想访问线程 B 持有的锁，但由于线程 B 并没有释放锁就进入休眠了，所以对于线程 A 而言，此时拿不到锁，也会陷入阻塞，那么线程 A 和线程 B 就都无法继续向下执行。
+
+【示例】`Thread.stop` 终止线程，导致线程任务戛然而止
+
+```java
+public class ThreadStopErrorDemo {
+
+    public static void main(String[] args) {
+        MyTask thread = new MyTask();
+        thread.start();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // 终止线程
+        thread.stop();
+        // 确保线程终止后，才执行下面的代码
+        while (thread.isAlive()) { }
+        // 输出两个计数器的最终状态
+        thread.print();
+    }
+
+    /**
+     * 持有两个计数器，run 方法中每次执行都会使计数器自增
+     */
+    private static class MyTask extends Thread {
+
+        private int i = 0;
+
+        private int j = 0;
+
+        @Override
+        public void run() {
+            synchronized (this) {
+                ++i;
+                try {
+                    // 模拟耗时操作
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ++j;
+            }
+        }
+
+        public void print() {
+            System.out.println("i=" + i + " j=" + j);
+        }
+
+    }
+
+}
+```
+
+（3）使用 `volatile` 标记方式停止线程正确吗？
+
+使用 `volatile` 标记方式停止线程并不总是正确的。虽然 `volatile` 变量可以确保可见性，即当一个线程修改了 `volatile` 变量的值，其他线程能够立即看到最新的值，但它并不能保证原子性，也就是说并不能保证多个线程对 `volatile` 变量的操作是互斥的。
+
+当我们使用 `volatile` 变量来控制线程的停止，通常是通过设置一个 `volatile` 标志位来告诉线程停止执行。例如：
+
+```java
+public class MyTask extends Thread {
+    private volatile boolean canceled = false;
+
+    public void run() {
+        while (!canceled) {
+            // 执行任务
+        }
+    }
+
+    public void stopTask() {
+        canceled = true;
+    }
+}
+```
+
+在上述例子中，`canceled` 是一个 `volatile` 变量，用来控制线程的停止。虽然这种方式在某些情况下可以工作，但它并不是一个可靠的停止线程的方式，因为在多线程环境中，其他线程修改 `canceled` 的值时，可能会出现竞态条件，导致线程无法正确停止。
 
 ### 线程优先级
 
@@ -397,7 +694,7 @@ Java 的每个对象中都有一个对象锁 (monitor），并且 `wait()`、`no
 
 ### volatile 保证线程可见性
 
-**经典问题**
+**典型问题**
 
 - `volatile` 有什么作用？
 - Java 中，如何保证变量的可见性？
@@ -414,7 +711,7 @@ Java 的每个对象中都有一个对象锁 (monitor），并且 `wait()`、`no
 
 ### volatile 防止 JVM 的指令重排序
 
-**经典问题**
+**典型问题**
 
 - `volatile` 有什么作用？
 - Java 中，如何防止 JVM 的指令重排序？
@@ -570,7 +867,7 @@ public void increase() {
 
 ### volatile 和 synchronized
 
-**经典问题**
+**典型问题**
 
 `volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` ？
 
@@ -586,19 +883,14 @@ public void increase() {
 
 ## synchronized
 
-> `synchronized` 有什么作用？
->
-> `synchronized` 的原理是什么？
->
-> 同步方法和同步块，哪个更好？
->
-> JDK1.6 对`synchronized` 做了哪些优化？
->
-> 使用 `synchronized` 修饰静态方法和非静态方法有什么区别？
-
-synchronized 作用
-
-**`synchronized` 可以保证在同一个时刻，只有一个线程可以执行某个方法或者某个代码块**。
+synchronized 关键字 synchronized 是什么？
+有什么用？
+如何使用 synchronized？
+构造方法可以用 synchronized 修饰么？
+synchronized 底层原理了解吗？
+JDK1.6 之后的 synchronized 底层做了哪些优化？
+锁升级原理了解吗？
+synchronized 和 volatile 有什么区别？
 
 `synchronized` 有 3 种应用方式：
 
@@ -624,6 +916,176 @@ Java 1.6 以后，`synchronized` 做了大量的优化，其性能已经与 `Loc
 
 - 同步块是更好的选择。
 - 因为它不会锁住整个对象（当然你也可以让它锁住整个对象）。同步方法会锁住整个对象，哪怕这个类中有多个不相关联的同步块，这通常会导致他们停止执行并需要等待获得这个对象上的锁。
+
+### synchronized 作用
+
+**典型问题**
+
+`synchronized` 有什么作用？
+
+**知识点**
+
+**`synchronized` 可以保证在同一个时刻，只有一个线程可以执行某个方法或者某个代码块**。
+
+`synchronized` 同步块对同一线程来说是可重入的，不会出现锁死问题。
+
+`synchronized` 同步块是互斥的，即已进入的线程执行完成前，会阻塞其他试图进入的线程。
+
+在 Java 早期版本中，`synchronized` 属于 **重量级锁**，效率低下。这是因为监视器锁（monitor）是依赖于底层的操作系统的 `Mutex Lock` 来实现的，Java 的线程是映射到操作系统的原生线程之上的。如果要挂起或者唤醒一个线程，都需要操作系统帮忙完成，而操作系统实现线程之间的切换时需要从用户态转换到内核态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高。
+
+不过，在 Java 6 之后， `synchronized` 引入了大量的优化如自旋锁、适应性自旋锁、锁消除、锁粗化、偏向锁、轻量级锁等技术来减少锁操作的开销，这些优化让 `synchronized` 锁的效率提升了很多。因此， `synchronized` 还是可以在实际项目中使用的，像 JDK 源码、很多开源框架都大量使用了 `synchronized` 。
+
+关于偏向锁多补充一点：由于偏向锁增加了 JVM 的复杂性，同时也并没有为所有应用都带来性能提升。因此，在 JDK15 中，偏向锁被默认关闭（仍然可以使用 `-XX:+UseBiasedLocking` 启用偏向锁），在 JDK18 中，偏向锁已经被彻底废弃（无法通过命令行打开）。
+
+### synchronized 用法
+
+**典型问题**
+
+- synchronized 可以用在哪些场景？
+- synchronized 如何使用？
+
+**知识点**
+
+`synchronized` 关键字的使用方式主要有下面 3 种：
+
+1. 修饰实例方法
+2. 修饰静态方法
+3. 修饰代码块
+
+**1、修饰实例方法** （锁当前对象实例）
+
+给当前对象实例加锁，进入同步代码前要获得 **当前对象实例的锁** 。
+
+```
+synchronized void method() {
+    // 业务代码
+}
+```
+
+**2、修饰静态方法** （锁当前类）
+
+给当前类加锁，会作用于类的所有对象实例 ，进入同步代码前要获得 **当前 class 的锁**。
+
+这是因为静态成员不属于任何一个实例对象，归整个类所有，不依赖于类的特定实例，被类的所有实例共享。
+
+```
+synchronized static void method() {
+    // 业务代码
+}
+```
+
+静态 `synchronized` 方法和非静态 `synchronized` 方法之间的调用互斥么？不互斥！如果一个线程 A 调用一个实例对象的非静态 `synchronized` 方法，而线程 B 需要调用这个实例对象所属类的静态 `synchronized` 方法，是允许的，不会发生互斥现象，因为访问静态 `synchronized` 方法占用的锁是当前类的锁，而访问非静态 `synchronized` 方法占用的锁是当前实例对象锁。
+
+**3、修饰代码块** （锁指定对象 / 类）
+
+对括号里指定的对象 / 类加锁：
+
+- `synchronized(object)` 表示进入同步代码库前要获得 **给定对象的锁**。
+- `synchronized（类。class)` 表示进入同步代码前要获得 **给定 Class 的锁**
+
+```
+synchronized(this) {
+    // 业务代码
+}
+```
+
+**总结：**
+
+- `synchronized` 关键字加到 `static` 静态方法和 `synchronized(class)` 代码块上都是是给 Class 类上锁；
+- `synchronized` 关键字加到实例方法上是给对象实例上锁；
+- 尽量不要使用 `synchronized(String a)` 因为 JVM 中，字符串常量池具有缓存功能。
+
+### 构造方法可以用 synchronized 修饰么？
+
+构造方法不能使用 synchronized 关键字修饰。不过，可以在构造方法内部使用 synchronized 代码块。
+
+另外，构造方法本身是线程安全的，但如果在构造方法中涉及到共享资源的操作，就需要采取适当的同步措施来保证整个构造过程的线程安全。
+
+### synchronized 底层原理了解吗？
+
+`synchronized` 经过编译后，会在同步块的前后分别形成 `monitorenter` 和 `monitorexit` 这两个字节码指令，这两个字节码指令都需要一个引用类型的参数来指明要锁定和解锁的对象。如果 `synchronized` 明确制定了对象参数，那就是这个对象的引用；如果没有明确指定，那就根据 `synchronized` 修饰的是实例方法还是静态方法，去对对应的对象实例或 `Class` 对象来作为锁对象。
+
+synchronized 关键字底层原理属于 JVM 层面的东西。
+
+#### synchronized 同步语句块的情况
+
+```
+public class SynchronizedDemo {
+    public void method() {
+        synchronized (this) {
+            System.out.println("synchronized 代码块");
+        }
+    }
+}
+```
+
+通过 JDK 自带的 `javap` 命令查看 `SynchronizedDemo` 类的相关字节码信息：首先切换到类的对应目录执行 `javac SynchronizedDemo.java` 命令生成编译后的 .class 文件，然后执行 `javap -c -s -v -l SynchronizedDemo.class`。
+
+[![synchronized 关键字原理](https://camo.githubusercontent.com/669b67b48f1e58c37ac12eb80239cc5df7df55d7d75f9187e1622ee401a0c230/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d7072696e6369706c652e706e67)](https://camo.githubusercontent.com/669b67b48f1e58c37ac12eb80239cc5df7df55d7d75f9187e1622ee401a0c230/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d7072696e6369706c652e706e67)
+
+从上面我们可以看出：**`synchronized` 同步语句块的实现使用的是 `monitorenter` 和 `monitorexit` 指令，其中 `monitorenter` 指令指向同步代码块的开始位置，`monitorexit` 指令则指明同步代码块的结束位置。**
+
+上面的字节码中包含一个 `monitorenter` 指令以及两个 `monitorexit` 指令，这是为了保证锁在同步代码块代码正常执行以及出现异常的这两种情况下都能被正确释放。
+
+当执行 `monitorenter` 指令时，线程试图获取锁也就是获取 **对象监视器 `monitor`** 的持有权。
+
+> 在 Java 虚拟机 (HotSpot) 中，Monitor 是基于 C++ 实现的，由 [ObjectMonitor](https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/runtime/objectMonitor.cpp) 实现的。每个对象中都内置了一个 `ObjectMonitor` 对象。
+>
+> 另外，`wait/notify` 等方法也依赖于 `monitor` 对象，这就是为什么只有在同步的块或者方法中才能调用 `wait/notify` 等方法，否则会抛出 `java.lang.IllegalMonitorStateException` 的异常的原因。
+
+在执行 `monitorenter` 时，会尝试获取对象的锁，如果锁的计数器为 0 则表示锁可以被获取，获取后将锁计数器设为 1 也就是加 1。
+
+[![ 执行 monitorenter 获取锁](https://camo.githubusercontent.com/9b5986778b36cc58ea99abe6df0a892dc46acae65bbb73fba6b6dcfc4834da6b/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d6765742d6c6f636b2d636f64652d626c6f636b2e706e67)](https://camo.githubusercontent.com/9b5986778b36cc58ea99abe6df0a892dc46acae65bbb73fba6b6dcfc4834da6b/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d6765742d6c6f636b2d636f64652d626c6f636b2e706e67)
+
+对象锁的的拥有者线程才可以执行 `monitorexit` 指令来释放锁。在执行 `monitorexit` 指令后，将锁计数器设为 0，表明锁被释放，其他线程可以尝试获取锁。
+
+[![ 执行 monitorexit 释放锁](https://camo.githubusercontent.com/ff0fb002626c445b1adc69507f430bc0ffd1202c9e0decfc58749f71c8183587/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d72656c656173652d6c6f636b2d626c6f636b2e706e67)](https://camo.githubusercontent.com/ff0fb002626c445b1adc69507f430bc0ffd1202c9e0decfc58749f71c8183587/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d72656c656173652d6c6f636b2d626c6f636b2e706e67)
+
+如果获取对象锁失败，那当前线程就要阻塞等待，直到锁被另外一个线程释放为止。
+
+#### synchronized 修饰方法的的情况
+
+```
+public class SynchronizedDemo2 {
+    public synchronized void method() {
+        System.out.println("synchronized 方法");
+    }
+}
+```
+
+[![synchronized 关键字原理](https://camo.githubusercontent.com/0ac6ee1ed5d3ca201bd9243767f5a3d239419b6381c9053c7ccfba00890bd4b7/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f73796e6368726f6e697a6564254535253835254233254539253934254145254535254144253937254535253845253946254537253930253836322e706e67)](https://camo.githubusercontent.com/0ac6ee1ed5d3ca201bd9243767f5a3d239419b6381c9053c7ccfba00890bd4b7/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f73796e6368726f6e697a6564254535253835254233254539253934254145254535254144253937254535253845253946254537253930253836322e706e67)
+
+`synchronized` 修饰的方法并没有 `monitorenter` 指令和 `monitorexit` 指令，取得代之的确实是 `ACC_SYNCHRONIZED` 标识，该标识指明了该方法是一个同步方法。JVM 通过该 `ACC_SYNCHRONIZED` 访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用。
+
+如果是实例方法，JVM 会尝试获取实例对象的锁。如果是静态方法，JVM 会尝试获取当前 class 的锁。
+
+#### 总结
+
+`synchronized` 同步语句块的实现使用的是 `monitorenter` 和 `monitorexit` 指令，其中 `monitorenter` 指令指向同步代码块的开始位置，`monitorexit` 指令则指明同步代码块的结束位置。
+
+`synchronized` 修饰的方法并没有 `monitorenter` 指令和 `monitorexit` 指令，取得代之的确实是 `ACC_SYNCHRONIZED` 标识，该标识指明了该方法是一个同步方法。
+
+**不过两者的本质都是对对象监视器 monitor 的获取。**
+
+相关推荐：[Java 锁与线程的那些事 - 有赞技术团队](https://tech.youzan.com/javasuo-yu-xian-cheng-de-na-xie-shi/) 。
+
+🧗🏻 进阶一下：学有余力的小伙伴可以抽时间详细研究一下对象监视器 `monitor`。
+
+### JDK1.6 之后的 synchronized 底层做了哪些优化？锁升级原理了解吗？
+
+在 Java 6 之后， `synchronized` 引入了大量的优化如自旋锁、适应性自旋锁、锁消除、锁粗化、偏向锁、轻量级锁等技术来减少锁操作的开销，这些优化让 `synchronized` 锁的效率提升了很多（JDK18 中，偏向锁已经被彻底废弃，前面已经提到过了）。
+
+锁主要存在四种状态，依次是：无锁状态、偏向锁状态、轻量级锁状态、重量级锁状态，他们会随着竞争的激烈而逐渐升级。注意锁可以升级不可降级，这种策略是为了提高获得锁和释放锁的效率。
+
+`synchronized` 锁升级是一个比较复杂的过程，面试也很少问到，如果你想要详细了解的话，可以看看这篇文章：[浅析 synchronized 锁升级的原理与实现](https://www.cnblogs.com/star95/p/17542850.html)。
+
+### synchronized 和 volatile 有什么区别？
+
+`synchronized` 关键字和 `volatile` 关键字是两个互补的存在，而不是对立的存在！
+
+- `volatile` 关键字是线程同步的轻量级实现，所以 `volatile` 性能肯定比 `synchronized` 关键字要好 。但是 `volatile` 关键字只能用于变量而 `synchronized` 关键字可以修饰方法以及代码块 。
+- `volatile` 关键字能保证数据的可见性，但不能保证数据的原子性。`synchronized` 关键字两者都能保证。
+- `volatile` 关键字主要用于解决变量在多个线程之间的可见性，而 `synchronized` 关键字解决的是多个线程之间访问资源的同步性。
 
 ## CAS
 
@@ -766,108 +1228,4 @@ JDK 1.8：
   - 如果都不满足，则利用 synchronized 锁写入数据。
   - 如果数量大于 `TREEIFY_THRESHOLD` 则要转换为红黑树。
 
-## 并发简介
 
-线程什么是线程和进程？
-Java 线程和操作系统的线程有啥区别？
-请简要描述线程与进程的关系，区别及优缺点？
-如何创建线程？
-说说线程的生命周期和状态？
-什么是线程上下文切换？
-Thread#sleep() 方法和 Object#wait() 方法对比为什么 wait() 方法不定义在 Thread 中？
-可以直接调用 Thread 类的 run 方法吗？
-多线程并发与并行的区别同步和异步的区别为什么要使用多线程？
-使用多线程可能带来什么问题？
-如何理解线程安全和不安全？
-单核 CPU 上运行多个线程效率一定会高吗？
-
-## 死锁
-
-死锁什么是线程死锁？
-如何检测死锁？
-如何预防和避免线程死锁？
-
-## volatile
-
-volatile 关键字如何保证变量的可见性？
-如何禁止指令重排序？
-volatile 可以保证原子性么？
-
-## synchronized
-
-synchronized 关键字 synchronized 是什么？
-有什么用？
-如何使用 synchronized？
-构造方法可以用 synchronized 修饰么？
-synchronized 底层原理了解吗？
-JDK1.6 之后的 synchronized 底层做了哪些优化？
-锁升级原理了解吗？
-synchronized 和 volatile 有什么区别？
-
-## ThreadLocal
-
-ThreadLocal 有什么用？
-如何使用 ThreadLocal？
-ThreadLocal 原理了解吗？
-ThreadLocal 内存泄露问题是怎么导致的？
-
-## 锁
-
-乐观锁和悲观锁什么是悲观锁？
-什么是乐观锁？
-如何实现乐观锁？
-CAS 算法存在哪些问题？
-ReentrantLockReentrantLock 是什么？
-公平锁和非公平锁有什么区别？
-synchronized 和 ReentrantLock 有什么区别？
-可中断锁和不可中断锁有什么区别？
-ReentrantReadWriteLockReentrantReadWriteLock 是什么？
-ReentrantReadWriteLock 适合什么场景？
-共享锁和独占锁有什么区别？
-线程持有读锁还能获取写锁吗？
-读锁为什么不能升级为写锁？
-StampedLockStampedLock 是什么？
-StampedLock 的性能为什么更好？
-StampedLock 适合什么场景？
-StampedLock 的底层原理了解吗？
-
-## 线程池
-
-线程池什么是线程池？为什么要用线程池？
-如何创建线程池？
-为什么不推荐使用内置线程池？
-线程池常见参数有哪些？
-如何解释？
-线程池的拒绝策略有哪些？
-如果不允许丢弃任务任务，应该选择哪个拒绝策略？
-CallerRunsPolicy 拒绝策略有什么风险？
-如何解决？
-线程池常用的阻塞队列有哪些？
-线程池处理任务的流程了解吗？
-线程池中线程异常后，销毁还是复用？
-如何给线程池命名？
-如何设定线程池的大小？
-如何动态修改线程池的参数？
-如何设计一个能够根据任务的优先级来执行的线程池？
-
-## Future
-
-Future 类有什么用？
-Callable 和 Future 有什么关系？
-CompletableFuture 类有什么用？
-
-## AQS
-
-AQS 是什么？
-AQS 的原理是什么？
-
-## 并发工具
-
-Semaphore 有什么用？
-Semaphore 的原理是什么？
-CountDownLatch 有什么用？
-CountDownLatch 的原理是什么？
-用过 CountDownLatch 么？
-什么场景下用的？
-CyclicBarrier 有什么用？
-CyclicBarrier 的原理是什么？

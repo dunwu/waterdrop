@@ -25,13 +25,13 @@ dir:
 
 ## 📖 内容
 
-### [Java 并发简介](01.Java并发简介.md)
+### [Java 并发简介](Java并发简介)
 
 > **关键词：`进程`、`线程`、`安全性`、`活跃性`、`性能`、`死锁`、`饥饿`、`上下文切换`**
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200701113445.png)
 
-### [Java 线程基础](02.Java线程基础.md)
+### [Java 线程基础](Java线程基础)
 
 > **关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`**
 
@@ -39,35 +39,35 @@ dir:
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/java-thread_1.png)
 
-### [Java 并发核心机制](03.Java并发核心机制.md)
+### [Java 并发核心机制](Java并发核心机制)
 
 > **关键词：`synchronized`、`volatile`、`CAS`、`ThreadLocal`**
 
-### [Java 并发锁](04.Java锁.md)
+### [Java 并发锁](Java锁)
 
 > **关键词：`AQS`、`ReentrantLock`、`ReentrantReadWriteLock`、`Condition`**
 
-### [Java 原子类](05.Java原子类.md)
+### [Java 原子类](Java原子类)
 
 > **关键词：`CAS`、`Atomic`**
 
-### [Java 并发容器](06.Java并发和容器.md)
+### [Java 并发容器](Java并发和容器)
 
 > **关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`**
 
-### [Java 线程池](07.Java线程池.md)
+### [Java 线程池](Java线程池)
 
 > **关键词：`Executor`、`ExecutorService`、`ThreadPoolExecutor`、`Executors`**
 
-### [Java 并发工具类](08.Java并发工具类.md)
+### [Java 并发工具类](Java并发工具类)
 
 > **关键词：`CountDownLatch`、`CyclicBarrier`、`Semaphore`**
 
-### [Java 内存模型](09.Java内存模型.md)
+### [Java 内存模型](Java内存模型)
 
 > **关键词：`JMM`、`volatile`、`synchronized`、`final`、`Happens-Before`、`内存屏障`**
 
-### [ForkJoin 框架](10.ForkJoin框架.md)
+### [ForkJoin 框架](ForkJoin框架)
 
 ## 📚 资料
 

@@ -101,16 +101,16 @@ index: false
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175827.png)
 
-- [Java 并发简介](01.JavaCore/05.并发/01.Java并发简介.md) - 关键词：`进程`、`线程`、`安全性`、`活跃性`、`性能`、`死锁`、`饥饿`、`上下文切换`
-- [Java 线程基础](01.JavaCore/05.并发/02.Java线程基础.md) - 关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`
-- [Java 并发核心机制](01.JavaCore/05.并发/03.Java并发核心机制.md) - 关键词：`synchronized`、`volatile`、`CAS`、`ThreadLocal`
-- [Java 并发锁](01.JavaCore/05.并发/04.Java锁.md) - 关键词：`AQS`、`ReentrantLock`、`ReentrantReadWriteLock`、`Condition`
-- [Java 原子类](01.JavaCore/05.并发/05.Java原子类.md) - 关键词：`CAS`、`Atomic`
-- [Java 并发容器](01.JavaCore/05.并发/06.Java并发和容器.md) - 关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`
-- [Java 线程池](01.JavaCore/05.并发/07.Java线程池.md) - 关键词：`Executor`、`ExecutorService`、`ThreadPoolExecutor`、`Executors`
-- [Java 并发工具类](01.JavaCore/05.并发/08.Java并发工具类.md) - 关键词：`CountDownLatch`、`CyclicBarrier`、`Semaphore`
-- [Java 内存模型](01.JavaCore/05.并发/09.Java内存模型.md) - 关键词：`JMM`、`volatile`、`synchronized`、`final`、`Happens-Before`、`内存屏障`
-- [ForkJoin 框架](01.JavaCore/05.并发/10.ForkJoin框架.md)
+- [Java 并发简介](01.JavaCore/05.并发/Java并发简介) - 关键词：`进程`、`线程`、`安全性`、`活跃性`、`性能`、`死锁`、`饥饿`、`上下文切换`
+- [Java 线程基础](01.JavaCore/05.并发/Java线程基础) - 关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`
+- [Java 并发核心机制](01.JavaCore/05.并发/Java并发核心机制) - 关键词：`synchronized`、`volatile`、`CAS`、`ThreadLocal`
+- [Java 并发锁](01.JavaCore/05.并发/Java锁) - 关键词：`AQS`、`ReentrantLock`、`ReentrantReadWriteLock`、`Condition`
+- [Java 原子类](01.JavaCore/05.并发/Java原子类) - 关键词：`CAS`、`Atomic`
+- [Java 并发容器](01.JavaCore/05.并发/Java并发和容器) - 关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`
+- [Java 线程池](01.JavaCore/05.并发/Java线程池) - 关键词：`Executor`、`ExecutorService`、`ThreadPoolExecutor`、`Executors`
+- [Java 并发工具类](01.JavaCore/05.并发/Java并发工具类) - 关键词：`CountDownLatch`、`CyclicBarrier`、`Semaphore`
+- [Java 内存模型](01.JavaCore/05.并发/Java内存模型) - 关键词：`JMM`、`volatile`、`synchronized`、`final`、`Happens-Before`、`内存屏障`
+- [ForkJoin 框架](01.JavaCore/05.并发/ForkJoin框架)
 
 #### [Java 虚拟机](01.JavaCore/06.JVM/)
 
@@ -354,18 +354,38 @@ index: false
 
 ## 📚 资料
 
-- Java 经典书籍
-  - [《Effective Java 中文版》](https://item.jd.com/12507084.html) - 本书介绍了在 Java 编程中 78 条极具实用价值的经验规则，这些经验规则涵盖了大多数开发人员每天所面临的问题的解决方案。同推荐《重构 : 改善既有代码的设计》、《代码整洁之道》、《代码大全》，有一定的内容重叠。
-  - [《Java 并发编程实战》](https://item.jd.com/10922250.html) - 本书深入浅出地介绍了 Java 线程和并发，是一本完美的 Java 并发参考手册。
-  - [《深入理解 Java 虚拟机》](https://item.jd.com/11252778.html) - 不去了解 JVM 的工程师，和咸鱼有什么区
-  - [《Maven 实战》](https://item.jd.com/10476794.html) - 国内最权威的 Maven 专家的力作，唯一一本哦！
-- 其他领域书籍
-  - [《Redis 设计与实现》](https://item.jd.com/11486101.html) - 系统而全面地描述了 Redis 内部运行机制。图示丰富，描述清晰，并给出大量参考信息，是 NoSQL 数据库开发人员案头必备。
-  - [《鸟哥的 Linux 私房菜 （基础学习篇）》](https://item.jd.com/12443890.html) - 本书是最具知名度的 Linux 入门书《鸟哥的 Linux 私房菜基础学习篇》的最新版，全面而详细地介绍了 Linux 操作系统。内容非常全面，建议挑选和自己实际工作相关度较高的，其他部分有需要再阅读。
-  - [《Head First 设计模式》](https://item.jd.com/10100236.html) - 《Head First 设计模式》(中文版)共有 14 章，每章都介绍了几个设计模式，完整地涵盖了四人组版本全部 23 个设计模式。
-  - [《HTTP 权威指南》](https://item.jd.com/11056556.html) - 本书尝试着将 HTTP 中一些互相关联且常被误解的规则梳理清楚，并编写了一系列基于各种主题的章节，对 HTTP 各方面的特性进行了介绍。纵观全书，对 HTTP“为什么”这样做进行了详细的解释，而不仅仅停留在它是“怎么做”的。
-  - [《TCP/IP 详解 系列》](https://item.jd.com/11966296.html) - 完整而详细的 TCP/IP 协议指南。针对任何希望理解 TCP/IP 协议是如何实现的读者设计。
-  - [《剑指 Offer：名企面试官精讲典型编程题》](https://item.jd.com/12163054.html) - 剖析了 80 个典型的编程面试题，系统整理基础知识、代码质量、解题思路、优化效率和综合能力这 5 个面试要点。
+- **书籍**
+  - Java 四大名著
+    - [《Java 编程思想（Thinking in java）》](https://book.douban.com/subject/2130190/)
+    - [《Java 核心技术 卷 I 基础知识》](https://book.douban.com/subject/26880667/)
+    - [《Java 核心技术 卷 II 高级特性》](https://book.douban.com/subject/27165931/)
+    - [《Effective Java》](https://book.douban.com/subject/30412517/)
+  - Java 并发
+    - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
+    - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
+  - Java 虚拟机
+    - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
+  - Java 入门
+    - [《O'Reilly：Head First Java》](https://book.douban.com/subject/2000732/)
+    - [《疯狂 Java 讲义》](https://book.douban.com/subject/3246499/)
+  - 其他
+    - [《Head First 设计模式》](https://book.douban.com/subject/2243615/)
+    - [《Java 网络编程》](https://book.douban.com/subject/1438754/)
+    - [《Java 加密与解密的艺术》](https://book.douban.com/subject/25861566/)
+    - [《阿里巴巴 Java 开发手册》](https://book.douban.com/subject/27605355/)
+- **教程、社区**
+  - [Runoob Java 教程](https://www.runoob.com/java/java-tutorial.html)
+  - [Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82)
+  - [Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)
+  - [Java 并发编程 78 讲](https://kaiwu.lagou.com/course/courseInfo.htm?courseId=16) - 拉勾教程，
+  - [Java 性能调优实战](https://time.geekbang.org/column/intro/100028001)
+  - [Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701)
+  - [深入拆解 Java 虚拟机](https://time.geekbang.org/column/intro/100010301)
+  - [CS-Notes](https://github.com/CyC2018/CS-Notes) - Github 上的 Java 基础级面试教程，行文清晰简洁
+  - [JavaGuide](https://github.com/Snailclimb/JavaGuide) - Github 上的 Java 面试教程，Java 基础部分讲解较为细致
+  - [advanced-java](https://github.com/doocs/advanced-java) - Github 上的 Java 面试教程，分布式部分从面试官视角讲解核心考察点
+  - [java-design-patterns](https://github.com/iluwatar/java-design-patterns) - Github 上的 Java 版设计模式教程
+  - [Java](https://github.com/TheAlgorithms/Java) - Github 上的 Java 算法教程
 
 ## 🚪 传送
 
