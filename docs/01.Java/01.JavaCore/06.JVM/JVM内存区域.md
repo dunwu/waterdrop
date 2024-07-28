@@ -41,28 +41,32 @@ Java 启动后，作为一个进程运行在操作系统中。
 
 JVM 在执行 Java 程序的过程中会把它所管理的内存划分为若干个不同的数据区域。这些区域都有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而存在，有些区域则依赖用户线程的启动和结束而建立和销毁。如下图所示：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-memory-runtime-data-area.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202407280930452.png)
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202407280931059.png)
 
 ### 程序计数器
 
-**`程序计数器（Program Counter Register）`** 是一块较小的内存空间，它可以看做是**当前线程所执行的字节码的行号指示器**。例如，分支、循环、跳转、异常、线程恢复等都依赖于计数器。
+**程序计数器（Program Counter Register）** 是一块较小的内存空间，它可以看做是**当前线程所执行的字节码的行号指示器**。字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，它是程序控制流的指示器，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成。
 
 当执行的线程数量超过 CPU 数量时，线程之间会根据时间片轮询争夺 CPU 资源。如果一个线程的时间片用完了，或者是其它原因导致这个线程的 CPU 资源被提前抢夺，那么这个退出的线程就需要单独的一个程序计数器，来记录下一条运行的指令，从而在线程切换后能恢复到正确的执行位置。各条线程间的计数器互不影响，独立存储，我们称这类内存区域为 “线程私有” 的内存。
 
-- 如果线程正在执行的是一个 Java 方法，这个计数器记录的是正在执行的虚拟机字节码指令的地址；
-- 如果正在执行的是 Native 方法，这个计数器值则为空（Undefined）。
+在任何一个确定的时刻，一个处理器都只会执行一条线程中的指令。因此，为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器，各线程之间计数器互不影响，独立存储，我们称这类内存区域为“线程私有”的内存。
+
+如果线程正在执行的是一个 Java 方法，这个计数器记录的是正在执行的虚拟机字节码指令的地
+址；如果正在执行的是本地（Native）方法，这个计数器值则应为空（Undefined）。
 
 > 🔔 注意：此内存区域是唯一一个在 JVM 中没有规定任何 `OutOfMemoryError` 情况的区域。
 
 ### Java 虚拟机栈
 
-**`Java 虚拟机栈（Java Virtual Machine Stacks）`** 也**是线程私有的，它的生命周期与线程相同**。
+**Java 虚拟机栈（Java Virtual Machine Stacks）** 也**是线程私有的，它的生命周期与线程相同**。
 
-每个 Java 方法在执行的同时都会创建一个栈帧（Stack Frame）用于存储 **局部变量表**、**操作数栈**、**常量池引用** 等信息。每一个方法从调用直至执行完成的过程，就对应着一个栈帧在 Java 虚拟机栈中入栈和出栈的过程。
+每个 Java 方法在执行的同时都会创建一个栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态连接、方法出口等信息。每一个方法从调用直至执行完成的过程，就对应着一个栈帧在 Java 虚拟机栈中入栈和出栈的过程。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-stack.png!w640)
-
-- **局部变量表** - 32 位变量槽，存放了编译期可知的各种基本数据类型、对象引用、`ReturnAddress` 类型。
+- **局部变量表**
+  - 存放了编译期可知的各种基本数据类型、对象引用、`ReturnAddress` 类型。局部变量表存放了编译期可知的各种 Java 虚拟机基本数据类型、对象引用（reference 类型，它不同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）和 returnAddress 类型（指向了一条字节码指令的地址）。
+  - 这些数据类型在局部变量表中的存储空间以局部变量槽（Slot）来表示，其中 64 位长度的 long 和 double 类型的数据会占用两个变量槽，其余的数据类型只占用一个。
 - **操作数栈** - 基于栈的执行引擎，虚拟机把操作数栈作为它的工作区，大多数指令都要从这里弹出数据、执行运算，然后把结果压回操作数栈。
 - **动态链接** - 每个栈帧都包含一个指向运行时常量池（方法区的一部分）中该栈帧所属方法的引用。持有这个引用是为了支持方法调用过程中的动态连接。Class 文件的常量池中有大量的符号引用，字节码中的方法调用指令就以常量池中指向方法的符号引用为参数。这些符号引用一部分会在类加载阶段或第一次使用的时候转化为直接引用，这种转化称为静态解析。另一部分将在每一次的运行期间转化为直接应用，这部分称为动态链接。
 - **方法出口** - 返回方法被调用的位置，恢复上层方法的局部变量和操作数栈，如果无返回值，则把它压入调用者的操作数栈。
@@ -84,17 +88,13 @@ JVM 在执行 Java 程序的过程中会把它所管理的内存划分为若干�
 
 ### 本地方法栈
 
-**`本地方法栈（Native Method Stack）`** 与虚拟机栈的作用相似。
-
-二者的区别在于：**虚拟机栈为 Java 方法服务；本地方法栈为 Native 方法服务**。本地方法并不是用 Java 实现的，而是由 C 语言实现的。
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-native-method-stack.gif!w640)
+**本地方法栈（Native Method Stack）** 与虚拟机栈的作用相似。二者的区别在于：**虚拟机栈为 Java 方法服务；本地方法栈为 Native 方法服务**。本地方法并不是用 Java 实现的，而是由 C 语言实现的。
 
 > 🔔 注意：本地方法栈也会抛出 `StackOverflowError` 异常和 `OutOfMemoryError` 异常。
 
 ### Java 堆
 
-**`Java 堆（Java Heap）` 的作用就是存放对象实例，几乎所有的对象实例都是在这里分配内存**。
+**Java 堆（Java Heap） 的作用就是存放对象实例，几乎所有的对象实例都是在这里分配内存**。
 
 Java 堆是垃圾收集的主要区域（因此也被叫做"GC 堆"）。现代的垃圾收集器基本都是采用**分代收集算法**，该算法的思想是针对不同的对象采取不同的垃圾回收算法。
 
@@ -191,12 +191,10 @@ public class JVMCase {
 		jvmcase.sayHello(stu);
 	}
 
-
 	// 常规静态方法
 	public static void print(Student stu) {
 		System.out.println("name: " + stu.getName() + "; sex:" + stu.getSexType() + "; age:" + stu.getAge());
 	}
-
 
 	// 非静态方法
 	public void sayHello(Student stu) {
@@ -371,8 +369,8 @@ public class HeapOutOfMemoryDemo {
 /**
  * GC overhead limit exceeded 示例
  * 错误现象：java.lang.OutOfMemoryError: GC overhead limit exceeded
- * 发生在GC占用大量时间为释放很小空间的时候发生的，是一种保护机制。导致异常的原因：一般是因为堆太小，没有足够的内存。
- * 官方对此的定义：超过98%的时间用来做GC并且回收了不到2%的堆内存时会抛出此异常。
+ * 发生在 GC 占用大量时间为释放很小空间的时候发生的，是一种保护机制。导致异常的原因：一般是因为堆太小，没有足够的内存。
+ * 官方对此的定义：超过 98%的时间用来做 GC 并且回收了不到 2%的堆内存时会抛出此异常。
  * VM Args: -Xms10M -Xmx10M
  */
 public class GcOverheadLimitExceededDemo {
@@ -418,13 +416,13 @@ Perm （永久代）空间主要用于存放 `Class` 和 Meta 信息，包括类
  * <p>
  * 错误现象：
  * <ul>
- * <li>java.lang.OutOfMemoryError: PermGen space (JDK8 以前版本)</li>
- * <li>java.lang.OutOfMemoryError: Metaspace (JDK8 及以后版本)</li>
+ * <li>java.lang.OutOfMemoryError: PermGen space (JDK8 以前版本）</li>
+ * <li>java.lang.OutOfMemoryError: Metaspace (JDK8 及以后版本）</li>
  * </ul>
  * VM Args:
  * <ul>
- * <li>-Xmx100M -XX:MaxPermSize=16M (JDK8 以前版本)</li>
- * <li>-Xmx100M -XX:MaxMetaspaceSize=16M (JDK8 及以后版本)</li>
+ * <li>-Xmx100M -XX:MaxPermSize=16M (JDK8 以前版本）</li>
+ * <li>-Xmx100M -XX:MaxMetaspaceSize=16M (JDK8 及以后版本）</li>
  * </ul>
  */
 public class PermOutOfMemoryErrorDemo {

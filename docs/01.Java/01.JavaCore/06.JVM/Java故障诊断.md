@@ -318,7 +318,7 @@ ls -l /proc/pid/task | wc -l
 
 查看 GC 日志，如果有明显提示 OOM 问题，那就可以根据提示信息，较为快速的定位问题。
 
-> OOM 定位可以参考：[JVM 内存区域之 OutOfMemoryError](02.JVM内存区域.md#OutOfMemoryError)
+> OOM 定位可以参考：[JVM 内存区域之 OutOfMemoryError](JVM内存区域#OutOfMemoryError)
 
 ### Minor GC
 

@@ -80,32 +80,33 @@ index: false
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200628154803.png)
 
-- [JVM 体系结构](06.JVM/01.JVM体系结构.md)
-- [JVM 内存区域](06.JVM/02.JVM内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
-- [JVM 垃圾收集](06.JVM/03.JVM垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
-- [JVM 类加载](06.JVM/04.JVM类加载.md) - 关键词：`ClassLoader`、`双亲委派`
-- [JVM 字节码](06.JVM/05.JVM字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
-- [JVM 命令行工具](06.JVM/11.JVM命令行工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`
-- [JVM GUI 工具](06.JVM/12.JVM_GUI工具.md) - 关键词：`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
-- [JVM 实战](06.JVM/21.JVM实战.md) - 关键词：`配置`、`调优`
-- [Java 故障诊断](06.JVM/22.Java故障诊断.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
+- [JVM 体系结构](06.JVM/JVM体系结构)
+- [JVM 内存区域](06.JVM/JVM内存区域) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
+- [JVM 垃圾收集](06.JVM/JVM垃圾收集) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
+- [JVM 类加载](06.JVM/JVM类加载) - 关键词：`ClassLoader`、`双亲委派`
+- [JVM 字节码](06.JVM/JVM字节码) - 关键词：`bytecode`、`asm`、`javassist`
+- [JVM 命令行工具](06.JVM/JVM命令行工具) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`
+- [JVM GUI 工具](06.JVM/JVM_GUI工具) - 关键词：`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
+- [JVM 实战](06.JVM/JVM实战) - 关键词：`配置`、`调优`
+- [Java 故障诊断](06.JVM/Java故障诊断) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
 
 ## 📚 资料
 
 - **书籍**
-  - Java 四大名著
-    - [《Java 编程思想（Thinking in java）》](https://book.douban.com/subject/2130190/)
-    - [《Java 核心技术 卷 I 基础知识》](https://book.douban.com/subject/26880667/)
-    - [《Java 核心技术 卷 II 高级特性》](https://book.douban.com/subject/27165931/)
-    - [《Effective Java》](https://book.douban.com/subject/30412517/)
+  - Java 基础
+    - [《Java 编程思想》](https://book.douban.com/subject/2130190/) - Thinking in java，典中典！由于成书较早，部分内容已经多少有点过时
+    - [《Java 核心技术 卷 I 开发基础》](https://book.douban.com/subject/35920145/) - 第 12 版，涵盖 Java 17 的新特性
+    - [《Java 核心技术 卷 II 高级特性》](https://book.douban.com/subject/36337685/) - 第 12 版，涵盖 Java 17 的新特性
+    - [《Effective Java》](https://book.douban.com/subject/36818907/) - 第 3 版，涵盖 Java 9 的新特性
+    - [《Head First Java》](https://book.douban.com/subject/2000732/) - 图文并茂，对新手非常友好的入门级教程
+    - [《疯狂 Java 讲义》](https://book.douban.com/subject/3246499/) - 入门级教程
   - Java 并发
-    - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
+    - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/) - 深入浅出地介绍 Java 线程和并发
     - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
   - Java 虚拟机
-    - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
-  - Java 入门
-    - [《O'Reilly：Head First Java》](https://book.douban.com/subject/2000732/)
-    - [《疯狂 Java 讲义》](https://book.douban.com/subject/3246499/)
+    - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/) - 第 3 版，国内最好的 JVM 书籍
+  - Java IO
+    - [《Netty 实战》](https://book.douban.com/subject/27038538/)
   - 其他
     - [《Head First 设计模式》](https://book.douban.com/subject/2243615/)
     - [《Java 网络编程》](https://book.douban.com/subject/1438754/)
@@ -113,12 +114,12 @@ index: false
     - [《阿里巴巴 Java 开发手册》](https://book.douban.com/subject/27605355/)
 - **教程、社区**
   - [Runoob Java 教程](https://www.runoob.com/java/java-tutorial.html)
-  - [Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82)
-  - [Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)
-  - [Java 并发编程 78 讲](https://kaiwu.lagou.com/course/courseInfo.htm?courseId=16) - 拉勾教程，
-  - [Java 性能调优实战](https://time.geekbang.org/column/intro/100028001)
-  - [Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701)
-  - [深入拆解 Java 虚拟机](https://time.geekbang.org/column/intro/100010301)
+  - [Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82) - 极客时间教程——从面试官视角梳理如何解答常见 Java 面试问题
+  - [Java 并发编程实战](https://time.geekbang.org/column/intro/100023901) - 极客时间教程——图文并茂，系统性讲解并发编程知识
+  - [Java 并发编程 78 讲](https://kaiwu.lagou.com/course/courseInfo.htm?courseId=16) - 拉勾教育教程——针对并发场景问题，讲解的通俗易懂
+  - [Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701) - 极客时间教程——基于 Java 生产环境的真实案例，讲解“避坑”的手段，很硬核
+  - [Java 性能调优实战](https://time.geekbang.org/column/intro/100028001) - 极客时间教程——覆盖 80% 以上 Java 应用调优场景
+  - [深入拆解 Java 虚拟机](https://time.geekbang.org/column/intro/100010301) - 极客时间教程
   - [CS-Notes](https://github.com/CyC2018/CS-Notes) - Github 上的 Java 基础级面试教程，行文清晰简洁
   - [JavaGuide](https://github.com/Snailclimb/JavaGuide) - Github 上的 Java 面试教程，Java 基础部分讲解较为细致
   - [advanced-java](https://github.com/doocs/advanced-java) - Github 上的 Java 面试教程，分布式部分从面试官视角讲解核心考察点

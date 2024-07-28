@@ -20,9 +20,9 @@ permalink: /pages/885f081c/
 
 ### 什么是字节码
 
-Java 字节码是Java虚拟机执行的一种指令格式。之所以被称之为字节码，是因为：**Java 字节码文件（`.class`）是一种以 8 位字节为基础单位的二进制流文件**，各个数据项严格按照顺序紧凑地排列在 .class 文件中，中间没有添加任何分隔符。**整个 .class 文件本质上就是一张表**。
+Java 字节码是 Java 虚拟机执行的一种指令格式。之所以被称之为字节码，是因为：**Java 字节码文件（`.class`）是一种以 8 位字节为基础单位的二进制流文件**，各个数据项严格按照顺序紧凑地排列在 .class 文件中，中间没有添加任何分隔符。**整个 .class 文件本质上就是一张表**。
 
-Java 能做到 “**一次编译，到处运行**”，一是因为 JVM 针对各种操作系统、平台都进行了定制；二是因为无论在什么平台，都可以编译生成固定格式的Java 字节码文件（`.class`）。
+Java 能做到 “**一次编译，到处运行**”，一是因为 JVM 针对各种操作系统、平台都进行了定制；二是因为无论在什么平台，都可以编译生成固定格式的 Java 字节码文件（`.class`）。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230419203137.png)
 
@@ -120,7 +120,7 @@ Asm 有两类 API：核心 API 和树形 API
 
 Asm Core API 可以类比解析 XML 文件中的 SAX 方式，不需要把这个类的整个结构读取进来，就可以用流式的方法来处理字节码文件。好处是非常节约内存，但是编程难度较大。然而出于性能考虑，一般情况下编程都使用 Core API。在 Core API 中有以下几个关键类：
 
-- ClassReader：用于读取已经编译好的.class 文件。
+- ClassReader：用于读取已经编译好的。class 文件。
 - ClassWriter：用于重新构建编译后的类，如修改类名、属性以及方法，也可以生成新的类的字节码文件。
 - 各种 Visitor 类：如上所述，CoreAPI 根据字节码从上到下依次处理，对于字节码文件中不同的区域有不同的 Visitor，比如用于访问方法的 MethodVisitor、用于访问类变量的 FieldVisitor、用于访问注解的 AnnotationVisitor 等。为了实现 AOP，重点要使用的是 MethodVisitor。
 
@@ -135,7 +135,7 @@ Asm Tree API 可以类比解析 XML 文件中的 DOM 方式，把整个类的结
 其中最重要的是 ClassPool、CtClass、CtMethod、CtField 这四个类：
 
 - `CtClass（compile-time class）` - 编译时类信息，它是一个 class 文件在代码中的抽象表现形式，可以通过一个类的全限定名来获取一个 CtClass 对象，用来表示这个类文件。
-- `ClassPool` - 从开发视角来看，ClassPool 是一张保存 CtClass 信息的 HashTable，key 为类名，value 为类名对应的 CtClass 对象。当我们需要对某个类进行修改时，就是通过 pool.getCtClass("className")方法从 pool 中获取到相应的 CtClass。
+- `ClassPool` - 从开发视角来看，ClassPool 是一张保存 CtClass 信息的 HashTable，key 为类名，value 为类名对应的 CtClass 对象。当我们需要对某个类进行修改时，就是通过 pool.getCtClass("className") 方法从 pool 中获取到相应的 CtClass。
 - `CtMethod`、`CtField` - 这两个比较好理解，对应的是类中的方法和属性。
 
 ## 工具

@@ -137,15 +137,15 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200628154803.png)
 
-- [JVM 体系结构](01.Java/01.JavaCore/06.JVM/01.JVM体系结构.md)
-- [JVM 内存区域](01.Java/01.JavaCore/06.JVM/02.JVM内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
-- [JVM 垃圾收集](01.Java/01.JavaCore/06.JVM/03.JVM垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
-- [JVM 类加载](01.Java/01.JavaCore/06.JVM/04.JVM类加载.md) - 关键词：`ClassLoader`、`双亲委派`
-- [JVM 字节码](01.Java/01.JavaCore/06.JVM/05.JVM字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
-- [JVM 命令行工具](01.Java/01.JavaCore/06.JVM/11.JVM命令行工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`
-- [JVM GUI 工具](01.Java/01.JavaCore/06.JVM/12.JVM_GUI工具.md) - 关键词：`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
-- [JVM 实战](01.Java/01.JavaCore/06.JVM/21.JVM实战.md) - 关键词：`配置`、`调优`
-- [Java 故障诊断](01.Java/01.JavaCore/06.JVM/22.Java故障诊断.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
+- [JVM 体系结构](01.Java/01.JavaCore/06.JVM/JVM体系结构)
+- [JVM 内存区域](01.Java/01.JavaCore/06.JVM/JVM内存区域) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
+- [JVM 垃圾收集](01.Java/01.JavaCore/06.JVM/JVM垃圾收集) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
+- [JVM 类加载](01.Java/01.JavaCore/06.JVM/JVM类加载) - 关键词：`ClassLoader`、`双亲委派`
+- [JVM 字节码](01.Java/01.JavaCore/06.JVM/JVM字节码) - 关键词：`bytecode`、`asm`、`javassist`
+- [JVM 命令行工具](01.Java/01.JavaCore/06.JVM/JVM命令行工具) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`
+- [JVM GUI 工具](01.Java/01.JavaCore/06.JVM/JVM_GUI工具) - 关键词：`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
+- [JVM 实战](01.Java/01.JavaCore/06.JVM/JVM实战) - 关键词：`配置`、`调优`
+- [Java 故障诊断](01.Java/01.JavaCore/06.JVM/Java故障诊断) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
 
 ### JavaEE
 
