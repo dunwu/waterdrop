@@ -193,23 +193,46 @@ JDK4 中新加入了 NIO，它可以使用 Native 函数库直接分配堆外内
 
 当 Java 虚拟机**遇到一条字节码 `new` 指令时，首先在常量池中尝试定位类的符号引用，并检查这个类是否已被类加载，如果没有，则必须先执行相应的类加载过程**。
 
-在类加载检查通过后，**接下来虚拟机将为新生对象分配内存**。对象所需内存的大小在类加载完成后便可完全确定，为对象分配空间的任务实际上便等同于把一块确定大小的内存块从 Java 堆中划分出来。
+在类加载检查通过后，**接下来虚拟机将为新生对象分配内存**。对象所需内存的大小在类加载完成后便可完全确定，为对象分配空间的任务实际上便等同于把一块确定大小的内存块从 Java 堆中划分出来。分配对象内存有两种方式：
 
-- **指针碰撞（Bump The Pointer）** - 如果 Java 堆中**内存是规整的**，所有被使用过的内存都被放在一 边，空闲的内存被放在另一边，中间放着一个指针作为分界点的指示器，那所分配内存就仅仅是把那个指针向空闲空间方向挪动一段与对象大小相等的距离。
-- **空闲列表（Free List）** - 如果 Java 堆中的**内存是不规整的**，已被使用的内存和空闲的内存相互交错在一起，那就没有办法简单地进行指针碰撞了，虚拟机就必须维护一个列表，记录上哪些内存块是可用的，在分配的时候从列表中找到一块足够大的空间划分给对象实例，并更新列表上的记录。
+**指针碰撞（Bump The Pointer）** - 如果 Java 堆中**内存是规整的**，所有被使用过的内存都被放在一 边，空闲的内存被放在另一边，中间放着一个指针作为分界点的指示器，那所分配内存就仅仅是把那个指针向空闲空间方向挪动一段与对象大小相等的距离。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408140753480.png)
+
+**空闲列表（Free List）** - 如果 Java 堆中的**内存是不规整的**，已被使用的内存和空闲的内存相互交错在一起，那就没有办法简单地进行指针碰撞了，虚拟机就必须维护一个列表，记录上哪些内存块是可用的，在分配的时候从列表中找到一块足够大的空间划分给对象实例，并更新列表上的记录。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408140753926.png)
 
 选择哪种分配方式由 Java 堆是否规整决定，而 Java 堆是否规整又由所采用的垃圾收集器是否采用**标记-压缩算法**决定。因此，当使用 Serial、ParNew 等带压缩整理过程的收集器时，系统采用的分配算法是指针碰撞，既简单又高效；而当使用 CMS 这种基于清除 （Sweep）算法的收集器时，理论上就只能采用较为复杂的空闲列表来分配内存。
 
 对象创建在虚拟机中是非常频繁的行为，因此还需要考虑分配内存空间的并发安全问题。一般有两种方案：
 
-- CAS 同步 - 对分配内存空间的动作进行同步处理——实际上虚拟机是采用CAS配上失败 重试的方式保证更新操作的原子性；
-- TLAB - 另外一种是把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在Java堆中预先分配一小块内存，称为**本地线程分配缓冲（Thread Local Allocation Buffer，TLAB）**，哪个线程要分配内存，就在哪个线程的本地缓冲区中分配，只有本地缓冲区用完了，分配新的缓存区时才需要同步锁定。
+- CAS 同步 - 对分配内存空间的动作进行同步处理——实际上虚拟机是采用 CAS 配上失败 重试的方式保证更新操作的原子性；
+- TLAB - 另外一种是把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在 Java 堆中预先分配一小块内存，称为**本地线程分配缓冲（Thread Local Allocation Buffer，TLAB）**，哪个线程要分配内存，就在哪个线程的本地缓冲区中分配，只有本地缓冲区用完了，分配新的缓存区时才需要同步锁定。
 
 接下来，需要执行类的构造函数（即 `<init>()` 方法）对对象进行初始化。
 
 ### 对象的内存布局
 
-在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分：对象头（Header）、实例 数据（Instance Data）和对齐填充（Padding）。
+在 HotSpot 虚拟机里，对象在堆内存中的存储布局可以划分为三个部分：
+
+- **对象头（Header）** - HotSpot 虚拟机对象的对象头部分包括两类信息。
+  - **Mark Word** - **用于存储对象自身的运行时数据**。如哈 希码（HashCode）、GC 分代年龄、锁状态标志、线程持有的锁、偏向线程 ID、偏向时间戳等，这部分数据的长度在 32 位和 64 位的虚拟机（未开启压缩指针）中分别为 32 个比特和 64 个比特。
+  - **类型指针** - **对象指向它的类型元数据的指针**，Java 虚拟机通过这个指针来确定该对象是哪个类的实例。并不是所有的虚拟机实现都必须在对象数据上保留类型指针，换句话说，查找对象的元数据信息并不一定要经过对象本身。此外，如果对象是一个 Java 数组，那在对象头中还必须有一块用于记录数组长度的数据，因为虚拟机可以通过普通 Java 对象的元数据信息确定 Java 对象的大小，但是如果数组的长度是不确定的，将无法通过元数据中的信息推断出数组的大小。
+- **实例数据（Instance Data）** - **对象真正存储的有效信息**，即我们在程序代码里面所定义的各种类型的字段内容，无论是从父类继承下来的，还是在子类中定义的字段都必须记录起来。
+- **对齐填充（Padding）** - 并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。
+
+### 对象的访问定位
+
+Java 程序会通过栈上的 reference 数据来操作堆上的具体对象。主流的对象访问方式主要有使用句柄和直接指针两种：使用句柄访问和使用直接指针访问。
+
+#### 使用句柄访问
+
+Java 堆中将可能会划分出一块内存来作为句柄池，reference 中存储的就是对象的句柄地址，而句柄中包含了对象实例数据与类型数据各自具体的地址信息。使用句柄来访问的最大好处就是 reference 中存储的是稳定句柄地 址，在对象被移动（垃圾收集时移动对象是非常普遍的行为）时只会改变句柄中的实例数据指针，而 reference 本身不需要被修改。
+
+#### 使用直接指针访问
+
+Java 堆中对象的内存布局就必须考虑如何放置访问类型数据的相关信息，reference 中存储的直接就是对象地址，如果只是访问对象本身的话，就不需要多一次间接访问的开销。使用直接指针来访问最大的好处就是速度更快，它节省了一次指针定位的时间开销。HotSpot 主要使用第二种方式进行对象访问。
 
 ## 内存分配
 
@@ -301,8 +324,6 @@ class Student{
 
 ### OutOfMemoryError
 
-#### 什么是 OutOfMemoryError
-
 `OutOfMemoryError` 简称为 OOM。Java 中对 OOM 的解释是，没有空闲内存，并且垃圾收集器也无法提供更多内存。通俗的解释是：JVM 内存不足了。
 
 在 JVM 规范中，**除了程序计数器区域外，其他运行时区域都可能发生 `OutOfMemoryError` 异常（简称 OOM）**。
@@ -311,21 +332,21 @@ class Student{
 
 #### 堆空间溢出
 
-`java.lang.OutOfMemoryError: Java heap space` 这个错误意味着：**堆空间溢出**。
+**java.lang.OutOfMemoryError: Java heap space 意味着：堆空间溢出**。
 
 更细致的说法是：Java 堆内存已经达到 `-Xmx` 设置的最大值。Java 堆用于存储对象实例，只要不断地创建对象，并且保证 GC Roots 到对象之间有可达路径来避免垃圾收集器回收这些对象，那么当堆空间到达最大容量限制后就会产生 OOM。
 
-堆空间溢出有可能是**`内存泄漏（Memory Leak）`** 或 **`内存溢出（Memory Overflow）`** 。需要使用 jstack 和 jmap 生成 threaddump 和 heapdump，然后用内存分析工具（如：MAT）进行分析。
+堆空间溢出有可能是**内存泄漏（Memory Leak）** 或 **内存溢出（Memory Overflow）** 。
 
 ##### Java heap space 分析步骤
 
 1. 使用 `jmap` 或 `-XX:+HeapDumpOnOutOfMemoryError` 获取堆快照。
-2. 使用内存分析工具（visualvm、mat、jProfile 等）对堆快照文件进行分析。
-3. 根据分析图，重点是确认内存中的对象是否是必要的，分清究竟是是内存泄漏（Memory Leak）还是内存溢出（Memory Overflow）。
+2. 使用内存分析工具（VisualVM、MAT、JProfile 等）对堆快照文件进行分析。
+3. 根据分析图，重点是确认内存中的对象是否是必要的，分清究竟是是内存泄漏还是内存溢出。
 
 ##### 内存泄漏
 
-**内存泄漏是指由于疏忽或错误造成程序未能释放已经不再使用的内存的情况**。
+**内存泄漏（Memory Leak）是指由于疏忽或错误造成程序未能释放已经不再使用的内存的情况**。
 
 内存泄漏并非指内存在物理上的消失，而是应用程序分配某段内存后，由于设计错误，失去了对该段内存的控制，因而造成了内存的浪费。内存泄漏随着被执行的次数不断增加，最终会导致内存溢出。
 
@@ -360,7 +381,7 @@ class Student{
  * 错误现象：java.lang.OutOfMemoryError: Java heap space
  * VM Args：-verbose:gc -Xms10M -Xmx10M -XX:+HeapDumpOnOutOfMemoryError
  */
-public class HeapOutOfMemoryDemo {
+public class HeapMemoryLeakOOM {
 
     public static void main(String[] args) {
         List<OomObject> list = new ArrayList<>();
@@ -387,11 +408,8 @@ public class HeapOutOfMemoryDemo {
  * 错误现象：java.lang.OutOfMemoryError: Java heap space
  * <p>
  * VM Args：-verbose:gc -Xms10M -Xmx10M
- *
- * @author <a href="mailto:forbreak@163.com">Zhang Peng</a>
- * @since 2019-06-25
  */
-public class HeapOutOfMemoryDemo {
+public class HeapOutOfMemoryOOM {
 
     public static void main(String[] args) {
         Double[] array = new Double[999999999];
@@ -400,8 +418,6 @@ public class HeapOutOfMemoryDemo {
 
 }
 ```
-
-执行 `java -verbose:gc -Xms10M -Xmx10M -XX:+HeapDumpOnOutOfMemoryError io.github.dunwu.javacore.jvm.memory.HeapMemoryLeakMemoryErrorDemo`
 
 上面的例子是一个极端的例子，试图创建一个维度很大的数组，堆内存无法分配这么大的内存，从而报错：`Java heap space`。
 
@@ -421,7 +437,7 @@ public class HeapOutOfMemoryDemo {
  * 官方对此的定义：超过 98%的时间用来做 GC 并且回收了不到 2%的堆内存时会抛出此异常。
  * VM Args: -Xms10M -Xmx10M
  */
-public class GcOverheadLimitExceededDemo {
+public class GcOverheadLimitExceededOOM {
 
     public static void main(String[] args) {
         List<Double> list = new ArrayList<>();
@@ -473,7 +489,7 @@ Perm （永久代）空间主要用于存放 `Class` 和 Meta 信息，包括类
  * <li>-Xmx100M -XX:MaxMetaspaceSize=16M (JDK8 及以后版本）</li>
  * </ul>
  */
-public class PermOutOfMemoryErrorDemo {
+public class PermGenSpaceOOM {
 
     public static void main(String[] args) throws Exception {
         for (int i = 0; i < 100_000_000; i++) {
@@ -493,15 +509,15 @@ public class PermOutOfMemoryErrorDemo {
 
 ##### 重部署时永久代空间不足
 
-对于更复杂，更实际的示例，让我们逐步介绍一下在应用程序重新部署期间发生的 Permgen 空间错误。重新部署应用程序时，你希望垃圾回收会摆脱引用所有先前加载的类的加载器，并被加载新类的类加载器取代。
+对于更复杂，更实际的示例，让我们逐步介绍一下在应用程序重新部署期间发生的 PermGen 空间错误。重新部署应用程序时，你希望垃圾回收会摆脱引用所有先前加载的类的加载器，并被加载新类的类加载器取代。
 
 不幸的是，许多第三方库以及对线程，JDBC 驱动程序或文件系统句柄等资源的不良处理使得无法卸载以前使用的类加载器。反过来，这意味着在每次重新部署期间，所有先前版本的类仍将驻留在 PermGen 中，从而在每次重新部署期间生成数十兆的垃圾。
 
-让我们想象一个使用 JDBC 驱动程序连接到关系数据库的示例应用程序。启动应用程序时，初始化代码将加载 JDBC 驱动程序以连接到数据库。对应于规范，JDBC 驱动程序向 java.sql.DriverManager 进行注册。该注册包括将对驱动程序实例的引用存储在 DriverManager 的静态字段中。
+让我们想象一个使用 JDBC 驱动程序连接到关系数据库的示例应用程序。启动应用程序时，初始化代码将加载 JDBC 驱动程序以连接到数据库。对应于规范，JDBC 驱动程序向 `java.sql.DriverManager` 进行注册。该注册包括将对驱动程序实例的引用存储在 `DriverManager` 的静态字段中。
 
-现在，当从应用程序服务器取消部署应用程序时，java.sql.DriverManager 仍将保留该引用。我们最终获得了对驱动程序类的实时引用，而驱动程序类又保留了用于加载应用程序的 java.lang.Classloader 实例的引用。反过来，这意味着垃圾回收算法无法回收空间。
+现在，当从应用程序服务器取消部署应用程序时，`java.sql.DriverManager` 仍将保留该引用。我们最终获得了对驱动程序类的实时引用，而驱动程序类又保留了用于加载应用程序的 `java.lang.Classloader` 实例的引用。反过来，这意味着垃圾回收算法无法回收空间。
 
-而且该 java.lang.ClassLoader 实例仍引用应用程序的所有类，通常在 PermGen 中占据数十兆字节。这意味着只需少量重新部署即可填充通常大小的 PermGen。
+而且该 `java.lang.ClassLoader` 实例仍引用应用程序的所有类，通常在 PermGen 中占据数十兆字节。这意味着只需少量重新部署即可填充通常大小的 PermGen。
 
 ##### PermGen space 解决方案
 
@@ -521,7 +537,7 @@ java -XX:MaxPermSize=512m com.yourcompany.YourClass
 
 （2）解决重新部署时的 `OutOfMemoryError`
 
-重新部署应用程序后立即发生 OutOfMemoryError 时，应用程序会遭受类加载器泄漏的困扰。在这种情况下，解决问题的最简单，继续进行堆转储分析–使用类似于以下命令的重新部署后进行堆转储：
+重新部署应用程序后立即发生 `OutOfMemoryError` 时，应用程序会遭受类加载器泄漏的困扰。在这种情况下，解决问题的最简单，继续进行堆转储分析–使用类似于以下命令的重新部署后进行堆转储：
 
 ```
 jmap -dump:format=b,file=dump.hprof <process-id>
@@ -644,7 +660,7 @@ public class MethodAreaOutOfMemoryDemo {
 【示例】
 
 ```java
-public class UnableCreateNativeThreadErrorDemo {
+public class UnableCreateNativeThreadOOM {
 
     public static void main(String[] args) {
         while (true) {
@@ -680,7 +696,7 @@ max user processes              (-u) 1800
 
 #### 直接内存溢出
 
-由直接内存导致的内存溢出，一个明显的特征是在 Head Dump 文件中不会看见明显的异常，如果发现 OOM 之后 Dump 文件很小，而程序中又直接或间接使用了 NIO，就可以考虑检查一下是不是这方面的原因。
+由直接内存导致的内存溢出，一个明显的特征是在 Heapdump 文件中不会看见明显的异常，如果发现 OOM 之后 Dump 文件很小，而程序中又直接或间接使用了 NIO，就可以考虑检查一下是不是这方面的原因。
 
 【示例】直接内存 `OutOfMemoryError`
 
@@ -708,33 +724,115 @@ public class DirectOutOfMemoryDemo {
 
 ### StackOverflowError
 
-对于 HotSpot 虚拟机来说，栈容量只由 `-Xss` 参数来决定如果线程请求的栈深度大于虚拟机所允许的最大深度，将抛出 `StackOverflowError` 异常。
+HotSpot 虚拟机中并不区分虚拟机栈和本地方法栈。
 
-从实战来说，栈溢出的常见原因：
+对于 HotSpot 虚拟机来说，栈容量只由 `-Xss` 参数来决定。
 
-- **递归函数调用层数太深**
-- **大量循环或死循环**
+栈溢出的常见原因：
+
+- **递归函数调用层数太深** - 线程请求的栈深度大于虚拟机所允许的最大深度，将抛出 `StackOverflowError` 异常。
+
+- **大量循环或死循环** - 虚拟机的栈内存允许动态扩展，当扩展栈容量无法申请到足够的内存时，将抛出
+
+  `OutOfMemoryError` 异常。
 
 【示例】递归函数调用层数太深导致 `StackOverflowError`
 
 ```java
-public class StackOverflowDemo {
+/**
+ * 以一个无限递归的示例方法来展示栈溢出
+ * <p>
+ * 栈溢出时，Java 会抛出 StackOverflowError ，出现此种情况是因为方法运行的时候栈的大小超过了虚拟机的上限所致。
+ * <p>
+ * Java 应用程序唤起一个方法调用时就会在调用栈上分配一个栈帧，这个栈帧包含引用方法的参数，本地参数，以及方法的返回地址。
+ * <p>
+ * 这个返回地址是被引用的方法返回后，程序能够继续执行的执行点。
+ * <p>
+ * 如果没有一个新的栈帧所需空间，Java 就会抛出 StackOverflowError。
+ * <p>
+ * VM 参数：
+ * <ul>
+ * <li>-Xss228k - 设置栈大小为 228k</li>
+ * </ul>
+ * <p>
+ *
+ */
+public class StackOverflowErrorDemo {
 
     private int stackLength = 1;
 
-    public void recursion() {
-        stackLength++;
-        recursion();
-    }
-
     public static void main(String[] args) {
-        StackOverflowDemo obj = new StackOverflowDemo();
+        StackOverflowErrorDemo obj = new StackOverflowErrorDemo();
         try {
             obj.recursion();
         } catch (Throwable e) {
             System.out.println("栈深度：" + obj.stackLength);
             e.printStackTrace();
         }
+    }
+
+    public void recursion() {
+        stackLength++;
+        recursion();
+    }
+
+}
+```
+
+【示例】大量循环或死循环导致 `StackOverflowError`
+
+```java
+/**
+ * 类成员循环依赖，导致 StackOverflowError
+ *
+ * VM 参数：
+ *
+ * -Xss228k - 设置栈大小为 228k
+ *
+ * @author <a href="mailto:forbreak@163.com">Zhang Peng</a>
+ * @since 2019-06-25
+ */
+public class StackOverflowErrorDemo2 {
+
+    public static void main(String[] args) {
+        A obj = new A();
+        System.out.println(obj.toString());
+    }
+
+    static class A {
+
+        private int value;
+
+        private B instance;
+
+        public A() {
+            value = 0;
+            instance = new B();
+        }
+
+        @Override
+        public String toString() {
+            return "<" + value + ", " + instance + ">";
+        }
+
+    }
+
+    static class B {
+
+        private int value;
+
+        private A instance;
+
+        public B() {
+            value = 10;
+            instance = new A();
+        }
+
+        @Override
+        public String toString() {
+            return "<" + value + ", " + instance + ">";
+        }
+
     }
 
 }
