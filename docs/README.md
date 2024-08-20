@@ -137,15 +137,14 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200628154803.png)
 
-- [JVM 体系结构](01.Java/01.JavaCore/06.JVM/JVM体系结构)
-- [JVM 内存区域](01.Java/01.JavaCore/06.JVM/JVM内存区域) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
-- [JVM 垃圾收集](01.Java/01.JavaCore/06.JVM/JVM垃圾收集) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
-- [JVM 类加载](01.Java/01.JavaCore/06.JVM/JVM类加载) - 关键词：`ClassLoader`、`双亲委派`
-- [JVM 字节码](01.Java/01.JavaCore/06.JVM/JVM字节码) - 关键词：`bytecode`、`asm`、`javassist`
-- [JVM 命令行工具](01.Java/01.JavaCore/06.JVM/JVM命令行工具) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`
-- [JVM GUI 工具](01.Java/01.JavaCore/06.JVM/JVM_GUI工具) - 关键词：`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
-- [JVM 实战](01.Java/01.JavaCore/06.JVM/JVM实战) - 关键词：`配置`、`调优`
-- [Java 故障诊断](01.Java/01.JavaCore/06.JVM/Java故障诊断) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
+- [Java 虚拟机之基本知识](01.Java/01.JavaCore/06.JVM/Java虚拟机之基本知识.md)
+- [Java 虚拟机之内存区域](01.Java/01.JavaCore/06.JVM/Java虚拟机之内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
+- [Java 虚拟机之垃圾收集](01.Java/01.JavaCore/06.JVM/Java虚拟机之垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
+- [Java 虚拟机之字节码](01.Java/01.JavaCore/06.JVM/Java虚拟机之字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
+- [Java 虚拟机之类加载](01.Java/01.JavaCore/06.JVM/Java虚拟机之类加载.md) - 关键词：`ClassLoader`、`双亲委派`
+- [Java 虚拟机之工具](01.Java/01.JavaCore/06.JVM/Java虚拟机之工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`、`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
+- [Java 虚拟机之故障处理](01.Java/01.JavaCore/06.JVM/Java虚拟机之故障处理.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
+- [Java 虚拟机之调优](01.Java/01.JavaCore/06.JVM/Java虚拟机之调优.md) - 关键词：`配置`、`调优`
 
 ### JavaEE
 
@@ -526,7 +525,7 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 ### [分布式理论](15.分布式/01.分布式理论/)
 
-- [分布式基础理论](15.分布式/01.分布式理论/01.分布式基础理论.md) - 关键词：`错误的分布式假设`
+- [分布式基础理论](15.分布式/01.分布式理论/01.分布式基础理论.md) - 关键词：`指标`、`挑战`、`超时检测`、`NTP`、`逻辑时钟`
 - [逻辑时钟](15.分布式/01.分布式理论/02.逻辑时钟.md) - 关键词：`逻辑时钟`、`向量时钟`、`版本时钟`、`全序`、`偏序`
 - [CAP 和 BASE](15.分布式/01.分布式理论/03.CAP和BASE.md) - 关键词：`ACID`、`CAP`、`BASE`、`一致性`
 - [拜占庭将军问题](15.分布式/01.分布式理论/10.拜占庭将军问题.md) - 关键词：`共识`
@@ -552,11 +551,11 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 ### [分布式调度](15.分布式/12.分布式调度/)
 
-- [流量控制](15.分布式/12.分布式调度/03.流量控制.md) - 关键词：`限流`、`熔断`、`降级`、`计数器法`、`时间窗口法`、`令牌桶法`、`漏桶法`
+- [服务注册和发现](15.分布式/12.分布式调度/01.服务注册和发现.md) - 关键词：`服务注册`、`服务发现`、`元数据`
 - [负载均衡](15.分布式/12.分布式调度/02.负载均衡.md) - 关键词：`轮询`、`随机`、`最少连接`、`源地址哈希`、`一致性哈希`、`虚拟 hash 槽`
-- [服务路由](15.分布式/12.分布式调度/01.服务路由.md) - 关键词：`路由`、`条件路由`、`脚本路由`、`标签路由`
-- [分布式会话](15.分布式/12.分布式调度/10.分布式会话.md) - 关键词：`粘性 Session`、`Session 复制共享`、`基于缓存的 session 共享`
-- [分布式 ID](15.分布式/12.分布式调度/04.分布式ID.md) - 关键词：`UUID`、`自增序列`、`雪花算法`、`Leaf`
+- [流量控制](15.分布式/12.分布式调度/03.流量控制) - 关键词：`限流`、`熔断`、`降级`、`计数器法`、`时间窗口法`、`令牌桶法`、`漏桶法`
+- [路由和网关](15.分布式/12.分布式调度/04.网关路由) - 关键词：`路由`、`条件路由`、`脚本路由`、`标签路由`
+- [分布式 ID](15.分布式/12.分布式调度/05.分布式ID.md) - 关键词：`UUID`、`自增序列`、`雪花算法`、`Leaf`
 
 ### 分布式高可用
 

@@ -1,7 +1,6 @@
 ---
-title: JVM 实战
+title: Java 虚拟机之调优
 date: 2019-10-28 22:04:39
-order: 21
 categories:
   - Java
   - JavaCore
@@ -13,7 +12,7 @@ tags:
 permalink: /pages/395de487/
 ---
 
-# JVM 实战
+# Java 虚拟机之调优
 
 ## JVM 调优概述
 

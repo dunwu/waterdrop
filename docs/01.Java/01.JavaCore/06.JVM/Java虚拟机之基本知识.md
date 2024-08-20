@@ -1,5 +1,5 @@
 ---
-title: JVM 体系结构
+title: Java 虚拟机之基本知识
 date: 2021-05-24 15:41:47
 order: 01
 categories:
@@ -13,7 +13,7 @@ tags:
 permalink: /pages/f847eacd/
 ---
 
-# JVM 体系结构
+# Java 虚拟机之基本知识
 
 > JVM 能跨平台工作，主要是由于 JVM 屏蔽了与各个计算机平台相关的软件、硬件之间的差异。
 

@@ -1,7 +1,6 @@
 ---
 title: Java 虚拟机之内存区域
 date: 2020-06-28 16:19:00
-order: 02
 categories:
   - Java
   - JavaCore

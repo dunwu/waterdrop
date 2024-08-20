@@ -1,5 +1,5 @@
 ---
-title: Java 故障诊断
+title: Java 虚拟机之故障处理
 date: 2020-07-30 17:56:33
 order: 22
 categories:
@@ -14,7 +14,7 @@ tags:
 permalink: /pages/78327955/
 ---
 
-# Java 故障诊断
+# Java虚拟机之故障处理
 
 ## 故障定位思路
 
