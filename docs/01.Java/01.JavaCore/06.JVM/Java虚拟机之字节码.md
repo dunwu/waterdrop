@@ -1,5 +1,5 @@
 ---
-title: JVM 之字节码
+title: Java 虚拟机之字节码
 date: 2019-10-28 22:04:39
 order: 05
 categories:
@@ -14,19 +14,17 @@ tags:
 permalink: /pages/885f081c/
 ---
 
-# JVM 之字节码
+# Java 虚拟机之字节码
 
 ## 字节码简介
-
-### 什么是字节码
 
 Java 字节码是 Java 虚拟机执行的一种指令格式。之所以被称之为字节码，是因为：**Java 字节码文件（`.class`）是一种以 8 位字节为基础单位的二进制流文件**，各个数据项严格按照顺序紧凑地排列在 .class 文件中，中间没有添加任何分隔符。**整个 .class 文件本质上就是一张表**。
 
 Java 能做到 “**一次编译，到处运行**”，一是因为 JVM 针对各种操作系统、平台都进行了定制；二是因为无论在什么平台，都可以编译生成固定格式的 Java 字节码文件（`.class`）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230419203137.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408200751147.png)
 
-### 类文件结构
+## 类文件结构
 
 一个 Java 类编译后生成的 .class 文件内容如下图所示，是一堆十六进制数。
 
@@ -38,19 +36,19 @@ Class 文件是一组以 8 个字节为基础单位的二进制流，各个数�
 
 字节码看似杂乱无序，实际上是由严格的格式要求组成的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230419154033.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408200748424.png)
 
-#### 魔数
+### 魔数
 
 每个 `.class` 文件的头 4 个字节称为 **`魔数（magic_number）`**，它的唯一作用是确定这个文件是否为一个能被虚拟机接收的 `.class` 文件。魔数的固定值为：`0xCAFEBABE`（咖啡宝贝）。
 
-#### 版本号
+### 版本号
 
 版本号（version）有 4 个字节，**前两个字节表示次版本号（Minor Version），后两个字节表示主版本号（Major Version）**。
 
 Java 的版本号是从 45 开始的，JDK 1.1 之后 的每个 JDK 大版本发布主版本号向上加 1。举例来说，如果版本号为：“00 00 00 34”。那么，次版本号转化为十进制为 0，主版本号转化为十进制为 52，在 Oracle 官网中查询序号 52 对应的主版本号为 1.8，所以编译该文件的 Java 版本号为 1.8.0。
 
-#### 常量池
+### 常量池
 
 紧接着主版本号之后的字节为常量池（constant_pool），**常量池可以理解为 `.class` 文件中的资源仓库**。
 
@@ -68,31 +66,31 @@ Java 的版本号是从 45 开始的，JDK 1.1 之后 的每个 JDK 大版本发
   - 字段的名称和描述符
   - 方法的名称和描述符
 
-#### 访问标志
+### 访问标志
 
 紧接着常量池的 2 个字节代表访问标志（access_flags），这个标志**用于识别一些类或者接口的访问信息**，描述该 Class 是类还是接口；以及是否被 `public`、`abstract`、`final` 等修饰符修饰。
 
-#### 类索引、父类索引、接口索引
+### 类索引、父类索引、接口索引集合
 
 类索引（this_class）和父类索引都是一个 u2 类型的数据，而接口索引集合是一组 u2 类型的数据的集合，**Class 文件中由这三项数据来确定该类型的继承关系**。
 
-#### 字段表集合
+### 字段表集合
 
 字段表（field_info）用于描述类和接口中声明的变量。Java 语言中的“字段”（Field）包括类级变 量以及实例级变量，但不包括在方法内部声明的局部变量。
 
 字段可以包括的修饰符有字段的作用域（public、private、protected 修饰 符）、是实例变量还是类变量（static 修饰符）、可变性（final）、并发可见性（volatile 修饰符，是否 强制从主内存读写）、可否被序列化（transient 修饰符）、字段数据类型（基本类型、对象、数组）、 字段名称。
 
-#### 方法表集合
+### 方法表集合
 
 Class 文件存储 格式中对方法的描述与对字段的描述采用了几乎完全一致的方式，方法表的结构如同字段表一样，依 次包括访问标志（access_flags）、名称索引（name_index）、描述符索引（descriptor_index）、属性表 集合（attributes）几项
 
 字段表结束后为方法表，方法表的结构如同字段表一样，依次包括了访问标志、名称索引、描述符索引、属性表集合几项。
 
-#### 属性表集合
+### 属性表集合
 
 属性表集合（attribute_info）存放了在该文件中类或接口所定义属性的基本信息。
 
-### 字节码指令
+## 字节码指令
 
 字节码指令由一个字节长度的、代表着某种特定操作含义的数字（称为操作码，Opcode）以及跟随其后的零到多个代表此操作所需参数（Operands）而构成。由于 JVM 采用面向操作数栈架构而不是寄存器架构，所以大多数的指令都不包括操作数，只有一个操作码。
 
@@ -141,10 +139,6 @@ Asm Tree API 可以类比解析 XML 文件中的 DOM 方式，把整个类的结
 - `CtClass（compile-time class）` - 编译时类信息，它是一个 class 文件在代码中的抽象表现形式，可以通过一个类的全限定名来获取一个 CtClass 对象，用来表示这个类文件。
 - `ClassPool` - 从开发视角来看，ClassPool 是一张保存 CtClass 信息的 HashTable，key 为类名，value 为类名对应的 CtClass 对象。当我们需要对某个类进行修改时，就是通过 pool.getCtClass("className") 方法从 pool 中获取到相应的 CtClass。
 - `CtMethod`、`CtField` - 这两个比较好理解，对应的是类中的方法和属性。
-
-## 工具
-
-[jclasslib](https://plugins.jetbrains.com/plugin/9248-jclasslib-bytecode-viewer) - IDEA 插件，可以直观查看当前字节码文件的类信息、常量池、方法区等信息。
 
 ## 参考资料
 

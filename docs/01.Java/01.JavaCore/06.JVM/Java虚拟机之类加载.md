@@ -1,5 +1,5 @@
 ---
-title: JVM 类加载
+title: Java 虚拟机之类加载
 date: 2020-06-17 15:06:46
 order: 04
 categories:
@@ -13,9 +13,7 @@ tags:
 permalink: /pages/3e37ea6e/
 ---
 
-# JVM 类加载
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200617145849.png)
+# Java 虚拟机之类加载
 
 ## 类加载机制
 
@@ -27,7 +25,7 @@ permalink: /pages/3e37ea6e/
 
 ## 类的生命周期
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200617115110.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408200752774.png)
 
 Java 类的完整生命周期包括以下几个阶段：
 
@@ -357,9 +355,7 @@ null
 
 下图展示的类加载器之间的层次关系，称为类加载器的**双亲委派模型（Parents Delegation Model）**。**该模型要求除了顶层的 Bootstrap ClassLoader 外，其余的类加载器都应有自己的父类加载器**。**这里类加载器之间的父子关系一般通过组合（Composition）关系来实现，而不是通过继承（Inheritance）的关系实现**。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jmm-类加载-双亲委派.png" width="500" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408200807340.png)
 
 **（1）工作过程**
 

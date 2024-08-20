@@ -1,5 +1,5 @@
 ---
-title: JVM 命令行工具
+title: Java 虚拟机之工具
 date: 2020-07-30 17:56:33
 order: 11
 categories:
@@ -14,7 +14,9 @@ tags:
 permalink: /pages/dd0d3c68/
 ---
 
-# JVM 命令行工具
+# Java 虚拟机之工具
+
+## JVM 命令行工具
 
 > Java 程序员免不了故障排查工作，所以经常需要使用一些 JVM 工具。
 >
@@ -32,11 +34,11 @@ permalink: /pages/dd0d3c68/
 | `jinfo`  | JVM 信息查看工具。用于实时查看和调整 JVM 进程参数。                                                                     |
 | `jcmd`   | JVM 命令行调试 工具。用于向 JVM 进程发送调试命令。                                                                      |
 
-## jps
+### jps
 
 > **[jps(JVM Process Status Tool)](https://docs.oracle.com/en/java/javase/11/tools/jps.html#GUID-6EB65B96-F9DD-4356-B825-6146E9EEC81E) 是虚拟机进程状态工具**。它可以显示指定系统内所有的 HotSpot 虚拟机进程状态信息。jps 通过 RMI 协议查询开启了 RMI 服务的远程虚拟机进程状态。
 
-### jps 命令用法
+#### jps 命令用法
 
 ```shell
 jps [option] [hostid]
@@ -57,7 +59,7 @@ jps [-help]
 
 其中 `option`、`hostid` 参数也可以不写。
 
-### jps 使用示例
+#### jps 使用示例
 
 【示例】列出本地 Java 进程
 
@@ -85,11 +87,11 @@ $ jps -l remote.domain
 2857 sun.tools.jstatd.jstatd
 ```
 
-## jstat
+### jstat
 
 > **[jstat(JVM statistics Monitoring)](https://docs.oracle.com/en/java/javase/11/tools/jstat.html)，是虚拟机统计信息监视工具**。jstat 用于监视虚拟机运行时状态信息，它可以显示出虚拟机进程中的类装载、内存、垃圾收集、JIT 编译等运行数据。
 
-### jstat 命令用法
+#### jstat 命令用法
 
 命令格式：
 
@@ -118,9 +120,9 @@ jstat [option] VMID [interval] [count]
 
 > 【参考】更详细说明可以参考：[jstat 命令查看 jvm 的 GC 情况](https://www.cnblogs.com/yjd_hycf_space/p/7755633.html)
 
-### jstat 使用示例
+#### jstat 使用示例
 
-#### 类加载统计
+##### 类加载统计
 
 使用 `jstat -class pid` 命令可以查看编译统计信息。
 
@@ -140,7 +142,7 @@ Loaded  Bytes  Unloaded  Bytes     Time
  26749 50405.3      873  1216.8      19.75
 ```
 
-#### 编译统计
+##### 编译统计
 
 使用 `jstat -compiler pid` 命令可以查看编译统计信息。
 
@@ -161,7 +163,7 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 - FailedType - 失败类型
 - FailedMethod - 失败的方法
 
-#### GC 统计
+##### GC 统计
 
 使用 `jstat -gc pid time` 命令可以查看 GC 统计信息。
 
@@ -210,13 +212,13 @@ $ jstat -gc 25196 1s 4
 
 > 注：更详细的参数含义可以参考官方文档：http://docs.oracle.com/javase/8/docs/technotes/tools/unix/jstat.html
 
-## jmap
+### jmap
 
 > **[jmap(JVM Memory Map)](https://docs.oracle.com/en/java/javase/11/tools/jmap.html) 是 Java 内存映像工具**。jmap 用于生成堆转储快照（一般称为 heapdump 或 dump 文件）。jmap 不仅能生成 dump 文件，还可以查询 `finalize` 执行队列、Java 堆和永久代的详细信息，如当前使用率、当前使用的是哪种收集器等。
 >
 > 如果不使用这个命令，还可以使用 `-XX:+HeapDumpOnOutOfMemoryError` 参数来让虚拟机出现 OOM 的时候，自动生成 dump 文件。
 
-### jmap 命令用法
+#### jmap 命令用法
 
 命令格式：
 
@@ -233,9 +235,9 @@ jmap [option] pid
 - `-permstat` - to print permanent generation statistics
 - `-F` - 当-dump 没有响应时，强制生成 dump 快照
 
-### jstat 使用示例
+#### jstat 使用示例
 
-#### 生成 heapdump 快照
+##### 生成 heapdump 快照
 
 dump 堆到文件，format 指定输出格式，live 指明是活着的对象，file 指定文件名
 
@@ -247,7 +249,7 @@ Heap dump file created
 
 dump.hprof 这个后缀是为了后续可以直接用 MAT(Memory Anlysis Tool)等工具打开。
 
-#### 查看实例数最多的类
+##### 查看实例数最多的类
 
 ```shell
 $ jmap -histo 29527 | head -n 6
@@ -259,7 +261,7 @@ $ jmap -histo 29527 | head -n 6
    3:       7382322      347307096  [Ljava.lang.Object;
 ```
 
-#### 查看指定进程的堆信息
+##### 查看指定进程的堆信息
 
 注意：使用 CMS GC 情况下，`jmap -heap PID` 的执行有可能会导致 java 进程挂起。
 
@@ -314,7 +316,7 @@ PS Perm Generation
    97.06831451706046% used
 ```
 
-## jstack
+### jstack
 
 > **[jstack(Stack Trace for java)](https://docs.oracle.com/en/java/javase/11/tools/jstack.html) 是 Java 堆栈跟踪工具**。jstack 用来打印目标 Java 进程中各个线程的栈轨迹，以及这些线程所持有的锁，并可以生成 java 虚拟机当前时刻的线程快照（一般称为 threaddump 或 javacore 文件）。
 >
@@ -324,7 +326,7 @@ PS Perm Generation
 
 线程出现停顿的时候通过 jstack 来查看各个线程的调用堆栈，就可以知道没有响应的线程到底在后台做什么事情，或者等待什么资源。 如果 java 程序崩溃生成 core 文件，jstack 工具可以用来获得 core 文件的 java stack 和 native stack 的信息，从而可以轻松地知道 java 程序是如何崩溃和在程序何处发生问题。另外，jstack 工具还可以附属到正在运行的 java 程序中，看到当时运行的 java 程序的 java stack 和 native stack 的信息, 如果现在运行的 java 程序呈现 hung 的状态，jstack 是非常有用的。
 
-### jstack 命令用法
+#### jstack 命令用法
 
 命令格式：
 
@@ -338,13 +340,13 @@ jstack [option] pid
 - `-l` - 除堆栈外，显示关于锁的附加信息
 - `-m` - 打印 java 和 jni 框架的所有栈信息
 
-### thread dump 文件
+#### thread dump 文件
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730112431.png)
 
 一个 Thread Dump 文件大致可以分为五个部分。
 
-#### 第一部分：Full thread dump identifier
+##### 第一部分：Full thread dump identifier
 
 这一部分是内容最开始的部分，展示了快照文件的生成时间和 JVM 的版本信息。
 
@@ -353,7 +355,7 @@ jstack [option] pid
 Full thread dump Java HotSpot(TM) 64-Bit Server VM (24.79-b02 mixed mode):
 ```
 
-#### 第二部分：Java EE middleware, third party & custom application Threads
+##### 第二部分：Java EE middleware, third party & custom application Threads
 
 这是整个文件的核心部分，里面展示了 JavaEE 容器（如 tomcat、resin 等）、自己的程序中所使用的线程信息。
 
@@ -379,11 +381,11 @@ Full thread dump Java HotSpot(TM) 64-Bit Server VM (24.79-b02 mixed mode):
 - `java.lang.Thread.State: WAITING (parking)` **JVM 线程状态：**这里标明了线程在代码级别的状态。
 - **线程调用栈信息：**下面就是当前线程调用的详细栈信息，用于代码的分析。堆栈信息应该从下向上解读，因为程序调用的顺序是从下向上的。
 
-#### 第三部分：HotSpot VM Thread
+##### 第三部分：HotSpot VM Thread
 
 这一部分展示了 JVM 内部线程的信息，用于执行内部的原生操作。下面常见的集中内置线程：
 
-##### "Attach Listener"
+###### "Attach Listener"
 
 该线程负责接收外部命令，执行该命令并把结果返回给调用者，此种类型的线程通常在桌面程序中出现。
 
@@ -392,7 +394,7 @@ Full thread dump Java HotSpot(TM) 64-Bit Server VM (24.79-b02 mixed mode):
    java.lang.Thread.State: RUNNABLE
 ```
 
-##### "DestroyJavaVM"
+###### "DestroyJavaVM"
 
 执行 `main()` 的线程在执行完之后调用 JNI 中的 `jni_DestroyJavaVM()` 方法会唤起 `DestroyJavaVM` 线程，处于等待状态，等待其它线程（java 线程和 native 线程）退出时通知它卸载 JVM。
 
@@ -401,7 +403,7 @@ Full thread dump Java HotSpot(TM) 64-Bit Server VM (24.79-b02 mixed mode):
    java.lang.Thread.State: RUNNABLE
 ```
 
-##### "Service Thread"
+###### "Service Thread"
 
 用于启动服务的线程
 
@@ -410,7 +412,7 @@ Full thread dump Java HotSpot(TM) 64-Bit Server VM (24.79-b02 mixed mode):
    java.lang.Thread.State: RUNNABLE
 ```
 
-##### "CompilerThread"
+###### "CompilerThread"
 
 用来调用 JITing，实时编译装卸类。通常 JVM 会启动多个线程来处理这部分工作，线程名称后面的数字也会累加，比如 CompilerThread1。
 
@@ -422,7 +424,7 @@ Full thread dump Java HotSpot(TM) 64-Bit Server VM (24.79-b02 mixed mode):
    java.lang.Thread.State: RUNNABLE
 ```
 
-##### "Signal Dispatcher"
+###### "Signal Dispatcher"
 
 Attach Listener 线程的职责是接收外部 jvm 命令，当命令接收成功后，会交给 signal dispather 线程去进行分发到各个不同的模块处理命令，并且返回处理结果。
 signal dispather 线程也是在第一次接收外部 jvm 命令时，进行初始化工作。
@@ -432,7 +434,7 @@ signal dispather 线程也是在第一次接收外部 jvm 命令时，进行初�
    java.lang.Thread.State: RUNNABLE
 ```
 
-##### "Finalizer"
+###### "Finalizer"
 
 这个线程也是在 main 线程之后创建的，其优先级为 10，主要用于在垃圾收集前，调用对象的 `finalize()` 方法；关于 Finalizer 线程的几点：
 
@@ -454,7 +456,7 @@ JVM 为什么要单独用一个线程来执行 `finalize()` 方法呢？
     at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:209)
 ```
 
-##### "Reference Handler"
+###### "Reference Handler"
 
 JVM 在创建 main 线程后就创建 Reference Handler 线程，其优先级最高，为 10，它主要用于处理引用对象本身（软引用、弱引用、虚引用）的垃圾回收问题 。
 
@@ -467,7 +469,7 @@ JVM 在创建 main 线程后就创建 Reference Handler 线程，其优先级最
     - locked <0x00000006d173c1f0> (a java.lang.ref.Reference$Lock)
 ```
 
-##### "VM Thread"
+###### "VM Thread"
 
 JVM 中线程的母体，根据 HotSpot 源码中关于 vmThread.hpp 里面的注释，它是一个单例的对象（最原始的线程）会产生或触发所有其他的线程，这个单例的 VM 线程是会被其他线程所使用来做一些 VM 操作（如清扫垃圾等）。
 在 VM Thread 的结构体里有一个 VMOperationQueue 列队，所有的 VM 线程操作(vm_operation)都会被保存到这个列队当中，VMThread 本身就是一个线程，它的线程负责执行一个自轮询的 loop 函数(具体可以参考：VMThread.cpp 里面的 void VMThread::loop()) ，该 loop 函数从 VMOperationQueue 列队中按照优先级取出当前需要执行的操作对象(VM_Operation)，并且调用 VM_Operation->evaluate 函数去执行该操作类型本身的业务逻辑。
@@ -477,11 +479,11 @@ VM 操作类型被定义在 vm_operations.hpp 文件内，列举几个：ThreadS
 "VM Thread" prio=10 tid=0x00007fbea80d3800 nid=0x5e9 runnable
 ```
 
-#### 第四部分：HotSpot GC Thread
+##### 第四部分：HotSpot GC Thread
 
 JVM 中用于进行资源回收的线程，包括以下几种类型的线程：
 
-##### "VM Periodic Task Thread"
+###### "VM Periodic Task Thread"
 
 该线程是 JVM 周期性任务调度的线程，它由 WatcherThread 创建，是一个单例对象。该线程在 JVM 内使用得比较频繁，比如：定期的内存监控、JVM 运行状况监控。
 
@@ -492,7 +494,7 @@ JVM 中用于进行资源回收的线程，包括以下几种类型的线程：
 可以使用 jstat 命令查看 GC 的情况，比如查看某个进程没有存活必要的引用可以使用命令 `jstat -gcutil 250 7` 参数中 pid 是进程 id，后面的 250 和 7 表示每 250 毫秒打印一次，总共打印 7 次。
 这对于防止因为应用代码中直接使用 native 库或者第三方的一些监控工具的内存泄漏有非常大的帮助。
 
-##### "GC task thread#0 (ParallelGC)"
+###### "GC task thread#0 (ParallelGC)"
 
 垃圾回收线程，该线程会负责进行垃圾回收。通常 JVM 会启动多个线程来处理这个工作，线程名称中#后面的数字也会累加。
 
@@ -508,7 +510,7 @@ JVM 中用于进行资源回收的线程，包括以下几种类型的线程：
 
 如果在 JVM 中增加了 `-XX:+UseConcMarkSweepGC` 参数将会启用 CMS （Concurrent Mark-Sweep）GC Thread 方式，以下是该模式下的线程类型：
 
-##### "Gang worker#0 (Parallel GC Threads)"
+###### "Gang worker#0 (Parallel GC Threads)"
 
 原来垃圾回收线程 GC task thread#0 (ParallelGC) 被替换为 Gang worker#0 (Parallel GC Threads)。Gang worker 是 JVM 用于年轻代垃圾回收(minor gc)的线程。
 
@@ -518,7 +520,7 @@ JVM 中用于进行资源回收的线程，包括以下几种类型的线程：
 "Gang worker#1 (Parallel GC Threads)" prio=10 tid=0x00007fbea801d800 nid=0x5e7 runnable
 ```
 
-##### "Concurrent Mark-Sweep GC Thread"
+###### "Concurrent Mark-Sweep GC Thread"
 
 并发标记清除垃圾回收器（就是通常所说的 CMS GC）线程， 该线程主要针对于年老代垃圾回收。
 
@@ -526,7 +528,7 @@ JVM 中用于进行资源回收的线程，包括以下几种类型的线程：
 "Concurrent Mark-Sweep GC Thread" prio=10 tid=0x00007fbea8073800 nid=0x5e8 runnable
 ```
 
-##### "Surrogate Locker Thread (Concurrent GC)"
+###### "Surrogate Locker Thread (Concurrent GC)"
 
 此线程主要配合 CMS 垃圾回收器来使用，是一个守护线程，主要负责处理 GC 过程中 Java 层的 Reference（指软引用、弱引用等等）与 jvm 内部层面的对象状态同步。
 
@@ -548,7 +550,7 @@ JVM 中用于进行资源回收的线程，包括以下几种类型的线程：
 CMST 开始 GC 时，会发一个消息给 SLT 让它去获取 Java 层 Reference 对象的全局锁：Lock。直到 CMS GC 完毕之后，JVM 会将 WeakHashMap 中所有被回收的对象所属的 WeakReference 容器对象放入到 Reference 的 pending 属性当中（每次 GC 完毕之后，pending 属性基本上都不会为 null 了），然后通知 SLT 释放并且 notify 全局锁:Lock。此时激活了 ReferenceHandler 线程的 run 方法，使其脱离 wait 状态，开始工作了。
 ReferenceHandler 这个线程会将 pending 中的所有 WeakReference 对象都移动到它们各自的列队当中，比如当前这个 WeakReference 属于某个 WeakHashMap 对象，那么它就会被放入相应的 ReferenceQueue 列队里面（该列队是链表结构）。 当我们下次从 WeakHashMap 对象里面 get、put 数据或者调用 size 方法的时候，WeakHashMap 就会将 ReferenceQueue 列队中的 WeakReference 依依 poll 出来去和 Entry[]数据做比较，如果发现相同的，则说明这个 Entry 所保存的对象已经被 GC 掉了，那么将 Entry[]内的 Entry 对象剔除掉。
 
-#### 第五部分：JNI global references count
+##### 第五部分：JNI global references count
 
 这一部分主要回收那些在 native 代码上被引用，但在 java 代码中却没有存活必要的引用，对于防止因为应用代码中直接使用 native 库或第三方的一些监控工具的内存泄漏有非常大的帮助。
 
@@ -558,11 +560,11 @@ JNI global references: 830
 
 下一篇文章将要讲述一个直接找出 CPU 100% 线程的例子。
 
-### 系统线程状态
+#### 系统线程状态
 
 系统线程有如下状态：
 
-#### deadlock
+##### deadlock
 
 死锁线程，一般指多个线程调用期间进入了相互资源占用，导致一直等待无法释放的情况。
 
@@ -603,11 +605,11 @@ JNI global references: 830
                 - None
 ```
 
-#### runnable
+##### runnable
 
 一般指该线程正在执行状态中，该线程占用了资源，正在处理某个操作，如通过 SQL 语句查询数据库、对某个文件进行写入等。
 
-#### blocked
+##### blocked
 
 线程正处于阻塞状态，指当前线程执行过程中，所需要的资源长时间等待却一直未能获取到，被容器的线程管理器标识为阻塞状态，可以理解为等待资源超时的线程。
 
@@ -636,7 +638,7 @@ JNI global references: 830
                 - <0x0000000780b0e1b8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
 ```
 
-#### waiting on condition
+##### waiting on condition
 
 线程正处于等待资源或等待某个条件的发生，具体的原因需要结合下面堆栈信息进行分析。
 
@@ -667,7 +669,7 @@ JNI global references: 830
                 at java.lang.Thread.run(Thread.java:662)
 ```
 
-#### waiting for monitor entry 或 in Object.wait()
+##### waiting for monitor entry 或 in Object.wait()
 
 Moniter 是 Java 中用以实现线程之间的互斥与协作的主要手段，它可以看成是对象或者 class 的锁，每个对象都有，也仅有一个 Monitor。
 
@@ -695,9 +697,9 @@ synchronized(obj) {
 
 当线程获得了 Monitor，进入了临界区之后，如果发现线程继续运行的条件没有满足，它则调用对象（通常是被 synchronized 的对象）的 wait()方法，放弃 Monitor，进入 "Wait Set"队列。只有当别的线程在该对象上调用了 notify()或者 notifyAll()方法，"Wait Set"队列中的线程才得到机会去竞争，但是只有一个线程获得对象的 Monitor，恢复到运行态。"Wait Set"中的线程在 Thread Dump 中显示的状态为 in Object.wait()。通常来说，当 CPU 很忙的时候关注 Runnable 状态的线程，反之则关注 waiting for monitor entry 状态的线程。
 
-### jstack 使用示例
+#### jstack 使用示例
 
-#### 找出某 Java 进程中最耗费 CPU 的 Java 线程
+##### 找出某 Java 进程中最耗费 CPU 的 Java 线程
 
 （1）找出 Java 进程
 
@@ -758,7 +760,7 @@ synchronized(sigLock) {
 
 它是轮询任务的空闲等待代码，上面的 `sigLock.wait(timeUntilContinue)` 就对应了前面的 `Object.wait()`。
 
-#### 生成 threaddump 文件
+##### 生成 threaddump 文件
 
 可以使用 `jstack -l <pid> > <file-path>` 命令生成 threaddump 文件
 
@@ -768,7 +770,7 @@ synchronized(sigLock) {
 jstack -l 8841 > /home/threaddump.txt
 ```
 
-## jinfo
+### jinfo
 
 > **[jinfo(JVM Configuration info)](https://docs.oracle.com/en/java/javase/11/tools/jinfo.html)，是 Java 配置信息工具**。jinfo 用于实时查看和调整虚拟机运行参数。如传递给 Java 虚拟机的`-X`（即输出中的 jvm_args）、`-XX`参数（即输出中的 VM Flags），以及可在 Java 层面通过`System.getProperty`获取的`-D`参数（即输出中的 System Properties）。
 
@@ -796,7 +798,7 @@ JVM version is 25.222-b10
 ...
 ```
 
-## jhat
+### jhat
 
 > **jhat(JVM Heap Analysis Tool)，是虚拟机堆转储快照分析工具**。jhat 与 jmap 搭配使用，用来分析 jmap 生成的 dump 文件。jhat 内置了一个微型的 HTTP/HTML 服务器，生成 dump 的分析结果后，可以在浏览器中查看。
 >
@@ -808,13 +810,212 @@ JVM version is 25.222-b10
 jhat [dumpfile]
 ```
 
+## JVM GUI 工具
+
+> Java 程序员免不了故障排查工作，所以经常需要使用一些 JVM 工具。
+>
+> 本文系统性的介绍一下常用的 JVM GUI 工具。
+
+### jconsole
+
+> jconsole 是 JDK 自带的 GUI 工具。**jconsole(Java Monitoring and Management Console) 是一种基于 JMX 的可视化监视与管理工具**。
+>
+> jconsole 的管理功能是针对 JMX MBean 进行管理，由于 MBean 可以使用代码、中间件服务器的管理控制台或所有符合 JMX 规范的软件进行访问。
+
+注意：使用 jconsole 的前提是 Java 应用开启 JMX。
+
+#### 开启 JMX
+
+Java 应用开启 JMX 后，可以使用 `jconsole` 或 `jvisualvm` 进行监控 Java 程序的基本信息和运行情况。
+
+开启方法是，在 java 指令后，添加以下参数：
+
+```java
+-Dcom.sun.management.jmxremote=true
+-Dcom.sun.management.jmxremote.ssl=false
+-Dcom.sun.management.jmxremote.authenticate=false
+-Djava.rmi.server.hostname=127.0.0.1
+-Dcom.sun.management.jmxremote.port=18888
+```
+
+- `-Djava.rmi.server.hostname` - 指定 Java 程序运行的服务器
+- `-Dcom.sun.management.jmxremote.port` - 指定 JMX 服务监听端口
+
+#### 连接 jconsole
+
+如果是本地 Java 进程，jconsole 可以直接绑定连接。
+
+如果是远程 Java 进程，需要连接 Java 进程的 JMX 端口。
+
+![Connecting to a JMX Agent Using the JMX Service URL](https://docs.oracle.com/javase/8/docs/technotes/guides/management/figures/connectadv.gif)
+
+#### jconsole 界面
+
+进入 jconsole 应用后，可以看到以下 tab 页面。
+
+- `概述` - 显示有关 Java VM 和监视值的概述信息。
+- `内存` - 显示有关内存使用的信息。内存页相当于可视化的 `jstat` 命令。
+- `线程` - 显示有关线程使用的信息。
+- `类` - 显示有关类加载的信息。
+- `VM 摘要` - 显示有关 Java VM 的信息。
+- `MBean` - 显示有关 MBean 的信息。
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730151422.png)
+
+### jvisualvm
+
+> jvisualvm 是 JDK 自带的 GUI 工具。**jvisualvm(All-In-One Java Troubleshooting Tool) 是多合一故障处理工具**。它支持运行监视、故障处理、性能分析等功能。
+
+个人觉得 jvisualvm 比 jconsole 好用。
+
+#### jvisualvm 概述页面
+
+jvisualvm 概述页面可以查看当前 Java 进程的基本信息，如：JDK 版本、Java 进程、JVM 参数等。
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150147.png)
+
+#### jvisualvm 监控页面
+
+在 jvisualvm 监控页面，可以看到 Java 进程的 CPU、内存、类加载、线程的实时变化。
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150254.png)
+
+#### jvisualvm 线程页面
+
+jvisualvm 线程页面展示了当前的线程状态。
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150416.png)
+
+jvisualvm 还可以生成线程 Dump 文件，帮助进一步分析线程栈信息。
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150830.png)
+
+#### jvisualvm 抽样器页面
+
+jvisualvm 可以对 CPU、内存进行抽样，帮助我们进行性能分析。
+
+### MAT
+
+[MAT](https://www.eclipse.org/mat/) 即 Eclipse Memory Analyzer Tool 的缩写。
+
+MAT 本身也能够获取堆的二进制快照。该功能将借助 `jps` 列出当前正在运行的 Java 进程，以供选择并获取快照。由于 `jps` 会将自己列入其中，因此你会在列表中发现一个已经结束运行的 `jps` 进程。
+
+MAT 可以独立安装（[官方下载地址](http://www.eclipse.org/mat/downloads.php)），也可以作为 Eclipse IDE 的插件安装。
+
+#### MAT 配置
+
+MAT 解压后，安装目录下有个 `MemoryAnalyzer.ini` 文件。
+
+`MemoryAnalyzer.ini` 中有个重要的参数 `Xmx` 表示最大内存，默认为：`-vmargs -Xmx1024m`
+
+如果试图用 MAT 导入的 dump 文件超过 1024 M，会报错：
+
+```shell
+An internal error occurred during: "Parsing heap dump from XXX"
+```
+
+此时，可以适当调整 `Xmx` 大小。如果设置的 `Xmx` 数值过大，本机内存不足以支撑，启动 MAT 会报错：
+
+```
+Failed to create the Java Virtual Machine
+```
+
+#### MAT 分析
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200308092746.png)
+
+点击 Leak Suspects 可以进入内存泄漏页面。
+
+（1）首先，可以查看饼图了解内存的整体消耗情况
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200308150556.png)
+
+（2）缩小范围，寻找问题疑似点
+
+![img](https://img-blog.csdn.net/20160223202154818)
+
+可以点击进入详情页面，在详情页面 Shortest Paths To the Accumulation Point 表示 GC root 到内存消耗聚集点的最短路径，如果某个内存消耗聚集点有路径到达 GC root，则该内存消耗聚集点不会被当做垃圾被回收。
+
+为了找到内存泄露，我获取了两个堆转储文件，两个文件获取时间间隔是一天（因为内存只是小幅度增长，短时间很难发现问题）。对比两个文件的对象，通过对比后的结果可以很方便定位内存泄露。
+
+MAT 同时打开两个堆转储文件，分别打开 Histogram，如下图。在下图中方框 1 按钮用于对比两个 Histogram，对比后在方框 2 处选择 Group By package，然后对比各对象的变化。不难发现 heap3.hprof 比 heap6.hprof 少了 64 个 eventInfo 对象，如果对代码比较熟悉的话想必这样一个结果是能够给程序员一定的启示的。而我也是根据这个启示差找到了最终内存泄露的位置。
+![img](https://img-blog.csdn.net/20160223203226362)
+
+### JProfile
+
+[JProfiler](https://www.ej-technologies.com/products/jprofiler/overview.html) 是一款性能分析工具。
+
+由于它是收费的，所以我本人使用较少。但是，它确实功能强大，且方便使用，还可以和 Intellij Idea 集成。
+
+### Arthas
+
+[Arthas](https://github.com/alibaba/arthas) 是 Alibaba 开源的 Java 诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪 Java 代码；实时监控 JVM 状态。
+
+Arthas 支持 JDK 6+，支持 Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 `Tab` 自动补全功能，进一步方便进行问题的定位和诊断。
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730145030.png)
+
+#### Arthas 基础命令
+
+- help——查看命令帮助信息
+- [cat](https://alibaba.github.io/arthas/cat.html)——打印文件内容，和 linux 里的 cat 命令类似
+- [echo](https://alibaba.github.io/arthas/echo.html)–打印参数，和 linux 里的 echo 命令类似
+- [grep](https://alibaba.github.io/arthas/grep.html)——匹配查找，和 linux 里的 grep 命令类似
+- [tee](https://alibaba.github.io/arthas/tee.html)——复制标准输入到标准输出和指定的文件，和 linux 里的 tee 命令类似
+- [pwd](https://alibaba.github.io/arthas/pwd.html)——返回当前的工作目录，和 linux 命令类似
+- cls——清空当前屏幕区域
+- session——查看当前会话的信息
+- [reset](https://alibaba.github.io/arthas/reset.html)——重置增强类，将被 Arthas 增强过的类全部还原，Arthas 服务端关闭时会重置所有增强过的类
+- version——输出当前目标 Java 进程所加载的 Arthas 版本号
+- history——打印命令历史
+- quit——退出当前 Arthas 客户端，其他 Arthas 客户端不受影响
+- stop——关闭 Arthas 服务端，所有 Arthas 客户端全部退出
+- [keymap](https://alibaba.github.io/arthas/keymap.html)——Arthas 快捷键列表及自定义快捷键
+
+#### Arthas jvm 相关命令
+
+- [dashboard](https://alibaba.github.io/arthas/dashboard.html)——当前系统的实时数据面板
+- [thread](https://alibaba.github.io/arthas/thread.html)——查看当前 JVM 的线程堆栈信息
+- [jvm](https://alibaba.github.io/arthas/jvm.html)——查看当前 JVM 的信息
+- [sysprop](https://alibaba.github.io/arthas/sysprop.html)——查看和修改 JVM 的系统属性
+- [sysenv](https://alibaba.github.io/arthas/sysenv.html)——查看 JVM 的环境变量
+- [vmoption](https://alibaba.github.io/arthas/vmoption.html)——查看和修改 JVM 里诊断相关的 option
+- [perfcounter](https://alibaba.github.io/arthas/perfcounter.html)——查看当前 JVM 的 Perf Counter 信息
+- [logger](https://alibaba.github.io/arthas/logger.html)——查看和修改 logger
+- [getstatic](https://alibaba.github.io/arthas/getstatic.html)——查看类的静态属性
+- [ognl](https://alibaba.github.io/arthas/ognl.html)——执行 ognl 表达式
+- [mbean](https://alibaba.github.io/arthas/mbean.html)——查看 Mbean 的信息
+- [heapdump](https://alibaba.github.io/arthas/heapdump.html)——dump java heap, 类似 jmap 命令的 heap dump 功能
+
+#### Arthas class/classloader 相关命令
+
+- [sc](https://alibaba.github.io/arthas/sc.html)——查看 JVM 已加载的类信息
+- [sm](https://alibaba.github.io/arthas/sm.html)——查看已加载类的方法信息
+- [jad](https://alibaba.github.io/arthas/jad.html)——反编译指定已加载类的源码
+- [mc](https://alibaba.github.io/arthas/mc.html)——内存编译器，内存编译`.java`文件为`.class`文件
+- [redefine](https://alibaba.github.io/arthas/redefine.html)——加载外部的`.class`文件，redefine 到 JVM 里
+- [dump](https://alibaba.github.io/arthas/dump.html)——dump 已加载类的 byte code 到特定目录
+- [classloader](https://alibaba.github.io/arthas/classloader.html)——查看 classloader 的继承树，urls，类加载信息，使用 classloader 去 getResource
+
+#### Arthas monitor/watch/trace 相关命令
+
+> 请注意，这些命令，都通过字节码增强技术来实现的，会在指定类的方法中插入一些切面来实现数据统计和观测，因此在线上、预发使用时，请尽量明确需要观测的类、方法以及条件，诊断结束要执行 `stop` 或将增强过的类执行 `reset` 命令。
+
+- [monitor](https://alibaba.github.io/arthas/monitor.html)——方法执行监控
+- [watch](https://alibaba.github.io/arthas/watch.html)——方法执行数据观测
+- [trace](https://alibaba.github.io/arthas/trace.html)——方法内部调用路径，并输出方法路径上的每个节点上耗时
+- [stack](https://alibaba.github.io/arthas/stack.html)——输出当前方法被调用的调用路径
+- [tt](https://alibaba.github.io/arthas/tt.html)——方法执行数据的时空隧道，记录下指定方法每次调用的入参和返回信息，并能对这些不同的时间下调用进行观测
+
 ## 参考资料
 
 - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
 - [《Java 性能调优实战》](https://time.geekbang.org/column/intro/100028001)
 - [JVM 性能调优监控工具 jps、jstack、jmap、jhat、jstat、hprof 使用详解](https://my.oschina.net/feichexia/blog/196575)
+- [JVM 故障分析及性能优化系列之一：使用 jstack 定位线程堆栈信息](https://www.javatang.com/archives/2017/10/19/33151873.html)
+- [jstat 命令查看 jvm 的 GC 情况](https://www.cnblogs.com/yjd_hycf_space/p/7755633.html)
 - [jconsole 官方文档](https://docs.oracle.com/javase/8/docs/technotes/guides/management/jconsole.html)
 - [jconsole 工具使用](https://www.cnblogs.com/kongzhongqijing/articles/3621441.html)
-- [jstat 命令查看 jvm 的 GC 情况](https://www.cnblogs.com/yjd_hycf_space/p/7755633.html)
+- [jvisualvm 官方文档](https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/index.html)
+- [Java jvisualvm 简要说明](https://blog.csdn.net/a19881029/article/details/8432368)
 - [利用内存分析工具（Memory Analyzer Tool，MAT）分析 java 项目内存泄露](https://blog.csdn.net/wanghuiqi2008/article/details/50724676)
-- [JVM 故障分析及性能优化系列之一：使用 jstack 定位线程堆栈信息](https://www.javatang.com/archives/2017/10/19/33151873.html)
