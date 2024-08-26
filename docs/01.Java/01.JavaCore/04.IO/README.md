@@ -9,7 +9,7 @@ tags:
   - Java
   - JavaCore
   - IO
-permalink: /pages/c629e4d3/
+permalink: /pages/29b38dd2/
 hidden: true
 index: false
 dir:

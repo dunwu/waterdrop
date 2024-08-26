@@ -1,14 +1,16 @@
 ---
 title: Java 并发面试二
+date: 2024-07-23 07:21:03
 categories:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 tags:
   - Java
   - JavaSE
   - 面试
   - 并发
+permalink: /pages/b1e468f4/
 ---
 
 # Java 并发面试二

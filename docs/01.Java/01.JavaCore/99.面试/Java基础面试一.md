@@ -3,13 +3,13 @@ title: Java 基础面试一
 date: 2024-06-18 22:46:20
 categories:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 tags:
   - Java
   - JavaSE
   - 面试
-permalink: /pages/f1702b17/
+permalink: /pages/5fe7db38/
 ---
 
 # Java 基础面试一

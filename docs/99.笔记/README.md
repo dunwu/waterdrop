@@ -16,7 +16,10 @@ index: false
 
 ### Java
 
-- [《玩转 Spring 全家桶》笔记](01.Java/01.玩转Spring全家桶笔记.md)
+- [《Java并发编程实战》笔记](01.Java/Java并发编程实战.md)
+- [《深入拆解Java虚拟机》笔记](01.Java/深入拆解Java虚拟机.md)
+- [《深入浅出Java虚拟机》笔记](01.Java/深入浅出Java虚拟机.md)
+- [《玩转 Spring 全家桶》笔记](01.Java/玩转Spring全家桶笔记.md)
 
 ### 设计
 

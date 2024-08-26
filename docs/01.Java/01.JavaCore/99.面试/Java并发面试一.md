@@ -3,14 +3,14 @@ title: Java 并发面试一
 date: 2020-06-04 13:51:00
 categories:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 tags:
   - Java
   - JavaSE
   - 面试
   - 并发
-permalink: /pages/34836712/
+permalink: /pages/bbf8a81d/
 ---
 
 # Java 并发面试一
@@ -1227,5 +1227,3 @@ JDK 1.8：
   - 如果当前位置的 `hashcode == MOVED == -1`, 则需要进行扩容。
   - 如果都不满足，则利用 synchronized 锁写入数据。
   - 如果数量大于 `TREEIFY_THRESHOLD` 则要转换为红黑树。
-
-

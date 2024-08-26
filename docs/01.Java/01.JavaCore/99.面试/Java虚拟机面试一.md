@@ -1,15 +1,16 @@
 ---
 title: Java 虚拟机面试一
+date: 2024-07-03 07:44:02
 categories:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 tags:
   - Java
   - JavaSE
   - 面试
   - 并发
-permalink: /pages/34836712/
+permalink: /pages/46c1e340/
 ---
 
 # Java 虚拟机面试一

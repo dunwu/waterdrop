@@ -1,14 +1,16 @@
 ---
 title: Java 容器面试二
+date: 2024-07-03 07:44:02
 categories:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 tags:
   - Java
   - JavaSE
   - 面试
   - 容器
+permalink: /pages/e3c58d1f/
 ---
 
 # Java 容器面试二

@@ -1,14 +1,16 @@
 ---
 title: Java 并发面试三
+date: 2024-07-23 07:21:03
 categories:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 tags:
   - Java
   - JavaSE
   - 面试
   - 并发
+permalink: /pages/8ede3b07/
 ---
 
 # Java 并发面试三
@@ -1410,4 +1412,3 @@ public class ProducerConsumerDemo03 {
 
 }
 ```
-

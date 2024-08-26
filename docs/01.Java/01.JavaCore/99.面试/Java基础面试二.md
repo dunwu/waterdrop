@@ -1,13 +1,15 @@
 ---
 title: Java 基础面试二
+date: 2024-07-03 07:44:02
 categories:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 tags:
   - Java
   - JavaSE
   - 面试
+permalink: /pages/dd562d6e/
 ---
 
 # Java 基础面试二

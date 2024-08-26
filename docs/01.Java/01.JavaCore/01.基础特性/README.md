@@ -8,7 +8,7 @@ categories:
 tags:
   - Java
   - JavaCore
-permalink: /pages/9c4855f3/
+permalink: /pages/a7aa142d/
 hidden: true
 index: false
 dir:

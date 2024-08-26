@@ -3,13 +3,13 @@ title: Java 面试
 date: 2020-06-04 13:51:00
 categories:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 tags:
   - Java
   - JavaSE
   - 面试
-permalink: /pages/94618c18/
+permalink: /pages/1b5f74fb/
 hidden: true
 index: false
 dir:
