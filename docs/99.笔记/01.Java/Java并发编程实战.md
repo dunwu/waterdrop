@@ -54,7 +54,7 @@ CPU、内存、I/O 设备三者的速度存在很大差异。为了合理利用 
 public class Test {
   private long count = 0;
   private void add10K() {
-    int idx = 0;1. 
+    int idx = 0;1.
     while(idx++ < 10000) {
       count += 1;
     }
@@ -326,7 +326,7 @@ class Account {
       this.balance -= amt;
       target.balance += amt;
     }
-  } 
+  }
 }
 ```
 
@@ -344,7 +344,7 @@ class Account {
   // 创建 Account 时传入同一个 lock 对象
   public Account(Object lock) {
     this.lock = lock;
-  } 
+  }
   // 转账
   void transfer(Account target, int amt){
     // 此处检查所有对象共享的锁
@@ -373,7 +373,7 @@ class Account {
         target.balance += amt;
       }
     }
-  } 
+  }
 }
 ```
 
@@ -436,10 +436,10 @@ class Allocator {
     Object from, Object to){
     if(als.contains(from) ||
          als.contains(to)){
-      return false;  
+      return false;
     } else {
       als.add(from);
-      als.add(to);  
+      als.add(to);
     }
     return true;
   }
@@ -462,9 +462,9 @@ class Account {
       ；
     try{
       // 锁定转出账户
-      synchronized(this){              
+      synchronized(this){
         // 锁定转入账户
-        synchronized(target){           
+        synchronized(target){
           if (this.balance > amt){
             this.balance -= amt;
             target.balance += amt;
@@ -474,7 +474,7 @@ class Account {
     } finally {
       actr.free(this, target)
     }
-  } 
+  }
 }
 ```
 
@@ -517,14 +517,14 @@ class Account {
     // 锁定序号小的账户
     synchronized(left){
       // 锁定序号大的账户
-      synchronized(right){ 
+      synchronized(right){
         if (this.balance > amt){
           this.balance -= amt;
           target.balance += amt;
         }
       }
     }
-  } 
+  }
 }
 ```
 
@@ -558,10 +558,10 @@ class Allocator {
       try{
         wait();
       }catch(Exception e){
-      }   
-    } 
+      }
+    }
     als.add(from);
-    als.add(to);  
+    als.add(to);
   }
   // 归还资源
   synchronized void free(Object from, Object to){
@@ -616,8 +616,8 @@ class Allocator {
 
 由互斥而产生的阻塞会影响性能。要提升性能有以下思路：
 
-- **无锁化** -  相关的技术有：ThreadLocal、写入时复制 (Copy-on-write)、乐观锁、原子类、Disruptor
-- **减少锁持有的时间** -  互斥锁本质上是将并行的程序串行化，所以要增加并行度，一定要减少持有锁的时间。相关的技术有：细粒度锁（ConcurrentHashMap 中的分段锁技术）；读写锁。
+- **无锁化** - 相关的技术有：ThreadLocal、写入时复制 (Copy-on-write)、乐观锁、原子类、Disruptor
+- **减少锁持有的时间** - 互斥锁本质上是将并行的程序串行化，所以要增加并行度，一定要减少持有锁的时间。相关的技术有：细粒度锁（ConcurrentHashMap 中的分段锁技术）；读写锁。
 
 ## 管程：并发编程的万能钥匙
 
@@ -695,7 +695,7 @@ Java 中线程共有六种状态：
 
 对于 I/O 密集型计算场景，最佳的线程数是与程序中 CPU 计算和 I/O 操作的耗时比相关的，我们可以总结出这样一个公式：
 
-> 最佳线程数 =CPU 核数 * [ 1 +（I/O 耗时 / CPU 耗时）]
+> 最佳线程数 =CPU 核数 \* [ 1 +（I/O 耗时 / CPU 耗时）]
 
 ## Java 线程（下）：为什么局部变量是线程安全的？
 
@@ -767,9 +767,273 @@ Java 中线程共有六种状态：
 
 ## Lock 和 Condition（上）：隐藏在并发包中的管程
 
+### 再造管程的理由
+
+已有 synchronized，还支持 Lock 的原因是，需要一把锁支持：
+
+1. **能够响应中断**。synchronized 的问题是，持有锁 A 后，如果尝试获取锁 B 失败，那么线程就进入阻塞状态，一旦发生死锁，就没有任何机会来唤醒阻塞的线程。但如果阻塞状态的线程能够响应中断信号，也就是说当我们给阻塞的线程发送中断信号的时候，能够唤醒它，那它就有机会释放曾经持有的锁 A。这样就破坏了不可抢占条件了。
+2. **支持超时**。如果线程在一段时间之内没有获取到锁，不是进入阻塞状态，而是返回一个错误，那这个线程也有机会释放曾经持有的锁。这样也能破坏不可抢占条件。
+3. **非阻塞地获取锁**。如果尝试获取锁失败，并不进入阻塞状态，而是直接返回，那这个线程也有机会释放曾经持有的锁。这样也能破坏不可抢占条件。
+
+```java
+// 支持中断的 API
+void lockInterruptibly()
+  throws InterruptedException;
+// 支持超时的 API
+boolean tryLock(long time, TimeUnit unit)
+  throws InterruptedException;
+// 支持非阻塞获取锁的 API
+boolean tryLock();
+```
+
+### 如何保证可见性
+
+以 ReentrantLock 为例，内部持有一个 volatile 的成员变量 state，获取锁的时候，会读写 state 的值；解锁的时候，也会读写 state 的值。由 volatile 保证变量的可见性。
+
+### 什么是可重入锁
+
+**所谓可重入锁，指的是线程可以重复获取同一把锁**。
+
+### 公平锁与非公平锁
+
+ReentrantLock 中实现了公平锁和非公平锁。
+
+```java
+//无参构造函数：默认非公平锁
+public ReentrantLock() {
+    sync = new NonfairSync();
+}
+//根据公平策略参数创建锁
+public ReentrantLock(boolean fair){
+    sync = fair ? new FairSync()
+                : new NonfairSync();
+}
+```
+
+锁都对应着一个等待队列，如果一个线程没有获得锁，就会进入等待队列，当有线程释放锁的时候，就需要从等待队列中唤醒一个等待的线程。如果是公平锁，唤醒的策略就是谁等待的时间长，就唤醒谁，很公平；如果是非公平锁，则不提供这个公平保证，有可能等待时间短的线程反而先被唤醒。
+
+### 用锁的最佳实践
+
+1. 永远只在更新对象的成员变量时加锁
+2. 永远只在访问可变的成员变量时加锁
+3. 永远不在调用其他对象的方法时加锁
+
 ## Lock 和 Condition（下）：Dubbo 如何用管程实现异步转同步？
 
+**Condition 实现了管程模型里面的条件变量**。
+
+**如何利用两个条件变量快速实现阻塞队列呢？**
+
+一个阻塞队列，需要两个条件变量，一个是队列不空（空队列不允许出队），另一个是队列不满（队列已满不允许入队）
+
+```java
+public class BlockedQueue<T>{
+  final Lock lock = new ReentrantLock();
+  // 条件变量：队列不满
+  final Condition notFull = lock.newCondition();
+  // 条件变量：队列不空
+  final Condition notEmpty = lock.newCondition();
+
+  // 入队
+  void enq(T x) {
+    lock.lock();
+    try {
+      while (队列已满){
+        // 等待队列不满
+        notFull.await();
+      }
+      // 省略入队操作...
+      // 入队后, 通知可出队
+      notEmpty.signal();
+    }finally {
+      lock.unlock();
+    }
+  }
+  // 出队
+  void deq(){
+    lock.lock();
+    try {
+      while (队列已空){
+        // 等待队列不空
+        notEmpty.await();
+      }
+      // 省略出队操作...
+      // 出队后，通知可入队
+      notFull.signal();
+    }finally {
+      lock.unlock();
+    }
+  }
+}
+```
+
+Lock 和 Condition 实现的管程，**线程等待和通知需要调用 await()、signal()、signalAll()**，它们的语义和 wait()、notify()、notifyAll() 是相同的。
+
+### 同步与异步
+
+同步和异步的区别：**调用方是否需要等待结果，如果需要等待结果，就是同步；如果不需要等待结果，就是异步**。
+
+### Dubbo 源码分析
+
+RPC 调用，**在 TCP 协议层面，发送完 RPC 请求后，线程是不会等待 RPC 的响应结果的**。
+
+Dubbo 调用关键代码：
+
+```java
+public class DubboInvoker{
+  Result doInvoke(Invocation inv){
+    // 下面这行就是源码中 108 行
+    // 为了便于展示，做了修改
+    return currentClient
+      .request(inv, timeout)
+      .get();
+  }
+}
+```
+
+当 RPC 返回结果之前，阻塞调用线程，让调用线程等待；当 RPC 返回结果后，唤醒调用线程，让调用线程重新执行。
+
+```java
+// 创建锁与条件变量
+private final Lock lock = new ReentrantLock();
+private final Condition done = lock.newCondition();
+
+// 调用方通过该方法等待结果
+Object get(int timeout){
+  long start = System.nanoTime();
+  lock.lock();
+  try {
+	while (!isDone()) {
+	  done.await(timeout);
+      long cur=System.nanoTime();
+	  if (isDone() ||
+          cur-start > timeout){
+	    break;
+	  }
+	}
+  } finally {
+	lock.unlock();
+  }
+  if (!isDone()) {
+	throw new TimeoutException();
+  }
+  return returnFromResponse();
+}
+// RPC 结果是否已经返回
+boolean isDone() {
+  return response != null;
+}
+// RPC 结果返回时调用该方法
+private void doReceived(Response res) {
+  lock.lock();
+  try {
+    response = res;
+    if (done != null) {
+      done.signal();
+    }
+  } finally {
+    lock.unlock();
+  }
+}
+```
+
 ## Semaphore：如何快速实现一个限流器？
+
+### 信号量模型
+
+信号量模型还是很简单的，可以简单概括为：**一个计数器，一个等待队列，三个方法**。在信号量模型里，计数器和等待队列对外是透明的，所以只能通过信号量模型提供的三个方法来访问它们，这三个方法分别是：init()、down() 和 up()。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408280813940.png)
+
+```java
+class Semaphore{
+  // 计数器
+  int count;
+  // 等待队列
+  Queue queue;
+  // 初始化操作
+  Semaphore(int c){
+    this.count=c;
+  }
+  //
+  void down(){
+    this.count--;
+    if(this.count<0){
+      // 将当前线程插入等待队列
+      // 阻塞当前线程
+    }
+  }
+  void up(){
+    this.count++;
+    if(this.count<=0) {
+      // 移除等待队列中的某个线程 T
+      // 唤醒线程 T
+    }
+  }
+}
+```
+
+号量模型里面，down()、up() 这两个操作历史上最早称为 P 操作和 V 操作，所以信号量模型也被称为 PV 原语。在 Java SDK 并发包里，down() 和 up() 对应的则是 acquire() 和 release()。
+
+### 如何使用信号量
+
+就像我们用互斥锁一样，只需要在进入临界区之前执行一下 down() 操作，退出临界区之前执行一下 up() 操作就可以了。下面是 Java 代码的示例，acquire() 就是信号量里的 down() 操作，release() 就是信号量里的 up() 操作。
+
+```java
+static int count;
+// 初始化信号量
+static final Semaphore s
+    = new Semaphore(1);
+// 用信号量保证互斥
+static void addOne() {
+  s.acquire();
+  try {
+    count+=1;
+  } finally {
+    s.release();
+  }
+}
+```
+
+### 快速实现一个限流器
+
+**Semaphore 可以允许多个线程访问一个临界区**。
+
+```java
+class ObjPool<T, R> {
+  final List<T> pool;
+  // 用信号量实现限流器
+  final Semaphore sem;
+  // 构造函数
+  ObjPool(int size, T t){
+    pool = new Vector<T>(){};
+    for(int i=0; i<size; i++){
+      pool.add(t);
+    }
+    sem = new Semaphore(size);
+  }
+  // 利用对象池的对象，调用 func
+  R exec(Function<T,R> func) {
+    T t = null;
+    sem.acquire();
+    try {
+      t = pool.remove(0);
+      return func.apply(t);
+    } finally {
+      pool.add(t);
+      sem.release();
+    }
+  }
+}
+// 创建对象池
+ObjPool<Long, String> pool =
+  new ObjPool<Long, String>(10, 2);
+// 通过对象池获取 t，之后执行
+pool.exec(t -> {
+    System.out.println(t);
+    return t.toString();
+});
+```
 
 ## ReadWriteLock：如何快速实现一个完备的缓存？
 
