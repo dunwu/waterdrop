@@ -38,7 +38,7 @@ permalink: /pages/3bafe85f/
 
 为了解决缓存一致性问题，**需要各个处理器访问缓存时都遵循一些协议，在读写时要根据协议来进行操作**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210102230327.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290755550.png)
 
 ### 代码乱序执行优化
 
@@ -71,11 +71,7 @@ JMM 规定了**所有的变量都存储在主内存（Main Memory）中**。
 
 每条线程还有自己的工作内存（Working Memory），**工作内存中保留了该线程使用到的变量的主内存的副本**。工作内存是 JMM 的一个抽象概念，并不真实存在，它涵盖了缓存，写缓冲区，寄存器以及其他的硬件和编译器优化。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210102225839.png)
-
 线程对变量的所有操作都必须在工作内存中进行，而不能直接读写主内存中的变量。不同的线程间也无法直接访问对方工作内存中的变量，**线程间变量值的传递均需要通过主内存来完成**。
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210102225657.png)
 
 > 说明：
 >
@@ -117,7 +113,7 @@ JMM 还规定了上述 8 种基本操作，需要满足以下规则：
 - 如果一个变量事先没有被 lock 操作锁定，则不允许对它执行 unlock 操作，也不允许去 unlock 一个被其他线程锁定的变量。
 - 对一个变量执行 unlock 操作之前，必须先把此变量同步到主内存中（执行 store 和 write 操作）
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210102230708.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290758072.png)
 
 ### 并发安全特性
 

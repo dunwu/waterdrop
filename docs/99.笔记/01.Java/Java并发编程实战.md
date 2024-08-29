@@ -838,12 +838,12 @@ public class BlockedQueue<T>{
   void enq(T x) {
     lock.lock();
     try {
-      while (队列已满){
+      while （队列已满）{
         // 等待队列不满
         notFull.await();
       }
-      // 省略入队操作...
-      // 入队后, 通知可出队
+      // 省略入队操作。..
+      // 入队后，通知可出队
       notEmpty.signal();
     }finally {
       lock.unlock();
@@ -853,11 +853,11 @@ public class BlockedQueue<T>{
   void deq(){
     lock.lock();
     try {
-      while (队列已空){
+      while （队列已空）{
         // 等待队列不空
         notEmpty.await();
       }
-      // 省略出队操作...
+      // 省略出队操作。..
       // 出队后，通知可入队
       notFull.signal();
     }finally {
@@ -1035,13 +1035,462 @@ pool.exec(t -> {
 });
 ```
 
+读写锁与互斥锁的一个重要区别就是**读写锁允许多个线程同时读共享变量**，而互斥锁是不允许的，这是读写锁在读多写少场景下性能优于互斥锁的关键。但**读写锁的写操作是互斥的**，当一个线程在写共享变量的时候，是不允许其他线程执行写操作和读操作。
+
+### 快速实现一个缓存
+
+Cache 这个工具类，我们提供了两个方法，一个是读缓存方法 get()，另一个是写缓存方法 put()。读缓存需要用到读锁，读锁的使用和前面我们介绍的 Lock 的使用是相同的，都是 try{}finally{}这个编程范式。写缓存则需要用到写锁，写锁的使用和读锁是类似的。这样看来，读写锁的使用还是非常简单的。
+
+```java
+class Cache<K,V> {
+  final Map<K, V> m =
+    new HashMap<>();
+  final ReadWriteLock rwl =
+    new ReentrantReadWriteLock();
+  // 读锁
+  final Lock r = rwl.readLock();
+  // 写锁
+  final Lock w = rwl.writeLock();
+  // 读缓存
+  V get(K key) {
+    r.lock();
+    try { return m.get(key); }
+    finally { r.unlock(); }
+  }
+  // 写缓存
+  V put(K key, V value) {
+    w.lock();
+    try { return m.put(key, v); }
+    finally { w.unlock(); }
+  }
+}
+```
+
+### 实现缓存的按需加载
+
+```java
+class Cache<K,V> {
+  final Map<K, V> m =
+    new HashMap<>();
+  final ReadWriteLock rwl =
+    new ReentrantReadWriteLock();
+  final Lock r = rwl.readLock();
+  final Lock w = rwl.writeLock();
+
+  V get(K key) {
+    V v = null;
+    //读缓存
+    r.lock();         ①
+    try {
+      v = m.get(key); ②
+    } finally{
+      r.unlock();     ③
+    }
+    //缓存中存在，返回
+    if(v != null) {   ④
+      return v;
+    }
+    //缓存中不存在，查询数据库
+    w.lock();         ⑤
+    try {
+      //再次验证
+      //其他线程可能已经查询过数据库
+      v = m.get(key); ⑥
+      if(v == null){  ⑦
+        //查询数据库
+        v=省略代码无数
+        m.put(key, v);
+      }
+    } finally{
+      w.unlock();
+    }
+    return v;
+  }
+}
+```
+
 ## ReadWriteLock：如何快速实现一个完备的缓存？
+
+### 读写锁的升级与降级
+
+```java
+//读缓存
+r.lock();         ①
+try {
+  v = m.get(key); ②
+  if (v == null) {
+    w.lock();
+    try {
+      //再次验证并更新缓存
+      //省略详细代码
+    } finally{
+      w.unlock();
+    }
+  }
+} finally{
+  r.unlock();     ③
+}
+```
+
+上面的代码，先是获取读锁，然后再升级为写锁，对此还有个专业的名字，叫**锁的升级**。可惜 ReadWriteLock 并不支持这种升级。
+
+不过，虽然锁的升级是不允许的，但是锁的降级却是允许的。
+
+```java
+class CachedData {
+  Object data;
+  volatile boolean cacheValid;
+  final ReadWriteLock rwl =
+    new ReentrantReadWriteLock();
+  // 读锁
+  final Lock r = rwl.readLock();
+  //写锁
+  final Lock w = rwl.writeLock();
+
+  void processCachedData() {
+    // 获取读锁
+    r.lock();
+    if (!cacheValid) {
+      // 释放读锁，因为不允许读锁的升级
+      r.unlock();
+      // 获取写锁
+      w.lock();
+      try {
+        // 再次检查状态
+        if (!cacheValid) {
+          data = ...
+          cacheValid = true;
+        }
+        // 释放写锁前，降级为读锁
+        // 降级是可以的
+        r.lock(); ①
+      } finally {
+        // 释放写锁
+        w.unlock();
+      }
+    }
+    // 此处仍然持有读锁
+    try {use(data);}
+    finally {r.unlock();}
+  }
+}
+```
 
 ## StampedLock：有没有比读写锁更快的锁？
 
+### StampedLock 支持的三种锁模式
+
+ReadWriteLock 支持两种模式：一种是读锁，一种是写锁。而 StampedLock 支持三种模式，分别是：**写锁**、**悲观读锁**和**乐观读**。其中，写锁、悲观读锁的语义和 ReadWriteLock 的写锁、读锁的语义非常类似，允许多个线程同时获取悲观读锁，但是只允许一个线程获取写锁，写锁和悲观读锁是互斥的。不同的是：StampedLock 里的写锁和悲观读锁加锁成功之后，都会返回一个 stamp；然后解锁的时候，需要传入这个 stamp。
+
+```java
+final StampedLock sl =
+  new StampedLock();
+
+// 获取/释放悲观读锁示意代码
+long stamp = sl.readLock();
+try {
+  //省略业务相关代码
+} finally {
+  sl.unlockRead(stamp);
+}
+
+// 获取/释放写锁示意代码
+long stamp = sl.writeLock();
+try {
+  //省略业务相关代码
+} finally {
+  sl.unlockWrite(stamp);
+}
+```
+
+StampedLock 的性能之所以比 ReadWriteLock 还要好，其关键是 StampedLock 支持乐观读的方式。ReadWriteLock 支持多个线程同时读，但是当多个线程同时读的时候，所有的写操作会被阻塞；而 StampedLock 提供的乐观读，是允许一个线程获取写锁的，也就是说不是所有的写操作都被阻塞。
+
+在 distanceFromOrigin() 这个方法中，首先通过调用 tryOptimisticRead() 获取了一个 stamp，这里的 tryOptimisticRead() 就是我们前面提到的乐观读。之后将共享变量 x 和 y 读入方法的局部变量中，不过需要注意的是，由于 tryOptimisticRead() 是无锁的，所以共享变量 x 和 y 读入方法局部变量时，x 和 y 有可能被其他线程修改了。因此最后读完之后，还需要再次验证一下是否存在写操作，这个验证操作是通过调用 validate(stamp) 来实现的。
+
+```java
+class Point {
+  private int x, y;
+  final StampedLock sl =
+    new StampedLock();
+  //计算到原点的距离
+  int distanceFromOrigin() {
+    // 乐观读
+    long stamp =
+      sl.tryOptimisticRead();
+    // 读入局部变量，
+    // 读的过程数据可能被修改
+    int curX = x, curY = y;
+    //判断执行读操作期间，
+    //是否存在写操作，如果存在，
+    //则 sl.validate 返回 false
+    if (!sl.validate(stamp)){
+      // 升级为悲观读锁
+      stamp = sl.readLock();
+      try {
+        curX = x;
+        curY = y;
+      } finally {
+        //释放悲观读锁
+        sl.unlockRead(stamp);
+      }
+    }
+    return Math.sqrt(
+      curX * curX + curY * curY);
+  }
+}
+```
+
+### 进一步理解乐观读
+
+StampedLock 的乐观读和数据库的乐观锁有异曲同工之妙。
+
+### StampedLock 使用注意事项
+
+对于读多写少的场景 StampedLock 性能很好，简单的应用场景基本上可以替代 ReadWriteLock，但是** StampedLock 的功能仅仅是 ReadWriteLock 的子集**，在使用的时候，还是有几个地方需要注意一下。
+
+StampedLock 在命名上并没有增加 Reentrant，想必你已经猜测到 StampedLock 应该是不可重入的。事实上，的确是这样的，**StampedLock 不支持重入**。这个是在使用中必须要特别注意的。
+
+另外，StampedLock 的悲观读锁、写锁都不支持条件变量，这个也需要你注意。
+
+还有一点需要特别注意，那就是：如果线程阻塞在 StampedLock 的 readLock() 或者 writeLock() 上时，此时调用该阻塞线程的 interrupt() 方法，会导致 CPU 飙升。
+
+```csharp
+final StampedLock lock
+  = new StampedLock();
+Thread T1 = new Thread(()->{
+  // 获取写锁
+  lock.writeLock();
+  // 永远阻塞在此处，不释放写锁
+  LockSupport.park();
+});
+T1.start();
+// 保证 T1 获取写锁
+Thread.sleep(100);
+Thread T2 = new Thread(()->
+  //阻塞在悲观读锁
+  lock.readLock()
+);
+T2.start();
+// 保证 T2 阻塞在读锁
+Thread.sleep(100);
+//中断线程 T2
+//会导致线程 T2 所在 CPU 飙升
+T2.interrupt();
+T2.join();
+```
+
+所以，**使用 StampedLock 一定不要调用中断操作，如果需要支持中断功能，一定使用可中断的悲观读锁 readLockInterruptibly() 和写锁 writeLockInterruptibly()**。这个规则一定要记清楚。
+
+## 总结
+
+StampedLock 读模板：
+
+```java
+final StampedLock sl =
+  new StampedLock();
+
+// 乐观读
+long stamp =
+  sl.tryOptimisticRead();
+// 读入方法局部变量
+......
+// 校验 stamp
+if (!sl.validate(stamp)){
+  // 升级为悲观读锁
+  stamp = sl.readLock();
+  try {
+    // 读入方法局部变量
+    .....
+  } finally {
+    //释放悲观读锁
+    sl.unlockRead(stamp);
+  }
+}
+//使用方法局部变量执行业务操作
+......
+```
+
+StampedLock 写模板：
+
+```csharp
+long stamp = sl.writeLock();
+try {
+  // 写共享变量
+  ......
+} finally {
+  sl.unlockWrite(stamp);
+}
+```
+
 ## CountDownLatch 和 CyclicBarrier：如何让多线程步调一致？
 
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98/assets/068418bdc371b8a1b4b740428a3b3ffe.png)
+
+对账系统串行处理流程：
+
+```java
+while（存在未对账订单）{
+  // 查询未对账订单
+  pos = getPOrders();
+  // 查询派送单
+  dos = getDOrders();
+  // 执行对账操作
+  diff = check(pos, dos);
+  // 差异写入差异库
+  save(diff);
+}
+```
+
+### 利用并行优化对账系统
+
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98/assets/cd997c259e4165c046e79e766abfe2a5.png)
+
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98/assets/a563c39ece918578ad2ff33ab5f3743b.png)
+
+### 用 CountDownLatch 实现线程等待
+
+```java
+// 创建 2 个线程的线程池
+Executor executor =
+  Executors.newFixedThreadPool(2);
+while（存在未对账订单）{
+  // 计数器初始化为 2
+  CountDownLatch latch =
+    new CountDownLatch(2);
+  // 查询未对账订单
+  executor.execute(()-> {
+    pos = getPOrders();
+    latch.countDown();
+  });
+  // 查询派送单
+  executor.execute(()-> {
+    dos = getDOrders();
+    latch.countDown();
+  });
+
+  // 等待两个查询操作结束
+  latch.await();
+
+  // 执行对账操作
+  diff = check(pos, dos);
+  // 差异写入差异库
+  save(diff);
+}
+```
+
+### 进一步优化性能
+
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98/assets/e663d90f49d9666e618ac1370ccca58b.png)
+
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%e5%ae%9e%e6%88%98/assets/22e8ba1c04a3bc2605b98376ed6832da.png)
+
+### 用 CyclicBarrier 实现线程同步
+
+CyclicBarrier 的计数器有自动重置的功能，当减到 0 的时候，会自动重置你设置的初始值。
+
+```java
+// 订单队列
+Vector<P> pos;
+// 派送单队列
+Vector<D> dos;
+// 执行回调的线程池
+Executor executor =
+  Executors.newFixedThreadPool(1);
+final CyclicBarrier barrier =
+  new CyclicBarrier(2, ()->{
+    executor.execute(()->check());
+  });
+
+void check(){
+  P p = pos.remove(0);
+  D d = dos.remove(0);
+  // 执行对账操作
+  diff = check(p, d);
+  // 差异写入差异库
+  save(diff);
+}
+
+void checkAll(){
+  // 循环查询订单库
+  Thread T1 = new Thread(()->{
+    while（存在未对账订单）{
+      // 查询订单库
+      pos.add(getPOrders());
+      // 等待
+      barrier.await();
+    }
+  });
+  T1.start();
+  // 循环查询运单库
+  Thread T2 = new Thread(()->{
+    while（存在未对账订单）{
+      // 查询运单库
+      dos.add(getDOrders());
+      // 等待
+      barrier.await();
+    }
+  });
+  T2.start();
+}
+```
+
+### 总结
+
+**CountDownLatch 主要用来解决一个线程等待多个线程的场景**。
+
+**CyclicBarrier 是一组线程之间互相等待**。
+
+CountDownLatch 的计数器是不能循环利用的，也就是说一旦计数器减到 0，再有线程调用 await()，该线程会直接通过。但 **CyclicBarrier 的计数器是可以循环利用的**，而且具备自动重置的功能，一旦计数器减到 0 会自动重置到你设置的初始值。除此之外，CyclicBarrier 还可以设置回调函数，可以说是功能丰富。
+
 ## 并发容器：都有哪些“坑”需要我们填？
+
+### 同步容器及其注意事项
+
+**组合操作需要注意竞态条件问题**，组合操作往往隐藏着竞态条件问题，即便每个操作都能保证原子性，也并不能保证组合操作的原子性。
+
+在容器领域**一个容易被忽视的“坑”是用迭代器遍历容器**。因为遍历元素，进行操作，不能保证原子性。
+
+基于 synchronized 这个同步关键字实现的容器被称为**同步容器**。Java 提供的同步容器还有 Vector、Stack 和 Hashtable。对这三个容器的遍历，同样要加锁保证互斥。
+
+### 并发容器及其注意事项
+
+Java 在 1.5 版本之前所谓的线程安全的容器，主要指的就是**同步容器**。不过同步容器有个最大的问题，那就是性能差，所有方法都用 synchronized 来保证互斥，串行度太高了。因此 Java 在 1.5 及之后版本提供了性能更高的容器，我们一般称为**并发容器**。
+
+![](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/assets/a20efe788caf4f07a4ad027639c80b1d.png)
+
+#### （一）List
+
+List 里面只有一个实现类就是** CopyOnWriteArrayList**。CopyOnWrite，顾名思义就是写的时候会将共享变量新复制一份出来，这样做的好处是读操作完全无锁。
+
+CopyOnWriteArrayList 内部维护了一个数组，成员变量 array 就指向这个内部数组，所有的读操作都是基于 array 进行的，如下图所示，迭代器 Iterator 遍历的就是 array 数组。
+
+![img](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/assets/38739130ee9f34b821b5849f4f15e710.png)
+
+如果在遍历 array 的同时，还有一个写操作，例如增加元素，CopyOnWriteArrayList 是如何处理的呢？
+
+CopyOnWriteArrayList 会将 array 复制一份，然后在新复制处理的数组上执行增加元素的操作，执行完之后再将 array 指向这个新的数组。通过下图你可以看到，读写是可以并行的，遍历操作一直都是基于原 array 执行，而写操作则是基于新 array 进行。
+
+![img](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/assets/b861fb667e94c4e6ea0ca9985e63c889.png)
+
+使用 CopyOnWriteArrayList 需要注意的“坑”主要有两个方面。一个是应用场景，CopyOnWriteArrayList 仅适用于写操作非常少的场景，而且能够容忍读写的短暂不一致。例如上面的例子中，写入的新元素并不能立刻被遍历到。另一个需要注意的是，CopyOnWriteArrayList 迭代器是只读的，不支持增删改。因为迭代器遍历的仅仅是一个快照，而对快照进行增删改是没有意义的。
+
+#### （二）Map
+
+Map接口的两个实现是ConcurrentHashMap和ConcurrentSkipListMap，它们从应用的角度来看，主要区别在于**ConcurrentHashMap的key是无序的，而ConcurrentSkipListMap的key是有序的**。
+
+使用ConcurrentHashMap和ConcurrentSkipListMap需要注意的地方是，它们的key和value都不能为空，否则会抛出`NullPointerException`这个运行时异常。下面这个表格总结了Map相关的实现类对于key和value的要求，你可以对比学习。
+
+![img](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/assets/6da9933b6312acf3445f736262425abe.png)
+
+ConcurrentSkipListMap里面的SkipList本身就是一种数据结构，中文一般都翻译为“跳表”。跳表插入、删除、查询操作平均的时间复杂度是 O(log n)，理论上和并发线程数没有关系，所以在并发度非常高的情况下，若你对ConcurrentHashMap的性能还不满意，可以尝试一下ConcurrentSkipListMap。
+
+### （三）Set
+
+Set接口的两个实现是CopyOnWriteArraySet和ConcurrentSkipListSet，使用场景可以参考前面讲述的CopyOnWriteArrayList和ConcurrentSkipListMap，它们的原理都是一样的，这里就不再赘述了。
+
+### （四）Queue
+
+Java并发包里面Queue这类并发容器是最复杂的，你可以从以下两个维度来分类。一个维度是**阻塞与非阻塞**，所谓阻塞指的是当队列已满时，入队操作阻塞；当队列已空时，出队操作阻塞。另一个维度是**单端与双端**，单端指的是只能队尾入队，队首出队；而双端指的是队首队尾皆可入队出队。Java并发包里**阻塞队列都用Blocking关键字标识，单端队列使用Queue标识，双端队列使用Deque标识**。
 
 ## 原子类：无锁工具类的典范
 
