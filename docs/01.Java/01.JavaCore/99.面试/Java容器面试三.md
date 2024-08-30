@@ -458,4 +458,4 @@ private static void oom() {
 
 ## 参考资料
 
-- [《Java 业务开发常见错误 100 例》](https://time.geekbang.org/column/intro/100047701)
+- [极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701)

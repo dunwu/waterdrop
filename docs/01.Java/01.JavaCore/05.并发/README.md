@@ -75,10 +75,10 @@ dir:
 - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
 - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
 - [《Effective Java》](https://book.douban.com/subject/30412517/)
-- [《Java 核心技术面试精讲》](https://time.geekbang.org/column/intro/82)
-- [《Java 性能调优实战》](https://time.geekbang.org/column/intro/100028001)
-- [《Java 业务开发常见错误 100 例》](https://time.geekbang.org/column/intro/100047701)
-- [《Java 并发编程实战》](https://time.geekbang.org/column/intro/100023901)
+- [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82)
+- [极客时间教程 - Java 性能调优实战](https://time.geekbang.org/column/intro/100028001)
+- [极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701)
+- [极客时间教程 - Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)
 
 ## 🚪 传送
 

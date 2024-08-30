@@ -1010,7 +1010,7 @@ Arthas 支持 JDK 6+，支持 Linux/Mac/Windows，采用命令行交互模式，
 ## 参考资料
 
 - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
-- [《Java 性能调优实战》](https://time.geekbang.org/column/intro/100028001)
+- [极客时间教程 - Java 性能调优实战](https://time.geekbang.org/column/intro/100028001)
 - [JVM 性能调优监控工具 jps、jstack、jmap、jhat、jstat、hprof 使用详解](https://my.oschina.net/feichexia/blog/196575)
 - [JVM 故障分析及性能优化系列之一：使用 jstack 定位线程堆栈信息](https://www.javatang.com/archives/2017/10/19/33151873.html)
 - [jstat 命令查看 jvm 的 GC 情况](https://www.cnblogs.com/yjd_hycf_space/p/7755633.html)

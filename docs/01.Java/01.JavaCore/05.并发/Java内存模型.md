@@ -304,4 +304,4 @@ JMM 要求 lock、unlock、read、load、assign、use、store、write 这 8 种�
 - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
 - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
 - [理解 Java 内存模型](https://juejin.im/post/5bf2977751882505d840321d)
-- [《Java 并发编程实战》](https://time.geekbang.org/column/intro/100023901)
+- [极客时间教程 - Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)

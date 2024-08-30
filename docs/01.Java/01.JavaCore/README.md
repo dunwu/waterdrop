@@ -113,12 +113,12 @@ index: false
     - [《阿里巴巴 Java 开发手册》](https://book.douban.com/subject/27605355/)
 - **教程、社区**
   - [Runoob Java 教程](https://www.runoob.com/java/java-tutorial.html)
-  - [Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82) - 极客时间教程——从面试官视角梳理如何解答常见 Java 面试问题
-  - [Java 并发编程实战](https://time.geekbang.org/column/intro/100023901) - 极客时间教程——图文并茂，系统性讲解并发编程知识
-  - [Java 并发编程 78 讲](https://kaiwu.lagou.com/course/courseInfo.htm?courseId=16) - 拉勾教育教程——针对并发场景问题，讲解的通俗易懂
-  - [Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701) - 极客时间教程——基于 Java 生产环境的真实案例，讲解“避坑”的手段，很硬核
-  - [Java 性能调优实战](https://time.geekbang.org/column/intro/100028001) - 极客时间教程——覆盖 80% 以上 Java 应用调优场景
-  - [深入拆解 Java 虚拟机](https://time.geekbang.org/column/intro/100010301) - 极客时间教程
+  - [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82) - 极客时间教程——从面试官视角梳理如何解答常见 Java 面试问题
+  - [极客时间教程 - Java 并发编程实战](https://time.geekbang.org/column/intro/100023901) - 极客时间教程——图文并茂，系统性讲解并发编程知识
+  - [拉勾教育教程 - Java 并发编程 78 讲](https://kaiwu.lagou.com/course/courseInfo.htm?courseId=16) - 拉勾教育教程——针对并发场景问题，讲解的通俗易懂
+  - [极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701) - 极客时间教程——基于 Java 生产环境的真实案例，讲解“避坑”的手段，很硬核
+  - [极客时间教程 - Java 性能调优实战](https://time.geekbang.org/column/intro/100028001) - 极客时间教程——覆盖 80% 以上 Java 应用调优场景
+  - [极客时间教程 - 深入拆解 Java 虚拟机](https://time.geekbang.org/column/intro/100010301) - 极客时间教程
   - [CS-Notes](https://github.com/CyC2018/CS-Notes) - Github 上的 Java 基础级面试教程，行文清晰简洁
   - [JavaGuide](https://github.com/Snailclimb/JavaGuide) - Github 上的 Java 面试教程，Java 基础部分讲解较为细致
   - [advanced-java](https://github.com/doocs/advanced-java) - Github 上的 Java 面试教程，分布式部分从面试官视角讲解核心考察点

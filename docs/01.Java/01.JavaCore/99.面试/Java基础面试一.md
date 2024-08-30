@@ -1102,4 +1102,4 @@ catch (IOException e) {
   - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
   - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
   - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
-  - [Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82?tab=catalog)
+  - [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82?tab=catalog)

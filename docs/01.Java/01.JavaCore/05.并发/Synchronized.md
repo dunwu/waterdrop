@@ -424,7 +424,7 @@ public static String concatString(String s1, String s2, String s3) {
 
 ## synchronized 的误区
 
-> 示例摘自：[《Java 业务开发常见错误 100 例》](https://time.geekbang.org/column/intro/100047701)
+> 示例摘自：[极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701)
 
 ### synchronized 使用范围不当导致的错误
 
@@ -599,7 +599,7 @@ public class synchronized锁粒度不当 {
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
 - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
 - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
-- [《Java 业务开发常见错误 100 例》](https://time.geekbang.org/column/intro/100047701)
+- [极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701)
 - [Java 并发编程：volatile 关键字解析](http://www.cnblogs.com/dolphin0520/p/3920373.html)
 - [Java 并发编程：synchronized](http://www.cnblogs.com/dolphin0520/p/3923737.html)
 - [深入理解 Java 并发之 synchronized 实现原理](https://blog.csdn.net/javazejian/article/details/72828483)

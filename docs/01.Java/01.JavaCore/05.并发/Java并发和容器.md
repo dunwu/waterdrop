@@ -443,7 +443,7 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
 
 #### ConcurrentHashMap 的实战
 
-> 示例摘自：[《Java 业务开发常见错误 100 例》](https://time.geekbang.org/column/intro/100047701)
+> 示例摘自：[极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701)
 
 ##### ConcurrentHashMap 错误示例
 
