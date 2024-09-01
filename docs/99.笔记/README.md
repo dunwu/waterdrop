@@ -16,11 +16,11 @@ index: false
 
 ### Java
 
-- [《Java并发编程实战》笔记一](01.Java/Java并发编程实战笔记一)
-- [《Java并发编程实战》笔记二](01.Java/Java并发编程实战笔记二)
-- [《Java并发编程实战》笔记三](01.Java/Java并发编程实战笔记三)
-- [《深入拆解Java虚拟机》笔记](01.Java/深入拆解Java虚拟机笔记)
-- [《深入浅出Java虚拟机》笔记](01.Java/深入浅出Java虚拟机笔记)
+- [《Java并发编程实战》笔记一](01.Java/Java并发编程实战笔记一.md)
+- [《Java并发编程实战》笔记二](01.Java/Java并发编程实战笔记二.md)
+- [《Java并发编程实战》笔记三](01.Java/Java并发编程实战笔记三.md)
+- [《深入拆解Java虚拟机》笔记](01.Java/深入拆解Java虚拟机笔记.md)
+- [《深入浅出Java虚拟机》笔记](01.Java/深入浅出Java虚拟机笔记.md)
 - [《玩转 Spring 全家桶》笔记](01.Java/玩转Spring全家桶笔记.md)
 
 ### 设计
