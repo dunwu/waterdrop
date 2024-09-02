@@ -1,5 +1,5 @@
 ---
-title: 《玩转 Spring 全家桶》笔记
+title: 《极客时间教程 - 玩转 Spring 全家桶》笔记
 date: 2023-07-29 15:25:09
 order: 01
 categories:
@@ -14,7 +14,7 @@ tags:
 permalink: /pages/6377841a/
 ---
 
-# 《玩转 Spring 全家桶》笔记
+# 《极客时间教程 - 玩转 Spring 全家桶》笔记
 
 ## 第一章：初识 Spring (4 讲)
 
@@ -255,9 +255,9 @@ TransactionDefinition
 
 | 隔离性                     | 值  | 脏读 | 不可重复读 | 幻读 |
 | -------------------------- | --- | ---- | ---------- | ---- |
-| ISOLATION_READ_UNCOMMITTED | 1   | ✔️️️    | ✔️️️          | ✔️️️    |
-| ISOLATION_READ_COMMITTED   | 2   | ❌   | ✔️️️          | ✔️️️    |
-| ISOLATION_REPEATABLE_READ  | 3   | ❌   | ❌         | ✔️️️    |
+| ISOLATION_READ_UNCOMMITTED | 1   | ✔️️️ | ✔️️️       | ✔️️️ |
+| ISOLATION_READ_COMMITTED   | 2   | ❌   | ✔️️️       | ✔️️️ |
+| ISOLATION_REPEATABLE_READ  | 3   | ❌   | ❌         | ✔️️️ |
 | ISOLATION_SERIALIZABLE     | 4   | ❌   | ❌         | ❌   |
 
 #### 编程式事务

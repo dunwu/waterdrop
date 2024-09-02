@@ -1,5 +1,5 @@
 ---
-title: 《深入浅出 Java 虚拟机》笔记
+title: 《极客时间教程 - 深入浅出 Java 虚拟机》笔记
 date: 2024-08-06 08:00:04
 order: 02
 categories:
@@ -11,7 +11,7 @@ tags:
 permalink: /pages/0685fb75/
 ---
 
-# 《深入浅出 Java 虚拟机》笔记
+# 《极客时间教程 - 深入浅出 Java 虚拟机》笔记
 
 ## 开篇词：JVM，一块难啃的骨头
 

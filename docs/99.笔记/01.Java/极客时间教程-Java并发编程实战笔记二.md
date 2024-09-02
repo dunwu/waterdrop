@@ -1,5 +1,5 @@
 ---
-title: 《Java 并发编程实战》笔记二
+title: 《极客时间教程 - Java 并发编程实战》笔记二
 date: 2024-08-26 14:36:05
 categories:
   - 笔记
@@ -10,7 +10,7 @@ tags:
 permalink: /pages/24d815a8/
 ---
 
-# 《Java 并发编程实战》笔记二
+# 《极客时间教程 - Java 并发编程实战》笔记二
 
 ## Lock 和 Condition（上）：隐藏在并发包中的管程
 

@@ -1,5 +1,5 @@
 ---
-title: 《深入拆解 Java 虚拟机》笔记
+title: 《极客时间教程 - 深入拆解 Java 虚拟机》笔记
 date: 2024-08-07 07:22:58
 order: 03
 categories:
@@ -11,7 +11,7 @@ tags:
 permalink: /pages/e416f8f1/
 ---
 
-# 《深入拆解 Java 虚拟机》笔记
+# 《极客时间教程 - 深入拆解 Java 虚拟机》笔记
 
 ## 开篇词 为什么我们要学习 Java 虚拟机？
 
