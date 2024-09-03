@@ -1,7 +1,6 @@
 ---
-title: ForkJoin框架
+title: Java 并发之 ForkJoin
 date: 2020-07-14 15:27:46
-order: 10
 categories:
   - Java
   - JavaCore
@@ -13,7 +12,7 @@ tags:
 permalink: /pages/5420c8d3/
 ---
 
-# Java Fork Join 框架
+# Java 并发之 ForkJoin
 
 **对于简单的并行任务，你可以通过“线程池 +Future”的方案来解决；如果任务之间有聚合关系，无论是 AND 聚合还是 OR 聚合，都可以通过 CompletableFuture 来解决；而批量的并行任务，则可以通过 CompletionService 来解决。**
 

@@ -1,7 +1,6 @@
 ---
-title: Java并发和容器
+title: Java 并发之容器
 date: 2020-02-02 17:54:36
-order: 06
 categories:
   - Java
   - JavaCore
@@ -14,7 +13,7 @@ tags:
 permalink: /pages/6fd8d836/
 ---
 
-# Java 并发和容器
+# Java 并发之容器
 
 ## 同步容器
 

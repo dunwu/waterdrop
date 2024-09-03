@@ -1,7 +1,6 @@
 ---
-title: Java线程池
+title: Java 并发之线程池
 date: 2019-12-24 23:52:25
-order: 07
 categories:
   - Java
   - JavaCore
@@ -14,7 +13,7 @@ tags:
 permalink: /pages/123b90fb/
 ---
 
-# Java 线程池
+# Java 并发之线程池
 
 ## 简介
 

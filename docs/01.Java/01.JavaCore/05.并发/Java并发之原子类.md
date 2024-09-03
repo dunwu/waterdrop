@@ -1,7 +1,6 @@
 ---
-title: Java原子类
+title: Java 并发之原子类
 date: 2019-12-26 23:11:52
-order: 05
 categories:
   - Java
   - JavaCore
@@ -14,7 +13,7 @@ tags:
 permalink: /pages/c86fcd4f/
 ---
 
-# Java 原子变量类
+# Java 并发之原子类
 
 ## 原子变量类简介
 

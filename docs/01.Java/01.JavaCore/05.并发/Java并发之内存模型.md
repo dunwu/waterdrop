@@ -1,7 +1,6 @@
 ---
-title: Java 内存模型
+title: Java 并发之内存模型
 date: 2020-12-25 18:43:11
-order: 09
 categories:
   - Java
   - JavaCore
@@ -13,11 +12,9 @@ tags:
 permalink: /pages/3bafe85f/
 ---
 
-# Java 内存模型
+# Java 并发之内存模型
 
-> **关键词**：`JMM`、`volatile`、`synchronized`、`final`、`Happens-Before`、`内存屏障`
->
-> **摘要**：Java 内存模型（Java Memory Model），简称 **JMM**。Java 内存模型的目标是为了解决由可见性和有序性导致的并发安全问题。Java 内存模型通过 **屏蔽各种硬件和操作系统的内存访问差异，以实现让 Java 程序在各种平台下都能达到一致的内存访问效果**。
+Java 内存模型（Java Memory Model），简称 **JMM**。Java 内存模型的目标是为了解决由可见性和有序性导致的并发安全问题。Java 内存模型通过 **屏蔽各种硬件和操作系统的内存访问差异，以实现让 Java 程序在各种平台下都能达到一致的内存访问效果**。
 
 ## 物理内存模型
 
@@ -55,7 +52,7 @@ permalink: /pages/3bafe85f/
 
 ## Java 内存模型
 
-**`内存模型`** 这个概念。我们可以理解为：**在特定的操作协议下，对特定的内存或高速缓存进行读写访问的过程抽象**。不同架构的物理计算机可以有不一样的内存模型，JVM 也有自己的内存模型。
+**内存模型** 这个概念。我们可以理解为：**在特定的操作协议下，对特定的内存或高速缓存进行读写访问的过程抽象**。不同架构的物理计算机可以有不一样的内存模型，JVM 也有自己的内存模型。
 
 JVM 中试图定义一种 Java 内存模型（Java Memory Model, JMM）来**屏蔽各种硬件和操作系统的内存访问差异**，以实现让 Java 程序 **在各种平台下都能达到一致的内存访问效果**。
 
@@ -206,14 +203,19 @@ Java 中对内存屏障的使用在一般的代码中不太容易见到，常见
 
 `volatile` 的中文意思是不稳定的，易变的，用 `volatile` 修饰变量是为了保证变量在多线程中的可见性。
 
-#### volatile 变量的特性
+### volatile 变量的特性
 
-`volatile` 变量具有两种特性：
+`volatile` 是轻量级的 `synchronized`，它在多处理器开发中保证了共享变量的“可见性”。
 
-- 保证变量对所有线程的可见性。
-- 禁止进行指令重排序
+被 `volatile` 修饰的变量，具备以下特性：
 
-##### 保证变量对所有线程的可见性
+- **线程可见性** - 保证了不同线程对这个变量进行操作时的可见性，即一个线程修改了某个共享变量，另外一个线程能读到这个修改的值。
+- **禁止指令重排序**
+- **不保证原子性**
+
+线程安全需要具备：可见性、原子性、顺序性。`volatile` 不保证原子性，所以决定了它不能彻底地保证线程安全。
+
+#### 保证变量对所有线程的可见性
 
 这里的可见性是指当一条线程修改了 volatile 变量的值，新值对于其他线程来说是可以立即得知的。而普通变量不能做到这一点，普通变量的值在线程间传递均需要通过主内存来完成。
 
@@ -242,7 +244,7 @@ Java 中对内存屏障的使用在一般的代码中不太容易见到，常见
 2. 执行引擎把 count 值加 1，并赋值给线程工作内存
 3. 线程工作内存把 count 值保存到主内存 有可能某一时刻 2 个线程在步骤 1 读取到的值都是 100，执行完步骤 2 得到的值都是 101，最后刷新了 2 次 101 保存到主内存。
 
-##### 语义 2 禁止进行指令重排序
+#### 禁止进行指令重排序
 
 具体一点解释，禁止重排序的规则如下：
 
@@ -273,18 +275,65 @@ doSomethingWithConfig();
 
 上面代码中如果定义 initialized 变量时没有使用 volatile 修饰，就有可能会由于指令重排序的优化，导致线程 A 中最后一句代码 "initialized = true" 在 “doSomethingReadConfg()” 之前被执行，这样会导致线程 B 中使用配置信息的代码就可能出现错误，而 volatile 关键字就禁止重排序的语义可以避免此类情况发生。
 
-#### volatile 的原理
+### volatile 的原理
 
-具体实现方式是在编译期生成字节码时，会在指令序列中增加内存屏障来保证，下面是基于保守策略的 JMM 内存屏障插入策略：
+观察加入 volatile 关键字和没有加入 volatile 关键字时所生成的汇编代码发现，**加入 `volatile` 关键字时，会多出一个 `lock` 前缀指令**。**`lock` 前缀指令实际上相当于一个内存屏障**（也成内存栅栏），内存屏障会提供 3 个功能：
 
-- 在每个 volatile 写操作的前面插入一个 StoreStore 屏障。 该屏障除了保证了屏障之前的写操作和该屏障之后的写操作不能重排序，还会保证了 volatile 写操作之前，任何的读写操作都会先于 volatile 被提交。
-- 在每个 volatile 写操作的后面插入一个 StoreLoad 屏障。 该屏障除了使 volatile 写操作不会与之后的读操作重排序外，还会刷新处理器缓存，使 volatile 变量的写更新对其他线程可见。
-- 在每个 volatile 读操作的后面插入一个 LoadLoad 屏障。 该屏障除了使 volatile 读操作不会与之前的写操作发生重排序外，还会刷新处理器缓存，使 volatile 变量读取的为最新值。
-- 在每个 volatile 读操作的后面插入一个 LoadStore 屏障。 该屏障除了禁止了 volatile 读操作与其之后的任何写操作进行重排序，还会刷新处理器缓存，使其他线程 volatile 变量的写更新对 volatile 读操作的线程可见。
+- 它确保指令重排序时不会把其后面的指令排到内存屏障之前的位置，也不会把前面的指令排到内存屏障的后面；即在执行到内存屏障这句指令时，在它前面的操作已经全部完成；
+- 它会强制将对缓存的修改操作立即写入主存；
+- 如果是写操作，它会导致其他 CPU 中对应的缓存行无效。
 
-#### volatile 的使用场景
+### volatile 的应用
 
-总结起来，就是“一次写入，到处读取”，某一线程负责更新变量，其他线程只读取变量（不更新变量），并根据变量的新值执行相应逻辑。例如状态标志位更新，观察者模型变量值发布。
+如果 `volatile` 变量修饰符使用恰当的话，它比 `synchronized` 的使用和执行成本更低，因为它不会引起线程上下文的切换和调度。但是，**`volatile` 无法替代 `synchronized` ，因为 `volatile` 无法保证操作的原子性**。
+
+通常来说，**使用 `volatile` 必须具备以下 2 个条件**：
+
+- **对变量的写操作不依赖于当前值**
+- **该变量没有包含在具有其他变量的表达式中**
+
+【示例】状态标记量
+
+```java
+volatile boolean flag = false;
+
+while(!flag) {
+    doSomething();
+}
+
+public void setFlag() {
+    flag = true;
+}
+```
+
+【示例】双重锁实现线程安全的单例模式
+
+```java
+class Singleton {
+    private volatile static Singleton instance = null;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if(instance==null) {
+            synchronized (Singleton.class) {
+                if(instance==null)
+                    instance = new Singleton();
+            }
+        }
+        return instance;
+    }
+}
+```
+
+### volatile 的问题
+
+`volatile` 的要点中，已经提到，**`volatile` 不保证原子性，所以 volatile 并不能保证线程安全**。
+
+那么，如何做到线程安全呢？有两种方案：
+
+- `volatile` + `synchronized` - 可以参考：【示例】双重锁实现线程安全的单例模式
+- 使用原子类替代 `volatile`
 
 ## synchronized
 
@@ -303,5 +352,10 @@ JMM 要求 lock、unlock、read、load、assign、use、store、write 这 8 种�
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
 - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
 - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
-- [理解 Java 内存模型](https://juejin.im/post/5bf2977751882505d840321d)
 - [极客时间教程 - Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)
+- [极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701)
+- [理解 Java 内存模型](https://juejin.im/post/5bf2977751882505d840321d)
+- [Java 并发编程：volatile 关键字解析](http://www.cnblogs.com/dolphin0520/p/3920373.html)
+- [Java 并发编程：synchronized](http://www.cnblogs.com/dolphin0520/p/3923737.html)
+- [深入理解 Java 并发之 synchronized 实现原理](https://blog.csdn.net/javazejian/article/details/72828483)
+- [synchronized 实现原理及锁优化](https://nicky-chen.github.io/2018/05/14/synchronized-principle/)

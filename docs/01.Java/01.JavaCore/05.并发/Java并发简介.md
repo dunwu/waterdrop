@@ -1,7 +1,6 @@
 ---
-title: Java并发简介
+title: Java 并发简介
 date: 2019-05-06 15:33:13
-order: 01
 categories:
   - Java
   - JavaCore
@@ -461,6 +460,19 @@ Java 不可能实现 100% 的公平性，我们依然可以通过同步结构在
 
 - 对于硬件资源限制，可以考虑使用集群并行执行程序。
 - 对于软件资源限制，可以考虑使用资源池将资源复用。
+
+## J.U.C 简介
+
+Java 的 `java.util.concurrent` 包（简称 J.U.C）中提供了大量并发工具类，是 Java 并发能力的主要体现（注意，不是全部，有部分并发能力的支持在其他包中）。从功能上，大致可以分为：
+
+- **原子类** - 如：`AtomicInteger`、`AtomicIntegerArray`、`AtomicReference`、`AtomicStampedReference` 等。
+- **锁** - 如：`ReentrantLock`、`ReentrantReadWriteLock` 等。
+- **并发容器** - 如：`ConcurrentHashMap`、`CopyOnWriteArrayList`、`CopyOnWriteArraySet` 等。
+- **阻塞队列** - 如：`ArrayBlockingQueue`、`LinkedBlockingQueue` 等。
+- **非阻塞队列** - 如： `ConcurrentLinkedQueue` 、`LinkedTransferQueue` 等。
+- **线程池** - 如：`ThreadPoolExecutor`、`Executors` 等。
+
+J.U.C 包中的工具类是基于 `synchronized`、`volatile`、`CAS`、`ThreadLocal` 这样的并发核心机制打造的。所以，要想深入理解 J.U.C 工具类的特性、为什么具有这样那样的特性，就必须先理解这些核心机制。
 
 ## 小结
 

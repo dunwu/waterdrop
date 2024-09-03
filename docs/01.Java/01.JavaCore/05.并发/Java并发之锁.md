@@ -1,7 +1,6 @@
 ---
-title: Java锁
+title: Java 并发之锁
 date: 2019-12-26 23:11:52
-order: 04
 categories:
   - Java
   - JavaCore
@@ -11,14 +10,13 @@ tags:
   - JavaCore
   - 并发
   - 锁
+  - AQS
 permalink: /pages/2061f1f6/
 ---
 
-# 深入理解 Java 并发锁
+# Java 并发之锁
 
 > 本文先阐述 Java 中各种锁的概念。
->
-> 然后，介绍锁的核心实现 AQS。
 >
 > 然后，重点介绍 Lock 和 Condition 两个接口及其实现。并发编程有两个核心问题：同步和互斥。
 >
@@ -125,14 +123,63 @@ class Task {
 
 乐观锁与悲观锁不是指具体的什么类型的锁，而是**处理并发同步的策略**。
 
-- **悲观锁** - 悲观锁对于并发采取悲观的态度，认为：**不加锁的并发操作一定会出问题**。**悲观锁适合写操作频繁的场景**。
-- **乐观锁** - 乐观锁对于并发采取乐观的态度，认为：**不加锁的并发操作也没什么问题。对于同一个数据的并发操作，是不会发生修改的**。在更新数据的时候，会采用不断尝试更新的方式更新数据。**乐观锁适合读多写少的场景**。
+- **悲观锁（Pessimistic Lock）**
+  - 总是假设最坏的情况，认为：**不加锁的并发操作一定会出问题**。
+  - 悲观锁在 Java 中的应用就是通过使用 `synchronized` 和 `Lock` 显示加锁来进行互斥同步，这是一种阻塞同步。
+  - **悲观锁适合写操作频繁的场景**。
+- **乐观锁（OptimisticLock）**
+  - 总是假设最好的情况，认为：**不加锁的并发操作也没什么问题**。每次访问数据时，都假设数据不会被其他线程修改，不必加锁。虽然不加锁，但不意味着什么都不做，而是在更新的时候，判断一下在此期间是否有其他线程更新该数据。
+  - 乐观锁最常见的实现方式，是使用版本号机制或 CAS 算法（Compare And Swap）去实现。
+  - 乐观锁的**优点**是：减少锁竞争，提高并发度。
+  - 乐观锁的**缺点**是：
+    - **存在 ABA 问题**。所谓的 ABA 问题是指在并发编程中，如果一个变量初次读取的时候是 A 值，它的值被改成了 B，然后又其他线程把 B 值改成了 A，而另一个早期线程在对比值时会误以为此值没有发生改变，但其实已经发生变化了
+    - 如果乐观锁所检查的数据存在大量锁竞争，会由于**不断循环重试，产生大量的 CPU 开销**。
+  - **乐观锁适合读多写少的场景**。
 
-悲观锁与乐观锁在 Java 中的典型实现：
+【示例】悲观锁示例
 
-- 悲观锁在 Java 中的应用就是通过使用 `synchronized` 和 `Lock` 显示加锁来进行互斥同步，这是一种阻塞同步。
+```java
+public void syncTask() {
+    synchronized (this) {
+        // 需要同步的操作
+    }
+}
 
-- 乐观锁在 Java 中的应用就是采用 `CAS` 机制（`CAS` 操作通过 `Unsafe` 类提供，但这个类不直接暴露为 API，所以都是间接使用，如各种原子类）。
+private Lock lock = new ReentrantLock();
+lock.lock();
+try {
+   // 需要同步的操作
+} finally {
+    lock.unlock();
+}
+```
+
+【示例】乐观锁示例
+
+```java
+// AtomicInteger 的 getAndAccumulate 方法采用了自旋 + CAS的乐观锁模式
+public final int getAndAccumulate(int x,
+	IntBinaryOperator accumulatorFunction) {
+	int prev, next;
+	do {
+		prev = get();
+		next = accumulatorFunction.applyAsInt(prev, x);
+	} while (!compareAndSet(prev, next));
+	return prev;
+}
+```
+
+乐观锁也是一种通用的锁机制，不仅在 Java 中，在其他很多软件领域，也存在乐观锁机制。比如下面的示例是 MySQL 中的乐观锁示例。
+
+假设，order 表中有一个字段 status，表示订单状态：status 为 1 代表订单未支付；status 为 2 代表订单已支付。现在，要将 id 为 1 的订单状态置为已支付，则操作如下：
+
+```sql
+select status, version from order where id=#{id}
+
+update order
+set status=2, version=version+1
+where id=#{id} and version=#{version};
+```
 
 ### 偏向锁、轻量级锁、重量级锁
 

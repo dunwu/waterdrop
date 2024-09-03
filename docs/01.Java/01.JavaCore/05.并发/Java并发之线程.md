@@ -1,7 +1,6 @@
 ---
-title: Java线程基础
+title: Java 并发之线程
 date: 2019-12-24 23:52:25
-order: 02
 categories:
   - Java
   - JavaCore
@@ -14,7 +13,7 @@ tags:
 permalink: /pages/162ef13a/
 ---
 
-# Java 线程基础
+# Java 并发之线程
 
 > **关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`**
 

@@ -1,7 +1,6 @@
 ---
-title: Synchronized
+title: Java 并发之 Synchronized
 date: 2020-12-25 18:43:11
-order: 11
 categories:
   - Java
   - JavaCore
@@ -13,7 +12,7 @@ tags:
 permalink: /pages/27433664/
 ---
 
-# Synchronized
+# Java 并发之 Synchronized
 
 ## synchronized 的简介
 
