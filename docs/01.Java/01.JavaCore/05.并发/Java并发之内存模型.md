@@ -152,13 +152,11 @@ Java 实现多线程可见性的方式有：
 
 ## Happens-Before
 
-JMM 为程序中所有的操作定义了一个偏序关系，称之为 **`先行发生原则（Happens-Before）`**。
-
-**Happens-Before** 是指 **前面一个操作的结果对后续操作是可见的**。
+JMM 为程序中所有的操作定义了一个偏序关系，称之为 **`先行发生原则（Happens-Before）`**。**Happens-Before** 是指 **前面一个操作的结果对后续操作是可见的**。
 
 **Happens-Before** 非常重要，它是判断数据是否存在竞争、线程是否安全的主要依据，依靠这个原则，我们可以通过几条规则一揽子地解决并发环境下两个操作间是否可能存在冲突的所有问题。
 
-- **程序次序规则** - 在一个线程中，按照程序顺序，前面的操作 Happens-Before 于后续的任意操作。
+- **程序顺序规则** - 在一个线程中，按照程序顺序，前面的操作 Happens-Before 于后续的任意操作。
 - **锁定规则** - 一个 `unLock` 操作 Happens-Before 于后面对同一个锁的 `lock` 操作。
 - **volatile 变量规则** - 对一个 `volatile` 变量的写操作 Happens-Before 于后面对这个变量的读操作。
 - **线程启动规则** - `Thread` 对象的 `start()` 方法 Happens-Before 于此线程的每个一个动作。

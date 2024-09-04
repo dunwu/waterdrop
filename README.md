@@ -95,7 +95,7 @@
 - [Java 原子类](docs/01.Java/01.JavaCore/05.并发/Java并发之原子类.md) - 关键词：`CAS`、`Atomic`
 - [Java 并发容器](docs/01.Java/01.JavaCore/05.并发/Java并发之容器.md) - 关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`
 - [Java 线程池](docs/01.Java/01.JavaCore/05.并发/Java并发之线程池.md) - 关键词：`Executor`、`ExecutorService`、`ThreadPoolExecutor`、`Executors`
-- [Java 并发工具类](docs/01.Java/01.JavaCore/05.并发/Java并发工具类) - 关键词：`CountDownLatch`、`CyclicBarrier`、`Semaphore`
+- [Java 并发工具类](docs/01.Java/01.JavaCore/05.并发/Java并发工具类.md) - 关键词：`CountDownLatch`、`CyclicBarrier`、`Semaphore`
 - [Java并发之ForkJoin](docs/01.Java/01.JavaCore/05.并发/Java并发之ForkJoin.md)
 
 #### [Java 虚拟机](docs/01.Java/01.JavaCore/06.JVM)
