@@ -84,13 +84,12 @@
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175827.png)
 
-- [Java 并发简介](docs/01.Java/01.JavaCore/05.并发/Java并发简介.md) - 关键词：`进程`、`线程`、`安全性`、`活跃性`、`性能`、`死锁`、`饥饿`、`上下文切换`
+- [Java 并发简介](docs/01.Java/01.JavaCore/05.并发/Java并发简介.md) - 关键词：`并发`、`线程`、`安全性`、`活跃性`、`性能`、`死锁`、`活锁`
+- [Java 内存模型](docs/01.Java/01.JavaCore/05.并发/Java并发之内存模型.md) - 关键词：`JMM`、`Happens-Before`、`内存屏障`、`volatile`、`synchronized`、`final`、`指令重排序`
 - [Java 线程基础](docs/01.Java/01.JavaCore/05.并发/Java并发之线程.md) - 关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`
-- [Java 内存模型](docs/01.Java/01.JavaCore/05.并发/Java并发之内存模型.md) - 关键词：`JMM`、`volatile`、`synchronized`、`final`、`Happens-Before`、`内存屏障`
-- [Java 并发之 Synchronized](docs/01.Java/01.JavaCore/05.并发/Java并发之Synchronized.md) - 关键词：`synchronized`
 - [Java 并发之 CAS](docs/01.Java/01.JavaCore/05.并发/Java并发之CAS.md) - 关键词：`CAS`、`自旋锁`
-- [Java 并发之 AQS](docs/01.Java/01.JavaCore/05.并发/Java并发之AQS.md) - 关键词：`AQS`
 - [Java 并发之 ThreadLocal](docs/01.Java/01.JavaCore/05.并发/Java并发之ThreadLocal.md) - 关键词：`ThreadLocal`
+- [Java 并发之 AQS](docs/01.Java/01.JavaCore/05.并发/Java并发之AQS.md) - 关键词：`AQS`
 - [Java 并发锁](docs/01.Java/01.JavaCore/05.并发/Java并发之锁.md) - 关键词：`AQS`、`ReentrantLock`、`ReentrantReadWriteLock`、`Condition`
 - [Java 原子类](docs/01.Java/01.JavaCore/05.并发/Java并发之原子类.md) - 关键词：`CAS`、`Atomic`
 - [Java 并发容器](docs/01.Java/01.JavaCore/05.并发/Java并发之容器.md) - 关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`

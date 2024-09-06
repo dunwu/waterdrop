@@ -87,11 +87,15 @@ permalink: /pages/bbf8a81d/
 
 **知识点**
 
-- **进程**：进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动。进程是操作系统进行资源分配的基本单位。进程可视为一个正在运行的程序。
-- **线程**：线程是操作系统进行调度的基本单位。
-- **管程**：管程（Monitor），是指管理共享变量以及对共享变量的操作过程，让他们支持并发。
-  - 管程和信号量是等价的，所谓等价指的是用管程能够实现信号量，也能用信号量实现管程。
-  - Java 通过 synchronized 关键字及 wait()、notify()、notifyAll() 这三个方法来支持管程。
+- **进程（Process）** - 进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动。进程是操作系统进行资源分配的基本单位。**进程可视为一个正在运行的程序**。
+- **线程（Thread）** - **线程是操作系统进行调度的基本单位**。
+- **管程（Monitor）** - **管程是指管理共享变量以及对共享变量的操作过程，让他们支持并发**。
+  - Java 通过 synchronized 关键字及 wait()、notify()、notifyAll() 这三个方法来实现管程技术。
+  - **管程和信号量是等价的，所谓等价指的是用管程能够实现信号量，也能用信号量实现管程**。
+- **协程（Coroutine）** - **协程可以理解为一种轻量级的线程**。
+  - 从操作系统的角度来看，线程是在内核态中调度的，而协程是在用户态调度的，所以相对于线程来说，协程切换的成本更低。
+  - 协程虽然也有自己的栈，但是相比线程栈要小得多，典型的线程栈大小差不多有 1M，而协程栈的大小往往只有几 K 或者几十 K。所以，无论是从时间维度还是空间维度来看，协程都比线程轻量得多。
+  - Go、Python、Lua、Kotlin 等语言都支持协程；Java OpenSDK 中的 Loom 项目目标就是支持协程。
 
 进程和线程的差异：
 
@@ -99,17 +103,9 @@ permalink: /pages/bbf8a81d/
 - 线程比进程划分更细，所以执行开销更小，并发性更高
 - 进程是一个实体，拥有独立的资源；而同一个进程中的多个线程共享进程的资源。
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/processes-vs-threads.jpg">
-</p>
+![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/processes-vs-threads.jpg)
 
 JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这就是为什么几个线程可以访问同一个对象。线程共享堆并拥有自己的堆栈空间。这是一个线程如何调用一个方法以及它的局部变量是如何保持线程安全的。但是堆不是线程安全的并且为了线程安全必须进行同步。
-
-**总结：** **线程是进程划分成的更小的运行单位。线程和进程最大的不同在于基本上各进程是独立的，而各线程则不一定，因为同一进程中的线程极有可能会相互影响。线程执行开销小，但不利于资源的管理和保护；而进程正相反。**
-
-下面是该知识点的扩展内容！
-
-下面来思考这样一个问题：为什么**程序计数器**、**虚拟机栈**和**本地方法栈**是线程私有的呢？为什么堆和方法区是线程共享的呢？
 
 #### 程序计数器为什么是私有的？
 
@@ -259,7 +255,7 @@ public class WrongResult {
 }
 ```
 
-启动两个线程，分别对变量 i 进行 10000 次 i++ 操作。理论上得到的结果应该是 20000，但实际结果却远小于理论结果。这是因为 i 变量虽然被修饰为 volatile，但由于 i++  不是原子操作，而 volatile 无法保证原子性，这就导致两个线程在循环 ++ 操作时，无法及时感知 i 的数值变化，最终导致累加数值远小于预期值。
+启动两个线程，分别对变量 i 进行 10000 次 i++ 操作。理论上得到的结果应该是 20000，但实际结果却远小于理论结果。这是因为 i 变量虽然被修饰为 volatile，但由于 i++ 不是原子操作，而 volatile 无法保证原子性，这就导致两个线程在循环 ++ 操作时，无法及时感知 i 的数值变化，最终导致累加数值远小于预期值。
 
 【示例】发布和初始化导致线程安全问题
 
@@ -346,20 +342,20 @@ Java 线程生命周期中有哪些状态？各状态之间如何切换？
 
 以下是各状态的说明，以及状态间的联系：
 
-- **开始（NEW）** - 还没有调用 `start()` 方法的线程处于此状态。
-- **可运行（RUNNABLE）** - 已经调用了 `start()` 方法的线程状态。此状态意味着，线程已经准备好了，一旦被线程调度器分配了 CPU 时间片，就可以运行线程。
+- **开始（NEW）** - 尚未调用 `start` 方法的线程处于此状态。此状态意味着：**创建的线程尚未启动**。
+- **可运行（RUNNABLE）** - 已经调用了 `start` 方法的线程处于此状态。此状态意味着，**线程已经准备好了**，一旦被线程调度器分配了 CPU 时间片，就可以运行线程。
   - 在操作系统层面，线程有 READY 和 RUNNING 状态；而在 JVM 层面，只能看到 RUNNABLE 状态，所以 Java 系统一般将这两个状态统称为 RUNNABLE（运行中） 状态 。
-- **阻塞（BLOCKED）** - 阻塞状态。线程阻塞的线程状态等待监视器锁定。处于阻塞状态的线程正在等待监视器锁定，以便在调用 `Object.wait()` 之后输入同步块/方法或重新输入同步块/方法。
-- **等待（WAITING）** - 等待状态。一个线程处于等待状态，是由于执行了 3 个方法中的任意方法：
-  - `Object.wait()`
-  - `Thread.join()`
-  - `LockSupport.park()`
+- **阻塞（BLOCKED）** - 此状态意味着：**线程处于被阻塞状态**。表示线程在等待 `synchronized` 的隐式锁（Monitor lock）。`synchronized` 修饰的方法、代码块同一时刻只允许一个线程执行，其他线程只能等待，即处于阻塞状态。当占用 `synchronized` 隐式锁的线程释放锁，并且等待的线程获得 `synchronized` 隐式锁时，就又会从 `BLOCKED` 转换到 `RUNNABLE` 状态。
+- **等待（WAITING）** - 此状态意味着：**线程无限期等待，直到被其他线程显式地唤醒**。 阻塞和等待的区别在于，阻塞是被动的，它是在等待获取 `synchronized` 的隐式锁。而等待是主动的，通过调用 `Object.wait` 等方法进入。
+  - 进入：`Object.wait()`；退出：`Object.notify` / `Object.notifyAll`
+  - 进入：`Thread.join()`；退出：被调用的线程执行完毕
+  - 进入：`LockSupport.park()`；退出：`LockSupport.unpark`
 - **定时等待（TIMED_WAITING）** - 等待指定时间的状态。一个线程处于定时等待状态，是由于执行了以下方法中的任意方法：
-  - `Thread.sleep(long)`
-  - `Object.wait(long)`
-  - `Thread.join(long)`
-  - `LockSupport.parkNanos(long)`
-  - `LockSupport.parkUntil(long)`
+  - 进入：`Thread.sleep(long)`；退出：时间结束
+  - 进入：`Object.wait(long)`；退出：时间结束 / `Object.notify` / `Object.notifyAll`
+  - 进入：`Thread.join(long)`；退出：时间结束 / 被调用的线程执行完毕
+  - 进入：`LockSupport.parkNanos(long)`；退出：`LockSupport.unpark`
+  - 进入：`LockSupport.parkUntil(long)`；退出：`LockSupport.unpark`
 - **终止 (TERMINATED)** - 线程 `run()` 方法执行结束，或者因异常退出了 `run()` 方法，则该线程结束生命周期。死亡的线程不可再次复生。
 
 > 👉 扩展阅读：
@@ -389,7 +385,6 @@ Java 线程生命周期中有哪些状态？各状态之间如何切换？
 虽然，看似有多种多样的创建线程方式。但是，从本质上来说，Java 就只有一种方式可以创建线程，那就是通过 `new Thread().start() ` 创建。不管是哪种方式，最终还是依赖于 `new Thread().start()`。
 
 > 👉 扩展阅读：[大家都说 Java 有三种创建线程的方式！并发编程中的惊天骗局！](https://mp.weixin.qq.com/s/NspUsyhEmKnJ-4OprRFp9g)。
->
 
 ### 线程启动
 
@@ -439,7 +434,7 @@ Java 线程生命周期中有哪些状态？各状态之间如何切换？
 
 （2）为什么 `Thread.sleep()`、`Thread.yield()` 设计为静态方法？
 
- `Thread.sleep()`、`Thread.yield()` 针对的是 **Running** 状态的线程，也就是说在非 **Running** 状态的线程上执行这两个方法没有意义。这就是为什么这两个方法被设计为静态的。它们只针对正在 **Running** 状态的线程工作，避免程序员错误的认为可以在其他非 **Running** 状态线程上调用。
+`Thread.sleep()`、`Thread.yield()` 针对的是 **Running** 状态的线程，也就是说在非 **Running** 状态的线程上执行这两个方法没有意义。这就是为什么这两个方法被设计为静态的。它们只针对正在 **Running** 状态的线程工作，避免程序员错误的认为可以在其他非 **Running** 状态线程上调用。
 
 > 👉 扩展阅读：[Java 线程中 yield 与 join 方法的区别](http://www.importnew.com/14958.html)
 > 👉 扩展阅读：[sleep()，wait()，yield() 和 join() 方法的区别](https://blog.csdn.net/xiangwanpeng/article/details/54972952)
@@ -496,7 +491,7 @@ Java 的每个对象中都有一个称之为 monitor 监视器的锁，由于每
 
 > 👉 扩展阅读：[Java 并发编程：线程间协作的两种方式：wait、notify、notifyAll 和 Condition](http://www.cnblogs.com/dolphin0520/p/3920385.html)
 
-### 线程停止
+### 线程终止
 
 **经典问题**
 
@@ -656,7 +651,7 @@ public class MyTask extends Thread {
 
 （1）Java 中的线程优先级的范围是 `[1,10]`，一般来说，高优先级的线程在运行时会具有优先权。可以通过 `thread.setPriority(Thread.MAX_PRIORITY)` 的方式设置，默认优先级为 `5`。
 
-（1）即使设置了线程的优先级，也**无法保证高优先级的线程一定先执行**。
+（2）即使设置了线程的优先级，也**无法保证高优先级的线程一定先执行**。
 
 这是因为 **Java 线程优先级依赖于操作系统的支持**，然而，不同的操作系统支持的线程优先级并不相同，不能很好的和 Java 中线程优先级一一对应。因此，Java 线程优先级控制并不可靠。
 
@@ -882,15 +877,6 @@ public void increase() {
 - `volatile` 标记的变量不会被编译器优化；`synchronized` 标记的变量可以被编译器优化。
 
 ## synchronized
-
-synchronized 关键字 synchronized 是什么？
-有什么用？
-如何使用 synchronized？
-构造方法可以用 synchronized 修饰么？
-synchronized 底层原理了解吗？
-JDK1.6 之后的 synchronized 底层做了哪些优化？
-锁升级原理了解吗？
-synchronized 和 volatile 有什么区别？
 
 `synchronized` 有 3 种应用方式：
 

@@ -12,12 +12,18 @@ export default navbar([
     icon: 'mdi:language-java',
     prefix: '/01.Java/',
     children: [
-      { text: 'JavaCore', link: '01.JavaCore/' },
-      { text: 'JavaEE', link: '02.JavaEE/' },
-      { text: '软件', link: '11.软件/' },
-      { text: '工具', link: '12.工具/' },
-      { text: '框架', link: '13.框架/' },
-      { text: '中间件', link: '14.中间件/' }
+      {
+        text: 'JavaCore',
+        icon: 'mdi:numeric-1-box-multiple-outline',
+        prefix: '01.JavaCore/',
+        link: '01.JavaCore/',
+        children: ['01.基础特性/', '02.高级特性/', '03.容器/', '04.IO/', '05.并发/', '06.JVM/', '99.面试/']
+      },
+      { text: 'JavaEE', icon: 'mdi:numeric-2-box-multiple-outline', link: '02.JavaEE/' },
+      { text: '软件', icon: 'mdi:numeric-3-box-multiple-outline', link: '11.软件/' },
+      { text: '工具', icon: 'mdi:numeric-4-box-multiple-outline', link: '12.工具/' },
+      { text: '框架', icon: 'mdi:numeric-5-box-multiple-outline', link: '13.框架/' },
+      { text: '中间件', icon: 'mdi:numeric-6-box-multiple-outline', link: '14.中间件/' }
     ]
   },
   {

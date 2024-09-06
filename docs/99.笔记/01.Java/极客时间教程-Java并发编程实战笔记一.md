@@ -87,7 +87,7 @@ public class Test {
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261450096.png)
 
-Java 的并发也是基于任务切换。Java 中，即使师一条语句，也可能需要执行多条 CPU 指令。**一个或者多个操作在 CPU 执行的过程中不被中断的特性称为原子性**。
+Java 的并发也是基于任务切换。Java 中，即使是一条语句，也可能需要执行多条 CPU 指令。**一个或者多个操作在 CPU 执行的过程中不被中断的特性称为原子性**。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292035170.png)
 
