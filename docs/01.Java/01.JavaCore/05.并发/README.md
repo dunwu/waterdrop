@@ -26,15 +26,15 @@ dir:
 ## 📖 内容
 
 - [Java 并发简介](Java并发简介.md) - 关键词：`并发`、`线程`、`安全性`、`活跃性`、`性能`、`死锁`、`活锁`
-- [Java 内存模型](Java并发之内存模型.md) - 关键词：`JMM`、`Happens-Before`、`内存屏障`、`volatile`、`synchronized`、`final`、`指令重排序`
-- [Java 线程基础](Java并发之线程.md) - 关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`
+- [Java 并发之内存模型](Java并发之内存模型.md) - 关键词：`JMM`、`Happens-Before`、`内存屏障`、`volatile`、`synchronized`、`final`、`指令重排序`
+- [Java 并发之线程](Java并发之线程.md) - 关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`
+- [Java 并发之锁](Java并发之锁.md) - 关键词：`AQS`、`ReentrantLock`、`ReentrantReadWriteLotyck`、`Condition`
 - [Java 并发之 CAS](Java并发之CAS.md) - 关键词：`CAS`、`自旋锁`
 - [Java 并发之 ThreadLocal](Java并发之ThreadLocal.md) - 关键词：`ThreadLocal`
 - [Java 并发之 AQS](Java并发之AQS.md) - 关键词：`AQS`
-- [Java 并发锁](Java并发之锁.md) - 关键词：`AQS`、`ReentrantLock`、`ReentrantReadWriteLotyck`、`Condition`
-- [Java 原子类](Java并发之原子类.md) - 关键词：`CAS`、`Atomic`
-- [Java 并发容器](Java并发之容器.md) - 关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`
-- [Java 线程池](Java并发之线程池.md) - 关键词：`Executor`、`ExecutorService`、`ThreadPoolExecutor`、`Executors`
+- [Java 并发之原子类](Java并发之原子类.md) - 关键词：`CAS`、`Atomic`
+- [Java 并发之容器](Java并发之容器.md) - 关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`
+- [Java 并发之线程池](Java并发之线程池.md) - 关键词：`Executor`、`ExecutorService`、`ThreadPoolExecutor`、`Executors`
 - [Java 并发工具类](Java并发工具类.md) - 关键词：`CountDownLatch`、`CyclicBarrier`、`Semaphore`
 - [Java并发之ForkJoin](Java并发之ForkJoin.md)
 

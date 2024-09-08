@@ -34,8 +34,10 @@ Java 内存模型（Java Memory Model），简称 **JMM**。Java 内存模型的
 为了合理利用 CPU 的高性能，平衡这三者的速度差异，计算机体系机构、操作系统、编译程序都做出了贡献，主要体现为：
 
 - **CPU 增加了缓存**，以均衡与 CPU 内存的速度差异；
-- **操作系统增加了进程、线程**，以分时复用 CPU，进而均衡 CPU 与 I/O 的速度差异；
 - **编译程序优化指令执行次序**，使得缓存能够得到更加合理地利用。
+- **操作系统增加了进程、线程**，以分时复用 CPU，进而均衡 CPU 与 I/O 的速度差异；
+
+**缓存**导致的可见性问题，**编译优化**带来的有序性问题，**线程切换**带来的原子性问题。
 
 ### 缓存一致性
 
@@ -133,9 +135,15 @@ JMM 还规定了上述 8 种基本操作，需要满足以下规则：
 
 ### 并发安全特性
 
-上文介绍了 Java 内存交互的 8 种基本操作，它们遵循 Java 内存三大特性：原子性、可见性、有序性。
+并发最重要的问题是并发安全问题。所谓**并发安全**，是指保证程序的正确性，使得并发处理结果符合预期。
 
-而这三大特性，归根结底，是为了实现多线程的 **数据一致性**，使得程序在多线程并发，指令重排序优化的环境中能如预期运行。
+并发安全需要保证几个基本特性：
+
+- **可见性** - 是一个线程修改了某个共享变量，其状态能够立即被其他线程知晓，通常被解释为将线程本地状态反映到主内存上，`volatile` 就是负责保证可见性的。
+- **有序性** - 是保证线程内串行语义，避免指令重排等。
+- **原子性** - 简单说就是相关操作不会中途被其他线程干扰，一般通过同步机制（加锁：`sychronized`、`Lock`）实现。
+
+而这三大特性，归根结底，是为了实现多线程的 **数据一致性**，使得程序在多线程并发，指令重排序优化的环境中能如预期运行。上文介绍了 Java 内存交互的 8 种基本操作，它们都保证可见性、有序性、原子性。
 
 #### 原子性
 
@@ -240,85 +248,157 @@ Java 中对内存屏障的使用在一般的代码中不太容易见到，常见
 - **同步静态方法** - 对于静态同步方法，锁是当前类的 `Class` 对象
 - **同步代码块** - 对于同步方法块，锁是 `synchonized` 括号里配置的对象
 
-::: tabs#synchronized应用
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409090719904.png)
 
-@tab 同步实例方法
-
-#### 同步实例方法
-
-先来看一个线程不安全的计数器示例。
-
-【示例】线程不安全的计数器 ❌
+【示例】`synchronized` 的使用语法
 
 ```java
-public class NoSynchronizedDemo implements Runnable {
+class Test {
 
-    public static final int MAX = 100000;
-
-    private static int count = 0;
-
-    public static void main(String[] args) throws InterruptedException {
-        NoSynchronizedDemo instance = new NoSynchronizedDemo();
-        Thread t1 = new Thread(instance);
-        Thread t2 = new Thread(instance);
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
-        System.out.println(count);
+    // 修饰成员方法
+    synchronized void sync1() {
+        // 临界区
     }
 
-    @Override
-    public void run() {
-        for (int i = 0; i < MAX; i++) {
-            increase();
+    // 修饰静态方法
+    synchronized static void sync2() {
+        // 临界区
+    }
+
+    // 对象锁
+    Object obj = new Object();
+    // 修饰代码块，使用对象锁
+    void sync3() {
+        synchronized (obj) {
+            // 临界区
         }
     }
 
-    public void increase() {
-        count++;
-    }
-
-}
-// 输出结果: 小于 200000 的随机数字
-```
-
-上面示例线程不安全的原因在与 count++ 不是原子操作，要解决此问题可以直接用 synchronized 修饰方法。其语义表示当前对象实例加锁，进入同步代码前要获得 当前对象实例的锁 。
-
-```java
-public class SynchronizedDemo implements Runnable {
-
-    private static final int MAX = 100000;
-
-    private static int count = 0;
-
-    public static void main(String[] args) throws InterruptedException {
-        SynchronizedDemo instance = new SynchronizedDemo();
-        Thread t1 = new Thread(instance);
-        Thread t2 = new Thread(instance);
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
-        System.out.println(count);
-    }
-
-    @Override
-    public void run() {
-        for (int i = 0; i < MAX; i++) {
-            increase();
+    // 修饰代码块，使用类锁（Class）
+    void sync4() {
+        synchronized (Test.class) {
+            //临界区
         }
-    }
-
-    /**
-     * synchronized 修饰普通方法
-     */
-    public synchronized void increase() {
-        count++;
     }
 
 }
 ```
+
+#### 用 synchronized 实现线程安全的计数器
+
+我们先来看一个简单的示例，这段代码维护了一个计数器变量 `count`，并通过 get() 和 add() 分别实现了读写方法。
+
+```java
+@NotThreadSafe
+public class NotThreadSafeCounter {
+
+    private static int count = 0;
+
+    public int get() {
+        return count;
+    }
+
+    public void add() {
+        count++;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        final int MAX = 100000;
+        NotThreadSafeCounter instance = new NotThreadSafeCounter();
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < MAX; i++) {
+                instance.add();
+            }
+        });
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < MAX; i++) {
+                instance.add();
+            }
+        });
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        System.out.println("count = " + instance.get());
+    }
+
+}
+// 输出：
+// count = 117626
+//
+```
+
+启动两个线程并行执行，期望最终值为 200000，但实际值为小于 200000 的随机数字。显然，上面的示例是线程不安全的。究其原因，在于 count++ 不是原子操作，不满足并发安全的原子性要求。
+
+要解决此问题，可以用 `synchronized` 修饰方法， `synchronized` 可以保证同一时刻只有一个线程执行临界区的代码。
+
+我们针对上面的示例来进行改造，将 `add()` 方法用 `synchronized` 修饰，如下所示。这下是不是就可以高枕无忧了呢？
+
+```java
+@NotThreadSafe
+public class NotThreadSafeCounter2 {
+
+    private static int count = 0;
+
+    public int get() {
+        return count;
+    }
+
+    public synchronized void add() {
+        count++;
+    }
+}
+```
+
+首先，`add()` 方法本身是线程安全的。但是，这个示例忽略了 `get()` 方法。因为 `get()` 方法未加锁，一个线程调用 `add()` 方法后，无法保证另一个线程调用 `get()` 时能立刻获取到更新后的结果，不满足并发安全的可见性要求。
+
+如何彻底解决 get() 并发不安全的问题呢？很简单，就是 `get()` 方法也用 `synchronized` 修饰一下。最终的线程安全示例如下：
+
+```java
+@ThreadSafe
+public class ThreadSafeCounter {
+
+    private int count = 0;
+
+    public synchronized long get() {
+        return count;
+    }
+
+    public synchronized void add() {
+        count++;
+    }
+}
+```
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409090720289.png)
+
+#### 静态 `synchronized` 方法和非静态 `synchronized` 是否互斥
+
+静态方法的同步是指同步在该方法所在的类对象上。因为在 JVM 中一个类只能对应一个类对象，所以同时只允许一个线程执行同一个类中的静态同步方法。
+
+静态 `synchronized` 方法和非静态 `synchronized` 方法之间的调用互斥么？
+
+答案是：不互斥，但可能存在并发问题！如果一个线程 A 调用一个实例对象的非静态 `synchronized` 方法；而线程 B 需要调用这个实例对象所属类的静态 `synchronized` 方法，是允许的，不会发生互斥现象，因为访问静态 `synchronized` 方法占用的锁是当前类的锁，而访问非静态 `synchronized` 方法占用的锁是当前实例对象锁。
+
+```java
+@ThreadSafe
+public class ThreadSafeCounter2 {
+
+    private static int count = 0;
+
+    public synchronized long get() {
+        return count;
+    }
+
+    public synchronized static void add() {
+        count++;
+    }
+}
+```
+
+上面这段代码实际上是用两个锁保护同一个资源。这个受保护的资源就是静态变量count，两个锁分别是this和ThreadSafeCounter2.class。我们可以用下面这幅图来形象描述这个关系。由于临界区get()和add()是用两个锁保护的，因此这两个临界区没有互斥关系，临界区add()对value的修改对临界区get()也没有可见性保证，这就导致并发问题了。
+
+#### 用 synchronized 保护多个资源
 
 【示例】错误示例
 
@@ -388,72 +468,6 @@ class Account {
   }
 }
 ```
-
-@tab 同步静态方法
-
-#### 同步静态方法
-
-静态方法的同步是指同步在该方法所在的类对象上。因为在 JVM 中一个类只能对应一个类对象，所以同时只允许一个线程执行同一个类中的静态同步方法。
-
-对于不同类中的静态同步方法，一个线程可以执行每个类中的静态同步方法而无需等待。不管类中的那个静态同步方法被调用，一个类只能由一个线程同时执行。
-
-```java
-public class SynchronizedDemo2 implements Runnable {
-
-    private static final int MAX = 100000;
-
-    private static int count = 0;
-
-    public static void main(String[] args) throws InterruptedException {
-        SynchronizedDemo2 instance = new SynchronizedDemo2();
-        Thread t1 = new Thread(instance);
-        Thread t2 = new Thread(instance);
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
-        System.out.println(count);
-    }
-
-    @Override
-    public void run() {
-        for (int i = 0; i < MAX; i++) {
-            increase();
-        }
-    }
-
-    /**
-     * synchronized 修饰静态方法
-     */
-    public synchronized static void increase() {
-        count++;
-    }
-
-}
-```
-
-静态 `synchronized` 方法和非静态 `synchronized` 方法之间的调用互斥么？不互斥！如果一个线程 A 调用一个实例对象的非静态 `synchronized` 方法；而线程 B 需要调用这个实例对象所属类的静态 `synchronized` 方法，是允许的，不会发生互斥现象，因为访问静态 `synchronized` 方法占用的锁是当前类的锁，而访问非静态 `synchronized` 方法占用的锁是当前实例对象锁。
-
-@tab 同步代码块
-
-#### 同步代码块
-
-对括号里指定的对象/类加锁：
-
-- `synchronized(object)` 表示进入同步代码库前要获得 **给定对象的锁**。
-- `synchronized(类.class)` 表示进入同步代码前要获得 **给定 Class 的锁**
-
-```java
-synchronized(this) {
-    //业务代码
-}
-
-synchronized(xxx.class) {
-    //业务代码
-}
-```
-
-:::
 
 ### synchronized 的原理
 
