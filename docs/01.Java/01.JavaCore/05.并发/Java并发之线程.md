@@ -10,12 +10,16 @@ tags:
   - JavaCore
   - 并发
   - 线程
+  - Thread
+  - Runnable
+  - Callable
+  - Future
+  - FutureTask
+  - 线程生命周期
 permalink: /pages/162ef13a/
 ---
 
 # Java 并发之线程
-
-> **关键词：`Thread`、`Runnable`、`Callable`、`Future`、`wait`、`notify`、`notifyAll`、`join`、`sleep`、`yeild`、`线程状态`、`线程通信`**
 
 ## 线程简介
 
@@ -432,9 +436,9 @@ public class MyTask extends Thread {
 public class ThreadSleepDemo {
 
     public static void main(String[] args) {
-        new Thread(new MyThread("线程A", 500)).start();
-        new Thread(new MyThread("线程B", 1000)).start();
-        new Thread(new MyThread("线程C", 1500)).start();
+        new Thread(new MyThread("线程 A", 500)).start();
+        new Thread(new MyThread("线程 B", 1000)).start();
+        new Thread(new MyThread("线程 C", 1500)).start();
     }
 
     static class MyThread implements Runnable {
@@ -475,8 +479,8 @@ public class ThreadYieldDemo {
 
     public static void main(String[] args) {
         MyThread t = new MyThread();
-        new Thread(t, "线程A").start();
-        new Thread(t, "线程B").start();
+        new Thread(t, "线程 A").start();
+        new Thread(t, "线程 B").start();
     }
 
     static class MyThread implements Runnable {
@@ -567,10 +571,10 @@ public class ThreadWaitNotifyDemo02 {
     private static final PriorityQueue<Integer> queue = new PriorityQueue<>(QUEUE_SIZE);
 
     public static void main(String[] args) {
-        new Producer("生产者A").start();
-        new Producer("生产者B").start();
-        new Consumer("消费者A").start();
-        new Consumer("消费者B").start();
+        new Producer("生产者 A").start();
+        new Producer("生产者 B").start();
+        new Consumer("消费者 A").start();
+        new Consumer("消费者 B").start();
     }
 
     static class Consumer extends Thread {
@@ -647,8 +651,8 @@ public class ThreadWaitNotifyDemo02 {
 public class ThreadJoinDemo {
 
     public static void main(String[] args) {
-        MyThread mt = new MyThread(); // 实例化Runnable子类对象
-        Thread t = new Thread(mt, "mythread"); // 实例化Thread对象
+        MyThread mt = new MyThread(); // 实例化 Runnable 子类对象
+        Thread t = new Thread(mt, "mythread"); // 实例化 Thread 对象
         t.start(); // 启动线程
         for (int i = 0; i < 50; i++) {
             if (i > 10) {
@@ -685,7 +689,7 @@ public class Piped {
     public static void main(String[] args) throws Exception {
         PipedWriter out = new PipedWriter();
         PipedReader in = new PipedReader();
-        // 将输出流和输入流进行连接，否则在使用时会抛出IOException
+        // 将输出流和输入流进行连接，否则在使用时会抛出 IOException
         out.connect(in);
         Thread printThread = new Thread(new Print(in), "PrintThread");
         printThread.start();
@@ -899,13 +903,35 @@ Java 的每个对象中都有一个称之为 monitor 监视器的锁，由于每
 
 > 👉 扩展阅读：[Java 中守护线程的总结](https://blog.csdn.net/shimiso/article/details/8964414)
 
+### 线程数
+
+**典型问题**
+
+（1）线程数是不是越多越好？
+
+（2）创建多少线程才合适？
+
+**知识点**
+
+使用多线程，初衷是为了提升程序性能。度量性能的核心指标是**延迟**和**吞吐量**。所谓提升性能，从度量的角度，主要是**降低延迟，提高吞吐量**。在并发编程领域，提升性能本质上就是提升硬件的利用率，再具体点来说，就是提升 I/O 的利用率和 CPU 的利用率。
+
+多线程并非越多越好，过多的线程可能会导致过多的上下文切换，反而降低系统性能。 通常需要根据服务器硬件资源和预期负载来合理设定线程数大小。
+
+程序一般都是 CPU 计算和 I/O 操作交叉执行的，由于 I/O 设备的速度相对于 CPU 来说都很慢，所以大部分情况下，I/O 操作执行的时间相对于 CPU 计算来说都非常长，这种场景我们一般都称为 I/O 密集型计算；和 I/O 密集型计算相对的就是 CPU 密集型计算了，CPU 密集型计算大部分场景下都是纯 CPU 计算。I/O 密集型程序和 CPU 密集型程序，计算最佳线程数的方法是不同的。
+
+**对于 CPU 密集型的计算场景，理论上“线程的数量=CPU 核数”就是最合适的**。不过在工程上，**线程的数量一般会设置为“CPU 核数+1”**，这样的话，当线程因为偶尔的内存页失效或其他原因导致阻塞时，这个额外的线程可以顶上，从而保证 CPU 的利用率。
+
+对于 I/O 密集型计算场景，最佳的线程数是与程序中 CPU 计算和 I/O 操作的耗时比相关的，我们可以总结出这样一个公式：
+
+> 最佳线程数=1 +（I/O 耗时 / CPU 耗时）
+
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
 - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
 - [进程和线程关系及区别](https://blog.csdn.net/yaosiming2011/article/details/44280797)
 - [Java 线程中 yield 与 join 方法的区别](http://www.importnew.com/14958.html)
-- [sleep()，wait()，yield()和 join()方法的区别](https://blog.csdn.net/xiangwanpeng/article/details/54972952)
+- [sleep()，wait()，yield() 和 join() 方法的区别](https://blog.csdn.net/xiangwanpeng/article/details/54972952)
 - [Java 并发编程：线程间协作的两种方式：wait、notify、notifyAll 和 Condition](https://www.cnblogs.com/dolphin0520/p/3920385.html)
 - [Java 并发编程：Callable、Future 和 FutureTask](https://www.cnblogs.com/dolphin0520/p/3949310.html)
 - [StackOverflow VisualVM - Thread States](https://stackoverflow.com/questions/27406200/visualvm-thread-states)

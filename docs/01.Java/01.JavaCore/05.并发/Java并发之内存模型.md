@@ -141,7 +141,7 @@ JMM 还规定了上述 8 种基本操作，需要满足以下规则：
 
 - **可见性** - 是一个线程修改了某个共享变量，其状态能够立即被其他线程知晓，通常被解释为将线程本地状态反映到主内存上，`volatile` 就是负责保证可见性的。
 - **有序性** - 是保证线程内串行语义，避免指令重排等。
-- **原子性** - 简单说就是相关操作不会中途被其他线程干扰，一般通过同步机制（加锁：`sychronized`、`Lock`）实现。
+- **原子性** - 简单说就是相关操作不会中途被其他线程干扰，一般通过互斥机制（加锁：`sychronized`、`Lock`）实现。
 
 而这三大特性，归根结底，是为了实现多线程的 **数据一致性**，使得程序在多线程并发，指令重排序优化的环境中能如预期运行。上文介绍了 Java 内存交互的 8 种基本操作，它们都保证可见性、有序性、原子性。
 
@@ -396,7 +396,7 @@ public class ThreadSafeCounter2 {
 }
 ```
 
-上面这段代码实际上是用两个锁保护同一个资源。这个受保护的资源就是静态变量count，两个锁分别是this和ThreadSafeCounter2.class。我们可以用下面这幅图来形象描述这个关系。由于临界区get()和add()是用两个锁保护的，因此这两个临界区没有互斥关系，临界区add()对value的修改对临界区get()也没有可见性保证，这就导致并发问题了。
+上面这段代码实际上是用两个锁保护同一个资源。这个受保护的资源就是静态变量 count，两个锁分别是 this 和 ThreadSafeCounter2.class。我们可以用下面这幅图来形象描述这个关系。由于临界区 get() 和 add() 是用两个锁保护的，因此这两个临界区没有互斥关系，临界区 add() 对 value 的修改对临界区 get() 也没有可见性保证，这就导致并发问题了。
 
 #### 用 synchronized 保护多个资源
 
@@ -640,10 +640,10 @@ public class Interesting {
     public void compare() {
         log.info("compare start");
         for (int i = 0; i < 10000; i++) {
-            //a始终等于b吗？
+            //a 始终等于 b 吗？
             if (a < b) {
                 log.info("a:{},b:{},{}", a, b, a > b);
-                //最后的a>b应该始终是false吗？
+                //最后的 a>b 应该始终是 false 吗？
             }
         }
         log.info("compare done");
@@ -655,10 +655,10 @@ public class Interesting {
 【输出】
 
 ```
-16:05:25.541 [Thread-0] INFO io.github.dunwu.javacore.concurrent.sync.synchronized使用范围不当 - add start
-16:05:25.544 [Thread-0] INFO io.github.dunwu.javacore.concurrent.sync.synchronized使用范围不当 - add done
-16:05:25.544 [Thread-1] INFO io.github.dunwu.javacore.concurrent.sync.synchronized使用范围不当 - compare start
-16:05:25.544 [Thread-1] INFO io.github.dunwu.javacore.concurrent.sync.synchronized使用范围不当 - compare done
+16:05:25.541 [Thread-0] INFO io.github.dunwu.javacore.concurrent.sync.synchronized 使用范围不当 - add start
+16:05:25.544 [Thread-0] INFO io.github.dunwu.javacore.concurrent.sync.synchronized 使用范围不当 - add done
+16:05:25.544 [Thread-1] INFO io.github.dunwu.javacore.concurrent.sync.synchronized 使用范围不当 - compare start
+16:05:25.544 [Thread-1] INFO io.github.dunwu.javacore.concurrent.sync.synchronized 使用范围不当 - compare done
 ```
 
 之所以出现这种错乱，是因为两个线程是交错执行 add 和 compare 方法中的业务逻辑，而且这些业务逻辑不是原子性的：a++ 和 b++ 操作中可以穿插在 compare 方法的比较代码中；更需要注意的是，a<b 这种比较操作在字节码层面是加载 a、加载 b 和比较三步，代码虽然是一行但也不是原子性的。
@@ -679,10 +679,10 @@ public synchronized void compare()
 静态字段属于类，类级别的锁才能保护；而非静态字段属于类实例，实例级别的锁就可以保护。
 
 ```java
-public class synchronized错误使用示例2 {
+public class synchronized 错误使用示例 2 {
 
     public static void main(String[] args) {
-        synchronized错误使用示例2 demo = new synchronized错误使用示例2();
+        synchronized 错误使用示例 2 demo = new synchronized 错误使用示例 2();
         System.out.println(demo.wrong(1000000));
         System.out.println(demo.right(1000000));
     }
@@ -734,7 +734,7 @@ wrong 方法中试图对一个静态对象加对象级别的 synchronized 锁，
 如果精细化考虑了锁应用范围后，性能还无法满足需求的话，我们就要考虑另一个维度的粒度问题了，即：区分读写场景以及资源的访问冲突，考虑使用悲观方式的锁还是乐观方式的锁。
 
 ```java
-public class synchronized锁粒度不当 {
+public class synchronized 锁粒度不当 {
 
     public static void main(String[] args) {
         Demo demo = new Demo();
@@ -988,7 +988,7 @@ public void increase() {
 - **对变量的写操作不依赖于当前值**
 - **该变量没有包含在具有其他变量的表达式中**
 
-::: tabs#volatile的应用
+::: tabs#volatile 的应用
 
 @tab 状态标记量
 
