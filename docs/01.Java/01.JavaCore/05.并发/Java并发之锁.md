@@ -111,17 +111,17 @@ class Task {
 - **`synchronized` 只支持非公平锁**。
 - **`ReentrantLock` 、`ReentrantReadWriteLock`，默认是非公平锁，但支持公平锁**。
 
-### 独享锁与共享锁
+### 独占锁与共享锁
 
-独享锁与共享锁是一种广义上的说法，从实际用途上来看，也常被称为互斥锁与读写锁。
+独占锁与共享锁是一种广义上的说法，从实际用途上来看，也常被称为互斥锁与读写锁。
 
-- **独享锁** - 独享锁是指 **锁一次只能被一个线程所持有**。
+- **独占锁** - 独占锁是指 **锁一次只能被一个线程所持有**。
 - **共享锁** - 共享锁是指 **锁可被多个线程所持有**。
 
-独享锁与共享锁在 Java 中的典型实现：
+独占锁与共享锁在 Java 中的典型实现：
 
-- **`synchronized` 、`ReentrantLock` 只支持独享锁**。
-- **`ReentrantReadWriteLock` 其写锁是独享锁，其读锁是共享锁**。读锁是共享锁使得并发读是非常高效的，读写，写读 ，写写的过程是互斥的。
+- **`synchronized` 、`ReentrantLock` 只支持独占锁**。
+- **`ReentrantReadWriteLock` 其写锁是独占锁，其读锁是共享锁**。读锁是共享锁使得并发读是非常高效的，读写，写读 ，写写的过程是互斥的。
 
 ### 悲观锁与乐观锁
 
@@ -1145,6 +1145,7 @@ try {
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
 - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
+- [极客时间教程 - Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)
 - [Java 并发编程：Lock](https://www.cnblogs.com/dolphin0520/p/3923167.html)
 - [深入学习 java 同步器 AQS](https://zhuanlan.zhihu.com/p/27134110)
 - [AbstractQueuedSynchronizer 框架](https://t.hao0.me/java/2016/04/01/aqs.html)

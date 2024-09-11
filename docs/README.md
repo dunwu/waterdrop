@@ -127,11 +127,11 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 - [Java 并发之线程](01.Java/01.JavaCore/05.并发/Java并发之线程.md) - 关键词：Thread、Runnable、Callable、Future、FutureTask、线程生命周期
 - [Java 并发之锁](01.Java/01.JavaCore/05.并发/Java并发之锁.md) - 关键词：锁、Lock、Condition、ReentrantLock、ReentrantReadWriteLock、StampedLock
 - [Java 并发之无锁](01.Java/01.JavaCore/05.并发/Java并发之无锁.md) - 关键词：CAS、ThreadLocal、Immutability、Copy-on-Write
-- [Java 并发之 AQS](01.Java/01.JavaCore/05.并发/Java并发之AQS.md) - 关键词：AQS
+- [Java 并发之 AQS](01.Java/01.JavaCore/05.并发/Java并发之AQS.md) - 关键词：AQS、独占锁、共享锁
 - [Java 并发之容器](01.Java/01.JavaCore/05.并发/Java并发之容器.md) - 关键词：ConcurrentHashMap、CopyOnWriteArrayList
 - [Java 并发之线程池](01.Java/01.JavaCore/05.并发/Java并发之线程池.md) - 关键词：Executor、ExecutorService、ThreadPoolExecutor、Executors
-- [Java 并发工具类](01.Java/01.JavaCore/05.并发/Java并发工具类.md) - 关键词：CountDownLatch、CyclicBarrier、Semaphore
-- [Java并发之ForkJoin](01.Java/01.JavaCore/05.并发/Java并发之ForkJoin.md)
+- [Java 并发之同步工具](01.Java/01.JavaCore/05.并发/Java并发之同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
+- [Java 并发之分工工具](01.Java/01.JavaCore/05.并发/Java并发之分工工具.md) - 关键词：CompletableFuture、CompletionStage、ForkJoinPool
 
 #### [Java 虚拟机](01.Java/01.JavaCore/06.JVM/)
 

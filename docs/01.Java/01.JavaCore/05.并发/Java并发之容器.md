@@ -10,6 +10,8 @@ tags:
   - JavaCore
   - 并发
   - 容器
+  - synchronized
+  - AQS
 permalink: /pages/6fd8d836/
 ---
 
@@ -1024,3 +1026,10 @@ private final Condition notEmpty = takeLock.newCondition();
 private final ReentrantLock putLock = new ReentrantLock();
 // 如果写操作的时候队列是满的，那么等待 notFull 条件
 private final Condition notFull = putLock.newCondition();
+```
+
+## 参考资料
+
+- [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
+- [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
+- [极客时间教程 - Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)
