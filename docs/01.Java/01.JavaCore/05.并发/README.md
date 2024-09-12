@@ -34,7 +34,7 @@ dir:
 - [Java 并发之容器](Java并发之容器.md) - 关键词：ConcurrentHashMap、CopyOnWriteArrayList
 - [Java 并发之线程池](Java并发之线程池.md) - 关键词：Executor、ExecutorService、ThreadPoolExecutor、Executors
 - [Java 并发之同步工具](Java并发之同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
-- [Java 并发之分工工具](Java并发之分工工具.md) - 关键词：CompletableFuture、CompletionStage、ForkJoinPool
+- [Java 并发之分工工具](Java并发之分工工具.md) - 关键词：FutureTask、CompletableFuture、CompletionStage、CompletionService、ForkJoinPool
 
 ## 📚 资料
 

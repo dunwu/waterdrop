@@ -15,35 +15,35 @@ permalink: /pages/123b90fb/
 
 # Java 并发之线程池
 
-## 简介
+## 线程池简介
 
-### 什么是线程池
-
-线程池是一种多线程处理形式，处理过程中将任务添加到队列，然后在创建线程后自动启动这些任务。
-
-### 为什么要用线程池
+线程池就是管理一系列线程的资源池，其提供了一种限制和管理线程资源的方式。每个线程池还维护一些基本统计信息，例如已完成任务的数量。
 
 如果并发请求数量很多，但每个线程执行的时间很短，就会出现频繁的创建和销毁线程。如此一来，会大大降低系统的效率，可能频繁创建和销毁线程的时间、资源开销要大于实际工作的所需。
 
-正是由于这个问题，所以有必要引入线程池。使用 **线程池的好处** 有以下几点：
+使用 **线程池的好处** 有以下几点：
 
 - **降低资源消耗** - 通过重复利用已创建的线程降低线程创建和销毁造成的消耗。
 - **提高响应速度** - 当任务到达时，任务可以不需要等到线程创建就能立即执行。
-- **提高线程的可管理性** - 线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。但是要做到合理的利用线程池，必须对其原理了如指掌。
+- **提高线程的可管理性** - 线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。
 
 ## Executor 框架
 
-> Executor 框架是一个根据一组执行策略调用，调度，执行和控制的异步任务的框架，目的是提供一种将”任务提交”与”任务如何运行”分离开来的机制。
+Executor 框架是一个根据一组执行策略调用，调度，执行和控制的异步任务的框架，目的是提供一种将”任务提交”与”任务如何运行”分离开来的机制。
+
+通过 `Executor` 来启动线程比使用 `Thread` 的 `start` 方法更好，除了更易管理，效率更好（用线程池实现，节约开销）外，还有关键的一点：有助于避免 this 逃逸问题。
+
+> this 逃逸是指在构造函数返回之前其他线程就持有该对象的引用，调用尚未构造完全的对象的方法可能引发令人疑惑的错误。
 
 ### 核心 API 概述
 
 Executor 框架核心 API 如下：
 
-- `Executor` - 运行任务的简单接口。
+- `Executor` - 运行任务的接口。
 - `ExecutorService` - 扩展了 `Executor` 接口。扩展能力：
   - 支持有返回值的线程；
   - 支持管理线程的生命周期。
-- `ScheduledExecutorService` - 扩展了 `ExecutorService` 接口。扩展能力：支持定期执行任务。
+- `ScheduledExecutorService` - 扩展了 `ExecutorService` 接口，支持定时调度任务。
 - `AbstractExecutorService` - `ExecutorService` 接口的默认实现。
 - `ThreadPoolExecutor` - Executor 框架最核心的类，它继承了 `AbstractExecutorService` 类。
 - `ScheduledThreadPoolExecutor` - `ScheduledExecutorService` 接口的实现，一个可定时调度任务的线程池。
@@ -141,7 +141,7 @@ public interface ScheduledExecutorService extends ExecutorService {
 
 ## ThreadPoolExecutor
 
-`java.uitl.concurrent.ThreadPoolExecutor` 类是 `Executor` 框架中最核心的类。所以，本文将着重讲述一下这个类。
+`java.uitl.concurrent.ThreadPoolExecutor` 类是 `Executor` 框架中最核心的类。
 
 ### 重要字段
 
@@ -186,13 +186,14 @@ private static final int TERMINATED =  3 << COUNT_BITS;
 `ThreadPoolExecutor` 有四个构造方法，前三个都是基于第四个实现。第四个构造方法定义如下：
 
 ```java
-public ThreadPoolExecutor(int corePoolSize,
-                              int maximumPoolSize,
-                              long keepAliveTime,
-                              TimeUnit unit,
-                              BlockingQueue<Runnable> workQueue,
-                              ThreadFactory threadFactory,
-                              RejectedExecutionHandler handler) {
+public ThreadPoolExecutor(int corePoolSize,// 线程池的核心线程数量
+						  int maximumPoolSize,// 线程池的最大线程数
+						  long keepAliveTime,// 当线程数大于核心线程数时，多余的空闲线程存活的最长时间
+						  TimeUnit unit,// 时间单位
+						  BlockingQueue<Runnable> workQueue,// 任务队列，用来储存等待执行任务的队列
+						  ThreadFactory threadFactory,// 线程工厂，用来创建线程，一般默认即可
+						  RejectedExecutionHandler handler// 拒绝策略，当提交的任务过多而不能及时处理时，我们可以定制策略来处理任务
+) {// 略}
 ```
 
 参数说明：
@@ -516,5 +517,6 @@ threadPool.awaitTermination(1, TimeUnit.HOURS);
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
 - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
+- [极客时间教程 - Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)
 - [深入理解 Java 线程池：ThreadPoolExecutor](https://www.jianshu.com/p/d2729853c4da)
 - [java 并发编程--Executor 框架](https://www.cnblogs.com/MOBIN/p/5436482.html)

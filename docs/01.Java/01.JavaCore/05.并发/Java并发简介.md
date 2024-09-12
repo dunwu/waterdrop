@@ -124,6 +124,10 @@ while(server is active) {
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409042332517.png)
 
+::: tabs#计数器示例
+
+@tab 线程不安全的计数器
+
 【示例】线程不安全的计数器示例 ❌
 
 ```java
@@ -167,6 +171,8 @@ public class NotThreadSafeCounter {
 
 假设线程 A 和线程 B 同时开始执行，那么第一次都会将 count=0 读到各自的 CPU 缓存里，执行完 count+=1 之后，各自 CPU 缓存里的值都是 1，同时写入内存后，我们会发现内存中是 1，而不是我们期望的 2。之后由于各自的 CPU 缓存里都有了 count 的值，两个线程都是基于 CPU 缓存里的 count 值来计算，所以导致最终 count 的值都是小于 20000 的。这就是缓存的可见性问题。
 
+@tab 线程安全的计数器
+
 【示例】线程安全的计数器示例 ✔
 
 针对上面线程不安全的计数器最简单的改造方法就是在 add() 方法上增加 `synchronized` 锁，如下所示：
@@ -183,6 +189,8 @@ public class ThreadSafeCounter {
     // 省略
 }
 ```
+
+:::
 
 ### 线程切换带来的原子性问题
 
