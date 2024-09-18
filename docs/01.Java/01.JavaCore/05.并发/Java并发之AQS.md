@@ -18,7 +18,7 @@ tags:
 
 ## AQS 简介
 
-**AQS** 是 `AbstractQueuedSynchronizer` 的缩写，即 ** 队列同步器 **，顾名思义，其主要作用是处理同步。它是并发锁和很多同步工具类的实现基石（如 `ReentrantLock`、`ReentrantReadWriteLock`、`CountDownLatch`、`Semaphore`、`FutureTask` 等）。
+**AQS** 是 `AbstractQueuedSynchronizer` 的缩写，即 **队列同步器**，顾名思义，其主要作用是处理同步。它是并发锁和很多同步工具类的实现基石（如 `ReentrantLock`、`ReentrantReadWriteLock`、`CountDownLatch`、`Semaphore`、`FutureTask` 等）。
 
 **AQS 提供了对锁和同步器的通用能力支持 **。在 `java.util.concurrent.locks` 包中的相关锁（常用的有 `ReentrantLock`、 `ThreadPoolExecutor`）都是基于 AQS 来实现。这些锁都没有直接继承 AQS，而是定义了一个 `Sync` 类去继承 AQS。为什么要这样呢？因为锁面向的是使用用户，而同步器面向的则是线程控制，那么在锁的实现中聚合同步器而不是直接继承 AQS 就可以很好的隔离二者所关注的事情。
 
@@ -63,7 +63,7 @@ public final boolean releaseShared(int arg)
 
 ## AQS 的原理
 
-AQS 核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态；如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制。这个机制是基于 **CLH 锁 ** （Craig, Landin, and Hagersten locks） 的变体实现的，将暂时获取不到锁的线程加入到队列中。
+AQS 核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态；如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制。这个机制是基于 **CLH 锁** （Craig, Landin, and Hagersten locks） 的变体实现的，将暂时获取不到锁的线程加入到队列中。
 
 CLH 本是一个单向队列，AQS 中的队列采用了 CLH 的变体，是一个虚拟的 FIFO 双向队列（虚拟的双向队列，是指不存在结点实例，仅存在结点之间的关联关系），暂时获取不到锁的线程将被加入到该队列中。AQS 将每条请求共享资源的线程封装成一个 CLH 队列锁的一个结点（Node）来实现锁的分配。在 CLH 队列锁中，一个节点表示一个线程，它保存着线程的引用（thread）、 当前节点在队列中的状态（waitStatus）、前驱节点（prev）、后继节点（next）。
 
@@ -245,13 +245,13 @@ private void unparkSuccessor(Node node) {
 
 AQS 中使用 `acquireInterruptibly(int arg)` 方法获取可中断的独占锁。
 
-`acquireInterruptibly(int arg)` 实现方式 ** 相较于获取独占锁方法（ `acquire`）非常相似 **，区别仅在于它会 ** 通过 `Thread.interrupted` 检测当前线程是否被中断 **，如果是，则立即抛出中断异常（`InterruptedException`）。
+`acquireInterruptibly(int arg)` 实现方式 **相较于获取独占锁方法（ `acquire`）非常相似**，区别仅在于它会 **通过 `Thread.interrupted` 检测当前线程是否被中断**，如果是，则立即抛出中断异常（`InterruptedException`）。
 
 #### 限时获取独占锁
 
 AQS 中使用 `tryAcquireNanos(int arg)` 方法获取超时等待的独占锁。
 
-doAcquireNanos 的实现方式 ** 相较于获取独占锁方法（ `acquire`）非常相似 **，区别在于它会根据超时时间和当前时间计算出截止时间。在获取锁的流程中，会不断判断是否超时，如果超时，直接返回 false；如果没超时，则用 `LockSupport.parkNanos` 来阻塞当前线程。
+doAcquireNanos 的实现方式 **相较于获取独占锁方法（ `acquire`）非常相似**，区别在于它会根据超时时间和当前时间计算出截止时间。在获取锁的流程中，会不断判断是否超时，如果超时，直接返回 false；如果没超时，则用 `LockSupport.parkNanos` 来阻塞当前线程。
 
 ### 共享锁的获取和释放
 
@@ -312,7 +312,7 @@ protected boolean tryReleaseShared(int)
 protected boolean isHeldExclusively()
 ```
 
-** 什么是钩子方法呢？** 钩子方法是一种被声明在抽象类中的方法，一般使用 `protected` 关键字修饰，它可以是空方法（由子类实现），也可以是默认实现的方法。模板设计模式通过钩子方法控制固定步骤的实现。
+**什么是钩子方法呢？** 钩子方法是一种被声明在抽象类中的方法，一般使用 `protected` 关键字修饰，它可以是空方法（由子类实现），也可以是默认实现的方法。模板设计模式通过钩子方法控制固定步骤的实现。
 
 ## 参考资料
 

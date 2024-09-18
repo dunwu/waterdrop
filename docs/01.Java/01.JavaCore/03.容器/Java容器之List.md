@@ -10,6 +10,9 @@ tags:
   - Java
   - JavaCore
   - 容器
+  - List
+  - ArrayList
+  - LinkedList
 permalink: /pages/c7adc138/
 ---
 
@@ -42,12 +45,6 @@ permalink: /pages/c7adc138/
 
 ## ArrayList
 
-> ArrayList 从数据结构角度来看，可以视为支持动态扩容的线性表。
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20220529190340.png)
-
-### ArrayList 要点
-
 `ArrayList` 是一个数组队列，相当于**动态数组**。**`ArrayList` 默认初始容量大小为 `10` ，添加元素时，如果发现容量已满，会自动扩容为原始大小的 1.5 倍**。因此，应该尽量在初始化 `ArrayList` 时，为其指定合适的初始化容量大小，减少扩容操作产生的性能开销。
 
 `ArrayList` 定义：
@@ -65,9 +62,7 @@ public class ArrayList<E> extends AbstractList<E>
 - `ArrayList` 实现了 `Serializable` 接口，**支持序列化**，能通过序列化方式传输。
 - `ArrayList` 是**非线程安全**的。
 
-### ArrayList 原理
-
-#### ArrayList 的数据结构
+### ArrayList 的数据结构
 
 ArrayList 包含了两个重要的元素：`elementData` 和 `size`。
 
@@ -80,19 +75,10 @@ transient Object[] elementData;
 private int size;
 ```
 
-- `size` - 是动态数组的实际大小。
-- `elementData` - 是一个 `Object` 数组，用于保存添加到 `ArrayList` 中的元素。
+- `size` - 是动态数组的实际大小，默认初始容量大小为 10。
+- `elementData` - 是一个 `Object` 数组，用于保存添加到 `ArrayList` 中的元素。正是由于实际存储元素的是 `Object` 数组，所以其天然支持随机访问。
 
-#### ArrayList 的序列化
-
-`ArrayList` 具有动态扩容特性，因此保存元素的数组不一定都会被使用，那么就没必要全部进行序列化。为此，`ArrayList` 定制了其序列化方式。具体做法是：
-
-- 存储元素的 `Object` 数组（即 `elementData`）使用 `transient` 修饰，使得它可以被 Java 序列化所忽略。
-- `ArrayList` 重写了 `writeObject()` 和 `readObject()` 来控制序列化数组中有元素填充那部分内容。
-
-> :bulb: 不了解 Java 序列化方式，可以参考：[Java 序列化](https://dunwu.github.io/waterdrop/pages/76ab164b/)
-
-#### ArrayList 构造方法
+### ArrayList 构造方法
 
 ArrayList 类实现了三个构造函数：
 
@@ -122,7 +108,16 @@ public ArrayList(int initialCapacity) {
 }
 ```
 
-#### ArrayList 访问元素
+### ArrayList 定制序列化
+
+`ArrayList` 具有动态扩容特性，因此保存元素的数组不一定都会被使用，那么就没必要全部进行序列化。为此，`ArrayList` 定制了其序列化方式。具体做法是：
+
+- 存储元素的 `Object` 数组（即 `elementData`）使用 `transient` 修饰，使得它可以被 Java 序列化所忽略。
+- `ArrayList` 重写了 `writeObject()` 和 `readObject()` 来控制序列化数组中有元素填充那部分内容。
+
+> :bulb: 不了解 Java 序列化方式，可以参考：[Java 序列化](https://dunwu.github.io/waterdrop/pages/dc9f1331/)
+
+### ArrayList 访问元素
 
 `ArrayList` 访问元素的实现主要基于以下关键性源码：
 
@@ -140,7 +135,7 @@ E elementData(int index) {
 
 实现非常简单，其实就是**通过数组下标访问数组元素，其时间复杂度为 O(1)**，所以很快。
 
-#### ArrayList 添加元素
+### ArrayList 添加元素
 
 `ArrayList` 添加元素有两种方法：一种是添加元素到数组末尾，另外一种是添加元素到任意位置。
 
@@ -208,7 +203,7 @@ private void grow(int minCapacity) {
 - 如果容量足够时，将数据作为数组中 `size+1` 位置上的元素写入，并将 `size` 自增 1。
 - 如果容量不够时，需要使用 `grow` 方法进行扩容数组，新容量的大小为 `oldCapacity + (oldCapacity >> 1)`，也就是旧容量的 1.5 倍。扩容操作实际上是**调用 `Arrays.copyOf()` 把原数组拷贝为一个新数组**，因此最好在创建 `ArrayList` 对象时就指定大概的容量大小，减少扩容操作的次数。
 
-#### ArrayList 删除元素
+### ArrayList 删除元素
 
 `ArrayList` 的删除方法和添加元素到任意位置方法有些相似。
 
@@ -230,7 +225,7 @@ public E remove(int index) {
 }
 ```
 
-#### ArrayList 的 Fail-Fast
+### ArrayList 的 fail-fast
 
 `ArrayList` 使用 `modCount` 来记录结构发生变化的次数。结构发生变化是指添加或者删除至少一个元素的所有操作，或者是调整内部数组的大小，仅仅只是设置元素的值不算结构发生变化。
 
@@ -259,12 +254,6 @@ private void writeObject(java.io.ObjectOutputStream s)
 
 ## LinkedList
 
-> LinkedList 从数据结构角度来看，可以视为双链表。
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20220529190416.png)
-
-### LinkedList 要点
-
 `LinkedList` 基于双链表结构实现。由于是双链表，所以**顺序访问会非常高效，而随机访问效率比较低。**
 
 `LinkedList` 定义：
@@ -283,9 +272,7 @@ public class LinkedList<E>
 - `LinkedList` 实现了 `Serializable` 接口，**支持序列化**。
 - `LinkedList` 是**非线程安全**的。
 
-### LinkedList 原理
-
-#### LinkedList 的数据结构
+### LinkedList 的数据结构
 
 **`LinkedList` 内部维护了一个双链表**。
 
@@ -318,14 +305,14 @@ private static class Node<E> {
 }
 ```
 
-#### LinkedList 的序列化
+### LinkedList 的序列化
 
 `LinkedList` 与 `ArrayList` 一样也定制了自身的序列化方式。具体做法是：
 
 - 将 `size` （双链表容量大小）、`first` 和`last` （双链表的头尾节点）修饰为 `transient`，使得它们可以被 Java 序列化所忽略。
 - 重写了 `writeObject()` 和 `readObject()` 来控制序列化时，只处理双链表中能被头节点链式引用的节点元素。
 
-#### LinkedList 访问元素
+### LinkedList 访问元素
 
 `LinkedList` 访问元素的实现主要基于以下关键性源码：
 
@@ -361,7 +348,7 @@ Node<E> node(int index) {
 
 **推荐使用迭代器遍历 `LinkedList` ，不要使用传统的 `for` 循环**。注：foreach 语法会被编译器转换成迭代器遍历，但是它的遍历过程中不允许修改 `List` 长度，即不能进行增删操作。
 
-#### LinkedList 添加元素
+### LinkedList 添加元素
 
 `LinkedList` 有多种添加元素方法：
 
@@ -441,7 +428,7 @@ void linkBefore(E e, Node<E> succ) {
 - 如果往头部添加元素，将头指针 `first` 指向新的 `Node`，之前的 `first` 对象的 `prev` 指向新的 `Node`。
 - 如果是向尾部添加元素，则将尾指针 `last` 指向新的 `Node`，之前的 `last` 对象的 `next` 指向新的 `Node`。
 
-#### LinkedList 删除元素
+### LinkedList 删除元素
 
 `LinkedList` 删除元素的实现主要基于以下关键性源码：
 
@@ -500,6 +487,18 @@ E unlink(Node<E> x) {
 - `unlink` 删除节点的方法：
   - 如果当前节点有前驱节点，则让前驱节点指向当前节点的下一个节点；否则，让双链表头指针指向下一个节点。
   - 如果当前节点有后继节点，则让后继节点指向当前节点的前一个节点；否则，让双链表尾指针指向上一个节点。
+
+## ArrayList vs. LinkedList
+
+- **是否保证线程安全：** `ArrayList` 和 `LinkedList` 都是不同步的，也就是不保证线程安全；
+- **底层数据结构：** `ArrayList` 底层使用的是 **`Object` 数组**；`LinkedList` 底层使用的是 **双向链表** 数据结构（JDK1.6 之前为循环链表，JDK1.7 取消了循环。注意双向链表和双向循环链表的区别，下面有介绍到！）
+- 插入和删除是否受元素位置的影响：
+  - `ArrayList` 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。 比如：执行`add(E e)`方法的时候， `ArrayList` 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是 O(1)。但是如果要在指定位置 i 插入和删除元素的话（`add(int index, E element)`），时间复杂度就为 O(n)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。
+  - `LinkedList` 采用链表存储，所以在头尾插入或者删除元素不受元素位置的影响（`add(E e)`、`addFirst(E e)`、`addLast(E e)`、`removeFirst()`、 `removeLast()`），时间复杂度为 O(1)，如果是要在指定位置 `i` 插入和删除元素的话（`add(int index, E element)`，`remove(Object o)`,`remove(int index)`）， 时间复杂度为 O(n) ，因为需要先移动到指定位置再插入和删除。
+- **是否支持快速随机访问：** `LinkedList` 不支持高效的随机元素访问，而 `ArrayList`（实现了 `RandomAccess` 接口） 支持。快速随机访问就是通过元素的序号快速获取元素对象(对应于`get(int index)`方法)。
+- **内存空间占用：** `ArrayList` 的空间浪费主要体现在在 list 列表的结尾会预留一定的容量空间，而 LinkedList 的空间花费则体现在它的每一个元素都需要消耗比 ArrayList 更多的空间（因为要存放直接后继和直接前驱以及数据）。
+
+我们在项目中一般是不会使用到 `LinkedList` 的，需要用到 `LinkedList` 的场景几乎都可以使用 `ArrayList` 来代替，并且，性能通常会更好！就连 `LinkedList` 的作者约书亚 · 布洛克（Josh Bloch）自己都说从来不会使用 `LinkedList` 。
 
 ## List 常见问题
 
@@ -618,7 +617,7 @@ log.info("arr:{} list:{}", Arrays.toString(arr), list);
 
 ### List.subList 问题点
 
-List.subList 直接引用了原始的 List，也可以认为是共享“存储”，而且对原始 List 直接进行结构性修改会导致 SubList 出现异常。
+`List.subList` 直接引用了原始的 `List`，也可以认为是共享“存储”，而且对原始 `List` 直接进行结构性修改会导致 `SubList` 出现异常。
 
 ```java
 private static List<List<Integer>> data = new ArrayList<>();
@@ -631,7 +630,7 @@ private static void oom() {
 }
 ```
 
-出现 OOM 的原因是，循环中的 1000 个具有 10 万个元素的 List 始终得不到回收，因为它始终被 subList 方法返回的 List 强引用。
+出现 OOM 的原因是，循环中的 1000 个具有 10 万个元素的 List 始终得不到回收，因为它始终被 `subList` 方法返回的 `List` 强引用。
 
 解决方法是：
 

@@ -11,12 +11,13 @@ tags:
   - JavaCore
   - IO
   - 序列化
+  - Serializable
+  - Externalizable
+  - transient
 permalink: /pages/dc9f1331/
 ---
 
 # 深入理解 Java 序列化
-
-> **_关键词：`Serializable`、`serialVersionUID`、`transient`、`Externalizable`、`writeObject`、`readObject`_**
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20220626163533.png)
 
@@ -33,7 +34,7 @@ permalink: /pages/dc9f1331/
 
 - 序列化可以将对象的字节序列持久化——保存在内存、文件、数据库中。
 - 在网络上传送对象的字节序列。
-- RMI(远程方法调用)
+- RMI（远程方法调用）
 
 ## JDK 序列化
 
@@ -54,7 +55,6 @@ public class SerializeDemo01 {
         MALE,
         FEMALE
     }
-
 
     static class Person implements Serializable {
         private static final long serialVersionUID = 1L;
@@ -462,7 +462,7 @@ public class SerializeDemo05 {
 ### JDK 序列化的问题
 
 - **无法跨语言**：JDK 序列化目前只适用基于 Java 语言实现的框架，其它语言大部分都没有使用 Java 的序列化框架，也没有实现 JDK 序列化这套协议。因此，如果是两个基于不同语言编写的应用程序相互通信，则无法实现两个应用服务之间传输对象的序列化与反序列化。
-- **容易被攻击**：对象是通过在 `ObjectInputStream` 上调用 `readObject()` 方法进行反序列化的，它可以将类路径上几乎所有实现了 `Serializable` 接口的对象都实例化。这意味着，在反序列化字节流的过程中，该方法可以执行任意类型的代码，这是非常危险的。对于需要长时间进行反序列化的对象，不需要执行任何代码，也可以发起一次攻击。攻击者可以创建循环对象链，然后将序列化后的对象传输到程序中反序列化，这种情况会导致 `hashCode` 方法被调用次数呈次方爆发式增长, 从而引发栈溢出异常。例如下面这个案例就可以很好地说明。
+- **容易被攻击**：对象是通过在 `ObjectInputStream` 上调用 `readObject()` 方法进行反序列化的，它可以将类路径上几乎所有实现了 `Serializable` 接口的对象都实例化。这意味着，在反序列化字节流的过程中，该方法可以执行任意类型的代码，这是非常危险的。对于需要长时间进行反序列化的对象，不需要执行任何代码，也可以发起一次攻击。攻击者可以创建循环对象链，然后将序列化后的对象传输到程序中反序列化，这种情况会导致 `hashCode` 方法被调用次数呈次方爆发式增长，从而引发栈溢出异常。例如下面这个案例就可以很好地说明。
 - **序列化后的流太大**：JDK 序列化中使用了 `ObjectOutputStream` 来实现对象转二进制编码，编码后的数组很大，非常影响存储和传输效率。
 - **序列化性能太差**：Java 的序列化耗时比较大。序列化的速度也是体现序列化性能的重要指标，如果序列化的速度慢，就会影响网络通信的效率，从而增加系统的响应时间。
 - **序列化编程限制**：
@@ -542,7 +542,7 @@ Hessian 本身也有问题，官方版本对 Java 里面一些常见对象的类
 
 ### JSON 是什么
 
-JSON 起源于 1999 年的 [JS 语言规范 ECMA262 的一个子集](http://javascript.crockford.com/)（即 15.12 章节描述了格式与解析），后来 2003 年作为一个数据格式[ECMA404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)（很囧的序号有不有？）发布。
+JSON 起源于 1999 年的 [JS 语言规范 ECMA262 的一个子集](http://javascript.crockford.com/)（即 15.12 章节描述了格式与解析），后来 2003 年作为一个数据格式 [ECMA404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)（很囧的序号有不有？）发布。
 2006 年，作为 [rfc4627](http://www.ietf.org/rfc/rfc4627.txt) 发布，这时规范增加到 18 页，去掉没用的部分，十页不到。
 
 JSON 的应用很广泛，这里有超过 100 种语言下的 JSON 库：[json.org](http://www.json.org/)。
@@ -591,7 +591,7 @@ JSON 优点
 JSON 缺点
 
 - 性能一般，文本表示的数据一般来说比二进制大得多，在数据传输上和解析处理上都要更影响性能。
-- 缺乏 schema，跟同是文本数据格式的 XML 比，在类型的严格性和丰富性上要差很多。XML 可以借由 XSD 或 DTD 来定义复杂的格式，并由此来验证 XML 文档是否符合格式要求，甚至进一步的，可以基于 XSD 来生成具体语言的操作代码，例如 apache xmlbeans。并且这些工具组合到一起，形成一套庞大的生态，例如基于 XML 可以实现 SOAP 和 WSDL，一系列的 ws-\*规范。但是我们也可以看到 JSON 在缺乏规范的情况下，实际上有更大一些的灵活性，特别是近年来 REST 的快速发展，已经有一些 schema 相关的发展(例如[理解 JSON Schema](https://spacetelescope.github.io/understanding-json-schema/index.html)，[使用 JSON Schema](http://usingjsonschema.com/downloads/)， [在线 schema 测试](http://azimi.me/json-schema-view/demo/demo.html))，也有类似于 WSDL 的[WADL](https://www.w3.org/Submission/wadl/)出现。
+- 缺乏 schema，跟同是文本数据格式的 XML 比，在类型的严格性和丰富性上要差很多。XML 可以借由 XSD 或 DTD 来定义复杂的格式，并由此来验证 XML 文档是否符合格式要求，甚至进一步的，可以基于 XSD 来生成具体语言的操作代码，例如 apache xmlbeans。并且这些工具组合到一起，形成一套庞大的生态，例如基于 XML 可以实现 SOAP 和 WSDL，一系列的 ws-\*规范。但是我们也可以看到 JSON 在缺乏规范的情况下，实际上有更大一些的灵活性，特别是近年来 REST 的快速发展，已经有一些 schema 相关的发展（例如 [理解 JSON Schema](https://spacetelescope.github.io/understanding-json-schema/index.html)，[使用 JSON Schema](http://usingjsonschema.com/downloads/)， [在线 schema 测试](http://azimi.me/json-schema-view/demo/demo.html))，也有类似于 WSDL 的 [WADL](https://www.w3.org/Submission/wadl/) 出现。
 
 ### JSON 库
 
@@ -607,8 +607,8 @@ Java 中比较流行的 JSON 库有：
 
 > 遵循好的设计与编码风格，能提前解决 80%的问题，个人推荐 Google JSON 风格指南。
 >
-> - 英文版[Google JSON Style Guide](https://google.github.io/styleguide/jsoncstyleguide.xml)：<https://google.github.io/styleguide/jsoncstyleguide.xml>
-> - 中文版[Google JSON 风格指南](https://github.com/darcyliu/google-styleguide/blob/master/JSONStyleGuide.md)：<https://github.com/darcyliu/google-styleguide/blob/master/JSONStyleGuide.md>
+> - 英文版 [Google JSON Style Guide](https://google.github.io/styleguide/jsoncstyleguide.xml)：<https://google.github.io/styleguide/jsoncstyleguide.xml>
+> - 中文版 [Google JSON 风格指南](https://github.com/darcyliu/google-styleguide/blob/master/JSONStyleGuide.md)：<https://github.com/darcyliu/google-styleguide/blob/master/JSONStyleGuide.md>
 
 简单摘录如下：
 
@@ -624,15 +624,15 @@ Java 中比较流行的 JSON 库有：
 - 设计好通用的分页参数
 - 设计好异常处理
 
-[JSON API](http://jsonapi.org.cn/format/)与 Google JSON 风格指南有很多可以相互参照之处。
+[JSON API](http://jsonapi.org.cn/format/) 与 Google JSON 风格指南有很多可以相互参照之处。
 
-[JSON API](http://jsonapi.org.cn/format/)是数据交互规范，用以定义客户端如何获取与修改资源，以及服务器如何响应对应请求。
+[JSON API](http://jsonapi.org.cn/format/) 是数据交互规范，用以定义客户端如何获取与修改资源，以及服务器如何响应对应请求。
 
 JSON API 设计用来最小化请求的数量，以及客户端与服务器间传输的数据量。在高效实现的同时，无需牺牲可读性、灵活性和可发现性。
 
 ## 序列化技术选型
 
-市面上有如此多的序列化技术，那么我们在应用时如何选择呢?
+市面上有如此多的序列化技术，那么我们在应用时如何选择呢？
 
 序列化技术选型，需要考量的维度，根据重要性从高到低，依次有：
 

@@ -21,37 +21,17 @@ dir:
 
 ## 📖 内容
 
-### [Java IO 模型](01.JavaIO模型.md)
-
-> 关键词：`InputStream`、`OutputStream`、`Reader`、`Writer`
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630202823.png)
-
-### [Java NIO](02.JavaNIO.md)
-
-> 关键词：`Channel`、`Buffer`、`Selector`、`非阻塞`、`多路复用`
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630203739.png)
-
-### [Java 序列化](03.Java序列化.md)
-
-> 关键词：`Serializable`、`serialVersionUID`、`transient`、`Externalizable`、`writeObject`、`readObject`
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630204142.png)
-
-### [Java 网络编程](04.Java网络编程.md)
-
-> 关键词：`Socket`、`ServerSocket`、`DatagramPacket`、`DatagramSocket`
-
-### [Java IO 工具类](05.JavaIO工具类.md)
-
-> 关键词：`File`、`RandomAccessFile`、`System`、`Scanner`
+- [Java I/O 之 简介](JavaIO简介.md) - 关键词：BIO、NIO、AIO
+- [Java I/O 之 BIO](JavaIO之BIO.md) - 关键词：BIO、InputStream、OutputStream、Reader、Writer、File、Socket、ServerSocket
+- [Java I/O 之 NIO](JavaIO之NIO.md) - 关键词：NIO、Channel、Buffer、Selector、多路复用
+- [Java I/O 之序列化](JavaIO之序列化.md) - 关键词：Serializable、serialVersionUID、transient、Externalizable
 
 ## 📚 资料
 
 - [《Java 编程思想（Thinking in java）》](https://book.douban.com/subject/2130190/)
 - [《Java 核心技术 卷 I 基础知识》](https://book.douban.com/subject/26880667/)
+- [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/100006701)
 
 ## 🚪 传送
 
-◾ 🏠 [JAVACORE 首页](https://github.com/dunwu/javacore) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/waterdrop/) ◾
+◾ 🏠 [JAVACORE 首页](https://github.com/dunwu/javacore/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/waterdrop/) ◾

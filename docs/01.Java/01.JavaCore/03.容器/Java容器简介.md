@@ -10,12 +10,17 @@ tags:
   - Java
   - JavaCore
   - 容器
+  - 泛型
+  - Iterable
+  - Iterator
+  - Comparable
+  - Comparator
+  - Cloneable
+  - fail-fast
 permalink: /pages/1bacccd8/
 ---
 
 # Java 容器简介
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175550.png)
 
 ## 容器简介
 
@@ -30,7 +35,7 @@ Java 中常用的存储容器就是数组和容器，二者有以下区别：
   - **数组可以存储基本数据类型，也可以存储引用数据类型**；
   - **容器只能存储引用数据类型**，基本数据类型的变量要转换成对应的包装类才能放入容器类中。
 
-> :bulb: 不了解什么是基本数据类型、引用数据类型、包装类这些概念，可以参考：[Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/e1e559ed/)
+> :bulb: 不了解什么是基本数据类型、引用数据类型、包装类这些概念，可以参考：[Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/3f3649ee/)
 
 ### 容器框架
 
@@ -39,10 +44,25 @@ Java 中常用的存储容器就是数组和容器，二者有以下区别：
 Java 容器框架主要分为 `Collection` 和 `Map` 两种。其中，`Collection` 又分为 `List`、`Set` 以及 `Queue`。
 
 - `Collection` - 一个独立元素的序列，这些元素都服从一条或者多条规则。
-  - `List` - 必须按照插入的顺序保存元素。
-  - `Set` - 不能有重复的元素。
-  - `Queue` - 按照排队规则来确定对象产生的顺序（通常与它们被插入的顺序相同）。
-- `Map` - 一组成对的“键值对”对象，允许你使用键来查找值。
+  - `List` - 必须按照插入的顺序保存元素。常见 `List` 容器有：
+    - `ArrayList` - `Object[]` 数组。
+    - `LinkedList` - 双链表 (JDK1.6 之前为循环链表，JDK1.7 取消了循环）。
+    - `Vector` - 通过 `synchronized` 修饰读写方法来保证并发安全。
+    - `Vector` - `Object[]` 数组，通过 `synchronized` 修饰读写方法来保证并发安全。
+  - `Set` - 不能有重复的元素。常见 `Set` 容器有：
+    - `HashSet` - 无序，内部基于 `HashMap` 来实现的。
+    - `LinkedHashSet` - 保证插入顺序，内部基于 `LinkedHashMap` 来实现的。
+    - `TreeSet` - 保证自然序或用户指定的比较器顺序，内部基于红黑树实现。
+  - `Queue` - 按照排队规则来确定对象产生的顺序。
+    - `PriorityQueue` - 基于 `Object[]` 数组来实现小顶堆
+    - `DelayQueue` - 延迟队列。
+    - `ArrayQueue` - `ArrayDeque` 是 `Deque` 的顺序表实现。基于动态数组实现了栈和队列所需的所有操作。
+    - `LinkedList` - `LinkedList` 是 `Deque` 的链表实现。
+- `Map` - 一组成对的“键值对”对象，允许你使用键来查找值。常见的 Map 容器有：
+  - `HashMap`：JDK1.8 之前 `HashMap` 由数组+链表组成的，数组是 `HashMap` 的主体，链表则是主要为了解决哈希冲突而存在的（“拉链法”解决冲突）。JDK1.8 以后在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树）时，将链表转化为红黑树，以减少搜索时间。
+  - `LinkedHashMap`：`LinkedHashMap` 继承自 `HashMap`，所以它的底层仍然是基于拉链式散列结构即由数组和链表或红黑树组成。另外，`LinkedHashMap` 在上面结构的基础上，增加了一条双向链表，使得上面的结构可以保持键值对的插入顺序。同时通过对链表进行相应的操作，实现了访问顺序相关逻辑。
+  - `Hashtable`：数组+链表组成的，数组是 `Hashtable` 的主体，链表则是主要为了解决哈希冲突而存在的。
+  - `TreeMap`：红黑树（自平衡的排序二叉树）。
 
 ## 容器的基本机制
 
@@ -64,13 +84,13 @@ list.add(123);
 
 如果没有泛型技术，如示例中的代码那样，容器中就可能存储任意数据类型，这是很危险的行为。
 
-```
+```java
 List<String> list = new ArrayList<String>();
 list.add("123");
 list.add(123);
 ```
 
-> :bulb: 想深入了解 Java 泛型技术的用法和原理可以参考：[深入理解 Java 泛型](https://dunwu.github.io/waterdrop/pages/ddc68bb5/)
+> :bulb: 想深入了解 Java 泛型技术的用法和原理可以参考：[深入理解 Java 泛型](https://dunwu.github.io/waterdrop/pages/4c266ac0/)
 
 ### Iterable 和 Iterator
 
@@ -158,7 +178,7 @@ public interface Comparable<T> {
 }
 ```
 
-`Comparator` 是比较接口，我们如果需要控制某个类的次序，而该类本身不支持排序(即没有实现 `Comparable` 接口)，那么我们就可以建立一个“该类的比较器”来进行排序，这个“比较器”只需要实现 `Comparator` 接口即可。也就是说，我们可以通过实现 `Comparator` 来新建一个比较器，然后通过这个比较器对类进行排序。
+`Comparator` 是比较接口，我们如果需要控制某个类的次序，而该类本身不支持排序（即没有实现 `Comparable` 接口），那么我们就可以建立一个“该类的比较器”来进行排序，这个“比较器”只需要实现 `Comparator` 接口即可。也就是说，我们可以通过实现 `Comparator` 来新建一个比较器，然后通过这个比较器对类进行排序。
 
 `Comparator` 接口定义：
 
@@ -240,7 +260,7 @@ public class FailFastDemo {
             Iterator<Integer> iterator = list.iterator();
             while (iterator.hasNext()) {
                 int i = iterator.next();
-                System.out.println("MyThreadA 访问元素:" + i);
+                System.out.println("MyThreadA 访问元素：" + i);
                 try {
                     TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
@@ -284,12 +304,12 @@ fail-fast 有两种解决方案：
 
 为了在并发环境下安全地使用容器，Java 提供了同步容器和并发容器。
 
-> 同步容器和并发容器详情请参考：[Java 并发容器](https://dunwu.github.io/waterdrop/pages/6fd8d836/)
+> 同步容器和并发容器详情请参考：[Java 并发之容器](https://dunwu.github.io/waterdrop/pages/6fd8d836/)
 
 ## 参考资料
 
 - [Java 编程思想（第 4 版）](https://item.jd.com/10058164.html)
-- [由浅入深理解 java 集合(一)——集合框架 Collection、Map](https://www.jianshu.com/p/589d58033841)
-- [由浅入深理解 java 集合(二)——集合 Set](https://www.jianshu.com/p/9081017a2d67)
+- [由浅入深理解 java 集合（一）——集合框架 Collection、Map](https://www.jianshu.com/p/589d58033841)
+- [由浅入深理解 java 集合（二）——集合 Set](https://www.jianshu.com/p/9081017a2d67)
 - [Java 提高篇（三十）-----Iterator](https://www.cnblogs.com/chenssy/p/3821328.html)
 - [Java 提高篇（三四）-----fail-fast 机制](https://blog.csdn.net/chenssy/article/details/38151189)

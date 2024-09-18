@@ -23,12 +23,12 @@ dir:
 
 ## 📖 内容
 
-- [Java 容器简介](01.Java容器简介.md) - 关键词：`Collection`、`泛型`、`Iterable`、`Iterator`、`Comparable`、`Comparator`、`Cloneable`、`fail-fast`
-- [Java 容器之 List](02.Java容器之List.md) - 关键词：`List`、`ArrayList`、`LinkedList`
-- [Java 容器之 Map](03.Java容器之Map.md) - 关键词：`Map`、`HashMap`、`TreeMap`、`LinkedHashMap`、`WeakHashMap`
-- [Java 容器之 Set](04.Java容器之Set.md) - 关键词：`Set`、`HashSet`、`TreeSet`、`LinkedHashSet`、`EmumSet`
-- [Java 容器之 Queue](05.Java容器之Queue.md) - 关键词：`Queue`、`Deque`、`ArrayDeque`、`LinkedList`、`PriorityQueue`
-- [Java 容器之 Stream](06.Java容器之Stream.md)
+- [Java 容器简介](Java容器简介.md) - 关键词：`泛型`、`Iterable`、`Iterator`、`Comparable`、`Comparator`、`Cloneable`、`fail-fast`
+- [Java 容器之 List](Java容器之List.md) - 关键词：`List`、`ArrayList`、`LinkedList`
+- [Java 容器之 Map](Java容器之Map.md) - 关键词：`Map`、`HashMap`、`TreeMap`、`LinkedHashMap`、`WeakHashMap`
+- [Java 容器之 Set](Java容器之Set.md) - 关键词：`Set`、`HashSet`、`TreeSet`、`LinkedHashSet`、`EmumSet`
+- [Java 容器之 Queue](Java容器之Queue.md) - 关键词：`Queue`、`Deque`、`ArrayDeque`、`LinkedList`、`PriorityQueue`
+- [Java 容器之 Stream](Java容器之Stream.md)
 
 ## 📚 资料
 
@@ -58,4 +58,4 @@ dir:
 
 ## 🚪 传送
 
-◾ 🏠 [JAVACORE 首页](https://github.com/dunwu/javacore) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/waterdrop/) ◾
+◾ 🏠 [JAVACORE 首页](https://github.com/dunwu/javacore/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/waterdrop/) ◾
