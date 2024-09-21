@@ -166,11 +166,47 @@ public class IteratorDemo {
 }
 ```
 
+《阿里巴巴 Java 开发手册》的描述如下：
+
+> **不要在 foreach 循环里进行元素的 `remove/add` 操作。remove 元素请使用 `Iterator` 方式，如果并发操作，需要对 `Iterator` 对象加锁。**
+
+通过反编译你会发现 foreach 语法底层其实还是依赖 `Iterator` 。不过， `remove/add` 操作直接调用的是集合自己的方法，而不是 `Iterator` 的 `remove/add`方法
+
+这就导致 `Iterator` 莫名其妙地发现自己有元素被 `remove/add` ，然后，它就会抛出一个 `ConcurrentModificationException` 来提示用户发生了并发修改异常。这就是单线程状态下产生的 **fail-fast 机制**。
+
+> **fail-fast 机制**：多个线程对 fail-fast 集合进行修改的时候，可能会抛出`ConcurrentModificationException`。 即使是单线程下也有可能会出现这种情况，上面已经提到过。
+>
+> 相关阅读：[什么是 fail-fastopen in new window](https://www.cnblogs.com/54chensongxia/p/12470446.html) 。
+
+Java8 开始，可以使用 `Collection#removeIf()`方法删除满足特定条件的元素，如：
+
+```java
+List<Integer> list = new ArrayList<>();
+for (int i = 1; i <= 10; ++i) {
+    list.add(i);
+}
+list.removeIf(filter -> filter % 2 == 0); /* 删除list中的所有偶数 */
+System.out.println(list); /* [1, 3, 5, 7, 9] */
+```
+
+除了上面介绍的直接使用 `Iterator` 进行遍历操作之外，你还可以：
+
+- 使用普通的 for 循环
+- 使用 fail-safe 的集合类。`java.util`包下面的所有的集合类都是 fail-fast 的，而`java.util.concurrent`包下面的所有的类都是 fail-safe 的。
+- ... ...
+
 ### Comparable 和 Comparator
 
-`Comparable` 是排序接口。若一个类实现了 `Comparable` 接口，表示该类的实例可以比较，也就意味着支持排序。实现了 `Comparable` 接口的类的对象的列表或数组可以通过 `Collections.sort` 或 `Arrays.sort` 进行自动排序。
+`Comparable` 接口和 `Comparator` 接口一般用于实现容器中元素的比较及排序：
 
-`Comparable` 接口定义：
+- `Comparable` 接口实际上是出自 `java.lang` 包 它有一个 `compareTo(Object obj) `方法用来排序
+- `Comparator  ` 接口实际上是出自 `java.util` 包它有一个 `compare(Object obj1, Object obj2)` 方法用来排序
+
+::: tabs#Comparable和Comparator接口定义
+
+@tab `Comparable` 接口定义
+
+`Comparable` 接口定义
 
 ```java
 public interface Comparable<T> {
@@ -178,9 +214,9 @@ public interface Comparable<T> {
 }
 ```
 
-`Comparator` 是比较接口，我们如果需要控制某个类的次序，而该类本身不支持排序（即没有实现 `Comparable` 接口），那么我们就可以建立一个“该类的比较器”来进行排序，这个“比较器”只需要实现 `Comparator` 接口即可。也就是说，我们可以通过实现 `Comparator` 来新建一个比较器，然后通过这个比较器对类进行排序。
+@tab `Comparator` 接口定义
 
-`Comparator` 接口定义：
+`Comparator` 接口定义
 
 ```java
 @FunctionalInterface
@@ -209,7 +245,126 @@ public interface Comparator<T> {
 }
 ```
 
-在 Java 容器中，一些可以排序的容器，如 `TreeMap`、`TreeSet`，都可以通过传入 `Comparator`，来定义内部元素的排序规则。
+:::
+
+假设，有一个 `List` 容器，存储的是 `User` 类型对象。现在要根据 `User` 中的 `age` 属性进行排序。
+
+User 定义如下：
+
+```java
+public class User {
+
+    private String name;
+    private int age;
+
+    public User(String name, int age) {
+        this.age = age;
+        this.name = name;
+    }
+    // getter、setter 略
+}
+```
+
+我们分别通过 `Comparable` 和 `Comparator` 来实现比较、排序，体会一下有何差异。
+
+::: tabs#Comparable和Comparator使用示例
+
+@tab `Comparable` 接口使用示例
+
+`Comparable` 接口使用示例
+
+```java
+public class ComparableDemo {
+
+    public static void main(String[] args) {
+        User a = new User("A", 18);
+        User b = new User("B", 17);
+        User c = new User("C", 20);
+        List<User> list = new ArrayList<>(Arrays.asList(a, b, c));
+        Collections.sort(list);
+        list.forEach(System.out::println);
+    }
+    // 输出：
+    // User{age=17, name='B'}
+    // User{age=18, name='A'}
+    // User{age=20, name='C'}
+
+    // 需要对被比较、排序的类进行改造，实现 Comparable 接口
+    static class User implements Comparable<User> {
+
+        private String name;
+        private int age;
+
+        public User(String name, int age) {
+            this.age = age;
+            this.name = name;
+        }
+        
+        // getter、setter 略
+
+        @Override
+        public int compareTo(User o) {
+            return this.age - o.age;
+        }
+
+        @Override
+        public String toString() {
+            return "User{" + "age=" + age + ", name='" + name + '\'' + '}';
+        }
+    }
+}
+```
+
+从上例可以看出，使用 `Comparable` 接口，被排序对象类必须实现 `Comparable` 接口；并在类中定义 `compareTo` 方法的实现，即排序逻辑必须置于被排序对象类中。
+
+@tab `Comparator` 接口使用示例
+
+`Comparator` 接口使用示例
+
+```java
+public class ComparatorDemo {
+
+    public static void main(String[] args) {
+        User a = new User("A", 18);
+        User b = new User("B", 17);
+        User c = new User("C", 20);
+        List<User> list = new ArrayList<>(Arrays.asList(a, b, c));
+        Collections.sort(list, new Comparator<User>() {
+            @Override
+            public int compare(User o1, User o2) {
+                return o1.age - o2.age;
+            }
+        });
+        list.forEach(System.out::println);
+    }
+    // 输出：
+    // User{age=17, name='B'}
+    // User{age=18, name='A'}
+    // User{age=20, name='C'}
+
+    static class User {
+
+        private String name;
+        private int age;
+
+        public User(String name, int age) {
+            this.age = age;
+            this.name = name;
+        }
+
+        // getter、setter 略
+
+        @Override
+        public String toString() {
+            return "User{" + "age=" + age + ", name='" + name + '\'' + '}';
+        }
+    }
+}
+```
+
+从上例可以看出，使用 `Comparator` 接口和  `Comparable` 接口的不同点在于：被排序的对象类无需实现 `Comparator` 接口，排序逻辑置于被排序对象类的外部。
+
+:::
 
 ### Cloneable
 

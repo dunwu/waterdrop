@@ -7,6 +7,7 @@ categories:
 tags:
   - Java
   - 并发
+permalink: /pages/37ccdcd1/
 ---
 
 # 《极客时间教程 - Java 并发编程实战》笔记四

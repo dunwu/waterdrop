@@ -52,33 +52,31 @@ index: false
 
 ### JavaCore
 
-#### [Java 基础特性](01.JavaCore/01.基础特性/)
+#### [Java 基础特性](01.JavaCore/01.基础特性)
 
-- [Java 开发环境](01.JavaCore/01.基础特性/00.Java开发环境.md)
-- [Java 基础语法特性](01.JavaCore/01.基础特性/01.Java基础语法.md)
-- [Java 基本数据类型](01.JavaCore/01.基础特性/02.Java基本数据类型.md)
-- [Java 面向对象](01.JavaCore/01.基础特性/03.Java面向对象.md)
-- [Java 方法](01.JavaCore/01.基础特性/04.Java方法.md)
-- [Java 数组](01.JavaCore/01.基础特性/05.Java数组.md)
-- [Java 枚举](01.JavaCore/01.基础特性/06.Java枚举.md)
-- [Java 控制语句](01.JavaCore/01.基础特性/07.Java控制语句.md)
-- [Java 异常](01.JavaCore/01.基础特性/08.Java异常.md)
-- [Java 泛型](01.JavaCore/01.基础特性/09.Java泛型.md)
-- [Java 反射](01.JavaCore/01.基础特性/10.Java反射.md)
-- [Java 注解](01.JavaCore/01.基础特性/11.Java注解.md)
-- [Java String 类型](01.JavaCore/01.基础特性/42.JavaString类型.md)
+- [Java 基础语法特性](01.JavaCore/01.基础特性/Java基础语法.md)
+- [Java 基本数据类型](01.JavaCore/01.基础特性/Java基本数据类型.md)
+- [Java 面向对象](01.JavaCore/01.基础特性/Java面向对象.md)
+- [Java 方法](01.JavaCore/01.基础特性/Java方法.md)
+- [Java 数组](01.JavaCore/01.基础特性/Java数组.md)
+- [Java 枚举](01.JavaCore/01.基础特性/Java枚举.md)
+- [Java 控制语句](01.JavaCore/01.基础特性/Java控制语句.md)
+- [Java 异常](01.JavaCore/01.基础特性/Java异常.md)
+- [Java 泛型](01.JavaCore/01.基础特性/Java泛型.md)
+- [Java 反射](01.JavaCore/01.基础特性/Java反射.md)
+- [Java 注解](01.JavaCore/01.基础特性/Java注解.md)
+- [Java String 类型](01.JavaCore/01.基础特性/JavaString类型.md)
 
-#### [Java 高级特性](01.JavaCore/02.高级特性/)
+#### [Java 高级特性](01.JavaCore/02.高级特性)
 
-- [Java 正则从入门到精通](01.JavaCore/02.高级特性/01.Java正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`反向引用`、`零宽断言`、`贪婪与懒惰`、`元字符`、`DFA`、`NFA`
-- [Java 编码和加密](01.JavaCore/02.高级特性/02.Java编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`、`MD5`、`SHA`、`HMAC`、`AES`、`DES`、`DESede`、`RSA`
-- [Java 国际化](01.JavaCore/02.高级特性/03.Java国际化.md) - 关键词：`Locale`、`ResourceBundle`、`NumberFormat`、`DateFormat`、`MessageFormat`
-- [Java JDK8](01.JavaCore/02.高级特性/04.JDK8.md) - 关键词：`Stream`、`lambda`、`Optional`、`@FunctionalInterface`
-- [Java SPI](01.JavaCore/02.高级特性/05.JavaSPI.md) - 关键词：`SPI`、`ClassLoader`
+- [Java 正则](01.JavaCore/02.高级特性/Java正则.md) - 关键词：Pattern、Matcher、捕获与非捕获、反向引用、零宽断言、贪婪与懒惰、元字符、DFA、NFA
+- [Java 编码和加密](01.JavaCore/02.高级特性/Java编码和加密.md) - 关键词：Base64、消息摘要、数字签名、对称加密、非对称加密、MD5、SHA、HMAC、AES、DES、DESede、RSA
+- [Java 国际化](01.JavaCore/02.高级特性/Java国际化.md) - 关键词：Locale、ResourceBundle、NumberFormat、DateFormat、MessageFormat
+- [Java JDK8](01.JavaCore/02.高级特性/JDK8特性.md) - 关键词：Stream、lambda、Optional、@FunctionalInterface
+- [Java SPI](01.JavaCore/02.高级特性/JavaSPI.md) - 关键词：SPI、ClassLoader
+- [JavaAgent](01.JavaCore/02.高级特性/JavaAgent.md)
 
-### [Java 容器](01.JavaCore/03.容器/)
-
-![img](01.JavaCore/https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175550.png)
+#### [Java 容器](01.JavaCore/03.容器)
 
 - [Java 容器简介](01.JavaCore/03.容器/Java容器简介.md) - 关键词：泛型、Iterable、Iterator、Comparable、Comparator、Cloneable、fail-fast
 - [Java 容器之 List](01.JavaCore/03.容器/Java容器之List.md) - 关键词：List、ArrayList、LinkedList
@@ -87,18 +85,14 @@ index: false
 - [Java 容器之 Queue](01.JavaCore/03.容器/Java容器之Queue.md) - 关键词：Queue、Deque、ArrayDeque、LinkedList、PriorityQueue
 - [Java 容器之 Stream](01.JavaCore/03.容器/Java容器之Stream.md)
 
-### [Java IO](01.JavaCore/04.IO/)
-
-![img](01.JavaCore/https://raw.githubusercontent.com/dunwu/images/master/snap/20200630205329.png)
+#### [Java IO](01.JavaCore/04.IO)
 
 - [Java I/O 之 简介](01.JavaCore/04.IO/JavaIO简介.md) - 关键词：BIO、NIO、AIO
 - [Java I/O 之 BIO](01.JavaCore/04.IO/JavaIO之BIO.md) - 关键词：BIO、InputStream、OutputStream、Reader、Writer、File、Socket、ServerSocket
 - [Java I/O 之 NIO](01.JavaCore/04.IO/JavaIO之NIO.md) - 关键词：NIO、Channel、Buffer、Selector、多路复用
 - [Java I/O 之序列化](01.JavaCore/04.IO/JavaIO之序列化.md) - 关键词：Serializable、serialVersionUID、transient、Externalizable
 
-#### [Java 并发](01.JavaCore/05.并发/)
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221175827.png)
+#### [Java 并发](01.JavaCore/05.并发)
 
 - [Java 并发简介](01.JavaCore/05.并发/Java并发简介.md) - 关键词：并发、线程、安全性、活跃性、性能、死锁、活锁
 - [Java 并发之内存模型](01.JavaCore/05.并发/Java并发之内存模型.md) - 关键词：JMM、Happens-Before、内存屏障、volatile、synchronized、final、指令重排序
@@ -111,9 +105,7 @@ index: false
 - [Java 并发之同步工具](01.JavaCore/05.并发/Java并发之同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
 - [Java 并发之分工工具](01.JavaCore/05.并发/Java并发之分工工具.md) - 关键词：CompletableFuture、CompletionStage、ForkJoinPool
 
-#### [Java 虚拟机](01.JavaCore/06.JVM/)
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200628154803.png)
+#### [Java 虚拟机](01.JavaCore/06.JVM)
 
 - [Java 虚拟机之基本知识](01.JavaCore/06.JVM/Java虚拟机之基本知识.md)
 - [Java 虚拟机之内存区域](01.JavaCore/06.JVM/Java虚拟机之内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`

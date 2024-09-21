@@ -129,34 +129,36 @@ public abstract class Dictionary<K,V> {}
 
 ## HashMap 类
 
-`HashMap` 类是最常用的 `Map`。
+从 `HashMap` 的命名，也可以看出：**`HashMap` 以散列方式存储键值对**。`HashMap` 是非线程安全的。
 
-### HashMap 要点
+**`HashMap` 允许使用空值和空键**，但 null 作为键只能有一个，null 作为值可以有多个。
 
-从 `HashMap` 的命名，也可以看出：**`HashMap` 以散列方式存储键值对**。
+（`HashMap` 类大致等同于 `Hashtable`，除了它是不同步的并且允许为空值。）这个类不保序；特别是，它的元素顺序可能会随着时间的推移变化。
 
-**`HashMap` 允许使用空值和空键**。（`HashMap` 类大致等同于 `Hashtable`，除了它是不同步的并且允许为空值。）这个类不保序；特别是，它的元素顺序可能会随着时间的推移变化。
+JDK1.8 之前 HashMap 由 数组+链表 组成的，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的（“拉链法”解决冲突）。 JDK1.8 以后的 `HashMap` 在解决哈希冲突时有了较大的变化，当链表长度大于等于阈值（默认为 8）（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树）时，将链表转化为红黑树，以减少搜索时间。
 
-**`HashMap` 有两个影响其性能的参数：初始容量和负载因子**。
+`HashMap` 默认的初始化大小为 16。之后每次扩充，容量变为原来的 2 倍。并且， `HashMap` 总是使用 2 的幂作为哈希表的大小。
 
-- 容量是哈希表中桶的数量，初始容量就是哈希表创建时的容量。
-- 加载因子是散列表在其容量自动扩容之前被允许的最大饱和量。当哈希表中的 entry 数量超过负载因子和当前容量的乘积时，散列表就会被重新映射（即重建内部数据结构），一般散列表大约是存储桶数量的两倍。
+### JDK8 之前 HashMap 数据结构
 
-通常，默认加载因子（0.75）在时间和空间成本之间提供了良好的平衡。较高的值会减少空间开销，但会增加查找成本（反映在大部分 `HashMap` 类的操作中，包括 `get` 和 `put`）。在设置初始容量时，应考虑映射中的条目数量及其负载因子，以尽量减少重新运行操作的次数。如果初始容量大于最大入口数除以负载因子，则不会发生重新刷新操作。
+之前 HashMap 底层是 **数组和链表** 结合在一起使用也就是 **链表散列**。
 
-如果许多映射要存储在 `HashMap` 实例中，使用足够大的容量创建映射将允许映射存储的效率高于根据需要执行自动重新散列以增长表。请注意，使用多个具有相同 `hashCode()` 的密钥是降低任何散列表性能的一个可靠方法。为了改善影响，当键是 `Comparable` 时，该类可以使用键之间的比较顺序来帮助断开关系。
+HashMap 通过 key 的 hashCode 经过扰动函数处理过后得到 hash 值，然后通过 `(n - 1) & hash` 判断当前元素存放的位置（这里的 n 指的是数组的长度），如果当前位置存在元素的话，就判断该元素与要存入的元素的 hash 值以及 key 是否相同，如果相同的话，直接覆盖，不相同就通过拉链法解决冲突。
 
-`HashMap` 不是线程安全的。
+所谓扰动函数指的就是 HashMap 的 hash 方法。使用 hash 方法也就是扰动函数是为了防止一些实现比较差的 hashCode() 方法 换句话说使用扰动函数之后可以减少碰撞。
 
-### HashMap 原理
+JDK7 的 HashMap 的 hash 方法：
 
-#### HashMap 数据结构
+```java
+static int hash(int h) {
+    h ^= (h >>> 20) ^ (h >>> 12);
+    return h ^ (h >>> 7) ^ (h >>> 4);
+}
+```
 
-`HashMap` 的核心字段：
+### JDK8 之后 HashMap 数据结构
 
-- `table` - `HashMap` 使用一个 `Node<K,V>[]` 类型的数组 `table` 来储存元素。
-- `size` - 初始容量。 初始为 16，每次容量不够自动扩容
-- `loadFactor` - 负载因子。自动扩容之前被允许的最大饱和量，默认 0.75。
+`HashMap` 的主要字段定义如下：
 
 ```java
 public class HashMap<K,V> extends AbstractMap<K,V>
@@ -170,23 +172,85 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     transient int size;
     // 这个HashMap被结构修改的次数结构修改是那些改变HashMap中的映射数量或者修改其内部结构（例如，重新散列）的修改。
     transient int modCount;
-    // 下一个调整大小的值（容量*加载因子）。
+    // 下一个调整大小的值（容量*负载因子）。
     int threshold;
-    // 散列表的加载因子
+    // 散列表的负载因子
     final float loadFactor;
 }
 ```
 
-#### HashMap 构造方法
+**`HashMap` 有两个影响其性能的参数：初始容量和负载因子**。
+
+- `size` - 初始容量。默认为 16，每次容量不够自动扩容。容量是哈希表中桶的数量，初始容量就是哈希表创建时的容量。
+- `loadFactor` - 负载因子。自动扩容之前被允许的最大饱和量，默认 0.75。负载因子是散列表在其容量自动扩容之前被允许的最大饱和量。当哈希表中的 entry 数量超过负载因子和当前容量的乘积时，散列表就会被重新映射（即重建内部数据结构），一般散列表大约是存储桶数量的两倍。
+
+通常，默认负载因子（0.75）在时间和空间成本之间提供了良好的平衡。较高的值会减少空间开销，但会增加查找成本（反映在大部分 `HashMap` 类的操作中，包括 `get` 和 `put`）。在设置初始容量时，应考虑映射中的条目数量及其负载因子，以尽量减少重新运行操作的次数。如果初始容量大于最大入口数除以负载因子，则不会发生重新刷新操作。
+
+如果许多映射要存储在 `HashMap` 实例中，使用足够大的容量创建映射将允许映射存储的效率高于根据需要执行自动重新散列以增长表。请注意，使用多个具有相同 `hashCode()` 的密钥是降低任何散列表性能的一个可靠方法。为了改善影响，当键是 `Comparable` 时，该类可以使用键之间的比较顺序来帮助断开关系。
+
+JDK8 的 HashMap 的 hash 方法：
 
 ```java
-public HashMap(); // 默认加载因子0.75
-public HashMap(int initialCapacity); // 默认加载因子0.75；以 initialCapacity 初始化容量
-public HashMap(int initialCapacity, float loadFactor); // 以 initialCapacity 初始化容量；以 loadFactor 初始化加载因子
-public HashMap(Map<? extends K, ? extends V> m) // 默认加载因子0.75
+static final int hash(Object key) {
+      int h;
+      // key.hashCode()：返回散列值也就是hashcode
+      // ^：按位异或
+      // >>>:无符号右移，忽略符号位，空位都以0补齐
+      return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+  }
 ```
 
-#### put 方法的实现
+在 `get` 和 `put` 的过程中，计算下标时，先对 `hashCode` 进行 `hash` 操作，然后再通过 `hash` 值进一步计算下标，如下图所示：
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/HashMap-hash.png" />
+</div>
+
+在对 `hashCode()` 计算 hash 时具体实现是这样的：
+
+```java
+static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+}
+```
+
+可以看到这个方法大概的作用就是：高 16bit 不变，低 16bit 和高 16bit 做了一个异或。
+
+在设计 hash 方法时，因为目前的 table 长度 n 为 2 的幂，而计算下标的时候，是这样实现的(使用 `&` 位操作，而非 `%` 求余)：
+
+```java
+(n - 1) & hash
+```
+
+设计者认为这方法很容易发生碰撞。为什么这么说呢？不妨思考一下，在 n - 1 为 15(0x1111) 时，其实散列真正生效的只是低 4bit 的有效位，当然容易碰撞了。
+
+因此，设计者想了一个顾全大局的方法(综合考虑了速度、作用、质量)，就是把高 16bit 和低 16bit 异或了一下。设计者还解释到因为现在大多数的 hashCode 的分布已经很不错了，就算是发生了碰撞也用 O(logn)的 tree 去做了。仅仅异或一下，既减少了系统的开销，也不会造成的因为高位没有参与下标的计算(table 长度比较小时)，从而引起的碰撞。
+
+如果还是产生了频繁的碰撞，会发生什么问题呢？作者注释说，他们使用树来处理频繁的碰撞(we use trees to handle large sets of collisions in bins)，在 [JEP-180](http://openjdk.java.net/jeps/180) 中，描述了这个问题：
+
+> Improve the performance of java.util.HashMap under high hash-collision conditions by using balanced trees rather than linked lists to store map entries. Implement the same improvement in the LinkedHashMap class.
+
+之前已经提过，在获取 HashMap 的元素时，基本分两步：
+
+1.  首先根据 hashCode() 做 hash，然后确定 bucket 的 index；
+
+2.  如果 bucket 的节点的 key 不是我们需要的，则通过 keys.equals()在链中找。
+
+在 JDK8 之前的实现中是用链表解决冲突的，在产生碰撞的情况下，进行 get 时，两步的时间复杂度是 O(1)+O(n)。因此，当碰撞很厉害的时候 n 很大，O(n)的速度显然是影响速度的。
+
+因此在 JDK8 中，利用红黑树替换链表，这样复杂度就变成了 O(1)+O(logn)了，这样在 n 很大的时候，能够比较理想的解决这个问题，在 JDK8：HashMap 的性能提升一文中有性能测试的结果。
+
+### HashMap 构造方法
+
+```java
+public HashMap(); // 默认负载因子0.75
+public HashMap(int initialCapacity); // 默认负载因子0.75；以 initialCapacity 初始化容量
+public HashMap(int initialCapacity, float loadFactor); // 以 initialCapacity 初始化容量；以 loadFactor 初始化负载因子
+public HashMap(Map<? extends K, ? extends V> m) // 默认负载因子0.75
+```
+
+### put 方法的实现
 
 put 方法大致的思路为：
 
@@ -265,7 +329,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 但如果我们将 hashCode 值右移 16 位（h >>> 16 代表无符号右移 16 位），也就是取 int 类型的一半，刚好可以将该二进制数对半切开，并且使用位异或运算（如果两个数对应的位置相反，则结果为 1，反之为 0），这样的话，就能避免上面的情况发生。这就是 hash() 方法的具体实现方式。**简而言之，就是尽量打乱 hashCode 真正参与运算的低 16 位。**
 
-#### get 方法的实现
+### get 方法的实现
 
 在理解了 put 之后，get 就很简单了。大致思路如下：
 
@@ -310,54 +374,7 @@ final Node<K,V> getNode(int hash, Object key) {
 }
 ```
 
-#### hash 方法的实现
-
-HashMap **计算桶下标（index）公式：`key.hashCode() ^ (h >>> 16)`**。
-
-下面针对这个公式来详细讲解。
-
-在 `get` 和 `put` 的过程中，计算下标时，先对 `hashCode` 进行 `hash` 操作，然后再通过 `hash` 值进一步计算下标，如下图所示：
-
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/HashMap-hash.png" />
-</div>
-
-在对 `hashCode()` 计算 hash 时具体实现是这样的：
-
-```java
-static final int hash(Object key) {
-    int h;
-    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-}
-```
-
-可以看到这个方法大概的作用就是：高 16bit 不变，低 16bit 和高 16bit 做了一个异或。
-
-在设计 hash 方法时，因为目前的 table 长度 n 为 2 的幂，而计算下标的时候，是这样实现的(使用 `&` 位操作，而非 `%` 求余)：
-
-```java
-(n - 1) & hash
-```
-
-设计者认为这方法很容易发生碰撞。为什么这么说呢？不妨思考一下，在 n - 1 为 15(0x1111) 时，其实散列真正生效的只是低 4bit 的有效位，当然容易碰撞了。
-
-因此，设计者想了一个顾全大局的方法(综合考虑了速度、作用、质量)，就是把高 16bit 和低 16bit 异或了一下。设计者还解释到因为现在大多数的 hashCode 的分布已经很不错了，就算是发生了碰撞也用 O(logn)的 tree 去做了。仅仅异或一下，既减少了系统的开销，也不会造成的因为高位没有参与下标的计算(table 长度比较小时)，从而引起的碰撞。
-
-如果还是产生了频繁的碰撞，会发生什么问题呢？作者注释说，他们使用树来处理频繁的碰撞(we use trees to handle large sets of collisions in bins)，在 [JEP-180](http://openjdk.java.net/jeps/180) 中，描述了这个问题：
-
-> Improve the performance of java.util.HashMap under high hash-collision conditions by using balanced trees rather than linked lists to store map entries. Implement the same improvement in the LinkedHashMap class.
-
-之前已经提过，在获取 HashMap 的元素时，基本分两步：
-
-1.  首先根据 hashCode()做 hash，然后确定 bucket 的 index；
-
-2.  如果 bucket 的节点的 key 不是我们需要的，则通过 keys.equals()在链中找。
-
-在 JDK8 之前的实现中是用链表解决冲突的，在产生碰撞的情况下，进行 get 时，两步的时间复杂度是 O(1)+O(n)。因此，当碰撞很厉害的时候 n 很大，O(n)的速度显然是影响速度的。
-
-因此在 JDK8 中，利用红黑树替换链表，这样复杂度就变成了 O(1)+O(logn)了，这样在 n 很大的时候，能够比较理想的解决这个问题，在 JDK8：HashMap 的性能提升一文中有性能测试的结果。
-
-#### resize 的实现
+### resize 的实现
 
 当 `put` 时，如果发现目前的 bucket 占用程度已经超过了 Load Factor 所希望的比例，那么就会发生 resize。在 resize 的过程，简单的说就是把 bucket 扩充为 2 倍，之后重新计算 index，把节点再放到新的 bucket 中。
 
@@ -481,9 +498,7 @@ final Node<K,V>[] resize() {
 | 是否有序              | 按照元素插入顺序存储           |
 | 是否线程安全          | 非线程安全                     |
 
-### LinkedHashMap 要点
-
-#### LinkedHashMap 数据结构
+### LinkedHashMap 数据结构
 
 **`LinkedHashMap` 通过维护一对 `LinkedHashMap.Entry<K,V>` 类型的头尾指针，以双链表形式，保存所有数据**。
 
@@ -647,7 +662,7 @@ private void deleteEntry(Entry<K,V> p) {
             root = replacement;
         else if (p == p.parent.left)
             p.parent.left  = replacement;
-        else 
+        else
             p.parent.right = replacement;
 
         // Null out links so they are OK to use by fixAfterDeletion.

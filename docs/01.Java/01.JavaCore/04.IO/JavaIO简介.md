@@ -105,6 +105,6 @@ AIO（Asynchronous IO） 即异步非阻塞 IO，指的是 JDK7 中，对 NIO �
 
 - [《Java 编程思想（Thinking in java）》](https://book.douban.com/subject/2130190/)
 - [《Java 核心技术 卷 I 基础知识》](https://book.douban.com/subject/26880667/)
-- [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/100006701)
+- [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82)
 - [BIO,NIO,AIO 总结](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/BIO-NIO-AIO.md)
 - [深入拆解 Tomcat & Jetty](https://time.geekbang.org/column/intro/100027701)

@@ -10,6 +10,10 @@ tags:
   - Java
   - JavaCore
   - 容器
+  - Set
+  - HashSet
+  - TreeSet
+  - LinkedHashSet
 permalink: /pages/da7e5eeb/
 ---
 
@@ -17,9 +21,7 @@ permalink: /pages/da7e5eeb/
 
 ## Set 简介
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/Set-diagrams.png" width="400" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/Set-diagrams.png)
 
 Set 家族成员简介：
 
@@ -237,9 +239,13 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
 - `EnumSet` 是有序的。以枚举值在 `EnumSet` 类中的定义顺序来决定集合元素的顺序。
 - `EnumSet` 不是线程安全的。
 
-## 要点总结
+## HashSet vs. LinkedHashSet vs. TreeSet
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200221190717.png)
+`HashSet`、`LinkedHashSet` 和 `TreeSet` 都是 `Set` 接口的实现类，都能保证元素唯一，并且都不是线程安全的。
+
+`HashSet`、`LinkedHashSet` 和 `TreeSet` 的主要区别在于底层数据结构不同。`HashSet` 的底层数据结构是哈希表（基于 `HashMap` 实现）。`LinkedHashSet` 的底层数据结构是链表和哈希表，元素的插入和取出顺序满足 FIFO。`TreeSet` 底层数据结构是红黑树，元素是有序的，排序的方式有自然排序和定制排序。
+
+底层数据结构不同又导致这三者的应用场景不同。`HashSet` 用于不需要保证元素插入和取出顺序的场景，`LinkedHashSet` 用于保证元素的插入和取出顺序满足 FIFO 的场景，`TreeSet` 用于支持对元素自定义排序规则的场景。
 
 ## 参考资料
 

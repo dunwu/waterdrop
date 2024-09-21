@@ -5,11 +5,10 @@ order: 08
 categories:
   - Java
   - JavaCore
-  - JVM
+  - 高级特性
 tags:
   - Java
   - JavaCore
-  - JVM
   - JavaAgent
 permalink: /pages/9d88f435/
 ---

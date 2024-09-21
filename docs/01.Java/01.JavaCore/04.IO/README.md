@@ -30,7 +30,7 @@ dir:
 
 - [《Java 编程思想（Thinking in java）》](https://book.douban.com/subject/2130190/)
 - [《Java 核心技术 卷 I 基础知识》](https://book.douban.com/subject/26880667/)
-- [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/100006701)
+- [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82)
 
 ## 🚪 传送
 
