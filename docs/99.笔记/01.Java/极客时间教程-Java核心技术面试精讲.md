@@ -47,7 +47,7 @@ Exception 又分为**可检查**（checked）异常和**不检查**（unchecked�
 
 【考点分析】
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e6%a0%b8%e5%bf%83%e6%8a%80%e6%9c%af%e9%9d%a2%e8%af%95%e7%b2%be%e8%ae%b2/assets/accba531a365e6ae39614ebfa3273900-20221026231601-msc2mtc.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240656683.png)
 
 **理解 Throwable、Exception、Error 的设计和分类**。
 
@@ -248,7 +248,7 @@ ArrayList 是应用更加广泛的**动态数组**实现，它本身不是线程
 
 LinkedList 顾名思义是 Java 提供的**双向链表**，所以它不需要像上面两种那样调整容量，它也不是线程安全的。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e6%a0%b8%e5%bf%83%e6%8a%80%e6%9c%af%e9%9d%a2%e8%af%95%e7%b2%be%e8%ae%b2/assets/675536edf1563b11ab7ead0def1215c7-20221026235156-ruadx2l.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240657167.png)
 
 ## 对比 Hashtable、HashMap、TreeMap 有什么不同？
 
@@ -285,7 +285,7 @@ HashMap 源码实现：
 - 分离锁，也就是将内部进行分段（Segment），里面则是 HashEntry 的数组，和 HashMap 类似，哈希相同的条目也是以链表形式存放。
 - HashEntry 内部使用 volatile 的 value 字段来保证可见性，也利用了不可变对象的机制以改进利用 Unsafe 提供的底层能力，比如 volatile access，去直接完成部分操作，以最优化性能，毕竟 Unsafe 中的很多操作都是 JVM intrinsic 优化过的。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e6%a0%b8%e5%bf%83%e6%8a%80%e6%9c%af%e9%9d%a2%e8%af%95%e7%b2%be%e8%ae%b2/assets/d45bcf9a34da2ef1ef335532b0198bd9-20221030215622-v85c2m9.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240701236.png)
 
 ```java
 public V get(Object key) {
@@ -517,13 +517,13 @@ public static void copyFileByChannel(File source, File dest) throws
 
 当我们使用输入输出流进行读写时，实际上是进行了多次上下文切换，比如应用读取数据时，先在内核态将数据从磁盘读取到内核缓存，再切换到用户态将数据从内核缓存读取到用户缓存。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e6%a0%b8%e5%bf%83%e6%8a%80%e6%9c%af%e9%9d%a2%e8%af%95%e7%b2%be%e8%ae%b2/assets/6d2368424431f1b0d2b935386324b585-20221030220940-ad6vrbo.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240702998.png)
 
 基于 NIO transferTo 的实现方式，在 Linux 和 Unix 上，则会使用到零拷贝技术，数据传输并不需要用户态参与，省去了上下文切换的开销和不必要的内存拷贝，进而可能提高应用拷贝性能。注意，transferTo 不仅仅是可以用在文件拷贝中，与其类似的，例如读取磁盘文件，然后进行 Socket 发送，同样可以享受这种机制带来的性能和扩展性提高。
 
 transferTo 的传输过程是：
 
-![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e6%a0%b8%e5%bf%83%e6%8a%80%e6%9c%af%e9%9d%a2%e8%af%95%e7%b2%be%e8%ae%b2/assets/b0c8226992bb97adda5ad84fe25372ea-20221030220940-29fhrfv.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240702146.png)
 
 ## 谈谈接口和抽象类有什么区别？
 
@@ -686,7 +686,7 @@ ${JAVA_HOME}\bin\jstack your_pid
 
 然后，分析得到的输出，具体片段如下：
 
-![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e6%a0%b8%e5%bf%83%e6%8a%80%e6%9c%af%e9%9d%a2%e8%af%95%e7%b2%be%e8%ae%b2/assets/1fcc1a521b801a5f7428d5229525a38b-20221031210709-5y82n89.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240702087.png)
 
 最后，结合代码分析线程栈信息。上面这个输出非常明显，找到处于 BLOCKED 状态的线程，按照试图获取（waiting）的锁 ID（请看我标记为相同颜色的数字）查找，很快就定位问题。 jstack 本身也会把类似的简单死锁抽取出来，直接打印出来。
 
@@ -745,7 +745,7 @@ J.U.C 包提供的容器（Queue、List、Set）、Map，从命名上可以大�
 
 下面这张图是 Java 并发类库提供的各种各样的**线程安全**队列实现，注意，图中并未将非线程安全部分包含进来。
 
-![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e6%a0%b8%e5%bf%83%e6%8a%80%e6%9c%af%e9%9d%a2%e8%af%95%e7%b2%be%e8%ae%b2/assets/791750d6fe7ef88ecb3897e1d029f079-20221031211708-9oo5slt.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240702121.png)
 
 我们可以从不同的角度进行分类，从基本的数据结构的角度分析，有两个特别的 [Deque](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html) 实现，ConcurrentLinkedDeque 和 LinkedBlockingDeque。Deque 的侧重点是支持对队列头尾都进行插入和删除，所以提供了特定的方法，如：
 
@@ -781,7 +781,7 @@ Executors 目前提供了 5 种不同的线程池创建配置：
 
 Executor 框架的基本组成，请参考下面的类图。
 
-![img](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Java%20%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E9%9D%A2%E8%AF%95%E7%B2%BE%E8%AE%B2/assets/fc70c37867c7fbfb672fa3e37fe14b5b-20221031214414-sszxr4j.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240703740.png)
 
 - Executor 是一个基础的接口，其初衷是将任务提交和任务执行细节解耦，这一点可以体会其定义的唯一方法。
 
@@ -818,11 +818,7 @@ private final HashSet<Worker> workers = new HashSet<>();
 
 ## AtomicInteger 底层实现原理是什么？如何在自己的产品代码中应用 CAS 操作？
 
-【典型回答】
-
-【考点分析】
-
-【知识扩展】
+【典型回答】+【考点分析】+【知识扩展】
 
 原子类基于 CAS（[compare-and-swap](https://en.wikipedia.org/wiki/Compare-and-swap)）技术。从其代码来看，它依赖于 Unsafe 提供的一些底层能力。
 
@@ -946,155 +942,491 @@ final boolean acquireQueued(final Node node, int arg) {
 
 ## 请介绍类加载过程，什么是双亲委派模型？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+类加载过程：
 
-【知识扩展】
+- 加载 - 将字节码数据从不同的数据源读取到 JVM 中，并映射为 JVM 认可的数据结构（Class 对象）。
+- 链接
+  - 验证 - 核验字节信息是符合 Java 虚拟机规范。
+  - 准备 - 创建类或接口中的静态变量，并初始化静态变量的初始值。
+  - 解析 - 将常量池中的符号引用（symbolic reference）替换为直接引用。
+- 初始化 - 真正去执行类初始化的代码逻辑，包括静态字段赋值的动作，以及执行类定义中的静态初始化块内的逻辑，编译器在编译阶段就会把这部分逻辑整理好，父类型的初始化逻辑优先于当前类型的逻辑。
+
+双亲委派
+
+- Bootstrap ClassLoader - 负责加载 /jre/lib 路径下的 jar。可以通过 `java -Xbootclasspath` 参数修改扫描路径。
+- Ext ClassLoader - 负责加载 `/jre/lib/ext` 路径下的 jar。可以通过 `-Djava.ext.dirs` 参数修改扫描路径。
+- App ClassLoaer- 负责加载 classpath 路径下的内容。可以通过 -Djava.system.class.loader 参数修改扫描路径。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240704663.png)
+
+通常类加载机制有三个基本特征：
+
+- 双亲委派模型。但不是所有类加载都遵守这个模型，有的时候，启动类加载器所加载的类型，是可能要加载用户代码的，比如 JDK 内部的 ServiceProvider/[ServiceLoader](https://docs.oracle.com/javase/9/docs/api/java/util/ServiceLoader.html) 机制，用户可以在标准 API 框架上，提供自己的实现，JDK 也需要提供些默认的参考实现。 例如，Java 中 JNDI、JDBC、文件系统、Cipher 等很多方面，都是利用的这种机制，这种情况就不会用双亲委派模型去加载，而是利用所谓的上下文加载器。
+- 可见性，子类加载器可以访问父加载器加载的类型，但是反过来是不允许的，不然，因为缺少必要的隔离，我们就没有办法利用类加载器去实现容器的逻辑。
+- 单一性，由于父加载器的类型对于子加载器是可见的，所以父加载器中加载过的类型，就不会在子加载器中重复加载。但是注意，类加载器“邻居”间，同一类型仍然可以被加载多次，因为互相并不可见。
+
+在 JDK 9 中，由于 Jigsaw 项目引入了 Java 平台模块化系统（JPMS），Java SE 的源代码被划分为一系列模块。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240704856.png)
+
+类加载器，类文件容器等都发生了非常大的变化：
+
+- -Xbootclasspath 参数不可用了。API 已经被划分到具体的模块，所以上文中，利用“-Xbootclasspath/p”替换某个 Java 核心类型代码，实际上变成了对相应的模块进行的修补，可以采用下面的解决方案：
+
+首先，确认要修改的类文件已经编译好，并按照对应模块（假设是 java.base）结构存放， 然后，给模块打补丁：
+
+```bash
+java --patch-module java.base=your_patch yourApp
+```
+
+- 扩展类加载器被重命名为平台类加载器（Platform Class-Loader），而且 extension 机制则被移除。也就意味着，如果我们指定 java.ext.dirs 环境变量，或者 lib/ext 目录存在，JVM 将直接返回**错误**！建议解决办法就是将其放入 classpath 里。
+- 部分不需要 AllPermission 的 Java 基础模块，被降级到平台类加载器中，相应的权限也被更精细粒度地限制起来。
+- rt.jar 和 tools.jar 同样是被移除了！JDK 的核心类库以及相关资源，被存储在 jimage 文件中，并通过新的 JRT 文件系统访问，而不是原有的 JAR 文件系统。虽然看起来很惊人，但幸好对于大部分软件的兼容性影响，其实是有限的，更直接地影响是 IDE 等软件，通常只要升级到新版本就可以了。
+- 增加了 Layer 的抽象， JVM 启动默认创建 BootLayer，开发者也可以自己去定义和实例化 Layer，可以更加方便的实现类似容器一般的逻辑抽象。
+
+结合了 Layer，目前的 JVM 内部结构就变成了下面的层次，内建类加载器都在 BootLayer 中，其他 Layer 内部有自定义的类加载器，不同版本模块可以同时工作在不同的 Layer。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240704234.png)
 
 ## 有哪些方法可以在运行时动态生成一个 Java 类？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+可以利用 Java 字节码操纵工具和类库来实现，如：[ASM](https://asm.ow2.io/)、[Javassist](http://www.javassist.org/)、cglib 等
 
-【知识扩展】
+类从字节码到 Class 对象的转换，在类加载过程中，这一步是通过下面的方法提供的功能，或者 defineClass 的其他本地对等实现。
+
+```java
+protected final Class<?> defineClass(String name, byte[] b, int off, int len,
+                                   ProtectionDomain protectionDomain)
+protected final Class<?> defineClass(String name, java.nio.ByteBuffer b,
+                                   ProtectionDomain protectionDomain)
+```
+
+JDK 提供的 defineClass 方法，最终都是本地代码实现的。
+
+```java
+static native Class<?> defineClass1(ClassLoader loader, String name, byte[] b, int off, int len,
+                                  ProtectionDomain pd, String source);
+
+static native Class<?> defineClass2(ClassLoader loader, String name, java.nio.ByteBuffer b,
+                                  int off, int len, ProtectionDomain pd,
+                                  String source);
+```
 
 ## 谈谈 JVM 内存区域的划分，哪些区域可能发生 OutOfMemoryError
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+- 首先，**程序计数器**（PC，Program Counter Register）。在 JVM 规范中，每个线程都有它自己的程序计数器，并且任何时间一个线程都只有一个方法在执行，也就是所谓的当前方法。程序计数器会存储当前线程正在执行的 Java 方法的 JVM 指令地址；或者，如果是在执行本地方法，则是未指定值（undefined）。
+- 第二，**Java 虚拟机栈**（Java Virtual Machine Stack），早期也叫 Java 栈。每个线程在创建时都会创建一个虚拟机栈，其内部保存一个个的栈帧（Stack Frame），对应着一次次的 Java 方法调用。
+  - 前面谈程序计数器时，提到了当前方法；同理，在一个时间点，对应的只会有一个活动的栈帧，通常叫作当前帧，方法所在的类叫作当前类。如果在该方法中调用了其他方法，对应的新的栈帧会被创建出来，成为新的当前帧，一直到它返回结果或者执行结束。JVM 直接对 Java 栈的操作只有两个，就是对栈帧的压栈和出栈。
+  - 栈帧中存储着局部变量表、操作数（operand）栈、动态链接、方法正常退出或者异常退出的定义等。
+- 第三，**堆**（Heap），它是 Java 内存管理的核心区域，用来放置 Java 对象实例，几乎所有创建的 Java 对象实例都是被直接分配在堆上。堆被所有的线程共享，在虚拟机启动时，我们指定的“Xmx”之类参数就是用来指定最大堆空间等指标。
+  - 理所当然，堆也是垃圾收集器重点照顾的区域，所以堆内空间还会被不同的垃圾收集器进行进一步的细分，最有名的就是新生代、老年代的划分。
+- 第四，**方法区**（Method Area）。这也是所有线程共享的一块内存区域，用于存储所谓的元（Meta）数据，例如类结构信息，以及对应的运行时常量池、字段、方法代码等。
+  - 由于早期的 Hotspot JVM 实现，很多人习惯于将方法区称为永久代（Permanent Generation）。Oracle JDK 8 中将永久代移除，同时增加了元数据区（Metaspace）。
+- 第五，**运行时常量池**（Run-Time Constant Pool），这是方法区的一部分。如果仔细分析过反编译的类文件结构，你能看到版本号、字段、方法、超类、接口等各种信息，还有一项信息就是常量池。Java 的常量池可以存放各种常量信息，不管是编译期生成的各种字面量，还是需要在运行时决定的符号引用，所以它比一般语言的符号表存储的信息更加宽泛。
+- 第六，**本地方法栈**（Native Method Stack）。它和 Java 虚拟机栈是非常相似的，支持对本地方法的调用，也是每个线程都会创建一个。在 Oracle Hotspot JVM 中，本地方法栈和 Java 虚拟机栈是在同一块儿区域，这完全取决于技术实现的决定，并未在规范中强制。
 
-【知识扩展】
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240705853.png)
+
+OOM 场景：
+
+- Java heap space - 堆空间溢出
+- GC overhead limit exceeded - GC 开销超过限制。官方给出的定义是：**超过 `98%` 的时间用来做 GC 并且回收了不到 `2%` 的堆内存时会抛出此异常**。这意味着，发生在 GC 占用大量时间为释放很小空间的时候发生的，是一种保护机制。导致异常的原因：一般是因为堆太小，没有足够的内存。
+- PermGen space - Perm （永久代）空间主要用于存放 `Class` 和 Meta 信息，包括类的名称和字段，带有方法字节码的方法，常量池信息，与类关联的对象数组和类型数组以及即时编译器优化。GC 在主程序运行期间不会对永久代空间进行清理，默认是 64M 大小。根据上面的定义，可以得出 **PermGen 大小要求取决于加载的类的数量以及此类声明的大小**。因此，可以说造成该错误的主要原因是永久代中装入了太多的类或太大的类。在 JDK8 之前的版本中，可以通过 `-XX:PermSize` 和 `-XX:MaxPermSize` 设置永久代空间大小，从而限制方法区大小，并间接限制其中常量池的容量。
+- Metaspace - Java8 以后，JVM 内存空间发生了很大的变化。取消了永久代，转而变为元数据区。
+- Unable to create new native thread - 无法新建本地线程。这个错误意味着：**Java 应用程序已达到其可以启动线程数的限制**。
+- 直接内存溢出 - 由直接内存导致的内存溢出，一个明显的特征是在 Heap Dump 文件中不会看见有什么明显的异常情况，如果读者发现内存溢出之后产生的 Dump 文件很小，而程序中又直接或间接使用了 DirectMemory（典型的间接使用就是 NIO），那就可以考虑重点检查一下直接内存方面的原因了。
 
 ## 如何监控和诊断 JVM 堆内和堆外内存使用？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+- `jps` - 显示指定系统内所有的 JVM 进程
+- `jstat` - 查看 JVM 统计信息（类装载、内存、垃圾收集、JIT 编译等运行数据）
+- `jmap` - 生成堆内存快照（称为 heapdump 或 dump 文件）
+- `jhat` - 用来分析 jmap 生成的 dump 文件
+- `jstack` - 生成线程快照（称为 threaddump 或 coredump 文件）
+- jinfo - 用于实时查看和调整虚拟机运行参数
+- `JConsole` - 基于 JMX 的可视化监视与管理工具
+- `VisualVM` - 多合一故障处理工具
+- `MAT` - Eclipse 提供的内存分析工具
+- JMC - [Java Mission Control](http://www.oracle.com/technetwork/java/javaseproducts/mission-control/java-mission-control-1998576.html) 不仅仅能够使用 [JMX](https://en.wikipedia.org/wiki/Java_Management_Extensions) 进行普通的管理、监控任务，还可以配合 [Java Flight Recorder](https://docs.oracle.com/javacomponents/jmc-5-4/jfr-runtime-guide/about.htm#JFRUH171)（JFR）技术，以非常低的开销，收集和分析 JVM 底层的 Profiling 和事件等信息。
+- `JProfile`
 
-【知识扩展】
+堆结构示意图。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240705463.png)
+
+### 年轻代
+
+新生代是大部分对象创建和销毁的区域，在通常的 Java 应用中，绝大部分对象生命周期都是很短暂的。其内部又分为 Eden 区域，作为对象初始分配的区域；两个 Survivor，有时候也叫 from、to 区域，被用来放置从 Minor GC 中保留下来的对象。
+
+JVM 会随意选取一个 Survivor 区域作为“to”，然后会在 GC 过程中进行区域间拷贝，也就是将 Eden 中存活下来的对象和 from 区域的对象，拷贝到这个“to”区域。这种设计主要是为了防止内存的碎片化，并进一步清理无用对象。
+
+从内存模型而不是垃圾收集的角度，对 Eden 区域继续进行划分，Hotspot JVM 还有一个概念叫做 Thread Local Allocation Buffer（TLAB）。这是 JVM 为每个线程分配的一个私有缓存区域，否则，多线程同时分配内存时，为避免操作同一地址，可能需要使用加锁等机制，进而影响分配速度。TLAB 仍然在堆上，它是分配在 Eden 区域内的。其内部结构比较直观易懂，start、end 就是起始地址，top（指针）则表示已经分配到哪里了。所以我们分配新对象，JVM 就会移动 top，当 top 和 end 相遇时，即表示该缓存已满，JVM 会试图再从 Eden 里分配一块儿。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240705117.png)
+
+### 老年代
+
+放置长生命周期的对象，通常都是从 Survivor 区域拷贝过来的对象。当然，也有特殊情况，我们知道普通的对象会被分配在 TLAB 上；如果对象较大，JVM 会试图直接分配在 Eden 其他位置上；如果对象太大，完全无法在新生代找到足够长的连续空闲空间，JVM 就会直接分配到老年代。
+
+### 永久代
+
+这部分就是早期 Hotspot JVM 的方法区实现方式了，储存 Java 类元数据、常量池、Intern 字符串缓存，在 JDK 8 之后，这些数据被存储在元数据空间。
+
+### JVM 参数
+
+- 最大堆体积
+
+```java
+-Xmx value
+```
+
+- 初始的最小堆体积
+
+```java
+-Xms value
+```
+
+- 老年代和新生代的比例
+
+```java
+-XX:NewRatio=value
+```
+
+默认情况下，这个数值是 2，意味着老年代是新生代的 2 倍大；换句话说，新生代是堆大小的 1/3。
+
+- 当然，也可以不用比例的方式调整新生代的大小，直接指定下面的参数，设定具体的内存大小数值。
+
+```java
+-XX:NewSize=value
+```
+
+- Eden 和 Survivor 的大小是按照比例设置的，如果 SurvivorRatio 是 8，那么 Survivor 区域就是 Eden 的 1⁄8 大小，也就是新生代的 1/10，因为 YoungGen=Eden + 2\*Survivor，JVM 参数格式是
+
+```java
+-XX:SurvivorRatio=value
+```
+
+- TLAB 当然也可以调整，JVM 实现了复杂的适应策略，如果你有兴趣可以参考这篇 [说明](https://blogs.oracle.com/jonthecollector/the-real-thing)。
 
 ## Java 常见的垃圾收集器有哪些？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+### 垃圾收集器
 
-【知识扩展】
+- Serial GC，它是最古老的垃圾收集器，“Serial”体现在其收集工作是单线程的，并且在进行垃圾收集过程中，会进入臭名昭著的“Stop-The-World”状态。当然，其单线程设计也意味着精简的 GC 实现，无需维护复杂的数据结构，初始化也简单，所以一直是 Client 模式下 JVM 的默认选项。从年代的角度，通常将其老年代实现单独称作 Serial Old，它采用了标记 - 整理（Mark-Compact）算法，区别于新生代的复制算法。
+
+- ParNew GC，很明显是个新生代 GC 实现，它实际是 Serial GC 的多线程版本，最常见的应用场景是配合老年代的 CMS GC 工作
+
+- CMS（Concurrent Mark Sweep） GC，基于标记 - 清除（Mark-Sweep）算法，设计目标是尽量减少停顿时间，这一点对于 Web 等反应时间敏感的应用非常重要，一直到今天，仍然有很多系统使用 CMS GC。但是，CMS 采用的标记 - 清除算法，存在着内存碎片化问题，所以难以避免在长时间运行等情况下发生 full GC，导致恶劣的停顿。另外，既然强调了并发（Concurrent），CMS 会占用更多 CPU 资源，并和用户线程争抢。
+- Parallel GC，在早期 JDK 8 等版本中，它是 server 模式 JVM 的默认 GC 选择，也被称作是吞吐量优先的 GC。它的算法和 Serial GC 比较相似，尽管实现要复杂的多，其特点是新生代和老年代 GC 都是并行进行的，在常见的服务器环境中更加高效。
+
+- G1 GC 这是一种兼顾吞吐量和停顿时间的 GC 实现，是 Oracle JDK 9 以后的默认 GC 选项。G1 可以直观的设定停顿时间的目标，相比于 CMS GC，G1 未必能做到 CMS 在最好情况下的延时停顿，但是最差情况要好很多。
+
+### 对象是否回收算法
+
+**引用计数法** - 就是为对象添加一个引用计数，用于记录对象被引用的情况，如果计数为 0，即表示对象可回收。引用计数法最大的问题是难以处理循环引用。
+
+**可达性分析法** - 就是将对象及其引用关系看作一个图，选定活动的对象作为 GC Roots，然后跟踪引用链条，如果一个对象和 GC Roots 之间不可达，也就是不存在引用链条，那么即可认为是可回收对象。JVM 会把虚拟机栈和本地方法栈中正在引用的对象、静态属性引用的对象和常量，作为 GC Roots。
+
+### 垃圾收集算法
+
+**标记 - 复制（Copying）** - 将内存划分为大小相等的两块，每次只使用其中一块，当这一块内存用完了就将还存活的对象复制到另一块上面，然后再把使用过的内存空间进行一次清理。这实际上也是利用了 CoW 机制。
+
+**标记 - 清除（Mark-Sweep）** - 将需要回收的对象进行标记，然后清除。标记和清除过程效率都不高，会产生大量碎片，导致无法给大对象分配内存。
+
+**标记 - 整理（Mark-Compact）** - 让所有存活的对象都向一端移动，然后直接清理掉端边界以外的内存。
+
+### 垃圾收集过程
+
+第一，Java 应用不断创建对象，通常都是分配在 Eden 区域，当其空间占用达到一定阈值时，触发 minor GC。仍然被引用的对象（绿色方块）存活下来，被复制到 JVM 选择的 Survivor 区域，而没有被引用的对象（黄色方块）则被回收。注意，我给存活对象标记了“数字 1”，这是为了表明对象的存活时间。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240706966.png)
+
+第二， 经过一次 Minor GC，Eden 就会空闲下来，直到再次达到 Minor GC 触发条件，这时候，另外一个 Survivor 区域则会成为 to 区域，Eden 区域的存活对象和 From 区域对象，都会被复制到 to 区域，并且存活的年龄计数会被加 1。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240706215.png)
+
+第三， 类似第二步的过程会发生很多次，直到有对象年龄计数达到阈值，这时候就会发生所谓的晋升（Promotion）过程，如下图所示，超过阈值的对象会被晋升到老年代。这个阈值是可以通过参数指定：
+
+`-XX:MaxTenuringThreshold=<N>`
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240706521.png)
+
+后面就是老年代 GC，具体取决于选择的 GC 选项，对应不同的算法。下面是一个简单标记 - 整理算法过程示意图，老年代中的无用对象被清除后， GC 会将对象进行整理，以防止内存碎片化。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240707750.png)
+
+通常我们把老年代 GC 叫作 Major GC，将对整个堆进行的清理叫作 Full GC，但是这个也没有那么绝对，因为不同的老年代 GC 算法其实表现差异很大，例如 CMS，“concurrent”就体现在清理工作是与工作线程一起并发运行的。
 
 ## 谈谈你的 GC 调优思路
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+GC 调优，从性能角度来看，通常关注三个方面，内存占用（footprint）、延时（latency）和吞吐量（throughput），大多数情况下调优会侧重于其中一个或者两个方面的目标，很少有情况可以兼顾三个不同的角度。
 
-【知识扩展】
+调优思路：
+
+- 理解应用需求和问题，确定调优目标。假设，我们开发了一个应用服务，但发现偶尔会出现性能抖动，出现较长的服务停顿。评估用户可接受的响应时间和业务量，将目标简化为，希望 GC 暂停尽量控制在 200ms 以内，并且保证一定标准的吞吐量。
+- 掌握 JVM 和 GC 的状态，定位具体的问题，确定真的有 GC 调优的必要。具体有很多方法，比如，通过 jstat 等工具查看 GC 等相关状态，可以开启 GC 日志，或者是利用操作系统提供的诊断工具等。例如，通过追踪 GC 日志，就可以查找是不是 GC 在特定时间发生了长时间的暂停，进而导致了应用响应不及时。
+- 这里需要思考，选择的 GC 类型是否符合我们的应用特征，如果是，具体问题表现在哪里，是 Minor GC 过长，还是 Mixed GC 等出现异常停顿情况；如果不是，考虑切换到什么类型，如 CMS 和 G1 都是更侧重于低延迟的 GC 选项。
+- 通过分析确定具体调整的参数或者软硬件配置。
+- 验证是否达到调优目标，如果达到目标，即可以考虑结束调优；否则，重复完成分析、调整、验证这个过程。
+
+### G1 GC 机制
+
+G1 内存区域如下图所示：
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240707671.png)
+
+region 的大小是一致的，数值是在 1M 到 32M 字节之间的一个 2 的幂值数，JVM 会尽量划分 2048 个左右、同等大小的 region。这个数字既可以手动调整，G1 也会根据堆大小自动进行调整。
+
+在 G1 实现中，年代是个逻辑概念，具体体现在，一部分 region 是作为 Eden，一部分作为 Survivor，除了意料之中的 Old region，G1 会将超过 region 50% 大小的对象（在应用中，通常是 byte 或 char 数组）归类为 Humongous 对象，并放置在相应的 region 中。逻辑上，Humongous region 算是老年代的一部分，因为复制这样的大对象是很昂贵的操作，并不适合新生代 GC 的复制算法。
+
+从 GC 算法的角度，G1 选择的是复合算法，可以简化理解为：
+
+- 在新生代，G1 采用的仍然是并行的复制算法，所以同样会发生 Stop-The-World 的暂停。
+- 在老年代，大部分情况下都是并发标记，而整理（Compact）则是和新生代 GC 时捎带进行，并且不是整体性的整理，而是增量进行的。
 
 ## Java 内存模型中的 happen-before 是什么？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+JMM 为程序中所有的操作定义了一个偏序关系，称之为 **`先行发生原则（Happens-Before）`**。**Happens-Before** 是指 **前面一个操作的结果对后续操作是可见的**。
 
-【知识扩展】
+**Happens-Before** 非常重要，它是判断数据是否存在竞争、线程是否安全的主要依据，依靠这个原则，我们可以通过几条规则一揽子地解决并发环境下两个操作间是否可能存在冲突的所有问题。
+
+- **程序顺序规则** - 在一个线程中，按照程序顺序，前面的操作 Happens-Before 于后续的任意操作。
+- **锁定规则** - 一个 `unLock` 操作 Happens-Before 于后面对同一个锁的 `lock` 操作。
+- **volatile 变量规则** - 对一个 `volatile` 变量的写操作 Happens-Before 于后面对这个变量的读操作。
+- **线程启动规则** - `Thread` 对象的 `start()` 方法 Happens-Before 于此线程的每个一个动作。
+- **线程终止规则** - 线程中所有的操作都 Happens-Before 于线程的终止检测，我们可以通过 `Thread.join()` 方法是否结束、`Thread.isAlive()` 的返回值手段检测到线程已经终止执行。
+- **线程中断规则** - 对线程 `interrupt()` 方法的调用 Happens-Before 于被中断线程的代码检测到中断事件的发生，可以通过 `Thread.interrupted()` 方法检测到是否有中断发生。
+- **对象终结规则** - 一个对象的初始化完成 Happens-Before 于它的 `finalize()` 方法的开始。
+- **传递性** - 如果 A Happens-Before B，且 B Happens-Before C，那么 A Happens-Before C。
 
 ## Java 程序运行在 Docker 等容器环境有哪些新问题？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+虽然看起来 Docker 之类容器和虚拟机非常相似，例如，它也有自己的 shell，能独立安装软件包，运行时与其他容器互不干扰。但是，如果深入分析你会发现，Docker 并不是一种完全的**虚拟化**技术，而更是一种轻量级的**隔离**技术。
 
-【知识扩展】
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240707589.png)
+
+基于 namespace，Docker 为每个容器提供了单独的命名空间，对网络、PID、用户、IPC 通信、文件系统挂载点等实现了隔离。对于 CPU、内存、磁盘 IO 等计算资源，则是通过 CGroup 进行管理。
+
+Docker 仅在类似 Linux 内核之上实现了有限的隔离和虚拟化，并不是像传统虚拟化软件那样，独立运行一个新的操作系统。对于 Java 来说，Docker 未完全隐藏底层信息，会产生以下问题：
+
+第一，容器环境对于计算资源的管理方式是全新的，CGroup 作为相对比较新的技术，历史版本的 Java 显然并不能自然地理解相应的资源限制。
+
+第二，namespace 对于容器内的应用细节增加了一些微妙的差异，比如 jcmd、jstack 等工具会依赖于“/proc//”下面提供的部分信息，但是 Docker 的设计改变了这部分信息的原有结构，我们需要对原有工具进行修改以适应这种变化。
+
+**从 JVM 运行机制的角度，为什么这些“沟通障碍”会导致 OOM 等问题呢？**
+
+- JVM 会大概根据检测到的内存大小，设置最初启动时的堆大小为系统内存的 1/64；并将堆最大值，设置为系统内存的 1/4。
+- 而 JVM 检测到系统的 CPU 核数，则直接影响到了 Parallel GC 的并行线程数目和 JIT complier 线程数目，甚至是我们应用中 ForkJoinPool 等机制的并行等级。
+
+这些默认参数，是根据通用场景选择的初始值。但是由于容器环境的差异，Java 的判断很可能是基于错误信息而做出的。更加严重的是，JVM 的一些原有诊断或备用机制也会受到影响。为保证服务的可用性，一种常见的选择是依赖“-XX:OnOutOfMemoryError”功能，通过调用处理脚本的形式来做一些补救措施，比如自动重启服务等。但是，这种机制是基于 fork 实现的，当 Java 进程已经过度提交内存时，fork 新的进程往往已经不可能正常运行了。
+
+**如何解决这些问题呢？**
+
+首先，如果你能够**升级到最新的 JDK 版本**，这个问题就迎刃而解了。针对这种情况，JDK 9 中引入了一些实验性的参数，以方便 Docker 和 Java“沟通”。
+
+如果你可以切换到 JDK 10 或者更新的版本，问题就更加简单了。Java 对容器（Docker）的支持已经比较完善，默认就会自适应各种资源限制和实现差异。
+
+JDK 9 中的实验性改进已经被移植到 Oracle JDK 8u131 之中。
 
 ## 你了解 Java 应用开发中的注入攻击吗？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+注入攻击其基本特征是程序允许攻击者将不可信的动态内容注入到程序中，并将其执行，这就可能完全改变最初预计的执行过程，产生恶意效果。
 
-【知识扩展】
+- SQL 注入攻击
+- 系统命令注入
+- XML 注入攻击
 
 ## 如何写出安全的 Java 代码？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
-
-【知识扩展】
+略
 
 ## 后台服务出现明显“变慢”，谈谈你的诊断思路？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
-
-【知识扩展】
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240708746.png)
 
 ## 有人说“Lambda 能让 Java 程序慢 30 倍”，你怎么看？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+在实际运行中，基于 Lambda/Stream 的版本（lambdaMaxInteger），比传统的 for-each 版本（forEachLoopMaxInteger）慢很多。
 
-【知识扩展】
+```java
+// 一个大的 ArrayList，内部是随机的整形数据
+volatile List<Integer> integers = …
+
+// 基准测试 1
+public int forEachLoopMaxInteger() {
+   int max = Integer.MIN_VALUE;
+   for (Integer n : integers) {
+    max = Integer.max(max, n);
+   }
+   return max;
+}
+
+// 基准测试 2
+public int lambdaMaxInteger() {
+   return integers.stream().reduce(Integer.MIN_VALUE, (a, b) -> Integer.max(a, b));
+}
+```
+
+以上代码片段更多的开销是源于自动装箱、拆箱（auto-boxing/unboxing），而不是源自 Lambda 和 Stream。
+
+一般来说，可以认为 Lambda/Stream 提供了与传统方式接近对等的性能，但是如果对于性能非常敏感，就不能完全忽视它在特定场景的性能差异了，例如：**初始化的开销**。 Lambda 并不算是语法糖，而是一种新的工作机制，在首次调用时，JVM 需要为其构建 [CallSite](https://docs.oracle.com/javase/8/docs/api/java/lang/invoke/CallSite.html) 实例。这意味着，如果 Java 应用启动过程引入了很多 Lambda 语句，会导致启动过程变慢。其实现特点决定了 JVM 对它的优化可能与传统方式存在差异。
 
 ## JVM 优化 Java 代码时都做了什么？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
-
-【知识扩展】
+略
 
 ## 谈谈 MySQL 支持的事务隔离级别，以及悲观锁和乐观锁的原理和应用场景？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+以最常见的 MySQL InnoDB 引擎为例，它是基于 MVCC（Multi-Versioning Concurrency Control）和锁的复合实现，按照隔离程度从低到高，MySQL 事务隔离级别分为四个不同层次：
 
-【知识扩展】
+- 读未提交（Read uncommitted），就是一个事务能够看到其他事务尚未提交的修改，这是最低的隔离水平，允许脏读出现。
+- 读已提交（Read committed），事务能够看到的数据都是其他事务已经提交的修改，也就是保证不会看到任何中间性状态，当然脏读也不会出现。读已提交仍然是比较低级别的隔离，并不保证再次读取时能够获取同样的数据，也就是允许其他事务并发修改数据，允许不可重复读和幻象读（Phantom Read）出现。
+- 可重复读（Repeatable reads），保证同一个事务中多次读取的数据是一致的，这是 MySQL InnoDB 引擎的默认隔离级别，但是和一些其他数据库实现不同的是，可以简单认为 MySQL 在可重复读级别不会出现幻象读。
+- 串行化（Serializable），并发事务之间是串行化的，通常意味着读取需要获取共享读锁，更新需要获取排他写锁，如果 SQL 使用 WHERE 语句，还会获取区间锁（MySQL 以 GAP 锁形式实现，可重复读级别中默认也会使用），这是最高的隔离级别。
+
+悲观锁和乐观锁：
+
+悲观锁 - 悲观锁一般就是利用类似 `SELECT … FOR UPDATE` 这样的语句，对数据加锁，避免其他事务意外修改数据。
+
+乐观锁 - 乐观锁则与 Java 并发包中的 AtomicFieldUpdater 类似，也是利用 CAS 机制，并不会对数据加锁，而是通过对比数据的时间戳或者版本号，来实现乐观锁需要的版本判断。
 
 ## 谈谈 Spring Bean 的生命周期和作用域？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+### Spring 创建 Bean
 
-【知识扩展】
+- 实例化 Bean 对象。
+- 设置 Bean 属性。
+- 如果我们通过各种 Aware 接口声明了依赖关系，则会注入 Bean 对容器基础设施层面的依赖。具体包括 BeanNameAware、BeanFactoryAware 和 ApplicationContextAware，分别会注入 Bean ID、Bean Factory 或者 ApplicationContext。
+- 调用 BeanPostProcessor 的前置初始化方法 postProcessBeforeInitialization。
+- 如果实现了 InitializingBean 接口，则会调用 afterPropertiesSet 方法。
+- 调用 Bean 自身定义的 init 方法。
+- 调用 BeanPostProcessor 的后置初始化方法 postProcessAfterInitialization。
+- 创建过程完毕。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240708158.png)
+
+### Spring 销毁 Bean
+
+Spring Bean 的销毁过程会依次调用 DisposableBean 的 destroy 方法和 Bean 自身定制的 destroy 方法。
+
+Spring Bean 有五个作用域，其中最基础的有下面两种：
+
+- Singleton，这是 Spring 的默认作用域，也就是为每个 IOC 容器创建唯一的一个 Bean 实例。
+- Prototype，针对每个 getBean 请求，容器都会单独创建一个 Bean 实例。
+
+从 Bean 的特点来看，Prototype 适合有状态的 Bean，而 Singleton 则更适合无状态的情况。另外，使用 Prototype 作用域需要经过仔细思考，毕竟频繁创建和销毁 Bean 是有明显开销的。
+
+如果是 Web 容器，则支持另外三种作用域：
+
+- Request，为每个 HTTP 请求创建单独的 Bean 实例。
+- Session，很显然 Bean 实例的作用域是 Session 范围。
+  - GlobalSession，用于 Portlet 容器，因为每个 Portlet 有单独的 Session，GlobalSession 提供一个全局性的 HTTP Session。·
 
 ## 对比 Java 标准 NIO 类库，你知道 Netty 是如何实现更高性能的吗？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+多路复用
 
-【知识扩展】
+零拷贝
+
+从 API 能力范围来看，Netty 完全是 Java NIO 框架的一个大大的超集
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240708363.png)
+
+Netty 官方提供的 Server 部分，完整用例请点击 [链接](http://netty.io/4.1/xref/io/netty/example/echo/package-summary.html)。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240708879.png)
+
+- [ServerBootstrap](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/bootstrap/ServerBootstrap.java)，服务器端程序的入口，这是 Netty 为简化网络程序配置和关闭等生命周期管理，所引入的 Bootstrapping 机制。我们通常要做的创建 Channel、绑定端口、注册 Handler 等，都可以通过这个统一的入口，以 **Fluent** API 等形式完成，相对简化了 API 使用。与之相对应， [Bootstrap](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/bootstrap/Bootstrap.java) 则是 Client 端的通常入口。
+- [Channel](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/channel/Channel.java)，作为一个基于 NIO 的扩展框架，Channel 和 Selector 等概念仍然是 Netty 的基础组件，但是针对应用开发具体需求，提供了相对易用的抽象。
+- [EventLoop](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/channel/EventLoop.java)，这是 Netty 处理事件的核心机制。例子中使用了 EventLoopGroup。我们在 NIO 中通常要做的几件事情，如注册感兴趣的事件、调度相应的 Handler 等，都是 EventLoop 负责。
+- [ChannelFuture](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/channel/ChannelFuture.java)，这是 Netty 实现异步 IO 的基础之一，保证了同一个 Channel 操作的调用顺序。Netty 扩展了 Java 标准的 Future，提供了针对自己场景的特有 [Future](https://github.com/netty/netty/blob/eb7f751ba519cbcab47d640cd18757f09d077b55/common/src/main/java/io/netty/util/concurrent/Future.java) 定义。
+- ChannelHandler，这是应用开发者**放置业务逻辑的主要地方**，也是我上面提到的“Separation Of Concerns”原则的体现。
+- [ChannelPipeline](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/channel/ChannelPipeline.java)，它是 ChannelHandler 链条的容器，每个 Channel 在创建后，自动被分配一个 ChannelPipeline。在上面的示例中，我们通过 ServerBootstrap 注册了 ChannelInitializer，并且实现了 initChannel 方法，而在该方法中则承担了向 ChannelPipleline 安装其他 Handler 的任务。
+
+参考下面的简化示意图，忽略 Inbound/OutBound Handler 的细节，理解这几个基本单元之间的操作流程和对应关系。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240709828.png)
+
+对比 Java 标准 NIO 的代码，Netty 提供的相对高层次的封装，减少了对 Selector 等细节的操纵，而 EventLoop、Pipeline 等机制则简化了编程模型，开发者不用担心并发等问题，在一定程度上简化了应用代码的开发。
 
 ## 谈谈常用的分布式 ID 的设计方案？Snowflake 是否受冬令时切换影响？
 
-【典型回答】
+【典型回答】+【考点分析】+【知识扩展】
 
-【考点分析】
+分布式 ID 基本要求：
 
-【知识扩展】
+- 全局唯一，区别于单点系统的唯一，全局是要求分布式系统内唯一。
+- 有序性，通常都需要保证生成的 ID 是有序递增的。例如，在数据库存储等场景中，有序 ID 便于确定数据位置，往往更加高效。
+
+业界方案：
+
+UUID
+
+各种数据库自增序列
+
+雪花算法 - 如 Twitter 早期开源的 [Snowflake](https://github.com/twitter/snowflake) 的实现，其结构定义可以参考下图：
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240710538.png)
 
 ## 周末福利 一份 Java 工程师必读书单
 
-【典型回答】
+- 《Java 编程思想》
 
-【考点分析】
+- 《Java 核心技术》
 
-【知识扩展】
+- 《Effective Java》
+
+- 《Head First 设计模式》
+
+- 《Java 并发编程实战》
+
+- 《深入理解 Java 虚拟机》
+
+- 《Java 性能优化权威指南》
+
+- 《Spring 实战》
+
+- 《Netty 实战》
+
+- 《大型分布式网站架构设计与实践》
+
+- 《深入分布式缓存：从原理到实践》
 
 ## 周末福利 谈谈我对 Java 学习和面试的看法
 
-【典型回答】
-
-【考点分析】
-
-【知识扩展】
+略
 
 ## 结束语 技术没有终点
 
