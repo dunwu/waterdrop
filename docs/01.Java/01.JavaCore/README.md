@@ -71,7 +71,7 @@ index: false
 
 ### [Java 虚拟机](06.JVM)
 
-- [Java 虚拟机之基本知识](06.JVM/Java虚拟机之基本知识.md)
+- [Java 虚拟机简介](06.JVM/Java虚拟机简介.md)
 - [Java 虚拟机之内存区域](06.JVM/Java虚拟机之内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
 - [Java 虚拟机之垃圾收集](06.JVM/Java虚拟机之垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
 - [Java 虚拟机之字节码](06.JVM/Java虚拟机之字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
