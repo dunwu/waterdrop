@@ -18,9 +18,8 @@ index: false
 
 ### 关系型数据库综合
 
-- [SQL 语法速成](01.综合/02.SQL语法.md)
-- [扩展 SQL](01.综合/03.扩展SQL.md)
-- [SQL Cheat Sheet](01.综合/99.SqlCheatSheet.md)
+- [关系数据库简介](01.综合/关系数据库简介.md)
+- [SQL 语法](01.综合/SQL语法.md)
 
 ### Mysql
 

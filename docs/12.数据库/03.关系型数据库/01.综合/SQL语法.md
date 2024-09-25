@@ -1,5 +1,5 @@
 ---
-title: SQL 语法速成
+title: SQL 语法必知必会
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202310011053288.png
 date: 2018-06-15 16:07:17
 order: 02
@@ -14,7 +14,7 @@ tags:
 permalink: /pages/cd3ae5de/
 ---
 
-# SQL 语法速成
+# SQL 语法必知必会
 
 > 本文针对关系型数据库的基本语法。限于篇幅，本文侧重说明用法，不会展开讲解特性、原理。
 >
@@ -170,7 +170,7 @@ DROP COLUMN age;
 ##### 修改列
 
 ```sql
-ALTER TABLE `user`
+ALTER TABLE user
 MODIFY COLUMN age tinyint;
 ```
 
@@ -179,6 +179,28 @@ MODIFY COLUMN age tinyint;
 ```sql
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS vip_user;
+```
+
+#### 修改表的编码格式
+
+utf8mb4 编码是 utf8 编码的超集，兼容 utf8，并且能存储 4 字节的表情字符。如果表的编码指定为 utf8，在保存 emoji 字段时会报错。
+
+```sql
+ALTER TABLE user CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+```
+
+#### 查看表的基本信息
+
+```sql
+SELECT * FROM information_schema.tables
+WHERE table_schema = 'test' AND table_name = 'user';
+```
+
+#### 查看表的列信息
+
+```sql
+SELECT * FROM information_schema.columns
+WHERE table_schema = 'test' AND table_name = 'user';
 ```
 
 ### 视图（VIEW）
@@ -337,6 +359,29 @@ DELETE FROM user WHERE username = 'robot';
 TRUNCATE TABLE user;
 ```
 
+### 如何批量删除大量数据
+
+如果要根据时间范围批量删除大量数据，最简单的语句如下：
+
+```sql
+delete from orders
+where timestamp < SUBDATE(CURDATE(),INTERVAL 3 month);
+```
+
+上面的语句，大概率执行会报错，提示删除失败，因为需要删除的数据量太大了，所以需要分批删除。
+
+可以先通过一次查询，找到符合条件的历史订单中最大的那个订单 ID，然后在删除语句中把删除的条件转换成按主键删除。
+
+```sql
+select max(id) from orders
+where timestamp < SUBDATE(CURDATE(),INTERVAL 3 month);
+
+-- 分批删除，? 填上一条语句查到的最大 ID
+delete from orders
+where id <= ?
+order by id limit 1000;
+```
+
 ### 查询数据
 
 > - `SELECT` 语句用于从数据库中查询数据。
@@ -363,7 +408,7 @@ SELECT prod_id, prod_name, prod_price FROM products;
 SELECT * FROM products;
 ```
 
-#### 查询不同的值
+#### 查询过滤重复值
 
 ```sql
 SELECT DISTINCT vend_id FROM products;
@@ -445,7 +490,16 @@ DELETE FROM Customers
 WHERE cust_name = 'Kids Place';
 ```
 
-可以在 `WHERE` 子句中使用的操作符：
+下面列举更多的 WHERE 常见用法：
+
+```sql
+SELECT column1, column2 FROM table_name WHERE condition;
+SELECT * FROM table_name WHERE condition1 AND condition2;
+SELECT * FROM table_name WHERE condition1 OR condition2;
+SELECT * FROM table_name WHERE NOT condition;
+SELECT * FROM table_name WHERE condition1 AND (condition2 OR condition3);
+SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE condition);
+```
 
 ### 比较操作符
 
