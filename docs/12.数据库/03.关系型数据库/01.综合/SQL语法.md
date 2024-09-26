@@ -72,68 +72,65 @@ WHERE username = 'root';
 - SQL 支持三种注释
 
 ```sql
-## 注释1
--- 注释2
-/* 注释3 */
+## 注释 1
+-- 注释 2
+/* 注释 3 */
 ```
 
 #### SQL 分类
 
-##### DDL
-
-**DDL**，英文叫做 Data Definition Language，即**“数据定义语言”**。**DDL 用于定义数据库对象**。
-
-DDL 定义操作包括创建（`CREATE`）、删除（`DROP`）、修改（`ALTER`）；而被操作的对象包括：数据库、数据表和列、视图、索引。
-
-##### DML
-
-**DML**，英文叫做 Data Manipulation Language，即**“数据操作语言”**。**DML 用于访问数据库的数据**。
-
-DML 访问操作包括插入（`INSERT`）、删除（`DELETE`）、修改（`UPDATE`）、查询（`SELECT`）。这四个指令合称 **CRUD**，英文单词为 Create, Read, Update, Delete，即增删改查。
-
-##### TCL
-
-**TCL**，英文叫做 Transaction Control Language，即**“事务控制语言”**。**TCL 用于管理数据库中的事务**，实际上就是用于管理由 DML 语句所产生的数据变更，它还允许将语句分组为逻辑事务。
-
-TCL 的核心指令是 `COMMIT`、`ROLLBACK`。
-
-##### DCL
-
-**DCL**，英文叫做 Data Control Language，即**“数据控制语言”**。DCL 用于对数据访问权进行控制，它可以控制特定用户账户对数据表、查看表、预存程序、用户自定义函数等数据库对象的控制权。
-
-DCL 的核心指令是 `GRANT`、`REVOKE`。
-
-DCL 以**控制用户的访问权限**为主，因此其指令作法并不复杂，可利用 DCL 控制的权限有：`CONNECT`、`SELECT`、`INSERT`、`UPDATE`、`DELETE`、`EXECUTE`、`USAGE`、`REFERENCES`。根据不同的 DBMS 以及不同的安全性实体，其支持的权限控制也有所不同。
+- DDL -  **DDL**，英文叫做 Data Definition Language，即**“数据定义语言”**。
+  - **DDL 用于定义数据库对象**。
+  - DDL 定义操作包括创建（`CREATE`）、删除（`DROP`）、修改（`ALTER`）；而被操作的对象包括：数据库、数据表和列、视图、索引。
+- DML - **DML**，英文叫做 Data Manipulation Language，即**“数据操作语言”**。
+  - **DML 用于访问数据库的数据**。
+  - DML 访问操作包括插入（`INSERT`）、删除（`DELETE`）、修改（`UPDATE`）、查询（`SELECT`）。这四个指令合称 **CRUD**，英文单词为 Create, Read, Update, Delete，即增删改查。
+- TCL - **TCL**，英文叫做 Transaction Control Language，即**“事务控制语言”**。
+  - **TCL 用于管理数据库中的事务**，实际上就是用于管理由 DML 语句所产生的数据变更，它还允许将语句分组为逻辑事务。
+  - TCL 的核心指令是 `COMMIT`、`ROLLBACK`。
+- DCL - **DCL**，英文叫做 Data Control Language，即**“数据控制语言”**。
+  - **DCL 用于对数据访问权限进行控制**，它可以控制特定用户账户对数据表、查看表、预存程序、用户自定义函数等数据库对象的控制权。
+  - DCL 的核心指令是 `GRANT`、`REVOKE`。
+  - DCL 以**控制用户的访问权限**为主，因此其指令作法并不复杂，可利用 DCL 控制的权限有：`CONNECT`、`SELECT`、`INSERT`、`UPDATE`、`DELETE`、`EXECUTE`、`USAGE`、`REFERENCES`。
+  - 根据不同的 DBMS 以及不同的安全性实体，其支持的权限控制也有所不同。
 
 ## 数据定义（CREATE、ALTER、DROP）
 
-> DDL 的主要功能是定义数据库对象（如：数据库、数据表、视图、索引等）。
+DDL 的主要功能是定义数据库对象（如：数据库、数据表、视图、索引等）。
 
 ### 数据库（DATABASE）
 
-#### 创建数据库
+以下为数据库定义示例：
+
+::: tabs#数据库定义
+
+@tab 创建数据库
 
 ```sql
 CREATE DATABASE IF NOT EXISTS db_tutorial;
 ```
 
-#### 删除数据库
+@tab 删除数据库
 
 ```sql
 DROP DATABASE IF EXISTS db_tutorial;
 ```
 
-#### 选择数据库
+@tab 选择数据库
 
 ```sql
 USE db_tutorial;
 ```
 
+:::
+
 ### 数据表（TABLE）
 
-#### 创建数据表
+以下为数据表定义示例：
 
-**普通创建**
+::: tabs#数据表定义
+
+@tab 创建数据表
 
 ```sql
 CREATE TABLE user (
@@ -144,44 +141,42 @@ CREATE TABLE user (
 ) COMMENT ='用户表';
 ```
 
-**根据已有的表创建新表**
-
-```sql
-CREATE TABLE vip_user AS
-SELECT * FROM user;
-```
-
-#### 修改数据表
-
-##### 添加列
-
-```sql
-ALTER TABLE user
-ADD age int(3);
-```
-
-##### 删除列
-
-```sql
-ALTER TABLE user
-DROP COLUMN age;
-```
-
-##### 修改列
-
-```sql
-ALTER TABLE user
-MODIFY COLUMN age tinyint;
-```
-
-#### 删除数据表
+@tab 删除数据表
 
 ```sql
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS vip_user;
 ```
 
-#### 修改表的编码格式
+@tab 复制表
+
+```sql
+CREATE TABLE vip_user AS
+SELECT * FROM user;
+```
+
+@tab 数据表添加列
+
+```sql
+ALTER TABLE user
+ADD age int(3);
+```
+
+@tab 数据表删除列
+
+```sql
+ALTER TABLE user
+DROP COLUMN age;
+```
+
+@tab 数据表修改列
+
+```sql
+ALTER TABLE user
+MODIFY COLUMN age tinyint;
+```
+
+@tab 修改表的编码格式
 
 utf8mb4 编码是 utf8 编码的超集，兼容 utf8，并且能存储 4 字节的表情字符。如果表的编码指定为 utf8，在保存 emoji 字段时会报错。
 
@@ -189,19 +184,27 @@ utf8mb4 编码是 utf8 编码的超集，兼容 utf8，并且能存储 4 字节�
 ALTER TABLE user CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ```
 
-#### 查看表的基本信息
+:::
+
+以下为数据表信息查看示例：
+
+::: tabs#数据表查看
+
+@tab 查看表的基本信息
 
 ```sql
 SELECT * FROM information_schema.tables
 WHERE table_schema = 'test' AND table_name = 'user';
 ```
 
-#### 查看表的列信息
+@tab 查看表的列信息
 
 ```sql
 SELECT * FROM information_schema.columns
 WHERE table_schema = 'test' AND table_name = 'user';
 ```
+
+:::
 
 ### 视图（VIEW）
 
@@ -214,7 +217,11 @@ WHERE table_schema = 'test' AND table_name = 'user';
 - 通过只给用户访问视图的权限，保证数据的安全性。
 - 更改数据格式和表示。
 
-#### 创建视图
+以下为视图定义示例：
+
+::: tabs#视图定义
+
+@tab 创建视图
 
 ```sql
 CREATE VIEW top_10_user_view AS
@@ -222,11 +229,13 @@ SELECT id, username FROM user
 WHERE id < 10;
 ```
 
-#### 删除视图
+@tab 删除视图
 
 ```sql
 DROP VIEW top_10_user_view;
 ```
+
+:::
 
 ### 索引（INDEX）
 
@@ -238,93 +247,159 @@ DROP VIEW top_10_user_view;
 
 “唯一索引”表明此索引的每一个索引值只对应唯一的数据记录。
 
-#### 创建索引
+以下为视图定义示例：
+
+::: tabs#索引定义
+
+@tab 创建索引
 
 ```sql
-CREATE INDEX idx_email
-    ON user(email);
+CREATE INDEX idx_email ON user(email);
 ```
 
-#### 创建唯一索引
+@tab 创建唯一索引
 
 ```sql
-CREATE UNIQUE INDEX uniq_name
-    ON user(name);
+CREATE UNIQUE INDEX uniq_name ON user(name);
 ```
 
-#### 删除索引
+@tab 删除索引
 
 ```sql
-ALTER TABLE user
-DROP INDEX idx_email;
-ALTER TABLE user
-DROP INDEX uniq_name;
+ALTER TABLE user DROP INDEX idx_email;
+ALTER TABLE user DROP INDEX uniq_name;
 ```
 
-#### 添加主键
+@tab 添加主键
 
 ```sql
-ALTER TABLE user
-ADD PRIMARY KEY (id);
+ALTER TABLE user ADD PRIMARY KEY (id);
 ```
 
-#### 删除主键
+@tab 删除主键
 
 ```sql
-ALTER TABLE user
-DROP PRIMARY KEY;
+ALTER TABLE user DROP PRIMARY KEY;
 ```
 
-### 约束
+:::
 
-> SQL 约束用于规定表中的数据规则。
+### 约束（CONSTRAINT）
+
+SQL 约束用于规定表中的数据规则。
 
 如果存在违反约束的数据行为，行为会被约束终止。约束可以在创建表时规定（通过 `CREATE TABLE` 语句），或者在表创建之后规定（通过 `ALTER TABLE` 语句）。
 
+定义约束的语法：
+
+```sql
+CREATE TABLE table_name (
+    column_name1 data_type(size) constraint_name,
+    column_name2 data_type(size) constraint_name,
+    column_name3 data_type(size) constraint_name,
+    ....
+);
+```
+
 约束类型
+
 - `NOT NULL` - 指示字段不能存储 `NULL` 值。
-- `UNIQUE` - 保证字段的每行必须有唯一的值。
+- `UNIQUE KEY` - 保证字段的每行必须有唯一的值。
 - `PRIMARY KEY` - PRIMARY KEY 的作用是唯一标识一条记录，不能重复，不能为空，即相当于 `NOT NULL` + `UNIQUE`。确保字段（或两个列多个列的结合）有唯一标识，有助于更容易更快速地找到表中的一个特定的记录。
 - `FOREIGN KEY` - 保证一个表中的数据匹配另一个表中的值的参照完整性。
 - `CHECK` - 用于检查字段取值范围的有效性。
 - `DEFAULT` - 表明字段的默认值。如果插入数据时，该字段没有赋值，就会被设置为默认值。
 
-创建表时使用约束条件：
+以下为约束定义示例：
+
+::: tabs#约束定义
+
+@tab NOT NULL
 
 ```sql
-CREATE TABLE Users (
-  Id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增Id',
-  Username VARCHAR(64) NOT NULL UNIQUE DEFAULT 'default' COMMENT '用户名',
-  Password VARCHAR(64) NOT NULL DEFAULT 'default' COMMENT '密码',
-  Email VARCHAR(64) NOT NULL DEFAULT 'default' COMMENT '邮箱地址',
-  Enabled TINYINT(4) DEFAULT NULL COMMENT '是否有效',
-  PRIMARY KEY (Id)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+CREATE TABLE demo (
+	id INT UNSIGNED NOT NULL
+);
 ```
+
+@tab UNIQUE KEY
+
+```sql
+CREATE TABLE demo2 (
+	id INT UNSIGNED NOT NULL,
+	name VARCHAR(50) NOT NULL UNIQUE KEY
+);
+```
+
+@tab PRIMARY KEY
+
+```sql
+CREATE TABLE demo3 (
+	id INT UNSIGNED NOT NULL PRIMARY KEY,
+	name VARCHAR(50) NOT NULL UNIQUE KEY
+);
+```
+
+@tab FOREIGN KEY
+
+```sql
+CREATE TABLE demo4 (
+	id INT UNSIGNED NOT NULL PRIMARY KEY,
+	name VARCHAR(50) NOT NULL UNIQUE KEY,
+	fid INT UNSIGNED,
+	FOREIGN KEY (fid) REFERENCES demo3(id)
+);
+```
+
+@tab CHECK
+
+```sql
+CREATE TABLE demo5 (
+	id INT UNSIGNED NOT NULL PRIMARY KEY,
+	name VARCHAR(50) NOT NULL UNIQUE KEY,
+	age INT CHECK (age > 0)
+);
+```
+
+@tab DEFAULT
+
+```sql
+CREATE TABLE demo6 (
+	id INT UNSIGNED NOT NULL PRIMARY KEY,
+	name VARCHAR(50) NOT NULL UNIQUE KEY,
+	age INT DEFAULT 0
+);
+```
+
+:::
 
 ## 增删改查（CRUD）
 
 增删改查，又称为 **`CRUD`**，是数据库基本操作中的基本操作。
 
-### 插入数据
+### 插入数据（INSERT）
 
-> - `INSERT INTO` 语句用于向表中插入新记录。
+`INSERT INTO` 语句用于向表中插入新记录。
 
-#### 插入完整的行
+以下为插入数据示例：
+
+::: tabs#插入数据
+
+@tab 插入完整的行
 
 ```sql
 INSERT INTO user
 VALUES (10, 'root', 'root', 'xxxx@163.com');
 ```
 
-#### 插入行的一部分
+@tab 插入行的一部分
 
 ```sql
 INSERT INTO user(username, password, email)
 VALUES ('admin', 'admin', 'xxxx@163.com');
 ```
 
-#### 插入查询出来的数据
+@tab 插入查询出来的数据
 
 ```sql
 INSERT INTO user(username)
@@ -332,9 +407,13 @@ SELECT name
 FROM account;
 ```
 
-### 更新数据
+:::
 
-> - `UPDATE` 语句用于更新表中的记录。
+### 更新数据（UPDATE）
+
+`UPDATE` 语句用于更新表中的记录。
+
+以下为更新数据示例：
 
 ```sql
 UPDATE user
@@ -342,30 +421,34 @@ SET username='robot', password='robot'
 WHERE username = 'root';
 ```
 
-### 删除数据
+### 删除数据（DELETE）
 
-> - `DELETE` 语句用于删除表中的记录。
-> - `TRUNCATE TABLE` 可以清空表，也就是删除所有行。
+- `DELETE` 语句用于删除表中的记录。
+- `TRUNCATE TABLE` 可以清空表，也就是删除所有行。
 
-#### 删除表中的指定数据
+以下为删除数据示例：
+
+::: tabs#删除数据
+
+@tab 删除表中的指定数据
 
 ```sql
 DELETE FROM user WHERE username = 'robot';
 ```
 
-#### 清空表中的数据
+@tab 清空表中的数据
 
 ```sql
 TRUNCATE TABLE user;
 ```
 
-### 如何批量删除大量数据
+@tab 批量删除大量数据
 
 如果要根据时间范围批量删除大量数据，最简单的语句如下：
 
 ```sql
-delete from orders
-where timestamp < SUBDATE(CURDATE(),INTERVAL 3 month);
+DELETE FROM order
+WHERE timestamp < SUBDATE(CURDATE(), INTERVAL 3 MONTH);
 ```
 
 上面的语句，大概率执行会报错，提示删除失败，因为需要删除的数据量太大了，所以需要分批删除。
@@ -373,95 +456,102 @@ where timestamp < SUBDATE(CURDATE(),INTERVAL 3 month);
 可以先通过一次查询，找到符合条件的历史订单中最大的那个订单 ID，然后在删除语句中把删除的条件转换成按主键删除。
 
 ```sql
-select max(id) from orders
-where timestamp < SUBDATE(CURDATE(),INTERVAL 3 month);
+SELECT max(id) FROM order
+WHERE timestamp < SUBDATE(CURDATE(), INTERVAL 3 MONTH);
 
 -- 分批删除，? 填上一条语句查到的最大 ID
-delete from orders
-where id <= ?
-order by id limit 1000;
+DELETE FROM order
+WHERE id <= ? ORDER BY id LIMIT 1000;
 ```
 
-### 查询数据
+:::
 
-> - `SELECT` 语句用于从数据库中查询数据。
-> - `DISTINCT` 用于返回唯一不同的值。它作用于所有列，也就是说所有列的值都相同才算相同。
-> - `LIMIT` 限制返回的行数。可以有两个参数，第一个参数为起始行，从 0 开始；第二个参数为返回的总行数。
->   - `ASC` ：升序（默认）
->   - `DESC` ：降序
+### 查询数据（SELECT）
 
-#### 查询单列
+- `SELECT` 语句用于从数据库中查询数据。
+- `DISTINCT` 用于返回唯一不同的值。它作用于所有列，也就是说所有列的值都相同才算相同。
+- `LIMIT` 限制返回的行数。可以有两个参数，第一个参数为起始行，从 0 开始；第二个参数为返回的总行数。
+  - `ASC` ：升序（默认）
+  - `DESC` ：降序
+
+#### SELECT 的用法
+
+以下为查询数据示例：
+
+::: tabs#删除数据
+
+@tab 查询单列
 
 ```sql
-SELECT prod_name FROM products;
+SELECT prod_name FROM product;
 ```
 
-#### 查询多列
+@tab 查询多列
 
 ```sql
-SELECT prod_id, prod_name, prod_price FROM products;
+SELECT prod_id, prod_name, prod_price FROM product;
 ```
 
-#### 查询所有列
+@tab 查询所有列
 
 ```sql
-SELECT * FROM products;
+SELECT * FROM product;
 ```
 
-#### 查询过滤重复值
+@tab 查询过滤重复值
 
 ```sql
-SELECT DISTINCT vend_id FROM products;
+SELECT DISTINCT vend_id FROM product;
 ```
 
-#### 限制查询数量
+@tab 限制查询数量
 
 ```sql
 -- 返回前 5 行
-SELECT * FROM products LIMIT 5;
-SELECT * FROM products LIMIT 0, 5;
+SELECT * FROM product LIMIT 5;
+SELECT * FROM product LIMIT 0, 5;
 -- 返回第 3 ~ 5 行
-SELECT * FROM products LIMIT 2, 3;
+SELECT * FROM product LIMIT 2, 3;
+```
+
+:::
+
+#### SELECT 的执行顺序
+
+关键字的顺序是不能颠倒的：
+
+```sql
+SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ...
+```
+
+SELECT 语句的执行顺序（在 MySQL 和 Oracle 中，SELECT 执行顺序基本相同）：
+
+```sql
+FROM > WHERE > GROUP BY > HAVING > SELECT 的字段 > DISTINCT > ORDER BY > LIMIT
+```
+
+比如你写了一个 SQL 语句，那么它的关键字顺序和执行顺序是下面这样的：
+
+```sql
+SELECT DISTINCT player_id, player_name, count(*) as num -- 顺序 5
+FROM player JOIN team ON player.team_id = team.team_id -- 顺序 1
+WHERE height > 1.80 -- 顺序 2
+GROUP BY player.team_id -- 顺序 3
+HAVING num > 2 -- 顺序 4
+ORDER BY num DESC -- 顺序 6
+LIMIT 2 -- 顺序 7
 ```
 
 ## 过滤数据（WHERE）
 
-子查询是嵌套在较大查询中的 SQL 查询。子查询也称为**内部查询**或**内部选择**，而包含子查询的语句也称为**外部查询**或**外部选择**。
-
-- 子查询可以嵌套在 `SELECT`，`INSERT`，`UPDATE` 或 `DELETE` 语句内或另一个子查询中。
-
-- 子查询通常会在另一个 `SELECT` 语句的 `WHERE` 子句中添加。
-
-- 您可以使用比较运算符，如 `>`，`<`，或 `=`。比较运算符也可以是多行运算符，如 `IN`，`ANY` 或 `ALL`。
-
-- 子查询必须被圆括号 `()` 括起来。
-
-- 内部查询首先在其父查询之前执行，以便可以将内部查询的结果传递给外部查询。执行过程可以参考下图：
-
-  <p align="center">
-    <img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/sql-subqueries.gif" alt="sql-subqueries">
-  </p>
-
-**子查询的子查询**
-
-```sql
-SELECT cust_name, cust_contact
-FROM customers
-WHERE cust_id IN (SELECT cust_id
-                  FROM orders
-                  WHERE order_num IN (SELECT order_num
-                                      FROM orderitems
-                                      WHERE prod_id = 'RGAN01'));
-```
-
-### WHERE 子句
+### WHERE
 
 在 SQL 语句中，数据根据 `WHERE` 子句中指定的搜索条件进行过滤。
 
 `WHERE` 子句的基本格式如下：
 
 ```sql
-SELECT ……(列名) FROM ……(表名) WHERE ……(子句条件)
+SELECT ……（列名） FROM ……（表名） WHERE ……（子句条件）
 ```
 
 `WHERE` 子句用于过滤记录，即缩小访问数据的范围。`WHERE` 后跟一个返回 `true` 或 `false` 的条件。
@@ -503,7 +593,7 @@ SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE 
 
 ### 比较操作符
 
-| 运算符 | 描述                                                   |
+| 操作符 | 描述                                                   |
 | ------ | ------------------------------------------------------ |
 | `=`    | 等于                                                   |
 | `<>`   | 不等于。注释：在 SQL 的一些版本中，该操作符可被写成 != |
@@ -514,7 +604,7 @@ SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE 
 
 ### 范围操作符
 
-| 运算符    | 描述                       |
+| 操作符    | 描述                       |
 | --------- | -------------------------- |
 | `BETWEEN` | 在某个范围内               |
 | `IN`      | 指定针对某个列的多个可能值 |
@@ -523,25 +613,31 @@ SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE 
 
 - `BETWEEN` 操作符在 `WHERE` 子句中使用，作用是选取介于某个范围内的值。
 
-**IN 示例**
+以下为范围操作符使用示例：
+
+::: tabs#范围操作符
+
+@tab IN 示例
 
 ```sql
 SELECT *
-FROM products
+FROM product
 WHERE vend_id IN ('DLL01', 'BRS01');
 ```
 
-**BETWEEN 示例**
+@tab BETWEEN 示例
 
 ```sql
 SELECT *
-FROM products
+FROM product
 WHERE prod_price BETWEEN 3 AND 5;
 ```
 
+:::
+
 ### 逻辑操作符
 
-| 运算符 | 描述       |
+| 操作符 | 描述       |
 | ------ | ---------- |
 | `AND`  | 并且（与） |
 | `OR`   | 或者（或） |
@@ -554,35 +650,38 @@ WHERE prod_price BETWEEN 3 AND 5;
 
 - `NOT` 操作符用于否定一个条件。
 
-**AND 示例**
+以下为逻辑操作符使用示例：
+
+::: tabs#逻辑操作符
+
+@tab AND 示例
 
 ```sql
-SELECT prod_id, prod_name, prod_price
-FROM products
+SELECT * FROM product
 WHERE vend_id = 'DLL01' AND prod_price <= 4;
 ```
 
-**OR 示例**
+@tab OR 示例
 
 ```sql
-SELECT prod_id, prod_name, prod_price
-FROM products
+SELECT * FROM product
 WHERE vend_id = 'DLL01' OR vend_id = 'BRS01';
 ```
 
-**NOT 示例**
+@tab NOT 示例
 
 ```sql
-SELECT *
-FROM products
+SELECT * FROM product
 WHERE prod_price NOT BETWEEN 3 AND 5;
 ```
+
+:::
 
 ### 通配符
 
 | 运算符 | 描述                       |
 | ------ | -------------------------- |
-| `LIKE` | 搜索某种模式               |
+| `LIKE` | 表示模糊查询模式           |
 | `%`    | 表示任意字符出现任意次数   |
 | `_`    | 表示任意字符出现一次       |
 | `[]`   | 必须匹配指定位置的一个字符 |
@@ -597,27 +696,53 @@ WHERE prod_price NOT BETWEEN 3 AND 5;
 
 > 注意：**不要滥用通配符，通配符位于开头处匹配会非常慢**。
 
-`%` 示例：
+以下为统配符使用示例：
+
+::: tabs#逻辑操作符
+
+@tab `%` 示例
 
 ```sql
-SELECT prod_id, prod_name, prod_price
-FROM products
+SELECT * FROM product
 WHERE prod_name LIKE '%bean bag%';
 ```
 
-`_` 示例：
+@tab `_` 示例
 
 ```sql
-SELECT prod_id, prod_name, prod_price
-FROM products
+SELECT * FROM product
 WHERE prod_name LIKE '__ inch teddy bear';
+```
+
+:::
+
+### 子查询
+
+子查询即嵌套在其他查询中的查询。
+
+子查询可以分为关联子查询和非关联子查询。
+
+- 子查询从数据表中查询了数据结果，如果这个数据结果只执行一次，然后这个数据结果作为主查询的条件进行执行，那么这样的子查询叫做**非关联子查询**。
+
+- 如果子查询需要执行多次，即采用循环的方式，先从外部查询开始，每次都传入子查询进行查询，然后再将结果反馈给外部，这种嵌套的执行方式就称为**关联子查询**。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/sql-subqueries.gif)
+
+以下示例仅返回订单表中订单额超过5000的那些客户的详细信息。
+
+```sql
+SELECT *
+FROM customers
+WHERE cust_id IN (SELECT DISTINCT cust_id
+                  FROM orders
+                  WHERE order_value > 5000);
 ```
 
 ## 排序和分组
 
 ### ORDER BY
 
-> `ORDER BY` 用于对结果集进行排序。
+`ORDER BY` 用于对结果集进行排序。
 
 `ORDER BY` 有两种排序模式：
 
@@ -629,7 +754,7 @@ WHERE prod_name LIKE '__ inch teddy bear';
 指定多个列的排序示例：
 
 ```sql
-SELECT * FROM products
+SELECT * FROM product
 ORDER BY prod_price DESC, prod_name ASC;
 ```
 
@@ -746,7 +871,7 @@ AND c2.cust_contact = 'Jim Jones';
 
 ```sql
 SELECT *
-FROM Products
+FROM product
 NATURAL JOIN Customers;
 ```
 
