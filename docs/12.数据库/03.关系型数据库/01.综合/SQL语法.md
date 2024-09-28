@@ -483,35 +483,45 @@ WHERE id <= ? ORDER BY id LIMIT 1000;
 @tab 查询单列
 
 ```sql
-SELECT prod_name FROM product;
+SELECT prod_name 
+FROM Products;
 ```
 
 @tab 查询多列
 
 ```sql
-SELECT prod_id, prod_name, prod_price FROM product;
+SELECT prod_id, prod_name, prod_price 
+FROM Products;
 ```
 
 @tab 查询所有列
 
 ```sql
-SELECT * FROM product;
+SELECT *
+FROM Products;
 ```
 
-@tab 查询过滤重复值
+@tab 查询去重
 
 ```sql
-SELECT DISTINCT vend_id FROM product;
+SELECT DISTINCT vend_id 
+FROM Products;
 ```
 
 @tab 限制查询数量
 
 ```sql
--- 返回前 5 行
-SELECT * FROM product LIMIT 5;
-SELECT * FROM product LIMIT 0, 5;
+-- 返回前 5 行（SQL Server 和 Access）
+SELECT TOP 5 prod_name 
+FROM Products;
+-- 返回前 5 行（MySQL、MariaDB、PostgreSQL 或者 SQLite）
+SELECT prod_name 
+FROM Products 
+LIMIT 5;
 -- 返回第 3 ~ 5 行
-SELECT * FROM product LIMIT 2, 3;
+SELECT prod_name 
+FROM Products 
+LIMIT 2, 3;
 ```
 
 :::
@@ -544,6 +554,8 @@ LIMIT 2 -- 顺序 7
 
 ## 过滤数据（WHERE）
 
+数据库表一般包含大量的数据，很少需要检索表中的所有行。通常只会 根据特定操作或报告的需要提取表数据的子集。只检索所需数据需要指 定搜索条件（search criteria），搜索条件也称为过滤条件（filter condition）。
+
 ### WHERE
 
 在 SQL 语句中，数据根据 `WHERE` 子句中指定的搜索条件进行过滤。
@@ -561,8 +573,9 @@ SELECT ……（列名） FROM ……（表名） WHERE ……（子句条件）
 **`SELECT` 语句中的 `WHERE` 子句**
 
 ```sql
-SELECT * FROM Customers
-WHERE cust_name = 'Kids Place';
+SELECT prod_name, prod_price 
+FROM Products 
+WHERE prod_price = 3.49;
 ```
 
 **`UPDATE` 语句中的 `WHERE` 子句**
@@ -593,14 +606,39 @@ SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE 
 
 ### 比较操作符
 
-| 操作符 | 描述                                                   |
-| ------ | ------------------------------------------------------ |
-| `=`    | 等于                                                   |
-| `<>`   | 不等于。注释：在 SQL 的一些版本中，该操作符可被写成 != |
-| `>`    | 大于                                                   |
-| `<`    | 小于                                                   |
-| `>=`   | 大于等于                                               |
-| `<=`   | 小于等于                                               |
+| 操作符  | 描述                                                   |
+| ------- | ------------------------------------------------------ |
+| `=`     | 等于                                                   |
+| `<>`    | 不等于。注释：在 SQL 的一些版本中，该操作符可被写成 != |
+| `>`     | 大于                                                   |
+| `<`     | 小于                                                   |
+| `>=`    | 大于等于                                               |
+| `<=`    | 小于等于                                               |
+| IS NULL | 是否为空                                               |
+
+【示例】查询所有价格小于 10 美元的产品
+
+```sql
+SELECT prod_name, prod_price 
+FROM Products 
+WHERE prod_price < 10;
+```
+
+【示例】查询所有不是供应商 DLL01 制造的产品
+
+```sql
+SELECT vend_id, prod_name 
+FROM Products 
+WHERE vend_id != 'DLL01';
+```
+
+【示例】查询邮件地址为空的客户
+
+```sql
+SELECT cust_name 
+FROM CUSTOMERS 
+WHERE cust_email IS NULL;
+```
 
 ### 范围操作符
 
@@ -613,24 +651,39 @@ SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE 
 
 - `BETWEEN` 操作符在 `WHERE` 子句中使用，作用是选取介于某个范围内的值。
 
+为什么要使用 IN 操作符？其优点如下。
+
+- 在有很多合法选项时，IN 操作符的语法更清楚，更直观。
+- 在与其他 AND 和 OR 操作符组合使用 IN 时，求值顺序更容易管理。
+- IN 操作符一般比一组 OR 操作符执行得更快（在上面这个合法选项很 少的例子中，你看不出性能差异）。
+- IN 的最大优点是可以包含其他 SELECT 语句，能够更动态地建立 WHERE 子句。
+
 以下为范围操作符使用示例：
 
 ::: tabs#范围操作符
 
 @tab IN 示例
 
+下面两条 SQL 的语义等价：
+
 ```sql
-SELECT *
-FROM product
-WHERE vend_id IN ('DLL01', 'BRS01');
+SELECT prod_name, prod_price 
+FROM Products 
+WHERE vend_id IN ( 'DLL01', 'BRS01' ) 
+ORDER BY prod_name;
+
+SELECT prod_name, prod_price 
+FROM Products 
+WHERE vend_id = 'DLL01' OR vend_id = 'BRS01' 
+ORDER BY prod_name;
 ```
 
 @tab BETWEEN 示例
 
 ```sql
-SELECT *
-FROM product
-WHERE prod_price BETWEEN 3 AND 5;
+SELECT prod_name, prod_price 
+FROM Products 
+WHERE prod_price BETWEEN 5 AND 10;
 ```
 
 :::
@@ -657,27 +710,34 @@ WHERE prod_price BETWEEN 3 AND 5;
 @tab AND 示例
 
 ```sql
-SELECT * FROM product
+SELECT prod_id, prod_price, prod_name 
+FROM Products
 WHERE vend_id = 'DLL01' AND prod_price <= 4;
 ```
 
 @tab OR 示例
 
 ```sql
-SELECT * FROM product
+SELECT prod_id, prod_price, prod_name 
+FROM Products
 WHERE vend_id = 'DLL01' OR vend_id = 'BRS01';
 ```
 
 @tab NOT 示例
 
 ```sql
-SELECT * FROM product
+SELECT prod_id, prod_price, prod_name 
+FROM Products
 WHERE prod_price NOT BETWEEN 3 AND 5;
 ```
 
 :::
 
 ### 通配符
+
+`LIKE` 操作符在 `WHERE` 子句中使用，作用是确定字符串是否匹配模式。只有字段是文本值时才使用 `LIKE`。
+
+`LIKE` 支持以下通配符匹配选项：
 
 | 运算符 | 描述                       |
 | ------ | -------------------------- |
@@ -703,14 +763,14 @@ WHERE prod_price NOT BETWEEN 3 AND 5;
 @tab `%` 示例
 
 ```sql
-SELECT * FROM product
+SELECT * FROM Products
 WHERE prod_name LIKE '%bean bag%';
 ```
 
 @tab `_` 示例
 
 ```sql
-SELECT * FROM product
+SELECT * FROM Products
 WHERE prod_name LIKE '__ inch teddy bear';
 ```
 
@@ -749,12 +809,20 @@ WHERE cust_id IN (SELECT DISTINCT cust_id
 - `ASC` ：升序（默认）
 - `DESC` ：降序
 
-可以按多个列进行排序，并且为每个列指定不同的排序方式。
-
-指定多个列的排序示例：
+单列排序示例：
 
 ```sql
-SELECT * FROM product
+SELECT prod_name 
+FROM Products 
+ORDER BY prod_name;
+```
+
+可以按多个列进行排序，并且为每个列指定不同的排序方式。
+
+多列排序示例：
+
+```sql
+SELECT * FROM Products
 ORDER BY prod_price DESC, prod_name ASC;
 ```
 
@@ -871,7 +939,7 @@ AND c2.cust_contact = 'Jim Jones';
 
 ```sql
 SELECT *
-FROM product
+FROM Products
 NATURAL JOIN Customers;
 ```
 
