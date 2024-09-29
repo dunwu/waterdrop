@@ -1041,9 +1041,243 @@ END;
 
 ## 第 20 课 管理事务处理
 
+使用事务处理（transaction processing），通过确保成批的 SQL 操作要么完全执行，要么完全不执行，来维护数据库的完整性。
+
+- 事务（transaction）指一组 SQL 语句；
+- 回退（rollback）指撤销指定 SQL 语句的过程；
+- 提交（commit）指将未存储的 SQL 语句结果写入数据库表；
+- 保留点（savepoint）指事务处理中设置的临时占位符（placeholder），可以对它发布回退（与回退整个事务处理不同）。
+
+事务开始结束标记
+
+```sql
+-- SQL Server
+BEGIN TRANSACTION
+...
+COMMIT TRANSACTION
+
+-- MariaDB 和 MySQL
+SET TRANSACTION
+...
+
+-- Oracle
+SET TRANSACTION
+...
+
+-- PostgreSQL
+BEGIN
+...
+```
+
+SQL 的 ROLLBACK 命令用来回退（撤销）SQL 语句
+
+```sql
+DELETE FROM Orders;
+ROLLBACK;
+```
+
+一般的 SQL 语句都是针对数据库表直接执行和编写的。这就是所谓的隐式提交（implicit commit），即提交（写或保存）操作是自动进行的。
+
+在事务处理块中，提交不会隐式进行。进行明确的提交，使用 COMMIT 语句。
+
+```sql
+BEGIN TRANSACTION
+DELETE OrderItems WHERE order_num = 12345
+DELETE Orders WHERE order_num = 12345
+COMMIT TRANSACTION
+```
+
+要支持回退部分事务，必须在事务处理块中的合适位置放置占位符。这样，如果需要回退，可以回退到某个占位符。在 SQL 中，这些占位符称为保留点。
+
+```sql
+-- MariaDB、MySQL 和 Oracle
+SAVEPOINT delete1;
+...
+ROLLBACK TO delete1;
+
+-- SQL Server
+SAVE TRANSACTION delete1;
+ROLLBACK TRANSACTION delete1;
+```
+
 ## 第 21 课 使用游标
 
+SQL 检索操作返回一组称为结果集的行，这组返回的行都是与 SQL 语句相匹配的行（零行或多行）。简单地使用 SELECT 语句，没有办法得到第一行、下一行或前 10 行。
+
+有时，需要在检索出来的行中前进或后退一行或多行，这就是游标的用途所在。游标（cursor）是一个存储在 DBMS 服务器上的数据库查询，它不是一条 SELECT 语句，而是被该语句检索出来的结果集。
+
+游标要点
+
+- 能够标记游标为只读，使数据能读取，但不能更新和删除。
+- 能控制可以执行的定向操作（向前、向后、第一、最后、绝对位置、相对位置等）。
+- 能标记某些列为可编辑的，某些列为不可编辑的。
+- 规定范围，使游标对创建它的特定请求（如存储过程）或对所有请求可访问。
+- 指示 DBMS 对检索出的数据（而不是指出表中活动数据）进行复制，使数据在游标打开和访问期间不变化。
+
+使用 DECLARE 语句创建游标，这条语句在不同的 DBMS 中有所不同。DECLARE 命名游标，并定义相应的 SELECT 语句，根据需要带 WHERE 和其他子句。
+
+```sql
+-- DB2、MariaDB、MySQL 和 SQL Server
+DECLARE CustCursor CURSOR
+FOR
+SELECT * FROM Customers
+WHERE cust_email IS NULL
+
+-- Oracle 和 PostgreSQL
+DECLARE CURSOR CustCursor
+IS
+SELECT * FROM Customers
+WHERE cust_email IS NULL
+```
+
+使用 OPEN CURSOR 语句打开游标，在大多数 DBMS 中的语法相同：
+
+```sql
+OPEN CURSOR CustCursor
+```
+
+关闭游标
+
+```sql
+CLOSE CustCursor
+```
+
 ## 第 22 课 高级 SQL 特性
+
+### 约束
+
+约束（constraint）管理如何插入或处理数据库数据的规则。
+
+DBMS 通过在数据库表上施加约束来实施引用完整性。大多数约束是在表定义中定义的，用 CREATE TABLE 或 ALTER TABLE 语句。
+
+主键是一种特殊的约束，用来保证一列（或一组列）中的值是唯一的，而且永不改动。换句话说，表中的一列（或多个列）的值唯一标识表中的每一行。
+
+表中任意列只要满足以下条件，都可以用于主键
+
+- 任意两行的主键值都不相同。
+- 每行都具有一个主键值（即列中不允许 NULL 值）。
+- 包含主键值的列从不修改或更新。
+- 主键值不能重用。如果从表中删除某一行，其主键值不分配给新行。
+
+创建表时指定主键
+
+```sql
+CREATE TABLE vendors (
+  vend_id CHAR(10) NOT NULL PRIMARY KEY,
+  vend_name CHAR(50) NOT NULL,
+  vend_address CHAR(50) NULL,
+  vend_city CHAR(50) NULL,
+  vend_state CHAR(5) NULL,
+  vend_zip CHAR(10) NULL,
+  vend_country CHAR(50) NULL
+);
+```
+
+更新表时指定主键
+
+```sql
+ALTER TABLE Vendors
+ADD CONSTRAINT PRIMARY KEY (vend_id);
+```
+
+外键是表中的一列，其值必须列在另一表的主键中。
+
+创建表时指定外键
+
+cust_id 中的任何值都必须是 Customers 表的 cust_id 中的值
+
+```sql
+CREATE TABLE Orders (
+  order_num INTEGER NOT NULL PRIMARY KEY,
+  order_date DATETIME NOT NULL,
+  cust_id CHAR(10) NOT NULL REFERENCES customers(cust_id)
+);
+```
+
+更新表时指定外键
+
+```sql
+ALTER TABLE Orders
+ADD CONSTRAINT
+FOREIGN KEY (cust_id) REFERENCES Customers (cust_id)
+```
+
+唯一约束用来保证一列（或一组列）中的数据是唯一的。它们类似于主键，但存在以下重要区别。
+
+- 表可包含多个唯一约束，但每个表只允许一个主键。
+- 唯一约束列可包含 NULL 值。
+- 唯一约束列可修改或更新。
+- 唯一约束列的值可重复使用。
+- 与主键不一样，唯一约束不能用来定义外键。
+
+检查约束用来保证一列（或一组列）中的数据满足一组指定的条件。检查约束的常见用途有以下几点。
+
+- 检查最小或最大值。例如，防止 0 个物品的订单（即使 0 是合法的数）。
+- 指定范围。例如，保证发货日期大于等于今天的日期，但不超过今天起一年后的日期。
+- 只允许特定的值。例如，在性别字段中只允许 M 或 F。
+
+利用这个约束，任何插入（或更新）的行都会被检查，保证 quantity 大于 0。
+
+```sql
+CREATE TABLE OrderItems (
+  order_num INTEGER NOT NULL,
+  order_item INTEGER NOT NULL,
+  prod_id CHAR(10) NOT NULL,
+  quantity INTEGER NOT NULL CHECK (quantity > 0),
+  item_price MONEY NOT NULL
+);
+```
+
+检查名为 gender 的列只包含 M 或 F，可编写如下的 ALTER TABLE 语句：
+
+```sql
+ADD CONSTRAINT CHECK (gender LIKE '[MF]')
+```
+
+### 索引
+
+索引用来排序数据以加快搜索和排序操作的速度。
+
+```sql
+CREATE INDEX prod_name_ind
+ON Products (prod_name);
+```
+
+### 触发器
+
+触发器是特殊的存储过程，它在特定的数据库活动发生时自动执行。触发器可以与特定表上的 INSERT、UPDATE 和 DELETE 操作（或组合）相关联。
+
+触发器的一些常见用途
+
+- 保证数据一致。例如，在 INSERT 或 UPDATE 操作中将所有州名转换为大写。
+- 基于某个表的变动在其他表上执行活动。例如，每当更新或删除一行时将审计跟踪记录写入某个日志表。
+- 进行额外的验证并根据需要回退数据。例如，保证某个顾客的可用资金不超限定，如果已经超出，则阻塞插入。
+- 计算计算列的值或更新时间戳。
+
+```sql
+-- SQL Server
+CREATE TRIGGER customer_state
+ON Customers
+FOR INSERT, UPDATE
+AS
+UPDATE Customers
+SET cust_state = Upper(cust_state)
+WHERE Customers.cust_id = inserted.cust_id;
+
+-- Oracle 和 PostgreSQL
+CREATE TRIGGER customer_state
+AFTER INSERT OR UPDATE
+FOR EACH ROW
+BEGIN
+UPDATE Customers
+SET cust_state = Upper(cust_state)
+WHERE Customers.cust_id = :OLD.cust_id
+END;
+```
+
+### 数据库安全
+
+安全性使用 SQL 的 GRANT 和 REVOKE 语句来管理。
 
 ## 参考资料
 
