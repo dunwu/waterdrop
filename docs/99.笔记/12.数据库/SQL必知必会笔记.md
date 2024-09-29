@@ -582,23 +582,462 @@ FROM Products;
 
 ## 第 10 课 分组数据
 
+分组是使用 SELECT 语句的 GROUP BY 子句建立的。
+
+```sql
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+GROUP BY vend_id;
+```
+
+GROUP BY 要点：
+
+- GROUP BY 子句可以包含任意数目的列，因而可以对分组进行嵌套，更细致地进行数据分组。
+- 如果在 GROUP BY 子句中嵌套了分组，数据将在最后指定的分组上进行汇总。换句话说，在建立分组时，指定的所有列都一起计算（所以不能从个别的列取回数据）。
+- GROUP BY 子句中列出的每一列都必须是检索列或有效的表达式（但不能是聚集函数）。如果在 SELECT 中使用表达式，则必须在 GROUP BY 子句中指定相同的表达式。不能使用别名。
+- 大多数 SQL 实现不允许 GROUP BY 列带有长度可变的数据类型（如文本或备注型字段）。
+- 除聚集计算语句外，SELECT 语句中的每一列都必须在 GROUP BY 子句中给出。
+- 如果分组列中包含具有 NULL 值的行，则 NULL 将作为一个分组返回。如果列中有多行 NULL 值，它们将分为一组。
+- GROUP BY 子句必须出现在 WHERE 子句之后，ORDER BY 子句之前。
+
+HAVING 要点：
+
+HAVING 非常类似于 WHERE。唯一的差别是，WHERE 过滤行，而 HAVING 过滤分组。
+
+过滤两个以上订单的分组
+
+```sql
+SELECT cust_id, COUNT(*) AS orders
+FROM Orders
+GROUP BY cust_id
+HAVING COUNT(*) >= 2;
+```
+
+列出具有两个以上产品且其价格大于等于 4 的供应商：
+
+```sql
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+WHERE prod_price >= 4
+GROUP BY vend_id
+HAVING COUNT(*) >= 2;
+```
+
+检索包含三个或更多物品的订单号和订购物品的数目：
+
+```sql
+SELECT order_num, COUNT(*) AS items
+FROM orderitems
+GROUP BY order_num
+HAVING COUNT(*) >= 3;
+```
+
+要按订购物品的数目排序输出，需要添加 ORDER BY 子句
+
+```sql
+SELECT order_num, COUNT(*) AS items
+FROM orderitems
+GROUP BY order_num
+HAVING COUNT(*) >= 3
+ORDER BY items, order_num;
+```
+
+在 SELECT 语句中使用时必须遵循的次序：
+
+```sql
+SELECT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY
+```
+
 ## 第 11 课 使用子查询
+
+子查询（subquery），即嵌套在其他查询中的查询。
+
+假如需要列出订购物品 RGAN01 的所有顾客，应该怎样检索？下面列出具体的步骤。
+
+(1) 检索包含物品 RGAN01 的所有订单的编号。
+
+```sql
+SELECT order_num
+FROM OrderItems
+WHERE prod_id = 'RGAN01';
+```
+
+输出
+
+```
+order_num
+-----------
+20007
+20008
+```
+
+(2) 检索具有前一步骤列出的订单编号的所有顾客的 ID。
+
+```sql
+SELECT cust_id
+FROM Orders
+WHERE order_num IN (20007,20008);
+```
+
+输出
+
+```
+cust_id
+----------
+1000000004
+1000000005
+```
+
+(3) 检索前一步骤返回的所有顾客 ID 的顾客信息。
+
+```sql
+SELECT cust_name, cust_contact
+FROM Customers
+WHERE cust_id IN ('1000000004','1000000005');
+```
+
+现在，结合这两个查询，把第一个查询（返回订单号的那一个）变为子查询。
+
+```sql
+SELECT cust_id
+FROM orders
+WHERE order_num IN (SELECT order_num
+                    FROM orderitems
+                    WHERE prod_id = 'RGAN01');
+```
+
+再进一步结合第三个查询
+
+```sql
+SELECT cust_name, cust_contact
+FROM customers
+WHERE cust_id IN (SELECT cust_id
+                  FROM orders
+                  WHERE order_num IN (SELECT order_num
+                                      FROM orderitems
+                                      WHERE prod_id = 'RGAN01'));
+```
 
 ## 第 12 课 联结表
 
+笛卡尔积 - 由没有联结条件的表关系返回的结果为笛卡儿积。检索出的行的数目将是第一个表中的行数乘以第二个表中的行数。
+
+内联结
+
+```sql
+SELECT vend_name, prod_name, prod_price
+FROM vendors INNER JOIN products
+ON vendors.vend_id = products.vend_id;
+```
+
+联结多个表
+
+下面两个 SQL 等价：
+
+```sql
+SELECT cust_name, cust_contact
+FROM customers, orders, orderitems
+WHERE customers.cust_id = orders.cust_id AND orderitems.order_num = orders.order_num AND prod_id = 'RGAN01';
+
+SELECT cust_name, cust_contact
+FROM customers
+WHERE cust_id IN (SELECT cust_id
+                  FROM orders
+                  WHERE order_num IN (SELECT order_num
+                                      FROM orderitems
+                                      WHERE prod_id = 'RGAN01'));
+```
+
 ## 第 13 课 创建高级联结
+
+自联结
+
+给与 Jim Jones 同一公司的所有顾客发送一封信件：
+
+```sql
+-- 子查询方式
+SELECT cust_id, cust_name, cust_contact
+FROM customers
+WHERE cust_name = (SELECT cust_name
+                   FROM customers
+                   WHERE cust_contact = 'Jim Jones');
+
+-- 自联结方式
+SELECT c1.cust_id, c1.cust_name, c1.cust_contact
+FROM customers AS c1, customers AS c2
+WHERE c1.cust_name = c2.cust_name AND c2.cust_contact = 'Jim Jones';
+```
+
+自然联结
+
+```sql
+SELECT c.*, o.order_num, o.order_date, oi.prod_id, oi.quantity, oi.item_price
+FROM customers AS c, orders AS o, orderitems AS oi
+WHERE c.cust_id = o.cust_id AND oi.order_num = o.order_num AND prod_id = 'RGAN01';
+```
+
+左外联结
+
+```sqL
+SELECT customers.cust_id, orders.order_num
+FROM customers
+       INNER JOIN orders
+ON customers.cust_id = orders.cust_id;
+
+SELECT customers.cust_id, orders.order_num
+FROM customers
+       LEFT OUTER JOIN orders
+ON customers.cust_id = orders.cust_id;
+```
+
+右外联结
+
+```sql
+SELECT customers.cust_id, orders.order_num
+FROM customers
+       RIGHT OUTER JOIN orders
+ON orders.cust_id = customers.cust_id;
+```
+
+全外联结
+
+```sql
+SELECT customers.cust_id, orders.order_num
+FROM orders
+       FULL OUTER JOIN customers
+ON orders.cust_id = customers.cust_id;
+```
+
+> 注意：Access、MariaDB、MySQL、Open Office Base 和 SQLite 不支持 FULLOUTER JOIN 语法。
+
+使用带聚集函数的联结
+
+```sql
+SELECT customers.cust_id,
+  COUNT(orders.order_num) AS num_ord
+FROM customers
+       INNER JOIN orders
+ON customers.cust_id = orders.cust_id
+GROUP BY customers.cust_id;
+```
 
 ## 第 14 课 组合查询
 
+主要有两种情况需要使用组合查询：
+
+- 在一个查询中从不同的表返回结构数据；
+- 对一个表执行多个查询，按一个查询返回数据。
+
+把 Illinois、Indiana、Michigan 等州的缩写传递给 IN 子句，检索出这些州的所有行
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN ('IL','IN','MI');
+```
+
+找出所有 Fun4All
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_name = 'Fun4All';
+```
+
+组合这两条语句
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM customers
+WHERE cust_state IN ('IL', 'IN', 'MI')
+UNION
+SELECT cust_name, cust_contact, cust_email
+FROM customers
+WHERE cust_name = 'Fun4All';
+```
+
+UNION 默认从查询结果集中自动去除了重复的行；如果想返回所有的匹配行，可使用 UNION ALL
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM customers
+WHERE cust_state IN ('IL', 'IN', 'MI')
+UNION ALL
+SELECT cust_name, cust_contact, cust_email
+FROM customers
+WHERE cust_name = 'Fun4All';
+```
+
 ## 第 15 课 插入数据
+
+插入完整的行
+
+```sql
+-- 下面两条 SQL 等价
+INSERT INTO Customers
+VALUES ('1000000006', 'Toy Land', '123 Any Street', 'New York', 'NY', '11111', 'USA', NULL, NULL);
+
+INSERT INTO Customers(cust_id, cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country, cust_contact, cust_email)
+VALUES ('1000000006', 'Toy Land', '123 Any Street', 'New York', 'NY','11111', 'USA', NULL, NULL);
+```
+
+插入行的一部分
+
+```sql
+INSERT INTO customers(cust_id, cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country)
+VALUES ('1000000006', 'Toy Land', '123 Any Street', 'New York', 'NY', '11111', 'USA');
+```
+
+插入某些查询的结果
+
+```sql
+INSERT INTO Customers(cust_id, cust_contact, cust_email, cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country)
+SELECT cust_id, cust_contact, cust_email, cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country
+FROM CustNew;
+```
+
+从一个表复制到另一个表
+
+```sql
+SELECT *
+INTO CustCopy
+FROM Customers;
+
+-- MariaDB、MySQL、Oracle、PostgreSQL 和 SQLite
+CREATE TABLE CustCopy AS
+SELECT * FROM Customers;
+```
 
 ## 第 16 课 更新和删除数据
 
+更新单列
+
+更新客户 1000000005 的电子邮件地址
+
+```sql
+UPDATE Customers
+SET cust_email = 'kim@thetoystore.com'
+WHERE cust_id = '1000000005';
+```
+
+更新多列
+
+```sql
+UPDATE customers
+SET cust_contact = 'Sam Roberts', cust_email = 'sam@toyland.com'
+WHERE cust_id = '1000000006';
+```
+
+从表中删除特定的行
+
+```sql
+DELETE FROM Customers
+WHERE cust_id = '1000000006';
+```
+
+更新和删除的指导原则
+
+- 除非确实打算更新和删除每一行，否则绝对不要使用不带 WHERE 子句的 UPDATE 或 DELETE 语句。
+- 保证每个表都有主键，尽可能像 WHERE 子句那样使用它（可以指定各主键、多个值或值的范围）。
+- 在 UPDATE 或 DELETE 语句使用 WHERE 子句前，应该先用 SELECT 进行测试，保证它过滤的是正确的记录，以防编写的 WHERE 子句不正确。
+- 使用强制实施引用完整性的数据库，这样 DBMS 将不允许删除其数据与其他表相关联的行。
+- 有的 DBMS 允许数据库管理员施加约束，防止执行不带 WHERE 子句的 UPDATE 或 DELETE 语句。如果所采用的 DBMS 支持这个特性，应该使用它。
+
 ## 第 17 课 创建和操纵表
+
+创建表
+
+利用 CREATE TABLE 创建表，必须给出下列信息：
+
+- 新表的名字，在关键字 CREATE TABLE 之后给出；
+- 表列的名字和定义，用逗号分隔；
+- 有的 DBMS 还要求指定表的位置。
+
+```sql
+CREATE TABLE products (
+  prod_id CHAR(10) NOT NULL,
+  vend_id CHAR(10) NOT NULL,
+  prod_name CHAR(254) NOT NULL,
+  prod_price DECIMAL(8, 2) NOT NULL,
+  prod_desc VARCHAR(1000) NULL
+);
+```
+
+### 更新表
+
+添加列：
+
+```sql
+ALTER TABLE Vendors
+ADD vend_phone CHAR(20);
+```
+
+删除列：
+
+```sql
+ALTER TABLE Vendors
+DROP COLUMN vend_phone;
+```
+
+### 删除表
+
+```sql
+DROP TABLE CustCopy;
+```
 
 ## 第 18 课 使用视图
 
+视图是虚拟的表。与包含数据的表不一样，视图只包含使用时动态检索数据的查询。
+
+视图的一些常见应用
+
+重用 SQL 语句
+
+- 简化复杂的 SQL 操作。在编写查询后，可以方便地重用它而不必知道其基本查询细节。
+- 使用表的一部分而不是整个表。
+- 保护数据。可以授予用户访问表的特定部分的权限，而不是整个表的访问权限。
+- 更改数据格式和表示。视图可返回与底层表的表示和格式不同的数据。
+
+创建视图
+
+创建一个名为 ProductCustomers 的视图，它联结三个表，返回已订购了任意产品的所有顾客的列表。
+
+```sql
+CREATE VIEW ProductCustomers AS
+SELECT cust_name, cust_contact, prod_id
+FROM Customers, Orders, OrderItems
+WHERE Customers.cust_id = Orders.cust_id
+AND OrderItems.order_num = Orders.order_num;
+```
+
+检索订购了产品 RGAN01 的顾客
+
+```sql
+SELECT cust_name, cust_contact
+FROM ProductCustomers
+WHERE prod_id = 'RGAN01';
+```
+
 ## 第 19 课 使用存储过程
+
+创建存储过程
+
+对邮件发送清单中具有邮件地址的顾客进行计数
+
+```sql
+CREATE PROCEDURE MailingListCount (
+  ListCount OUT INTEGER
+) IS
+v_rows INTEGER;
+
+BEGIN
+SELECT COUNT(*)
+INTO v_rows
+FROM customers
+WHERE NOT cust_email IS NULL;
+ListCount := v_rows;
+END;
+```
 
 ## 第 20 课 管理事务处理
 
