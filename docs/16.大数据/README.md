@@ -77,7 +77,7 @@ index: false
 
 - **综合**
   - **教程**
-    - [从 0 开始学大数据](https://time.geekbang.org/column/intro/100020201)
+    - [极客时间教程 - 从 0 开始学大数据](https://time.geekbang.org/column/intro/100020201)
     - [BigData-Notes](https://github.com/heibaiying/BigData-Notes)
   - **论文**
     - [The Google File System](https://static.googleusercontent.com/media/research.google.com/zh-CN//archive/gfs-sosp2003.pdf) - Google 大数据三驾马车之一

@@ -1,7 +1,7 @@
 ---
 icon: logos:mysql
 title: Mysql 架构
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202309242206810.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202410022029759.png
 date: 2020-07-16 11:14:07
 order: 01
 categories:
@@ -26,7 +26,7 @@ permalink: /pages/b322c2bc/
 
 **存储引擎层负责数据的存储和提取**。其架构模式是插件式的，支持 InnoDB、MyISAM、Memory 等多个存储引擎。现在最常用的存储引擎是 InnoDB，它从 MySQL 5.5.5 版本开始成为了默认存储引擎。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311111138178.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410022029759.png)
 
 ## Mysql 查询流程
 
@@ -144,7 +144,7 @@ MySQL 更新过程和 MySQL 查询过程类似，也会将流程走一遍。不�
 
 InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，那么总共就可以记录 4GB 的操作。从头开始写，写到末尾就又回到开头循环写，如下面这个图所示。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311111210060.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410022031931.png)
 
 write pos 是当前记录的位置，一边写一边后移，写到第 3 号文件末尾后就回到 0 号文件开头。checkpoint 是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。
 

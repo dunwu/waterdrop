@@ -57,7 +57,7 @@ index: false
 
 - [Mysql 教程](03.关系型数据库/02.Mysql)
 
-  [Mysql 架构](03.关系型数据库/02.Mysql/01.Mysql架构.md)、[Mysql 存储引擎](03.关系型数据库/02.Mysql/02.Mysql存储引擎.md)、[Mysql 索引](03.关系型数据库/02.Mysql/03.Mysql索引.md)、[Mysql 事务](03.关系型数据库/02.Mysql/04.Mysql事务.md)、[Mysql 锁](03.关系型数据库/02.Mysql/05.Mysql锁.md)、[Mysql 高可用](03.关系型数据库/02.Mysql/06.Mysql高可用.md)、[Mysql 优化](03.关系型数据库/02.Mysql/07.Mysql优化.md)、[Mysql 运维](03.关系型数据库/02.Mysql/20.Mysql运维.md)、[Mysql 面试](03.关系型数据库/02.Mysql/99.Mysql面试.md)
+  [Mysql 架构](03.关系型数据库/02.Mysql/Mysql架构.md)、[Mysql 存储引擎](03.关系型数据库/02.Mysql/Mysql存储引擎.md)、[Mysql 索引](03.关系型数据库/02.Mysql/Mysql索引.md)、[Mysql 事务](03.关系型数据库/02.Mysql/Mysql事务.md)、[Mysql 锁](03.关系型数据库/02.Mysql/Mysql锁.md)、[Mysql 高可用](03.关系型数据库/02.Mysql/Mysql高可用.md)、[Mysql 优化](03.关系型数据库/02.Mysql/Mysql优化.md)、[Mysql 运维](03.关系型数据库/02.Mysql/Mysql运维.md)、[Mysql 面试](03.关系型数据库/02.Mysql/Mysql面试.md)
 
 ### [列式数据库](06.列式数据库)
 

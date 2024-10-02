@@ -1,6 +1,6 @@
 ---
 title: SQL 语法必知必会
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202310011053288.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202410022047122.png
 date: 2018-06-15 16:07:17
 order: 02
 categories:
@@ -19,8 +19,6 @@ permalink: /pages/cd3ae5de/
 > 本文针对关系型数据库的基本语法。限于篇幅，本文侧重说明用法，不会展开讲解特性、原理。
 >
 > 本文语法主要针对 Mysql，但大部分的语法对其他关系型数据库也适用。
-
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202310011053288.png)
 
 ## SQL 简介
 
@@ -72,14 +70,22 @@ WHERE username = 'root';
 - SQL 支持三种注释
 
 ```sql
-## 注释 1
--- 注释 2
-/* 注释 3 */
+SELECT prod_name -- 这是一条注释
+FROM Products;
+
+# 这是一条注释
+SELECT prod_name
+FROM Products;
+
+/* SELECT prod_name, vend_id
+FROM Products; */
+SELECT prod_name
+FROM Products;
 ```
 
 #### SQL 分类
 
-- DDL -  **DDL**，英文叫做 Data Definition Language，即**“数据定义语言”**。
+- DDL - **DDL**，英文叫做 Data Definition Language，即**“数据定义语言”**。
   - **DDL 用于定义数据库对象**。
   - DDL 定义操作包括创建（`CREATE`）、删除（`DROP`）、修改（`ALTER`）；而被操作的对象包括：数据库、数据表和列、视图、索引。
 - DML - **DML**，英文叫做 Data Manipulation Language，即**“数据操作语言”**。
@@ -132,6 +138,12 @@ USE db_tutorial;
 
 @tab 创建数据表
 
+利用 `CREATE TABLE` 创建表，必须给出下列信息：
+
+- 新表的名字，在关键字 `CREATE TABLE` 之后给出；
+- 表列的名字和定义，用逗号分隔；
+- 有的 DBMS 还要求指定表的位置。
+
 ```sql
 CREATE TABLE user (
     id       INT(10) UNSIGNED NOT NULL COMMENT 'Id',
@@ -145,7 +157,7 @@ CREATE TABLE user (
 
 ```sql
 DROP TABLE IF EXISTS user;
-DROP TABLE IF EXISTS vip_user;
+DROP TABLE CustCopy;
 ```
 
 @tab 复制表
@@ -223,10 +235,22 @@ WHERE table_schema = 'test' AND table_name = 'user';
 
 @tab 创建视图
 
+创建一个名为 ProductCustomers 的视图，它联结三个表，返回已订购了任意产品的所有顾客的列表。
+
 ```sql
-CREATE VIEW top_10_user_view AS
-SELECT id, username FROM user
-WHERE id < 10;
+CREATE VIEW ProductCustomers AS
+SELECT cust_name, cust_contact, prod_id
+FROM Customers, Orders, OrderItems
+WHERE Customers.cust_id = Orders.cust_id
+AND OrderItems.order_num = Orders.order_num;
+```
+
+检索订购了产品 RGAN01 的顾客
+
+```sql
+SELECT cust_name, cust_contact
+FROM ProductCustomers
+WHERE prod_id = 'RGAN01';
 ```
 
 @tab 删除视图
@@ -286,7 +310,7 @@ ALTER TABLE user DROP PRIMARY KEY;
 
 ### 约束（CONSTRAINT）
 
-SQL 约束用于规定表中的数据规则。
+约束（constraint）管理如何插入或处理数据库数据的规则。
 
 如果存在违反约束的数据行为，行为会被约束终止。约束可以在创建表时规定（通过 `CREATE TABLE` 语句），或者在表创建之后规定（通过 `ALTER TABLE` 语句）。
 
@@ -388,23 +412,39 @@ CREATE TABLE demo6 (
 @tab 插入完整的行
 
 ```sql
-INSERT INTO user
-VALUES (10, 'root', 'root', 'xxxx@163.com');
+-- 下面两条 SQL 等价
+INSERT INTO Customers
+VALUES ('1000000006', 'Toy Land', '123 Any Street', 'New York', 'NY', '11111', 'USA', NULL, NULL);
+
+INSERT INTO Customers(cust_id, cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country, cust_contact, cust_email)
+VALUES ('1000000006', 'Toy Land', '123 Any Street', 'New York', 'NY','11111', 'USA', NULL, NULL);
 ```
 
 @tab 插入行的一部分
 
 ```sql
-INSERT INTO user(username, password, email)
-VALUES ('admin', 'admin', 'xxxx@163.com');
+INSERT INTO customers(cust_id, cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country)
+VALUES ('1000000006', 'Toy Land', '123 Any Street', 'New York', 'NY', '11111', 'USA');
 ```
 
 @tab 插入查询出来的数据
 
 ```sql
-INSERT INTO user(username)
-SELECT name
-FROM account;
+INSERT INTO Customers(cust_id, cust_contact, cust_email, cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country)
+SELECT cust_id, cust_contact, cust_email, cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country
+FROM CustNew;
+```
+
+@tab 从一个表复制到另一个表
+
+```sql
+SELECT *
+INTO CustCopy
+FROM Customers;
+
+-- MariaDB、MySQL、Oracle、PostgreSQL 和 SQLite
+CREATE TABLE CustCopy AS
+SELECT * FROM Customers;
 ```
 
 :::
@@ -413,13 +453,34 @@ FROM account;
 
 `UPDATE` 语句用于更新表中的记录。
 
-以下为更新数据示例：
+::: tabs#更新数据
+
+@tab 更新单列
+
+更新客户 1000000005 的电子邮件地址
 
 ```sql
-UPDATE user
-SET username='robot', password='robot'
-WHERE username = 'root';
+UPDATE Customers
+SET cust_email = 'kim@thetoystore.com'
+WHERE cust_id = '1000000005';
 ```
+
+@tab 更新多列
+
+```sql
+UPDATE customers
+SET cust_contact = 'Sam Roberts', cust_email = 'sam@toyland.com'
+WHERE cust_id = '1000000006';
+```
+
+@tab 从表中删除特定的行
+
+```sql
+DELETE FROM Customers
+WHERE cust_id = '1000000006';
+```
+
+:::
 
 ### 删除数据（DELETE）
 
@@ -483,14 +544,14 @@ WHERE id <= ? ORDER BY id LIMIT 1000;
 @tab 查询单列
 
 ```sql
-SELECT prod_name 
+SELECT prod_name
 FROM Products;
 ```
 
 @tab 查询多列
 
 ```sql
-SELECT prod_id, prod_name, prod_price 
+SELECT prod_id, prod_name, prod_price
 FROM Products;
 ```
 
@@ -504,24 +565,39 @@ FROM Products;
 @tab 查询去重
 
 ```sql
-SELECT DISTINCT vend_id 
+SELECT DISTINCT vend_id
 FROM Products;
 ```
 
 @tab 限制查询数量
 
 ```sql
--- 返回前 5 行（SQL Server 和 Access）
-SELECT TOP 5 prod_name 
+-- SQL Server 和 Access
+SELECT TOP 5 prod_name
 FROM Products;
--- 返回前 5 行（MySQL、MariaDB、PostgreSQL 或者 SQLite）
-SELECT prod_name 
-FROM Products 
+
+-- DB2
+SELECT prod_name
+FROM Products
+FETCH FIRST 5 ROWS ONLY;
+
+-- Oracle
+SELECT prod_name
+FROM Products
+WHERE ROWNUM <=5;
+
+-- MySQL、MariaDB、PostgreSQL 或者 SQLite
+SELECT prod_name
+FROM Products
 LIMIT 5;
--- 返回第 3 ~ 5 行
-SELECT prod_name 
-FROM Products 
-LIMIT 2, 3;
+-- 检索从第 5 行起的 5 行数据
+SELECT prod_name
+FROM Products
+LIMIT 5 OFFSET 5;
+-- MySQL 和 MariaDB 中，上面的示例可以简化如下
+SELECT prod_name
+FROM Products
+LIMIT 5, 5;
 ```
 
 :::
@@ -554,7 +630,7 @@ LIMIT 2 -- 顺序 7
 
 ## 过滤数据（WHERE）
 
-数据库表一般包含大量的数据，很少需要检索表中的所有行。通常只会 根据特定操作或报告的需要提取表数据的子集。只检索所需数据需要指 定搜索条件（search criteria），搜索条件也称为过滤条件（filter condition）。
+数据库表一般包含大量的数据，很少需要检索表中的所有行。通常只会根据特定操作或报告的需要提取表数据的子集。只检索所需数据需要指 定搜索条件（search criteria），搜索条件也称为过滤条件（filter condition）。
 
 ### WHERE
 
@@ -566,34 +642,7 @@ LIMIT 2 -- 顺序 7
 SELECT ……（列名） FROM ……（表名） WHERE ……（子句条件）
 ```
 
-`WHERE` 子句用于过滤记录，即缩小访问数据的范围。`WHERE` 后跟一个返回 `true` 或 `false` 的条件。
-
-`WHERE` 可以与 `SELECT`，`UPDATE` 和 `DELETE` 一起使用。
-
-**`SELECT` 语句中的 `WHERE` 子句**
-
-```sql
-SELECT prod_name, prod_price 
-FROM Products 
-WHERE prod_price = 3.49;
-```
-
-**`UPDATE` 语句中的 `WHERE` 子句**
-
-```sql
-UPDATE Customers
-SET cust_name = 'Jack Jones'
-WHERE cust_name = 'Kids Place';
-```
-
-**`DELETE` 语句中的 `WHERE` 子句**
-
-```sql
-DELETE FROM Customers
-WHERE cust_name = 'Kids Place';
-```
-
-下面列举更多的 WHERE 常见用法：
+`WHERE` 的常见用法：
 
 ```sql
 SELECT column1, column2 FROM table_name WHERE condition;
@@ -601,8 +650,69 @@ SELECT * FROM table_name WHERE condition1 AND condition2;
 SELECT * FROM table_name WHERE condition1 OR condition2;
 SELECT * FROM table_name WHERE NOT condition;
 SELECT * FROM table_name WHERE condition1 AND (condition2 OR condition3);
-SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE condition);
+SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE condition)
 ```
+
+`WHERE` 可以与 `SELECT`，`UPDATE` 和 `DELETE` 一起使用。
+
+::: tabs#WHERE 示例
+
+@tab `SELECT` 语句中的 `WHERE` 子句
+
+检索所有价格小于 10 美元的产品。
+
+```sql
+SELECT prod_name, prod_price
+FROM Products
+WHERE prod_price < 10;
+```
+
+检索所有不是供应商 DLL01 制造的产品
+
+```sql
+-- 下面两条查询语句作用相同
+
+SELECT vend_id, prod_name
+FROM Products
+WHERE vend_id <> 'DLL01';
+
+SELECT vend_id, prod_name
+FROM Products
+WHERE vend_id != 'DLL01';
+```
+
+检索价格在 5 美元和 10 美元之间的所有产品
+
+```sql
+SELECT prod_name, prod_price
+FROM Products
+WHERE prod_price BETWEEN 5 AND 10;
+```
+
+检索所有没有邮件地址的顾客
+
+```sql
+SELECT cust_name
+FROM CUSTOMERS
+WHERE cust_email IS NULL;
+```
+
+@tab `UPDATE` 语句中的 `WHERE` 子句
+
+```sql
+UPDATE Customers
+SET cust_name = 'Jack Jones'
+WHERE cust_name = 'Kids Place';
+```
+
+@tab `DELETE` 语句中的 `WHERE` 子句
+
+```sql
+DELETE FROM Customers
+WHERE cust_name = 'Kids Place';
+```
+
+:::
 
 ### 比较操作符
 
@@ -619,24 +729,24 @@ SELECT * FROM table_name WHERE EXISTS (SELECT column_name FROM table_name WHERE 
 【示例】查询所有价格小于 10 美元的产品
 
 ```sql
-SELECT prod_name, prod_price 
-FROM Products 
+SELECT prod_name, prod_price
+FROM Products
 WHERE prod_price < 10;
 ```
 
 【示例】查询所有不是供应商 DLL01 制造的产品
 
 ```sql
-SELECT vend_id, prod_name 
-FROM Products 
+SELECT vend_id, prod_name
+FROM Products
 WHERE vend_id != 'DLL01';
 ```
 
 【示例】查询邮件地址为空的客户
 
 ```sql
-SELECT cust_name 
-FROM CUSTOMERS 
+SELECT cust_name
+FROM CUSTOMERS
 WHERE cust_email IS NULL;
 ```
 
@@ -647,9 +757,9 @@ WHERE cust_email IS NULL;
 | `BETWEEN` | 在某个范围内               |
 | `IN`      | 指定针对某个列的多个可能值 |
 
-- `IN` 操作符在 `WHERE` 子句中使用，作用是在指定的几个特定值中任选一个值。
+`BETWEEN` 操作符在 `WHERE` 子句中使用，作用是选取介于某个范围内的值。
 
-- `BETWEEN` 操作符在 `WHERE` 子句中使用，作用是选取介于某个范围内的值。
+`IN` 操作符用来指定条件范围，范围中的每个条件都可以进行匹配。`IN` 取一组由逗号分隔、括在圆括号中的合法值。
 
 为什么要使用 IN 操作符？其优点如下。
 
@@ -667,22 +777,22 @@ WHERE cust_email IS NULL;
 下面两条 SQL 的语义等价：
 
 ```sql
-SELECT prod_name, prod_price 
-FROM Products 
-WHERE vend_id IN ( 'DLL01', 'BRS01' ) 
+SELECT prod_name, prod_price
+FROM Products
+WHERE vend_id IN ( 'DLL01', 'BRS01' )
 ORDER BY prod_name;
 
-SELECT prod_name, prod_price 
-FROM Products 
-WHERE vend_id = 'DLL01' OR vend_id = 'BRS01' 
+SELECT prod_name, prod_price
+FROM Products
+WHERE vend_id = 'DLL01' OR vend_id = 'BRS01'
 ORDER BY prod_name;
 ```
 
 @tab BETWEEN 示例
 
 ```sql
-SELECT prod_name, prod_price 
-FROM Products 
+SELECT prod_name, prod_price
+FROM Products
 WHERE prod_price BETWEEN 5 AND 10;
 ```
 
@@ -701,52 +811,79 @@ WHERE prod_price BETWEEN 5 AND 10;
 - `AND` 优先级高于 `OR`，为了明确处理顺序，可以使用 `()`。`AND` 操作符表示左右条件都要满足。
 - `OR` 操作符表示左右条件满足任意一个即可。
 
-- `NOT` 操作符用于否定一个条件。
+- `NOT` 操作符用于否定其后条件。
 
 以下为逻辑操作符使用示例：
 
 ::: tabs#逻辑操作符
 
-@tab AND 示例
+@tab `AND` 示例
+
+检索由供应商 DLL01 制造且价格小于等于 4 美元的所有产品的名称和价格
 
 ```sql
-SELECT prod_id, prod_price, prod_name 
+SELECT prod_id, prod_price, prod_name
 FROM Products
 WHERE vend_id = 'DLL01' AND prod_price <= 4;
 ```
 
-@tab OR 示例
+@tab `OR` 示例
+
+检索由供应商 DLL01 或供应商 BRS01 制造的所有产品的名称和价格
 
 ```sql
-SELECT prod_id, prod_price, prod_name 
+SELECT prod_id, prod_price, prod_name
 FROM Products
 WHERE vend_id = 'DLL01' OR vend_id = 'BRS01';
 ```
 
 @tab NOT 示例
 
+检索除 DLL01 之外的所有供应商制造的产品
+
 ```sql
-SELECT prod_id, prod_price, prod_name 
+SELECT prod_name
 FROM Products
-WHERE prod_price NOT BETWEEN 3 AND 5;
+WHERE NOT vend_id = 'DLL01'
+ORDER BY prod_name;
+```
+
+和下面的示例作用相同
+
+```sql
+SELECT prod_name
+FROM Products
+WHERE vend_id <> 'DLL01'
+ORDER BY prod_name;
+```
+
+@tab `AND` 和 `OR` 优先级示例
+
+SQL 在处理 `OR` 操作符前，优先处理 `AND` 操作符。
+
+下面的示例中，SQL 会理解为由供应商 BRS01 制造的价格为 10 美元以上的所有产品，以及由供应商 DLL01 制造的所有产品，而不管其价格如何。
+
+```sql
+SELECT prod_name, prod_price
+FROM Products
+WHERE vend_id = 'DLL01' OR vend_id = 'BRS01'
+AND prod_price >= 10;
+```
+
+任何时候使用具有 AND 和 OR 操作符的 WHERE 子句，都应该使用圆括号明确地分组操作符。
+
+```sql
+SELECT prod_name, prod_price
+FROM Products
+WHERE (vend_id = 'DLL01' OR vend_id = 'BRS01')
+AND prod_price >= 10;
 ```
 
 :::
 
 ### 通配符
 
-`LIKE` 操作符在 `WHERE` 子句中使用，作用是确定字符串是否匹配模式。只有字段是文本值时才使用 `LIKE`。
-
-`LIKE` 支持以下通配符匹配选项：
-
-| 运算符 | 描述                       |
-| ------ | -------------------------- |
-| `LIKE` | 表示模糊查询模式           |
-| `%`    | 表示任意字符出现任意次数   |
-| `_`    | 表示任意字符出现一次       |
-| `[]`   | 必须匹配指定位置的一个字符 |
-
-`LIKE` 操作符在 `WHERE` 子句中使用，作用是确定字符串是否匹配模式。只有字段是文本值时才使用 `LIKE`。
+`LIKE` 操作符在 `WHERE` 子句中使用，作用是确定字符串是否匹配模式。只有字段是文本值时才使用 `LIKE`。**不要滥用通配符，通配符位于开头处匹配会非常慢**。
 
 `LIKE` 支持以下通配符匹配选项：
 
@@ -754,17 +891,36 @@ WHERE prod_price NOT BETWEEN 3 AND 5;
 - `_` 表示任何字符出现一次。
 - `[]` 必须匹配指定位置的一个字符。
 
-> 注意：**不要滥用通配符，通配符位于开头处匹配会非常慢**。
+> 说明：并不是所有 DBMS 都支持 `[]`。只有微软的 Access 和 SQL Server 支持 `[]`。
 
-以下为统配符使用示例：
+以下为通配符使用示例：
 
 ::: tabs#逻辑操作符
 
 @tab `%` 示例
 
+检索所有产品名以 Fish 开头的产品
+
 ```sql
-SELECT * FROM Products
+SELECT prod_id, prod_name
+FROM Products
+WHERE prod_name LIKE 'Fish%';
+```
+
+检索产品名中包含 bean bag 的产品
+
+```sql
+SELECT prod_id, prod_name
+FROM Products
 WHERE prod_name LIKE '%bean bag%';
+```
+
+检索产品名中以 F 开头，y 结尾的产品
+
+```sql
+SELECT prod_name
+FROM Products
+WHERE prod_name LIKE 'F%y';
 ```
 
 @tab `_` 示例
@@ -774,11 +930,22 @@ SELECT * FROM Products
 WHERE prod_name LIKE '__ inch teddy bear';
 ```
 
+@tab `[]` 示例
+
+找出所有名字以 J 或 M 开头的联系人：
+
+```sql
+SELECT cust_contact
+FROM Customers
+WHERE cust_contact LIKE '[JM]%'
+ORDER BY cust_contact;
+```
+
 :::
 
 ### 子查询
 
-子查询即嵌套在其他查询中的查询。
+子查询（subquery），即嵌套在其他查询中的查询。
 
 子查询可以分为关联子查询和非关联子查询。
 
@@ -788,23 +955,77 @@ WHERE prod_name LIKE '__ inch teddy bear';
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/sql-subqueries.gif)
 
-以下示例仅返回订单表中订单额超过5000的那些客户的详细信息。
+假如需要列出订购物品 RGAN01 的所有顾客，应该怎样检索？下面列出具体的步骤。
+
+(1) 检索包含物品 RGAN01 的所有订单的编号。
 
 ```sql
-SELECT *
+SELECT order_num
+FROM OrderItems
+WHERE prod_id = 'RGAN01';
+```
+
+输出
+
+```text
+order_num
+-----------
+20007
+20008
+```
+
+(2) 检索具有前一步骤列出的订单编号的所有顾客的 ID。
+
+```sql
+SELECT cust_id
+FROM Orders
+WHERE order_num IN (20007,20008);
+```
+
+输出
+
+```text
+cust_id
+----------
+1000000004
+1000000005
+```
+
+(3) 检索前一步骤返回的所有顾客 ID 的顾客信息。
+
+```sql
+SELECT cust_name, cust_contact
+FROM Customers
+WHERE cust_id IN ('1000000004','1000000005');
+```
+
+现在，结合这两个查询，把第一个查询（返回订单号的那一个）变为子查询。
+
+```sql
+SELECT cust_id
+FROM orders
+WHERE order_num IN (SELECT order_num
+                    FROM orderitems
+                    WHERE prod_id = 'RGAN01');
+```
+
+再进一步结合第三个查询
+
+```sql
+SELECT cust_name, cust_contact
 FROM customers
-WHERE cust_id IN (SELECT DISTINCT cust_id
+WHERE cust_id IN (SELECT cust_id
                   FROM orders
-                  WHERE order_value > 5000);
+                  WHERE order_num IN (SELECT order_num
+                                      FROM orderitems
+                                      WHERE prod_id = 'RGAN01'));
 ```
 
 ## 排序和分组
 
 ### ORDER BY
 
-`ORDER BY` 用于对结果集进行排序。
-
-`ORDER BY` 有两种排序模式：
+`ORDER BY` 用于对结果集进行排序。`ORDER BY` 子句取一个或多个列的名字，据此对输出进行排序。`ORDER BY` 支持两种排序方式：
 
 - `ASC` ：升序（默认）
 - `DESC` ：降序
@@ -812,8 +1033,8 @@ WHERE cust_id IN (SELECT DISTINCT cust_id
 单列排序示例：
 
 ```sql
-SELECT prod_name 
-FROM Products 
+SELECT prod_name
+FROM Products
 ORDER BY prod_name;
 ```
 
@@ -826,15 +1047,27 @@ SELECT * FROM Products
 ORDER BY prod_price DESC, prod_name ASC;
 ```
 
+按列位置排序（不推荐）：
+
+```sql
+SELECT prod_id, prod_price, prod_name
+FROM Products
+ORDER BY 2, 3;
+```
+
 ### GROUP BY
 
-> `GROUP BY` 子句将记录分组到汇总行中，`GROUP BY` 为每个组返回一个记录。
+`GROUP BY` 子句将记录分组到汇总行中，`GROUP BY` 为每个组返回一个记录。
 
-`GROUP BY` 可以按一列或多列进行分组。
+GROUP BY 要点：
 
-`GROUP BY` 通常还涉及聚合函数：COUNT，MAX，SUM，AVG 等。
-
-`GROUP BY` 按分组字段进行排序后，`ORDER BY` 可以以汇总字段来进行排序。
+- GROUP BY 子句可以包含任意数目的列，因而可以对分组进行嵌套，更细致地进行数据分组。
+- 如果在 GROUP BY 子句中嵌套了分组，数据将在最后指定的分组上进行汇总。换句话说，在建立分组时，指定的所有列都一起计算（所以不能从个别的列取回数据）。
+- GROUP BY 子句中列出的每一列都必须是检索列或有效的表达式（但不能是聚集函数）。如果在 SELECT 中使用表达式，则必须在 GROUP BY 子句中指定相同的表达式。不能使用别名。
+- 大多数 SQL 实现不允许 GROUP BY 列带有长度可变的数据类型（如文本或备注型字段）。
+- 除聚集计算语句外，SELECT 语句中的每一列都必须在 GROUP BY 子句中给出。
+- 如果分组列中包含具有 NULL 值的行，则 NULL 将作为一个分组返回。如果列中有多行 NULL 值，它们将分为一组。
+- GROUP BY 子句必须出现在 WHERE 子句之后，ORDER BY 子句之前。
 
 分组示例：
 
@@ -853,49 +1086,79 @@ ORDER BY cust_name DESC;
 
 ### HAVING
 
-> `HAVING` 用于对汇总的 `GROUP BY` 结果进行过滤。`HAVING` 要求存在一个 `GROUP BY` 子句。
+`HAVING` 用于对汇总的 `GROUP BY` 结果进行过滤。`HAVING` 要求存在一个 `GROUP BY` 子句。
 
 `WHERE` 和 `HAVING` 可以在相同的查询中。
 
 `HAVING` vs `WHERE`：
 
-- `WHERE` 和 `HAVING` 都是用于过滤。
-- `HAVING` 适用于汇总的组记录；而 `WHERE` 适用于单个记录。
+- `HAVING` 非常类似于 `WHERE`。`WHERE` 和 `HAVING` 都是用于过滤。
+- `WHERE` 过滤行，而 `HAVING` 过滤分组。
 
 使用 `WHERE` 和 `HAVING` 过滤数据示例：
 
+过滤两个以上订单的分组
+
 ```sql
-SELECT cust_name, COUNT(*) AS num
-FROM Customers
-WHERE cust_email IS NOT NULL
-GROUP BY cust_name
-HAVING COUNT(*) >= 1;
+SELECT cust_id, COUNT(*) AS orders
+FROM Orders
+GROUP BY cust_id
+HAVING COUNT(*) >= 2;
 ```
 
-## 连接和组合
+列出具有两个以上产品且其价格大于等于 4 的供应商：
 
-### 连接（JOIN）
+```sql
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+WHERE prod_price >= 4
+GROUP BY vend_id
+HAVING COUNT(*) >= 2;
+```
 
-**在 SELECT, UPDATE 和 DELETE 语句中，“连接”可以用于联合多表查询。连接使用 `JOIN` 关键字，并且条件语句使用 `ON` 而不是 `WHERE`**。
+检索包含三个或更多物品的订单号和订购物品的数目：
 
-**连接可以替换子查询，并且一般比子查询的效率更快**。
+```sql
+SELECT order_num, COUNT(*) AS items
+FROM orderitems
+GROUP BY order_num
+HAVING COUNT(*) >= 3;
+```
+
+要按订购物品的数目排序输出，需要添加 ORDER BY 子句
+
+```sql
+SELECT order_num, COUNT(*) AS items
+FROM orderitems
+GROUP BY order_num
+HAVING COUNT(*) >= 3
+ORDER BY items, order_num;
+```
+
+## 联结和组合
+
+### 联结（JOIN）
+
+**在 SELECT, UPDATE 和 DELETE 语句中，“联结”可以用于联合多表查询。联结使用 `JOIN` 关键字，并且条件语句使用 `ON` 而不是 `WHERE`**。
+
+**联结可以替换子查询，并且一般比子查询的效率更快**。
 
 `JOIN` 有以下类型：
 
-- 内连接 - 内连接又称等值连接，用于获取两个表中字段匹配关系的记录，**使用 `INNER JOIN` 关键字**。在没有条件语句的情况下**返回笛卡尔积**。
-  - 笛卡尔积 - **“笛卡尔积”也称为交叉连接（`CROSS JOIN`），它的作用就是可以把任意表进行连接，即使这两张表不相关**。
-  - 自连接（=） - **“自连接（=）”可以看成内连接的一种，只是连接的表是自身而已**。
-  - 自然连接（NATURAL JOIN） - **“自然连接”会自动连接所有同名列**。自然连接使用 `NATURAL JOIN` 关键字。
-- 外连接
-  - 左连接（LEFT JOIN） - **“左外连接”会获取左表所有记录，即使右表没有对应匹配的记录**。左外连接使用 `LEFT JOIN` 关键字。
-  - 右连接（RIGHT JOIN） - **“右外连接”会获取右表所有记录，即使左表没有对应匹配的记录**。右外连接使用 `RIGHT JOIN` 关键字。
+- **内联结** - 内联结又称等值联结，用于获取两个表中字段匹配关系的记录，**使用 `INNER JOIN` 关键字**。在没有条件语句的情况下**返回笛卡尔积**。
+  - **笛卡尔积** - “笛卡尔积”也称为交叉联结（`CROSS JOIN`）。由没有联结条件的表关系返回的结果为笛卡儿积。检索出的行的数目将是第一个表中的行数乘以第二个表中的行数。
+  - **自联结（=）** - “自联结（=）”可以看成内联结的一种，只是联结的表是自身而已。
+  - **自然联结（NATURAL JOIN）** - “自然联结”会自动联结所有同名列。自然联结使用 `NATURAL JOIN` 关键字。
+- **外联结**
+  - **左联结（LEFT JOIN）** - “左外联结”会获取左表所有记录，即使右表没有对应匹配的记录。左外联结使用 `LEFT JOIN` 关键字。
+  - **右联结（RIGHT JOIN）** - “右外联结”会获取右表所有记录，即使左表没有对应匹配的记录。右外联结使用 `RIGHT JOIN` 关键字。
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/sql-join.png" alt="sql-join">
 </div>
-#### 内连接（INNER JOIN）
+#### 内联结（INNER JOIN）
 
-内连接又称等值连接，用于获取两个表中字段匹配关系的记录，**使用 `INNER JOIN` 关键字**。在没有条件语句的情况下**返回笛卡尔积**。
+内联结又称等值联结，用于获取两个表中字段匹配关系的记录，**使用 `INNER JOIN` 关键字**。在没有条件语句的情况下**返回笛卡尔积**。
 
 ```sql
 SELECT vend_name, prod_name, prod_price
@@ -910,7 +1173,7 @@ ON vendors.vend_id = products.vend_id;
 
 ##### 笛卡尔积
 
-**“笛卡尔积”也称为交叉连接（`CROSS JOIN`），它的作用就是可以把任意表进行连接，即使这两张表不相关**。但通常进行连接还是需要筛选的，因此需要在连接后面加上 `WHERE` 子句，也就是作为过滤条件对连接数据进行筛选。
+**“笛卡尔积”也称为交叉联结（`CROSS JOIN`），它的作用就是可以把任意表进行联结，即使这两张表不相关**。但通常进行联结还是需要筛选的，因此需要在联结后面加上 `WHERE` 子句，也就是作为过滤条件对联结数据进行筛选。
 
 笛卡尔积是一个数学运算。假设我有两个集合 X 和 Y，那么 X 和 Y 的笛卡尔积就是 X 和 Y 的所有可能组合，也就是第一个对象来自于 X，第二个对象来自于 Y 的所有可能。
 
@@ -922,20 +1185,29 @@ SELECT * FROM t1, t2;
 SELECT * FROM t1 CROSS JOIN t2;
 ```
 
-##### 自连接（=）
+##### 自联结（=）
 
-**“自连接”可以看成内连接的一种，只是连接的表是自身而已**。
+**“自联结”可以看成内联结的一种，只是联结的表是自身而已**。
+
+给与 Jim Jones 同一公司的所有顾客发送一封信件：
 
 ```sql
+-- 子查询方式
+SELECT cust_id, cust_name, cust_contact
+FROM customers
+WHERE cust_name = (SELECT cust_name
+                   FROM customers
+                   WHERE cust_contact = 'Jim Jones');
+
+-- 自联结方式
 SELECT c1.cust_id, c1.cust_name, c1.cust_contact
-FROM customers c1, customers c2
-WHERE c1.cust_name = c2.cust_name
-AND c2.cust_contact = 'Jim Jones';
+FROM customers AS c1, customers AS c2
+WHERE c1.cust_name = c2.cust_name AND c2.cust_contact = 'Jim Jones';
 ```
 
-##### 自然连接（NATURAL JOIN）
+##### 自然联结（NATURAL JOIN）
 
-**“自然连接”会自动连接所有同名列**。自然连接使用 `NATURAL JOIN` 关键字。
+**“自然联结”会自动联结所有同名列**。自然联结使用 `NATURAL JOIN` 关键字。
 
 ```sql
 SELECT *
@@ -943,13 +1215,13 @@ FROM Products
 NATURAL JOIN Customers;
 ```
 
-#### 外连接（OUTER JOIN）
+#### 外联结（OUTER JOIN）
 
-外连接返回一个表中的所有行，并且仅返回来自此表中满足连接条件的那些行，即两个表中的列是相等的。外连接分为左外连接、右外连接、全外连接（Mysql 不支持）。
+外联结返回一个表中的所有行，并且仅返回来自此表中满足联结条件的那些行，即两个表中的列是相等的。外联结分为左外联结、右外联结、全外联结（Mysql 不支持）。
 
-##### 左连接（LEFT JOIN）
+##### 左联结（LEFT JOIN）
 
-**“左外连接”会获取左表所有记录，即使右表没有对应匹配的记录**。左外连接使用 `LEFT JOIN` 关键字。
+**“左外联结”会获取左表所有记录，即使右表没有对应匹配的记录**。左外联结使用 `LEFT JOIN` 关键字。
 
 ```sql
 SELECT customers.cust_id, orders.order_num
@@ -957,9 +1229,9 @@ FROM customers LEFT JOIN orders
 ON customers.cust_id = orders.cust_id;
 ```
 
-##### 右连接（RIGHT JOIN）
+##### 右联结（RIGHT JOIN）
 
-**“右外连接”会获取右表所有记录，即使左表没有对应匹配的记录**。右外连接使用 `RIGHT JOIN` 关键字。
+**“右外联结”会获取右表所有记录，即使左表没有对应匹配的记录**。右外联结使用 `RIGHT JOIN` 关键字。
 
 ```sql
 SELECT customers.cust_id, orders.order_num
@@ -969,7 +1241,7 @@ ON customers.cust_id = orders.cust_id;
 
 ### 组合（UNION）
 
-> `UNION` 运算符**将两个或更多查询的结果组合起来，并生成一个结果集**，其中包含来自 `UNION` 中参与查询的提取行。
+`UNION` 运算符**将两个或更多查询的结果组合起来，并生成一个结果集**，其中包含来自 `UNION` 中参与查询的提取行。
 
 `UNION` 基本规则：
 
@@ -977,16 +1249,28 @@ ON customers.cust_id = orders.cust_id;
 - 每个查询中涉及表的列的数据类型必须相同或兼容。
 - 通常返回的列名取自第一个查询。
 
-默认会去除相同行，如果需要保留相同行，使用 `UNION ALL`。
+主要有两种情况需要使用组合查询：
 
-只能包含一个 `ORDER BY` 子句，并且必须位于语句的最后。
-
-应用场景：
-
-- 在一个查询中从不同的表返回结构数据。
+- 在一个查询中从不同的表返回结构数据；
 - 对一个表执行多个查询，按一个查询返回数据。
 
-组合查询示例：
+把 Illinois、Indiana、Michigan 等州的缩写传递给 IN 子句，检索出这些州的所有行
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN ('IL','IN','MI');
+```
+
+找出所有 Fun4All
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_name = 'Fun4All';
+```
+
+组合这两条语句
 
 ```sql
 SELECT cust_name, cust_contact, cust_email
@@ -998,9 +1282,21 @@ FROM customers
 WHERE cust_name = 'Fun4All';
 ```
 
+`UNION` 默认从查询结果集中自动去除了重复的行；如果想返回所有的匹配行，可使用 `UNION ALL`。
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM customers
+WHERE cust_state IN ('IL', 'IN', 'MI')
+UNION ALL
+SELECT cust_name, cust_contact, cust_email
+FROM customers
+WHERE cust_name = 'Fun4All';
+```
+
 ### JOIN vs UNION
 
-- `JOIN` 中连接表的列可能不同，但在 `UNION` 中，所有查询的列数和列顺序必须相同。
+- `JOIN` 中联结表的列可能不同，但在 `UNION` 中，所有查询的列数和列顺序必须相同。
 - `UNION` 将查询之后的行放在一起（垂直放置），但 `JOIN` 将查询之后的列放在一起（水平放置），即它构成一个笛卡尔积。
 
 ## 函数
@@ -1020,10 +1316,39 @@ WHERE cust_name = 'Fun4All';
 
 其中， **SOUNDEX()** 可以将一个字符串转换为描述其语音表示的字母数字模式。
 
+以下为部分字符串函数的使用示例
+
+拼接字符串值：
+
 ```sql
-SELECT *
-FROM mytable
-WHERE SOUNDEX(col1) = SOUNDEX('apple')
+-- Access 和 SQL Server
+SELECT vend_name + ' (' + vend_country + ')'
+FROM Vendors
+ORDER BY vend_name;
+
+-- DB2、Oracle、PostgreSQL、SQLite 和 Open Office Base
+SELECT vend_name || ' (' || vend_country || ')'
+FROM Vendors
+ORDER BY vend_name;
+
+-- MySQL 或 MariaDB
+SELECT Concat(vend_name, ' (', vend_country, ')')
+FROM Vendors
+ORDER BY vend_name;
+```
+
+去除字符串中的空格：
+
+```sql
+-- Access 和 SQL Server
+SELECT RTRIM(vend_name) + ' (' + RTRIM(vend_country) + ')'
+FROM Vendors
+ORDER BY vend_name;
+
+-- DB2、Oracle、PostgreSQL、SQLite 和 Open Office Base
+SELECT RTRIM(vend_name) || ' (' || RTRIM(vend_country) || ')'
+FROM Vendors
+ORDER BY vend_name;
 ```
 
 ### 时间函数
@@ -1051,21 +1376,48 @@ WHERE SOUNDEX(col1) = SOUNDEX('apple')
 |     `TIME()`     |   返回一个日期时间的时间部分   |
 |     `YEAR()`     |     返回一个日期的年份部分     |
 
+部分日期和时间处理函数使用示例：
+
 ```sql
-mysql> SELECT NOW();
-2018-4-14 20:25:11
+-- SQL Server
+SELECT order_num
+FROM Orders
+WHERE DATEPART(yy, order_date) = 2012;
+
+-- Access
+SELECT order_num
+FROM Orders
+WHERE DATEPART('yyyy', order_date) = 2012;
+
+-- PostgreSQL
+SELECT order_num
+FROM Orders
+WHERE DATE_PART('year', order_date) = 2012;
+
+-- Oracle
+SELECT order_num
+FROM Orders
+WHERE to_number(to_char(order_date, 'YYYY')) = 2012;
+
+-- MySQL 和 MariaDB
+SELECT order_num
+FROM Orders
+WHERE YEAR(order_date) = 2012;
 ```
 
 ### 数学函数
 
 常见 Mysql 数学函数：
 
-|   函数    |   说明   |
-| :-------: | :------: |
-|  `ABS()`  | 取绝对值 |
-|  `MOD()`  |   取余   |
-| `ROUND()` | 四舍五入 |
-|   `...`   |          |
+|   函数   | 说明               |
+| :------: | ------------------ |
+| `ABS()`  | 返回一个数的绝对值 |
+| `COS()`  | 返回一个角度的余弦 |
+| `EXP()`  | 返回一个数的指数值 |
+|  `PI()`  | 返回圆周率         |
+| `SIN()`  | 返回一个角度的正弦 |
+| `SQRT()` | 返回一个数的平方根 |
+| `TAN()`  | 返回一个角度的正切 |
 
 ### 聚合函数
 
@@ -1077,14 +1429,68 @@ mysql> SELECT NOW();
 |  `MIN()`  | 返回某列的最小值 |
 |  `SUM()`  |  返回某列值之和  |
 
-`AVG()` 会忽略 NULL 行。
+`AVG()` 通过对表中行数计数并计算其列值之和，求得该列的平均值。
 
 使用 DISTINCT 可以让汇总函数值汇总不同的值。
 
+::: tabs#聚合函数示例
+
+@tab `AVG()` 示例
+
+使用 `AVG()` 返回 Products 表中所有产品的平均价格：
+
 ```sql
-SELECT AVG(DISTINCT col1) AS avg_col
-FROM mytable
+SELECT AVG(prod_price) AS avg_price
+FROM Products;
 ```
+
+@tab `COUNT()` 示例
+
+`COUNT()` 函数进行计数。可利用 `COUNT()` 确定表中行的数目或符合特定条件的行的数目。
+
+返回 Customers 表中顾客的总数：
+
+```sql
+SELECT COUNT(*) AS num_cust
+FROM Customers;
+```
+
+只对具有电子邮件地址的客户计数：
+
+```sql
+SELECT COUNT(cust_email) AS num_cust
+FROM Customers;
+```
+
+@tab `MAX()` 示例
+
+返回 Products 表中最贵物品的价格：
+
+```sql
+SELECT MAX(prod_price) AS max_price
+FROM Products;
+```
+
+@tab `MIN()` 示例
+
+返回 Products 表中最便宜物品的价格
+
+```sql
+SELECT MIN(prod_price) AS min_price
+FROM Products;
+```
+
+@tab `SUM()` 示例
+
+返回订单中所有物品数量之和
+
+```sql
+SELECT SUM(quantity) AS items_ordered
+FROM OrderItems
+WHERE order_num = 20005;
+```
+
+:::
 
 ### 转换函数
 
@@ -1291,9 +1697,16 @@ select @s as sum;
 
 ### 触发器
 
-> 触发器可以视为一种特殊的存储过程。
->
-> 触发器是一种与表操作有关的数据库对象，当触发器所在表上出现指定事件时，将调用该对象，即表的操作事件触发表上的触发器的执行。
+触发器是特殊的存储过程，它在特定的数据库活动发生时自动执行。触发器可以与特定表上的 INSERT、UPDATE 和 DELETE 操作（或组合）相关联。
+
+触发器是一种与表操作有关的数据库对象，当触发器所在表上出现指定事件时，将调用该对象，即表的操作事件触发表上的触发器的执行。
+
+触发器的一些常见用途
+
+- 保证数据一致。例如，在 INSERT 或 UPDATE 操作中将所有州名转换为大写。
+- 基于某个表的变动在其他表上执行活动。例如，每当更新或删除一行时将审计跟踪记录写入某个日志表。
+- 进行额外的验证并根据需要回退数据。例如，保证某个顾客的可用资金不超限定，如果已经超出，则阻塞插入。
+- 计算计算列的值或更新时间戳。
 
 #### 触发器特性
 
@@ -1348,15 +1761,24 @@ END;
 创建触发器示例：
 
 ```sql
-DELIMITER $
-CREATE TRIGGER `trigger_insert_user`
-AFTER INSERT ON `user`
+-- SQL Server
+CREATE TRIGGER customer_state
+ON Customers
+FOR INSERT, UPDATE
+AS
+UPDATE Customers
+SET cust_state = Upper(cust_state)
+WHERE Customers.cust_id = inserted.cust_id;
+
+-- Oracle 和 PostgreSQL
+CREATE TRIGGER customer_state
+AFTER INSERT OR UPDATE
 FOR EACH ROW
 BEGIN
-    INSERT INTO `user_history`(user_id, operate_type, operate_time)
-    VALUES (NEW.id, 'add a user',  now());
-END $
-DELIMITER ;
+UPDATE Customers
+SET cust_state = Upper(cust_state)
+WHERE Customers.cust_id = :OLD.cust_id
+END;
 ```
 
 查看触发器示例：
@@ -1373,9 +1795,17 @@ DROP TRIGGER IF EXISTS trigger_insert_user;
 
 ## 游标
 
-> 游标（CURSOR）是一个存储在 DBMS 服务器上的数据库查询，它不是一条 `SELECT` 语句，而是被该语句检索出来的结果集。在存储过程中使用游标可以对一个结果集进行移动遍历。
+游标（CURSOR）是一个存储在 DBMS 服务器上的数据库查询，它不是一条 `SELECT` 语句，而是被该语句检索出来的结果集。在存储过程中使用游标可以对一个结果集进行移动遍历。
 
 游标主要用于交互式应用，其中用户需要对数据集中的任意行进行浏览和修改。
+
+游标要点
+
+- 能够标记游标为只读，使数据能读取，但不能更新和删除。
+- 能控制可以执行的定向操作（向前、向后、第一、最后、绝对位置、相对位置等）。
+- 能标记某些列为可编辑的，某些列为不可编辑的。
+- 规定范围，使游标对创建它的特定请求（如存储过程）或对所有请求可访问。
+- 指示 DBMS 对检索出的数据（而不是指出表中活动数据）进行复制，使数据在游标打开和访问期间不变化。
 
 使用游标的步骤：
 
@@ -1404,6 +1834,7 @@ BEGIN
     -- 指定游标循环结束时的返回值
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = true;
     SET total = 0;
+    -- 打开游标
     OPEN cur;
     FETCH cur INTO sid, sname, sage;
     WHILE(NOT done)
@@ -1411,7 +1842,7 @@ BEGIN
         SET total = total + 1;
         FETCH cur INTO sid, sname, sage;
     END WHILE;
-
+    -- 关闭游标
     CLOSE cur;
     SELECT total;
 END $
