@@ -115,6 +115,7 @@ Redis 支持很多丰富的特性，如：**事务** 、**Lua 脚本**、**发�
 - **文章**
   - [Introduction to Redis](https://www.slideshare.net/dvirsky/introduction-to-redis)
   - [《我们一起进大厂》系列- Redis 基础](https://juejin.im/post/5db66ed9e51d452a2f15d833)
+  - [Redis Explained](https://architecturenotes.co/p/redis)
 - **源码**
   - [《Redis 实战》配套 Python 源码](https://github.com/josiahcarlson/redis-in-action)
 - **资源汇总**
