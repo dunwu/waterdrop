@@ -24,25 +24,16 @@ index: false
 
 ## 📖 内容
 
-### [MongoDB 应用指南](01.MongoDB应用指南.md)
-
-### [MongoDB 的 CRUD 操作](02.MongoDB的CRUD操作.md)
-
-### [MongoDB 聚合操作](03.MongoDB的聚合操作.md)
-
-### [MongoDB 事务](04.MongoDB事务.md)
-
-### [MongoDB 建模](05.MongoDB建模.md)
-
-### [MongoDB 建模示例](06.MongoDB建模示例.md)
-
-### [MongoDB 索引](07.MongoDB索引.md)
-
-### [MongoDB 复制](08.MongoDB复制.md)
-
-### [MongoDB 分片](09.MongoDB分片.md)
-
-### [MongoDB 运维](20.MongoDB运维.md)
+- [MongoDB 简介](MongoDB简介.md)
+- [MongoDB 之 CRUD](MongoDB之CRUD.md)
+- [MongoDB 聚合操作](MongoDB聚合操作.md)
+- [MongoDB 事务](MongoDB事务.md)
+- [MongoDB 建模](MongoDB建模.md)
+- [MongoDB 建模示例](MongoDB建模示例.md)
+- [MongoDB 索引](MongoDB索引.md)
+- [MongoDB 复制](MongoDB复制.md)
+- [MongoDB 分片](MongoDB分片.md)
+- [MongoDB 运维](MongoDB运维.md)
 
 ## 📚 资料
 

@@ -411,16 +411,16 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 >
 > MongoDB 最大的特点是它支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引。
 
-- [MongoDB 应用指南](12.数据库/04.文档数据库/01.MongoDB/01.MongoDB应用指南.md)
-- [MongoDB 的 CRUD 操作](12.数据库/04.文档数据库/01.MongoDB/02.MongoDB的CRUD操作.md)
-- [MongoDB 聚合操作](12.数据库/04.文档数据库/01.MongoDB/03.MongoDB的聚合操作.md)
-- [MongoDB 事务](12.数据库/04.文档数据库/01.MongoDB/04.MongoDB事务.md)
-- [MongoDB 建模](12.数据库/04.文档数据库/01.MongoDB/05.MongoDB建模.md)
-- [MongoDB 建模示例](12.数据库/04.文档数据库/01.MongoDB/06.MongoDB建模示例.md)
-- [MongoDB 索引](12.数据库/04.文档数据库/01.MongoDB/07.MongoDB索引.md)
-- [MongoDB 复制](12.数据库/04.文档数据库/01.MongoDB/08.MongoDB复制.md)
-- [MongoDB 分片](12.数据库/04.文档数据库/01.MongoDB/09.MongoDB分片.md)
-- [MongoDB 运维](12.数据库/04.文档数据库/01.MongoDB/20.MongoDB运维.md)
+- [MongoDB 简介](12.数据库/04.文档数据库/01.MongoDB/MongoDB简介.md)
+- [MongoDB 之 CRUD](12.数据库/04.文档数据库/01.MongoDB/MongoDB之CRUD.md)
+- [MongoDB 聚合操作](12.数据库/04.文档数据库/01.MongoDB/MongoDB聚合操作.md)
+- [MongoDB 事务](12.数据库/04.文档数据库/01.MongoDB/MongoDB事务.md)
+- [MongoDB 建模](12.数据库/04.文档数据库/01.MongoDB/MongoDB建模.md)
+- [MongoDB 建模示例](12.数据库/04.文档数据库/01.MongoDB/MongoDB建模示例.md)
+- [MongoDB 索引](12.数据库/04.文档数据库/01.MongoDB/MongoDB索引.md)
+- [MongoDB 复制](12.数据库/04.文档数据库/01.MongoDB/MongoDB复制.md)
+- [MongoDB 分片](12.数据库/04.文档数据库/01.MongoDB/MongoDB分片.md)
+- [MongoDB 运维](12.数据库/04.文档数据库/01.MongoDB/MongoDB运维.md)
 
 ### KV 数据库
 
@@ -449,20 +449,20 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 > Elasticsearch 是一个基于 Lucene 的搜索和数据分析工具，它提供了一个分布式服务。Elasticsearch 是遵从 Apache 开源条款的一款开源产品，是当前主流的企业级搜索引擎。
 
-- [Elasticsearch 面试总结](12.数据库/07.搜索引擎数据库/01.Elasticsearch/01.Elasticsearch面试总结.md) 💯
-- [Elasticsearch 快速入门](12.数据库/07.搜索引擎数据库/01.Elasticsearch/02.Elasticsearch快速入门.md)
-- [Elasticsearch 简介](12.数据库/07.搜索引擎数据库/01.Elasticsearch/03.Elasticsearch简介.md)
-- [Elasticsearch 索引](12.数据库/07.搜索引擎数据库/01.Elasticsearch/04.Elasticsearch索引.md)
-- [Elasticsearch 查询](12.数据库/07.搜索引擎数据库/01.Elasticsearch/05.Elasticsearch查询.md)
-- [Elasticsearch 高亮](12.数据库/07.搜索引擎数据库/01.Elasticsearch/06.Elasticsearch高亮.md)
-- [Elasticsearch 排序](12.数据库/07.搜索引擎数据库/01.Elasticsearch/07.Elasticsearch排序.md)
-- [Elasticsearch 聚合](12.数据库/07.搜索引擎数据库/01.Elasticsearch/08.Elasticsearch聚合.md)
-- [Elasticsearch 分析器](12.数据库/07.搜索引擎数据库/01.Elasticsearch/09.Elasticsearch分析器.md)
-- [Elasticsearch 性能优化](12.数据库/07.搜索引擎数据库/01.Elasticsearch/10.Elasticsearch性能优化.md)
-- [Elasticsearch Rest API](12.数据库/07.搜索引擎数据库/01.Elasticsearch/11.ElasticsearchRestApi.md)
-- [ElasticSearch Java API 之 High Level REST Client](12.数据库/07.搜索引擎数据库/01.Elasticsearch/12.ElasticsearchHighLevelRestJavaApi.md)
-- [Elasticsearch 集群和分片](12.数据库/07.搜索引擎数据库/01.Elasticsearch/13.Elasticsearch集群和分片.md)
-- [Elasticsearch 运维](12.数据库/07.搜索引擎数据库/01.Elasticsearch/20.Elasticsearch运维.md)
+- [Elasticsearch 简介](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch简介.md)
+- [Elasticsearch 索引](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch索引.md)
+- [Elasticsearch 映射](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch映射.md)
+- [Elasticsearch 查询](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch查询.md)
+- [Elasticsearch 高亮](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch高亮.md)
+- [Elasticsearch 排序](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch排序.md)
+- [Elasticsearch 聚合](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch聚合.md)
+- [Elasticsearch 分析器](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch分析器.md)
+- [Elasticsearch 性能优化](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch性能优化.md)
+- [Elasticsearch Rest API](12.数据库/07.搜索引擎数据库/01.Elasticsearch/ElasticsearchRestApi.md)
+- [ElasticSearch Java API 之 High Level REST Client](12.数据库/07.搜索引擎数据库/01.Elasticsearch/ElasticsearchHighLevelRestJavaApi.md)
+- [Elasticsearch 集群和分片](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch集群和分片.md)
+- [Elasticsearch 运维](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch运维.md)
+- [Elasticsearch 面试总结](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch面试.md) 💯
 
 #### Elastic
 

@@ -20,35 +20,20 @@ index: false
 
 ## 📖 内容
 
-### [Elasticsearch 面试总结](01.Elasticsearch面试总结.md) 💯
-
-### [Elasticsearch 快速入门](02.Elasticsearch快速入门.md)
-
-### [Elasticsearch 简介](03.Elasticsearch简介.md)
-
-### [Elasticsearch 索引管理](04.Elasticsearch索引.md)
-
-### [Elasticsearch 映射](05.Elasticsearch映射.md)
-
-### [Elasticsearch 查询](05.Elasticsearch查询.md)
-
-### [Elasticsearch 高亮](06.Elasticsearch高亮.md)
-
-### [Elasticsearch 排序](07.Elasticsearch排序.md)
-
-### [Elasticsearch 聚合](08.Elasticsearch聚合.md)
-
-### [Elasticsearch 分析器](09.Elasticsearch分析器.md)
-
-### [Elasticsearch 性能优化](10.Elasticsearch性能优化.md)
-
-### [Elasticsearch Rest API](11.ElasticsearchRestApi.md)
-
-### [ElasticSearch Java API 之 High Level REST Client](12.ElasticsearchHighLevelRestJavaApi.md)
-
-### [Elasticsearch 集群和分片](13.Elasticsearch集群和分片.md)
-
-### [Elasticsearch 运维](20.Elasticsearch运维.md)
+-  [Elasticsearch 简介](Elasticsearch简介.md)
+-  [Elasticsearch 索引](Elasticsearch索引.md)
+-  [Elasticsearch 映射](Elasticsearch映射.md)
+-  [Elasticsearch 查询](Elasticsearch查询.md)
+-  [Elasticsearch 高亮](Elasticsearch高亮.md)
+-  [Elasticsearch 排序](Elasticsearch排序.md)
+-  [Elasticsearch 聚合](Elasticsearch聚合.md)
+-  [Elasticsearch 分析器](Elasticsearch分析器.md)
+-  [Elasticsearch 性能优化](Elasticsearch性能优化.md)
+-  [Elasticsearch Rest API](ElasticsearchRestApi.md)
+-  [ElasticSearch Java API 之 High Level REST Client](ElasticsearchHighLevelRestJavaApi.md)
+-  [Elasticsearch 集群和分片](Elasticsearch集群和分片.md)
+-  [Elasticsearch 运维](Elasticsearch运维.md)
+-  [Elasticsearch 面试总结](Elasticsearch面试.md) 💯
 
 ## 📚 资料
 

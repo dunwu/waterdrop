@@ -18,25 +18,16 @@ index: false
 
 ### MongoDB
 
-#### [MongoDB 应用指南](01.MongoDB/01.MongoDB应用指南.md)
-
-#### [MongoDB 的 CRUD 操作](01.MongoDB/02.MongoDB的CRUD操作.md)
-
-#### [MongoDB 聚合操作](01.MongoDB/03.MongoDB的聚合操作.md)
-
-#### [MongoDB 事务](01.MongoDB/04.MongoDB事务.md)
-
-#### [MongoDB 建模](01.MongoDB/05.MongoDB建模.md)
-
-#### [MongoDB 建模示例](01.MongoDB/06.MongoDB建模示例.md)
-
-#### [MongoDB 索引](01.MongoDB/07.MongoDB索引.md)
-
-#### [MongoDB 复制](01.MongoDB/08.MongoDB复制.md)
-
-#### [MongoDB 分片](01.MongoDB/09.MongoDB分片.md)
-
-#### [MongoDB 运维](01.MongoDB/20.MongoDB运维.md)
+- [MongoDB 简介](01.MongoDB/MongoDB简介.md)
+- [MongoDB 之 CRUD](01.MongoDB/MongoDB之CRUD.md)
+- [MongoDB 聚合操作](01.MongoDB/MongoDB聚合操作.md)
+- [MongoDB 事务](01.MongoDB/MongoDB事务.md)
+- [MongoDB 建模](01.MongoDB/MongoDB建模.md)
+- [MongoDB 建模示例](01.MongoDB/MongoDB建模示例.md)
+- [MongoDB 索引](01.MongoDB/MongoDB索引.md)
+- [MongoDB 复制](01.MongoDB/MongoDB复制.md)
+- [MongoDB 分片](01.MongoDB/MongoDB分片.md)
+- [MongoDB 运维](01.MongoDB/MongoDB运维.md)
 
 ## 📚 资料
 

@@ -16,6 +16,39 @@ permalink: /pages/6219b063/
 
 # Elasticsearch 面试总结
 
+## Elasticsearch 简介
+
+### 什么是 ElasticSearch
+
+**[Elasticsearch](https://github.com/elastic/elasticsearch) 是一个开源的分布式搜索和分析引擎**。
+
+**[Elasticsearch](https://github.com/elastic/elasticsearch) 基于搜索库 [Lucene](https://github.com/apache/lucene-solr) 开发**。ElasticSearch 隐藏了 Lucene 的复杂性，提供了简单易用的 REST API / Java API 接口（另外还有其他语言的 API 接口）。
+
+ElasticSearch 可以视为一个文档存储，它**将复杂数据结构序列化为 JSON 存储**。
+
+**ElasticSearch 是近实时（Near Realtime，缩写 NRT）的全文搜索**。近实时是指：
+
+- 从写入数据到数据可以被搜索，存在较小的延迟（大概是 1s）。
+- 基于 ES 执行搜索和分析可以达到秒级。
+
+## Elasticsearch 索引
+
+## Elasticsearch 映射
+
+## Elasticsearch 查询
+
+## Elasticsearch 高亮
+
+## Elasticsearch 排序
+
+## Elasticsearch 聚合
+
+## Elasticsearch 分析器
+
+## Elasticsearch 复制
+
+## Elasticsearch 分区
+
 ## 集群部署
 
 ES 部署情况：

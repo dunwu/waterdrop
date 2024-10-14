@@ -20,6 +20,32 @@ permalink: /pages/646e92be/
 
 Elasticsearch 索引管理主要包括如何进行索引的创建、索引的删除、副本的更新、索引读写权限、索引别名的配置等等内容。
 
+创建索引
+
+创建名为 books 的索引：
+
+```http
+PUT /books
+```
+
+响应
+
+```json
+{
+  "acknowledged": true,
+  "shards_acknowledged": true,
+  "index": "books"
+}
+```
+
+修改索引
+
+关闭索引
+
+打开索引
+
+删除索引
+
 ### 索引删除
 
 ES 索引删除操作向 ES 集群的 http 接口发送指定索引的 delete http 请求即可，可以通过 curl 命令，具体如下：
@@ -84,7 +110,7 @@ ES 索引别名有个典型的应用场景是平滑切换，更多细节可以�
 
 Elasticsearch 索引的配置项主要分为**静态配置属性**和**动态配置属性**，静态配置属性是索引创建后不能修改，而动态配置属性则可以随时修改。
 
-ES 索引设置的 api 为 **_`_settings`_**，完整的示例如下：
+ES 索引设置的 api 为 **_settings_**，完整的示例如下：
 
 ```bash
 PUT /my_index
