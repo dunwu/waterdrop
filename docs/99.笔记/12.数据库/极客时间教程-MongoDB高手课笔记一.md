@@ -1,6 +1,6 @@
 ---
-title: 《极客时间教程 - MongoDB 高手课》笔记
-date: 2024-10-16 08:23:24
+title: 《极客时间教程 - MongoDB 高手课》笔记一
+date: 2024-10-17 07:19:53
 categories:
   - 笔记
   - 数据库
@@ -8,10 +8,10 @@ tags:
   - 数据库
   - 文档数据库
   - MongoDB
-permalink: /pages/b1bc0bf0/
+permalink: /pages/bbbcae56/
 ---
 
-# 《极客时间教程 - MongoDB 高手课》笔记
+# 《极客时间教程 - MongoDB 高手课》笔记一
 
 ## 第一章：MongoDB 再入门
 
