@@ -18,19 +18,21 @@ permalink: /pages/57308862/
 
 ## 副本和可用性
 
-副本可以**提供冗余并提高数据可用性**。在不同数据库服务器上使用多个数据副本，可以提供一定程度的容错能力，以防止单个数据库服务器宕机时，数据丢失。
+MongoDB 中*的副本集*是一组维护相同数据集的 [`mongod`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongod/#mongodb-binary-bin.mongod) 进程。复制提供冗余并提高[数据可用性](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-high-availability)。由于数据副本位于不同的数据库服务器上，复制提供了一定程度的容错能力，以防止单个数据库服务器丢失。
 
-在某些情况下，副本还可以**提供更大的读取吞吐量**。因为客户端可以将读取操作发送到不同的服务器。在不同数据中心中维护数据副本可以提高数据本地性和分布式应用程序的可用性。您还可以维护其他副本以用于专用目的：例如灾难恢复，报告或备份。
+在某些情况下，副本还可以**提供更大的读取吞吐量**。因为客户端可以将读取操作发送到不同的服务器。在不同数据中心中维护数据副本可以提高数据本地性和分布式应用程序的可用性。您还可以维护其他副本以用于专用目的：例如故障恢复，报告或备份。
 
 ## MongoDB 副本
 
-MongoDB 中的副本集是一组维护相同数据集的 mongod 进程。一个副本集包含多个数据承载节点和一个仲裁器节点（可选）。在数据承载节点中，只有一个成员被视为主要节点，而其他节点则被视为次要节点。
+副本集是一组维护相同数据集的 [`mongod`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongod/#mongodb-binary-bin.mongod) 实例。副本集包含多个数据承载节点和一个（可选）仲裁节点。在数据承载节点中，有且只有一个成员被视为主节点，而其他节点被视为辅助节点。
 
-**主节点负责接收所有写操作**。副本集只能有一个主副本，能够以 [`{ w: "majority" }`](https://docs.mongodb.com/manual/reference/write-concern/#writeconcern."majority") 来确认集群中节点的写操作成功情况；尽管在某些情况下，另一个 MongoDB 实例可能会暂时认为自己也是主要的。主节点在其操作日志（即 [oplog](https://docs.mongodb.com/manual/core/replica-set-oplog/)）中记录了对其数据集的所有更改。
+每个副本集节点必须属于且只能属于一个副本集。
+
+[主节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/#std-label-replica-set-primary)接收所有写入操作。一个副本集只能有一个主节点，能够通过 [`{ w： “majority” }`](https://www.mongodb.com/zh-cn/docs/manual/reference/write-concern/#mongodb-writeconcern-writeconcern.-majority-) 确认写操作；尽管在某些情况下，另一个 mongod 实例可能会暂时认为自己也是主节点。主节点在其 oplog （即 [oplog](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-oplog/)）中记录对其数据集的所有更改。有关主节点操作的更多信息，请参阅[副本集主节点。](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/)
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165054.svg)
 
-**从节点复制主节点的操作日志，并将操作应用于其数据集**，以便同步主节点的数据。如果主节点不可用，则符合条件的从节点将选举新的主节点。
+[从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/#std-label-replica-set-secondary-members-ref)复制主节点的 oplog 并将操作应用于其数据集，以便辅助数据库的数据集反映主数据库的数据集。如果主节点不可用，符合条件的从节点将举行选举，以选举自己为新的主节点。
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165055.svg)
 
@@ -44,9 +46,9 @@ MongoDB 中的副本集是一组维护相同数据集的 mongod 进程。一个�
 
 ### 慢操作
 
-从节点复制主节点的操作日志，并将操作异步应用于其数据集。通过从节点同步主节点的数据集，即使一个或多个成员失败，副本集（MongoDB 集群）也可以继续运行。
+从节点复制主节点的 oplog ，并将操作异步应用于其数据集。通过从节点同步主节点的数据集，即使一个或多个成员失败，副本集（MongoDB 集群）也可以继续运行。
 
-从 4.2 版本开始，副本集的从节点记录慢操作（操作时间比设置的阈值长）的日志条目。这些慢操作在 [`REPL`](https://docs.mongodb.com/manual/reference/log-messages/#REPL) 组件下的 [诊断日志](https://docs.mongodb.com/manual/reference/program/mongod/#cmdoption-mongod-logpath) 中记录了日志消息，并使用了文本 `op: <oplog entry>` 花费了 `<num>ms`。这些慢操作日志条目仅取决于慢操作阈值，而不取决于日志级别（在系统级别或组件级别），配置级别或运行缓慢的采样率。探查器不会捕获缓慢的操作日志条目。
+从 4.2 版本开始，副本集的从节点记录慢操作（操作时间比设置的阈值长）的日志条目。这些慢操作在 [`REPL`](https://docs.mongodb.com/manual/reference/log-messages/#REPL) 组件下的 [诊断日志](https://docs.mongodb.com/manual/reference/program/mongod/#cmdoption-mongod-logpath) 中记录了日志消息，并使用了文本 `op: <oplog entry>` 花费了 `<num>ms`。这些慢 oplog 条目仅取决于慢操作阈值，而不取决于日志级别（在系统级别或组件级别），配置级别或运行缓慢的采样率。探查器不会捕获缓慢的 oplog 条目。
 
 ### 复制延迟和流控
 
@@ -76,7 +78,7 @@ MongoDB 中的副本集是一组维护相同数据集的 mongod 进程。一个�
 
 ## 读操作
 
-### 读优先
+### 读取首选项
 
 默认情况下，客户端从主节点读取数据；但是，客户端可以指定读取首选项，以将读取操作发送到从节点。
 

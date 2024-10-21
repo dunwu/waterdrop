@@ -15,37 +15,30 @@ permalink: /pages/773f1695/
 
 # MongoDB 的 CRUD 操作
 
-## 一、基本 CRUD 操作
-
 MongoDB 的 CRUD 操作是针对 document 的读写操作。
 
-### Create 操作
+MongoDB 中的所有写入操作在单个文档级别上都是**原子**的。
 
-MongoDB 提供以下操作向一个 collection 插入 document
+## 插入操作
 
-- [`db.collection.insertOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/#db.collection.insertOne)：插入一条 document
-- [`db.collection.insertMany()`](https://docs.mongodb.com/manual/reference/method/db.collection.insertMany/#db.collection.insertMany)：插入多条 document
+MongoDB 提供了以下方法将文档插入集合：
 
-> 注：以上操作都是原子操作。
+- [`db.collection.insertOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/#db.collection.insertOne)
+- [`db.collection.insertMany()`](https://docs.mongodb.com/manual/reference/method/db.collection.insertMany/#db.collection.insertMany)
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924112342.svg)
 
 插入操作的特性：
 
-- MongoDB 中的所有写操作都是单个文档级别的原子操作。
+- MongoDB 中的所有写入操作在单个文档级别上都是原子的。
 - 如果要插入的 collection 当前不存在，则插入操作会自动创建 collection。
-- 在 MongoDB 中，存储在集合中的每个文档都需要一个唯一的 [`_id`](https://docs.mongodb.com/manual/reference/glossary/#term-id) 字段作为主键。如果插入的文档省略 `_id` 字段，则 MongoDB 驱动程序会自动为 `_id` 字段生成 ObjectId。
+- 如果文档未指定 `_id` 字段，则 MongoDB 会将 `_id` 字段添加 ObjectId 值到新文档中。
 - 可以 MongoDB 写入操作的确认级别来控制写入行为。
 
 【示例】插入一条 document 示例
 
 ```javascript
-db.inventory.insertOne({
-  item: 'canvas',
-  qty: 100,
-  tags: ['cotton'],
-  size: { h: 28, w: 35.5, uom: 'cm' }
-})
+db.inventory.find({ item: 'canvas' })
 ```
 
 【示例】插入多条 document 示例
@@ -73,19 +66,56 @@ db.inventory.insertMany([
 ])
 ```
 
-### Read 操作
+> 更多详情参考：https://www.mongodb.com/zh-cn/docs/manual/tutorial/insert-documents/
 
-MongoDB 提供 [`db.collection.find()`](https://docs.mongodb.com/manual/reference/method/db.collection.find/#db.collection.find) 方法来检索 document。
+## 查询操作
+
+MongoDB 提供了 [`db.collection.find()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.find/#mongodb-method-db.collection.find) 方法从集合中查找文档。
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924113832.svg)
 
-### Update 操作
+可以在 `{}` 中指定查询条件来查找要匹配的数据。如果 `{}` 为空，则会返回集合中的所有文档。
 
-MongoDB 提供以下操作来更新 collection 中的 document
+```javascript
+db.inventory.insertMany([
+  { item: 'journal', qty: 25, size: { h: 14, w: 21, uom: 'cm' }, status: 'A' },
+  {
+    item: 'notebook',
+    qty: 50,
+    size: { h: 8.5, w: 11, uom: 'in' },
+    status: 'A'
+  },
+  { item: 'paper', qty: 100, size: { h: 8.5, w: 11, uom: 'in' }, status: 'D' },
+  {
+    item: 'planner',
+    qty: 75,
+    size: { h: 22.85, w: 30, uom: 'cm' },
+    status: 'D'
+  },
+  {
+    item: 'postcard',
+    qty: 45,
+    size: { h: 10, w: 15.25, uom: 'cm' },
+    status: 'A'
+  }
+])
 
-- [`db.collection.updateOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.updateOne/#db.collection.updateOne)：更新一条 document
-- [`db.collection.updateMany()`](https://docs.mongodb.com/manual/reference/method/db.collection.updateMany/#db.collection.updateMany)：更新多条 document
-- [`db.collection.replaceOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.replaceOne/#db.collection.replaceOne)：替换一条 document
+// 查询集合中所有文档
+db.inventory.find({})
+
+// 查询集合所有 status 等于 "D" 的文档
+db.inventory.find({ status: 'D' })
+```
+
+> 更多详情参考：https://www.mongodb.com/zh-cn/docs/manual/tutorial/query-documents/
+
+## 更新操作
+
+MongoDB 提供以下操作来更新集合中的文档：
+
+- [`db.collection.updateOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.updateOne/#db.collection.updateOne)
+- [`db.collection.updateMany()`](https://docs.mongodb.com/manual/reference/method/db.collection.updateMany/#db.collection.updateMany)
+- [`db.collection.replaceOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.replaceOne/#db.collection.replaceOne)
 
 语法格式：
 
@@ -188,27 +218,43 @@ db.inventory.replaceOne(
 
 更新操作的特性：
 
-- MongoDB 中的所有写操作都是单个文档级别的原子操作。
+- MongoDB 中的所有写入操作在单个文档级别上都是原子性的。
 - 一旦设置了，就无法更新或替换 [`_id`](https://docs.mongodb.com/manual/reference/glossary/#term-id) 字段。
 - 除以下情况外，MongoDB 会在执行写操作后保留文档字段的顺序：
   - `_id` 字段始终是文档中的第一个字段。
   - 包括重命名字段名称的更新可能导致文档中字段的重新排序。
 - 如果更新操作中包含 `upsert : true` 并且没有 document 匹配过滤器，MongoDB 会新插入一个 document；如果有匹配的 document，MongoDB 会修改或替换这些 document。
 
-### Delete 操作
+## 删除操作
 
-MongoDB 提供以下操作来删除 collection 中的 document
+MongoDB 提供了以下操作来删除集合中的文档：
 
-- [`db.collection.deleteOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.deleteOne/#db.collection.deleteOne)：删除一条 document
-- [`db.collection.deleteMany()`](https://docs.mongodb.com/manual/reference/method/db.collection.deleteMany/#db.collection.deleteMany)：删除多条 document
+- [`db.collection.deleteOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.deleteOne/#db.collection.deleteOne)
+- [`db.collection.deleteMany()`](https://docs.mongodb.com/manual/reference/method/db.collection.deleteMany/#db.collection.deleteMany)
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924120007.svg)
 
-删除操作的特性：
+可以指定用于标识要删除的文档的过滤器，这些筛选条件和 find 方法的过滤器语法一致。
 
-- MongoDB 中的所有写操作都是单个文档级别的原子操作。
+【示例】删除集合中的所有文档
 
-## 二、批量写操作
+```javascript
+db.inventory.deleteMany({})
+```
+
+【示例】删除 `status` 字段等于 `"A"` 的文档
+
+```javascript
+db.inventory.deleteMany({ status: 'A' })
+```
+
+【示例】删除 `status` 为 `"D"` 的第一个文档
+
+```javascript
+db.inventory.deleteOne({ status: 'D' })
+```
+
+## 批量写操作
 
 MongoDB 通过 [`db.collection.bulkWrite()`](https://docs.mongodb.com/manual/reference/method/db.collection.bulkWrite/#db.collection.bulkWrite) 方法来支持批量写操作（包括批量插入、更新、删除）。
 
@@ -238,46 +284,37 @@ MongoDB 通过 [`db.collection.bulkWrite()`](https://docs.mongodb.com/manual/ref
 
 【示例】批量写操作示例
 
+以下 [`bulkWrite()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.bulkWrite/#mongodb-method-db.collection.bulkWrite) 示例对 `pizzas` 集合运行以下操作：
+
+- 使用 `insertOne` 添加两个文档。
+- 使用 `updateOne` 更新一个文档。
+- 使用 `deleteOne` 删除文档。
+- 使用 `replaceOne` 替换一个文档。
+
 ```javascript
-try {
-  db.characters.bulkWrite([
-    {
-      insertOne: {
-        document: {
-          _id: 4,
-          char: 'Dithras',
-          class: 'barbarian',
-          lvl: 4
-        }
-      }
-    },
-    {
-      insertOne: {
-        document: {
-          _id: 5,
-          char: 'Taeln',
-          class: 'fighter',
-          lvl: 3
-        }
-      }
-    },
-    {
-      updateOne: {
-        filter: { char: 'Eldon' },
-        update: { $set: { status: 'Critical Injury' } }
-      }
-    },
-    { deleteOne: { filter: { char: 'Brisbane' } } },
-    {
-      replaceOne: {
-        filter: { char: 'Meldane' },
-        replacement: { char: 'Tanys', class: 'oracle', lvl: 4 }
-      }
+db.pizzas.bulkWrite([
+  {
+    insertOne: { document: { _id: 3, type: 'beef', size: 'medium', price: 6 } }
+  },
+  {
+    insertOne: {
+      document: { _id: 4, type: 'sausage', size: 'large', price: 10 }
     }
-  ])
-} catch (e) {
-  print(e)
-}
+  },
+  {
+    updateOne: {
+      filter: { type: 'cheese' },
+      update: { $set: { price: 8 } }
+    }
+  },
+  { deleteOne: { filter: { type: 'pepperoni' } } },
+  {
+    replaceOne: {
+      filter: { type: 'vegan' },
+      replacement: { type: 'tofu', size: 'small', price: 4 }
+    }
+  }
+])
 ```
 
 ### 批量写操作策略
@@ -292,33 +329,14 @@ try {
 
 要提高对分片集群的写入性能，请使用 [`bulkWrite()`](https://docs.mongodb.com/manual/reference/method/db.collection.bulkWrite/#db.collection.bulkWrite)，并将可选参数顺序设置为 false。[`mongos`](https://docs.mongodb.com/manual/reference/program/mongos/#bin.mongos) 可以尝试同时将写入操作发送到多个分片。对于空集合，首先按照分片群集中的分割 [chunk](https://docs.mongodb.com/manual/reference/glossary/#term-chunk) 中的说明预拆分 collection。
 
-#### 避免单调节流
+#### 避免单调限速
 
-如果在一次插入操作中，分片 key 单调递增，那么所有的插入数据都会存入 collection 的最后一个 chunk，也就是存入一个分片中。因此，集群的插入容量将永远不会超过该单个分片的插入容量。
+如果分片键在插入期间单调增加，则所有已插入数据都会进入集合中的最后一个数据段，该数据段将始终出现在单个分片上。因此，集群的插入容量永远不会超过该单个分片的插入容量。
 
-如果插入量大于单个分片可以处理的插入量，并且无法避免单调递增的分片键，那么请考虑对应用程序进行以下修改：
+如果插入量大于单个分片可以处理的容量，并且无法避免分片键的单调增加，则可以考虑对应用程序进行以下修改：
 
-- 反转分片密钥的二进制位。这样可以保留信息，并避免将插入顺序与值序列的增加关联起来。
-- 交换第一个和最后一个 16 位字以“随机”插入。
-
-## SQL 和 MongoDB 对比
-
-### 术语和概念
-
-| SQL 术语和概念              | MongoDB 术语和概念                                                                                                                                                                                                                        |
-| :-------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| database                    | [database](https://docs.mongodb.com/manual/reference/glossary/#term-database)                                                                                                                                                             |
-| table                       | [collection](https://docs.mongodb.com/manual/reference/glossary/#term-collection)                                                                                                                                                         |
-| row                         | [document](https://docs.mongodb.com/manual/reference/glossary/#term-document) 或 [BSON](https://docs.mongodb.com/manual/reference/glossary/#term-bson)                                                                                    |
-| column                      | [field](https://docs.mongodb.com/manual/reference/glossary/#term-field)                                                                                                                                                                   |
-| index                       | [index](https://docs.mongodb.com/manual/reference/glossary/#term-index)                                                                                                                                                                   |
-| table joins                 | [`$lookup`](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/#pipe._S_lookup)、嵌入式文档                                                                                                                            |
-| primary key                 | [primary key](https://docs.mongodb.com/manual/reference/glossary/#term-primary-key)<br>MongoDB 中自动设置主键为 [`_id`](https://docs.mongodb.com/manual/reference/glossary/#term-id) 字段                                                 |
-| aggregation (e.g. group by) | aggregation pipeline<br>参考 [SQL to Aggregation Mapping Chart](https://docs.mongodb.com/manual/reference/sql-aggregation-comparison/).                                                                                                   |
-| SELECT INTO NEW_TABLE       | [`$out`](https://docs.mongodb.com/manual/reference/operator/aggregation/out/#pipe._S_out)<br>参考 [SQL to Aggregation Mapping Chart](https://docs.mongodb.com/manual/reference/sql-aggregation-comparison/)                               |
-| MERGE INTO TABLE            | [`$merge`](https://docs.mongodb.com/manual/reference/operator/aggregation/merge/#pipe._S_merge) (MongoDB 4.2 开始支持)<br>参考 [SQL to Aggregation Mapping Chart](https://docs.mongodb.com/manual/reference/sql-aggregation-comparison/). |
-| UNION ALL                   | [`$unionWith`](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/#pipe._S_unionWith) (MongoDB 4.4 开始支持)                                                                                                        |
-| transactions                | [transactions](https://docs.mongodb.com/manual/core/transactions/)                                                                                                                                                                        |
+- 反转分片键的二进制位。这样将保留信息，并避免将插入顺序与递增的值序列相关联。
+- 交换第一个和最后一个 16 位字，“随机打乱”插入。
 
 ## 参考资料
 

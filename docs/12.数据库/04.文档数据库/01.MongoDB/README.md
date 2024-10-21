@@ -25,8 +25,8 @@ index: false
 ## 📖 内容
 
 - [MongoDB 简介](MongoDB简介.md)
-- [MongoDB 之 CRUD](MongoDB之CRUD.md)
-- [MongoDB 聚合操作](MongoDB聚合操作.md)
+- [MongoDB CRUD](MongoDB之CRUD.md)
+- [MongoDB 聚合](MongoDB聚合.md)
 - [MongoDB 事务](MongoDB事务.md)
 - [MongoDB 建模](MongoDB建模.md)
 - [MongoDB 建模示例](MongoDB建模示例.md)
@@ -39,6 +39,7 @@ index: false
 
 - **官方**
   - [MongoDB 官网](https://www.mongodb.com/)
+  - [MongoDB 官方手册](https://www.mongodb.com/zh-cn/docs/manual/)
   - [MongoDB Github](https://github.com/mongodb/mongo)
   - [MongoDB 官方免费教程](https://university.mongodb.com/)
 - **教程**
