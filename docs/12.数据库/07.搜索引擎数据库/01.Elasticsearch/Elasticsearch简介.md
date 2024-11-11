@@ -60,71 +60,31 @@ Elasticsearch 的主要功能：
 index -> type -> mapping -> document -> field
 ```
 
-### Cluster
+Elasticsearch 核心概念如下：
 
-集群包含多个节点，每个节点属于哪个集群都是通过一个配置来决定的，对于中小型应用来说，刚开始一个集群就一个节点很正常。
-
-### Node
-
-Node 是集群中的一个节点，节点也有一个名称，默认是随机分配的。默认节点会去加入一个名称为 `Elasticsearch` 的集群。如果直接启动一堆节点，那么它们会自动组成一个 Elasticsearch 集群，当然一个节点也可以组成 Elasticsearch 集群。
-
-### Index
-
-**可以认为是文档（document）的优化集合。**
-
-ES 会为所有字段建立索引，经过处理后写入一个反向索引（Inverted Index）。查找数据的时候，直接查找该索引。
-
-所以，ES 数据管理的顶层单位就叫做 Index（索引）。它是单个数据库的同义词。每个 Index （即数据库）的名字必须是小写。
-
-### Type
-
-每个索引里可以有一个或者多个类型（type）。`类型（type）` 是 index 的一个逻辑分类。
-
-不同的 Type 应该有相似的结构（schema），举例来说，`id`字段不能在这个组是字符串，在另一个组是数值。这是与关系型数据库的表的 [一个区别](https://www.elastic.co/guide/en/Elasticsearch/guide/current/mapping.html)。性质完全不同的数据（比如`products`和`logs`）应该存成两个 Index，而不是一个 Index 里面的两个 Type（虽然可以做到）。
-
-> 注意：根据 [规划](https://www.elastic.co/blog/index-type-parent-child-join-now-future-in-Elasticsearch)，Elastic 6.x 版只允许每个 Index 包含一个 Type，7.x 版将会彻底移除 Type。
-
-### Document
-
-Index 里面单条的记录称为 Document（文档）。许多条 Document 构成了一个 Index。
-
-每个 **`文档（document）`** 都是字段（field）的集合。
-
-Document 使用 JSON 格式表示，下面是一个例子。
-
-```javascript
-{
-"user": "张三",
-"title": "工程师",
-"desc": "数据库管理"
-}
-```
-
-同一个 Index 里面的 Document，不要求有相同的结构（scheme），但是最好保持相同，这样有利于提高搜索效率。
-
-### Field
-
-**`字段（field）`** 是包含数据的键值对。
-
-默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
-
-### Shard
-
-当单台机器不足以存储大量数据时，Elasticsearch 可以将一个索引中的数据切分为多个 **`分片（shard）`** 。 **`分片（shard）`** 分布在多台服务器上存储。有了 shard 就可以横向扩展，存储更多数据，让搜索和分析等操作分布到多台服务器上去执行，提升吞吐量和性能。每个 shard 都是一个 lucene index。
-
-### Replica
-
-任何一个服务器随时可能故障或宕机，此时 shard 可能就会丢失，因此可以为每个 shard 创建多个 **`副本（replica）`**。replica 可以在 shard 故障时提供备用服务，保证数据不丢失，多个 replica 还可以提升搜索操作的吞吐量和性能。primary shard（建立索引时一次设置，不能修改，默认 5 个），replica shard（随时修改数量，默认 1 个），默认每个索引 10 个 shard，5 个 primary shard，5 个 replica shard，最小的高可用配置，是 2 台服务器。
+- **Cluster（集群）** - 集群包含多个节点，每个节点属于哪个集群都是通过一个配置来决定的，对于中小型应用来说，刚开始一个集群就一个节点很正常。
+- **Node（节点）** - Node 是集群中的一个节点，节点也有一个名称，默认是随机分配的。默认节点会去加入一个名称为 `Elasticsearch` 的集群。如果直接启动一堆节点，那么它们会自动组成一个 Elasticsearch 集群，当然一个节点也可以组成 Elasticsearch 集群。
+- **Index（索引）** - 在 ES 中，**可以将索引视为文档（document）的集合**。
+  - ES 会为所有字段建立索引，经过处理后写入一个反向索引（Inverted Index）。查找数据的时候，直接查找该索引。
+  - 所以，ES 数据管理的顶层单位就叫做 Index（索引）。它是单个数据库的同义词。每个 Index （即数据库）的名字必须是小写。
+- **Type（类型）** - 每个索引里可以有一个或者多个类型（type）。`类型（type）` 是 Index 的一个逻辑分类。
+  - 不同的 Type 应该有相似的结构（schema），举例来说，`id`字段不能在这个组是字符串，在另一个组是数值。这是与关系型数据库的表的 [一个区别](https://www.elastic.co/guide/en/Elasticsearch/guide/current/mapping.html)。性质完全不同的数据（比如`products`和`logs`）应该存成两个 Index，而不是一个 Index 里面的两个 Type（虽然可以做到）。
+  - 注意：ES 7.x 版已彻底移除 Type。
+- **Document（文档）** - Index 里面单条的记录称为 Document。许多条 Document 构成了一个 Index。
+- 每个 **`文档（document）`** 都是字段（field）的集合。
+- **Field（字段）** - 包含数据的键值对。默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
+- **Shard（分片）** - 当单台机器不足以存储大量数据时，Elasticsearch 可以将一个索引中的数据切分为多个 **`分片（shard）`** 。 **`分片（shard）`** 分布在多台服务器上存储。有了 shard 就可以横向扩展，存储更多数据，让搜索和分析等操作分布到多台服务器上去执行，提升吞吐量和性能。每个 shard 都是一个 lucene index。
+- **Replica（副本）** - 任何一个服务器随时可能故障或宕机，此时 shard 可能就会丢失，因此可以为每个 shard 创建多个 **`副本（replica）`**。replica 可以在 shard 故障时提供备用服务，保证数据不丢失，多个 replica 还可以提升搜索操作的吞吐量和性能。primary shard（建立索引时一次设置，不能修改，默认 5 个），replica shard（随时修改数量，默认 1 个），默认每个索引 10 个 shard，5 个 primary shard，5 个 replica shard，最小的高可用配置，是 2 台服务器。
 
 ### ES 核心概念 vs. DB 核心概念
 
-| ES                     | DB                 |
-| ---------------------- | ------------------ |
-| 索引（index）          | 数据库（database） |
-| 类型（type，6.0 废弃） | 数据表（table）    |
-| 文档（docuemnt）       | 行（row）          |
-| 字符（field）          | 列（column）       |
-| 映射（mapping）        | 表结构（schema）   |
+| ES                               | DB                 |
+| -------------------------------- | ------------------ |
+| 索引（index）                    | 数据库（database） |
+| 类型（type，6.0 废弃，7.0 移除） | 数据表（table）    |
+| 文档（docuemnt）                 | 行（row）          |
+| 字符（field）                    | 列（column）       |
+| 映射（mapping）                  | 表结构（schema）   |
 
 ## Elastic Stack 生态
 

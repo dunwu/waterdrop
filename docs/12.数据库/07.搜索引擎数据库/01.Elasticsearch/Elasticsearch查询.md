@@ -16,11 +16,47 @@ permalink: /pages/f8fab8f0/
 
 # Elasticsearch 查询
 
-Elasticsearch 查询语句采用基于 RESTful 风格的接口封装成 JSON 格式的对象，称之为 Query DSL。Elasticsearch 查询分类大致分为**全文查询**、**词项查询**、**复合查询**、**嵌套查询**、**位置查询**、**特殊查询**。Elasticsearch 查询从机制分为两种，一种是根据用户输入的查询词，通过排序模型计算文档与查询词之间的**相关度**，并根据评分高低排序返回；另一种是**过滤机制**，只根据过滤条件对文档进行过滤，不计算评分，速度相对较快。
+Elasticsearch 提供了基于 JSON 的  DSL（Domain Specific Language）来定义查询。
+
+可以将 DSL 视为查询的 AST（抽象语法树），由两种类型的子句组成：
+
+- 叶子查询 - 在指定字段中查找特定值，例如：[`match`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html)、[`term`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html) 和 [`range`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)。
+
+- 组合查询 - 组合其他叶子查询或组合查询，用于以逻辑方式组合多个查询（例如： [`bool`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html)、[`dis_max`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html)），或更改它们的行为（例如：[`constant_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html)）。
+
+
+查询子句的行为会有所不同，具体取决于它们是在 query content 还是 filter context 中使用。
+
+- `query` context - **有相关性计算**，采用相关性算法，计算文档与查询关键词之间的相关度，并根据评分（`_score`）大小排序。
+- `filter` context - **无相关性计算**，可以利用缓存，性能更好。
+
+从用法角度，Elasticsearch 查询分类大致分为：
+
+- [Compound（组合查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)
+- [Term-level（词项查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html)
+- [Full text（全文查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
+- [Joining（联结查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/joining-queries.html)
+- [Specialized（专用查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/specialized-queries.html)
+- [Geo（地理位置查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/geo-queries.html)
+- [Span（跨度查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/span-queries.html)
+- [Vector（向量查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/vector-queries.html)
+- [Shape（形状查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/shape-queries.html)
 
 ## 全文查询
 
 ES 全文查询主要用于在全文字段上，主要考虑查询词与文档的相关性（Relevance）。
+
+ES 查询支持以下类型：
+
+- [intervals](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-intervals-query.html)
+- [match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html)
+- [match_bool_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-bool-prefix-query.html)
+- [match_phrase](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html)
+- [match_phrase_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html)
+- [combined_fields](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-combined-fields-query.html)
+- [multi_match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html)
+- [query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)
+- [simple_query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html)
 
 ### intervals query
 
@@ -512,16 +548,16 @@ DELETE groups
 
 词项查询有以下类型：
 
-- **[`exists` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)**
-- **[`fuzzy` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)**
-- **[`ids` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html)**
-- **[`prefix` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)**
-- **[`range` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)**
-- **[`regexp` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)**
-- **[`term` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)**
-- **[`terms` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)**
-- **[`type` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-type-query.html)**
-- **[`wildcard` query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html)**
+- **[Exists](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)**
+- **[Fuzzy](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)**
+- **[IDs](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html)**
+- **[Prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)**
+- **[Range](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)**
+- **[Regexp](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)**
+- **[Term](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)**
+- **[Terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)**
+- **[Terms set](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-set-query.html)**
+- **[Wildcard](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html)**
 
 ### exists query
 
@@ -1633,3 +1669,6 @@ GET /my-index/_search
 ```
 
 文档符合 query 中的条件，返回结果中可以查到上文中注册的 bool query。percolate query 的这种特性适用于数据分类、数据路由、事件监控和预警等场景。
+
+## 参考资料
+
