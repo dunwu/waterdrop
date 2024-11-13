@@ -11,7 +11,7 @@ tags:
 
 # 《极客时间教程 - Elasticsearch 核心技术与实战》笔记一
 
-## Elasticsearch 核心技术与实战课程简介
+## 第一章：概述
 
 ### 课程介绍（略）
 
@@ -49,7 +49,7 @@ Beats - 各种采集器
 
 X-Pack - 商业化套件
 
-## Elasticsearch 安装部署
+## 第二章：安装上手
 
 ### Elasticsearch 的安装与简单配置
 

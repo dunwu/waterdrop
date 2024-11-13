@@ -11,7 +11,7 @@ tags:
 
 # 《极客时间教程 - Elasticsearch 核心技术与实战》笔记二
 
-## 深入 ES 查询
+## 第四章：深入搜索
 
 ### 基于词项和基于全文的搜索
 
@@ -1258,7 +1258,7 @@ ES 5.3 引入了跨集群搜索的功能。
 - 允许任何节点扮演 federated 节点，以轻量的方式，将搜索请求进行代理
 - 不需要以 Client Node 形式加入其他集群
 
-## ES 分布式设计
+## 第五章：分布式特性及分布式搜索的机制
 
 ### 集群分布式模型及选主与脑裂问题
 
@@ -1404,11 +1404,336 @@ ES 搜索分为两阶段：
 
 每个分片都要基于自己分片上的数据进行相关度计算。这会导致打分偏离的情况，尤其是数据量很少时。当文档总数很少的情况下，主分片数越多，相关性计算会越不准。
 
+解决算分不准的方法
+
+将主分片数设为 1；
+
+使用 `_search?search_type=dfs_query_then_fetch`，消耗更多 CPU 和内存，执行性能低下
+
+```shell
+DELETE message
+PUT message
+{
+  "settings": {
+    "number_of_shards": 20
+  }
+}
+
+GET message
+
+POST message/_doc?routing=1
+{
+  "content":"good"
+}
+
+POST message/_doc?routing=2
+{
+  "content":"good morning"
+}
+
+POST message/_doc?routing=3
+{
+  "content":"good morning everyone"
+}
+
+POST message/_search
+{
+  "explain": true,
+  "query": {
+    "match_all": {}
+  }
+}
+
+POST message/_search
+{
+  "explain": true,
+  "query": {
+    "term": {
+      "content": {
+        "value": "good"
+      }
+    }
+  }
+}
+
+POST message/_search?search_type=dfs_query_then_fetch
+{
+
+  "query": {
+    "term": {
+      "content": {
+        "value": "good"
+      }
+    }
+  }
+}
+```
+
 ### 排序及 DocValues&Fielddata
+
+默认采用相关性算分对结果进行降序排序
+
+可以通过设定 sorting 参数，自行设定排序
+
+如果不指定 _score，算分为 null
+
+```shell
+#单字段排序
+POST /kibana_sample_data_ecommerce/_search
+{
+  "size": 5,
+  "query": {
+    "match_all": {
+
+    }
+  },
+  "sort": [
+    {"order_date": {"order": "desc"}}
+  ]
+}
+
+#多字段排序
+POST /kibana_sample_data_ecommerce/_search
+{
+  "size": 5,
+  "query": {
+    "match_all": {
+
+    }
+  },
+  "sort": [
+    {"order_date": {"order": "desc"}},
+    {"_doc":{"order": "asc"}},
+    {"_score":{ "order": "desc"}}
+  ]
+}
+
+GET kibana_sample_data_ecommerce/_mapping
+
+#对 text 字段进行排序。默认会报错，需打开 fielddata
+POST /kibana_sample_data_ecommerce/_search
+{
+  "size": 5,
+  "query": {
+    "match_all": {
+
+    }
+  },
+  "sort": [
+    {"customer_full_name": {"order": "desc"}}
+  ]
+}
+
+#打开 text 的 fielddata
+PUT kibana_sample_data_ecommerce/_mapping
+{
+  "properties": {
+    "customer_full_name" : {
+          "type" : "text",
+          "fielddata": true,
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        }
+  }
+}
+
+#关闭 keyword 的 doc values
+PUT test_keyword
+PUT test_keyword/_mapping
+{
+  "properties": {
+    "user_name":{
+      "type": "keyword",
+      "doc_values":false
+    }
+  }
+}
+
+DELETE test_keyword
+
+PUT test_text
+PUT test_text/_mapping
+{
+  "properties": {
+    "intro":{
+      "type": "text",
+      "doc_values":true
+    }
+  }
+}
+
+DELETE test_text
+
+DELETE temp_users
+PUT temp_users
+PUT temp_users/_mapping
+{
+  "properties": {
+    "name":{"type": "text","fielddata": true},
+    "desc":{"type": "text","fielddata": true}
+  }
+}
+
+Post temp_users/_doc
+{"name":"Jack","desc":"Jack is a good boy!","age":10}
+
+#打开 fielddata 后，查看 docvalue_fields 数据
+POST  temp_users/_search
+{
+  "docvalue_fields": [
+    "name","desc"
+    ]
+}
+
+#查看整型字段的 docvalues
+POST  temp_users/_search
+{
+  "docvalue_fields": [
+    "age"
+    ]
+}
+```
 
 ### 分页与遍历-FromSize&SearchAfter&ScrollAPI
 
+#### from + size
+
+当一个查询：from = 990, size = 10，会在每个分片上先获取 1000 个文档。然后，通过协调节点聚合所有结果。最后，再通过排序选取前 1000 个文档。
+
+页数越深，占用内存越多。为了避免深分页问题，ES 默认限定到 10000 个文档。
+
+#### search after
+
+实时获取下一页文档信息，不支持指定页数，只能向下翻页。
+
+需要指定 sort，并保证值是唯一的
+
+然后，可以反复使用上次结果中最后一个文档的 sort 值进行查询
+
+#### scroll
+
+创建一个快照，有新的数据写入以后，无法被查到。
+
+每次持续后，输入上一次的 scroll id
+
+```shell
+POST tmdb/_search
+{
+  "from": 10000,
+  "size": 1,
+  "query": {
+    "match_all": {
+
+    }
+  }
+}
+
+#Scroll API
+DELETE users
+
+POST users/_doc
+{"name":"user1","age":10}
+
+POST users/_doc
+{"name":"user2","age":11}
+
+POST users/_doc
+{"name":"user2","age":12}
+
+POST users/_doc
+{"name":"user2","age":13}
+
+POST users/_count
+
+POST users/_search
+{
+    "size": 1,
+    "query": {
+        "match_all": {}
+    },
+    "sort": [
+        {"age": "desc"} ,
+        {"_id": "asc"}    
+    ]
+}
+
+POST users/_search
+{
+    "size": 1,
+    "query": {
+        "match_all": {}
+    },
+    "search_after":
+        [
+          10,
+          "ZQ0vYGsBrR8X3IP75QqX"],
+    "sort": [
+        {"age": "desc"} ,
+        {"_id": "asc"}    
+    ]
+}
+
+#Scroll API
+DELETE users
+POST users/_doc
+{"name":"user1","age":10}
+
+POST users/_doc
+{"name":"user2","age":20}
+
+POST users/_doc
+{"name":"user3","age":30}
+
+POST users/_doc
+{"name":"user4","age":40}
+
+POST /users/_search?scroll=5m
+{
+    "size": 1,
+    "query": {
+        "match_all" : {
+        }
+    }
+}
+
+POST users/_doc
+{"name":"user5","age":50}
+POST /_search/scroll
+{
+    "scroll" : "1m",
+    "scroll_id" : "DXF1ZXJ5QW5kRmV0Y2gBAAAAAAAAAWAWbWdoQXR2d3ZUd2kzSThwVTh4bVE0QQ=="
+}
+```
+
 ### 处理并发读写
+
+采用乐观锁机制
+
+内部版本控制：`_seq_no` + `primary_term`
+
+外部版本控制：`version` + `version_type=external`
+
+## 第六章：深入聚合分析（略）
+
+## 第七章：数据建模（略）
+
+## 第八章：保护你的数据（略）
+
+## 第九章：水平扩展 Elasticsearch 集群
+
+## 第十章：生产环境中的集群运维（略）
+
+## 第十一章：索引生命周期管理（略）
+
+## 第十二章：用Logstash和Beats构建数据管道（略）
+
+## 第十三章：用Kibana进行数据可视化分析（略）
+
+## 第十四章：探索X-Pack套件（略）
 
 ## 参考资料
 

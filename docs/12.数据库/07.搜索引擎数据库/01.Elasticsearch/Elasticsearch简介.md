@@ -28,7 +28,7 @@ Elasticsearch 可以视为一个文档存储，它**将复杂数据结构序列�
 - 从写入数据到数据可以被搜索，存在较小的延迟（大概是 1s）。
 - 基于 ES 执行搜索和分析可以达到秒级。
 
-## 为什么不直接使用 Lucene
+## 为什么使用 Elasticsearch
 
 Elasticsearch 是基于 Lucene 的，那么为什么不是直接使用 Lucene 呢？
 
@@ -54,7 +54,33 @@ Elasticsearch 的主要功能：
 
 除了搜索，结合 Kibana、Logstash、Beats 开源产品，Elastic Stack（简称 ELK）还被广泛运用在大数据近实时分析领域，包括：**日志分析**、**指标监控**、**信息安全**等。它可以帮助你**探索海量结构化、非结构化数据，按需创建可视化报表，对监控数据设置报警阈值，通过使用机器学习，自动识别异常状况**。
 
-## Elasticsearch 核心概念
+> 参考：[What is Elasticsearch?](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro-what-is-es.html)
+
+## Elasticsearch 历史
+
+- 1.0（2014 年）
+- 5.0（2016 年）
+  - Lucene 6.x
+  - 默认打分机制从 TD-IDF 改为 BM 25
+  - 增加 Keyword 类型
+- 6.0（2017 年）
+  - Lucene 7.x
+  - 跨集群复制
+  - 索引生命周期管理
+  - SQL 的支持
+- 7.0（2019 年）
+  - Lucene 8.0
+  - 移除 Type
+  - ECK （用于支持 K8S）
+  - 集群协调
+  - High Level Rest Client
+  - Script Score 查询
+- 8.0（2022 年）
+  - Lucene 9.0
+  - 向量搜索
+  - 支持 OpenTelemetry
+
+## Elasticsearch 概念
 
 ```
 index -> type -> mapping -> document -> field
@@ -70,13 +96,16 @@ Elasticsearch 核心概念如下：
 - **Type（类型）** - 每个索引里可以有一个或者多个类型（type）。`类型（type）` 是 Index 的一个逻辑分类。
   - 不同的 Type 应该有相似的结构（schema），举例来说，`id`字段不能在这个组是字符串，在另一个组是数值。这是与关系型数据库的表的 [一个区别](https://www.elastic.co/guide/en/Elasticsearch/guide/current/mapping.html)。性质完全不同的数据（比如`products`和`logs`）应该存成两个 Index，而不是一个 Index 里面的两个 Type（虽然可以做到）。
   - 注意：ES 7.x 版已彻底移除 Type。
-- **Document（文档）** - Index 里面单条的记录称为 Document。许多条 Document 构成了一个 Index。
-- 每个 **`文档（document）`** 都是字段（field）的集合。
+- **Document（文档）** - Index 里面单条的记录称为 Document。文档是一组字段。每个文档都有一个唯一的 ID。下面是一个文档示例：
 - **Field（字段）** - 包含数据的键值对。默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
+- [**Metadata Field（元数据字段）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html) - 存储有关文档的信息的系统字段。元数据字段都以 `_` 开头。常见元数据字段：
+  - [`_index`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index-field.html) - 文档所属的索引
+  - [`_id`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html) - 文档的 ID
+  - [`_source`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html) - 表示文档原文的 JSON
 - **Shard（分片）** - 当单台机器不足以存储大量数据时，Elasticsearch 可以将一个索引中的数据切分为多个 **`分片（shard）`** 。 **`分片（shard）`** 分布在多台服务器上存储。有了 shard 就可以横向扩展，存储更多数据，让搜索和分析等操作分布到多台服务器上去执行，提升吞吐量和性能。每个 shard 都是一个 lucene index。
 - **Replica（副本）** - 任何一个服务器随时可能故障或宕机，此时 shard 可能就会丢失，因此可以为每个 shard 创建多个 **`副本（replica）`**。replica 可以在 shard 故障时提供备用服务，保证数据不丢失，多个 replica 还可以提升搜索操作的吞吐量和性能。primary shard（建立索引时一次设置，不能修改，默认 5 个），replica shard（随时修改数量，默认 1 个），默认每个索引 10 个 shard，5 个 primary shard，5 个 replica shard，最小的高可用配置，是 2 台服务器。
 
-### ES 核心概念 vs. DB 核心概念
+ES 核心概念 vs. DB 核心概念：
 
 | ES                               | DB                 |
 | -------------------------------- | ------------------ |
@@ -88,19 +117,17 @@ Elasticsearch 核心概念如下：
 
 ## Elastic Stack 生态
 
-### Elastic Stack  核心组件
-
 Elastic Stack 生态主要组成：Beats + Logstash + ElasticSearch + Kibana
 
 ![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/ElasticSearch%e7%9f%a5%e8%af%86%e4%bd%93%e7%b3%bb%e8%af%a6%e8%a7%a3/assets/es-introduce-1-1.png)
 
-#### Beats
+### Beats
 
 Beats 是一个面向**轻量型采集器**的平台，这些采集器可以从边缘机器向 Logstash、ElasticSearch 发送数据，它是由 Go 语言进行开发的，运行效率方面比较快。从下图中可以看出，不同 Beats 的套件是针对不同的数据源。
 
 ![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/ElasticSearch%e7%9f%a5%e8%af%86%e4%bd%93%e7%b3%bb%e8%af%a6%e8%a7%a3/assets/es-introduce-2-0.png)
 
-#### Logstash
+### Logstash
 
 Logstash 是**动态数据收集管道**，拥有可扩展的插件生态系统，支持从不同来源采集数据，转换数据，并将数据发送到不同的存储库中。其能够与 ElasticSearch 产生强大的协同作用，后被 Elastic 公司在 2013 年收购。
 
@@ -114,7 +141,7 @@ Logstash 是**动态数据收集管道**，拥有可扩展的插件生态系统�
 
 4）监控；
 
-#### ElasticSearch
+### ElasticSearch
 
 ElasticSearch 对数据进行**搜索、分析和存储**，其是基于 JSON 的分布式搜索和分析引擎，专门为实现水平可扩展性、高可靠性和管理便捷性而设计的。
 
@@ -126,7 +153,7 @@ ElasticSearch 对数据进行**搜索、分析和存储**，其是基于 JSON �
 
 3）将分词结果及其权重一并存入，以备用户在搜索数据时，根据权重将结果排名和打分，将返回结果呈现给用户；
 
-#### Kibana
+### Kibana
 
 Kibana 实现**数据可视化**，其作用就是在 ElasticSearch 中进行民航。Kibana 能够以图表的形式呈现数据，并且具有可扩展的用户界面，可以全方位的配置和管理 ElasticSearch。
 
@@ -136,7 +163,7 @@ Kibana 最早的时候是基于 Logstash 创建的工具，后被 Elastic 公司
 
 2）可以通过机器学习的技术，对异常情况进行检测，用于提前发现可疑问题；
 
-### 从日志收集系统看 ES Stack 的发展
+### ELK 演化
 
 > 我们看下 ELK 技术栈的演化，通常体现在日志收集系统中。
 
@@ -191,7 +218,7 @@ beats 结合 logstash 带来的优势：
 
 > 我们再看下官方开发成员分享的最佳实践。
 
-#### 日志收集系统
+（1）日志收集系统
 
 （PS：就是我们上面阐述的）
 
@@ -203,11 +230,11 @@ beats 结合 logstash 带来的优势：
 
 ![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/ElasticSearch%e7%9f%a5%e8%af%86%e4%bd%93%e7%b3%bb%e8%af%a6%e8%a7%a3/assets/es-introduce-2-6.png)
 
-#### Metric 收集和 APM 性能监控
+（2）Metric 收集和 APM 性能监控
 
 ![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/ElasticSearch%e7%9f%a5%e8%af%86%e4%bd%93%e7%b3%bb%e8%af%a6%e8%a7%a3/assets/es-introduce-2-7.png)
 
-#### 多数据中心方案
+（3）多数据中心方案
 
 通过冗余实现数据高可用
 
@@ -220,6 +247,14 @@ beats 结合 logstash 带来的优势：
 数据分散，跨集群的搜索
 
 ![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/ElasticSearch%e7%9f%a5%e8%af%86%e4%bd%93%e7%b3%bb%e8%af%a6%e8%a7%a3/assets/es-introduce-2-10.png)
+
+## Elasticsearch 快速入门
+
+> 参考：[Quick starts](https://www.elastic.co/guide/en/elasticsearch/reference/current/quickstart.html)
+
+## Elasticsearch 设置
+
+> 参考：[Set up Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
 
 ## Elasticsearch 基本原理
 
@@ -356,7 +391,7 @@ buffer 每 refresh 一次，就会产生一个 `segment file`，所以默认情�
 - **官方**
   - [Elasticsearch 官网](https://www.elastic.co/cn/products/Elasticsearch)
   - [Elasticsearch Github](https://github.com/elastic/Elasticsearch)
-  - [Elasticsearch 官方文档](https://www.elastic.co/guide/en/Elasticsearch/reference/current/index.html)
+  - [Elasticsearch 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 - **文章**
   - [Install Elasticsearch with RPM](https://www.elastic.co/guide/en/Elasticsearch/reference/current/rpm.html#rpm)
   - [https://www.ruanyifeng.com/blog/2017/08/Elasticsearch.html](https://www.ruanyifeng.com/blog/2017/08/Elasticsearch.html)
