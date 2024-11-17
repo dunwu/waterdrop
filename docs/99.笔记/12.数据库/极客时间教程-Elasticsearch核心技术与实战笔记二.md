@@ -1717,7 +1717,52 @@ POST /_search/scroll
 
 外部版本控制：`version` + `version_type=external`
 
-## 第六章：深入聚合分析（略）
+## 第六章：深入聚合分析
+
+### Bucket&Metric聚合分析及嵌套聚合
+
+Metric（统计） - 统计计算
+
+Bucket（分组） - 按一定规则，将文档分配到不同的桶中。
+
+Metric 聚合
+
+- **单值聚合** - 只输出一个分析结果
+  - min、max、avg、sum、cardinality
+- **多值聚合** - 输出多个分析结果
+  - stats、extended_stats、percentile、percentile_rank、top_hits
+
+### Pipeline聚合分析
+
+Pipeline聚合支持对聚合分析的结果，进行再次聚合分析。
+
+Pipeline 聚合的分析结果会输出到原结果中，根据位置的不同，分为两类：
+
+- **sibling** - 结果和现有分析结果同级。例如：[max_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-max-bucket-aggregation.html)、[min_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-min-bucket-aggregation.html)、[avg_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-avg-bucket-aggregation.html)、[sum_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-sum-bucket-aggregation.html)、[stats_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-stats-bucket-aggregation.html)、[extended_stats_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-extended-stats-bucket-aggregation.html)、[percentiles_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-percentiles-bucket-aggregation.html)。
+- **parent** - 结果内嵌到现有的聚合分析结果中。例如：[derivative](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-derivative-aggregation.html)、[cumulative_sum](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-cumulative-sum-aggregation.html)、[moving_function](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-movfn-aggregation.html)。
+
+### 聚合的作用范围及排序
+
+ES 聚合分析的默认作用范围是 query 的查询结果集。
+
+同时 ES 还支持以下方式改变聚合的作用范围：
+
+- filter
+- post_filter
+- global
+
+指定 order，按照 `_count` 和 `_key` 进行排序。
+
+### 聚合分析的原理及精准度问题
+
+ES 在进行聚合分析时，协调节点会在每个分片的主分片、副分片中选一个，然后在不同分片上分别进行聚合计算，然后将每个分片的聚合结果进行汇总，返回最终结果。
+
+由于，并非基于全量数据进行计算，所以聚合结果并非完全准确。
+
+要解决聚合准确性问题，有两个解决方案：
+
+- 解决方案 1：当数据量不大时，设置 Primary Shard 为 1，这意味着在数据全集上进行聚合。
+- 解决方案 2：设置 [`shard_size`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-shard-size) 参数，将计算数据范围变大，进而使得 ES 的**整体性能变低，精准度变高**。shard_size 值的默认值是 `size * 1.5 + 10`。
 
 ## 第七章：数据建模（略）
 

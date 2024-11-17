@@ -16,16 +16,24 @@ permalink: /pages/c6244284/
 
 # Elasticsearch 聚合
 
-Elasticsearch 是一个分布式的全文搜索引擎，索引和搜索是 Elasticsearch 的基本功能。事实上，Elasticsearch 的聚合（Aggregations）功能也十分强大，允许在数据上做复杂的分析统计。Elasticsearch 提供的聚合分析功能主要有**指标聚合(metrics aggregations)**、**桶聚合(bucket aggregations)**、**管道聚合(pipeline aggregations)** 和 **矩阵聚合(matrix aggregations)** 四大类，管道聚合和矩阵聚合官方说明是在试验阶段，后期会完全更改或者移除，这里不再对管道聚合和矩阵聚合进行讲解。
+聚合将数据汇总为指标、统计数据或其他分析。
 
-## 聚合的具体结构
+Elasticsearch 将聚合分为三类：
+
+| 类型                                                                                                                          | 说明                               |
+| ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| [**Metric（指标聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics.html)    | 根据字段值进行统计计算             |
+| [**Bucket（桶聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket.html)       | 根据字段值、范围或其他条件进行分组 |
+| [**Pipeline（管道聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html) | 根据其他聚合结果进行聚合           |
+
+## 聚合的用法
 
 所有的聚合，无论它们是什么类型，都遵从以下的规则。
 
-- 使用查询中同样的 JSON 请求来定义它们，而且你是使用键 aggregations 或者是 aggs 来进行标记。需要给每个聚合起一个名字，指定它的类型以及和该类型相关的选项。
+- 通过 JSON 来定义聚合计算，使用 `aggregations` 或 `aggs` 来标记聚合计算。需要给每个聚合起一个名字，指定它的类型以及和该类型相关的选项。
 - 它们运行在查询的结果之上。和查询不匹配的文档不会计算在内，除非你使用 global 聚集将不匹配的文档囊括其中。
 - 可以进一步过滤查询的结果，而不影响聚集。
-
+  
 以下是聚合的基本结构：
 
 ```json
@@ -51,589 +59,332 @@ Elasticsearch 是一个分布式的全文搜索引擎，索引和搜索是 Elast
 >
 > 此外，脚本也可以被人可能利用进行恶意代码攻击，尽量使用沙盒（sandbox）内的脚本语言。
 
-示例：查询所有球员的平均年龄是多少，并对球员的平均薪水加 188（也可以理解为每名球员加 188 后的平均薪水）。
+::: details 【示例】根据 my-field 字段进行 terms 聚合计算
 
-```bash
-POST /player/_search?size=0
+```json
+GET /my-index-000001/_search
 {
   "aggs": {
-    "avg_age": {
-      "avg": {
-        "field": "age"
+    "my-agg-name": {
+      "terms": {
+        "field": "my-field"
       }
+    }
+  }
+}
+```
+
+响应结果：
+
+```json
+{
+  "took": 78,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 5,
+      "relation": "eq"
     },
-    "avg_salary_188": {
-      "avg": {
-        "script": {
-          "source": "doc.salary.value + 188"
+    "max_score": 1.0,
+    "hits": [...]
+  },
+  "aggregations": {
+    "my-agg-name": { // my-agg-name 聚合计算的结果
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": []
+    }
+  }
+}
+```
+
+:::
+
+::: details 用于测试的数据
+
+为 `/employees` 索引添加测试数据：
+
+```json
+DELETE /employees
+PUT /employees/
+{
+  "mappings" : {
+      "properties" : {
+        "age" : {
+          "type" : "integer"
+        },
+        "gender" : {
+          "type" : "keyword"
+        },
+        "job" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 50
+            }
+          }
+        },
+        "name" : {
+          "type" : "keyword"
+        },
+        "salary" : {
+          "type" : "integer"
         }
       }
     }
-  }
 }
+
+PUT /employees/_bulk
+{"index":{"_id":"1"}}
+{"name":"Emma","age":32,"job":"Product Manager","gender":"female","salary":35000}
+{"index":{"_id":"2"}}
+{"name":"Underwood","age":41,"job":"Dev Manager","gender":"male","salary":50000}
+{"index":{"_id":"3"}}
+{"name":"Tran","age":25,"job":"Web Designer","gender":"male","salary":18000}
+{"index":{"_id":"4"}}
+{"name":"Rivera","age":26,"job":"Web Designer","gender":"female","salary":22000}
+{"index":{"_id":"5"}}
+{"name":"Rose","age":25,"job":"QA","gender":"female","salary":18000}
+{"index":{"_id":"6"}}
+{"name":"Lucy","age":31,"job":"QA","gender":"female","salary":25000}
+{"index":{"_id":"7"}}
+{"name":"Byrd","age":27,"job":"QA","gender":"male","salary":20000}
+{"index":{"_id":"8"}}
+{"name":"Foster","age":27,"job":"Java Programmer","gender":"male","salary":20000}
+{"index":{"_id":"9"}}
+{"name":"Gregory","age":32,"job":"Java Programmer","gender":"male","salary":22000}
+{"index":{"_id":"10"}}
+{"name":"Bryant","age":20,"job":"Java Programmer","gender":"male","salary":9000}
+{"index":{"_id":"11"}}
+{"name":"Jenny","age":36,"job":"Java Programmer","gender":"female","salary":38000}
+{"index":{"_id":"12"}}
+{"name":"Mcdonald","age":31,"job":"Java Programmer","gender":"male","salary":32000}
+{"index":{"_id":"13"}}
+{"name":"Jonthna","age":30,"job":"Java Programmer","gender":"female","salary":30000}
+{"index":{"_id":"14"}}
+{"name":"Marshall","age":32,"job":"Javascript Programmer","gender":"male","salary":25000}
+{"index":{"_id":"15"}}
+{"name":"King","age":33,"job":"Java Programmer","gender":"male","salary":28000}
+{"index":{"_id":"16"}}
+{"name":"Mccarthy","age":21,"job":"Javascript Programmer","gender":"male","salary":16000}
+{"index":{"_id":"17"}}
+{"name":"Goodwin","age":25,"job":"Javascript Programmer","gender":"male","salary":16000}
+{"index":{"_id":"18"}}
+{"name":"Catherine","age":29,"job":"Javascript Programmer","gender":"female","salary":20000}
+{"index":{"_id":"19"}}
+{"name":"Boone","age":30,"job":"DBA","gender":"male","salary":30000}
+{"index":{"_id":"20"}}
+{"name":"Kathy","age":29,"job":"DBA","gender":"female","salary":20000}
 ```
 
-## 指标聚合
+:::
 
-指标聚合（又称度量聚合）主要从不同文档的分组中提取统计数据，或者，从来自其他聚合的文档桶来提取统计数据。
+### 限定数据范围
 
-这些统计数据通常来自数值型字段，如最小或者平均价格。用户可以单独获取每项统计数据，或者也可以使用 stats 聚合来同时获取它们。更高级的统计数据，如平方和或者是标准差，可以通过 extended stats 聚合来获取。
+ES 聚合分析的默认作用范围是 `query` 的查询结果集。
 
-### Max Aggregation
+同时 ES 还支持以下方式改变聚合的作用范围：
 
-Max Aggregation 用于最大值统计。例如，统计 sales 索引中价格最高的是哪本书，并且计算出对应的价格的 2 倍值，查询语句如下：
+- `filter` - 只对当前子聚合语句生效
+- `post_filter` - 对聚合分析后的文档进行再次过滤
+- `global` - 无视 query，对全部文档进行统计
 
-```
-GET /sales/_search?size=0
+::: details 【示例】使用 query 限定聚合数据的范围
+
+```json
+POST /employees/_search
 {
-  "aggs" : {
-    "max_price" : {
-      "max" : {
-        "field" : "price"
-      }
-    },
-    "max_price_2" : {
-      "max" : {
-        "field" : "price",
-        "script": {
-          "source": "_value * 2.0"
-        }
-      }
-    }
-  }
-}
-```
-
-**指定的 field，在脚本中可以用 \_value 取字段的值**。
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "max_price": {
-      "value": 188.0
-    },
-    "max_price_2": {
-      "value": 376.0
-    }
-  }
-}
-```
-
-### Min Aggregation
-
-Min Aggregation 用于最小值统计。例如，统计 sales 索引中价格最低的是哪本书，查询语句如下：
-
-```
-GET /sales/_search?size=0
-{
-  "aggs" : {
-    "min_price" : {
-      "min" : {
-        "field" : "price"
-      }
-    }
-  }
-}
-```
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "min_price": {
-      "value": 18.0
-    }
-  }
-}
-```
-
-### Avg Aggregation
-
-Avg Aggregation 用于计算平均值。例如，统计 exams 索引中考试的平均分数，如未存在分数，默认为 60 分，查询语句如下：
-
-```
-GET /exams/_search?size=0
-{
-  "aggs" : {
-    "avg_grade" : {
-      "avg" : {
-        "field" : "grade",
-        "missing": 60
-      }
-    }
-  }
-}
-```
-
-**如果指定字段没有值，可以通过 missing 指定默认值；若未指定默认值，缺失该字段值的文档将被忽略（计算）**。
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "avg_grade": {
-      "value": 78.0
-    }
-  }
-}
-```
-
-除了常规的平均值聚合计算外，elasticsearch 还提供了加权平均值的聚合计算，详情参见 [Elasticsearch 指标聚合之 Weighted Avg Aggregation](https://www.knowledgedict.com/tutorial/elasticsearch-aggregations-metrics-weighted-avg-aggregation.html)。
-
-### Sum Aggregation
-
-Sum Aggregation 用于计算总和。例如，统计 sales 索引中 type 字段中匹配 hat 的价格总和，查询语句如下：
-
-```
-GET /exams/_search?size=0
-{
-  "query" : {
-    "constant_score" : {
-      "filter" : {
-        "match" : { "type" : "hat" }
+  "size": 0,
+  "query": {
+    "range": {
+      "age": {
+        "gte": 20
       }
     }
   },
-  "aggs" : {
-    "hat_prices" : {
-      "sum" : { "field" : "price" }
-    }
-  }
-}
-```
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "hat_prices": {
-      "value": 567.0
-    }
-  }
-}
-```
-
-### Value Count Aggregation
-
-Value Count Aggregation 可按字段统计文档数量。例如，统计 books 索引中包含 author 字段的文档数量，查询语句如下：
-
-```
-GET /books/_search?size=0
-{
-  "aggs" : {
-    "doc_count" : {
-      "value_count" : { "field" : "author" }
-    }
-  }
-}
-```
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "doc_count": {
-      "value": 5
-    }
-  }
-}
-```
-
-### Cardinality Aggregation
-
-Cardinality Aggregation 用于基数统计，其作用是先执行类似 SQL 中的 distinct 操作，去掉集合中的重复项，然后统计去重后的集合长度。例如，在 books 索引中对 language 字段进行 cardinality 操作可以统计出编程语言的种类数，查询语句如下：
-
-```
-GET /books/_search?size=0
-{
-  "aggs" : {
-    "all_lan" : {
-      "cardinality" : { "field" : "language" }
-    },
-    "title_cnt" : {
-      "cardinality" : { "field" : "title.keyword" }
-    }
-  }
-}
-```
-
-**假设 title 字段为文本类型（text），去重时需要指定 keyword，表示把 title 作为整体去重，即不分词统计**。
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "all_lan": {
-      "value": 8
-    },
-    "title_cnt": {
-      "value": 18
-    }
-  }
-}
-```
-
-### Stats Aggregation
-
-Stats Aggregation 用于基本统计，会一次返回 count、max、min、avg 和 sum 这 5 个指标。例如，在 exams 索引中对 grade 字段进行分数相关的基本统计，查询语句如下：
-
-```
-GET /exams/_search?size=0
-{
-  "aggs" : {
-    "grades_stats" : {
-      "stats" : { "field" : "grade" }
-    }
-  }
-}
-```
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "grades_stats": {
-      "count": 2,
-      "min": 50.0,
-      "max": 100.0,
-      "avg": 75.0,
-      "sum": 150.0
-    }
-  }
-}
-```
-
-### Extended Stats Aggregation
-
-Extended Stats Aggregation 用于高级统计，和基本统计功能类似，但是会比基本统计多出以下几个统计结果，sum_of_squares（平方和）、variance（方差）、std_deviation（标准差）、std_deviation_bounds（平均值加/减两个标准差的区间）。在 exams 索引中对 grade 字段进行分数相关的高级统计，查询语句如下：
-
-```
-GET /exams/_search?size=0
-{
-  "aggs" : {
-    "grades_stats" : {
-      "extended_stats" : { "field" : "grade" }
-    }
-  }
-}
-```
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "grades_stats": {
-      "count": 2,
-      "min": 50.0,
-      "max": 100.0,
-      "avg": 75.0,
-      "sum": 150.0,
-      "sum_of_squares": 12500.0,
-      "variance": 625.0,
-      "std_deviation": 25.0,
-      "std_deviation_bounds": {
-        "upper": 125.0,
-        "lower": 25.0
-      }
-    }
-  }
-}
-```
-
-### Percentiles Aggregation
-
-Percentiles Aggregation 用于百分位统计。百分位数是一个统计学术语，如果将一组数据从大到小排序，并计算相应的累计百分位，某一百分位所对应数据的值就称为这一百分位的百分位数。默认情况下，累计百分位为 [ 1, 5, 25, 50, 75, 95, 99 ]。以下例子给出了在 latency 索引中对 load_time 字段进行加载时间的百分位统计，查询语句如下：
-
-```
-GET latency/_search
-{
-  "size": 0,
-  "aggs" : {
-    "load_time_outlier" : {
-      "percentiles" : {
-        "field" : "load_time"
-      }
-    }
-  }
-}
-```
-
-**需要注意的是，如上的 `load_time` 字段必须是数字类型**。
-
-聚合结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "load_time_outlier": {
-      "values" : {
-        "1.0": 5.0,
-        "5.0": 25.0,
-        "25.0": 165.0,
-        "50.0": 445.0,
-        "75.0": 725.0,
-        "95.0": 945.0,
-        "99.0": 985.0
-      }
-    }
-  }
-}
-```
-
-百分位的统计也可以指定 percents 参数指定百分位，如下：
-
-```
-GET latency/_search
-{
-  "size": 0,
-  "aggs" : {
-    "load_time_outlier" : {
-      "percentiles" : {
-        "field" : "load_time",
-        "percents": [60, 80, 95]
-      }
-    }
-  }
-}
-```
-
-### Percentiles Ranks Aggregation
-
-Percentiles Ranks Aggregation 与 Percentiles Aggregation 统计恰恰相反，就是想看当前数值处在什么范围内（百分位）， 假如你查一下当前值 500 和 600 所处的百分位，发现是 90.01 和 100，那么说明有 90.01 % 的数值都在 500 以内，100 % 的数值在 600 以内。
-
-```
-GET latency/_search
-{
-  "size": 0,
-    "aggs" : {
-      "load_time_ranks" : {
-        "percentile_ranks" : {
-          "field" : "load_time",
-          "values" : [500, 600]
-        }
-      }
-  }
-}
-```
-
-**`同样 load_time` 字段必须是数字类型**。
-
-返回结果大概类似如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "load_time_ranks": {
-      "values" : {
-        "500.0": 90.01,
-        "600.0": 100.0
-      }
-    }
-  }
-}
-```
-
-可以设置 `keyed` 参数为 `true`，将对应的 values 作为桶 key 一起返回，默认是 `false`。
-
-```
-GET latency/_search
-{
-  "size": 0,
   "aggs": {
-    "load_time_ranks": {
-      "percentile_ranks": {
-        "field": "load_time",
-        "values": [500, 600],
-        "keyed": true
-      }
-    }
-  }
-}
-```
-
-返回结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "load_time_ranks": {
-      "values": [
-        {
-          "key": 500.0,
-          "value": 90.01
-        },
-        {
-          "key": 600.0,
-          "value": 100.0
-        }
-      ]
-    }
-  }
-}
-```
-
-## 桶聚合
-
-bucket 可以理解为一个桶，它会遍历文档中的内容，凡是符合某一要求的就放入一个桶中，分桶相当于 SQL 中的 group by。从另外一个角度，可以将指标聚合看成单桶聚合，即把所有文档放到一个桶中，而桶聚合是多桶型聚合，它根据相应的条件进行分组。
-
-| 种类                                          | 描述/场景                                                                                      |
-| :-------------------------------------------- | :--------------------------------------------------------------------------------------------- |
-| 词项聚合（Terms Aggregation）                 | 用于分组聚合，让用户得知文档中每个词项的频率，它返回每个词项出现的次数。                       |
-| 差异词项聚合（Significant Terms Aggregation） | 它会返回某个词项在整个索引中和在查询结果中的词频差异，这有助于我们发现搜索场景中有意义的词。   |
-| 过滤器聚合（Filter Aggregation）              | 指定过滤器匹配的所有文档到单个桶（bucket），通常这将用于将当前聚合上下文缩小到一组特定的文档。 |
-| 多过滤器聚合（Filters Aggregation）           | 指定多个过滤器匹配所有文档到多个桶（bucket）。                                                 |
-| 范围聚合（Range Aggregation）                 | 范围聚合，用于反映数据的分布情况。                                                             |
-| 日期范围聚合（Date Range Aggregation）        | 专门用于日期类型的范围聚合。                                                                   |
-| IP 范围聚合（IP Range Aggregation）           | 用于对 IP 类型数据范围聚合。                                                                   |
-| 直方图聚合（Histogram Aggregation）           | 可能是数值，或者日期型，和范围聚集类似。                                                       |
-| 时间直方图聚合（Date Histogram Aggregation）  | 时间直方图聚合，常用于按照日期对文档进行统计并绘制条形图。                                     |
-| 空值聚合（Missing Aggregation）               | 空值聚合，可以把文档集中所有缺失字段的文档分到一个桶中。                                       |
-| 地理点范围聚合（Geo Distance Aggregation）    | 用于对地理点（geo point）做范围统计。                                                          |
-
-### Terms Aggregation
-
-Terms Aggregation 用于词项的分组聚合。最为经典的用例是获取 X 中最频繁（top frequent）的项目，其中 X 是文档中的某个字段，如用户的名称、标签或分类。由于 terms 聚集统计的是每个词条，而不是整个字段值，因此通常需要在一个非分析型的字段上运行这种聚集。原因是, 你期望“big data”作为词组统计，而不是“big”单独统计一次，“data”再单独统计一次。
-
-用户可以使用 terms 聚集，从分析型字段（如内容）中抽取最为频繁的词条。还可以使用这种信息来生成一个单词云。
-
-```
-{
-  "aggs": {
-    "profit_terms": {
-      "terms": { // terms 聚合 关键字
-        "field": "profit",
-        ......
-      }
-    }
-  }
-}
-```
-
-在 terms 分桶的基础上，还可以对每个桶进行指标统计，也可以基于一些指标或字段值进行排序。示例如下：
-
-```
-{
-  "aggs": {
-    "item_terms": {
+    "jobs": {
       "terms": {
-        "field": "item_id",
-        "size": 1000,
-        "order":[{
-          "gmv_stat": "desc"
-        },{
-          "gmv_180d": "desc"
-        }]
+        "field":"job.keyword"
+
+      }
+    }
+  }
+}
+```
+
+:::
+
+::: details 【示例】使用 filter 限定聚合数据的范围
+
+```json
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "older_person": {
+      "filter":{
+        "range":{
+          "age":{
+            "from":35
+          }
+        }
+      },
+      "aggs":{
+         "jobs":{
+           "terms": {
+        "field":"job.keyword"
+      }
+    }},
+    "all_jobs": {
+      "terms": {
+        "field":"job.keyword"
+
+      }
+    }
+  }
+}
+```
+
+:::
+
+### 控制返回聚合结果
+
+::: details 【示例】仅返回聚合结果
+
+使用 `field` 限定聚合返回的展示字段：
+
+```json
+POST /employees/_search
+{
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword"
+      }
+    }
+  }
+}
+
+// 找出所有的 job 类型，还能找到聚合后符合条件的结果
+POST /employees/_search
+{
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword"
+      }
+    }
+  },
+  "post_filter": {
+    "match": {
+      "job.keyword": "Dev Manager"
+    }
+  }
+}
+```
+
+默认情况下，包含聚合的搜索会同时返回搜索命中和聚合结果。要仅返回聚合结果，请将 `size` 设置为 `0`：
+
+```json
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword"
+      }
+    }
+  }
+}
+```
+
+:::
+
+### 聚合结果排序
+
+::: details 【示例】聚合结果排序
+
+指定 `order`，按照 `_count` 和 `_key` 进行排序。
+
+```json
+POST /employees/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "age": {
+        "gte": 20
+      }
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "order": [
+          {
+            "_count": "asc"
+          },
+          {
+            "_key": "desc"
+          }
+        ]
+      }
+    }
+  }
+}
+
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "order": [
+          {
+            "avg_salary": "desc"
+          }
+        ]
       },
       "aggs": {
-        "gmv_stat": {
-          "sum": {
-            "field": "gmv"
-          }
-        },
-        "gmv_180d": {
-          "sum": {
-            "script": "doc['gmv_90d'].value*2"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-返回的结果如下：
-
-```
-{
-  ...
-  "aggregations": {
-    "hospital_id_agg": {
-      "doc_count_error_upper_bound": 0,
-      "sum_other_doc_count": 260,
-      "buckets": [
-        {
-          "key": 23388,
-          "doc_count": 18,
-          "gmv_stat": {
-            "value": 176220
-          },
-          "gmv_180d": {
-            "value": 89732
-          }
-        },
-        {
-          "key": 96117,
-          "doc_count": 16,
-          "gmv_stat": {
-            "value": 129306
-          },
-          "gmv_180d": {
-            "value": 56988
-          }
-        },
-        ...
-      ]
-    }
-  }
-}
-```
-
-默认情况下返回按文档计数从高到低的前 10 个分组，可以通过 size 参数指定返回的分组数。
-
-### Filter Aggregation
-
-Filter Aggregation 是过滤器聚合，可以把符合过滤器中的条件的文档分到一个桶中，即是单分组聚合。
-
-```
-{
-  "aggs": {
-    "age_terms": {
-      "filter": {"match":{"gender":"F"}},
-      "aggs": {
-        "avg_age": {
+        "avg_salary": {
           "avg": {
-            "field": "age"
+            "field": "salary"
           }
         }
       }
     }
   }
 }
-```
 
-### Filters Aggregation
-
-Filters Aggregation 是多过滤器聚合，可以把符合多个过滤条件的文档分到不同的桶中，即每个分组关联一个过滤条件，并收集所有满足自身过滤条件的文档。
-
-```
+POST /employees/_search
 {
   "size": 0,
   "aggs": {
-    "messages": {
-      "filters": {
-        "filters": {
-          "errors": { "match": { "body": "error" } },
-          "warnings": { "match": { "body": "warning" } }
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "order": [
+          {
+            "stats_salary.min": "desc"
+          }
+        ]
+      },
+      "aggs": {
+        "stats_salary": {
+          "stats": {
+            "field": "salary"
+          }
         }
       }
     }
@@ -641,51 +392,498 @@ Filters Aggregation 是多过滤器聚合，可以把符合多个过滤条件的
 }
 ```
 
-在这个例子里，我们分析日志信息。聚合会创建两个关于日志数据的分组，一个收集包含错误信息的文档，另一个收集包含告警信息的文档。而且每个分组会按月份划分。
+:::
 
-```
+### 运行多个聚合
+
+::: details 【示例】运行多个聚合
+
+可以在同一请求中指定多个聚合：
+
+```json
+POST /employees/_search
 {
-  ...
-  "aggregations": {
-    "messages": {
-      "buckets": {
-        "errors": {
-          "doc_count": 1
-        },
-        "warnings": {
-          "doc_count": 2
-        }
+  "size": 0,
+  "query": {
+    "range": {
+      "age": {
+        "gte": 40
       }
     }
-  }
-}
-```
-
-### Range Aggregation
-
-Range Aggregation 范围聚合是一个基于多组值来源的聚合，可以让用户定义一系列范围，每个范围代表一个分组。在聚合执行的过程中，从每个文档提取出来的值都会检查每个分组的范围，并且使相关的文档落入分组中。注意，范围聚合的每个范围内包含 from 值但是排除 to 值。
-
-```
-{
+  },
   "aggs": {
-    "age_range": {
-      "range": {
-        "field": "age",
-          "ranges": [{
-            "to": 25
-          },
-          {
-            "from": 25,
-            "to": 35
-          },
-          {
-            "from": 35
-          }]
+    "jobs": {
+      "terms": {
+        "field":"job.keyword"
+
+      }
+    },
+
+    "all":{
+      "global":{},
+      "aggs":{
+        "salary_avg":{
+          "avg":{
+            "field":"salary"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+:::
+
+### 运行子聚合
+
+::: details 【示例】运行子聚合
+
+Bucket 聚合支持 Bucket 或 Metric 子聚合。例如，具有 [avg](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-avg-aggregation.html) 子聚合的 terms 聚合会计算每个桶中文档的平均值。嵌套子聚合没有级别或深度限制。
+
+```json
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "size": 10
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        }
+      }
+    },
+    "min_salary_by_job":{
+      "min_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    }
+  }
+}
+```
+
+响应将子聚合结果嵌套在其父聚合下：
+
+```json
+{
+  // ...
+  "aggregations": {
+    "jobs": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 6,
+      "buckets": [
+        {
+          "key": "Java Programmer",
+          "doc_count": 7,
+          "avg_salary": {
+            "value": 25571.428571428572
+          }
         },
-        "aggs": {
-          "bmax": {
-            "max": {
-              "field": "balance"
+        {
+          "key": "Javascript Programmer",
+          "doc_count": 4,
+          "avg_salary": {
+            "value": 19250.0
+          }
+        },
+        {
+          "key": "QA",
+          "doc_count": 3,
+          "avg_salary": {
+            "value": 21000.0
+          }
+        }
+      ]
+    },
+    "min_salary_by_job": {
+      "value": 19250.0,
+      "keys": ["Javascript Programmer"]
+    }
+  }
+}
+```
+
+:::
+
+## Metric（指标聚合）
+
+指标聚合主要从不同文档的分组中提取统计数据，或者，从来自其他聚合的文档桶来提取统计数据。
+
+这些统计数据通常来自数值型字段，如最小或者平均价格。用户可以单独获取每项统计数据，或者也可以使用 stats 聚合来同时获取它们。更高级的统计数据，如平方和或者是标准差，可以通过 extended stats 聚合来获取。
+
+ES 支持的指标聚合类型：
+
+| 类型                                                                                                                                                                | 说明                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| [avg](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-avg-aggregation.html)                                             | 平均值聚合                                   |
+| [boxplot](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-boxplot-aggregation.html)                                     | 箱线图聚合                                   |
+| [cardinality](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html)                             | 近似计算非重复值                             |
+| [extended_stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-extendedstats-aggregation.html)                        | 扩展统计聚合                                 |
+| [geo_bounds](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-geobounds-aggregation.html)                                | 地理边界聚合                                 |
+| [geo_centroid](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-geocentroid-aggregation.html)                            | 根据* geo *字段的所有坐标值计算加权质心      |
+| [geo_line_geo_line](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-geo-line.html)                                      | 根据地理数据生成可用于线性几何图形展示的数据 |
+| [cartesian_bounds](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cartesian-bounds-aggregation.html)                   | 笛卡尔积边界聚合                             |
+| [cartesian_centroid](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cartesian-centroid-aggregation.html)               | 计算所有坐标值加权质心                       |
+| [matrix_stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-matrix-stats-aggregation.html)                                   | 矩阵统计聚合                                 |
+| [max](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-max-aggregation.html)                                             | 最大值聚合                                   |
+| [median_absolute_deviation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-median-absolute-deviation-aggregation.html) | 中位数绝对偏差聚合                           |
+| [min](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-min-aggregation.html)                                             | 最小值聚合                                   |
+| [percentile_ranks](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-percentile-rank-aggregation.html)                    | 百分位排名聚合                               |
+| [percentiles](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-percentile-aggregation.html)                              | 百分位聚合                                   |
+| [rate](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-rate-aggregation.html)                                           | 频率聚合                                     |
+| [scripted_metric](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-scripted-metric-aggregation.html)                     | 脚本化指标聚合                               |
+| [stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-stats-aggregation.html)                                         | 统计聚合                                     |
+| [string_stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-string-stats-aggregation.html)                           | 字符串统计聚合                               |
+| [sum](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-sum-aggregation.html)                                             | 求和聚合                                     |
+| [t_test](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-ttest-aggregation.html)                                        | 校验聚合                                     |
+| [top_hits](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-top-hits-aggregation.html)                                   | 热门点击统计                                 |
+| [top_metrics](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-top-metrics.html)                                         | 热门指标聚合                                 |
+| [value_count](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-valuecount-aggregation.html)                              | 值统计聚合                                   |
+| [weighted_avg](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-weight-avg-aggregation.html)                             | 加权平均值聚合                               |
+
+::: details 【示例】指标聚合示例
+
+Metric 聚合测试：
+
+```json
+// Metric 聚合，找到最低的工资
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "min_salary": {
+      "min": {
+        "field":"salary"
+      }
+    }
+  }
+}
+
+// Metric 聚合，找到最高的工资
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "max_salary": {
+      "max": {
+        "field":"salary"
+      }
+    }
+  }
+}
+
+// 多个 Metric 聚合，找到最低最高和平均工资
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "max_salary": {
+      "max": {
+        "field": "salary"
+      }
+    },
+    "min_salary": {
+      "min": {
+        "field": "salary"
+      }
+    },
+    "avg_salary": {
+      "avg": {
+        "field": "salary"
+      }
+    }
+  }
+}
+
+// 一个聚合，输出多值
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "stats_salary": {
+      "stats": {
+        "field": "salary"
+      }
+    }
+  }
+}
+```
+
+:::
+
+## Bucket（桶聚合）
+
+桶聚合不会像指标聚合那样计算字段的指标，而是创建文档桶。每个桶都与一个标准（取决于聚合类型）相关联，该标准确定当前上下文中的文档是否“落入”其中。换句话说，桶有效地定义了文档集。除了桶本身之外，`桶`聚合还计算并返回“落入”每个桶的文档数。
+
+与`指标`聚合相反，桶聚合可以保存子聚合。这些子聚合将针对其 “父” 桶聚合创建的桶进行聚合。
+
+Elasticsearch 中支持的桶聚合类型：
+
+| 类型                                                                                                                                                           | 说明                   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| [adjacency_matrix](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-adjacency-matrix-aggregation.html)               | 邻接矩阵聚合           |
+| [auto_interval_date_histogram](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-autodatehistogram-aggregation.html)  | 自动间隔日期直方图聚合 |
+| [categorize_text](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-categorize-text-aggregation.html)                 | 对文本进行分类聚合     |
+| [children](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-children-aggregation.html)                               | 子文档聚合             |
+| [composite](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-composite-aggregation.html)                             | 组合聚合               |
+| [date_histogram](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-datehistogram-aggregation.html)                    | 日期直方图聚合         |
+| [date_range](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-daterange-aggregation.html)                            | 日期范围聚合           |
+| [diversified_sampler](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-diversified-sampler-aggregation.html)         | 多种采样器聚合         |
+| [filter](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-filter-aggregation.html)                                   | 过滤器聚合             |
+| [filters](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-filters-aggregation.html)                                 | 多过滤器聚合           |
+| [geo_distance](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geodistance-aggregation.html)                        | 地理距离聚合           |
+| [geohash_grid](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html)                        | geohash 网格           |
+| [geohex_grid](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohexgrid-aggregation.html)                          | geohex 网格            |
+| [geotile_grid](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geotilegrid-aggregation.html)                        | geotile 网格           |
+| [global](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-global-aggregation.html)                                   | 全局聚合               |
+| [histogram](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-histogram-aggregation.html)                             | 直方图聚合             |
+| [ip_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-ipprefix-aggregation.html)                              | IP 前缀聚合            |
+| [ip_range](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-iprange-aggregation.html)                                | IP 范围聚合            |
+| [missing](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-missing-aggregation.html)                                 | 空值聚合               |
+| [multi_terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-multi-terms-aggregation.html)                         | 多词项分组聚合         |
+| [nested](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-nested-aggregation.html)                                   | 嵌套聚合               |
+| [parent](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-parent-aggregation.html)                                   | 父文档聚合             |
+| [random_sampler](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-random-sampler-aggregation.html)                          | 随机采样器聚合         |
+| [range](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-range-aggregation.html)                                     | 范围聚合               |
+| [rare_terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-rare-terms-aggregation.html)                           | 稀有多词项聚合         |
+| [reverse_nested](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-reverse-nested-aggregation.html)                   | 反向嵌套聚合           |
+| [sampler](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-sampler-aggregation.html)                                 | 采样器聚合             |
+| [significant_terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-significantterms-aggregation.html)              | 重要词项聚合           |
+| [significant_text](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-significanttext-aggregation.html)                | 重要文本聚合           |
+| [terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html)                                     | 词项分组聚合           |
+| [time_series](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-time-series-aggregation.html)                         | 时间序列聚合           |
+| [variable_width_histogram](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-variablewidthhistogram-aggregation.html) | 可变宽度直方图聚合     |
+
+::: details 【示例】terms 聚合查询
+
+默认，ES 不允许对 Text 字段进行 terms 聚合查询
+
+```json
+// 对 keword 进行聚合
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field":"job.keyword"
+      }
+    }
+  }
+}
+
+// 对 Text 字段进行 terms 聚合查询，失败
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job"
+      }
+    }
+  }
+}
+
+// 对 Text 字段打开 fielddata，支持 terms aggregation
+PUT employees/_mapping
+{
+  "properties" : {
+    "job":{
+       "type":     "text",
+       "fielddata": true
+    }
+  }
+}
+
+// 对 Text 字段进行 terms 分词。分词后的 terms
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field":"job"
+      }
+    }
+  }
+}
+
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field":"job.keyword"
+      }
+    }
+  }
+}
+```
+
+:::
+
+::: details 【示例】更多 Bucket 聚合示例
+
+```json
+// 对 job 进行近似去重统计
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "cardinate": {
+      "cardinality": {
+        "field": "job"
+      }
+    }
+  }
+}
+
+// 对 gender 进行聚合
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "gender": {
+      "terms": {
+        "field":"gender"
+      }
+    }
+  }
+}
+
+// 指定 bucket 的 size
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "ages_5": {
+      "terms": {
+        "field":"age",
+        "size":3
+      }
+    }
+  }
+}
+
+// 指定 size，不同工种中，年纪最大的 3 个员工的具体信息
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field":"job.keyword"
+      },
+      "aggs":{
+        "old_employee":{
+          "top_hits":{
+            "size":3,
+            "sort":[
+              {
+                "age":{
+                  "order":"desc"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+// Salary Ranges 分桶，可以自己定义 key
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "salary_range": {
+      "range": {
+        "field":"salary",
+        "ranges":[
+          {
+            "to":10000
+          },
+          {
+            "from":10000,
+            "to":20000
+          },
+          {
+            "key":">20000",
+            "from":20000
+          }
+        ]
+      }
+    }
+  }
+}
+
+// Salary Histogram, 工资 0 到 10 万，以 5000 一个区间进行分桶
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "salary_histrogram": {
+      "histogram": {
+        "field":"salary",
+        "interval":5000,
+        "extended_bounds":{
+          "min":0,
+          "max":100000
+
+        }
+      }
+    }
+  }
+}
+
+// 嵌套聚合 1，按照工作类型分桶，并统计工资信息
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "Job_salary_stats": {
+      "terms": {
+        "field": "job.keyword"
+      },
+      "aggs": {
+        "salary": {
+          "stats": {
+            "field": "salary"
+          }
+        }
+      }
+    }
+  }
+}
+
+// 多次嵌套。根据工作类型分桶，然后按照性别分桶，计算工资的统计信息
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "Job_gender_stats": {
+      "terms": {
+        "field": "job.keyword"
+      },
+      "aggs": {
+        "gender_stats": {
+          "terms": {
+            "field": "gender"
+          },
+          "aggs": {
+            "salary_stats": {
+              "stats": {
+                "field": "salary"
+              }
             }
           }
         }
@@ -695,43 +893,276 @@ Range Aggregation 范围聚合是一个基于多组值来源的聚合，可以�
 }
 ```
 
-返回结果如下：
+:::
 
-```
+## Pipeline（管道聚合）
+
+管道聚合处理从其他聚合而不是文档集生成的输出，从而将信息添加到输出树中。
+
+Pipeline 聚合的分析结果会输出到原结果中，根据位置的不同，分为两类：
+
+- **sibling** - 结果和现有分析结果同级。例如：[max_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-max-bucket-aggregation.html)、[min_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-min-bucket-aggregation.html)、[avg_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-avg-bucket-aggregation.html)、[sum_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-sum-bucket-aggregation.html)、[stats_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-stats-bucket-aggregation.html)、[extended_stats_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-extended-stats-bucket-aggregation.html)、[percentiles_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-percentiles-bucket-aggregation.html)。
+- **parent** - 结果内嵌到现有的聚合分析结果中。例如：[derivative](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-derivative-aggregation.html)、[cumulative_sum](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-cumulative-sum-aggregation.html)、[moving_function](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-movfn-aggregation.html)。
+
+管道聚合可以通过使用 `buckets_path` 参数来指示所需指标的路径，从而引用执行计算所需的聚合。管道聚合不能具有子聚合，但根据类型，它可以引用`buckets_path`中的另一个管道，从而允许链接管道聚合。
+
+以下为 Elasticsearch 支持的管道聚合类型：
+
+| 类型                                                                                                                                                           | 说明             |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| [avg_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-avg-bucket-aggregation.html)                         | 平均桶           |
+| [bucket_script](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-bucket-script-aggregation.html)                   | 桶脚本           |
+| [bucket_count_ks_test](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-count-ks-test-aggregation.html)              | 桶数 k-s 测试    |
+| [bucket_correlation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-correlation-aggregation.html)                  | 桶关联           |
+| [bucket_selector](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-bucket-selector-aggregation.html)               | 桶选择器         |
+| [bucket_sort](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-bucket-sort-aggregation.html)                       | 桶排序           |
+| [change_point](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-change-point-aggregation.html)                              | 更改点           |
+| [cumulative_cardinality](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-cumulative-cardinality-aggregation.html) | 累积基数         |
+| [cumulative_sum](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-cumulative-sum-aggregation.html)                 | 累计总和         |
+| [derivative](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-derivative-aggregation.html)                         | 导数             |
+| [extended_stats_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-extended-stats-bucket-aggregation.html)   | 扩展的统计信息桶 |
+| [inference_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-inference-bucket-aggregation.html)             | 推理桶           |
+| [max_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-max-bucket-aggregation.html)                         | 最大桶           |
+| [min_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-min-bucket-aggregation.html)                         | 最小桶           |
+| [moving_function](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-movfn-aggregation.html)                         | 移动功能         |
+| [moving_percentiles](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-moving-percentiles-aggregation.html)         | 移动百分位数     |
+| [normalize](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-normalize-aggregation.html)                           | 正常化           |
+| [percentiles_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-percentiles-bucket-aggregation.html)         | 百分位数桶       |
+| [serial_differencing](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-serialdiff-aggregation.html)                | 序列差分         |
+| [stats_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-stats-bucket-aggregation.html)                     | 统计桶           |
+| [sum_bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-sum-bucket-aggregation.html)                         | 总和桶           |
+
+::: details 【示例】Pipeline 聚合示例
+
+```json
+// 平均工资最低的工作类型
+POST /employees/_search
 {
-  ...
-  "aggregations": {
-    "age_range": {
-      "buckets": [{
-        "key": "*-25.0",
-        "to": 25,
-        "doc_count": 225,
-        "bmax": {
-          "value": 49587
-        }
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "size": 10
       },
-      {
-        "key": "25.0-35.0",
-        "from": 25,
-        "to": 35,
-        "doc_count": 485,
-        "bmax": {
-          "value": 49795
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
         }
+      }
+    },
+    "min_salary_by_job":{
+      "min_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    }
+  }
+}
+
+// 平均工资最高的工作类型
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "size": 10
       },
-      {
-        "key": "35.0-*",
-        "from": 35,
-        "doc_count": 290,
-        "bmax": {
-          "value": 49989
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
         }
-      }]
+      }
+    },
+    "max_salary_by_job":{
+      "max_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    }
+  }
+}
+
+// 平均工资的平均工资
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "size": 10
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        }
+      }
+    },
+    "avg_salary_by_job":{
+      "avg_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    }
+  }
+}
+
+// 平均工资的统计分析
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "size": 10
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        }
+      }
+    },
+    "stats_salary_by_job":{
+      "stats_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    }
+  }
+}
+
+// 平均工资的百分位数
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "jobs": {
+      "terms": {
+        "field": "job.keyword",
+        "size": 10
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        }
+      }
+    },
+    "percentiles_salary_by_job":{
+      "percentiles_bucket": {
+        "buckets_path": "jobs>avg_salary"
+      }
+    }
+  }
+}
+
+// 按照年龄对平均工资求导
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "age": {
+      "histogram": {
+        "field": "age",
+        "min_doc_count": 1,
+        "interval": 1
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        },
+        "derivative_avg_salary":{
+          "derivative": {
+            "buckets_path": "avg_salary"
+          }
+        }
+      }
+    }
+  }
+}
+
+// Cumulative_sum
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "age": {
+      "histogram": {
+        "field": "age",
+        "min_doc_count": 1,
+        "interval": 1
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        },
+        "cumulative_salary":{
+          "cumulative_sum": {
+            "buckets_path": "avg_salary"
+          }
+        }
+      }
+    }
+  }
+}
+
+// Moving Function
+POST /employees/_search
+{
+  "size": 0,
+  "aggs": {
+    "age": {
+      "histogram": {
+        "field": "age",
+        "min_doc_count": 1,
+        "interval": 1
+      },
+      "aggs": {
+        "avg_salary": {
+          "avg": {
+            "field": "salary"
+          }
+        },
+        "moving_avg_salary":{
+          "moving_fn": {
+            "buckets_path": "avg_salary",
+            "window":10,
+            "script": "MovingFunctions.min(values)"
+          }
+        }
+      }
     }
   }
 }
 ```
 
+:::
+
+## 聚合的执行流程
+
+ES 在进行聚合分析时，协调节点会在每个分片的主分片、副分片中选一个，然后在不同分片上分别进行聚合计算，然后将每个分片的聚合结果进行汇总，返回最终结果。
+
+由于，并非基于全量数据进行计算，所以聚合结果并非完全准确。
+
+要解决聚合准确性问题，有两个解决方案：
+
+- 解决方案 1：当数据量不大时，设置 Primary Shard 为 1，这意味着在数据全集上进行聚合。
+- 解决方案 2：设置 [`shard_size`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-shard-size) 参数，将计算数据范围变大，进而使得 ES 的**整体性能变低，精准度变高**。shard_size 值的默认值是 `size * 1.5 + 10`。
+
 ## 参考资料
 
 - [Elasticsearch 教程](https://www.knowledgedict.com/tutorial/elasticsearch-intro.html)
+- [ES 官方文档之 Aggregations](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)
