@@ -449,20 +449,18 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 > Elasticsearch 是一个基于 Lucene 的搜索和数据分析工具，它提供了一个分布式服务。Elasticsearch 是遵从 Apache 开源条款的一款开源产品，是当前主流的企业级搜索引擎。
 
-- [Elasticsearch 简介](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch简介.md)
-- [Elasticsearch 索引](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch索引.md)
-- [Elasticsearch 映射](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch映射.md)
-- [Elasticsearch 查询](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch查询.md)
-- [Elasticsearch 高亮](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch高亮.md)
-- [Elasticsearch 排序](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch排序.md)
-- [Elasticsearch 聚合](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch聚合.md)
-- [Elasticsearch 分析器](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch分析器.md)
-- [Elasticsearch 性能优化](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch性能优化.md)
-- [Elasticsearch Rest API](12.数据库/07.搜索引擎数据库/01.Elasticsearch/ElasticsearchRestApi.md)
-- [ElasticSearch Java API 之 High Level REST Client](12.数据库/07.搜索引擎数据库/01.Elasticsearch/ElasticsearchHighLevelRestJavaApi.md)
-- [Elasticsearch 集群和分片](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch集群和分片.md)
-- [Elasticsearch 运维](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch运维.md)
-- [Elasticsearch 面试总结](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch面试.md) 💯
+- [Elasticsearch 简介](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_简介.md)
+- [Elasticsearch 存储](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_存储.md)
+- [Elasticsearch 搜索](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_搜索.md)
+- [Elasticsearch 聚合](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_聚合.md)
+- [Elasticsearch 分析](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_分析.md)
+- [Elasticsearch DSL](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_DSL.md)
+- [Elasticsearch 集群](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_集群.md)
+- [Elasticsearch 优化](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_优化.md)
+- [Elasticsearch 运维](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_运维.md)
+- [Elasticsearch API 之 Rest](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_API_Rest.md)
+- [ElasticSearch API 之 High Level REST Client](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_API_HighLevelRest.md)
+- [Elasticsearch 面试](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_面试.md) 💯
 
 #### Elastic
 

@@ -1,7 +1,6 @@
 ---
-title: ElasticSearch Java API 之 High Level REST Client
+title: ElasticSearch API 之 HighLevelRestClient
 date: 2022-03-01 18:55:46
-order: 12
 categories:
   - 数据库
   - 搜索引擎数据库
@@ -14,7 +13,7 @@ tags:
 permalink: /pages/02faef83/
 ---
 
-# ElasticSearch Java API 之 High Level REST Client
+# ElasticSearch API 之 HighLevelRestClient
 
 > Elasticsearch 官方的 High Level REST Client 在 7.1.5.0 版本废弃。所以本文中的 API 不推荐使用。
 

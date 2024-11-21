@@ -1,7 +1,6 @@
 ---
-title: Elasticsearch 性能优化
+title: Elasticsearch 优化
 date: 2022-01-21 19:54:43
-order: 10
 categories:
   - 数据库
   - 搜索引擎数据库
@@ -14,7 +13,7 @@ tags:
 permalink: /pages/a363fdc7/
 ---
 
-# Elasticsearch 性能优化
+# Elasticsearch 优化
 
 Elasticsearch 是当前流行的企业级搜索引擎，设计用于云计算中，能够达到实时搜索，稳定，可靠，快速，安装使用方便。作为一个开箱即用的产品，在生产环境上线之后，我们其实不一定能确保其的性能和稳定性。如何根据实际情况提高服务的性能，其实有很多技巧。这章我们分享从实战经验中总结出来的 elasticsearch 性能优化，主要从硬件配置优化、索引优化设置、查询方面优化、数据结构优化、集群架构优化等方面讲解。
 

@@ -1,7 +1,6 @@
 ---
-title: Elasticsearch 查询
+title: Elasticsearch DSL
 date: 2022-01-18 08:01:08
-order: 05
 categories:
   - 数据库
   - 搜索引擎数据库
@@ -11,19 +10,18 @@ tags:
   - 搜索引擎数据库
   - Elasticsearch
   - 查询
+  - DSL
 permalink: /pages/f8fab8f0/
 ---
 
-# Elasticsearch 查询
+# Elasticsearch DSL
 
-Elasticsearch 提供了基于 JSON 的  DSL（Domain Specific Language）来定义查询。
+Elasticsearch 提供了基于 JSON 的 DSL（Domain Specific Language）来定义查询。
 
 可以将 DSL 视为查询的 AST（抽象语法树），由两种类型的子句组成：
 
 - 叶子查询 - 在指定字段中查找特定值，例如：[`match`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html)、[`term`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html) 和 [`range`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)。
-
 - 组合查询 - 组合其他叶子查询或组合查询，用于以逻辑方式组合多个查询（例如： [`bool`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html)、[`dis_max`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html)），或更改它们的行为（例如：[`constant_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html)）。
-
 
 查询子句的行为会有所不同，具体取决于它们是在 query content 还是 filter context 中使用。
 
@@ -1672,3 +1670,4 @@ GET /my-index/_search
 
 ## 参考资料
 
+- [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
