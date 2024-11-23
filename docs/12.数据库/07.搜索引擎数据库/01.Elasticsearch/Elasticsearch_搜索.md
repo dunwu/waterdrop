@@ -1,5 +1,7 @@
 ---
+icon: logos:elasticsearch
 title: Elasticsearch 搜索
+date: 2024-11-22 07:37:46
 categories:
   - 数据库
   - 搜索引擎数据库
@@ -9,6 +11,7 @@ tags:
   - 搜索引擎数据库
   - Elasticsearch
   - 查询
+permalink: /pages/b630d7a6/
 ---
 
 # Elasticsearch 搜索

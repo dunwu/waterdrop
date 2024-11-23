@@ -1,4 +1,5 @@
 ---
+icon: logos:elasticsearch
 title: Elasticsearch 优化
 date: 2022-01-21 19:54:43
 categories:

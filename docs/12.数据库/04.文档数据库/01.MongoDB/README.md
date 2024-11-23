@@ -24,16 +24,15 @@ index: false
 
 ## 📖 内容
 
-- [MongoDB 简介](MongoDB简介.md)
-- [MongoDB CRUD](MongoDB之CRUD.md)
-- [MongoDB 聚合](MongoDB聚合.md)
-- [MongoDB 事务](MongoDB事务.md)
-- [MongoDB 建模](MongoDB建模.md)
-- [MongoDB 建模示例](MongoDB建模示例.md)
-- [MongoDB 索引](MongoDB索引.md)
-- [MongoDB 复制](MongoDB复制.md)
-- [MongoDB 分片](MongoDB分片.md)
-- [MongoDB 运维](MongoDB运维.md)
+- [MongoDB 简介](MongoDB_简介.md)
+- [MongoDB CRUD](MongoDB_CRUD.md)
+- [MongoDB 聚合](MongoDB_聚合.md)
+- [MongoDB 事务](MongoDB_事务.md)
+- [MongoDB 建模](MongoDB_建模.md)
+- [MongoDB 索引](MongoDB_索引.md)
+- [MongoDB 复制](MongoDB_复制.md)
+- [MongoDB 分片](MongoDB_分片.md)
+- [MongoDB 运维](MongoDB_运维.md)
 
 ## 📚 资料
 

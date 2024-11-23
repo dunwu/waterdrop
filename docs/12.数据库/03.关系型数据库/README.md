@@ -23,15 +23,15 @@ index: false
 
 ### Mysql
 
-- [Mysql 架构](02.Mysql/Mysql架构.md)
-- [Mysql 存储引擎](02.Mysql/Mysql存储引擎.md)
-- [Mysql 索引](02.Mysql/Mysql索引.md)
-- [Mysql 事务](02.Mysql/Mysql事务.md)
-- [Mysql 锁](02.Mysql/Mysql锁.md)
-- [Mysql 高可用](02.Mysql/Mysql高可用.md)
-- [Mysql 优化](02.Mysql/Mysql优化.md)
-- [Mysql 运维](02.Mysql/Mysql运维.md)
-- [Mysql 面试](02.Mysql/Mysql面试.md)
+- [Mysql 架构](02.Mysql/Mysql_架构)
+- [Mysql 存储引擎](02.Mysql/Mysql_存储引擎)
+- [Mysql 索引](02.Mysql/Mysql_索引)
+- [Mysql 事务](02.Mysql/Mysql_事务)
+- [Mysql 锁](02.Mysql/Mysql_锁)
+- [Mysql 高可用](02.Mysql/Mysql_高可用)
+- [Mysql 优化](02.Mysql/Mysql_优化)
+- [Mysql 运维](02.Mysql/Mysql_运维)
+- [Mysql 面试](02.Mysql/Mysql_面试)
 
 ### 其他
 

@@ -21,15 +21,15 @@ index: false
 
 ## 📖 内容
 
-- [Mysql 架构](Mysql架构.md)
-- [Mysql 存储引擎](Mysql存储引擎.md)
-- [Mysql 索引](Mysql索引.md)
-- [Mysql 事务](Mysql事务.md)
-- [Mysql 锁](Mysql锁.md)
-- [Mysql 高可用](Mysql高可用.md)
-- [Mysql 优化](Mysql优化.md)
-- [Mysql 运维](Mysql运维.md)
-- [Mysql 面试](Mysql面试.md)
+- [Mysql 架构](Mysql_架构)
+- [Mysql 存储引擎](Mysql_存储引擎)
+- [Mysql 索引](Mysql_索引)
+- [Mysql 事务](Mysql_事务)
+- [Mysql 锁](Mysql_锁)
+- [Mysql 高可用](Mysql_高可用)
+- [Mysql 优化](Mysql_优化)
+- [Mysql 运维](Mysql_运维)
+- [Mysql 面试](Mysql_面试)
 
 ## 📚 资料
 

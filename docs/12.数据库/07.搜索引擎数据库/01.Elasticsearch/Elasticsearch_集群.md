@@ -1,5 +1,6 @@
 ---
-title: Elasticsearch 集群和分片
+icon: logos:elasticsearch
+title: Elasticsearch 集群
 date: 2022-03-01 20:52:25
 categories:
   - 数据库
@@ -14,7 +15,7 @@ tags:
 permalink: /pages/e3fe52cc/
 ---
 
-# Elasticsearch 集群和分片
+# Elasticsearch 集群
 
 ## 集群
 

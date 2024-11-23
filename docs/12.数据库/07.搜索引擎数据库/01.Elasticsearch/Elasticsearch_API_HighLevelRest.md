@@ -1,4 +1,5 @@
 ---
+icon: logos:elasticsearch
 title: ElasticSearch API 之 HighLevelRestClient
 date: 2022-03-01 18:55:46
 categories:

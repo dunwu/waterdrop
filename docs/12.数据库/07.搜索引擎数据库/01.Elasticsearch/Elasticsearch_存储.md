@@ -1,7 +1,8 @@
 ---
+icon: logos:elasticsearch
 title: Elasticsearch 存储
 date: 2022-02-22 21:01:01
-categoriElasticsearch:
+categories:
   - 数据库
   - 搜索引擎数据库
   - Elasticsearch
@@ -11,7 +12,7 @@ tags:
   - Elasticsearch
   - 存储
   - 索引
-permalink: /pagElasticsearch/646e92be/
+permalink: /pages/646e92be/
 ---
 
 # Elasticsearch 存储
@@ -74,7 +75,7 @@ Elasticsearch 的实际存储会将每个 index 分为多个 shard，而 shard �
 
 ![](https://miro.medium.com/v2/resize:fit:720/format:webp/1*AaxjInoSw4tC5x_SmmhTMg.png)
 
-Elasticsearch 的每个 shard 对应一个 lucene index。lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期[合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modulElasticsearch-merge.html)较大的 segment，以保持索引大小。
+Elasticsearch 的每个 shard 对应一个 lucene index。lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期[合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html)较大的 segment，以保持索引大小。
 
 ### Elasticsearch 写数据过程
 
@@ -83,7 +84,7 @@ Elasticsearch 的每个 shard 对应一个 lucene index。lucene index 又会被
 - 实际的 node 上的 `primary shard` 处理请求，然后将数据同步到 `replica node`。
 - `coordinating node` 如果发现 `primary node` 和所有 `replica node` 都完成工作后，就返回响应结果给客户端。
 
-![img](https://raw.githubusercontent.com/dunwu/imagElasticsearch/master/snap/20210712104055.png)
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210712104055.png)
 
 ### Elasticsearch 读数据过程
 
@@ -119,23 +120,23 @@ j2ee 特别牛
 
 ![img](https://miro.medium.com/v2/resize:fit:700/1*1lOqsxQsZHDC7lZVlrKCXQ.jpeg)
 
-[![Elasticsearch-write-detail](https://github.com/doocs/advanced-java/raw/master/docs/high-concurrency/imagElasticsearch/Elasticsearch-write-detail.png)](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/imagElasticsearch/Elasticsearch-write-detail.png)
+[![Elasticsearch-write-detail](https://github.com/doocs/advanced-java/raw/master/docs/high-concurrency/images/es-write-detail.png)](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/images/es-write-detail.png)
 
 先写入内存 buffer，在 buffer 里的时候数据是搜索不到的；同时将数据写入 translog 日志文件。
 
-如果 buffer 快满了，或者到一定时间，就会将内存 buffer 数据 `refrElasticsearchh` 到一个新的 `segment file` 中，但是此时数据不是直接进入 `segment file` 磁盘文件，而是先进入 `os cache` 。这个过程就是 `refrElasticsearchh`。
+如果 buffer 快满了，或者到一定时间，就会将内存 buffer 数据 `refresh` 到一个新的 `segment file` 中，但是此时数据不是直接进入 `segment file` 磁盘文件，而是先进入 `os cache` 。这个过程就是 `refresh`。
 
 每隔 1 秒钟，Elasticsearch 将 buffer 中的数据写入一个**新的** `segment file`，每秒钟会产生一个**新的磁盘文件** `segment file`，这个 `segment file` 中就存储最近 1 秒内 buffer 中写入的数据。
 
-但是如果 buffer 里面此时没有数据，那当然不会执行 refrElasticsearchh 操作，如果 buffer 里面有数据，默认 1 秒钟执行一次 refrElasticsearchh 操作，刷入一个新的 segment file 中。
+但是如果 buffer 里面此时没有数据，那当然不会执行 refresh 操作，如果 buffer 里面有数据，默认 1 秒钟执行一次 refresh 操作，刷入一个新的 segment file 中。
 
-操作系统里面，磁盘文件其实都有一个东西，叫做 `os cache`，即操作系统缓存，就是说数据写入磁盘文件之前，会先进入 `os cache`，先进入操作系统级别的一个内存缓存中去。只要 `buffer` 中的数据被 refrElasticsearchh 操作刷入 `os cache`中，这个数据就可以被搜索到了。
+操作系统里面，磁盘文件其实都有一个东西，叫做 `os cache`，即操作系统缓存，就是说数据写入磁盘文件之前，会先进入 `os cache`，先进入操作系统级别的一个内存缓存中去。只要 `buffer` 中的数据被 refresh 操作刷入 `os cache`中，这个数据就可以被搜索到了。
 
-为什么叫 Elasticsearch 是**准实时**的？ `NRT`，全称 `near real-time`。默认是每隔 1 秒 refrElasticsearchh 一次的，所以 Elasticsearch 是准实时的，因为写入的数据 1 秒之后才能被看到。可以通过 Elasticsearch 的 `rElasticsearchtful api` 或者 `java api`，**手动**执行一次 refrElasticsearchh 操作，就是手动将 buffer 中的数据刷入 `os cache`中，让数据立马就可以被搜索到。只要数据被输入 `os cache` 中，buffer 就会被清空了，因为不需要保留 buffer 了，数据在 translog 里面已经持久化到磁盘去一份了。
+为什么叫 Elasticsearch 是**准实时**的？ `NRT`，全称 `near real-time`。默认是每隔 1 秒 refresh 一次的，所以 Elasticsearch 是准实时的，因为写入的数据 1 秒之后才能被看到。可以通过 Elasticsearch 的 `rElasticsearchtful api` 或者 `java api`，**手动**执行一次 refresh 操作，就是手动将 buffer 中的数据刷入 `os cache`中，让数据立马就可以被搜索到。只要数据被输入 `os cache` 中，buffer 就会被清空了，因为不需要保留 buffer 了，数据在 translog 里面已经持久化到磁盘去一份了。
 
-重复上面的步骤，新的数据不断进入 buffer 和 translog，不断将 `buffer` 数据写入一个又一个新的 `segment file` 中去，每次 `refrElasticsearchh` 完 buffer 清空，translog 保留。随着这个过程推进，translog 会变得越来越大。当 translog 达到一定长度的时候，就会触发 `commit` 操作。
+重复上面的步骤，新的数据不断进入 buffer 和 translog，不断将 `buffer` 数据写入一个又一个新的 `segment file` 中去，每次 `refresh` 完 buffer 清空，translog 保留。随着这个过程推进，translog 会变得越来越大。当 translog 达到一定长度的时候，就会触发 `commit` 操作。
 
-commit 操作发生第一步，就是将 buffer 中现有数据 `refrElasticsearchh` 到 `os cache` 中去，清空 buffer。然后，将一个 `commit point` 写入磁盘文件，里面标识着这个 `commit point` 对应的所有 `segment file`，同时强行将 `os cache` 中目前所有的数据都 `fsync` 到磁盘文件中去。最后**清空** 现有 translog 日志文件，重启一个 translog，此时 commit 操作完成。
+commit 操作发生第一步，就是将 buffer 中现有数据 `refresh` 到 `os cache` 中去，清空 buffer。然后，将一个 `commit point` 写入磁盘文件，里面标识着这个 `commit point` 对应的所有 `segment file`，同时强行将 `os cache` 中目前所有的数据都 `fsync` 到磁盘文件中去。最后**清空** 现有 translog 日志文件，重启一个 translog，此时 commit 操作完成。
 
 这个 commit 操作叫做 `flush`。默认 30 分钟自动执行一次 `flush`，但如果 translog 过大，也会触发 `flush`。flush 操作就对应着 commit 的全过程，我们可以通过 Elasticsearch api，手动执行 flush 操作，手动将 os cache 中的数据 fsync 强刷到磁盘上去。
 
@@ -145,7 +146,7 @@ translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁�
 
 实际上你在这里，如果面试官没有问你 Elasticsearch 丢数据的问题，你可以在这里给面试官炫一把，你说，其实 Elasticsearch 第一是准实时的，数据写入 1 秒后可以搜索到；可能会丢失数据的。有 5 秒的数据，停留在 buffer、translog os cache、segment file os cache 中，而不在磁盘上，此时如果宕机，会导致 5 秒的**数据丢失**。
 
-**总结一下**，数据先写入内存 buffer，然后每隔 1s，将数据 refrElasticsearchh 到 os cache，到了 os cache 数据就能被搜索到（所以我们才说 Elasticsearch 从写入到能被搜索到，中间有 1s 的延迟）。每隔 5s，将数据写入 translog 文件（这样如果机器宕机，内存数据全没，最多会有 5s 的数据丢失），translog 大到一定程度，或者默认每隔 30mins，会触发 commit 操作，将缓冲区的数据都 flush 到 segment file 磁盘文件中。
+**总结一下**，数据先写入内存 buffer，然后每隔 1s，将数据 refresh 到 os cache，到了 os cache 数据就能被搜索到（所以我们才说 Elasticsearch 从写入到能被搜索到，中间有 1s 的延迟）。每隔 5s，将数据写入 translog 文件（这样如果机器宕机，内存数据全没，最多会有 5s 的数据丢失），translog 大到一定程度，或者默认每隔 30mins，会触发 commit 操作，将缓冲区的数据都 flush 到 segment file 磁盘文件中。
 
 > 数据写入 segment file 之后，同时就建立好了倒排索引。
 
@@ -155,7 +156,7 @@ translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁�
 
 如果是更新操作，就是将原来的 doc 标识为 `deleted` 状态，然后新写入一条数据。
 
-buffer 每 refrElasticsearchh 一次，就会产生一个 `segment file`，所以默认情况下是 1 秒钟一个 `segment file`，这样下来 `segment file` 会越来越多，此时会定期执行 merge。每次 merge 的时候，会将多个 `segment file` 合并成一个，同时这里会将标识为 `deleted` 的 doc 给**物理删除掉**，然后将新的 `segment file` 写入磁盘，这里会写一个 `commit point`，标识所有新的 `segment file`，然后打开 `segment file` 供搜索使用，同时删除旧的 `segment file`。
+buffer 每 refresh 一次，就会产生一个 `segment file`，所以默认情况下是 1 秒钟一个 `segment file`，这样下来 `segment file` 会越来越多，此时会定期执行 merge。每次 merge 的时候，会将多个 `segment file` 合并成一个，同时这里会将标识为 `deleted` 的 doc 给**物理删除掉**，然后将新的 `segment file` 写入磁盘，这里会写一个 `commit point`，标识所有新的 `segment file`，然后打开 `segment file` 供搜索使用，同时删除旧的 `segment file`。
 
 ### 底层 lucene
 
@@ -221,7 +222,7 @@ PUT /my_index
     "index": {
       "number_of_shards": "1",
       "number_of_replicas": "1",
-      "refrElasticsearchh_interval": "60s",
+      "refresh_interval": "60s",
       "analysis": {
         "filter": {
           "tsconvert": {
@@ -261,7 +262,7 @@ PUT /my_index
 			},
 			"indexing": {
 				"slowlog": {
-					"thrElasticsearchhold": {
+					"threshold": {
 						"index": {
 							"warn": "2s",
 							"info": "1s"
@@ -271,19 +272,19 @@ PUT /my_index
 			},
 			"provided_name": "hospital_202101070533",
 			"query": {
-				"default_field": "timElasticsearchtamp",
+				"default_field": "timestamp",
 				"parse": {
 					"allow_unmapped_fields": "false"
 				}
 			},
-			"requElasticsearchts": {
+			"requests": {
 				"cache": {
 					"enable": "true"
 				}
 			},
 			"search": {
 				"slowlog": {
-					"thrElasticsearchhold": {
+					"threshold": {
 						"fetch": {
 							"warn": "1s",
 							"info": "200ms"
@@ -308,8 +309,8 @@ PUT /my_index
 
 #### 索引静态配置
 
-- **_`index.number_of_shards`_**：索引的主分片数，默认值是 **_`5`_**。这个配置在索引创建后不能修改；在 Elasticsearch 层面，可以通过 **_`Elasticsearch.index.max_number_of_shards`_** 属性设置索引最大的分片数，默认为 **_`1024`_**。
-- **_`index.codec`_**：数据存储的压缩算法，默认值为 **_`LZ4`_**，可选择值还有 **_`bElasticsearcht_comprElasticsearchsion`_**，它比 LZ4 可以获得更好的压缩比（即占据较小的磁盘空间，但存储性能比 LZ4 低）。
+- **_`index.number_of_shards`_**：索引的主分片数，默认值是 **_`5`_**。这个配置在索引创建后不能修改；在 Elasticsearch 层面，可以通过 **_`es.index.max_number_of_shards`_** 属性设置索引最大的分片数，默认为 **_`1024`_**。
+- **_`index.codec`_**：数据存储的压缩算法，默认值为 **_`LZ4`_**，可选择值还有 **_`best_compression`_**，它比 LZ4 可以获得更好的压缩比（即占据较小的磁盘空间，但存储性能比 LZ4 低）。
 - **_`index.routing_partition_size`_**：路由分区数，如果设置了该参数，其路由算法为：`( hash(_routing) + hash(_id) % index.routing_parttion_size ) % number_of_shards`。如果该值不设置，则路由算法为 `hash(_routing) % number_of_shardings`，`_routing` 默认值为 `_id`。
 
 静态配置里，有重要的部分是配置分析器（config analyzers）。
@@ -326,7 +327,7 @@ PUT /my_index
 #### 索引动态配置
 
 - **_`index.number_of_replicas`_**：索引主分片的副本数，默认值是 **_`1`_**，该值必须大于等于 0，这个配置可以随时修改。
-- **_`index.refrElasticsearchh_interval`_**：执行新索引数据的刷新操作频率，该操作使对索引的最新更改对搜索可见，默认为 **_`1s`_**。也可以设置为 **_`-1`_** 以禁用刷新。更详细信息参考 [Elasticsearch 动态修改 refrElasticsearchh_interval 刷新间隔设置](https://www.knowledgedict.com/tutorial/elasticsearch-refrElasticsearchh_interval-settings.html)。
+- **_`index.refresh_interval`_**：执行新索引数据的刷新操作频率，该操作使对索引的最新更改对搜索可见，默认为 **_`1s`_**。也可以设置为 **_`-1`_** 以禁用刷新。更详细信息参考 [Elasticsearch 动态修改 refresh_interval 刷新间隔设置](https://www.knowledgedict.com/tutorial/elasticsearch-refresh_interval-settings.html)。
 
 ### Mapping
 
@@ -363,7 +364,7 @@ Elasticsearch 官方将静态映射称为**显式映射（[Explicit mapping](htt
 PUT /my-index-000001
 {
   "mappings": {
-    "propertiElasticsearch": {
+    "properties": {
       "age":    { "type": "integer" },
       "email":  { "type": "keyword"  },
       "name":   { "type": "text"  }
@@ -377,7 +378,7 @@ PUT /my-index-000001
 ```javascript
 PUT /my-index-000001/_mapping
 {
-  "propertiElasticsearch": {
+  "properties": {
     "employee-id": {
       "type": "keyword",
       "index": false
@@ -474,7 +475,7 @@ PUT books/it/1
 {
   "books": {
     "mappings": {
-      "propertiElasticsearch": {
+      "properties": {
         "id": {
           "type": "long"
         },
@@ -500,14 +501,14 @@ PUT books/it/1
 
 ##### 动态模板
 
-**动态模板（[dynamic templatElasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templatElasticsearch.html)）**是用于给 `mapping` 动态添加字段的自定义规则。
+**动态模板（[dynamic templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html)）**是用于给 `mapping` 动态添加字段的自定义规则。
 
 动态模板可以设置匹配条件，只有匹配的情况下才使用动态模板：
 
 - `match_mapping_type` 对 Elasticsearch 检测到的数据类型进行操作
 - `match` 和 `unmatch` 使用模式匹配字段名称
 - `path_match` 和 `path_unmatch` 对字段的完整虚线路径进行操作
-- 如果动态模板没有定义 `match_mapping_type`、`match` 或 `path_match`，则不会匹配任何字段。您仍然可以在批量请求的 `dynamic_templatElasticsearch` 部分按名称引用模板。
+- 如果动态模板没有定义 `match_mapping_type`、`match` 或 `path_match`，则不会匹配任何字段。您仍然可以在批量请求的 `dynamic_templates` 部分按名称引用模板。
 
 【示例】当设置 `'dynamic':'true'` 时，Elasticsearch 会将字符串字段映射为带有关键字子字段的文本字段。如果只是索引结构化内容并且对全文搜索不感兴趣，可以让 Elasticsearch 仅将字段映射为关键字字段。这种情况下，只有完全匹配才能搜索到这些字段。
 
@@ -515,7 +516,7 @@ PUT books/it/1
 PUT my-index-000001
 {
   "mappings": {
-    "dynamic_templatElasticsearch": [
+    "dynamic_templates": [
       {
         "strings_as_keywords": {
           "match_mapping_type": "string",
@@ -561,12 +562,12 @@ Elasticsearch 提供了非常丰富的数据类型，官方将其分为以下几
   - [`boolean`](https://www.elastic.co/guide/en/elasticsearch/reference/current/boolean.html)：布尔类型，值为 true 或 false。
   - [Keywords](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html)：keyword 族类型，包括 `keyword`、`constant_keyword` 和 `wildcard`。
   - [Numbers](https://www.elastic.co/guide/en/elasticsearch/reference/current/number.html)：数字类型，如 `long` 和 `double`
-  - **DatElasticsearch**：日期类型，包括 [`date`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html) 和 [`date_nanos`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date_nanos.html)。
+  - **Dates**：日期类型，包括 [`date`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html) 和 [`date_nanos`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date_nanos.html)。
   - [`alias`](https://www.elastic.co/guide/en/elasticsearch/reference/current/field-alias.html)：用于定义存在字段的别名。
 - **对象类型**
   - [`object`](https://www.elastic.co/guide/en/elasticsearch/reference/current/object.html)：JSON 对象
   - [`flattened`](https://www.elastic.co/guide/en/elasticsearch/reference/current/flattened.html)：整个 JSON 对象作为单个字段值。
-  - [`nElasticsearchted`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nElasticsearchted.html)：保留其子字段之间关系的 JSON 对象。
+  - [`nested`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html)：保留其子字段之间关系的 JSON 对象。
   - [`join`](https://www.elastic.co/guide/en/elasticsearch/reference/current/parent-join.html)：为同一索引中的文档定义父/子关系。
 - **结构化数据类型**
 
@@ -583,13 +584,13 @@ Elasticsearch 提供了非常丰富的数据类型，官方将其分为以下几
 - **文本搜索类型**
   - [`text` fields](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html)：text 族类型，包括 `text` 和 `match_only_text`。
   - [`annotated-text`](https://www.elastic.co/guide/en/elasticsearch/plugins/8.2/mapper-annotated-text.html)：包含特殊标记的文本。用于识别命名实体。
-  - [`completion`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggElasticsearchters.html#completion-suggElasticsearchter)：用于自动补全。
+  - [`completion`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html#completion-suggester)：用于自动补全。
   - [`search_as_you_type`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-as-you-type.html)：键入时完成的类似文本的类型。
   - [`token_count`](https://www.elastic.co/guide/en/elasticsearch/reference/current/token-count.html)：文本中标记的计数。
 - **文档排名类型**
   - [`dense_vector`](https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html)：记录浮点数的密集向量。
   - [`rank_feature`](https://www.elastic.co/guide/en/elasticsearch/reference/current/rank-feature.html)：记录一个数字特征，为了在查询时提高命中率。
-  - [`rank_featurElasticsearch`](https://www.elastic.co/guide/en/elasticsearch/reference/current/rank-featurElasticsearch.html)：记录多个数字特征，为了在查询时提高命中率。
+  - [`rank_features`](https://www.elastic.co/guide/en/elasticsearch/reference/current/rank-features.html)：记录多个数字特征，为了在查询时提高命中率。
 - **空间数据类型**
 
   - [`geo_point`](https://www.elastic.co/guide/en/elasticsearch/reference/current/geo-point.html)：地理经纬度
@@ -613,7 +614,7 @@ Elasticsearch 提供了非常丰富的数据类型，官方将其分为以下几
 - **文档计数元数据字段**
   - [`_doc_count`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-doc-count-field.html)：当文档表示预聚合数据时，用于存储文档计数的自定义字段。
 - **索引元数据字段**
-  - [`_field_namElasticsearch`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-field-namElasticsearch-field.html)：文档中的所有非空字段。
+  - [`_field_names`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-field-names-field.html)：文档中的所有非空字段。
   - [`_ignored`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-ignored-field.html)：文档中所有的由于 [`ignore_malformed`](https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-malformed.html) 而在索引时被忽略的字段。
 - **路由元数据字段**
   - [`_routing`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html)：将文档路由到特定分片的自定义路由值。
@@ -628,9 +629,9 @@ Elasticsearch 提供了以下映射参数：
 - [`analyzer`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer.html)：指定在索引或搜索文本字段时用于文本分析的分析器。
 - [`coerce`](https://www.elastic.co/guide/en/elasticsearch/reference/current/coerce.html)：如果开启，Elasticsearch 将尝试清理脏数据以适应字段的数据类型。
 - [`copy_to`](https://www.elastic.co/guide/en/elasticsearch/reference/current/copy-to.html)：允许将多个字段的值复制到一个组字段中，然后可以将其作为单个字段进行查询。
-- [`doc_valuElasticsearch`](https://www.elastic.co/guide/en/elasticsearch/reference/current/doc-valuElasticsearch.html)：默认情况下，所有字段都是被
+- [`doc_values`](https://www.elastic.co/guide/en/elasticsearch/reference/current/doc-values.html)：默认情况下，所有字段都是被
 - [`dynamic`](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic.html)：是否开启动态映射。
-- [`eager_global_ordinals`](https://www.elastic.co/guide/en/elasticsearch/reference/current/eager-global-ordinals.html)：当在 global ordinals 的时候，refrElasticsearchh 以后下一次查询字典就需要重新构建，在追求查询的场景下很影响查询性能。可以使用 eager_global_ordinals，即在每次 refrElasticsearchh 以后即可更新字典，字典常驻内存，减少了查询的时候构建字典的耗时。
+- [`eager_global_ordinals`](https://www.elastic.co/guide/en/elasticsearch/reference/current/eager-global-ordinals.html)：当在 global ordinals 的时候，refresh 以后下一次查询字典就需要重新构建，在追求查询的场景下很影响查询性能。可以使用 eager_global_ordinals，即在每次 refresh 以后即可更新字典，字典常驻内存，减少了查询的时候构建字典的耗时。
 - [`enabled`](https://www.elastic.co/guide/en/elasticsearch/reference/current/enabled.html)：只能应用于顶级 mapping 定义和 `object` 字段。设置为 `false` 后，Elasticsearch 解析时，会完全跳过该字段。
 - [`fielddata`](https://www.elastic.co/guide/en/elasticsearch/reference/current/fielddata.html)：默认情况下， `text` 字段是可搜索的，但不可用于聚合、排序或脚本。如果为字段设置 `fielddata=true`，就会通过反转倒排索引将 fielddata 加载到内存中。请注意，这可能会占用大量内存。如果想对 `text` 字段进行聚合、排序或脚本操作，fielddata 是唯一方法。
 - [`fields`](https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html)：有时候，同一个字段需要以不同目的进行索引，此时可以通过 `fields` 进行配置。
@@ -638,15 +639,15 @@ Elasticsearch 提供了以下映射参数：
 - [`ignore_above`](https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-above.html)：字符串长度大于 `ignore_above` 所设，则不会被索引或存储。
 - [`ignore_malformed`](https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-malformed.html)：有时候，同一个字段，可能会存储不同的数据类型。默认情况下，Elasticsearch 解析字段数据类型失败时，会引发异常，并拒绝整个文档。 如果设置 `ignore_malformed` 为 `true`，则允许忽略异常。这种情况下，格式错误的字段不会被索引，但文档中的其他字段可以正常处理。
 - [`index_options`](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-options.html) 用于控制将哪些信息添加到倒排索引以进行搜索和突出显示。只有 `text` 和 `keyword` 等基于术语（term）的字段类型支持此配置。
-- [`index_phrasElasticsearch`](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-phrasElasticsearch.html)：如果启用，两个词的组合（shinglElasticsearch）将被索引到一个单独的字段中。这允许以更大的索引为代价，更有效地运行精确的短语查询（无 slop）。请注意，当停用词未被删除时，此方法效果最佳，因为包含停用词的短语将不使用辅助字段，并将回退到标准短语查询。接受真或假（默认）。
-- [`index_prefixElasticsearch`](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-prefixElasticsearch.html)：index_prefixElasticsearch 参数启用 term 前缀索引以加快前缀搜索。
+- [`index_phrases`](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-phrases.html)：如果启用，两个词的组合（shingles）将被索引到一个单独的字段中。这允许以更大的索引为代价，更有效地运行精确的短语查询（无 slop）。请注意，当停用词未被删除时，此方法效果最佳，因为包含停用词的短语将不使用辅助字段，并将回退到标准短语查询。接受真或假（默认）。
+- [`index_prefixes`](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-prefixes.html)：index_prefixes 参数启用 term 前缀索引以加快前缀搜索。
 - [`index`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index.html)：`index` 选项控制字段值是否被索引。默认为 true。
 - [`meta`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-field-meta.html)：附加到字段的元数据。此元数据对 Elasticsearch 是不透明的，它仅适用于多个应用共享相同索引的元数据信息，例如：单位。
 - [`normalizer`](https://www.elastic.co/guide/en/elasticsearch/reference/current/normalizer.html)：`keyword` 字段的 `normalizer` 属性类似于 [`analyzer`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer.html) ，只是它保证分析链只产生单个标记。 `normalizer` 在索引 `keyword` 之前应用，以及在搜索时通过查询解析器（例如匹配查询）或通过术语级别查询（例如术语查询）搜索关键字字段时应用。
 - [`norms`](https://www.elastic.co/guide/en/elasticsearch/reference/current/norms.html)：`norms` 存储在查询时使用的各种规范化因子，以便计算文档的相关性评分。
 - [`null_value`](https://www.elastic.co/guide/en/elasticsearch/reference/current/null-value.html)：null 值无法被索引和搜索。当一个字段被设为 null，则被视为没有值。`null_value` 允许将空值替换为指定值，以便对其进行索引和搜索。
 - [`position_increment_gap`](https://www.elastic.co/guide/en/elasticsearch/reference/current/position-increment-gap.html)：分析的文本字段会考虑术语位置，以便能够支持邻近或短语查询。当索引具有多个值的文本字段时，值之间会添加一个“假”间隙，以防止大多数短语查询在值之间匹配。此间隙的大小使用 `position_increment_gap` 配置，默认为 100。
-- [`propertiElasticsearch`](https://www.elastic.co/guide/en/elasticsearch/reference/current/propertiElasticsearch.html)：类型映射、对象字段和嵌套字段包含的子字段，都称为属性。这些属性可以是任何数据类型，包括对象和嵌套。
+- [`properties`](https://www.elastic.co/guide/en/elasticsearch/reference/current/properties.html)：类型映射、对象字段和嵌套字段包含的子字段，都称为属性。这些属性可以是任何数据类型，包括对象和嵌套。
 - [`search_analyzer`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-analyzer.html)：通常，在索引时和搜索时应使用相同的分析器，以确保查询中的术语与倒排索引中的术语格式相同。但是，有时在搜索时使用不同的分析器可能是有意义的，例如使用 [`edge_ngram`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-edgengram-tokenizer.html) 标记器实现自动补全或使用同义词搜索时。
 - [`similarity`](https://www.elastic.co/guide/en/elasticsearch/reference/current/similarity.html)：Elasticsearch 允许为每个字段配置文本评分算法或相似度。相似度设置提供了一种选择文本相似度算法的简单方法，而不是默认的 BM25，例如布尔值。只有 `text` 和 `keyword` 等基于文本的字段类型支持此配置。
 - [`store`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-store.html)：默认情况下，对字段值进行索引以使其可搜索，但不会存储它们。这意味着可以查询该字段，但无法检索原始字段值。通常这不重要，字段值已经是默认存储的 `_source` 字段的一部分。如果您只想检索单个字段或几个字段的值，而不是整个 `_source`，则可以通过 [source filtering](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-fields.html#source-filtering) 来实现。
@@ -660,8 +661,8 @@ Elasticsearch 提供了以下映射参数：
 
 - `index.mapping.total_fields.limit`：索引中的最大字段数。字段和对象映射以及字段别名计入此限制。默认值为 `1000`。
 - `index.mapping.depth.limit`：字段的最大深度，以内部对象的数量来衡量。例如，如果所有字段都在根对象级别定义，则深度为 `1`。如果有一个对象映射，则深度为 `2`，以此类推。默认值为 `20`。
-- `index.mapping.nElasticsearchted_fields.limit`：索引中不同 `nElasticsearchted` 映射的最大数量。 `nElasticsearchted` 类型只应在特殊情况下使用，即需要相互独立地查询对象数组。为了防止设计不佳的映射，此设置限制了每个索引的唯一 `nElasticsearchted` 类型的数量。默认值为 `50`。
-- `index.mapping.nElasticsearchted_objects.limit`：单个文档中，所有 `nElasticsearchted` 类型中包含的最大嵌套 JSON 对象数。当文档包含太多 `nElasticsearchted` 对象时，此限制有助于防止出现内存溢出。默认值为 `10000`。
+- `index.mapping.nested_fields.limit`：索引中不同 `nested` 映射的最大数量。 `nested` 类型只应在特殊情况下使用，即需要相互独立地查询对象数组。为了防止设计不佳的映射，此设置限制了每个索引的唯一 `nested` 类型的数量。默认值为 `50`。
+- `index.mapping.nested_objects.limit`：单个文档中，所有 `nested` 类型中包含的最大嵌套 JSON 对象数。当文档包含太多 `nested` 对象时，此限制有助于防止出现内存溢出。默认值为 `10000`。
 - `index.mapping.field_name_length.limit`：设置字段名称的最大长度。默认为 Long.MAX_VALUE（无限制）。
 
 ## 参考资料

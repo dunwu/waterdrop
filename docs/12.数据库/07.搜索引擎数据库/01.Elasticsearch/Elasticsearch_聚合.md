@@ -1,4 +1,5 @@
 ---
+icon: logos:elasticsearch
 title: Elasticsearch 聚合
 date: 2022-01-19 22:49:16
 categories:

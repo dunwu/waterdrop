@@ -1,4 +1,5 @@
 ---
+icon: logos:elasticsearch
 title: Elasticsearch 面试
 date: 2020-06-16 07:10:44
 categories:
@@ -32,7 +33,7 @@ ElasticSearch 可以视为一个文档存储，它**将复杂数据结构序列�
 
 ## Elasticsearch 架构
 
-### 写数据流程
+### ES 更新操作是如何执行的？
 
 写入操作包含：单文档写入（index、create、update、delete）和批量写入（bulk）。
 
@@ -92,7 +93,7 @@ Elasticsearch 的 document 的物理存储是 Luncene segment，而 segment 不�
 - 如果是更新操作，就是将原来的 doc 标识为 `deleted` 状态，然后新写入一条数据。
 - `memory buffer` 每 `refresh` 一次，就会产生一个 `segment file`。由于，默认每秒刷新 1 次，即每秒产生一个 `segment file`，这样下来 `segment file` 会越来越多。ES 会定期执行 merge 操作，将多个 `segment file` 合并成一个。合并时会将标识为 `deleted` 的 doc 给**物理删除掉**，然后将新的 `segment file` 写入磁盘，这里会写一个 `commit point`，标识所有新的 `segment file`，然后打开 `segment file` 供搜索使用，同时删除旧的 `segment file`。
 
-### 搜索数据流程
+### ES 查询操作是如何执行的？
 
 在 Elasticsearch 中，搜索一般分为两个阶段，query 和 fetch 阶段。可以简单的理解，query 阶段确定要取哪些 doc，fetch 阶段取出具体的 doc。
 
@@ -139,13 +140,7 @@ translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁�
 
 > 数据写入 segment file 之后，同时就建立好了倒排索引。
 
-### 底层 lucene
-
-简单来说，lucene 就是一个 jar 包，里面包含了封装好的各种建立倒排索引的算法代码。我们用 Java 开发的时候，引入 lucene jar，然后基于 lucene 的 api 去开发就可以了。
-
-通过 lucene，我们可以将已有的数据建立索引，lucene 会在本地磁盘上面，给我们组织索引的数据结构。
-
-#### Elasticsearch 如何在高并发环境下保证读写一致？
+### ES 如何在高并发环境下保证读写一致？
 
 **乐观锁机制** - 可以通过版本号使用乐观并发控制，以确保新版本不会被旧版本覆盖，由应用层来处理具体的冲突；
 
@@ -153,9 +148,7 @@ translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁�
 
 对于读操作，可以设置 replication 为 sync（默认），这使得操作在主分片和副本分片都完成后才会返回；如果设置 replication 为 async 时，也可以通过设置搜索请求参数、\_preference 为 primary 来查询主分片，确保文档是最新版本。
 
-### 倒排索引
-
-#### 什么是倒排索引？
+### 什么是倒排索引？
 
 ![](https://miro.medium.com/v2/resize:fit:1100/format:webp/1*67BtkRv3KVjStbbK48HCYQ.png)
 
@@ -194,7 +187,7 @@ translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁�
 - 倒排索引中的所有词项对应一个或多个文档；
 - 倒排索引中的词项**根据字典顺序升序排列**
 
-#### Elasticsearch 中的倒排索引如何工作？
+### Elasticsearch 中的倒排索引如何工作？
 
 在搜索引擎中，每个文档都有一个对应的文档 ID，文档内容被表示为一系列关键词的集合。例如，文档 1 经过分词，提取了 20 个关键词，每个关键词都会记录它在文档中出现的次数和出现位置。那么，倒排索引就是**关键词到文档** ID 的映射，每个关键词都对应着一系列的文件，这些文件中都出现了关键词。
 
@@ -212,7 +205,7 @@ lucene 从 4+版本后开始大量使用的数据结构是 FST。FST 有两个�
 
 （2）查询速度快。O(len(str)) 的查询时间复杂度。
 
-#### Elasticsearch 中的倒排索引如何读写？
+### Elasticsearch 中的倒排索引如何读写？
 
 Elasticsearch 中的倒排索引其实是基于 Lucene 实现。
 
@@ -246,17 +239,7 @@ Trie 的核心思想是空间换时间，利用字符串的公共前缀来降低
 
 ## Elasticsearch 搜索
 
-### 查询性能（待完善）
-
-**典型问题**
-
-（1）Elasticsearch 查询速度为什么快？
-
-（2）为什么这么多条件查询，Elasticsearch 还是很快？
-
-**知识点**
-
-（1）Elasticsearch 查询速度为什么快？
+### ES 查询速度为什么快？
 
 - **倒排索引** - Elasticsearch 查询速度快最核心的点在于使用倒排索引。
   - 在 ES 中，为了提高查询效率，它对存储的文档进行了分词处理。分词是将连续的文本切分成一个个独立的词项的过程。对文本进行分词后，ES 会为每个词项创建一个倒排索引。这样，当用户进行查询时，ES 只需要在倒排索引中查找匹配的词项，从而快速地定位到相关的文档。
@@ -265,19 +248,7 @@ Trie 的核心思想是空间换时间，利用字符串的公共前缀来降低
 
 > 参考：https://cloud.tencent.com/developer/article/1922613
 
-### 分页
-
-**典型问题**
-
-（1）Elasticsearch 有几种分页方式？各有什么特点？
-
-（2）Elasticsearch 为什么会有深分页问题？
-
-（3）Elasticsearch 如何解决深分页问题？
-
-**知识点**
-
-（1）Elasticsearch 有几种分页方式？各有什么特点？
+### ES 有几种分页方式？各有什么特点？
 
 Elasticsearch 支持三种分页查询方式。
 
@@ -285,7 +256,7 @@ Elasticsearch 支持三种分页查询方式。
 - search after - search after 搜索方式不支持指定页数，只能向下翻页；并且需要指定 sort，并保证值是唯一的。然后，可以反复使用上次结果中最后一个文档的 sort 值进行查询。
 - scroll - scroll 查询方式类似于 RDBMS 中的游标，只允许向下翻页。每次下一页查询后，使用返回结果的 scroll id 来作为下一次翻页的标记。scroll 查询会在搜索初始化阶段会生成快照，后续数据的变化无法及时体现在查询结果，因此更加适合一次性批量查询或非实时数据的分页查询。
 
-（2）Elasticsearch 为什么会有深分页问题？
+### ES 为什么会有深分页问题？
 
 在 Elasticsearch 中，搜索一般分为两个阶段，query 和 fetch 阶段。可以简单的理解，query 阶段确定要取哪些 doc，fetch 阶段取出具体的 doc。
 
@@ -296,7 +267,7 @@ Elasticsearch 支持三种分页查询方式。
 
 由以上流程可知：每个 shard 要扫描 from + size 条数据；而协调节点需要接收并处理 `(from + size) * primary_shard_num` 条数据量。一旦 from 或 size 过大，计算量也会很大，耗时很高。因此，ES 默认限制数据结果窗口大小为 10000（可以通过 `index.max_result_window` 调整）。
 
-（3）Elasticsearch 如何解决深分页问题？
+### 如何解决 ES 深分页问题？
 
 可以使用 search after 或 scroll 分页方式来解决深分页。
 
@@ -304,7 +275,7 @@ Elasticsearch 官方不再建议使用 scroll 查询方式进行深分页，而�
 
 ## Elasticsearch 聚合
 
-### Elasticsearch 如何对海量数据（过亿）进行聚合计算？
+### ES 如何对海量数据（过亿）进行聚合计算？
 
 Elasticsearch 提供的首个近似聚合是 cardinality 度量。它提供一个字段的基数，即该字段的 distinct 或者 unique 值的数目。它是基于 HLL 算法的。HLL 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 bits 做概率估算从而得到基数。其特点是：可配置的精度，用来控制内存的使用（更精确 ＝ 更多内存）；小的数据集精度是非常高的；我们可以通过配置参数，来设置去重需要的固定内存使用量。无论数千还是数十亿的唯一值，内存使用量只与你配置的精确度相关。
 
@@ -312,9 +283,7 @@ Elasticsearch 提供的首个近似聚合是 cardinality 度量。它提供一�
 
 ## Elasticsearch 复制
 
-### 故障转移
-
-#### Elasticsearch 是如何实现选主的？
+### ES 是如何实现选主的？
 
 限制条件：
 
@@ -332,11 +301,17 @@ Elasticsearch 提供的首个近似聚合是 cardinality 度量。它提供一�
 
 - 补充：master 节点的职责主要包括集群、节点和索引的管理，不负责文档级别的管理；data 节点可以关闭 http 功能。
 
-### 脑裂
+### ES 如何避免脑裂问题？
 
 ## Elasticsearch 分区
 
+### ES 是如何实现分区再均衡的？
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411221525828.png)
+
 ## Elasticsearch 生产环境
+
+### ES 生产环境部署情况是怎样的？
 
 **典型问题**
 

@@ -1,4 +1,5 @@
 ---
+icon: logos:elasticsearch
 title: Elasticsearch 教程
 date: 2022-04-11 16:52:35
 categories:

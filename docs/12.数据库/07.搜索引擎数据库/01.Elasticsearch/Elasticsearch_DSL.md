@@ -1,4 +1,5 @@
 ---
+icon: logos:elasticsearch
 title: Elasticsearch DSL
 date: 2022-01-18 08:01:08
 categories:
