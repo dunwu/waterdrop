@@ -18,22 +18,305 @@ permalink: /pages/6219b063/
 
 ## Elasticsearch 简介
 
-### 什么是 ElasticSearch
+### 【基础】什么是 ES？
+
+:::details 参考答案
 
 **[Elasticsearch](https://github.com/elastic/elasticsearch) 是一个开源的分布式搜索和分析引擎**。
 
-**[Elasticsearch](https://github.com/elastic/elasticsearch) 基于搜索库 [Lucene](https://github.com/apache/lucene-solr) 开发**。ElasticSearch 隐藏了 Lucene 的复杂性，提供了简单易用的 REST API / Java API 接口（另外还有其他语言的 API 接口）。
+**[Elasticsearch](https://github.com/elastic/elasticsearch) 基于搜索库 [Lucene](https://github.com/apache/lucene-solr) 开发**。Elasticsearch 隐藏了 Lucene 的复杂性，提供了简单易用的 REST API / Java API 接口（另外还有其他语言的 API 接口）。
 
-ElasticSearch 可以视为一个文档存储，它**将复杂数据结构序列化为 JSON 存储**。
+Elasticsearch 是面向文档的，它**将复杂数据结构序列化为 JSON 形式存储**。
 
-**ElasticSearch 是近实时（Near Realtime，缩写 NRT）的全文搜索**。近实时是指：
+**Elasticsearch 是近实时（Near Realtime，缩写 NRT）的全文搜索**。近实时是指：
 
 - 从写入数据到数据可以被搜索，存在较小的延迟（大概是 1s）。
 - 基于 Elasticsearch 执行搜索和分析可以达到秒级。
 
+:::
+
+### 【基础】ES 的应用场景有哪些？
+
+:::details 参考答案
+
+Elasticsearch 的主要功能如下：
+
+- **海量数据的分布式存储及集群管理**
+- **提供丰富的近实时搜索能力**
+- **海量数据的近实时分析（聚合）**
+
+Elasticsearch 被广泛应用于以下场景：
+
+- **搜索**
+  - **全文检索** - Elasticsearch 通过快速搜索大型数据集，使复杂的搜索查询变得更加容易。它对于需要即时和相关搜索结果的网站、应用程序或企业特别有用。
+  - **自动补全和拼写纠正** - 可以在用户输入内容时，实时提供自动补全和拼写纠正，以增加用户体验并提高搜索效率。
+  - **地理空间搜索** - 使用地理空间查询搜索位置并计算空间关系。
+- **可观测性**
+  - **日志、指标和链路追踪** - 收集、存储和分析来自应用程序、系统和服务的日志、指标和追踪。
+  - **性能监控** - 监控和分析业务关键性能指标。
+  - **OpenTelemetry** - 使用 OpenTelemetry 标准，将遥测数据采集到 Elastic Stack。
+
+:::
+
+### 【基础】什么是 ES 索引？
+
+:::details 参考答案
+
+在 Elasticsearch 中，索引（index）在不同场景下，有着不同的含义。
+
+索引是 Elasticsearch 逻辑存储的最顶层设计——索引可视为文档的集合。索引有唯一的名称标识，可以更新、删除、搜索。
+
+在 Elasticsearch 中，数据以 JSON 文档的形式存储。Elasticsearch 利用一种称为倒排索引的数据结构，该结构专为实现快速全文搜索而设计。
+
+:::
+
+### 【基础】如何在 ES 中 CRUD？
+
+:::details 参考答案
+
+Elasticsearch 的基本 CRUD 方式如下：
+
+- **添加索引**
+  - `PUT <index>/_create/<id>` - 指定 id，如果 id 已存在，报错
+  - `POST <index>/_doc` - 自动生成 `_id`
+- **删除索引** - `DELETE /<index>？pretty`
+- **更新索引** - `POST <index>/_update/<id>`
+- **查询索引** - `GET <index>/_doc/<id>`
+- **批量更新** - `bulk` API 支持 `index/create/update/delete`
+- **批量查询** - `_mget` 和 `_msearch` 可以用于批量查询
+
+> 扩展：[Quick starts](https://www.elastic.co/guide/en/elasticsearch/reference/current/quickstart.html)
+
+:::
+
+### 【中级】什么是 Elasic Stack(ELK)？
+
+:::details 参考答案
+
+Elastic Stack 通常被用来作为日志采集、检索、可视化的解决方案。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231210104.png)
+
+Elastic Stack 也常被称为 ELK，这是 Elastic 公司旗下三款产品 [Elasticsearch](https://www.elastic.co/elasticsearch) 、[Logstash](https://www.elastic.co/products/logstash) 、[Kibana](https://www.elastic.co/kibana) 的首字母组合。
+
+- [Elasticsearch](https://www.elastic.co/elasticsearch) 负责存储数据，并提供对数据的检索和分析。
+- [Logstash](https://www.elastic.co/logstash) 传输和处理你的日志、事务或其他数据。
+- [Kibana](https://www.elastic.co/kibana) 将 Elasticsearch 的数据分析并渲染为可视化的报表。
+
+Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](https://www.elastic.co/beats)，这是针对不同类型数据的轻量级采集器套件。
+
+此外，基于 Elastic Stack，其技术生态还可以和一些主流的分布式中间件进行集成，以应对各种不同的场景。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231211496.png)
+
+:::
+
+## Elasticsearch 存储
+
+### 【基础】ES 的逻辑存储是怎样设计的？
+
+:::details 参考答案
+
+Elasticsearch 的逻辑存储被设计为层级结构，自上而下依次为：
+
+```
+index -> type -> mapping -> document -> field
+```
+
+各层级结构的说明如下：
+
+（1）Document（文档）
+
+Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文档。Elasticsearch 以 JSON 文档的形式序列化和存储数据。文档是一组字段，这些字段是包含数据的键值对。每个文档都有一个唯一的 ID。
+
+一个简单的 Elasticsearch 文档可能如下所示：
+
+```json
+{
+  "_index": "my-first-elasticsearch-index",
+  "_id": "DyFpo5EBxE8fzbb95DOa",
+  "_version": 1,
+  "_seq_no": 0,
+  "_primary_term": 1,
+  "found": true,
+  "_source": {
+    "email": "john@smith.com",
+    "first_name": "John",
+    "last_name": "Smith",
+    "info": {
+      "bio": "Eco-warrior and defender of the weak",
+      "age": 25,
+      "interests": [
+        "dolphins",
+        "whales"
+      ]
+    },
+    "join_date": "2024/05/01"
+  }
+}
+```
+
+Elasticsearch 中的 document 是无模式的，也就是并非所有 document 都必须拥有完全相同的字段，它们不受限于同一个模式。
+
+（2）Field（字段）
+
+field 包含数据的键值对。默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
+
+`document` 包含数据和元数据。[**Metadata Field（元数据字段）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html) 是存储有关文档信息的系统字段。在 Elasticsearch 中，元数据字段都以 `_` 开头。常见的元数据字段有：
+
+- [`_index`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index-field.html) - 文档所属的索引
+- [`_id`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html) - 文档的 ID
+- [`_source`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html) - 表示文档原文的 JSON
+
+（3）Type（类型）
+
+在 Elasticsearch 中，**type 是 document 的逻辑分类**。每个 index 里可以有一个或多个 type。
+
+不同的 type 应该有相似的结构（schema）。举例来说，`id`字段不能在这个组是字符串，在另一个组是数值。
+
+> 注意：Elasticsearch 7.x 版已彻底移除 type。
+
+（4）Index（索引）
+
+在 Elasticsearch 中，**可以将 index 视为 document 的集合**。
+
+Elasticsearch 会为所有字段建立索引，经过处理后写入一个倒排索引（Inverted Index）。查找数据的时候，直接查找该索引。
+
+所以，Elasticsearch 数据管理的顶层单位就叫做 Index。它是单个数据库的同义词。每个 Index 的名字必须是小写。
+
+（5）Elasticsearch 概念和 RDBM  概念
+
+| Elasticsearch                    | DB                 |
+| -------------------------------- | ------------------ |
+| 索引（index）                    | 数据库（database） |
+| 类型（type，6.0 废弃，7.0 移除） | 数据表（table）    |
+| 文档（docuemnt）                 | 行（row）          |
+| 字符（field）                    | 列（column）       |
+| 映射（mapping）                  | 表结构（schema）   |
+
+:::
+
+### 【基础】ES 的物理存储是怎样设计的？
+
+:::details 参考答案
+
+Elasticsearch 的物理存储，天然使用了分布式设计。
+
+每个 Elasticsearch 进程都从属于一个 cluster，一个 cluster 可以有一个或多个 node（即 Elasticsearch 进程）。
+
+Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分布在集群中不同节点上。正是由于这个机制，使得 Elasticsearch 有了水平扩展的能力。shard 也是 Elasticsearch 将数据从一个节点迁移到拎一个节点的最小单位。
+
+Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。简单来说，Lucene 就是一个 jar 包，里面包含了封装好的构建、管理倒排索引的算法代码。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411242138288.png)
+
+:::
+
+### 【中级】什么是倒排索引？
+
+:::details 参考答案
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411241115617.png)
+
+举例来说，假设有以下文档：
+
+| DocId | Doc                                            |
+| ----- | ---------------------------------------------- |
+| 1     | 谷歌地图之父跳槽 Facebook                      |
+| 2     | 谷歌地图之父加盟 Facebook                      |
+| 3     | 谷歌地图创始人拉斯离开谷歌加盟 Facebook        |
+| 4     | 谷歌地图之父跳槽 Facebook 与 Wave 项目取消有关 |
+| 5     | 谷歌地图之父拉斯加盟社交网站 Facebook          |
+
+对文档进行分词之后，得到以下**倒排索引**。
+
+| WordId | Word     | DocIds        |
+| ------ | -------- | ------------- |
+| 1      | 谷歌     | 1, 2, 3, 4, 5 |
+| 2      | 地图     | 1, 2, 3, 4, 5 |
+| 3      | 之父     | 1, 2, 4, 5    |
+| 4      | 跳槽     | 1, 4          |
+| 5      | Facebook | 1, 2, 3, 4, 5 |
+| 6      | 加盟     | 2, 3, 5       |
+| 7      | 创始人   | 3             |
+| 8      | 拉斯     | 3, 5          |
+| 9      | 离开     | 3             |
+| 10     | 与       | 4             |
+| ..     | ..       | ..            |
+
+另外，实用的倒排索引还可以记录更多的信息，比如文档频率信息，表示在文档集合中有多少个文档包含某个单词。
+
+那么，有了倒排索引，搜索引擎可以很方便地响应用户的查询。比如用户输入查询 `Facebook` ，搜索系统查找倒排索引，从中读出包含这个单词的文档，这些文档就是提供给用户的搜索结果。
+
+要注意倒排索引的两个重要细节：
+
+- 倒排索引中的所有词项对应一个或多个文档；
+- 倒排索引中的词项**根据字典顺序升序排列**
+
+:::
+
+### 【中级】Elasticsearch 中的倒排索引如何工作？
+
+:::details 参考答案
+
+Elasticsearch 中的倒排索引其实是基于 Lucene 实现。
+
+倒排索引的工作原理是——将文档分解为更小的单元，称为分词。然后，这些分词与包含该分词的文档列表一起存储在数据库中。执行搜索查询时，倒排索引用于快速查找包含搜索词的文档。
+
+- Lucene 的写操作流程（索引），就是将原始文本进行分词，然后按倒排索引结构存储。
+- Lucene 的读操作流程（搜索），就是在倒排索引结构中进行检索，然后找到原始文档，返回结果。
+
+Lucene 倒排索引的底层实现是基于：FST（Finite State Transducer）数据结构。
+
+Lucene 从 4+版本后开始大量使用的数据结构是 FST。FST 有两个优点：
+
+（1）空间占用小。通过对词典中单词前缀和后缀的重复利用，压缩了存储空间；
+
+（2）查询速度快。查询时间复杂度为 `O(len(str))`。
+
+:::
+
+### 字典树
+
+常用字典数据结构如下所示：
+
+![img](https://pic2.zhimg.com/80/v2-8bb844c5b8fb944111fa8cecdb0e12d5_720w.jpg)
+
+Trie 的核心思想是空间换时间，利用字符串的公共前缀来降低查询时间的开销以达到提高效率的目的。它有 3 个基本性质：
+
+- 根节点不包含字符，除根节点外每一个节点都只包含一个字符。
+
+- 从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串。
+
+- 每个节点的所有子节点包含的字符都不相同。
+
+![img](https://pic4.zhimg.com/80/v2-26a48882a8f09a50dfeb79cc25045fcf_720w.jpg)
+
+（1）可以看到，trie 树每一层的节点数是 26^i 级别的。所以为了节省空间，我们还可以用动态链表，或者用数组来模拟动态。而空间的花费，不会超过单词数 × 单词长度。
+
+（2）实现：对每个结点开一个字母集大小的数组，每个结点挂一个链表，使用左儿子右兄弟表示法记录这棵树；
+
+（3）对于中文的字典树，每个节点的子节点用一个哈希表存储，这样就不用浪费太大的空间，而且查询速度上可以保留哈希的复杂度 O(1)。
+
+![img](https://pic4.zhimg.com/80/v2-79f2a89041e546d9feccf55e4ff1c0d7_720w.jpg)
+
+### 【基础】什么是 Elasticsearch 中的静态映射、动态映射？
+
+:::details 参考答案
+
+在 Elasticsearch 中，映射可分为静态映射和动态映射。在关系型数据库中写入数据之前首先要建表，在建表语句中声明字段的属性，在 Elasticsearch 中，则不必如此。Elasticsearch 最重要的功能之一就是让你尽可能快地开始探索数据，文档写入 Elasticsearch 中，它会根据字段的类型自动识别，这种机制称为**动态映射**，而**静态映射**则是写入数据之前对字段的属性进行手工设置。
+
+Elasticsearch 官方将静态映射称为**显式映射（[Explicit mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html)）**。**静态映射**是在创建索引时手工指定索引映射。静态映射和 SQL 中在建表语句中指定字段属性类似。相比动态映射，通过静态映射可以添加更详细、更精准的配置信息。
+
+静态映射的形式就是设置 mapping。在 Elasticsearch 中，mapping 是用于定义文档结构的 JSON 对象。它指定文档中允许的字段，以及它们的数据类型和其他属性。mapping 用于控制文档的存储和索引方式，还影响文档的搜索和分析方式。mapping 是一种强大的工具，可用于以结构化方式存储数据。它们使搜索、筛选和分析数据变得更加容易。
+
+动态映射机制，允许用户不手动定义映射，Elasticsearch 会自动识别字段类型。在实际项目中，如果遇到的业务在导入数据之前不确定有哪些字段，也不清楚字段的类型是什么，使用动态映射非常合适。当 Elasticsearch 在文档中碰到一个以前没见过的字段时，它会利用动态映射来决定该字段的类型，并自动把该字段添加到映射中。例如：创建一个名为 `data` 的索引、其 `mapping` 类型为 `_doc`，并且有一个类型为 `long` 的字段 `count`。
+
+:::
+
 ## Elasticsearch 架构
 
-### ES 更新操作是如何执行的？
+### Elasticsearch 更新操作是如何执行的？
 
 写入操作包含：单文档写入（index、create、update、delete）和批量写入（bulk）。
 
@@ -91,9 +374,9 @@ Elasticsearch 的 document 的物理存储是 Luncene segment，而 segment 不�
 
 - 如果是删除操作，commit 的时候会生成一个 `.del` 文件，里面将某个 doc 标识为 `deleted` 状态，那么搜索的时候根据 `.del` 文件就知道这个 doc 是否被删除了。
 - 如果是更新操作，就是将原来的 doc 标识为 `deleted` 状态，然后新写入一条数据。
-- `memory buffer` 每 `refresh` 一次，就会产生一个 `segment file`。由于，默认每秒刷新 1 次，即每秒产生一个 `segment file`，这样下来 `segment file` 会越来越多。ES 会定期执行 merge 操作，将多个 `segment file` 合并成一个。合并时会将标识为 `deleted` 的 doc 给**物理删除掉**，然后将新的 `segment file` 写入磁盘，这里会写一个 `commit point`，标识所有新的 `segment file`，然后打开 `segment file` 供搜索使用，同时删除旧的 `segment file`。
+- `memory buffer` 每 `refresh` 一次，就会产生一个 `segment file`。由于，默认每秒刷新 1 次，即每秒产生一个 `segment file`，这样下来 `segment file` 会越来越多。Elasticsearch 会定期执行 merge 操作，将多个 `segment file` 合并成一个。合并时会将标识为 `deleted` 的 doc 给**物理删除掉**，然后将新的 `segment file` 写入磁盘，这里会写一个 `commit point`，标识所有新的 `segment file`，然后打开 `segment file` 供搜索使用，同时删除旧的 `segment file`。
 
-### ES 查询操作是如何执行的？
+### Elasticsearch 查询操作是如何执行的？
 
 在 Elasticsearch 中，搜索一般分为两个阶段，query 和 fetch 阶段。可以简单的理解，query 阶段确定要取哪些 doc，fetch 阶段取出具体的 doc。
 
@@ -102,9 +385,9 @@ Elasticsearch 的 document 的物理存储是 Luncene segment，而 segment 不�
 3. query phase：每个 shard 在内部执行搜索请求，执行结果存到自身内部的大小同样为 from+size 的优先级队列里，然后将结果返回给 `coordinate node`，`coordinate node` 对数据进行汇总处理：合并、排序、分页，产生最终结果。
 4. fetch phase：`coordinate node` 根据 `doc id` 去各个节点上 fetch（拉取）实际的 `document` 数据，最终返回给客户端。
 
-由以上流程可知：每个 shard 要扫描 `from + size` 条数据；而协调节点需要接收并处理 `(from + size) * primary_shard_num` 条数据量。一旦 from 或 size 过大，计算量也会很大，耗时很高。因此，ES 默认限制数据结果窗口大小为 10000（可以通过 `index.max_result_window` 调整）。——这就是为什么 ES 存在深分页问题。
+由以上流程可知：每个 shard 要扫描 `from + size` 条数据；而协调节点需要接收并处理 `(from + size) * primary_shard_num` 条数据量。一旦 from 或 size 过大，计算量也会很大，耗时很高。因此，Elasticsearch 默认限制数据结果窗口大小为 10000（可以通过 `index.max_result_window` 调整）。——这就是为什么 Elasticsearch 存在深分页问题。
 
-此外，需要注意的是：搜索的时候，查询的是 Filesystem Cache 中的数据；而存在于 Memory Buffer 中，还未来得及刷新的数据，是不可见的。由于，默认刷新时间为 1 秒，这就是为什么 ES 被称为近实时搜索的原因。
+此外，需要注意的是：搜索的时候，查询的是 Filesystem Cache 中的数据；而存在于 Memory Buffer 中，还未来得及刷新的数据，是不可见的。由于，默认刷新时间为 1 秒，这就是为什么 Elasticsearch 被称为近实时搜索的原因。
 
 ![img](https://pic2.zhimg.com/80/v2-4c25616e623de2aee23bd63ec22a5bfd_720w.jpg)
 
@@ -140,7 +423,7 @@ translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁�
 
 > 数据写入 segment file 之后，同时就建立好了倒排索引。
 
-### ES 如何在高并发环境下保证读写一致？
+### Elasticsearch 如何在高并发环境下保证读写一致？
 
 **乐观锁机制** - 可以通过版本号使用乐观并发控制，以确保新版本不会被旧版本覆盖，由应用层来处理具体的冲突；
 
@@ -148,107 +431,24 @@ translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁�
 
 对于读操作，可以设置 replication 为 sync（默认），这使得操作在主分片和副本分片都完成后才会返回；如果设置 replication 为 async 时，也可以通过设置搜索请求参数、\_preference 为 primary 来查询主分片，确保文档是最新版本。
 
-### 什么是倒排索引？
-
-![](https://miro.medium.com/v2/resize:fit:1100/format:webp/1*67BtkRv3KVjStbbK48HCYQ.png)
-
-举例来说，假设有以下文档：
-
-| DocId | Doc                                            |
-| ----- | ---------------------------------------------- |
-| 1     | 谷歌地图之父跳槽 Facebook                      |
-| 2     | 谷歌地图之父加盟 Facebook                      |
-| 3     | 谷歌地图创始人拉斯离开谷歌加盟 Facebook        |
-| 4     | 谷歌地图之父跳槽 Facebook 与 Wave 项目取消有关 |
-| 5     | 谷歌地图之父拉斯加盟社交网站 Facebook          |
-
-对文档进行分词之后，得到以下**倒排索引**。
-
-| WordId | Word     | DocIds        |
-| ------ | -------- | ------------- |
-| 1      | 谷歌     | 1, 2, 3, 4, 5 |
-| 2      | 地图     | 1, 2, 3, 4, 5 |
-| 3      | 之父     | 1, 2, 4, 5    |
-| 4      | 跳槽     | 1, 4          |
-| 5      | Facebook | 1, 2, 3, 4, 5 |
-| 6      | 加盟     | 2, 3, 5       |
-| 7      | 创始人   | 3             |
-| 8      | 拉斯     | 3, 5          |
-| 9      | 离开     | 3             |
-| 10     | 与       | 4             |
-| ..     | ..       | ..            |
-
-另外，实用的倒排索引还可以记录更多的信息，比如文档频率信息，表示在文档集合中有多少个文档包含某个单词。
-
-那么，有了倒排索引，搜索引擎可以很方便地响应用户的查询。比如用户输入查询 `Facebook` ，搜索系统查找倒排索引，从中读出包含这个单词的文档，这些文档就是提供给用户的搜索结果。
-
-要注意倒排索引的两个重要细节：
-
-- 倒排索引中的所有词项对应一个或多个文档；
-- 倒排索引中的词项**根据字典顺序升序排列**
-
-### Elasticsearch 中的倒排索引如何工作？
-
-在搜索引擎中，每个文档都有一个对应的文档 ID，文档内容被表示为一系列关键词的集合。例如，文档 1 经过分词，提取了 20 个关键词，每个关键词都会记录它在文档中出现的次数和出现位置。那么，倒排索引就是**关键词到文档** ID 的映射，每个关键词都对应着一系列的文件，这些文件中都出现了关键词。
-
-倒排索引，是通过分词策略，形成了词和文章的映射关系表，这种词典+映射表即为倒排索引。有了倒排索引，就能实现 o（1）时间复杂度的效率检索文章了，极大的提高了检索效率。
-
-学术的解答方式：
-
-倒排索引，相反于一篇文章包含了哪些词，它从词出发，记载了这个词在哪些文档中出现过，由两部分组成——词典和倒排表。
-
-加分项：倒排索引的底层实现是基于：FST（Finite State Transducer）数据结构。
-
-lucene 从 4+版本后开始大量使用的数据结构是 FST。FST 有两个优点：
-
-（1）空间占用小。通过对词典中单词前缀和后缀的重复利用，压缩了存储空间；
-
-（2）查询速度快。O(len(str)) 的查询时间复杂度。
-
-### Elasticsearch 中的倒排索引如何读写？
-
-Elasticsearch 中的倒排索引其实是基于 Lucene 实现。
-
-- Lucene 的写操作流程（索引），就是将原始文本进行分词，然后按倒排索引结构存储。
-
-- Lucene 的读操作流程（搜索），就是在倒排索引结构中进行检索，然后找到原始文档，返回结果。
-
-### 字典树
-
-常用字典数据结构如下所示：
-
-![img](https://pic2.zhimg.com/80/v2-8bb844c5b8fb944111fa8cecdb0e12d5_720w.jpg)
-
-Trie 的核心思想是空间换时间，利用字符串的公共前缀来降低查询时间的开销以达到提高效率的目的。它有 3 个基本性质：
-
-- 根节点不包含字符，除根节点外每一个节点都只包含一个字符。
-
-- 从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串。
-
-- 每个节点的所有子节点包含的字符都不相同。
-
-![img](https://pic4.zhimg.com/80/v2-26a48882a8f09a50dfeb79cc25045fcf_720w.jpg)
-
-（1）可以看到，trie 树每一层的节点数是 26^i 级别的。所以为了节省空间，我们还可以用动态链表，或者用数组来模拟动态。而空间的花费，不会超过单词数 × 单词长度。
-
-（2）实现：对每个结点开一个字母集大小的数组，每个结点挂一个链表，使用左儿子右兄弟表示法记录这棵树；
-
-（3）对于中文的字典树，每个节点的子节点用一个哈希表存储，这样就不用浪费太大的空间，而且查询速度上可以保留哈希的复杂度 O(1)。
-
-![img](https://pic4.zhimg.com/80/v2-79f2a89041e546d9feccf55e4ff1c0d7_720w.jpg)
-
 ## Elasticsearch 搜索
 
-### ES 查询速度为什么快？
+### Elasticsearch 查询速度为什么快？
+
+:::details 参考答案
 
 - **倒排索引** - Elasticsearch 查询速度快最核心的点在于使用倒排索引。
-  - 在 ES 中，为了提高查询效率，它对存储的文档进行了分词处理。分词是将连续的文本切分成一个个独立的词项的过程。对文本进行分词后，ES 会为每个词项创建一个倒排索引。这样，当用户进行查询时，ES 只需要在倒排索引中查找匹配的词项，从而快速地定位到相关的文档。
+  - 在 Elasticsearch 中，为了提高查询效率，它对存储的文档进行了分词处理。分词是将连续的文本切分成一个个独立的词项的过程。对文本进行分词后，Elasticsearch 会为每个词项创建一个倒排索引。这样，当用户进行查询时，Elasticsearch 只需要在倒排索引中查找匹配的词项，从而快速地定位到相关的文档。
   - 正向索引的结构是每个文档和关键字做关联，每个文档都有与之对应的关键字，记录关键字在文档中出现的位置和次数；而倒排索引则是将文档中的词项和文档的 ID 进行关联，这样就可以通过词项快速找到包含它的文档。
 - **分片** - Elasticsearch 通过分片，支持分布式存储和搜索，可以实现搜索的并行处理和负载均衡。
 
 > 参考：https://cloud.tencent.com/developer/article/1922613
 
-### ES 有几种分页方式？各有什么特点？
+:::
+
+### Elasticsearch 有几种分页方式？各有什么特点？
+
+:::details 参考答案
 
 Elasticsearch 支持三种分页查询方式。
 
@@ -256,7 +456,11 @@ Elasticsearch 支持三种分页查询方式。
 - search after - search after 搜索方式不支持指定页数，只能向下翻页；并且需要指定 sort，并保证值是唯一的。然后，可以反复使用上次结果中最后一个文档的 sort 值进行查询。
 - scroll - scroll 查询方式类似于 RDBMS 中的游标，只允许向下翻页。每次下一页查询后，使用返回结果的 scroll id 来作为下一次翻页的标记。scroll 查询会在搜索初始化阶段会生成快照，后续数据的变化无法及时体现在查询结果，因此更加适合一次性批量查询或非实时数据的分页查询。
 
-### ES 为什么会有深分页问题？
+:::
+
+### Elasticsearch 为什么会有深分页问题？
+
+:::details 参考答案
 
 在 Elasticsearch 中，搜索一般分为两个阶段，query 和 fetch 阶段。可以简单的理解，query 阶段确定要取哪些 doc，fetch 阶段取出具体的 doc。
 
@@ -265,25 +469,173 @@ Elasticsearch 支持三种分页查询方式。
 3. query phase：每个 shard 在内部执行搜索请求，执行结果存到自身内部的大小同样为 from+size 的优先级队列里，然后将结果返回给 `coordinate node`，`coordinate node` 对数据进行汇总处理：合并、排序、分页，产生最终结果。
 4. fetch phase：`coordinate node` 根据 `doc id` 去各个节点上 fetch（拉取）实际的 `document` 数据，最终返回给客户端。
 
-由以上流程可知：每个 shard 要扫描 from + size 条数据；而协调节点需要接收并处理 `(from + size) * primary_shard_num` 条数据量。一旦 from 或 size 过大，计算量也会很大，耗时很高。因此，ES 默认限制数据结果窗口大小为 10000（可以通过 `index.max_result_window` 调整）。
+由以上流程可知：每个 shard 要扫描 from + size 条数据；而协调节点需要接收并处理 `(from + size) * primary_shard_num` 条数据量。一旦 from 或 size 过大，计算量也会很大，耗时很高。因此，Elasticsearch 默认限制数据结果窗口大小为 10000（可以通过 `index.max_result_window` 调整）。
 
-### 如何解决 ES 深分页问题？
+:::
+
+### 如何解决 Elasticsearch 深分页问题？
+
+:::details 参考答案
 
 可以使用 search after 或 scroll 分页方式来解决深分页。
 
 Elasticsearch 官方不再建议使用 scroll 查询方式进行深分页，而是推荐使用 [`search_after`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after) 和时间点（PIT）一起使用。
 
+:::
+
+### Elasticsearch 索引别名有什么用？
+
+:::details 参考答案
+
+Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允许同时对多个索引执行操作，或者通过隐藏底层索引结构的复杂性来简化索引管理。
+
+:::
+
+### 【基础】Elasticsearch 查询中的 query 上下文和 filter 上下文有什么区别？
+
+在 Elasticsearch 中，可以在两个不同的上下文中执行查询：
+
+filter 上下文 - filter 的主要目的是通过应用特定条件或过滤器来缩小搜索结果的范围。当您希望根据特定标准包含或排除文档而不考虑其相关性分数时，会使用过滤器。
+
+query 上下文 - 主要目的是确定文档与搜索查询的相关性。它根据每个文档与查询条件的匹配程度计算每个文档的相关性分数。当您希望根据文档的相关性分数检索最相关的文档时，会使用查询。
+
+### 【基础】match 查询功能有什么用途？
+
+Elasticsearch 中的 match 查询功能用于搜索包含特定值的文档。match 查询可用于搜索包含特定字符串、特定数字或特定日期的文档。
+
+match 查询采用两个参数：字段名称和要搜索的值。字段名称是要搜索的文档中的“字段名称”。该值是您要搜索的值。
+
+### 【基础】multi_match 查询功能有什么用途？
+
+Elasticsearch 中的 multi_match 查询功能旨在通过单个查询跨多个字段执行搜索。它允许您指定多个字段并同时在所有指定字段中搜索匹配的文档。以下是 multi-match 查询函数的一些常见使用案例：
+
+- 跨字段搜索
+- 查询多个文本字段
+- 搜索相关性
+- 灵活的搜索
+- 多语言搜索
+- 部分匹配
+
+### 【基础】range  查询功能有什么用途？
+
+Elasticsearch 中的 range 查询功能用于搜索包含指定范围内的值的文档。范围查询可用于搜索包含特定字符串、特定数字或特定日期的文档。
+
+范围查询采用三个参数：字段名称、起始值和结束值。字段名称是文档中要搜索的字段的名称。起始值是要搜索的最小值。end value （结束值） 是要搜索的最大值。
+
+### 【基础】exists 查询功能有什么用途？
+
+Elasticsearch 中的 'exists' 查询函数用于检查文档中是否存在特定字段。当您想根据某个字段的存在与否来搜索文档时，它特别有用。
+
+'exists' 查询接受一个参数：字段名称。Field name （字段名称） 是要搜索的字段的名称。
+
+### 【基础】script_score 查询功能有什么用途？
+
+Elasticsearch 中的 script_score 函数用于根据自定义评分脚本自定义搜索结果的评分。它允许您通过提供计算每个文档的自定义分数的脚本来影响文档的相关性评分。
+
+script_score 功能提供了灵活性，并可以控制 Elasticsearch 中搜索结果的评分。
+
+### 【基础】common_terms 查询功能有什么用途？
+
+Elasticsearch 中的 common_terms 查询函数用于文本查询，旨在查找与查询匹配的文档，同时考虑其他查询通常可能忽略的常见术语。它有助于解决查找相关结果的挑战，同时仍考虑索引文档的很大一部分中出现的常用术语。
+
+### 【基础】bool 查询功能有什么用途？
+
+Elasticsearch 中的布尔查询是使用布尔运算符将多个查询合并为单个查询的查询。
+
+布尔查询的主要子句是：
+
+- must - 必须子句指定必须与查询匹配的文档。所有与 must 子句不匹配的文档都将被排除在结果之外。
+- should - should 子句指定应与查询匹配的文档。与 should 子句匹配的文档将包含在结果中，即使它们与 must 子句不匹配也是如此。
+- must_not - must_not 子句指定必须与查询不匹配的文档。与 must_not 子句匹配的所有文档都将从结果中排除。
+
 ## Elasticsearch 聚合
 
-### ES 如何对海量数据（过亿）进行聚合计算？
+### 【基础】什么是聚合？Elasticsearch 中有哪些聚合？
+
+:::details 参考答案
+
+Elasticsearch 中的聚合是一项强大的功能，可让您实时分析、汇总和执行复杂的数据集计算。聚合提供了从索引数据中分组和提取可操作见解的功能，这些数据可用于数据可视化、报告和分析目的。
+
+Elasticsearch 中的聚合主要有三种类型：
+
+- Bucket：分组计算
+- Metric：统计值计算
+- Pipeline：在聚合结果的基础上再次聚合，而非直接处理文档数据
+
+:::
+
+### 【中级】Elasticsearch 如何对海量数据（过亿）进行聚合计算？
 
 Elasticsearch 提供的首个近似聚合是 cardinality 度量。它提供一个字段的基数，即该字段的 distinct 或者 unique 值的数目。它是基于 HLL 算法的。HLL 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 bits 做概率估算从而得到基数。其特点是：可配置的精度，用来控制内存的使用（更精确 ＝ 更多内存）；小的数据集精度是非常高的；我们可以通过配置参数，来设置去重需要的固定内存使用量。无论数千还是数十亿的唯一值，内存使用量只与你配置的精确度相关。
 
 ## Elasticsearch 分析
 
+### 【基础】Elasticsearch 中的分析器是什么？
+
+在 Elasticsearch 中，分析器是用于对文本进行分词的组件。分析器用于将文本分解为更小的单元，称为分词。然后，这些分词用于索引和搜索文本。分析器的主要目标是将原始文本转换为可以有效搜索和分析的结构化格式 （分词）。
+
+文本分析由 [**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 执行，分析器是一组控制整个过程的规则。无论是索引还是搜索，都需要使用分析器。
+
+[**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 由三个组件组成：零个或多个 [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)、有且仅有一个 [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)、零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)。
+
+它的执行顺序如下：
+
+```
+character filters -> tokenizer -> token filters
+```
+
+## Elasticsearch 集群
+
+### 【基础】如哈查看 Elasticsearch 集群状态？
+
+在 Elasticsearch 中， `_cat` API 是一组简单明了的 API，以人类可读的格式提供有关集群、节点、索引和其他组件的信息。`_cat` API 主要用于故障排除、监控和快速了解 Elasticsearch 集群的状态和运行状况。
+
+### 【中级】Elasticsearch 集群中有哪些不同类型的节点？
+
+:::details 参考答案
+
+Elasticsearch 中的节点是指集群中的单个 Elasticsearch 进程实例。节点用于存储数据并参与集群的索引和搜索功能。
+
+节点间会相互通信以分配数据和工作负载，从而确保集群的平衡和高性能。节点可以配置不同的角色，这些角色决定了它们在集群中的职责。
+
+可以通过在 `elasticsearch.yml` 中设置 `node.roles` 来为节点分配角色。但是，如果您未设置 nodes.roles，则默认情况下，节点将被分配以下角色：
+
+- **master（主节点）** - **主节点负责管理集群状态**。这包括集群中有哪些节点、存在哪些索引以及分片所在的位置等信息。
+  - **分配分片**：创建新索引时，主节点将分片分配给集群中的节点。
+  - **分片再均衡**：如果节点发生故障，主节点将重新平衡分片以确保所有数据仍然可用。
+- **master-eligible（候选主节点）** - 当主节点无法正常工作，候选节点可以参与主节点的选举，其中一个节点回被选为主节点。
+- **data（数据节点）** - 数据节点负责存储、索引和提供实际数据（分片数据）。它们处理索引操作 （在索引中添加或更新文档） 和搜索操作 （根据查询条件检索相关文档）。
+- **ingest（摄取节点）** - 这些节点在索引之前预处理传入数据。他们使用 Elasticsearch 的采集管道在采集数据时对其进行转换、丰富和筛选。
+- **coordinating（协调节点）** - 协调节点充当客户端请求的入口点，负责编排客户端和数据节点之间的通信。它们不存储数据或执行摄取处理，而是充当智能负载均衡器，优化查询和聚合的分发。
+- **machine learning（机器学习节点）** - 机器学习节点专用于在 Elasticsearch 中运行机器学习作业，通常用于异常检测和数据分析。
+- **cross-cluster search（CCS，跨集群搜索节点）** - CCS 节点支持同时查询多个 Elasticsearch 集群，充当跨这些集群执行联合搜索的单个点。
+- **voting-only（仅限投票节点）** - 这些节点符合主节点条件，但不能被选为主节点。它们的主要功能是在主节点选举中投票，帮助防止票数平局并维护集群稳定性。
+
+:::
+
+### 【高级】Elasticsearch 集群中的 hot-warm-cold 架构有什么作用？
+
+hot-warm-cold 是一种在 Elasticsearch 集群中的不同节点之间分配数据的方法。
+
+- **hot** - hot 节点是集群中速度最快、功能最强大的节点。它们用于存储和提供最常访问的数据。
+- **warm** - warm 节点的速度不如热节点快，但仍然相对较快。它们用于存储和提供访问频率低于热节点上数据的数据的数据。
+- **cold** - cold 节点是集群中最慢且功能最弱的节点。它们用于存储和提供不经常访问的数据。
+
+### 【高级】Elasticsearch 集群中的 ILM 是什么？
+
 ## Elasticsearch 复制
 
-### ES 是如何实现选主的？
+### Elasticsearch 如何保证数据可靠性？
+
+Elasticsearch 通过以下几项功能确保数据可靠性：
+
+- **复制**：将数据复制到集群中的多个节点，从而防止在节点发生故障时丢失数据。
+- **分片**：数据被划分为分片，分片可以分布在多个节点上。这提高了性能和可伸缩性。
+- **快照和还原**：Elasticsearch 提供快照和还原功能，允许您创建和还原数据备份。这可以防止由于人为错误或灾难而导致的数据丢失。
+- **监控和警报**：Elasticsearch 提供了许多监控和警报功能，可以帮助您识别和解决潜在的数据问题。
+- **安全性**：Elasticsearch 可以配置多种安全功能，以保护您的数据免受未经授权的访问。
+
+### Elasticsearch 是如何实现选主的？
 
 限制条件：
 
@@ -301,17 +653,38 @@ Elasticsearch 提供的首个近似聚合是 cardinality 度量。它提供一�
 
 - 补充：master 节点的职责主要包括集群、节点和索引的管理，不负责文档级别的管理；data 节点可以关闭 http 功能。
 
-### ES 如何避免脑裂问题？
+### Elasticsearch 如何避免脑裂问题？
+
+Elasticsearch 中的最小主节点配置指定了集群中必须可用的最小节点数，才能将集群视为正常运行。如果集群中的节点数低于最小主节点配置，集群将进入“裂脑”状态，这可能导致数据丢失和其他问题。最低主节点配置非常重要，因为它可确保始终有 quorum 节点可用于管理集群。仲裁是集群中的大多数节点，对于选举新的主节点、创建或删除索引以及重新平衡分片等任务，它是必需的。
 
 ## Elasticsearch 分区
 
-### ES 是如何实现分区再均衡的？
+### 【中级】Elasticsearch 是如何实现水平扩展的？
+
+Elasticsearch 通过分片来实现水平扩展。在 Elasticsearch 中，分片是索引的逻辑划分。索引可以有一个或多个分片，并且每个分片可以存储在集群中的不同节点上。分片用于在多个节点之间分配数据，从而提高性能和可扩展性。
+
+Elasticsearch 中有两种类型的分片：
+
+- primary shard（主分片） - 用于存储原始数据。适当增加主分片数，可以提升 Elasticsearch 集群的吞吐量和
+- replica shard（副本分片） - 用于存储数据备份。
+
+默认情况下，每个索引都有 1 个主分片（早期版本，默认每个索引有 5 个主分片）。
+
+### Elasticsearch 是如何实现分区再均衡的？
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411221525828.png)
 
+## Elasticsearch 建模
+
+### 【基础】什么是 Elasticsearch 文档的父子关系？
+
+Elasticsearch 中的父子关系是一种对文档之间的分层关系进行建模的方法。在父子关系中，一个文档（父文档）可以有一个或多个子文档。父文档是层次结构的根，子文档是其后代。
+
+要创建父子关系，请在子文档中指定 `parent` 字段。`parent` 字段是包含父文档 ID 的字符串。当索引一个子文档时，Elasticsearch 会自动将其与父文档关联。
+
 ## Elasticsearch 生产环境
 
-### ES 生产环境部署情况是怎样的？
+### Elasticsearch 生产环境部署情况是怎样的？
 
 **典型问题**
 
@@ -487,10 +860,17 @@ scroll 会一次性给你生成**所有数据的一个快照**，然后每次滑
 
 ### 综合优化
 
-#### ES 索引数据多，如何优化？
+#### Elasticsearch 索引数据多，如何优化？
 
 **知识点**
 
 - **动态索引** - 如果单索引数据量过大，可以创建索引模板，并周期性创建新索引（举例来说，索引名为 blog_yyyyMMdd），实现数据的分解。
 - **冷热数据分离** - 将一定范围（如：一周、一月等）的数据作为热数据，其他数据作为冷数据。针对冷数据，可以考虑定期 force_merge + shrink 进行压缩，以节省存储空间和检索效率。
 - **分区再均衡** - Elasticsearch 集群可以动态根据节点数的变化，调整索引分片在集群上的分布。但需要注意的是，要提前合理规划好索引的分片数：分片数过少，则增加节点也无法水平扩展；分片数过多，影响 Elasticsearch 读写效率。
+
+## 参考资料
+
+- [Elasticsearch 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
+- https://www.turing.com/interview-questions/elasticsearch
+
+- https://github.com/rkm-ravi94/awesome-devops-interview/blob/main/elasticsearch.md

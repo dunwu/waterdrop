@@ -29,11 +29,42 @@ index -> type -> mapping -> document -> field
 
 ### Document（文档）
 
-Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文档。每个文档都有一个唯一的 ID。文档以灵活的层次结构组织起来（JSON）。
+Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文档。Elasticsearch 以 JSON 文档的形式序列化和存储数据。文档是一组字段，这些字段是包含数据的键值对。每个文档都有一个唯一的 ID。
 
-**Field（字段）** - 包含数据的键值对。默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
+一个简单的 Elasticsearch 文档可能如下所示：
 
-[**Metadata Field（元数据字段）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html) - 存储有关文档的信息的系统字段。元数据字段都以 `_` 开头。常见元数据字段：
+```json
+{
+  "_index": "my-first-elasticsearch-index",
+  "_id": "DyFpo5EBxE8fzbb95DOa",
+  "_version": 1,
+  "_seq_no": 0,
+  "_primary_term": 1,
+  "found": true,
+  "_source": {
+    "email": "john@smith.com",
+    "first_name": "John",
+    "last_name": "Smith",
+    "info": {
+      "bio": "Eco-warrior and defender of the weak",
+      "age": 25,
+      "interests": [
+        "dolphins",
+        "whales"
+      ]
+    },
+    "join_date": "2024/05/01"
+  }
+}
+```
+
+Elasticsearch 中的 document 是无模式的，也就是并非所有 document 都必须拥有完全相同的字段，它们不受限于同一个模式。
+
+### Field（字段）
+
+field 包含数据的键值对。默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
+
+`document` 包含数据和元数据。[**Metadata Field（元数据字段）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html) 是存储有关文档信息的系统字段。在 Elasticsearch 中，元数据字段都以 `_` 开头。常见的元数据字段有：
 
 - [`_index`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index-field.html) - 文档所属的索引
 - [`_id`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html) - 文档的 ID
@@ -49,17 +80,17 @@ Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文
 
 ### Index（索引）
 
-在 Elasticsearch 中，**可以将 index 视为 document 的集合**。
+在 Elasticsearch 中，**可以将 index 视为 document 的集合**。每个索引存储在磁盘上的同组文件中；索引存储了所有映射类型的字段，还有一些设置。
 
 Elasticsearch 会为所有字段建立索引，经过处理后写入一个倒排索引（Inverted Index）。查找数据的时候，直接查找该索引。
 
 所以，Elasticsearch 数据管理的顶层单位就叫做 Index。它是单个数据库的同义词。每个 Index 的名字必须是小写。
 
-### 小结
+### Elasticsearch 概念和 RDBM  概念
 
-Elasticsearch 核心概念 vs. DB 核心概念：
+Elasticsearch 概念 vs.   RDBM 概念
 
-| Elasticsearch                    | DB                 |
+| Elasticsearch 概念               | RDBM 概念          |
 | -------------------------------- | ------------------ |
 | 索引（index）                    | 数据库（database） |
 | 类型（type，6.0 废弃，7.0 移除） | 数据表（table）    |
@@ -71,98 +102,13 @@ Elasticsearch 核心概念 vs. DB 核心概念：
 
 Elasticsearch 的物理存储，天然使用了分布式设计。
 
-Elasticsearch 的实际存储会将每个 index 分为多个 shard，而 shard 可以分布在集群中不同节点上。正是由于这个机制，使得 Elasticsearch 有了水平扩展的能力。
+每个 Elasticsearch 进程都从属于一个 cluster，一个 cluster 可以有一个或多个 node（即 Elasticsearch 进程）。
 
-![](https://miro.medium.com/v2/resize:fit:720/format:webp/1*AaxjInoSw4tC5x_SmmhTMg.png)
+Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分布在集群中不同节点上。正是由于这个机制，使得 Elasticsearch 有了水平扩展的能力。shard 也是 Elasticsearch 将数据从一个节点迁移到拎一个节点的最小单位。
 
-Elasticsearch 的每个 shard 对应一个 lucene index。lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期[合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html)较大的 segment，以保持索引大小。
+Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。简单来说，Lucene 就是一个 jar 包，里面包含了封装好的构建、管理倒排索引的算法代码。
 
-### Elasticsearch 写数据过程
-
-- 客户端选择一个 node 发送请求过去，这个 node 就是 `coordinating node`（协调节点）。
-- `coordinating node` 对 document 进行**路由**，将请求转发给对应的 node（有 primary shard）。
-- 实际的 node 上的 `primary shard` 处理请求，然后将数据同步到 `replica node`。
-- `coordinating node` 如果发现 `primary node` 和所有 `replica node` 都完成工作后，就返回响应结果给客户端。
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210712104055.png)
-
-### Elasticsearch 读数据过程
-
-可以通过 `doc id` 来查询，会根据 `doc id` 进行 hash，判断出来当时把 `doc id` 分配到了哪个 shard 上面去，从那个 shard 去查询。
-
-- 客户端发送请求到**任意**一个 node，成为 `coordinate node`。
-- `coordinate node` 对 `doc id` 进行哈希路由，将请求转发到对应的 node，此时会使用 `round-robin` **轮询算法**，在 `primary shard` 以及其所有 replica 中随机选择一个，让读请求负载均衡。
-- 接收请求的 node 返回 document 给 `coordinate node`。
-- `coordinate node` 返回 document 给客户端。
-
-### Elasticsearch 搜索数据过程
-
-Elasticsearch 最强大的是做全文检索，就是比如你有三条数据：
-
-```
-java 真好玩儿啊
-java 好难学啊
-j2ee 特别牛
-```
-
-你根据 `java` 关键词来搜索，将包含 `java` 的 `document` 给搜索出来。Elasticsearch 就会给你返回：java 真好玩儿啊，java 好难学啊。
-
-- 客户端发送请求到一个 `coordinate node` 。
-- 协调节点将搜索请求转发到**所有**的 shard 对应的 `primary shard` 或 `replica shard` ，都可以。
-- query phase：每个 shard 将自己的搜索结果（其实就是一些 `doc id` ）返回给协调节点，由协调节点进行数据的合并、排序、分页等操作，产出最终结果。
-- fetch phase：接着由协调节点根据 `doc id` 去各个节点上**拉取实际**的 `document` 数据，最终返回给客户端。
-
-> 写请求是写入 primary shard，然后同步给所有的 replica shard；读请求可以从 primary shard 或 replica shard 读取，采用的是随机轮询算法。
-
-### 写数据底层原理
-
-![](https://miro.medium.com/1*mB9Uqv2ECmj-_Rxuw_Mgww.png)
-
-![img](https://miro.medium.com/v2/resize:fit:700/1*1lOqsxQsZHDC7lZVlrKCXQ.jpeg)
-
-[![Elasticsearch-write-detail](https://github.com/doocs/advanced-java/raw/master/docs/high-concurrency/images/es-write-detail.png)](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/images/es-write-detail.png)
-
-先写入内存 buffer，在 buffer 里的时候数据是搜索不到的；同时将数据写入 translog 日志文件。
-
-如果 buffer 快满了，或者到一定时间，就会将内存 buffer 数据 `refresh` 到一个新的 `segment file` 中，但是此时数据不是直接进入 `segment file` 磁盘文件，而是先进入 `os cache` 。这个过程就是 `refresh`。
-
-每隔 1 秒钟，Elasticsearch 将 buffer 中的数据写入一个**新的** `segment file`，每秒钟会产生一个**新的磁盘文件** `segment file`，这个 `segment file` 中就存储最近 1 秒内 buffer 中写入的数据。
-
-但是如果 buffer 里面此时没有数据，那当然不会执行 refresh 操作，如果 buffer 里面有数据，默认 1 秒钟执行一次 refresh 操作，刷入一个新的 segment file 中。
-
-操作系统里面，磁盘文件其实都有一个东西，叫做 `os cache`，即操作系统缓存，就是说数据写入磁盘文件之前，会先进入 `os cache`，先进入操作系统级别的一个内存缓存中去。只要 `buffer` 中的数据被 refresh 操作刷入 `os cache`中，这个数据就可以被搜索到了。
-
-为什么叫 Elasticsearch 是**准实时**的？ `NRT`，全称 `near real-time`。默认是每隔 1 秒 refresh 一次的，所以 Elasticsearch 是准实时的，因为写入的数据 1 秒之后才能被看到。可以通过 Elasticsearch 的 `rElasticsearchtful api` 或者 `java api`，**手动**执行一次 refresh 操作，就是手动将 buffer 中的数据刷入 `os cache`中，让数据立马就可以被搜索到。只要数据被输入 `os cache` 中，buffer 就会被清空了，因为不需要保留 buffer 了，数据在 translog 里面已经持久化到磁盘去一份了。
-
-重复上面的步骤，新的数据不断进入 buffer 和 translog，不断将 `buffer` 数据写入一个又一个新的 `segment file` 中去，每次 `refresh` 完 buffer 清空，translog 保留。随着这个过程推进，translog 会变得越来越大。当 translog 达到一定长度的时候，就会触发 `commit` 操作。
-
-commit 操作发生第一步，就是将 buffer 中现有数据 `refresh` 到 `os cache` 中去，清空 buffer。然后，将一个 `commit point` 写入磁盘文件，里面标识着这个 `commit point` 对应的所有 `segment file`，同时强行将 `os cache` 中目前所有的数据都 `fsync` 到磁盘文件中去。最后**清空** 现有 translog 日志文件，重启一个 translog，此时 commit 操作完成。
-
-这个 commit 操作叫做 `flush`。默认 30 分钟自动执行一次 `flush`，但如果 translog 过大，也会触发 `flush`。flush 操作就对应着 commit 的全过程，我们可以通过 Elasticsearch api，手动执行 flush 操作，手动将 os cache 中的数据 fsync 强刷到磁盘上去。
-
-translog 日志文件的作用是什么？你执行 commit 操作之前，数据要么是停留在 buffer 中，要么是停留在 os cache 中，无论是 buffer 还是 os cache 都是内存，一旦这台机器死了，内存中的数据就全丢了。所以需要将数据对应的操作写入一个专门的日志文件 `translog` 中，一旦此时机器宕机，再次重启的时候，Elasticsearch 会自动读取 translog 日志文件中的数据，恢复到内存 buffer 和 os cache 中去。
-
-translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁盘中去，所以默认情况下，可能有 5 秒的数据会仅仅停留在 buffer 或者 translog 文件的 os cache 中，如果此时机器挂了，会**丢失** 5 秒钟的数据。但是这样性能比较好，最多丢 5 秒的数据。也可以将 translog 设置成每次写操作必须是直接 `fsync` 到磁盘，但是性能会差很多。
-
-实际上你在这里，如果面试官没有问你 Elasticsearch 丢数据的问题，你可以在这里给面试官炫一把，你说，其实 Elasticsearch 第一是准实时的，数据写入 1 秒后可以搜索到；可能会丢失数据的。有 5 秒的数据，停留在 buffer、translog os cache、segment file os cache 中，而不在磁盘上，此时如果宕机，会导致 5 秒的**数据丢失**。
-
-**总结一下**，数据先写入内存 buffer，然后每隔 1s，将数据 refresh 到 os cache，到了 os cache 数据就能被搜索到（所以我们才说 Elasticsearch 从写入到能被搜索到，中间有 1s 的延迟）。每隔 5s，将数据写入 translog 文件（这样如果机器宕机，内存数据全没，最多会有 5s 的数据丢失），translog 大到一定程度，或者默认每隔 30mins，会触发 commit 操作，将缓冲区的数据都 flush 到 segment file 磁盘文件中。
-
-> 数据写入 segment file 之后，同时就建立好了倒排索引。
-
-### 删除/更新数据底层原理
-
-如果是删除操作，commit 的时候会生成一个 `.del` 文件，里面将某个 doc 标识为 `deleted` 状态，那么搜索的时候根据 `.del` 文件就知道这个 doc 是否被删除了。
-
-如果是更新操作，就是将原来的 doc 标识为 `deleted` 状态，然后新写入一条数据。
-
-buffer 每 refresh 一次，就会产生一个 `segment file`，所以默认情况下是 1 秒钟一个 `segment file`，这样下来 `segment file` 会越来越多，此时会定期执行 merge。每次 merge 的时候，会将多个 `segment file` 合并成一个，同时这里会将标识为 `deleted` 的 doc 给**物理删除掉**，然后将新的 `segment file` 写入磁盘，这里会写一个 `commit point`，标识所有新的 `segment file`，然后打开 `segment file` 供搜索使用，同时删除旧的 `segment file`。
-
-### 底层 lucene
-
-简单来说，lucene 就是一个 jar 包，里面包含了封装好的各种建立倒排索引的算法代码。我们用 Java 开发的时候，引入 lucene jar，然后基于 lucene 的 api 去开发就可以了。
-
-通过 lucene，我们可以将已有的数据建立索引，lucene 会在本地磁盘上面，给我们组织索引的数据结构。
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411242138288.png)
 
 ## 倒排索引
 
@@ -207,9 +153,7 @@ buffer 每 refresh 一次，就会产生一个 `segment file`，所以默认情�
 
 > 上面只是一个简单的栗子，并没有严格按照字典顺序升序排列。
 
-## 存储配置
-
-### Settings
+## Setting
 
 Elasticsearch 索引的配置项主要分为**静态配置属性**和**动态配置属性**，静态配置属性是索引创建后不能修改，而动态配置属性则可以随时修改。
 
@@ -301,13 +245,13 @@ PUT /my_index
 }
 ```
 
-#### 固定属性
+### 固定属性
 
 - **_`index.creation_date`_**：顾名思义索引的创建时间戳。
 - **_`index.uuid`_**：索引的 uuid 信息。
 - **_`index.version.created`_**：索引的版本号。
 
-#### 索引静态配置
+### 索引静态配置
 
 - **_`index.number_of_shards`_**：索引的主分片数，默认值是 **_`5`_**。这个配置在索引创建后不能修改；在 Elasticsearch 层面，可以通过 **_`es.index.max_number_of_shards`_** 属性设置索引最大的分片数，默认为 **_`1024`_**。
 - **_`index.codec`_**：数据存储的压缩算法，默认值为 **_`LZ4`_**，可选择值还有 **_`best_compression`_**，它比 LZ4 可以获得更好的压缩比（即占据较小的磁盘空间，但存储性能比 LZ4 低）。
@@ -324,12 +268,12 @@ PUT /my_index
   - **_`filter`_**：定义新的 token filter，如同义词 filter。
   - **_`analyzer`_**：配置新的分析器，一般是 char_filter、tokenizer 和一些 token filter 的组合。
 
-#### 索引动态配置
+### 索引动态配置
 
 - **_`index.number_of_replicas`_**：索引主分片的副本数，默认值是 **_`1`_**，该值必须大于等于 0，这个配置可以随时修改。
 - **_`index.refresh_interval`_**：执行新索引数据的刷新操作频率，该操作使对索引的最新更改对搜索可见，默认为 **_`1s`_**。也可以设置为 **_`-1`_** 以禁用刷新。更详细信息参考 [Elasticsearch 动态修改 refresh_interval 刷新间隔设置](https://www.knowledgedict.com/tutorial/elasticsearch-refresh_interval-settings.html)。
 
-### Mapping
+## Mapping
 
 在 Elasticsearch 中，**`Mapping`**（映射），用来定义一个文档以及其所包含的字段如何被存储和索引，可以在映射中事先定义字段的数据类型、字段的权重、分词器等属性，就如同在关系型数据库中创建数据表时会设置字段的类型。
 
@@ -343,11 +287,11 @@ Mapping 会把 json 文档映射成 Lucene 所需要的扁平格式
 
 每个 `document` 都是 `field` 的集合，每个 `field` 都有自己的数据类型。映射数据时，可以创建一个 `mapping`，其中包含与 `document` 相关的 `field` 列表。映射定义还包括元数据 `field`，例如 `_source` ，它自定义如何处理 `document` 的关联元数据。
 
-#### 映射分类
+### 映射分类
 
 在 Elasticsearch 中，映射可分为静态映射和动态映射。在关系型数据库中写入数据之前首先要建表，在建表语句中声明字段的属性，在 Elasticsearch 中，则不必如此，Elasticsearch 最重要的功能之一就是让你尽可能快地开始探索数据，文档写入 Elasticsearch 中，它会根据字段的类型自动识别，这种机制称为**动态映射**，而**静态映射**则是写入数据之前对字段的属性进行手工设置。
 
-##### 静态映射
+#### 静态映射
 
 Elasticsearch 官方将静态映射称为**显式映射（[Explicit mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html)）**。**静态映射**是在创建索引时手工指定索引映射。静态映射和 SQL 中在建表语句中指定字段属性类似。相比动态映射，通过静态映射可以添加更详细、更精准的配置信息。
 
@@ -399,7 +343,7 @@ GET /my-index-000001/_mapping
 GET /my-index-000001/_mapping/field/employee-id
 ```
 
-##### 动态映射
+#### 动态映射
 
 动态映射机制，允许用户不手动定义映射，Elasticsearch 会自动识别字段类型。在实际项目中，如果遇到的业务在导入数据之前不确定有哪些字段，也不清楚字段的类型是什么，使用动态映射非常合适。当 Elasticsearch 在文档中碰到一个以前没见过的字段时，它会利用动态映射来决定该字段的类型，并自动把该字段添加到映射中。
 
@@ -410,7 +354,7 @@ PUT data/_doc/1
 { "count": 5 }
 ```
 
-##### 动态字段映射
+#### 动态字段映射
 
 动态字段映射（[Dynamic field mappings](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html)）是用于管理动态字段检测的规则。当 Elasticsearch 在文档中检测到新字段时，默认情况下会动态将该字段添加到类型映射中。
 
@@ -418,28 +362,28 @@ PUT data/_doc/1
 
 [`dynamic`](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic.html) 不同设置的作用：
 
-| 可选值    | 说明                                                         |
-| --------- | ------------------------------------------------------------ |
-| `true`    | 新字段被添加到 mapping 中。mapping 的默认设置。              |
-| `runtime` | 新字段被添加到 mapping 中并作为运行时字段——这些字段不会被索引，但是可以在查询时出现在 `_source` 中。 |
+| 可选值    | 说明                                                                                                                |
+| --------- | ------------------------------------------------------------------------------------------------------------------- |
+| `true`    | 新字段被添加到 mapping 中。mapping 的默认设置。                                                                     |
+| `runtime` | 新字段被添加到 mapping 中并作为运行时字段——这些字段不会被索引，但是可以在查询时出现在 `_source` 中。                |
 | `false`   | 新字段不会被索引或搜索，但仍会出现在返回匹配的 `_source` 字段中。这些字段不会添加到映射中，并且必须显式添加新字段。 |
-| `strict`  | 如果检测到新字段，则会抛出异常并拒绝文档。必须将新字段显式添加到映射中。 |
+| `strict`  | 如果检测到新字段，则会抛出异常并拒绝文档。必须将新字段显式添加到映射中。                                            |
 
 > 需要注意的是：对已有字段，一旦已经有数据写入，就不再支持修改字段定义。如果希望改变字段类型，必须重建索引。这是由于 Lucene 实现的倒排索引，一旦生成后，就不允许修改。如果修改了字段的数据类型，会导致已被索引的字段无法被搜索。
 
 启用动态字段映射后，Elasticsearch 使用内置规则来确定如何映射每个字段的数据类型。规则如下：
 
-| **JSON 数据类型**                                            | **`"dynamic":"true"`**                  | **`"dynamic":"runtime"`**   |
-| ------------------------------------------------------------ | --------------------------------------- | --------------------------- |
-| `null`                                                       | 没有字段被添加                          | 没有字段被添加              |
-| `true` or `false`                                            | `boolean` 类型                          | `boolean` 类型              |
-| 浮点型数字                                                   | `float` 类型                            | `double` 类型               |
-| 数字                                                         | 数字型                                  | `long` 类型                 |
-| JSON 对象                                                    | `object` 类型                           | 没有字段被添加              |
-| 数组                                                         | 由数组中第一个非空值决定                | 由数组中第一个非空值决定    |
-| 开启[日期检测](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#date-detection)的字符串 | `date` 类型                             | `date` 类型                 |
-| 开启[数字检测](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#numeric-detection)的字符串 | `float` 类型或 `long`类型               | `double` 类型或 `long` 类型 |
-| 什么也没开启的字符串                                         | 带有 `.keyword` 子 field 的 `text` 类型 | `keyword` 类型              |
+| **JSON 数据类型**                                                                                                                      | **`"dynamic":"true"`**                  | **`"dynamic":"runtime"`**   |
+| -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------------- |
+| `null`                                                                                                                                 | 没有字段被添加                          | 没有字段被添加              |
+| `true` or `false`                                                                                                                      | `boolean` 类型                          | `boolean` 类型              |
+| 浮点型数字                                                                                                                             | `float` 类型                            | `double` 类型               |
+| 数字                                                                                                                                   | 数字型                                  | `long` 类型                 |
+| JSON 对象                                                                                                                              | `object` 类型                           | 没有字段被添加              |
+| 数组                                                                                                                                   | 由数组中第一个非空值决定                | 由数组中第一个非空值决定    |
+| 开启 [日期检测](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#date-detection) 的字符串    | `date` 类型                             | `date` 类型                 |
+| 开启 [数字检测](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#numeric-detection) 的字符串 | `float` 类型或 `long`类型               | `double` 类型或 `long` 类型 |
+| 什么也没开启的字符串                                                                                                                   | 带有 `.keyword` 子 field 的 `text` 类型 | `keyword` 类型              |
 
 下面举一个例子认识动态 mapping，在 Elasticsearch 中创建一个新的索引并查看它的 mapping，命令如下：
 
@@ -499,7 +443,7 @@ PUT books/it/1
 
 动态映射有时可能会错误的识别字段类型，这种情况下，可能会导致一些功能无法正常使用，如 Range 查询。所以，使用动态 mapping 要结合实际业务需求来综合考虑，如果将 Elasticsearch 当作主要的数据存储使用，并且希望出现未知字段时抛出异常来提醒你注意这一问题，那么开启动态 mapping 并不适用。
 
-##### 动态模板
+#### 动态模板
 
 **动态模板（[dynamic templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html)）**是用于给 `mapping` 动态添加字段的自定义规则。
 
@@ -530,7 +474,7 @@ PUT my-index-000001
 }
 ```
 
-#### 运行时字段
+### 运行时字段
 
 运行时字段是在查询时评估的字段。运行时字段有以下作用：
 
@@ -551,7 +495,7 @@ PUT my-index-000001
 
 就其核心而言，运行时字段最重要的好处是能够在您提取字段后将字段添加到文档中。此功能简化了映射决策，因为您不必预先决定如何解析数据，并且可以使用运行时字段随时修改映射。使用运行时字段允许更小的索引和更快的摄取时间，这结合使用更少的资源并降低您的运营成本。
 
-#### 字段数据类型
+### 字段数据类型
 
 在 Elasticsearch 中，每个字段都有一个字段数据类型或字段类型，用于指示字段包含的数据类型（例如字符串或布尔值）及其预期用途。字段类型按系列分组。同一族中的类型具有完全相同的搜索行为，但可能具有不同的空间使用或性能特征。
 
@@ -622,7 +566,7 @@ Elasticsearch 提供了非常丰富的数据类型，官方将其分为以下几
   - [`_meta`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-meta-field.html)：应用程序特定的元数据。
   - [`_tier`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-tier-field.html)：文档所属索引的当前数据层首选项。
 
-#### 映射参数
+### 映射参数
 
 Elasticsearch 提供了以下映射参数：
 
@@ -657,7 +601,7 @@ Elasticsearch 提供了以下映射参数：
   - 起始和结束字符偏移量，用于将 term 和原始字符串进行映射
   - 有效负载（如果可用） - 用户定义的，与 term 位置相关的二进制数据
 
-#### 映射配置
+### 映射配置
 
 - `index.mapping.total_fields.limit`：索引中的最大字段数。字段和对象映射以及字段别名计入此限制。默认值为 `1000`。
 - `index.mapping.depth.limit`：字段的最大深度，以内部对象的数量来衡量。例如，如果所有字段都在根对象级别定义，则深度为 `1`。如果有一个对象映射，则深度为 `2`，以此类推。默认值为 `20`。
