@@ -47,6 +47,7 @@ index: false
   - [ELK Stack 权威指南](https://github.com/chenryn/logstash-best-practice-cn)
   - [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
   - [Elasticsearch 教程](https://www.knowledgedict.com/tutorial/elasticsearch-intro.html)
+  - [Elasticsearch 从入门到实践](https://www.itshujia.com/books/elasticsearch)
 - **文章**
   - [Elasticsearch+Logstash+Kibana 教程](https://www.cnblogs.com/xing901022/p/4704319.html)
   - [ELK（Elasticsearch、Logstash、Kibana）安装和配置](https://github.com/judasn/Linux-Tutorial/blob/master/ELK-Install-And-Settings.md)

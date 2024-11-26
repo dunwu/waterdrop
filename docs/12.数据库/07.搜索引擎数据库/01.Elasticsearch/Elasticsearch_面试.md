@@ -58,18 +58,6 @@ Elasticsearch 被广泛应用于以下场景：
 
 :::
 
-### 【基础】什么是 ES 索引？
-
-:::details 参考答案
-
-在 Elasticsearch 中，索引（index）在不同场景下，有着不同的含义。
-
-索引是 Elasticsearch 逻辑存储的最顶层设计——索引可视为文档的集合。索引有唯一的名称标识，可以更新、删除、搜索。
-
-在 Elasticsearch 中，数据以 JSON 文档的形式存储。Elasticsearch 利用一种称为倒排索引的数据结构，该结构专为实现快速全文搜索而设计。
-
-:::
-
 ### 【基础】如何在 ES 中 CRUD？
 
 :::details 参考答案
@@ -119,9 +107,7 @@ Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](
 
 Elasticsearch 的逻辑存储被设计为层级结构，自上而下依次为：
 
-```
-index -> type -> mapping -> document -> field
-```
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260812733.png)
 
 各层级结构的说明如下：
 
@@ -146,10 +132,7 @@ Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文
     "info": {
       "bio": "Eco-warrior and defender of the weak",
       "age": 25,
-      "interests": [
-        "dolphins",
-        "whales"
-      ]
+      "interests": ["dolphins", "whales"]
     },
     "join_date": "2024/05/01"
   }
@@ -184,7 +167,7 @@ Elasticsearch 会为所有字段建立索引，经过处理后写入一个倒排
 
 所以，Elasticsearch 数据管理的顶层单位就叫做 Index。它是单个数据库的同义词。每个 Index 的名字必须是小写。
 
-（5）Elasticsearch 概念和 RDBM  概念
+（5）Elasticsearch 概念和 RDBM 概念
 
 | Elasticsearch                    | DB                 |
 | -------------------------------- | ------------------ |
@@ -208,7 +191,7 @@ Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分�
 
 Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。简单来说，Lucene 就是一个 jar 包，里面包含了封装好的构建、管理倒排索引的算法代码。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411242138288.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260815446.png)
 
 :::
 
@@ -216,107 +199,125 @@ Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索�
 
 :::details 参考答案
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411241115617.png)
+既然有倒排索引，顾名思义，有与之相对的正排索引。这里，以实现一个诗词检索器为例，来说明一下正排索引和倒排索引的区别。
 
-举例来说，假设有以下文档：
+**正排索引是 ID 到数据的映射关系**。如下所示，每首诗词用一个 ID 唯一识别。如果，我们要查找诗歌内容中是否包含某个关键字，就不得不在内容的完整文本中进行检索，效率很低。即使针对文档内容创建传统 RDBM 的索引（通常为 B+ 树结构），查找效率依然低下，并且会产生较大的额外存储空间开销。
 
-| DocId | Doc                                            |
-| ----- | ---------------------------------------------- |
-| 1     | 谷歌地图之父跳槽 Facebook                      |
-| 2     | 谷歌地图之父加盟 Facebook                      |
-| 3     | 谷歌地图创始人拉斯离开谷歌加盟 Facebook        |
-| 4     | 谷歌地图之父跳槽 Facebook 与 Wave 项目取消有关 |
-| 5     | 谷歌地图之父拉斯加盟社交网站 Facebook          |
+| ID  | 文档标题   | 文档内容                                         |
+| --- | ---------- | ------------------------------------------------ |
+| 1   | 望月怀远   | 海上生明月，天涯共此时…                          |
+| 2   | 春江花月夜 | 春江潮水连海平，海上明月共潮生…                  |
+| 3   | 静夜思     | 床前明月光，疑是地上霜。举头望明月，低头思故乡。 |
+| 4   | 锦瑟       | 沧海月明珠有泪，蓝田日暖玉生烟…                  |
 
-对文档进行分词之后，得到以下**倒排索引**。
+倒排索引的实现与正排索引相反。**将文本分词后保存为多个词项，词项到 ID 的映射关系称为倒排索引（Inverted index）**。
 
-| WordId | Word     | DocIds        |
-| ------ | -------- | ------------- |
-| 1      | 谷歌     | 1, 2, 3, 4, 5 |
-| 2      | 地图     | 1, 2, 3, 4, 5 |
-| 3      | 之父     | 1, 2, 4, 5    |
-| 4      | 跳槽     | 1, 4          |
-| 5      | Facebook | 1, 2, 3, 4, 5 |
-| 6      | 加盟     | 2, 3, 5       |
-| 7      | 创始人   | 3             |
-| 8      | 拉斯     | 3, 5          |
-| 9      | 离开     | 3             |
-| 10     | 与       | 4             |
-| ..     | ..       | ..            |
+| 词项 | ID         | 词频                               |
+| ---- | ---------- | ---------------------------------- |
+| 月   | 1, 2, 3, 4 | 1：1 次、2：1 次、3：2 次、4：1 次 |
+| 明月 | 1, 2, 3    | 1：1 次、2：1 次、3：2 次          |
+| 海   | 1, 2, 4    | 1：1 次、2：1 次、4：1 次          |
 
-另外，实用的倒排索引还可以记录更多的信息，比如文档频率信息，表示在文档集合中有多少个文档包含某个单词。
+除了要保存词项与 ID 的关系外，还需要保存这个词项在对应文档出现的位置、偏移量等信息，这是因为很多检索的场景中还需要判断关键词前后的内容是否符合搜索要求。
 
-那么，有了倒排索引，搜索引擎可以很方便地响应用户的查询。比如用户输入查询 `Facebook` ，搜索系统查找倒排索引，从中读出包含这个单词的文档，这些文档就是提供给用户的搜索结果。
-
-要注意倒排索引的两个重要细节：
-
-- 倒排索引中的所有词项对应一个或多个文档；
-- 倒排索引中的词项**根据字典顺序升序排列**
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260816781.png)
 
 :::
 
-### 【中级】Elasticsearch 中的倒排索引如何工作？
+### 【中级】什么是字典树？
 
 :::details 参考答案
 
-Elasticsearch 中的倒排索引其实是基于 Lucene 实现。
+Trie（字典树），也被称为前缀树，是一种树状数据结构，用于有效检索键值对。它通常用于实现字典和自动补全功能，使其成为许多搜索算法的基本组件。
 
-倒排索引的工作原理是——将文档分解为更小的单元，称为分词。然后，这些分词与包含该分词的文档列表一起存储在数据库中。执行搜索查询时，倒排索引用于快速查找包含搜索词的文档。
+Trie 遵循一个规则：如果两个字符串有共同的前缀，那么它们在 Trie 中将具有相同的祖先。
 
-- Lucene 的写操作流程（索引），就是将原始文本进行分词，然后按倒排索引结构存储。
-- Lucene 的读操作流程（搜索），就是在倒排索引结构中进行检索，然后找到原始文档，返回结果。
+Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效。此外，Trie 有 Hash 不具备的优势：Trie 支持前缀搜索和排序。Trie 的主要问题是：存储词项需要额外的空间，对于长文本，空间可能会变得很大。
 
-Lucene 倒排索引的底层实现是基于：FST（Finite State Transducer）数据结构。
-
-Lucene 从 4+版本后开始大量使用的数据结构是 FST。FST 有两个优点：
-
-（1）空间占用小。通过对词典中单词前缀和后缀的重复利用，压缩了存储空间；
-
-（2）查询速度快。查询时间复杂度为 `O(len(str))`。
+![](https://media.geeksforgeeks.org/wp-content/uploads/20220828232752/Triedatastructure1.png)
 
 :::
 
-### 字典树
-
-常用字典数据结构如下所示：
-
-![img](https://pic2.zhimg.com/80/v2-8bb844c5b8fb944111fa8cecdb0e12d5_720w.jpg)
-
-Trie 的核心思想是空间换时间，利用字符串的公共前缀来降低查询时间的开销以达到提高效率的目的。它有 3 个基本性质：
-
-- 根节点不包含字符，除根节点外每一个节点都只包含一个字符。
-
-- 从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串。
-
-- 每个节点的所有子节点包含的字符都不相同。
-
-![img](https://pic4.zhimg.com/80/v2-26a48882a8f09a50dfeb79cc25045fcf_720w.jpg)
-
-（1）可以看到，trie 树每一层的节点数是 26^i 级别的。所以为了节省空间，我们还可以用动态链表，或者用数组来模拟动态。而空间的花费，不会超过单词数 × 单词长度。
-
-（2）实现：对每个结点开一个字母集大小的数组，每个结点挂一个链表，使用左儿子右兄弟表示法记录这棵树；
-
-（3）对于中文的字典树，每个节点的子节点用一个哈希表存储，这样就不用浪费太大的空间，而且查询速度上可以保留哈希的复杂度 O(1)。
-
-![img](https://pic4.zhimg.com/80/v2-79f2a89041e546d9feccf55e4ff1c0d7_720w.jpg)
-
-### 【基础】什么是 Elasticsearch 中的静态映射、动态映射？
+### 【高级】ES 如何实现倒排索引？
 
 :::details 参考答案
 
-在 Elasticsearch 中，映射可分为静态映射和动态映射。在关系型数据库中写入数据之前首先要建表，在建表语句中声明字段的属性，在 Elasticsearch 中，则不必如此。Elasticsearch 最重要的功能之一就是让你尽可能快地开始探索数据，文档写入 Elasticsearch 中，它会根据字段的类型自动识别，这种机制称为**动态映射**，而**静态映射**则是写入数据之前对字段的属性进行手工设置。
+在 Elasticsearch 中，数据存储、检索实际上是基于 Lucene 实现。
 
-Elasticsearch 官方将静态映射称为**显式映射（[Explicit mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html)）**。**静态映射**是在创建索引时手工指定索引映射。静态映射和 SQL 中在建表语句中指定字段属性类似。相比动态映射，通过静态映射可以添加更详细、更精准的配置信息。
+一个 Elasticsearch shard 对应一个 Lucene index，
 
-静态映射的形式就是设置 mapping。在 Elasticsearch 中，mapping 是用于定义文档结构的 JSON 对象。它指定文档中允许的字段，以及它们的数据类型和其他属性。mapping 用于控制文档的存储和索引方式，还影响文档的搜索和分析方式。mapping 是一种强大的工具，可用于以结构化方式存储数据。它们使搜索、筛选和分析数据变得更加容易。
+Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。
 
-动态映射机制，允许用户不手动定义映射，Elasticsearch 会自动识别字段类型。在实际项目中，如果遇到的业务在导入数据之前不确定有哪些字段，也不清楚字段的类型是什么，使用动态映射非常合适。当 Elasticsearch 在文档中碰到一个以前没见过的字段时，它会利用动态映射来决定该字段的类型，并自动把该字段添加到映射中。例如：创建一个名为 `data` 的索引、其 `mapping` 类型为 `_doc`，并且有一个类型为 `long` 的字段 `count`。
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260817705.png)
+
+倒排索引的组成主要有 3 个部分：
+
+- **Term Dictionary** - **Term Dictionary 用于保存 term（词项）**。由于 ES 会对 document 中的每个 field 都进行分词，所以数据量可能会非常大。
+  - Term Dictionary 存储数据时，先将所有的 term 进行排序，然后将 Term Dictionary 中有共同前缀的 term 抽取出来进行分块存储；再对共同前缀做索引，最后通过索引就可以找到公共前缀对应的块在 Term Dictionary 文件中的偏移地址。
+  - 由于每个块中都有共同前缀，所有不需要再保存每个 Term 的全部内容，只需要保存其后缀即可，而且这些后缀都是排好序的。
+- **Term Index** - **Term Index 是 Term Dictionary 的索引**。由于 Term Dictionary 存储的 term 可能会非常多，为了提高查询效率，从而设计了 Term Index。
+  - 为了提高检索效率以及节省空间，Term Index 只使用公共前缀做索引。
+  - **Lucene 中实现 Term Index 采用了 FST 算法**。FST 是一种非常复杂的结构，可以把它简单理解为一个**占用空间小且高效的 KV 数据结构**，有点类似于 Trie（字典树）。FST 有以下的特点：
+    - 通过对 Term Dictionary 数据的前缀复用，压缩了存储空间；
+    - 高效的查询性能，`O(len(prefix))` 的复杂度；
+    - 构建后不可修改，因此 Lucene segment 也不允许修改。
+- **Posting List** - **Posting List 保存着每个 term 的映射信息**。如文档 ID、词频、位置等。Lucene 把这些数据分成 3 个文件进行存储：
+  - `.doc` 文件，记录了文档 ID 信息和 term 的词频，还额外记录了跳表的信息，用来加速文档 ID 的查询；并且还记录了 term 在 `.pos` 和 `.pay` 文件中的位置，有助于进行快速读取。
+  - `.pay` 文件，记录了 payload 信息和 term 在 doc 中的偏移信息；
+  - `.pos` 文件，记录了 term 在 doc 中的位置信息。
+
+> 扩展：https://www.itshujia.com/read/elasticsearch/354.html
+
+:::
+
+### 【基础】ES 支持哪些数据类型？
+
+:::details 参考答案
+
+Elasticsearch 支持丰富的数据类型，常见的有：
+
+- 文本类型：[`text`](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html)、[`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#keyword-field-type)、[`constant_keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#constant-keyword-field-type)、 [`wildcard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#wildcard-field-type)
+
+- 二进制类型：[`binary`](https://www.elastic.co/guide/en/elasticsearch/reference/current/binary.html)
+
+- 数值类型：`long`、`float` 等
+
+- 日期类型：[`date`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html)
+
+- 布尔类型：[`boolean`](https://www.elastic.co/guide/en/elasticsearch/reference/current/boolean.html)
+
+- 对象类型：[`object`](https://www.elastic.co/guide/en/elasticsearch/reference/current/object.html)、[`nested`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html)
+
+> 扩展：[数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
+
+:::
+
+### 【基础】ES 如何识别字段的数据类型？
+
+:::details 参考答案
+
+在 Elasticsearch 中，每个文档都是字段的集合，每个字段都有自己的 [数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)。**Elasticsearch 通过映射来定义文档及其包含字段的存储和索引方式**。
+
+Elasticsearch 映射可分为动态映射和静态映射。
+
+在 RDBM 中写入数据之前首先要建表，在建表语句中声明字段的属性，在 Elasticsearch 中，则不必如此。Elasticsearch 最重要的功能之一是：文档写入 Elasticsearch 中，它会自动检测新字段的数据类型，这种机制称为 [**动态映射**](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-mapping.html)。也正是由于这点，所以说 Elasticsearch 是无模式的。
+
+例如，执行下面添加文档的操作，Elasticsearch 会自动将 `count` 字段识别为 `long` 类型。
+
+```bash
+PUT data/_doc/1
+{ "count": 5 }
+```
+
+Elasticsearch 的动态映射无法保证完全符合预期，因此 Elasticsearch 也提供了显示设置映射规则的方法。[**静态映射（显示映射）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html) 是在创建索引时显示设置索引映射（即设置 mapping）。静态映射和 SQL 中在建表语句中指定字段属性类似。相比动态映射，通过静态映射可以添加更详细、更精准的配置信息。
+
+- mapping 是用于定义文档结构的 JSON 对象。它指定文档中允许的字段，以及它们的数据类型和其他属性。mapping 用于控制文档的存储和索引方式，还影响文档的搜索和分析方式。
 
 :::
 
 ## Elasticsearch 架构
 
-### Elasticsearch 更新操作是如何执行的？
+### 【高级】ES 更新操作是如何执行的？
 
 写入操作包含：单文档写入（index、create、update、delete）和批量写入（bulk）。
 
@@ -376,7 +377,7 @@ Elasticsearch 的 document 的物理存储是 Luncene segment，而 segment 不�
 - 如果是更新操作，就是将原来的 doc 标识为 `deleted` 状态，然后新写入一条数据。
 - `memory buffer` 每 `refresh` 一次，就会产生一个 `segment file`。由于，默认每秒刷新 1 次，即每秒产生一个 `segment file`，这样下来 `segment file` 会越来越多。Elasticsearch 会定期执行 merge 操作，将多个 `segment file` 合并成一个。合并时会将标识为 `deleted` 的 doc 给**物理删除掉**，然后将新的 `segment file` 写入磁盘，这里会写一个 `commit point`，标识所有新的 `segment file`，然后打开 `segment file` 供搜索使用，同时删除旧的 `segment file`。
 
-### Elasticsearch 查询操作是如何执行的？
+### 【高级】ES 查询操作是如何执行的？
 
 在 Elasticsearch 中，搜索一般分为两个阶段，query 和 fetch 阶段。可以简单的理解，query 阶段确定要取哪些 doc，fetch 阶段取出具体的 doc。
 
@@ -423,7 +424,7 @@ translog 其实也是先写入 os cache 的，默认每隔 5 秒刷一次到磁�
 
 > 数据写入 segment file 之后，同时就建立好了倒排索引。
 
-### Elasticsearch 如何在高并发环境下保证读写一致？
+### 【高级】ES 如何保证读写一致？
 
 **乐观锁机制** - 可以通过版本号使用乐观并发控制，以确保新版本不会被旧版本覆盖，由应用层来处理具体的冲突；
 
@@ -516,7 +517,7 @@ Elasticsearch 中的 multi_match 查询功能旨在通过单个查询跨多个�
 - 多语言搜索
 - 部分匹配
 
-### 【基础】range  查询功能有什么用途？
+### 【基础】range 查询功能有什么用途？
 
 Elasticsearch 中的 range 查询功能用于搜索包含指定范围内的值的文档。范围查询可用于搜索包含特定字符串、特定数字或特定日期的文档。
 
@@ -872,5 +873,4 @@ scroll 会一次性给你生成**所有数据的一个快照**，然后每次滑
 
 - [Elasticsearch 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 - https://www.turing.com/interview-questions/elasticsearch
-
 - https://github.com/rkm-ravi94/awesome-devops-interview/blob/main/elasticsearch.md
