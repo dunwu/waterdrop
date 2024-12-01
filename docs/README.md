@@ -474,7 +474,7 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 - [Elasticsearch 集群](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_集群.md)
 - [Elasticsearch 优化](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_优化.md)
 - [Elasticsearch 运维](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_运维.md)
-- [Elasticsearch API 之 Rest](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_API_Rest.md)
+- [Elasticsearch API](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_API.md)
 - [ElasticSearch API 之 High Level REST Client](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_API_HighLevelRest.md)
 - [Elasticsearch 面试](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_面试.md) 💯
 

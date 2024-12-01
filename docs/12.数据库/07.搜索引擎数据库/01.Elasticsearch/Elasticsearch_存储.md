@@ -48,10 +48,7 @@ Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文
     "info": {
       "bio": "Eco-warrior and defender of the weak",
       "age": 25,
-      "interests": [
-        "dolphins",
-        "whales"
-      ]
+      "interests": ["dolphins", "whales"]
     },
     "join_date": "2024/05/01"
   }
@@ -86,9 +83,9 @@ Elasticsearch 会为所有字段建立索引，经过处理后写入一个倒排
 
 所以，Elasticsearch 数据管理的顶层单位就叫做 Index。它是单个数据库的同义词。每个 Index 的名字必须是小写。
 
-### Elasticsearch 概念和 RDBM  概念
+### Elasticsearch 概念和 RDBM 概念
 
-Elasticsearch 概念 vs.   RDBM 概念
+Elasticsearch 概念 vs. RDBM 概念
 
 | Elasticsearch 概念               | RDBM 概念          |
 | -------------------------------- | ------------------ |

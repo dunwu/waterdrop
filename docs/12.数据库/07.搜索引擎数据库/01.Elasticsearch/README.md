@@ -28,9 +28,10 @@ index: false
 - [Elasticsearch 分析](Elasticsearch_分析.md)
 - [Elasticsearch DSL](Elasticsearch_DSL.md)
 - [Elasticsearch 集群](Elasticsearch_集群.md)
+- [Elasticsearch 架构](Elasticsearch_架构.md)
 - [Elasticsearch 优化](Elasticsearch_优化.md)
 - [Elasticsearch 运维](Elasticsearch_运维.md)
-- [Elasticsearch API 之 Rest](Elasticsearch_API_Rest.md)
+- [Elasticsearch API](Elasticsearch_API.md)
 - [ElasticSearch API 之 High Level REST Client](Elasticsearch_API_HighLevelRest.md)
 - [Elasticsearch 面试](Elasticsearch_面试.md) 💯
 

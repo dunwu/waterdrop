@@ -547,16 +547,16 @@ DELETE groups
 
 词项查询有以下类型：
 
-- **[Exists](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)**
-- **[Fuzzy](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)**
-- **[IDs](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html)**
-- **[Prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)**
-- **[Range](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)**
-- **[Regexp](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)**
-- **[Term](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)**
-- **[Terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)**
-- **[Terms set](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-set-query.html)**
-- **[Wildcard](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html)**
+- **[exists](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)**
+- **[fuzzy](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)**
+- **[ids](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html)**
+- **[prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)**
+- **[range](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)**
+- **[regexp](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)**
+- **[term](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)**
+- **[terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)**
+- **[terms set](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-set-query.html)**
+- **[wildcard](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html)**
 
 ### exists query
 
@@ -586,7 +586,7 @@ GET kibana_sample_data_ecommerce/_search
 
 - `{ "user" : "jane" }` 有 user 字段，且不为空。
 - `{ "user" : "" }` 有 user 字段，值为空字符串。
-- `{ "user" : "-" }` 有 user 字段，值不为空。
+- { "user" : "-" } 有 user 字段，值不为空。
 - `{ "user" : [ "jane" ] }` 有 user 字段，值不为空。
 - `{ "user" : [ "jane", null ] }` 有 user 字段，至少一个值不为空即可。
 
@@ -599,7 +599,7 @@ GET kibana_sample_data_ecommerce/_search
 
 ### fuzzy query
 
-[**`fuzzy query`**（模糊查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)返回包含与搜索词相似的词的文档。ES 使用 [Levenshtein edit distance（Levenshtein 编辑距离）](https://en.wikipedia.org/wiki/Levenshtein_distance)测量相似度或模糊度。
+[**`fuzzy query`**（模糊查询）](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html) 返回包含与搜索词相似的词的文档。ES 使用 [Levenshtein edit distance（Levenshtein 编辑距离）](https://en.wikipedia.org/wiki/Levenshtein_distance) 测量相似度或模糊度。
 
 编辑距离是将一个术语转换为另一个术语所需的单个字符更改的数量。这些变化可能包括：
 
@@ -725,7 +725,7 @@ GET kibana_sample_data_ecommerce/_search
 
 [**`regexp query`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html) 返回与正则表达式相匹配的 term 所属的文档。
 
-[正则表达式](https://zh.wikipedia.org/zh-hans/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F)是一种使用占位符字符匹配数据模式的方法，称为运算符。
+[正则表达式](https://zh.wikipedia.org/zh-hans/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F) 是一种使用占位符字符匹配数据模式的方法，称为运算符。
 
 示例：以下搜索返回 `user.id` 字段包含任何以 `k` 开头并以 `y` 结尾的文档。 `.*` 运算符匹配任何长度的任何字符，包括无字符。匹配项可以包括 `ky`、`kay` 和 `kimchy`。
 
@@ -746,7 +746,7 @@ GET /_search
 }
 ```
 
-> 注意：如果配置了[`search.allow_expensive_queries`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html#query-dsl-allow-expensive-queries) ，则 [**`regexp query`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html) 会被禁用。
+> 注意：如果配置了 [`search.allow_expensive_queries`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html#query-dsl-allow-expensive-queries) ，则 [**`regexp query`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html) 会被禁用。
 
 ### term query
 
@@ -901,7 +901,7 @@ GET /_search
 }
 ```
 
-> 注意：如果配置了[`search.allow_expensive_queries`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html#query-dsl-allow-expensive-queries) ，则[**`wildcard query`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html) 会被禁用。
+> 注意：如果配置了 [`search.allow_expensive_queries`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html#query-dsl-allow-expensive-queries) ，则 [**`wildcard query`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html) 会被禁用。
 
 ### 词项查询完整示例
 
@@ -990,6 +990,14 @@ POST /products/_search
 ## 复合查询
 
 复合查询就是把一些简单查询组合在一起实现更复杂的查询需求，除此之外，复合查询还可以控制另外一个查询的行为。
+
+复合查询有以下类型：
+
+- [`bool`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html) - 布尔查询，可以组合多个过滤语句来过滤文档。
+- [`boosting`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-boosting-query.html) - 在 positive 块中指定匹配文档的语句，同时降低在 negative 块中也匹配的文档的得分，提供调整相关性算分的能力。
+- [`constant_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html) - 包装了一个过滤器查询，不进行算分。
+- [`dis_max`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html) - 返回匹配了一个或者多个查询语句的文档，但只将最佳匹配的评分作为相关性算分返回。
+- [`function_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html) - 支持使用函数来修改查询返回的分数。
 
 ### bool query
 

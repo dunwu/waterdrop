@@ -1,6 +1,6 @@
 ---
 icon: logos:elasticsearch
-title: Elasticsearch Rest API
+title: ElasticSearch API
 date: 2020-06-16 07:10:44
 categories:
   - 数据库
@@ -14,7 +14,7 @@ tags:
 permalink: /pages/24933bd4/
 ---
 
-# ElasticSearch Rest API
+# ElasticSearch API
 
 > **[Elasticsearch](https://github.com/elastic/elasticsearch) 是一个分布式、RESTful 风格的搜索和数据分析引擎**，能够解决不断涌现出的各种用例。 作为 Elastic Stack 的核心，它集中存储您的数据，帮助您发现意料之中以及意料之外的情况。
 >
@@ -24,7 +24,87 @@ permalink: /pages/24933bd4/
 >
 > REST API 最详尽的文档应该参考：[ES 官方 REST API](https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html)
 
-## ElasticSearch Rest API 语法格式
+## ElasticSearch API 简介
+
+Elasticsearch 官方提供了很多版本的 Java 客户端，包含但不限于：
+
+- [Transport Client](https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html) - 7.0 废弃，8.0 移除。
+- Java REST 客户端
+- [Elasticsearch Java API Client](https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/index.html) -
+
+如果当前是：8.X 版本，推荐 Elasticsearch `Java API`客户端。
+
+如果当前是：7.X 版本且不考虑升级，推荐 `High Level REST`客户端。
+
+如果当前是：5.X、6.X 版本，推荐尽早升级集群版本。
+
+### Elasticsearch Java API Client 快速入门
+
+:::detail 示例
+
+```java
+//创建一个低级的客户端
+final RestClient restClient = RestClient.builder(new HttpHost("localhost", 9200)).build();
+//创建 JSON 对象映射器
+final RestClientTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+//创建 API 客户端
+final ElasticsearchClient client = new ElasticsearchClient(transport);
+//查询所有索引-------------------------------------------------------------------------------------
+final GetIndexResponse response = client.indices().get(query -> query.index("_all"));
+final IndexState products = response.result().get("products");
+System.out.println(products.toString());
+//关闭
+client.shutdown();
+transport.close();
+restClient.close();
+```
+
+:::
+
+### Transport Client 快速入门
+
+`TransportClient` 使用 `transport` 模块远程连接到 Elasticsearch 集群。它不会加入集群，而只是获取一个或多个初始传输地址，并以轮询方式与它们通信。
+
+> 扩展：https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
+
+:::detail 示例
+
+启动客户端：
+
+```java
+// 启动
+TransportClient client = new PreBuiltTransportClient(Settings.EMPTY)
+        .addTransportAddress(new TransportAddress(InetAddress.getByName("host1"), 9300))
+        .addTransportAddress(new TransportAddress(InetAddress.getByName("host2"), 9300));
+
+// 关闭
+client.close();
+```
+
+配置集群名称
+
+注意，如果使用的集群名称与 “elasticsearch” 不同，则必须设置集群名称。
+
+```java
+Settings settings = Settings.builder()
+        .put("cluster.name", "myClusterName").build();
+TransportClient client = new PreBuiltTransportClient(settings);
+// Add transport addresses and do something with the client...
+```
+
+启用 sniffing
+
+```java
+Settings settings = Settings.builder()
+        .put("client.transport.sniff", true).build();
+TransportClient client = new PreBuiltTransportClient(settings);
+```
+
+:::
+
+## ElasticSearch Rest
+
+### ElasticSearch Rest API 语法格式
 
 向 Elasticsearch 发出的请求的组成部分与其它普通的 HTTP 请求是一样的：
 
@@ -35,9 +115,9 @@ curl -X<VERB> '<PROTOCOL>://<HOST>:<PORT>/<PATH>?<QUERY_STRING>' -d '<BODY>'
 - `VERB`：HTTP 方法，支持：`GET`, `POST`, `PUT`, `HEAD`, `DELETE`
 - `PROTOCOL`：http 或者 https 协议（只有在 Elasticsearch 前面有 https 代理的时候可用）
 - `HOST`：Elasticsearch 集群中的任何一个节点的主机名，如果是在本地的节点，那么就叫 localhost
-- `PORT`：Elasticsearch HTTP 服务所在的端口，默认为 9200 PATH API 路径（例如\_count 将返回集群中文档的数量），
+- `PORT`：Elasticsearch HTTP 服务所在的端口，默认为 9200 PATH API 路径（例如、\_count 将返回集群中文档的数量），
 - `PATH`：可以包含多个组件，例如 `_cluster/stats` 或者 `_nodes/stats/jvm`
-- `QUERY_STRING`：一些可选的查询请求参数，例如?pretty 参数将使请求返回更加美观易读的 JSON 数据
+- `QUERY_STRING`：一些可选的查询请求参数，例如？pretty 参数将使请求返回更加美观易读的 JSON 数据
 - `BODY`：一个 JSON 格式的请求主体（如果请求需要的话）
 
 ElasticSearch Rest API 分为两种：
@@ -53,7 +133,7 @@ Request Body Search 示例：
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220530072654.png)
 
-## 索引 API
+### 索引 API
 
 > 参考资料：[Elasticsearch 官方之 cat 索引 API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html)
 
@@ -127,11 +207,11 @@ GET kibana_sample_data_ecommerce
 # 查看索引的文档总数
 GET kibana_sample_data_ecommerce/_count
 
-# 查看前10条文档，了解文档格式
+# 查看前 10 条文档，了解文档格式
 GET kibana_sample_data_ecommerce/_search
 
 # _cat indices API
-# 查看indices
+# 查看 indices
 GET /_cat/indices/kibana*?v&s=index
 
 # 查看状态为绿的索引
@@ -198,7 +278,7 @@ POST kibana_sample_data_ecommerce/_open
 POST kibana_sample_data_ecommerce/_close
 ```
 
-## 文档
+### 文档
 
 ```bash
 ############Create Document############
@@ -210,7 +290,7 @@ POST users/_doc
     "message" : "trying out Kibana"
 }
 
-#create document. 指定Id。如果id已经存在，报错
+#create document. 指定 Id。如果 id 已经存在，报错
 PUT users/_doc/1?op_type=create
 {
     "user" : "Jack",
@@ -230,9 +310,8 @@ PUT users/_create/1
 #Get the document by ID
 GET users/_doc/1
 
-
 ###  Index & Update
-#Update 指定 ID  (先删除，在写入)
+#Update 指定 ID  （先删除，在写入）
 GET users/_doc/1
 
 PUT users/_doc/1
@@ -240,7 +319,6 @@ PUT users/_doc/1
 	"user" : "Mike"
 
 }
-
 
 #GET users/_doc/1
 #在原文档上增加字段
@@ -252,17 +330,14 @@ POST users/_update/1/
     }
 }
 
-
-
 ### Delete by Id
 # 删除文档
 DELETE users/_doc/1
 
-
 ### Bulk 操作
 #执行两次，查看每次的结果
 
-#执行第1次
+#执行第 1 次
 POST _bulk
 { "index" : { "_index" : "test", "_id" : "1" } }
 { "field1" : "value1" }
@@ -272,8 +347,7 @@ POST _bulk
 { "update" : {"_id" : "1", "_index" : "test"} }
 { "doc" : {"field2" : "value2"} }
 
-
-#执行第2次
+#执行第 2 次
 POST _bulk
 { "index" : { "_index" : "test", "_id" : "1" } }
 { "field1" : "value1" }
@@ -298,8 +372,7 @@ GET /_mget
     ]
 }
 
-
-#URI中指定index
+#URI 中指定 index
 GET /test/_mget
 {
     "docs" : [
@@ -313,7 +386,6 @@ GET /test/_mget
         }
     ]
 }
-
 
 GET /_mget
 {
@@ -345,7 +417,6 @@ POST kibana_sample_data_ecommerce/_msearch
 {"query" : {"match_all" : {}},"size":1}
 {"index" : "kibana_sample_data_flights"}
 {"query" : {"match_all" : {}},"size":2}
-
 
 ### 清除测试数据
 #清除数据
@@ -547,7 +618,7 @@ $ curl 'localhost:9200/user/admin/_search?pretty'
 
 ### 全文搜索
 
-ES 的查询非常特别，使用自己的[查询语法](https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl.html)，要求 GET 请求带有数据体。
+ES 的查询非常特别，使用自己的 [查询语法](https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl.html)，要求 GET 请求带有数据体。
 
 ```bash
 $ curl -H 'Content-Type: application/json' 'localhost:9200/user/admin/_search?pretty'  -d '
@@ -625,7 +696,7 @@ $ curl 'localhost:9200/user/admin/_search'  -d '
 
 上面代码搜索的是`软件 or 系统`。
 
-如果要执行多个关键词的`and`搜索，必须使用[布尔查询](https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-bool-query.html)。
+如果要执行多个关键词的`and`搜索，必须使用 [布尔查询](https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-bool-query.html)。
 
 ```bash
 $ curl -H 'Content-Type: application/json' 'localhost:9200/user/admin/_search?pretty'  -d '
@@ -815,7 +886,7 @@ GET /movies/_search?q=title:(Beautiful NOT Mind)
 示例：
 
 ```bash
-# 范围查询 ,区间写法
+# 范围查询 , 区间写法
 GET /movies/_search?q=title:beautiful AND year:{2010 TO 2018%7D
 {
 	"profile":"true"
@@ -1030,7 +1101,7 @@ POST movies/_search
 }
 ```
 
-## 集群 API
+### 集群 API
 
 > [Elasticsearch 官方之 Cluster API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster.html)
 
@@ -1091,7 +1162,7 @@ GET /_cluster/health/kibana_sample_data_flights?level=shards
 GET /_cluster/state
 ```
 
-## 节点 API
+### 节点 API
 
 > [Elasticsearch 官方之 cat Nodes API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-nodes.html)——返回有关集群节点的信息。
 
@@ -1102,7 +1173,7 @@ GET /_cat/nodes?v=true
 GET /_cat/nodes?v=true&h=id,ip,port,v,m
 ```
 
-## 分片 API
+### 分片 API
 
 > [Elasticsearch 官方之 cat Shards API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-shards.html)——shards 命令是哪些节点包含哪些分片的详细视图。它会告诉你它是主还是副本、文档数量、它在磁盘上占用的字节数以及它所在的节点。
 
@@ -1115,7 +1186,7 @@ GET /_cat/shards/my-index-*
 GET /_cat/shards?h=index,shard,prirep,state,unassigned.reason
 ```
 
-## 监控 API
+### 监控 API
 
 Elasticsearch 中集群相关的健康、统计等相关的信息都是围绕着 `cat` API 进行的。
 
@@ -1156,7 +1227,5 @@ GET /_cat
 
 ## 参考资料
 
-- **官方**
-  - [Elasticsearch 官网](https://www.elastic.co/cn/products/elasticsearch)
-  - [Elasticsearch Github](https://github.com/elastic/elasticsearch)
-  - [Elasticsearch 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
+- [Elasticsearch 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
+- https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#elasticsearch.clients
