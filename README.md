@@ -429,7 +429,8 @@
 
 - [Elasticsearch 简介](docs/12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_简介.md)
 - [Elasticsearch 存储](docs/12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_存储.md)
-- [Elasticsearch 搜索](docs/12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_搜索.md)
+- [Elasticsearch 搜索（上）](docs/12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_搜索上.md)
+- [Elasticsearch 搜索（下）](docs/12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_搜索下.md)
 - [Elasticsearch 聚合](docs/12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_聚合.md)
 - [Elasticsearch 分析](docs/12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_分析.md)
 - [Elasticsearch DSL](docs/12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_DSL.md)

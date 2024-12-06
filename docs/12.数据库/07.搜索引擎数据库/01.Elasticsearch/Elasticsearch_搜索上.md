@@ -1,6 +1,6 @@
 ---
 icon: logos:elasticsearch
-title: Elasticsearch 搜索
+title: Elasticsearch 搜索（上）
 date: 2024-11-22 07:37:46
 categories:
   - 数据库
@@ -10,11 +10,11 @@ tags:
   - 数据库
   - 搜索引擎数据库
   - Elasticsearch
-  - 查询
+  - 搜索
 permalink: /pages/b630d7a6/
 ---
 
-# Elasticsearch 搜索
+# Elasticsearch 搜索（上）
 
 ## 搜索简介
 

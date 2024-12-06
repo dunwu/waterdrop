@@ -23,10 +23,10 @@ index: false
 
 - [Elasticsearch 简介](Elasticsearch_简介.md)
 - [Elasticsearch 存储](Elasticsearch_存储.md)
-- [Elasticsearch 搜索](Elasticsearch_搜索.md)
+- [Elasticsearch 搜索（上）](Elasticsearch_搜索上.md)
+- [Elasticsearch 搜索（下）](Elasticsearch_搜索下.md)
 - [Elasticsearch 聚合](Elasticsearch_聚合.md)
 - [Elasticsearch 分析](Elasticsearch_分析.md)
-- [Elasticsearch DSL](Elasticsearch_DSL.md)
 - [Elasticsearch 集群](Elasticsearch_集群.md)
 - [Elasticsearch 架构](Elasticsearch_架构.md)
 - [Elasticsearch 优化](Elasticsearch_优化.md)

@@ -96,10 +96,15 @@ Elasticsearch 被广泛应用于以下场景：
 index -> type -> mapping -> document -> field
 ```
 
-Elasticsearch 核心概念如下：
+Elasticsearch 集群的核心概念如下：
 
-- **Cluster（集群）** - 集群包含多个节点，每个节点属于哪个集群都是通过一个配置来决定的，对于中小型应用来说，刚开始一个集群就一个节点很正常。
-- **Node（节点）** - Node 是集群中的一个节点，节点也有一个名称，默认是随机分配的。默认节点会去加入一个名称为 `Elasticsearch` 的集群。如果直接启动一堆节点，那么它们会自动组成一个 Elasticsearch 集群，当然一个节点也可以组成 Elasticsearch 集群。
+- **Cluster（集群）** - **由多个协同工作的 ES 实例组合成的集合称为集群**。集群架构使得 ES 具备了高可用性和可扩展性。
+- **Node（节点）** - **单个 ES 服务实例称为 Node，本质上就是一个 Java 进程**。每个节点都有各自的名字，默认是随机分配的，也可以通过 `node.name` 指定。
+- **Shard（分片）** - 当单台机器不足以存储大量数据时，Elasticsearch 可以将一个索引中的数据切分为多个 **`分片（shard）`** 。 **`分片（shard）`** 分布在多台服务器上存储。有了 shard 就可以横向扩展，存储更多数据，让搜索和分析等操作分布到多台服务器上去执行，提升吞吐量和性能。每个 shard 都是一个 lucene index。
+- **Replica（副本）** - 任何一个服务器随时可能故障或宕机，此时 shard 可能就会丢失，因此可以为每个 shard 创建多个 **`副本（replica）`**。replica 可以在 shard 故障时提供备用服务，保证数据不丢失，多个 replica 还可以提升搜索操作的吞吐量和性能。primary shard（建立索引时一次设置，不能修改，默认 5 个），replica shard（随时修改数量，默认 1 个），默认每个索引 10 个 shard，5 个 primary shard，5 个 replica shard，最小的高可用配置，是 2 台服务器。
+
+Elasticsearch 数据的核心概念如下：
+
 - **Index（索引）** - 在 ES 中，**可以将索引视为文档（document）的集合**。
   - ES 会为所有字段建立索引，经过处理后写入一个倒排索引（Inverted Index）。查找数据的时候，直接查找该索引。
   - 所以，ES 数据管理的顶层单位就叫做 Index（索引）。它是单个数据库的同义词。每个 Index （即数据库）的名字必须是小写。
@@ -112,8 +117,6 @@ Elasticsearch 核心概念如下：
   - [`_index`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index-field.html) - 文档所属的索引
   - [`_id`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html) - 文档的 ID
   - [`_source`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html) - 表示文档原文的 JSON
-- **Shard（分片）** - 当单台机器不足以存储大量数据时，Elasticsearch 可以将一个索引中的数据切分为多个 **`分片（shard）`** 。 **`分片（shard）`** 分布在多台服务器上存储。有了 shard 就可以横向扩展，存储更多数据，让搜索和分析等操作分布到多台服务器上去执行，提升吞吐量和性能。每个 shard 都是一个 lucene index。
-- **Replica（副本）** - 任何一个服务器随时可能故障或宕机，此时 shard 可能就会丢失，因此可以为每个 shard 创建多个 **`副本（replica）`**。replica 可以在 shard 故障时提供备用服务，保证数据不丢失，多个 replica 还可以提升搜索操作的吞吐量和性能。primary shard（建立索引时一次设置，不能修改，默认 5 个），replica shard（随时修改数量，默认 1 个），默认每个索引 10 个 shard，5 个 primary shard，5 个 replica shard，最小的高可用配置，是 2 台服务器。
 
 ES 核心概念 vs. DB 核心概念：
 
@@ -143,28 +146,404 @@ Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231211496.png)
 
+## Elasticsearch 安装和设置
+
+> 参考：[Set up Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
+
 ## Elasticsearch 快速入门
 
 Elasticsearch 的基本 CRUD 方式如下：
 
-- **添加索引**
-  - `PUT <index>/_create/<id>` - 指定 id，如果 id 已存在，报错
-  - `POST <index>/_doc` - 自动生成 `_id`
-- **删除索引** - `DELETE /<index>？pretty`
-- **更新索引** - `POST <index>/_update/<id>`
-- **查询索引** - `GET <index>/_doc/<id>`
-- **批量更新** - `bulk` API 支持 `index/create/update/delete`
-- **批量查询** - `_mget` 和 `_msearch` 可以用于批量查询
+- **新建文档** - ES 提供了 [Index API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html) 来新建文档。
+  - `PUT /<index>/_create/<_id>` - 指定 id，如果 id 已存在，会报错
+  - `POST /<index>/_doc` - 自动生成 `_id`
+- **删除文档** - ES 提供了 [Delete API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html) 来删除文档。
+  - `DELETE /<index>`
+- **更新文档** - ES 提供了 [Update API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html) 来更新文档。
+  - `POST /<index>/_update/<_id>`
+- **查询文档** - ES 提供了 [Get API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html) 来指定 ID 查询文档。
+  - `GET <index>/_doc/<_id>`
+- **批量写** - ES 提供了 [Bulk API(`_bulk`)](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) 来执行批量写操作。Bulk API 支持 Index、Create、Update、Delete 四种操作。
+- **批量查** - ES 提供了 [Multi Get API(`_mget`)](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-get.html) 来执行批量指定 ID 查询操作。
 
 > 扩展：[Quick starts](https://www.elastic.co/guide/en/elasticsearch/reference/current/quickstart.html)
 
-## Elasticsearch 设置
+### 索引管理
 
-> 参考：[Set up Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
+:::details 创建索引
+
+创建索引 `users`：
+
+```bash
+PUT users
+{
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "keyword"
+      },
+      "age": {
+        "type": "integer"
+      },
+      "message": {
+        "type": "text"
+      }
+    }
+  },
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1
+  }
+}
+```
+
+响应结果：
+
+```json
+{
+  "acknowledged": true,
+  "shards_acknowledged": true,
+  "index": "users"
+}
+```
+
+:::
+
+:::details 删除索引
+
+删除索引 `users`：
+
+```bash
+DELETE users
+```
+
+响应结果：
+
+```json
+{
+  "acknowledged": true
+}
+```
+
+:::
+
+### 新建文档
+
+ES 提供了 [Index API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html) 来新建文档。ES 提供了两种创建文档的方式：
+
+- `PUT /<index>/_create/<_id>` - 指定 id，如果 `_id` 已存在，会报错
+- `POST /<index>/_doc` - 自动生成 `_id`
+
+:::details 不指定 ID 新建文档
+
+ES 会自动为新建的文档分片一个 UID。
+
+```bash
+POST /users/_doc
+{
+    "user" : "dunwu",
+    "age" : 20,
+    "message" : "learning Elasticsearch"
+}
+```
+
+响应结果：
+
+```json
+{
+  "_index": "users",
+  "_type": "_doc",
+  "_id": "_JVCi5MBf44xQviy3tpW",
+  "_version": 1,
+  "result": "created",
+  "_shards": {
+    "total": 2,
+    "successful": 1,
+    "failed": 0
+  },
+  "_seq_no": 1,
+  "_primary_term": 1
+}
+```
+
+:::
+
+:::details 指定 ID 新建文档
+
+```bash
+PUT users/_create/2
+{
+    "user" : "jason",
+    "age" : 20,
+    "message" : "learning Redis"
+}
+```
+
+响应结果：
+
+```json
+{
+  "_index": "users",
+  "_type": "_doc",
+  "_id": "2",
+  "_version": 1,
+  "result": "created",
+  "_shards": {
+    "total": 2,
+    "successful": 1,
+    "failed": 0
+  },
+  "_seq_no": 1,
+  "_primary_term": 1
+}
+```
+
+指定 ID 如果已经存在，返回报错。可以再执行一遍上面的指令，会得到类似下面的错误响应：
+
+```json
+{
+  "error": {
+    "root_cause": [
+      {
+        "type": "version_conflict_engine_exception",
+        "reason": "[2]: version conflict, document already exists (current version [1])",
+        "index_uuid": "bkNSOG6RTEet3Q65ynCuBA",
+        "shard": "0",
+        "index": "users"
+      }
+    ],
+    "type": "version_conflict_engine_exception",
+    "reason": "[2]: version conflict, document already exists (current version [1])",
+    "index_uuid": "bkNSOG6RTEet3Q65ynCuBA",
+    "shard": "0",
+    "index": "users"
+  },
+  "status": 409
+}
+```
+
+:::
+
+### 删除文档
+
+ES 提供了 [Delete API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html) 来删除文档。
+
+:::details 指定 ID 删除文档
+
+```bash
+DELETE users/_doc/2
+```
+
+响应结果：
+
+```json
+{
+  "_index": "users",
+  "_type": "_doc",
+  "_id": "2",
+  "_version": 2,
+  "result": "deleted",
+  "_shards": {
+    "total": 2,
+    "successful": 1,
+    "failed": 0
+  },
+  "_seq_no": 4,
+  "_primary_term": 1
+}
+```
+
+:::
+
+### 更新文档
+
+ES 提供了 [Update API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html) 来更新文档。
+
+:::details 指定 ID 查询
+
+```bash
+POST users/_update/_JVCi5MBf44xQviy3tpW
+{
+  "doc": {
+    "message": "learning HBase"
+  }
+}
+```
+
+响应结果：
+
+```json
+{
+  "_index": "users",
+  "_type": "_doc",
+  "_id": "_JVCi5MBf44xQviy3tpW",
+  "_version": 2,
+  "result": "updated",
+  "_shards": {
+    "total": 2,
+    "successful": 1,
+    "failed": 0
+  },
+  "_seq_no": 2,
+  "_primary_term": 1
+}
+```
+
+:::
+
+### 查询文档
+
+ES 提供了 [Get API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html) 来指定 ID 查询文档。
+
+:::details 指定 ID 查询
+
+```bash
+GET users/_doc/_JVCi5MBf44xQviy3tpW
+```
+
+响应结果：
+
+```json
+{
+  "_index": "users",
+  "_type": "_doc",
+  "_id": "_JVCi5MBf44xQviy3tpW",
+  "_version": 2,
+  "_seq_no": 2,
+  "_primary_term": 1,
+  "found": true,
+  "_source": {
+    "user": "dunwu",
+    "age": 20,
+    "message": "learning HBase"
+  }
+}
+```
+
+:::
+
+### 批量写
+
+ES 提供了 [Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) 来执行批量写操作。Bulk API 支持 Index、Create、Update、Delete 四种操作。
+
+:::details 批量操作
+
+执行第 1 次：
+
+```bash
+POST _bulk
+{ "index" : { "_index" : "test", "_id" : "1" } }
+{ "field1" : "value1" }
+{ "delete" : { "_index" : "test", "_id" : "2" } }
+{ "create" : { "_index" : "test", "_id" : "3" } }
+{ "field1" : "value3" }
+{ "update" : {"_id" : "1", "_index" : "test"} }
+{ "doc" : {"field2" : "value2"} }
+```
+
+响应结果：
+
+```json
+{
+  "took": 5436,
+  "errors": false,
+  "items": [
+    // 略
+  ]
+}
+```
+
+执行第 2 次：
+
+```bash
+POST _bulk
+{ "index" : { "_index" : "test", "_id" : "1" } }
+{ "field1" : "value1" }
+{ "delete" : { "_index" : "test", "_id" : "2" } }
+{ "create" : { "_index" : "test", "_id" : "3" } }
+{ "field1" : "value3" }
+{ "update" : {"_id" : "1", "_index" : "test"} }
+{ "doc" : {"field2" : "value2"} }
+```
+
+响应结果：
+
+```json
+{
+  "took": 1870,
+  "errors": true,
+  "items": [
+    // 略
+  ]
+}
+```
+
+:::
+
+### 批量查
+
+ES 提供了 [Multi Get API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-get.html) 来执行批量指定 ID 查询操作。
+
+:::details 批量查询
+
+```bash
+GET /_mget
+{
+  "docs": [
+    {
+      "_index": "users",
+      "_id": "_JVCi5MBf44xQviy3tpW"
+    },
+    {
+      "_index": "users",
+      "_id": "2"
+    }
+  ]
+}
+```
+
+响应结果：
+
+```json
+{
+  "docs": [
+    {
+      "_index": "users",
+      "_type": "_doc",
+      "_id": "_JVCi5MBf44xQviy3tpW",
+      "_version": 2,
+      "_seq_no": 2,
+      "_primary_term": 1,
+      "found": true,
+      "_source": {
+        "user": "dunwu",
+        "age": 20,
+        "message": "learning HBase"
+      }
+    },
+    {
+      "_index": "users",
+      "_type": "_doc",
+      "_id": "2",
+      "_version": 1,
+      "_seq_no": 3,
+      "_primary_term": 1,
+      "found": true,
+      "_source": {
+        "user": "jason",
+        "age": 20,
+        "message": "learning Redis"
+      }
+    }
+  ]
+}
+```
+
+:::
 
 ## 参考资料
 
 - [Elasticsearch 官网](https://www.elastic.co/cn/products/Elasticsearch)
 - [Elasticsearch 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 - [What is Elasticsearch?](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro-what-is-es.html)
-- [https://www.ruanyifeng.com/blog/2017/08/Elasticsearch.html](https://www.ruanyifeng.com/blog/2017/08/Elasticsearch.html)
+- [Elasticsearch 从入门到实践](https://www.itshujia.com/books/elasticsearch)

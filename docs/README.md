@@ -467,7 +467,8 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 - [Elasticsearch 简介](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_简介.md)
 - [Elasticsearch 存储](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_存储.md)
-- [Elasticsearch 搜索](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_搜索.md)
+- [Elasticsearch 搜索（上）](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_搜索上.md)
+- [Elasticsearch 搜索（下）](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_搜索下.md)
 - [Elasticsearch 聚合](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_聚合.md)
 - [Elasticsearch 分析](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_分析.md)
 - [Elasticsearch DSL](12.数据库/07.搜索引擎数据库/01.Elasticsearch/Elasticsearch_DSL.md)

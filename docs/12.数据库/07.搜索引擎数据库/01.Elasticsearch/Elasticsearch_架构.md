@@ -66,13 +66,15 @@ ES 的数据持久化流程主要有以下几个过程：**Refresh、写 Translo
 
 在文档写入的时候，ES 会将文档先写入到 **Index Buffer** 中。
 
-当 Index Buffer 大小达到阈值（默认为 JVM 的 10%），或间隔一段时间（默认每秒执行一次，可以通过 `index.refresh_interval` 进行设置），ES 会将 Index Buffer 中的数据写入到一个新的 Segment 文件中。此时的 Segment 文件存在于 Filesystem Cache 中。这个过程称为 **Refresh**。
+当 Index Buffer 大小达到阈值（默认为 JVM 的 10%），或间隔一段时间（默认每秒执行一次，可以通过 `index.refresh_interval` 进行设置），ES 会将 Index Buffer 中的数据写入到一个新的 Segment 文件中。此时的 Segment 文件存在于 OS Cache 中。这个过程称为 **Refresh**。
+
+refresh 写完 segment 后，会更新 shard 的 commit point。commit point 在 shard 中以 `segments_xxx` 形式名字的文件存在，用来记录每个 shard 中 segment 相关的信息。
 
 此外，ES 也支持通过 API 手动触发 Refresh 操作。
 
 Refresh 过程有几点需要注意：
 
-- 在 Index Buffer 中的数据是搜索不到的；Refresh 后，数据进入 **Filesystem Cache**，这时数据就可以搜索了。由于，刷新默认间隔一秒，写入的数据需要一秒后才可见，因此，ES 被称为近实时搜索数据库。
+- 在 Index Buffer 中的数据是搜索不到的；Refresh 后，数据进入 **OS Cache**，这时数据就可以搜索了。由于，刷新默认间隔一秒，写入的数据需要一秒后才可见，因此，ES 被称为近实时搜索数据库。
 - Index Buffer 的设计是为了通过批量写入，提高写入效率。但是，这种设计也带来了新的问题：一旦 ES 节点发生断点，Index Buffer 中的数据就丢失了。为了避免数据丢失，ES 的解决方案就是下文要提到的 **Translog**。
 - Index Buffer 每次 Refresh 时，都会创建一个新的 Segment 文件。随着时间推移，Segment 文件会越来越多。这些 Segment 都要消耗文件句柄和内存，每次搜索都要检查每个 Segment 然后再合并结果。因此，Segment 越多、搜索也越慢。为了减少 Segment 文件数，ES 的解决方案就是下文要提到的 **Merge** 操作。
 
@@ -80,23 +82,26 @@ Refresh 过程有几点需要注意：
 
 **ES 通过 Translog（事务日志）来保证数据不丢失**。
 
-数据写入 Index Buffer 后，ES 会将数据也写入 Translog。Translog 只允许追加写入，并且默认是调用 fsync 进行刷盘的。**每个分片都会有自己的 Translog，在 Refresh 的时候系统会清空 Index Buffer，但不会清空 Translog**。一旦机器宕机，再次重启的时候， ES 会自动读取 Translog 中的数据，恢复到 Index Buffer 和 Filesystem Cache 中。
+数据写入 Index Buffer 后，ES 会将数据也写入 Translog，写入完毕后即可以返回客户端写入成功。**Translog 只允许追加写入**，并且默认是调用 fsync 进行刷盘的。**每个分片都会有自己的 Translog，在 Refresh 的时候系统会清空 Index Buffer，但不会清空 Translog**。一旦机器宕机，再次重启的时候， ES 会自动读取 Translog 中的数据，恢复到 Index Buffer 和 OS Cache 中。
 
-Translog 其实也是先写入 Filesystem Cache 的，默认每 5 秒刷一次到磁盘中去。所以，如果机器宕机，可能会丢失 5 秒的数据。这样设计的目的，还是基于写入效率的考虑。如果每条数据都直接写入磁盘，开销是比较高的，所以这里设计为延时批量写入。
+Translog 其实也是先写入 OS Cache 的，默认每 5 秒刷一次到磁盘中去（由 `index.translog.interval` 控制）。所以，如果机器宕机，可能会丢失 5 秒的数据。这样设计的目的，还是基于写入效率的考虑。如果每条数据都直接写入磁盘，开销是比较高的，所以这里设计为延时批量写入。
 
-实际上你在这里，如果面试官没有问你 es 丢数据的问题，你可以在这里给面试官炫一把，你说，其实 es 第一是准实时的，数据写入 1 秒后可以搜索到；可能会丢失数据的。有 5 秒的数据，停留在 buffer、translog os cache、segment file os cache 中，而不在磁盘上，此时如果宕机，会导致 5 秒的**数据丢失**。
+> 通过 Refresh 和 写 Translog 两节的内容，我们可以总结为：
+>
+> - ES 之所以被称为**近实时查询**，是由于数据写入后，需要刷新（默认间隔 1 秒）后，才可以搜索到；
+> - ES 虽然有 Translog 机制，但依然有丢失数据的风险——有 5 秒的数据，是暂存在 index buffer、translog(os cache)、segment file(os cache) 中，此时尚未保存到磁盘。如果此时发生宕机或断电，会**丢失 5 秒的数据**。
 
 #### Flush
 
 Flush 操作本质上就是 commit 操作，即 ES 的数据持久化操作。
 
-1. Flush 操作的第一步，就是将 index buffer 中现有数据 `refresh` 到 `filesystem cache` 中去，清空 buffer。
-2. 然后，将一个 `commit point` 写入磁盘文件，里面标识着这个 `commit point` 对应的所有 Segment 文件。同时，强行将 `filesystem cache` 中目前所有的数据都 `fsync` 到磁盘中去。
-3. 最后，**清空** 现有 translog 日志文件，重启一个 translog，此时 commit 操作完成。
+1. Flush 操作的第一步，就是将 index buffer 中现有数据 `refresh` 到 `OS Cache` 中去，清空 buffer。
+2. 然后，将一个 `commit point` 写入磁盘文件，里面标识着这个 `commit point` 对应的所有 Segment 文件。同时，强行将 `OS Cache` 中目前所有的数据都 `fsync` 到磁盘中去。
+3. 最后，删除当前的 translog，新建一个 translog，此时 commit 操作完成。
 
 以下两个条件满足任意一个，就会触发 Flush 操作：
 
-- 默认每 30 分钟触发执行一次；
+- 默认每 30 分钟触发执行一次（由 `index.translog.flush_threshold_period` 控制）
 - Translog 写满时触发执行，默认容量为 512M（由 `index.translog.flush_threshold_size` 控制）。
 
 #### Merge
