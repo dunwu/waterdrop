@@ -1,13 +1,11 @@
 ---
 title: 分布式算法 Gossip
 date: 2021-07-13 09:18:41
-order: 13
 categories:
   - 分布式
-  - 分布式理论
+  - 分布式综合
 tags:
   - 分布式
-  - 理论
   - 算法
   - Gossip
 permalink: /pages/88db2f5d/

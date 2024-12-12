@@ -113,7 +113,7 @@ export default navbar([
     icon: 'mdi:resistor-nodes',
     prefix: '/15.分布式/',
     children: [
-      { text: '分布式理论', link: '01.分布式理论/' },
+      { text: '分布式综合', link: '00.分布式综合/' },
       { text: '分布式协同', link: '11.分布式协同/' },
       { text: '分布式调度', link: '12.分布式调度/' },
       { text: '分布式通信', link: '21.分布式通信/' },

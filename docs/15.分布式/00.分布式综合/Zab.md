@@ -1,13 +1,11 @@
 ---
 title: ZAB 协议
 date: 2024-04-28 16:41:07
-order: 14
 categories:
   - 分布式
-  - 分布式理论
+  - 分布式综合
 tags:
   - 分布式
-  - 理论
   - 算法
   - 共识
   - ZAB

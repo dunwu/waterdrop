@@ -1,7 +1,6 @@
 ---
 title: 《Dubbo 源码解读与实战》笔记
 date: 2023-06-25 19:24:38
-order: 02
 categories:
   - 笔记
   - 分布式

@@ -2,13 +2,11 @@
 title: 深入剖析共识性算法 Paxos
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202310200757219.png
 date: 2020-02-02 22:00:00
-order: 11
 categories:
   - 分布式
-  - 分布式理论
+  - 分布式综合
 tags:
   - 分布式
-  - 理论
   - 算法
   - 共识
   - Paxos

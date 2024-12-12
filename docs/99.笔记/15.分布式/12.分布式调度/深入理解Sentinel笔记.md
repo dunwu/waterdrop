@@ -147,3 +147,7 @@ NodeSelectorSlot 负责为资源的首次访问创建 DefaultNode，以及维护
 ## 20 结束语：Sentinel 对应用的性能影响如何？
 
 ## 21 番外篇：Sentinel 1.8.0 熔断降级新特性解读
+
+## 资料
+
+https://wujiuye.com/album/52c96863a60441829497e98226e2c337

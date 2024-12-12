@@ -1,10 +1,9 @@
 ---
 title: CAP 和 BASE
 date: 2021-11-08 08:15:33
-order: 03
 categories:
   - 分布式
-  - 分布式理论
+  - 分布式综合
 tags:
   - 分布式
   - 一致性

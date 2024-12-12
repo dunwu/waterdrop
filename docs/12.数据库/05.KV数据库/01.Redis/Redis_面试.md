@@ -176,7 +176,7 @@ Redis 与 Memcached 的**差异**：
 
 通过以上分析，可以看出，Redis 在很多方面都占有优势。因此，绝大多数情况下，优先选择 Redis 作为分布式缓存。
 
-> 参考：[《脚踏两只船的困惑 - Memcached 与 Redis》](www.imooc.com/article/23549)
+> 参考：[《脚踏两只船的困惑 - Memcached 与 Redis》](https://www.imooc.com/article/23549)
 
 ## Redis 数据类型
 
@@ -192,6 +192,8 @@ Redis 与 Memcached 的**差异**：
 - 随着 Redis 版本升级，又陆续支持以下数据类型： BitMap（2.2 版新增）、HyperLogLog（2.8 版新增）、GEO（3.2 版新增）、Stream（5.0 版新增）。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309232155082.png)
+
+> [What Redis data structures look like](https://redislabs.com/ebook/part-1-getting-started/chapter-1-getting-to-know-redis/1-2-what-redis-data-structures-look-like/)
 
 ### Redis 各数据类型的应用场景
 
@@ -296,19 +298,12 @@ AOF 持久化
 （2）Redis 内存淘汰策略
 
 - **不淘汰**
-
   - **`noeviction`** - 当内存使用达到阈值的时候，所有引起申请内存的命令会报错。这是 Redis 默认的策略。
-
 - **在过期键中进行淘汰**
-
   - **`volatile-random`** - 在设置了过期时间的键空间中，随机移除某个 key。
-
   - **`volatile-ttl`** - 在设置了过期时间的键空间中，具有更早过期时间的 key 优先移除。
-
   - **`volatile-lru`** - 在设置了过期时间的键空间中，优先移除最近未使用的 key。
-
   - **`volatile-lfu`** （Redis 4.0 新增）- 淘汰所有设置了过期时间的键值中，最少使用的键值。
-
 - **在所有键中进行淘汰**
   - **`allkeys-lru`** - 在主键空间中，优先移除最近未使用的 key。
   - **`allkeys-random`** - 在主键空间中，随机移除某个 key。

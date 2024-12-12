@@ -1,7 +1,6 @@
 ---
 title: 《Kafka 核心源码解读》笔记
 date: 2022-07-03 14:53:05
-order: 13
 categories:
   - 笔记
   - 分布式

@@ -1,7 +1,6 @@
 ---
 title: 《RPC 实战与核心原理》笔记
 date: 2022-06-19 09:48:17
-order: 01
 categories:
   - 笔记
   - 分布式
