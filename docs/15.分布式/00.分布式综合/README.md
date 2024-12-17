@@ -1,24 +1,24 @@
 ---
-title: 分布式理论
+title: 分布式综合
 date: 2022-06-23 17:17:18
 categories:
   - 分布式
   - 分布式综合
 tags:
   - 分布式
-  - 理论
 permalink: /pages/2716904b/
 hidden: true
 index: false
 ---
 
-# 分布式理论
+# 分布式综合
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202405170821320.png)
 
 ## 📖 内容
 
-- [逻辑时钟](逻辑时钟.md) - 关键词：`逻辑时钟`、`向量时钟`、`版本向量时钟`、`全序`、`偏序`
+- [分布式简介](分布式简介.md)
+- [逻辑时钟](逻辑时钟.md) - 关键词：`物理时钟`、`逻辑时钟`、`向量时钟`、`全序`、`偏序`
 - [CAP 和 BASE](CAP&BASE.md) - 关键词：`ACID`、`CAP`、`BASE`、`一致性`
 - [拜占庭将军问题](拜占庭将军问题.md) - 关键词：`共识`
 - [分布式算法 Paxos](Paxos.md) - 关键词：`共识`、`Paxos`

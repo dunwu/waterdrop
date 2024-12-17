@@ -1,5 +1,6 @@
 ---
 title: 《极客时间教程 - Elasticsearch 核心技术与实战》笔记二
+date: 2024-11-12 07:58:46
 categories:
   - 笔记
   - 数据库
@@ -7,6 +8,7 @@ tags:
   - 数据库
   - 搜索引擎数据库
   - Elasticsearch
+permalink: /pages/87ebfd72/
 ---
 
 # 《极客时间教程 - Elasticsearch 核心技术与实战》笔记二
