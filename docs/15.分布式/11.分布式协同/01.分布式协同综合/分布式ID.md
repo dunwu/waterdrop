@@ -4,15 +4,16 @@ date: 2019-07-24 11:55:00
 order: 04
 categories:
   - 分布式
-  - 分布式调度
+  - 分布式协同
+  - 分布式协同综合
 tags:
   - 分布式
-  - 调度
+  - 协同
   - 分布式 ID
   - UUID
   - Snowflake
   - Leaf
-permalink: /pages/26843a0b/
+permalink: /pages/058bdd15/
 ---
 
 # 分布式 ID
@@ -39,7 +40,7 @@ ID 是 Identity 的缩写，用于唯一的标识一条数据。**分布式 ID**
 
 ## UUID
 
-UUID 是通用唯一识别码（Universally Unique Identifier）的缩写，是一种 128 位的标识符，用 16 进制表示，需要 32 个字符。**UUID 会根据运行应用的计算机网卡 MAC 地址、时间戳、命令空间等元素，通过一定的随机算法产生**。
+UUID 是通用唯一识别码（Universally Unique Identifier）的缩写，是一种 128 位的标识符，由32个16进制字符表示。**UUID 会根据运行应用的计算机网卡 MAC 地址、时间戳、命名空间等元素，通过一定的随机算法产生**。
 
 UUID 不保证全局唯一性，我们需要小心 ID 冲突（尽管这种可能性很小）。
 
