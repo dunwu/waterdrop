@@ -18,12 +18,8 @@ index: false
 
 ### RPC
 
-#### RPC 综合
-
-- [RPC 基础](01.RPC/00.RPC综合/01.RPC基础.md)
-- [RPC 进阶](01.RPC/00.RPC综合/02.RPC进阶.md)
-- [RPC 高级](01.RPC/00.RPC综合/03.RPC高级.md)
-- [服务注册和发现](01.RPC/00.RPC综合/11.服务注册和发现.md)
+- [Dubbo 面试](01.RPC/Dubbo面试.md)
+- [RPC 面试](01.RPC/RPC面试.md)
 
 ### MQ
 

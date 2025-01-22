@@ -7,8 +7,9 @@ categories:
   - RPC
 tags:
   - 分布式
-  - 分布式通信
+  - 通信
   - RPC
+  - 微服务
 permalink: /pages/2af2f5a6/
 hidden: true
 index: false
@@ -18,11 +19,8 @@ index: false
 
 ## 📖 内容
 
-### RPC 综合
-
-- [RPC 基础](00.RPC综合/01.RPC基础.md)
-- [RPC 进阶](00.RPC综合/02.RPC进阶.md)
-- [RPC 高级](00.RPC综合/03.RPC高级.md)
+- [Dubbo 面试](Dubbo面试.md)
+- [RPC 面试](RPC面试.md)
 
 ## 📚 资料
 
