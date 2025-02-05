@@ -36,7 +36,7 @@ Kafka Producer 发送的数据对象叫做 `ProducerRecord` ，它有 4 个关�
 
 Kafka 生产者发送消息流程：
 
-（1）**序列化** - 发送前，生产者要先把键和值序列化。
+（1）**序列化** - 发送前，生产者要先把键和值序列化成字节数组，这样它们才能够在网络中传输。
 
 （2）**分区** - 数据被传给分区器。如果在 `ProducerRecord` 中已经指定了分区，那么分区器什么也不会做；否则，分区器会根据 `ProducerRecord` 的键来选择一个分区。选定分区后，生产者就知道该把消息发送给哪个主题的哪个分区。
 
@@ -358,6 +358,7 @@ Producer<String, String> producer = new KafkaProducer<>(props);
 Broker 端在缓存中保存了这 seq number，对于接收的每条消息，如果其序号比 Broker 缓存中序号大于 1 则接受它，否则将其丢弃。这样就可以实现了消息重复提交了。但是，只能保证单个 Producer 对于同一个 `<Topic, Partition>` 的 Exactly Once 语义。不能保证同一个 Producer 一个 topic 不同的 partion 幂等。
 
 ![img](http://www.heartthinkdo.com/wp-content/uploads/2018/05/1-1.png)
+
 实现幂等之后：
 
 ![img](http://www.heartthinkdo.com/wp-content/uploads/2018/05/2.png)

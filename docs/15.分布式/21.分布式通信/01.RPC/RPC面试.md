@@ -1,5 +1,6 @@
 ---
 title: RPC 面试
+date: 2025-01-22 08:08:21
 categories:
   - 分布式
   - 分布式通信
@@ -9,6 +10,7 @@ tags:
   - 通信
   - 微服务
   - RPC
+permalink: /pages/9b74993b/
 ---
 
 # RPC 面试

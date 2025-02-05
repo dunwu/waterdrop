@@ -144,6 +144,30 @@ MQ 通信模型大致有以下类型：
 
 :::
 
+### 【基础】获取 MQ 消息有哪些模式？
+
+:::details 要点
+
+消息引擎获取消息有两种模式：
+
+- **push 模式** - MQ 推送数据给消费者
+- **pull 模式** - 消费者主动向 MQ 请求数据
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502031317162.png)
+
+Kafka 消费者（Consumer）以 pull 方式从 Broker 拉取消息。相比于 push 方式，pull 方式灵活度和扩展性更好，因为消费的主动性由消费者自身控制。
+
+push 模式的优缺点：
+
+- 缺点：由 broker 决定消息推送的速率，对于不同消费速率的 consumer 就不太好处理了。push 模式下，当 broker 推送的速率远大于 consumer 消费的速率时，consumer 恐怕就要崩溃了。
+
+push 模式的优缺点：
+
+- 优点：consumer 可以根据自己的消费能力自主的决定消费策略
+- 缺点：如果 broker 没有可供消费的消息，将导致 consumer 不断在循环中轮询，直到新消息到达。为了避免这点，Kafka 有个参数可以让 consumer 阻塞直到新消息到达
+
+:::
+
 ### 【中级】引入 MQ 带来哪些问题？
 
 :::details 要点
@@ -185,6 +209,8 @@ Kafka 的客户端和 Broker 都会保存 Offset。客户端消费消息后，�
 :::details 要点
 
 应对重复消费问题，需要在业务层面，通过 **幂等性设计** 来解决。
+
+**幂等**（idempotent、idempotence）是一个数学与计算机学概念，指的是：**一个幂等操作的特点是其任意多次执行所产生的影响均与一次执行的影响相同。**
 
 MQ 重复消费不可怕，可怕的是没有应对机制，可以借鉴的思路有：
 

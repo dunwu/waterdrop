@@ -17,14 +17,14 @@ permalink: /pages/4952bbd2/
 
 ## 消费者简介
 
-### pull 模式
+### 获取消息模式
 
 消息引擎获取消息有两种模式：
 
-- push 模式：MQ 推送数据给消费者
-- pull 模式：消费者主动向 MQ 请求数据
+- **push 模式** - MQ 推送数据给消费者
+- **pull 模式** - 消费者主动向 MQ 请求数据
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210425190248.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502031317162.png)
 
 Kafka 消费者（Consumer）以 pull 方式从 Broker 拉取消息。相比于 push 方式，pull 方式灵活度和扩展性更好，因为消费的主动性由消费者自身控制。
 

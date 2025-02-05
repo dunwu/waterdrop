@@ -5,7 +5,6 @@ categories:
   - 分布式
   - 分布式通信
   - RPC
-  - Dubbo
 tags:
   - 分布式
   - 通信
