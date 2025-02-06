@@ -577,8 +577,8 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 ##### [Kafka](15.分布式/21.分布式通信/02.MQ/01.Kafka)
 
 - [Kafka 快速入门](15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka快速入门.md)
-- [Kafka 生产者](15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka生产者.md)
-- [Kafka 消费者](15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka消费者.md)
+- [Kafka 生产](15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka生产.md)
+- [Kafka 消费](15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka消费.md)
 - [Kafka 集群](15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka集群.md)
 - [Kafka 可靠传输](15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka可靠传输.md)
 - [Kafka 存储](15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka存储.md)

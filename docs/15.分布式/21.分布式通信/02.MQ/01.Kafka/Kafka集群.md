@@ -1,7 +1,6 @@
----
+``---
 title: Kafka 集群
 date: 2021-04-29 08:17:17
-order: 04
 categories:
   - 分布式
   - 分布式通信
@@ -25,7 +24,7 @@ permalink: /pages/32977605/
 
 在 Broker 停机、出现网络分区或长时间垃圾回收停顿时，Broker 会与 ZooKeeper 断开连接，此时 Broker 在启动时创建的临时节点会自动被 ZooKeeper 移除。监听 Broker 列表的 Kafka 组件会被告知 Broker 已移除。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210423171607.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070741387.png)
 
 Kafka 在 ZooKeeper 的关键存储信息：
 
@@ -48,7 +47,7 @@ Kafka 在 ZooKeeper 的关键存储信息：
 
 控制器（Controller），是 Apache Kafka 的核心组件。它的主要作用是在 ZooKeeper 的帮助下管理和协调整个 Kafka 集群。控制器其实就是一个 Broker，只不过它除了具有一般 Broker 的功能以外，还负责 Leader 的选举。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210429071042.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070741426.png)
 
 ### 如何选举控制器
 
@@ -56,7 +55,7 @@ Kafka 在 ZooKeeper 的关键存储信息：
 
 选举控制器的详细流程：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210502213820.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070742505.png)
 
 1. 第一个在 ZooKeeper 中成功创建 `/controller` 临时节点的 Broker 会被指定为控制器。
 
@@ -122,7 +121,7 @@ Preferred 领导者选举主要是 Kafka 为了避免部分 Broker 负载过重�
 
 Kafka 使用 Topic 来组织数据，每个 Topic 被分为若干个 Partition，每个 Partition 有多个副本。每个 Broker 可以保存成百上千个属于不同 Topic 和 Partition 的副本。**Kafka 副本的本质是一个只能追加写入的提交日志**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210407180101.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070743894.png)
 
 Kafka 副本有两种角色：
 
@@ -130,7 +129,7 @@ Kafka 副本有两种角色：
 - **Follower 副本（从）**：Leader 副本以外的副本都是 Follower 副本。**Follower 唯一的任务就是从 Leader 那里复制消息，保持与 Leader 一致的状态**。
 - 如果 Leader 宕机，其中一个 Follower 会被选举为新的 Leader。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210407191337.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070743006.png)
 
 为了与 Leader 保持同步，Follower 向 Leader 发起获取数据的请求，这种请求与消费者为了读取消息而发送的请求是一样的。请求消息里包含了 Follower 想要获取消息的偏移量，而这些偏移量总是有序的。
 
@@ -147,8 +146,6 @@ ISR 即 In-sync Replicas，表示同步副本。Follower 副本不提供服务�
 Kafka Broker 端参数 `replica.lag.time.max.ms` 参数，指定了 Follower 副本能够落后 Leader 副本的最长时间间隔，默认为 10s。这意味着：只要一个 Follower 副本落后 Leader 副本的时间不连续超过 10 秒，那么 Kafka 就认为该 Follower 副本与 Leader 是**同步**的，即使此时 Follower 副本中保存的消息明显少于 Leader 副本中的消息。
 
 ISR 是一个动态调整的集合，会不断将同步副本加入集合，将不同步副本移除集合。Leader 副本天然就在 ISR 中。
-
-## 选举 Leader
 
 ### Unclean 领导者选举
 
@@ -243,7 +240,7 @@ Follower 宕机，啥事儿没有；Leader 宕机了，会从 Follower 中重新
   - [Kafka Github](https://github.com/apache/kafka)
   - [Kafka 官方文档](https://kafka.apache.org/documentation/)
 - **书籍**
-  - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
 - **教程**
   - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
   - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/100029201)

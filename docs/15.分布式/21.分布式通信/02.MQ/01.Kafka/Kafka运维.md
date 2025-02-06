@@ -1,7 +1,6 @@
 ---
 title: Kafka 运维
 date: 2020-06-03 09:55:35
-order: 08
 categories:
   - 分布式
   - 分布式通信
@@ -410,7 +409,7 @@ Kafka 机器数 = 单位时间需要处理的总数据量 / 单机所占用带�
   - [Kafka Github](https://github.com/apache/kafka)
   - [Kafka 官方文档](https://kafka.apache.org/documentation/)
 - **书籍**
-  - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
 - **教程**
   - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
   - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/100029201)

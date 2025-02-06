@@ -1,7 +1,6 @@
 ---
-title: Kafka 生产者
+title: Kafka 生产
 date: 2021-04-14 15:05:34
-order: 02
 categories:
   - 分布式
   - 分布式通信
@@ -13,7 +12,7 @@ tags:
 permalink: /pages/f49f3bd2/
 ---
 
-# Kafka 生产者
+# Kafka 生产
 
 ## 生产者简介
 
@@ -803,8 +802,8 @@ public void onlyConsumeInTransaction() {
   - [Kafka Confluent 官网](http://kafka.apache.org/)
   - [Kafka Jira](https://issues.apache.org/jira/projects/KAFKA?selectedItem=com.atlassian.jira.jira-projects-plugin:components-page)
 - **书籍**
-  - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
-  - [《深入理解 Kafka：核心设计与实践原理》](https://item.jd.com/12489649.html)
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
+  - [《深入理解 Kafka：核心设计与实践原理》](https://book.douban.com/subject/30437872/)
   - [《Kafka 技术内幕》](https://item.jd.com/12234113.html)
 - **教程**
   - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)

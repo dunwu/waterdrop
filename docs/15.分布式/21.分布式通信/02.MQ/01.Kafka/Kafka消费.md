@@ -1,7 +1,6 @@
 ---
-title: Kafka 消费者
+title: Kafka 消费
 date: 2021-04-14 15:05:34
-order: 03
 categories:
   - 分布式
   - 分布式通信
@@ -13,7 +12,7 @@ tags:
 permalink: /pages/4952bbd2/
 ---
 
-# Kafka 消费者
+# Kafka 消费
 
 ## 消费者简介
 
@@ -57,20 +56,20 @@ Kafka 消费者从属于消费者群组，**一个群组里的 Consumer 订阅�
 
 同一时刻，**一条消息只能被同一消费者组中的一个消费者实例消费**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210408194235.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070722981.png)
 
 **不同消费者群组之间互不影响**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210408194839.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070723165.png)
 
 ### 消费流程
 
-Kafka 消费者通过 `poll` 来获取消息，但是获取消息时并不是立刻返回结果，需要考虑两个因素：
+Kafka 消费者通过 `poll` 模式来获取消息，但是获取消息时并不是立刻返回结果，需要考虑两个因素：
 
 - 消费者通过 `customer.poll(time)` 中设置等待时间
 - Broker 会等待累计一定量数据，然后发送给消费者。这样可以减少网络开销。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210425194822.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070724283.png)
 
 poll 除了获取消息外，还有其他作用：
 
@@ -329,7 +328,7 @@ try {
 
 **Rebalance 本质上是一种协议，规定了一个 Consumer Group 下的所有 Consumer 如何达成一致，来分配订阅 Topic 的每个分区**。比如某个 Group 下有 20 个 Consumer 实例，它订阅了一个具有 100 个分区的 Topic。正常情况下，Kafka 平均会为每个 Consumer 分配 5 个分区。这个分配的过程就叫 Rebalance。
 
-当在群组里面 新增/移除消费者 或者 新增/移除 kafka 集群 broker 节点 时，群组协调器 Broker 会触发再均衡，重新为每一个 Partition 分配消费者。**Rebalance 期间，消费者无法读取消息，造成整个消费者群组一小段时间的不可用。**
+当在群组里面新增/移除消费者或者新增/移除 kafka 集群 broker 节点时，群组协调器 Broker 会触发再均衡，重新为每一个 Partition 分配消费者。**Rebalance 期间，消费者无法读取消息，造成整个消费者群组一小段时间的不可用。**
 
 ### 何时生分区再均衡
 
@@ -355,7 +354,7 @@ try {
 
 （2）消费者通过向被指派为群组协调器（Coordinator）的 Broker 定期发送心跳来维持它们和群组的从属关系以及它们对分区的所有权。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210415160730.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070723810.png)
 
 （3）群主从群组协调器获取群组成员列表，然后给每一个消费者进行分配分区 Partition。有两种分配策略：Range 和 RoundRobin。
 
@@ -384,7 +383,7 @@ try {
 
 ### 分区再均衡的问题
 
-- 首先，Rebalance 过程对 Consumer Group 消费过程有极大的影响。在 Rebalance 过程中，所有 Consumer 实例都会停止消费，等待 Rebalance 完成。
+- 首先，Rebalance 过程对 Consumer Group 消费过程有极大的影响。**在 Rebalance 过程中，所有 Consumer 实例都会停止消费，等待 Rebalance 完成**。
 - 其次，目前 Rebalance 的设计是所有 Consumer 实例共同参与，全部重新分配所有分区。其实更高效的做法是尽量减少分配方案的变动。
 - 最后，Rebalance 实在是太慢了。
 
@@ -407,7 +406,7 @@ try {
 
 #### 未及时发送心跳
 
-**第一类非必要 Rebalance 是因为未能及时发送心跳，导致 Consumer 被“踢出”Group 而引发的**。因此，你需要仔细地设置**session.timeout.ms 和 heartbeat.interval.ms**的值。我在这里给出一些推荐数值，你可以“无脑”地应用在你的生产环境中。
+**第一类非必要 Rebalance 是因为未能及时发送心跳**，导致 Consumer 被“踢出”Group 而引发的。因此，**需要合理设置会话超时时间**。这里给出一些推荐数值，你可以“无脑”地应用在你的生产环境中。
 
 - 设置 `session.timeout.ms` = 6s。
 - 设置 `heartbeat.interval.ms` = 2s。
@@ -417,7 +416,7 @@ try {
 
 #### Consumer 消费时间过长
 
-**第二类非必要 Rebalance 是 Consumer 消费时间过长导致的**。我之前有一个客户，在他们的场景中，Consumer 消费数据时需要将消息处理之后写入到 MongoDB。显然，这是一个很重的消费逻辑。MongoDB 的一丁点不稳定都会导致 Consumer 程序消费时长的增加。此时，**`max.poll.interval.ms`** 参数值的设置显得尤为关键。如果要避免非预期的 Rebalance，你最好将该参数值设置得大一点，比你的下游最大处理时间稍长一点。就拿 MongoDB 这个例子来说，如果写 MongoDB 的最长时间是 7 分钟，那么你可以将该参数设置为 8 分钟左右。
+**第二类非必要 Rebalance 是 Consumer 消费时间过长导致的**。此时，**`max.poll.interval.ms`** 参数值的设置显得尤为关键。如果要避免非预期的 Rebalance，你最好将该参数值设置得大一点，比你的下游最大处理时间稍长一点。
 
 #### GC 参数
 
@@ -599,7 +598,7 @@ if (partitionInfos != null) {
   - [Kafka Github](https://github.com/apache/kafka)
   - [Kafka 官方文档](https://kafka.apache.org/documentation/)
 - **书籍**
-  - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
 - **教程**
   - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
   - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/100029201)

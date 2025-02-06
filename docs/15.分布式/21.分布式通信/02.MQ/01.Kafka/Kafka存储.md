@@ -1,7 +1,6 @@
 ---
 title: Kafka 存储
 date: 2021-04-29 08:17:17
-order: 06
 categories:
   - 分布式
   - 分布式通信
@@ -21,7 +20,7 @@ permalink: /pages/4d7aaaa2/
 
 ## 逻辑存储
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210427195053.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070720162.png)
 
 ## 持久化
 
@@ -56,7 +55,7 @@ Partiton 命名规则为 Topic 名称 + 有序序号，第一个 Partiton 序号
 
 ### Log Segment
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210615200304.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070721654.png)
 
 因为在一个大文件中查找和删除消息是非常耗时且容易出错的。所以，Kafka 将每个 Partition 切割成若干个片段，即日志段（Log Segment）。**默认每个 Segment 大小不超过 1G，且只包含 7 天的数据**。如果 Segment 的消息量达到 1G，那么该 Segment 会关闭，同时打开一个新的 Segment 进行写入。
 
@@ -96,7 +95,7 @@ Kafka 允许消费者从任意有效的偏移量位置开始读取消息。Kafka
 
 有了偏移量索引文件，通过它，Kafka 就能够根据指定的偏移量快速定位到消息的实际物理位置。具体的做法是，根据指定的偏移量，使用二分法查询定位出该偏移量对应的消息所在的分段索引文件和日志数据文件。然后通过二分查找法，继续查找出小于等于指定偏移量的最大偏移量，同时也得出了对应的 position（实际物理位置），根据该物理位置在分段的日志数据文件中顺序扫描查找偏移量与指定偏移量相等的消息。下面是 Kafka 中分段的日志数据文件和偏移量索引文件的对应映射关系图（其中也说明了如何按照起始偏移量来定位到日志数据文件中的具体消息）。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210615222550.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070722556.png)
 
 ## 清理
 
@@ -130,7 +129,7 @@ Kafka 允许消费者从任意有效的偏移量位置开始读取消息。Kafka
   - [Kafka Github](https://github.com/apache/kafka)
   - [Kafka 官方文档](https://kafka.apache.org/documentation/)
 - **书籍**
-  - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
 - **教程**
   - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
   - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/100029201)

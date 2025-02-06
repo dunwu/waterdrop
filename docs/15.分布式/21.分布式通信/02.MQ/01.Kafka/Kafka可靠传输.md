@@ -1,7 +1,6 @@
 ---
 title: Kafka 可靠传输
 date: 2021-04-14 15:05:34
-order: 05
 categories:
   - 分布式
   - 分布式通信
@@ -21,7 +20,7 @@ permalink: /pages/4c187841/
 
 一条消息从生产到消费，可以划分三个阶段：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210422042613.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070727544.png)
 
 - **生产阶段**：Producer 创建消息，并通过网络发送给 Broker。
 - **存储阶段**：Broker 收到消息并存储，如果是集群，还要同步副本给其他 Broker。
@@ -77,7 +76,7 @@ Broker 有 3 个配置参数会影响 Kafka 消息存储的可靠性。
 
 在生产消息阶段，消息队列一般通过请求确认机制，来保证消息的可靠传递，Kafka 也不例外。
 
-[Kafka 生产者](Kafka生产者) 中提到了，Kafka 有三种发送方式：同步、异步、异步回调。
+[Kafka 生产](Kafka生产) 中提到了，Kafka 有三种发送方式：同步、异步、异步回调。
 
 同步方式能保证消息不丢失，但性能太差；异步方式发送消息，通常会立即返回，但消息可能丢失。
 
@@ -258,7 +257,7 @@ Kafka 每一个 Partition 只能隶属于消费者群组中的一个 Consumer，
   - [Kafka Github](https://github.com/apache/kafka)
   - [Kafka 官方文档](https://kafka.apache.org/documentation/)
 - **书籍**
-  - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
 - **教程**
   - [消息队列高手课](https://time.geekbang.org/column/intro/100032301)
   - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)

@@ -72,8 +72,8 @@ index: false
 ##### [Kafka](21.分布式通信/02.MQ/01.Kafka)
 
 - [Kafka 快速入门](21.分布式通信/02.MQ/01.Kafka/Kafka快速入门.md)
-- [Kafka 生产者](21.分布式通信/02.MQ/01.Kafka/Kafka生产者.md)
-- [Kafka 消费者](21.分布式通信/02.MQ/01.Kafka/Kafka消费者.md)
+- [Kafka 生产](21.分布式通信/02.MQ/01.Kafka/Kafka生产.md)
+- [Kafka 消费](21.分布式通信/02.MQ/01.Kafka/Kafka消费.md)
 - [Kafka 集群](21.分布式通信/02.MQ/01.Kafka/Kafka集群.md)
 - [Kafka 可靠传输](21.分布式通信/02.MQ/01.Kafka/Kafka可靠传输.md)
 - [Kafka 存储](21.分布式通信/02.MQ/01.Kafka/Kafka存储.md)
@@ -158,28 +158,49 @@ index: false
 
 #### RPC 资料
 
-- [**RPC 实战与核心原理**](https://time.geekbang.org/column/intro/100046201) - 极客时间教程
+- **教程**
+  - [**极客时间教程 - RPC 实战与核心原理**](https://time.geekbang.org/column/intro/100046201)
+- **官方**
+  - [Dubbo Github](https://github.com/apache/dubbo)
+  - [Dubbo 官方文档](https://dubbo.apache.org/zh-cn/)
+- **文章**
+  - [如何基于 Dubbo 进行服务治理、服务降级、失败重试以及超时重试？](https://github.com/doocs/advanced-java/blob/master/docs/distributed-system/dubbo-service-management.md)
 
 #### MQ 资料
 
-- **教程**
-  - [**消息队列高手课**](https://time.geekbang.org/column/intro/100032301)
-  - [**Kafka 中文文档**](https://github.com/apachecn/kafka-doc-zh)
-  - [**Kafka 核心技术与实战**](https://time.geekbang.org/column/intro/100029201) - 极客时间教程
-  - [**Kafka 核心源码解读**](https://time.geekbang.org/column/intro/304) - 极客时间教程
-- **文章**
-  - [**The Log: What every software engineer should know about real-time data’s unifying abstraction**](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)，[**译文**](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)
-  - [**Introduction and Overview of Apache Kafka**](https://www.slideshare.net/mumrah/kafka-talk-tri-hug) - Kafka 简介 PPT
 - **官方**
   - [Kafka 官网](http://kafka.apache.org/)
   - [Kafka Github](https://github.com/apache/kafka)
   - [Kafka 官方文档](https://kafka.apache.org/documentation/)
   - [Kafka Confluent 官网](http://kafka.apache.org/)
   - [Kafka Jira](https://issues.apache.org/jira/projects/KAFKA?selectedItem=com.atlassian.jira.jira-projects-plugin:components-page)
+  - [RocketMQ Github](https://github.com/apache/rocketmq)
+  - [RocketMQ 官方文档](http://rocketmq.apache.org/docs/quick-start/)
+  - [ActiveMQ 官网](http://activemq.apache.org/)
 - **书籍**
-  - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
-  - [《深入理解 Kafka：核心设计与实践原理》](https://item.jd.com/12489649.html)
-  - [《Kafka 技术内幕》](https://item.jd.com/12234113.html)
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
+  - [《深入理解 Kafka：核心设计与实践原理》](https://book.douban.com/subject/30437872/)
+  - [《RocketMQ 技术内幕》](https://book.douban.com/subject/30417623/)
+- **教程**
+  - [**极客时间教程 - 消息队列高手课**](https://time.geekbang.org/column/intro/100032301)
+  - [**Kafka 中文文档**](https://github.com/apachecn/kafka-doc-zh)
+  - [**极客时间教程 - Kafka 核心技术与实战**](https://time.geekbang.org/column/intro/100029201)
+  - [**极客时间教程 - Kafka 核心源码解读**](https://time.geekbang.org/column/intro/304)
+- **视频**
+  - [Apache Kafka Fundamentals You Should Know](https://www.youtube.com/watch?v=-RDyEFvnTXI)
+  - [Top Kafka Use Cases You Should Know](https://www.youtube.com/watch?v=Ajz6dBp_EB4)
+  - [System Design: Why is Kafka fast?](https://www.youtube.com/watch?v=UNUz1-msbOM)
+  - [System Design: Why is Kafka so Popular?](https://www.youtube.com/watch?v=yIAcHMJzqJc)
+- **文章**
+  - [**The Log: What every software engineer should know about real-time data’s unifying abstraction**](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)，[**译文**](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)
+  - [**Introduction and Overview of Apache Kafka**](https://www.slideshare.net/mumrah/kafka-talk-tri-hug) - Kafka 简介 PPT
+  - [Why is Kafka so fast? How does it work?](https://blog.bytebytego.com/p/why-is-kafka-so-fast-how-does-it)
+  - [大型网站架构系列：分布式 MQ（一）](https://www.cnblogs.com/itfly8/p/5155983.html)
+  - [大型网站架构系列：MQ（二）](https://www.cnblogs.com/itfly8/p/5156155.html)
+  - [阿里 RocketMQ 优势对比](https://juejin.im/entry/5a0abfb5f265da43062a4a91)
+  - [advanced-java 之 MQ](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/mq-interview.md)
+  - [浅谈消息队列及常见的消息中间件](https://juejin.im/post/6844903635046924296)
+  - [聊聊 Kafka： Kafka 为啥这么快？](https://xie.infoq.cn/article/49bc80d683c373db93d017a99)
 
 ### 分布式存储资料
 

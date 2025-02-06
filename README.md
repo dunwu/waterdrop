@@ -539,8 +539,8 @@
 ##### [Kafka](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka)
 
 - [Kafka 快速入门](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka快速入门.md)
-- [Kafka 生产者](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka生产者.md)
-- [Kafka 消费者](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka消费者.md)
+- [Kafka 生产](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka生产.md)
+- [Kafka 消费](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka消费.md)
 - [Kafka 集群](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka集群.md)
 - [Kafka 可靠传输](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka可靠传输.md)
 - [Kafka 存储](docs/15.分布式/21.分布式通信/02.MQ/01.Kafka/Kafka存储.md)

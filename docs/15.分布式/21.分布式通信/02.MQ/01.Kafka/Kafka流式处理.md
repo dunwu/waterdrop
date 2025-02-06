@@ -1,7 +1,6 @@
 ---
 title: Kafka 流式处理
 date: 2020-07-24 06:52:07
-order: 07
 categories:
   - 分布式
   - 分布式通信
@@ -146,7 +145,7 @@ Kafka 的消息传递层对数据进行分区以进行存储和传输。 Kafka S
   - [Kafka Github](https://github.com/apache/kafka)
   - [Kafka 官方文档](https://kafka.apache.org/documentation/)
 - **书籍**
-  - [《Kafka 权威指南》](https://item.jd.com/12270295.html)
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
 - **教程**
   - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
   - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/100029201)

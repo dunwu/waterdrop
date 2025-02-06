@@ -31,8 +31,8 @@ index: false
 ### [Kafka](01.Kafka)
 
 - [Kafka 快速入门](01.Kafka/Kafka快速入门.md)
-- [Kafka 生产者](01.Kafka/Kafka生产者.md)
-- [Kafka 消费者](01.Kafka/Kafka消费者.md)
+- [Kafka 生产](01.Kafka/Kafka生产.md)
+- [Kafka 消费](01.Kafka/Kafka消费.md)
 - [Kafka 集群](01.Kafka/Kafka集群.md)
 - [Kafka 可靠传输](01.Kafka/Kafka可靠传输.md)
 - [Kafka 存储](01.Kafka/Kafka存储.md)
@@ -66,17 +66,6 @@ index: false
 - 后来大家开始用 RabbitMQ，但是确实 erlang 语言阻止了大量的 Java 工程师去深入研究和掌控它，对公司而言，几乎处于不可控的状态，但是确实人家是开源的，比较稳定的支持，活跃度也高；
 - 不过现在确实越来越多的公司会去用 RocketMQ，确实很不错，毕竟是阿里出品，但社区可能有突然黄掉的风险（目前 RocketMQ 已捐给 [Apache](https://github.com/apache/rocketmq)，但 GitHub 上的活跃度其实不算高）对自己公司技术实力有绝对自信的，推荐用 RocketMQ，否则回去老老实实用 RabbitMQ 吧，人家有活跃的开源社区，绝对不会黄。
 - 所以**中小型公司**，技术实力较为一般，技术挑战不是特别高，用 RabbitMQ 是不错的选择；**大型公司**，基础架构研发实力较强，用 RocketMQ 是很好的选择。
-- 如果是**大数据领域**的实时计算、日志采集等场景，用 Kafka 是业内标准的，绝对没问题，社区活跃度很高，绝对不会黄，何况几乎是全世界这个领域的事实性规范。
-
-## 📚 资料
-
-- **Kafka**
-  - [Kafka Github](https://github.com/apache/kafka)
-  - [Kafka 官网](http://kafka.apache.org/)
-  - [Kafka 官方文档](https://kafka.apache.org/documentation/)
-  - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
-- **ActiveMQ**
-  - [ActiveMQ 官网](http://activemq.apache.org/)
 
 ## 🚪 传送
 

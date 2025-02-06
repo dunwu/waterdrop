@@ -65,8 +65,8 @@ index: false
 > **[Kafka](https://dunwu.github.io/waterdrop/pages/260fb327/) 是一个分布式流处理平台，此外，它也被广泛应用于消息队列**。
 
 - [Kafka 快速入门](https://dunwu.github.io/waterdrop/pages/838a5f6a/)
-- [Kafka 生产者](https://dunwu.github.io/waterdrop/pages/f49f3bd2/)
-- [Kafka 消费者](https://dunwu.github.io/waterdrop/pages/4952bbd2/)
+- [Kafka 生产](https://dunwu.github.io/waterdrop/pages/f49f3bd2/)
+- [Kafka 消费](https://dunwu.github.io/waterdrop/pages/4952bbd2/)
 - [Kafka 集群](https://dunwu.github.io/waterdrop/pages/32977605/)
 - [Kafka 可靠传输](https://dunwu.github.io/waterdrop/pages/4c187841/)
 - [Kafka 存储](https://dunwu.github.io/waterdrop/pages/4d7aaaa2/)
