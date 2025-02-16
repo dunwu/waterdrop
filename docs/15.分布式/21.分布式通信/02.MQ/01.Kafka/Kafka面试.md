@@ -1,7 +1,7 @@
 ---
 title: Kafka 面试
-date: 2025-02-03 11:15:43
 cover: https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/distributed/mq/kafka/kafka-event-system.png
+date: 2025-02-03 11:15:43
 categories:
   - 分布式
   - 分布式通信
@@ -24,7 +24,7 @@ permalink: /pages/404a13d7/
 
 :::details 要点
 
-Apache Kafka 是一款开源的消息引擎系统，也是一个分布式流计算平台，此外，还可以作为数据存储\*\*。
+**Apache Kafka 是一款开源的消息引擎系统，也是一个分布式流计算平台，此外，还可以作为数据存储**。
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070719480.gif)
 
@@ -50,6 +50,34 @@ Kafka 的设计目标：
   - **选举 Leader**：Kafka 基于 ZooKeeper 支持选举 Leader，实现了故障转移能力。
 - **伸缩性**
   - **分区**：Kafka 的分区机制使得其具有良好的伸缩性。
+
+:::
+
+### 【基础】Kafka 有哪些核心术语？
+
+:::details 要点
+
+Kafka 的核心术语如下：
+
+- **消息** - Record。Kafka 是消息引擎嘛，这里的消息就是指 Kafka 处理的主要对象。
+- **主题** - Topic。主题是承载消息的逻辑容器，在实际使用中多用来区分具体的业务。
+- **分区** - Partition。一个有序不变的消息序列。每个主题下可以有多个分区。
+- **消息位移** - Offset。表示分区中每条消息的位置信息，是一个单调递增且不变的值。
+- **副本** - Replica。Kafka 中同一条消息能够被拷贝到多个地方以提供数据冗余，这些地方就是所谓的副本。副本还分为领导者副本和追随者副本，各自有不同的角色划分。副本是在分区层级下的，即每个分区可配置多个副本实现高可用。
+- **生产者** - Producer。向主题发布新消息的应用程序。
+- **消费者** - Consumer。从主题订阅新消息的应用程序。
+- **消费者位移** - Consumer Offset。表征消费者消费进度，每个消费者都有自己的消费者位移。
+- **消费者组** - Consumer Group。多个消费者实例共同组成的一个组，同时消费多个分区以实现高吞吐。
+- **分区再均衡** - Rebalance。消费者组内某个消费者实例挂掉后，其他消费者实例自动重新分配订阅主题分区的过程。Rebalance 是 Kafka 消费者端实现高可用的重要手段。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070720162.png)
+
+Kafka 的三层消息架构：
+
+- 第一层是主题层，每个主题可以配置 M 个分区，而每个分区又可以配置 N 个副本。
+- 第二层是分区层，每个分区的 N 个副本中只能有一个充当领导者角色，对外提供服务；其他 N-1 个副本是追随者副本，只是提供数据冗余之用。
+- 第三层是消息层，分区中包含若干条消息，每条消息的位移从 0 开始，依次递增。
+- 最后，客户端程序只能与分区的领导者副本进行交互。
 
 :::
 

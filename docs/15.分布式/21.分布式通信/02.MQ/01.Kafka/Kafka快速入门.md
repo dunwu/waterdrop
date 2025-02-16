@@ -79,23 +79,24 @@ Kafka 主要有以下发行版本：
 
 Kafka 有以下重大版本：
 
+- 0.7 - 只提供了最基础的消息队列功能
 - 0.8
   - 正式引入了副本机制
   - 至少升级到 0.8.2.2
 - 0.9
   - 增加了基础的安全认证 / 权限功能
+  - 用 Java 重写了新版本消费者 API
+  - 引入了 Kafka Connect 组件
   - 新版本 Producer API 在这个版本中算比较稳定
 - 0.10
-  - 引入了 Kafka Streams
+  - 引入了 Kafka Streams，正式升级成分布式流处理平台
   - 至少升级到 0.10.2.2
   - 修复了一个可能导致 Producer 性能降低的 Bug
-  - 使用新版本 Consumer API
 - 0.11
   - 提供幂等性 Producer API 以及事务
   - 对 Kafka 消息格式做了重构
   - 至少升级到 0.11.0.3
-- 1.0 和 2.0
-  - Kafka Streams 的改进
+- 1.0 和 2.0 - Kafka Streams 的改进
 
 ## Kafka 服务端使用入门
 
