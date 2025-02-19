@@ -121,6 +121,15 @@ export default navbar([
     ]
   },
   {
+    text: '大数据',
+    icon: 'devicon-plain:hadoop',
+    prefix: '/16.大数据/',
+    children: [
+      { text: 'Hadoop', icon: 'devicon:hadoop', link: 'hadoop/' },
+      { text: 'Hive', icon: 'simple-icons:apachehive', link: 'hive/' }
+    ]
+  },
+  {
     text: '工作',
     icon: 'mdi:briefcase',
     link: '/96.工作/'

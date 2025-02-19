@@ -18,21 +18,21 @@ index: false
 
 ## 📖 内容
 
-### [Flink 入门](01.Flink入门.md)
+### [Flink 入门](Flink入门.md)
 
-### [Flink 简介](02.Flink简介.md)
+### [Flink 简介](Flink简介.md)
 
-### [Flink ETL](03.FlinkETL.md)
+### [Flink ETL](FlinkETL.md)
 
-### [Flink 事件驱动](04.Flink事件驱动.md)
+### [Flink 事件驱动](Flink事件驱动.md)
 
-### [Flink API](05.FlinkApi.md)
+### [Flink API](FlinkApi.md)
 
-### [Flink 架构](06.Flink架构.md)
+### [Flink 架构](Flink架构.md)
 
-### [Flink 运维](07.Flink运维.md)
+### [Flink 运维](Flink运维.md)
 
-### [Flink Table API & SQL](08.FlinkTableApi.md)
+### [Flink Table API & SQL](FlinkTableApi.md)
 
 ## 📚 资料
 

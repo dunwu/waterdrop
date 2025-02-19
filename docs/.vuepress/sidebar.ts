@@ -124,6 +124,15 @@ export default sidebar({
       collapsible: true
     },
     {
+      text: '大数据',
+      icon: 'devicon-plain:hadoop',
+      prefix: '16.大数据/',
+      children: [
+        { text: 'Hadoop', icon: 'devicon:hadoop', prefix: 'hadoop', collapsible: true, children: 'structure' },
+        { text: 'Hive', icon: 'simple-icons:apachehive', prefix: 'hive', collapsible: true, children: 'structure' }
+      ]
+    },
+    {
       text: '工作',
       icon: 'mdi:briefcase',
       prefix: '96.工作/',
