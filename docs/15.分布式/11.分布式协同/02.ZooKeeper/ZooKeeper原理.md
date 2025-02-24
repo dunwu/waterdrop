@@ -1,14 +1,14 @@
 ---
 title: ZooKeeper原理
 date: 2020-06-02 22:28:54
-order: 01
 categories:
   - 分布式
   - 分布式协同
   - ZooKeeper
 tags:
   - 分布式
-  - 分布式协同
+  - 协同
+  - zookeeper
 permalink: /pages/885cc3a1/
 ---
 
@@ -32,6 +32,16 @@ ZooKeeper 主要用来解决分布式集群中应用系统的一致性问题，�
 
 很多大名鼎鼎的框架都基于 ZooKeeper 来实现分布式高可用，如：Dubbo、Kafka 等。
 
+### ZooKeeper 的特性
+
+ZooKeeper 具有以下特性：
+
+- **顺序一致性**：所有客户端看到的服务端数据模型都是一致的；从一个客户端发起的事务请求，最终都会严格按照其发起顺序被应用到 ZooKeeper 中。具体的实现可见：[原子广播](#原子广播)
+- **原子性** - 所有事务请求的处理结果在整个集群中所有机器上的应用情况是一致的，即整个集群要么都成功应用了某个事务，要么都没有应用。 实现方式可见：[事务](#事务)
+- **单一视图** - 无论客户端连接的是哪个 Zookeeper 服务器，其看到的服务端数据模型都是一致的。
+- **高性能** - ZooKeeper 将**数据全量存储在内存中**，所以其性能很高。需要注意的是：由于 **ZooKeeper 的所有更新和删除都是基于事务的**，因此 ZooKeeper 在读多写少的应用场景中有性能表现较好，**如果写操作频繁，性能会大大下滑**。
+- **高可用** - ZooKeeper 的高可用是基于副本机制实现的，此外 ZooKeeper 支持故障恢复，可见：[选举 Leader](#选举-Leader)
+
 ### ZooKeeper 的应用场景
 
 - 配置管理
@@ -44,16 +54,6 @@ ZooKeeper 主要用来解决分布式集群中应用系统的一致性问题，�
 - 分布式同步：如锁、栅栏、队列
 - 分布式系统的选主
 - 中心化和高可靠的数据注册
-
-### ZooKeeper 的特性
-
-ZooKeeper 具有以下特性：
-
-- **顺序一致性**：所有客户端看到的服务端数据模型都是一致的；从一个客户端发起的事务请求，最终都会严格按照其发起顺序被应用到 ZooKeeper 中。具体的实现可见：[原子广播](#原子广播)
-- **原子性** - 所有事务请求的处理结果在整个集群中所有机器上的应用情况是一致的，即整个集群要么都成功应用了某个事务，要么都没有应用。 实现方式可见：[事务](#事务)
-- **单一视图** - 无论客户端连接的是哪个 Zookeeper 服务器，其看到的服务端数据模型都是一致的。
-- **高性能** - ZooKeeper 将**数据全量存储在内存中**，所以其性能很高。需要注意的是：由于 **ZooKeeper 的所有更新和删除都是基于事务的**，因此 ZooKeeper 在读多写少的应用场景中有性能表现较好，**如果写操作频繁，性能会大大下滑**。
-- **高可用** - ZooKeeper 的高可用是基于副本机制实现的，此外 ZooKeeper 支持故障恢复，可见：[选举 Leader](#选举-Leader)
 
 ### ZooKeeper 的设计目标
 
@@ -415,8 +415,6 @@ ZooKeeper 可以处理两种类型的队列：
 
 ## ZooKeeper 的缺点
 
-ZooKeeper 的监听是一次性的。
-
 ### ZooKeeper 不是为高可用性设计的
 
 生产环境中常常需要通过多机房部署来容灾。出于成本考虑，一般多机房都是同时提供服务的，即一个机房撑不住所有流量。**ZooKeeper 集群只能有一个 Leader**，一旦机房之间连接出现故障，那么只有 Leader 所在的机房可以正常工作，其他机房只能停摆。于是所有流量集中到 Leader 所在的机房，由于处理不过来而导致崩溃。
@@ -460,7 +458,7 @@ ZooKeeper 的权限控制非常弱。在大型的复杂系统里面，使用 Zoo
   - [ZooKeeper 官方文档](https://cwiki.apache.org/confluence/display/ZOOKEEPER)
   - [ZooKeeper Github](https://github.com/apache/zookeeper)
 - **书籍**
-  - [《Hadoop 权威指南（第四版）》](https://item.jd.com/12109713.html)
+  - [《Hadoop 权威指南（第四版）》](https://book.douban.com/subject/27115351/)
   - [《从 Paxos 到 Zookeeper 分布式一致性原理与实践》](https://item.jd.com/11622772.html)
 - **文章**
   - [分布式服务框架 ZooKeeper -- 管理分布式环境中的数据](https://www.ibm.com/developerworks/cn/opensource/os-cn-zookeeper/index.html)

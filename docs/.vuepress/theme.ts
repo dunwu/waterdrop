@@ -10,7 +10,7 @@ export default hopeTheme({
     url: 'https://dunwu.github.io/waterdrop'
   },
 
-  iconAssets: 'iconify',
+  iconAssets: ['iconify'],
 
   logo: '/logo.svg',
 

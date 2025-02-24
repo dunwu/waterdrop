@@ -4,7 +4,6 @@ date: 2020-09-09 17:53:08
 order: 02
 categories:
   - 大数据
-  - 其他
 tags:
   - 大数据
   - Sqoop

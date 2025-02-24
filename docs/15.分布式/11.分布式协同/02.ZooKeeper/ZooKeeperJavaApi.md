@@ -1,14 +1,14 @@
 ---
 title: ZooKeeperJavaApi
 date: 2022-02-19 13:27:21
-order: 02
 categories:
   - 分布式
   - 分布式协同
   - ZooKeeper
 tags:
   - 分布式
-  - 分布式协同
+  - 协同
+  - zookeeper
 permalink: /pages/029ebe41/
 ---
 
@@ -632,7 +632,7 @@ public class AclOperation {
   - [ZooKeeper 官方文档](https://cwiki.apache.org/confluence/display/ZOOKEEPER)
   - [ZooKeeper Github](https://github.com/apache/zookeeper)
 - **书籍**
-  - [《Hadoop 权威指南（第四版）》](https://item.jd.com/12109713.html)
+  - [《Hadoop 权威指南（第四版）》](https://book.douban.com/subject/27115351/)
 - **文章**
   - [分布式服务框架 ZooKeeper -- 管理分布式环境中的数据](https://www.ibm.com/developerworks/cn/opensource/os-cn-zookeeper/index.html)
   - [ZooKeeper 的功能以及工作原理](https://www.cnblogs.com/felixzh/p/5869212.html)

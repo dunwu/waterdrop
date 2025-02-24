@@ -1,14 +1,14 @@
 ---
 title: ZooKeeper命令
 date: 2022-02-19 13:27:21
-order: 03
 categories:
   - 分布式
   - 分布式协同
   - ZooKeeper
 tags:
   - 分布式
-  - 分布式协同
+  - 协同
+  - zookeeper
 permalink: /pages/bd3b7203/
 ---
 

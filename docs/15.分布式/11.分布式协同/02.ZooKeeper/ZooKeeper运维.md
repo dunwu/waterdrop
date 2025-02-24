@@ -1,14 +1,14 @@
 ---
 title: ZooKeeper运维
 date: 2020-06-02 22:28:38
-order: 04
 categories:
   - 分布式
   - 分布式协同
   - ZooKeeper
 tags:
   - 分布式
-  - 分布式协同
+  - 协同
+  - zookeeper
 permalink: /pages/c26d08a8/
 ---
 

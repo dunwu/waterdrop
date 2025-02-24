@@ -116,17 +116,25 @@ export default navbar([
       { text: '分布式综合', link: '00.分布式综合/' },
       { text: '分布式协同', link: '11.分布式协同/' },
       { text: '分布式调度', link: '12.分布式调度/' },
-      { text: '分布式通信', link: '21.分布式通信/' },
+      {
+        text: '分布式通信',
+        children: [
+          { text: 'RPC', icon: 'file-icons:powerpc', link: '21.分布式通信/01.RPC' },
+          { text: 'MQ', icon: 'mdi:mq', link: '21.分布式通信/02.MQ' }
+        ]
+      },
       { text: '分布式存储', link: '22.分布式存储/' }
     ]
   },
   {
     text: '大数据',
     icon: 'devicon-plain:hadoop',
-    prefix: '/16.大数据/',
     children: [
-      { text: 'Hadoop', icon: 'devicon:hadoop', link: 'hadoop/' },
-      { text: 'Hive', icon: 'simple-icons:apachehive', link: 'hive/' }
+      { text: 'Hadoop', icon: 'devicon:hadoop', link: '/16.大数据/hadoop/' },
+      { text: 'Hive', icon: 'simple-icons:apachehive', link: '/16.大数据/hive/' },
+      { text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/06.列式数据库/01.HBase/' },
+      { text: 'ZooKeeper', link: '/15.分布式/11.分布式协同/02.ZooKeeper/' },
+      { text: 'Kafka', icon: 'logos:kafka-icon', link: '/15.分布式/21.分布式通信/02.MQ/01.Kafka/' }
     ]
   },
   {

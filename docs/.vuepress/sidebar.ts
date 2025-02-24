@@ -126,10 +126,41 @@ export default sidebar({
     {
       text: '大数据',
       icon: 'devicon-plain:hadoop',
-      prefix: '16.大数据/',
       children: [
-        { text: 'Hadoop', icon: 'devicon:hadoop', prefix: 'hadoop', collapsible: true, children: 'structure' },
-        { text: 'Hive', icon: 'simple-icons:apachehive', prefix: 'hive', collapsible: true, children: 'structure' }
+        {
+          text: 'Hadoop',
+          icon: 'devicon:hadoop',
+          prefix: '16.大数据/hadoop/',
+          collapsible: true,
+          children: 'structure'
+        },
+        {
+          text: 'Hive',
+          icon: 'simple-icons:apachehive',
+          prefix: '16.大数据/hive/',
+          collapsible: true,
+          children: 'structure'
+        },
+        {
+          text: 'HBase',
+          icon: 'logos:hbase',
+          prefix: '12.数据库/06.列式数据库/01.HBase/',
+          collapsible: true,
+          children: 'structure'
+        },
+        {
+          text: 'ZooKeeper',
+          prefix: '15.分布式/11.分布式协同/02.ZooKeeper/',
+          collapsible: true,
+          children: 'structure'
+        },
+        {
+          text: 'Kafka',
+          icon: 'logos:kafka-icon',
+          prefix: '15.分布式/21.分布式通信/02.MQ/01.Kafka/',
+          collapsible: true,
+          children: 'structure'
+        }
       ]
     },
     {
