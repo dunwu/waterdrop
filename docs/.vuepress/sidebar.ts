@@ -54,38 +54,24 @@ export default sidebar({
         {
           text: '关系型数据库',
           prefix: '03.关系型数据库/',
-          children: [
-            { text: '综合', icon: 'openmoji:overview', prefix: '01.综合', collapsible: true, children: 'structure' },
-            { text: 'Mysql', icon: 'logos:mysql', prefix: '02.Mysql', collapsible: true, children: 'structure' },
-            {
-              text: '其他',
-              icon: 'mdi:dots-horizontal-circle',
-              prefix: '99.其他',
-              collapsible: true,
-              children: 'structure'
-            }
-          ]
+          children: [{ text: 'Mysql', icon: 'logos:mysql', prefix: 'mysql', collapsible: true, children: 'structure' }]
         },
         {
           text: '文档数据库',
           prefix: '04.文档数据库/',
           children: [
-            { text: 'MongoDB', icon: 'logos:mongodb', prefix: '01.MongoDB', collapsible: true, children: 'structure' }
+            { text: 'MongoDB', icon: 'logos:mongodb', prefix: 'mongodb', collapsible: true, children: 'structure' }
           ]
         },
         {
           text: 'KV数据库',
           prefix: '05.KV数据库/',
-          children: [
-            { text: 'Redis', icon: 'logos:redis', prefix: '01.Redis', collapsible: true, children: 'structure' }
-          ]
+          children: [{ text: 'Redis', icon: 'logos:redis', prefix: 'redis', collapsible: true, children: 'structure' }]
         },
         {
           text: '列式数据库',
           prefix: '06.列式数据库/',
-          children: [
-            { text: 'HBase', icon: 'logos:hbase', prefix: '01.HBase', collapsible: true, children: 'structure' }
-          ]
+          children: [{ text: 'HBase', icon: 'logos:hbase', prefix: 'hbase', collapsible: true, children: 'structure' }]
         },
         {
           text: '搜索引擎数据库',
@@ -94,14 +80,14 @@ export default sidebar({
             {
               text: 'Elasticsearch',
               icon: 'logos:elasticsearch',
-              prefix: '01.Elasticsearch',
+              prefix: 'elasticsearch',
               collapsible: true,
               children: 'structure'
             },
             {
               text: 'Elastic技术栈',
               icon: 'vscode-icons:file-type-elastic',
-              prefix: '02.Elastic',
+              prefix: 'elastic',
               collapsible: true,
               children: 'structure'
             }
@@ -144,7 +130,7 @@ export default sidebar({
         {
           text: 'HBase',
           icon: 'logos:hbase',
-          prefix: '12.数据库/06.列式数据库/01.HBase/',
+          prefix: '12.数据库/06.列式数据库/hbase/',
           collapsible: true,
           children: 'structure'
         },

@@ -18,15 +18,15 @@ index: false
 
 ### MongoDB
 
-- [MongoDB 简介](01.MongoDB/MongoDB_简介.md)
-- [MongoDB CRUD](01.MongoDB/MongoDB_CRUD.md)
-- [MongoDB 聚合](01.MongoDB/MongoDB_聚合.md)
-- [MongoDB 事务](01.MongoDB/MongoDB_事务.md)
-- [MongoDB 建模](01.MongoDB/MongoDB_建模.md)
-- [MongoDB 索引](01.MongoDB/MongoDB_索引.md)
-- [MongoDB 复制](01.MongoDB/MongoDB_复制.md)
-- [MongoDB 分片](01.MongoDB/MongoDB_分片.md)
-- [MongoDB 运维](01.MongoDB/MongoDB_运维.md)
+- [MongoDB 简介](mongodb/MongoDB_简介.md)
+- [MongoDB CRUD](mongodb/MongoDB_CRUD.md)
+- [MongoDB 聚合](mongodb/MongoDB_聚合.md)
+- [MongoDB 事务](mongodb/MongoDB_事务.md)
+- [MongoDB 建模](mongodb/MongoDB_建模.md)
+- [MongoDB 索引](mongodb/MongoDB_索引.md)
+- [MongoDB 复制](mongodb/MongoDB_复制.md)
+- [MongoDB 分片](mongodb/MongoDB_分片.md)
+- [MongoDB 运维](mongodb/MongoDB_运维.md)
 
 ## 📚 资料
 

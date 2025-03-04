@@ -65,40 +65,38 @@ export default navbar([
   {
     text: '数据库',
     icon: 'mdi:database',
-    prefix: '/12.数据库/',
+    link: '/12.数据库/',
     children: [
-      { text: '数据库综合', link: '01.数据库综合' },
-      { text: '数据库中间件', link: '02.数据库中间件' },
+      { text: '数据库综合', link: '/12.数据库/01.数据库综合/' },
+      { text: '数据库中间件', link: '/12.数据库/02.数据库中间件/' },
       {
         text: '关系型数据库',
-        prefix: '03.关系型数据库/',
+        link: '/12.数据库/03.关系型数据库/',
         children: [
-          { text: '综合', icon: 'openmoji:overview', link: '01.综合' },
-          { text: 'Mysql', icon: 'logos:mysql', link: '02.Mysql' },
-          { text: '其他', icon: 'mdi:dots-horizontal-circle', link: '99.其他' }
+          { text: 'Mysql', icon: 'logos:mysql', link: '/12.数据库/03.关系型数据库/mysql/' },
         ]
       },
       {
         text: '文档数据库',
-        prefix: '04.文档数据库/',
-        children: [{ text: 'MongoDB', icon: 'logos:mongodb', link: '01.MongoDB' }]
+        link: '/12.数据库/04.文档数据库/',
+        children: [{ text: 'MongoDB', icon: 'logos:mongodb', link: '/12.数据库/04.文档数据库/mongodb/' }]
       },
       {
         text: 'KV数据库',
-        prefix: '05.KV数据库/',
-        children: [{ text: 'Redis', icon: 'logos:redis', link: '01.Redis' }]
+        link: '/12.数据库/05.KV数据库/',
+        children: [{ text: 'Redis', icon: 'logos:redis', link: '/12.数据库/05.KV数据库/redis/' }]
       },
       {
         text: '列式数据库',
-        prefix: '06.列式数据库/',
-        children: [{ text: 'HBase', icon: 'logos:hbase', link: '01.HBase' }]
+        link: '/12.数据库/06.列式数据库/',
+        children: [{ text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/06.列式数据库/hbase/' }]
       },
       {
         text: '搜索引擎数据库',
-        prefix: '07.搜索引擎数据库/',
+        link: '/12.数据库/07.搜索引擎数据库/',
         children: [
-          { text: 'Elasticsearch', icon: 'logos:elasticsearch', link: '01.Elasticsearch' },
-          { text: 'Elastic技术栈', icon: 'vscode-icons:file-type-elastic', link: '02.Elastic' }
+          { text: 'Elasticsearch', icon: 'logos:elasticsearch', link: '/12.数据库/07.搜索引擎数据库/elasticsearch/' },
+          { text: 'Elastic技术栈', icon: 'vscode-icons:file-type-elastic', link: '/12.数据库/07.搜索引擎数据库/elastic/' }
         ]
       }
     ]
@@ -132,7 +130,7 @@ export default navbar([
     children: [
       { text: 'Hadoop', icon: 'devicon:hadoop', link: '/16.大数据/hadoop/' },
       { text: 'Hive', icon: 'simple-icons:apachehive', link: '/16.大数据/hive/' },
-      { text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/06.列式数据库/01.HBase/' },
+      { text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/06.列式数据库/hbase/' },
       { text: 'ZooKeeper', link: '/15.分布式/11.分布式协同/02.ZooKeeper/' },
       { text: 'Kafka', icon: 'logos:kafka-icon', link: '/15.分布式/21.分布式通信/02.MQ/01.Kafka/' }
     ]
