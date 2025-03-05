@@ -1,6 +1,6 @@
 ---
 icon: logos:mongodb
-title: MongoDB 的 CRUD 操作
+title: MongoDB CRUD
 date: 2020-09-25 21:23:41
 categories:
   - 数据库
@@ -13,7 +13,7 @@ tags:
 permalink: /pages/773f1695/
 ---
 
-# MongoDB 的 CRUD 操作
+# MongoDB CRUD
 
 MongoDB 的 CRUD 操作是针对 document 的读写操作。
 
@@ -26,7 +26,7 @@ MongoDB 提供了以下方法将文档插入集合：
 - [`db.collection.insertOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/#db.collection.insertOne)
 - [`db.collection.insertMany()`](https://docs.mongodb.com/manual/reference/method/db.collection.insertMany/#db.collection.insertMany)
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924112342.svg)
+![插入操作](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924112342.svg)
 
 插入操作的特性：
 
@@ -72,7 +72,7 @@ db.inventory.insertMany([
 
 MongoDB 提供了 [`db.collection.find()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.find/#mongodb-method-db.collection.find) 方法从集合中查找文档。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924113832.svg)
+![查询操作](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924113832.svg)
 
 可以在 `{}` 中指定查询条件来查找要匹配的数据。如果 `{}` 为空，则会返回集合中的所有文档。
 
@@ -123,7 +123,7 @@ MongoDB 提供以下操作来更新集合中的文档：
 - [`db.collection.updateMany(<filter>, <update>, <options>)`](https://docs.mongodb.com/manual/reference/method/db.collection.updateMany/#db.collection.updateMany)
 - [`db.collection.replaceOne(<filter>, <update>, <options>)`](https://docs.mongodb.com/manual/reference/method/db.collection.replaceOne/#db.collection.replaceOne)
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924114043.svg)
+![更新操作](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924114043.svg)
 
 【示例】插入测试数据
 
@@ -232,7 +232,7 @@ MongoDB 提供了以下操作来删除集合中的文档：
 - [`db.collection.deleteOne()`](https://docs.mongodb.com/manual/reference/method/db.collection.deleteOne/#db.collection.deleteOne)
 - [`db.collection.deleteMany()`](https://docs.mongodb.com/manual/reference/method/db.collection.deleteMany/#db.collection.deleteMany)
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924120007.svg)
+![删除操作](https://raw.githubusercontent.com/dunwu/images/master/snap/20200924120007.svg)
 
 可以指定用于标识要删除的文档的过滤器，这些筛选条件和 find 方法的过滤器语法一致。
 
@@ -340,10 +340,4 @@ db.pizzas.bulkWrite([
 
 ## 参考资料
 
-- **官方**
-  - [MongoDB 官网](https://www.mongodb.com/)
-  - [MongoDB Github](https://github.com/mongodb/mongo)
-  - [MongoDB 官方免费教程](https://university.mongodb.com/)
-- **教程**
-  - [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)
-  - [MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
+- [MongoDB 官方文档之 CRUD 操作](https://www.mongodb.com/zh-cn/docs/manual/crud/)

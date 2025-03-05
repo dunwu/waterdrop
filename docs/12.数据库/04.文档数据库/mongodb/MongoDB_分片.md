@@ -84,7 +84,7 @@ MongoDB 使用分片 Key 在各个分片之间分发 collection 的 document。�
 
 document 的分片键值决定了其在各个分片中的分布
 
-- 从 MongoDB 4.2 开始，除非您的分片 Key 字段是不可变的\_id 字段，否则您可以更新 document 的分片键值。
+- 从 MongoDB 4.2 开始，除非您的分片 Key 字段是不可变的`_id` 字段，否则您可以更新 document 的分片键值。
 - 在 MongoDB 4.0 及更低版本中，文档的分片 Key 字段值是不可变的。
 
 分片 Key 索引：要对已填充的 collection 进行分片，该 collection 必须具有以分片 Key 开头的索引。分片一个空 collection 时，如果该 collection 还没有针对指定分片 Key 的适当索引，则 MongoDB 会创建支持索引。
@@ -138,7 +138,7 @@ Hash 分片策略会先计算分片 Key 字段值的哈希值；然后，根据�
 - **官方**
   - [MongoDB 官网](https://www.mongodb.com/)
   - [MongoDB Github](https://github.com/mongodb/mongo)
-  - [MongoDB 官方免费教程](https://university.mongodb.com/)
+  - [MongoDB 官方免费教程](https://learn.mongodb.com/)
 - **教程**
   - [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)
-  - [MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
+  - [极客时间教程 - MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)

@@ -75,7 +75,7 @@ index: false
 - [Mysql 高可用](03.关系型数据库/mysql/Mysql_高可用.md)
 - [Mysql 优化](03.关系型数据库/mysql/Mysql_优化.md)
 - [Mysql 运维](03.关系型数据库/mysql/Mysql_运维.md)
-- [Mysql 面试](03.关系型数据库/mysql/Mysql_面试.md)
+- [Mysql 面试](03.关系型数据库/mysql/Mysql_面试.md) 💯
 
 ### 文档数据库
 
@@ -90,12 +90,13 @@ index: false
 - [MongoDB 简介](04.文档数据库/mongodb/MongoDB_简介.md)
 - [MongoDB CRUD](04.文档数据库/mongodb/MongoDB_CRUD.md)
 - [MongoDB 聚合](04.文档数据库/mongodb/MongoDB_聚合.md)
+- [MongoDB 索引](04.文档数据库/mongodb/MongoDB_索引.md)
 - [MongoDB 事务](04.文档数据库/mongodb/MongoDB_事务.md)
 - [MongoDB 建模](04.文档数据库/mongodb/MongoDB_建模.md)
-- [MongoDB 索引](04.文档数据库/mongodb/MongoDB_索引.md)
 - [MongoDB 复制](04.文档数据库/mongodb/MongoDB_复制.md)
 - [MongoDB 分片](04.文档数据库/mongodb/MongoDB_分片.md)
 - [MongoDB 运维](04.文档数据库/mongodb/MongoDB_运维.md)
+- [MongoDB 面试](04.文档数据库/mongodb/MongoDB_面试.md) 💯
 
 ### KV 数据库
 
@@ -116,7 +117,7 @@ index: false
 - [Redis 脚本](05.KV数据库/redis/Redis_脚本.md) - 关键词：`Lua`
 - [Redis 运维](05.KV数据库/redis/Redis_运维.md) - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
 - [Redis 实战](05.KV数据库/redis/Redis_实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
-- [Redis 面试](05.KV数据库/redis/Redis_面试.md) - 关键词：`面试`
+- [Redis 面试](05.KV数据库/redis/Redis_面试.md) 💯
 
 #### [Memcached](05.KV数据库/Memcached.md)
 
@@ -134,6 +135,7 @@ index: false
 - [HBase Java API 高级特性之协处理器](06.列式数据库/hbase/HBase_API_高级特性_协处理器.md)
 - [HBase 运维](06.列式数据库/hbase/HBase_运维.md)
 - [HBase 命令](06.列式数据库/hbase/HBase_命令.md)
+- [HBase 面试](06.列式数据库/hbase/HBase_面试.md) 💯
 
 ### 搜索引擎数据库
 
@@ -332,10 +334,12 @@ index: false
 - **官方**
   - [MongoDB 官网](https://www.mongodb.com/)
   - [MongoDB Github](https://github.com/mongodb/mongo)
-  - [MongoDB 官方免费教程](https://university.mongodb.com/)
+  - [MongoDB 官方免费教程](https://learn.mongodb.com/)
+- **书籍**
+  - [《MongoDB 权威指南》](https://book.douban.com/subject/35688800/)
 - **教程**
   - [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.md)
-  - [MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
+  - [极客时间教程 - MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
 - **数据**
   - [mongodb-json-files](https://github.com/ozlerhakan/mongodb-json-files)
 - **文章**

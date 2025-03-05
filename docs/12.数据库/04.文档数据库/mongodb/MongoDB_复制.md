@@ -108,7 +108,7 @@ MongoDB 中*的副本集*是一组维护相同数据集的 [`mongod`](https://ww
 - **官方**
   - [MongoDB 官网](https://www.mongodb.com/)
   - [MongoDB Github](https://github.com/mongodb/mongo)
-  - [MongoDB 官方免费教程](https://university.mongodb.com/)
+  - [MongoDB 官方免费教程](https://learn.mongodb.com/)
 - **教程**
   - [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)
-  - [MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
+  - [极客时间教程 - MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)

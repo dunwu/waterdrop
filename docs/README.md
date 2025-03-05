@@ -401,7 +401,7 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 - [Mysql 高可用](12.数据库/03.关系型数据库/mysql/Mysql_高可用.md)
 - [Mysql 优化](12.数据库/03.关系型数据库/mysql/Mysql_优化.md)
 - [Mysql 运维](12.数据库/03.关系型数据库/mysql/Mysql_运维.md)
-- [Mysql 面试](12.数据库/03.关系型数据库/mysql/Mysql_面试.md)
+- [Mysql 面试](12.数据库/03.关系型数据库/mysql/Mysql_面试.md) 💯
 
 ### 文档数据库
 
@@ -416,12 +416,13 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 - [MongoDB 简介](12.数据库/04.文档数据库/mongodb/MongoDB_简介.md)
 - [MongoDB CRUD](12.数据库/04.文档数据库/mongodb/MongoDB_CRUD.md)
 - [MongoDB 聚合](12.数据库/04.文档数据库/mongodb/MongoDB_聚合.md)
+- [MongoDB 索引](12.数据库/04.文档数据库/mongodb/MongoDB_索引.md)
 - [MongoDB 事务](12.数据库/04.文档数据库/mongodb/MongoDB_事务.md)
 - [MongoDB 建模](12.数据库/04.文档数据库/mongodb/MongoDB_建模.md)
-- [MongoDB 索引](12.数据库/04.文档数据库/mongodb/MongoDB_索引.md)
 - [MongoDB 复制](12.数据库/04.文档数据库/mongodb/MongoDB_复制.md)
 - [MongoDB 分片](12.数据库/04.文档数据库/mongodb/MongoDB_分片.md)
 - [MongoDB 运维](12.数据库/04.文档数据库/mongodb/MongoDB_运维.md)
+- [MongoDB 面试](12.数据库/04.文档数据库/mongodb/MongoDB_面试.md) 💯
 
 ### KV 数据库
 
@@ -442,7 +443,7 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 - [Redis 脚本](12.数据库/05.KV数据库/redis/Redis_脚本.md) - 关键词：`Lua`
 - [Redis 运维](12.数据库/05.KV数据库/redis/Redis_运维.md) - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
 - [Redis 实战](12.数据库/05.KV数据库/redis/Redis_实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
-- [Redis 面试](12.数据库/05.KV数据库/redis/Redis_面试.md) - 关键词：`面试`
+- [Redis 面试](12.数据库/05.KV数据库/redis/Redis_面试.md) 💯
 
 #### [Memcached](12.数据库/05.KV数据库/Memcached.md)
 
@@ -460,6 +461,7 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 - [HBase Java API 高级特性之协处理器](12.数据库/06.列式数据库/hbase/HBase_API_高级特性_协处理器.md)
 - [HBase 运维](12.数据库/06.列式数据库/hbase/HBase_运维.md)
 - [HBase 命令](12.数据库/06.列式数据库/hbase/HBase_命令.md)
+- [HBase 面试](12.数据库/06.列式数据库/hbase/HBase_面试.md) 💯
 
 ### 搜索引擎数据库
 

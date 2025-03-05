@@ -1,5 +1,5 @@
 ---
-icon: logos:mongodb
+icon: openmoji:military-medal
 title: MongoDB 面试
 date: 2025-03-04 21:03:08
 categories:
@@ -16,15 +16,29 @@ permalink: /pages/edc11157/
 
 # MongoDB 面试
 
-## 简介
+## MongoDB 简介
+
+> 扩展阅读：
+>
+> - [MongoDB 官方文档之 MongoDB 简介](https://www.mongodb.com/zh-cn/docs/manual/introduction/)
+> - [MongoDB 简史](https://www.infoq.cn/article/3d4suwkc2fvikykemnvw)
+> - [MongoDB 发展历史及各主要版本新特性概述](https://blog.csdn.net/JiekeXu/article/details/143670868)
 
 ### 【基础】MongoDB 是什么？
 
 :::details 要点
 
-MongoDB 是一个基于 **分布式文件存储** 的开源 NoSQL 数据库系统，由 **C++** 编写的。MongoDB 提供了 **面向文档** 的存储方式，操作起来比较简单和容易，支持“**无模式**”的数据建模，可以存储比较复杂的数据类型，是一款非常流行的 **文档类型数据库** 。
+MongoDB 是一个**面向文档**的开源 NoSQL 数据库系统，由 **C++** 编写的。MongoDB 支持“**无模式**”的数据建模，可以存储比较复杂的数据类型，是一款非常流行的 **文档类型数据库** 。
 
 在高负载的情况下，MongoDB 天然支持水平扩展和高可用，可以很方便地添加更多的节点/实例，以保证服务性能和可用性。在许多场景下，MongoDB 可以用于代替传统的关系型数据库或键/值存储方式，皆在为 Web 应用提供可扩展的高可用高性能数据存储解决方案。
+
+MongoDB 提供了丰富的功能：
+
+- [**读写操作 (CRUD)**](https://www.mongodb.com/zh-cn/docs/manual/crud/#std-label-crud)
+- [**数据聚合**](https://www.mongodb.com/zh-cn/docs/manual/core/aggregation-pipeline/#std-label-aggregation-pipeline)
+- [**文本搜索**](https://www.mongodb.com/zh-cn/docs/manual/text-search/#std-label-text-search)
+- [**地理空间搜索**](https://www.mongodb.com/zh-cn/docs/manual/tutorial/geospatial-tutorial/)
+- ...
 
 :::
 
@@ -32,21 +46,28 @@ MongoDB 是一个基于 **分布式文件存储** 的开源 NoSQL 数据库系�
 
 :::details 要点
 
-- **数据记录被存储为文档**：MongoDB 中的记录就是一个 BSON 文档，它是由键值对组成的数据结构，类似于 JSON 对象，是 MongoDB 中的基本数据单元。
-- **模式自由**：集合的概念类似 MySQL 里的表，但它不需要定义任何模式，能够用更少的数据对象表现复杂的领域模型对象。
-- **支持多种查询方式**：MongoDB 查询 API 支持读写操作 (CRUD) 以及数据聚合、文本搜索和地理空间查询。
-- **支持 ACID 事务**：NoSQL 数据库通常不支持事务，为了可扩展和高性能进行了权衡。不过，也有例外，MongoDB 就支持事务。与关系型数据库一样，MongoDB 事务同样具有 ACID 特性。MongoDB 单文档原生支持原子性，也具备事务的特性。MongoDB 4.0 加入了对多文档事务的支持，但只支持复制集部署模式下的事务，也就是说事务的作用域限制为一个副本集内。MongoDB 4.2 引入了分布式事务，增加了对分片集群上多文档事务的支持，并合并了对副本集上多文档事务的现有支持。
-- **高效的二进制存储**：存储在集合中的文档，是以键值对的形式存在的。键用于唯一标识一个文档，一般是 `ObjectId` 类型，值是以 BSON 形式存在的。BSON = Binary JSON， 是在 JSON 基础上加了一些类型及元数据描述的格式。
-- **自带数据压缩功能**：存储同样的数据所需的资源更少。
-- **支持 mapreduce**：通过分治的方式完成复杂的聚合任务。不过，从 MongoDB 5.0 开始，map-reduce 已经不被官方推荐使用了，替代方案是 [聚合管道](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/)。聚合管道提供比 map-reduce 更好的性能和可用性。
-- **支持多种类型的索引**：MongoDB 支持多种类型的索引，包括单字段索引、复合索引、多键索引、哈希索引、文本索引、 地理位置索引等，每种类型的索引有不同的使用场合。
-- **支持 failover**：提供自动故障恢复的功能，主节点发生故障时，自动从从节点中选举出一个新的主节点，确保集群的正常使用，这对于客户端来说是无感知的。
-- **支持分片集群**：MongoDB 支持集群自动切分数据，让集群存储更多的数据，具备更强的性能。在数据插入和更新时，能够自动路由和存储。
+MongoDB 主要有以下特性：
+
+- **面向文档** - MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/docs/manual/core/document/#std-label-bson-document-format)。BSON 是 [JSON](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-JSON) 文档的二进制表示形式，尽管它包含的数据类型比 JSON 多。最大 BSON 文档大小为 16 MB。
+- **无模式** - MongoDB 中没有预定义模式（predefined schema），文档键值的类型和大小不是固定的。由于没有固定的模式，因此按需添加或删除字段变得更容易。
+- **丰富的查询方式** - MongoDB 支持基本的 CRUD 以及数据聚合、文本搜索和地理空间查询。
+- **丰富的索引类型** - MongoDB 支持多种类型的索引，包括单字段索引、复合索引、多键索引、哈希索引、文本索引、 地理位置索引等，每种类型的索引有不同的使用场合。
+- **支持 ACID 事务** - NoSQL 通常不支持事务，但 MongoDB 支持事务，且 MongoDB 支持 ACID。
+  - MongoDB 单文档支持原子性，也具备事务的特性。
+  - MongoDB 4.0 加入了对多文档事务的支持，但只支持复制集部署模式下的事务，也就是说事务的作用域限制为一个副本集内。
+  - MongoDB 4.2 引入了分布式事务，增加了对分片集群上多文档事务的支持，并合并了对副本集上多文档事务的现有支持。
+- **支持压缩**：存储同样的数据所需的资源更少。
+- **支持 map-reduce** - 通过分治的方式完成复杂的聚合任务。不过，从 MongoDB 5.0 开始，map-reduce 已经不被官方推荐使用了，替代方案是 [聚合管道](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/)。聚合管道提供比 map-reduce 更好的性能和可用性。
 - **支持存储大文件**：MongoDB 的单文档存储空间要求不超过 16MB。对于超过 16MB 的大文件，MongoDB 提供了 GridFS 来进行存储，通过 GridFS，可以将大型数据进行分块处理，然后将这些切分后的小文档保存在数据库中。
+
+MongoDB 作为分布式存储，自然也具备了分布式的一般特性：
+
+- **高可用** - 通过**复制**机制实现**高可用**，提供**数据冗余**和**自动故障转移**能力。在 MongoDB 中，这种机制称为 [**副本集**](https://www.mongodb.com/zh-cn/docs/manual/replication/)。[**副本集**](https://www.mongodb.com/zh-cn/docs/manual/replication/) 是一组 MongoDB 服务器，它们维护相同的数据集，并可提供冗余和提高数据可用性。
+- **高性能** - 通过**分片**机制提供**水平扩容**能力，以支撑海量数据，海量并发。从 3.4 开始，MongoDB 支持基于 [**分片键**](https://www.mongodb.com/zh-cn/docs/manual/core/zone-sharding/#std-label-zone-sharding) 创建数据的 [**区域**](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-shard-key)。在均衡的集群中，MongoDB 仅将区域覆盖的读写定向到区域内的那些分片。
 
 :::
 
-【基础】MongoDB 适合什么应用场景？
+### 【基础】MongoDB 适合什么应用场景？
 
 :::details 要点
 
@@ -61,84 +82,325 @@ MongoDB 是一个基于 **分布式文件存储** 的开源 NoSQL 数据库系�
 
 :::
 
+### 【基础】MongoDB vs.RDBM？
+
+:::details 要点
+
+MongoDB vs.RDBM：
+
+| 特性      | MongoDB                                          | RDBMS    |
+| --------- | ------------------------------------------------ | -------- |
+| 数据模型  | 文档模型                                         | 关系型   |
+| CRUD 操作 | MQL/SQL                                          | SQL      |
+| 高可用    | 复制集                                           | 集群模式 |
+| 扩展性    | 支持分片                                         | 数据分区 |
+| 扩繁方式  | 垂直扩展+水平扩展                                | 垂直扩展 |
+| 索引类型  | B 树、全文索引、地理位置索引、多键索引、TTL 索引 | B 树     |
+| 数据容量  | 没有理论上限                                     | 千万、亿 |
+
+:::
+
+### 【基础】MongoDB 有哪些里程碑版本？
+
+:::details 要点
+
+MongoDB 是由 **10gen** 开发的 NoSQL 数据库，该公司由 Dwight Merriman 和 Eliot Horowitz 于 2007 年创立。2013 年，**10gen 更名为 MongoDB Inc**.。以更好地反映其对 MongoDB 数据库开发的关注。2017 年，MongoDB 公司上市。
+
+里程碑版本：
+
+- **1.0** - 2009 年，MongoDB 发布第一版。
+- **1.6** - 2010 年，引入分片机制（Sharding），支持水平扩展。
+- **2.2** - 2012 年，引入了聚合管道（Pipeline）。
+- **2.4** - 2013 年，引入了全文搜索。
+- **3.0** - 2015 年，全面支持 **WiredTiger** 存储引擎，并支持可插拔存储引擎。
+- **4.0** - 2019 年，支持 ACID 事务。
+- **4.2** - 2020 年，支持分布式事务。
+
+> 扩展阅读：
+>
+> - [MongoDB 简史](https://www.infoq.cn/article/3d4suwkc2fvikykemnvw)
+> - [MongoDB 发展历史及各主要版本新特性概述](https://blog.csdn.net/JiekeXu/article/details/143670868)
+
+:::
+
+## MongoDB 聚合
+
+> 扩展阅读：[MongoDB 官方文档之聚合](https://www.mongodb.com/zh-cn/docs/manual/aggregation/)
+
+### 【基础】MongoDB 支持哪些聚合方式？
+
+:::details 要点
+
+聚合操作处理多个文档并返回计算结果。可以使用聚合操作来：
+
+- 将多个文档中的值组合在一起。
+- 对分组数据执行操作，返回单一结果。
+- 分析一段时间内的数据变化。
+
+若要执行聚合操作，可以使用：
+
+- [聚合管道](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-aggregation-pipeline-intro)，这是执行聚合的首选方法。
+- [单一目的聚合方法](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-single-purpose-agg-methods)，这些方法很简单，但缺乏聚合管道的功能。
+- [Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/)，从 MongoDB 5.0 开始，[Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/#std-label-Map-Reduce) 已被弃用。聚合管道提供的性能和可用性比 Map-Reduce 更优越。
+
+:::
+
+### 【中级】什么是聚合管道？
+
+:::details 要点
+
+聚合管道由一个或多个处理文档的 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 组成：
+
+- 每个阶段对输入文档执行一个操作。例如，某个阶段可以过滤文档、对文档进行分组并计算值。
+- 从一个阶段输出的文档将传递到下一阶段。
+- 一个聚合管道可以返回针对文档组的结果。例如，返回总值、平均值、最大值和最小值。
+
+如使用 [通过聚合管道更新](https://www.mongodb.com/zh-cn/docs/manual/tutorial/update-documents-with-aggregation-pipeline/#std-label-updates-agg-pipeline) 中显示的阶段，则可以通过聚合管道更新文档。
+
+> 注意：使用 [`db.collection.aggregate()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.aggregate/#mongodb-method-db.collection.aggregate) 方法运行的聚合管道不会修改集合中的文档，除非管道包含 [`$merge`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge) 或 [`$out`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out) 阶段。
+
+![MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921092725.png)
+
+[阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 的其他要点：
+
+- 阶段不必为每个输入文档输出一个文档。例如，某些阶段可能会产生新文档或过滤掉现有文档。
+- 同一个阶段可以在管道中多次出现，但以下阶段例外：[`$out`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out)、[`$merge`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge) 和 [`$geoNear`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/geoNear/#mongodb-pipeline-pipe.-geoNear)。
+- 要在阶段中计算平均值和执行其他计算，请使用指定 [聚合操作符](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/#std-label-aggregation-expressions) 的 [聚合表达式](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/#std-label-aggregation-expression-operators)。
+
+MongoDB 聚合管道提供了许多等价于 SQL 中常见聚合语句的操作。 下表概述了常见的 SQL 聚合语句或函数和 MongoDB 聚合操作的映射表：
+
+| RDBM 操作               | MongoDB 聚合操作                                                                                                                                                                                          |
+| :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WHERE`                 | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
+| `GROUP BY`              | [`$group`](https://docs.mongodb.com/manual/reference/operator/aggregation/group/#pipe._S_group)                                                                                                           |
+| `HAVING`                | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
+| `SELECT`                | [`$project`](https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project)                                                                                                     |
+| `ORDER BY`              | [`$sort`](https://docs.mongodb.com/manual/reference/operator/aggregation/sort/#pipe._S_sort)                                                                                                              |
+| `LIMIT`                 | [`$limit`](https://docs.mongodb.com/manual/reference/operator/aggregation/limit/#pipe._S_limit)                                                                                                           |
+| `SUM()`                 | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)                                                                                                                  |
+| `COUNT()`               | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)[`$sortByCount`](https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/#pipe._S_sortByCount) |
+| `JOIN`                  | [`$lookup`](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/#pipe._S_lookup)                                                                                                        |
+| `SELECT INTO NEW_TABLE` | [`$out`](https://docs.mongodb.com/manual/reference/operator/aggregation/out/#pipe._S_out)                                                                                                                 |
+| `MERGE INTO TABLE`      | [`$merge`](https://docs.mongodb.com/manual/reference/operator/aggregation/merge/#pipe._S_merge) (Available starting in MongoDB 4.2)                                                                       |
+| `UNION ALL`             | [`$unionWith`](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/#pipe._S_unionWith) (Available starting in MongoDB 4.4)                                                           |
+
+下面通过一个示例来展示，如何通过 MongoDB 聚合计算总订单数量：
+
+以下聚合管道示例包含两个 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference)，并返回按披萨名称分组后，各款中号披萨的总订单数量：
+
+```javascript
+db.orders.aggregate([
+  // Stage 1: 根据 size 过滤订单
+  {
+    $match: { size: 'medium' }
+  },
+  // Stage 2: 按名称对剩余文档进行分组，并计算总数量
+  {
+    $group: { _id: '$name', totalQuantity: { $sum: '$quantity' } }
+  }
+])[
+  // 输出
+  ({ _id: 'Cheese', totalQuantity: 50 },
+  { _id: 'Vegan', totalQuantity: 10 },
+  { _id: 'Pepperoni', totalQuantity: 20 })
+]
+```
+
+[`$match`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/match/#mongodb-pipeline-pipe.-match) 阶段：
+
+- 从披萨订单文档过滤出 `size` 为 `medium` 的披萨。
+- 将剩余文档传递到 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 阶段。
+
+[`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 阶段：
+
+- 按披萨 `name` 对剩余文档进行分组。
+- 使用 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 计算每种披萨 `name` 的总订单 `quantity`。总数存储在聚合管道返回的 `totalQuantity` 字段中。
+
+:::
+
+### 【基础】RDBM 聚合 vs. MongoDB 聚合？
+
+:::details 要点
+
+MongoDB pipeline 提供了许多等价于 SQL 中常见聚合语句的操作。 下表概述了常见的 SQL 聚合语句或函数和 MongoDB 聚合操作的映射表：
+
+| RDBM 操作               | MongoDB 聚合操作                                                                                                                                                                                          |
+| :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WHERE`                 | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
+| `GROUP BY`              | [`$group`](https://docs.mongodb.com/manual/reference/operator/aggregation/group/#pipe._S_group)                                                                                                           |
+| `HAVING`                | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
+| `SELECT`                | [`$project`](https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project)                                                                                                     |
+| `ORDER BY`              | [`$sort`](https://docs.mongodb.com/manual/reference/operator/aggregation/sort/#pipe._S_sort)                                                                                                              |
+| `LIMIT`                 | [`$limit`](https://docs.mongodb.com/manual/reference/operator/aggregation/limit/#pipe._S_limit)                                                                                                           |
+| `SUM()`                 | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)                                                                                                                  |
+| `COUNT()`               | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)[`$sortByCount`](https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/#pipe._S_sortByCount) |
+| `JOIN`                  | [`$lookup`](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/#pipe._S_lookup)                                                                                                        |
+| `SELECT INTO NEW_TABLE` | [`$out`](https://docs.mongodb.com/manual/reference/operator/aggregation/out/#pipe._S_out)                                                                                                                 |
+| `MERGE INTO TABLE`      | [`$merge`](https://docs.mongodb.com/manual/reference/operator/aggregation/merge/#pipe._S_merge) (Available starting in MongoDB 4.2)                                                                       |
+| `UNION ALL`             | [`$unionWith`](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/#pipe._S_unionWith) (Available starting in MongoDB 4.4)                                                           |
+
+RDBM 聚合 vs. MongoDB 聚合：
+
+![SQL 聚合 vs. MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921200556.png)
+
+:::
+
+### 【中级】MongoDB Map-Reduce 有什么用？
+
+:::details 要点
+
+> 从 MongoDB 5.0 开始，[Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/#std-label-Map-Reduce) 已被弃用。聚合管道提供的性能和可用性比 Map-Reduce 更优越。
+
+Map-Reduce 是一种数据处理范式，用于将大量数据汇总为有用的聚合结果。为了执行 Map-Reduce 操作，MongoDB 提供了 [`mapReduce`](https://docs.mongodb.com/manual/reference/command/mapReduce/#dbcmd.mapReduce) 数据库命令。
+
+![Map-Reduce](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921155546.svg)
+
+在上面的操作中，MongoDB 将 map 阶段应用于每个输入 document（即 collection 中与查询条件匹配的 document）。 map 函数分发出多个键 - 值对。对于具有多个值的那些键，MongoDB 应用 reduce 阶段，该阶段收集并汇总聚合的数据。然后，MongoDB 将结果存储在 collection 中。可选地，reduce 函数的输出可以通过 finalize 函数来进一步汇总聚合结果。
+
+MongoDB 中的所有 Map-Reduce 函数都是 JavaScript，并在 mongod 进程中运行。 Map-Reduce 操作将单个 collection 的 document 作为输入，并且可以在开始 map 阶段之前执行任意排序和限制。 mapReduce 可以将 Map-Reduce 操作的结果作为 document 返回，也可以将结果写入 collection。
+
+:::
+
 ## 存储
 
 ### 【基础】MongoDB 的逻辑存储是什么？
 
 :::details 要点
 
-MongoDB 的存储结构区别于传统的关系型数据库，主要由如下三个单元组成：
+MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/docs/manual/core/document/#std-label-bson-document-format)。BSON 是 [JSON](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-JSON) 文档的二进制表示形式，尽管它包含的数据类型比 JSON 多。最大 BSON 文档大小为 16 MB。
 
-- **文档（Document）**：MongoDB 中最基本的单元，由 BSON 键值对（key-value）组成，类似于关系型数据库中的行（Row）。
-- **集合（Collection）**：一个集合可以包含多个文档，类似于关系型数据库中的表（Table）。
-- **数据库（Database）**：一个数据库中可以包含多个集合，可以在 MongoDB 中创建多个数据库，类似于关系型数据库中的数据库（Database）。
+每个 MongoDB 文档都需要一个唯一的 [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) 字段作为 [主键](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-primary-key)。如果插入的文档省略了 `_id` 字段，则 MongoDB 驱动程序会自动为 `_id` 字段生成 [ObjectId](https://www.mongodb.com/zh-cn/docs/manual/reference/bson-types/#std-label-objectid)。
 
-也就是说，MongoDB 将数据记录存储为文档 （更具体来说是 [BSON 文档](https://www.mongodb.com/docs/manual/core/document/#std-label-bson-document-format)），这些文档在集合中聚集在一起，数据库中存储一个或多个文档集合。
+这些 [MongoDB 文档](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-document) 收集在 [集合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-collection) 中。[数据库](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-database) 存储一个或多个文档集合。
 
-**SQL 与 MongoDB 常见术语对比**：
+为了方便理解 MongoDB 概念，下面将 MongoDB 概念和 RDBM 概念进行对比：
 
-| SQL                      | MongoDB                         |
-| ------------------------ | ------------------------------- |
-| 表（Table）              | 集合（Collection）              |
-| 行（Row）                | 文档（Document）                |
-| 列（Col）                | 字段（Field）                   |
-| 主键（Primary Key）      | 对象 ID（Objectid）             |
-| 索引（Index）            | 索引（Index）                   |
-| 嵌套表（Embedded Table） | 嵌入式文档（Embedded Document） |
-| 数组（Array）            | 数组（Array）                   |
+| RDBM 概念          | MongoDB 概念                                                                        |
+| :----------------- | :---------------------------------------------------------------------------------- |
+| database（数据库） | database（数据库）                                                                  |
+| table（表）        | collection（集合）                                                                  |
+| row（行）          | document（文档）                                                                    |
+| column（列）       | field（字段）                                                                       |
+| index（索引）      | index（索引）                                                                       |
+| primary key        | [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) |
 
 #### 文档
 
-文档的记录就是一个 BSON 文档，它是由键值对组成的数据结构，类似于 JSON 对象，是 MongoDB 中的基本数据单元。字段的值可能包括其他文档、数组和文档数组。
+文档是 MongoDB 中的**基本数据单元**。**文档是一组有序键值对（即 BSON）**。MongoDB 的文档不需要设置相同的字段，并且相同的字段不需要相同的数据类型，这与关系型数据库有很大的区别，也是 MongoDB 非常突出的特点。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024526.png)
+![MongoDB Document](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024526.png)
 
-文档的键是字符串。除了少数例外情况，键可以使用任意 UTF-8 字符。
+需要注意的是：
 
-- 键不能含有 `\0`（空字符）。这个字符用来表示键的结尾。
+- **文档中的键/值对是有序的**。
+
+- 文档的键是字符串。除了少数例外情况，**键可以使用任意 UTF-8 字符**。
+
+- 文档中的值不仅可以是在双引号里面的字符串，还可以是其他几种数据类型（甚至可以是整个嵌入的文档）。
+
+- **MongoDB 区分类型和大小写**。例如，下面这两对文档是不同的：
+
+  ```json
+  {"count" : 5}
+  {"count" : "5"}
+
+  {"count" : 5}
+  {"Count" : 5}
+  ```
+
+- MongoDB 的文档不能有重复的键。例如，下面这个文档是不合法的
+
+  ```json
+  {"greeting" : "Hello, world!", "greeting" : "Hello, MongoDB!"
+  ```
+
+文档键命名规范：
+
+- 键不能含有 `\0` （空字符）。这个字符用来表示键的结尾。
 - `.` 和 `$` 有特别的意义，只有在特定环境下才能使用。
-- 以下划线`_`开头的键是保留的（不是严格要求的）。
-
-**BSON [bee·sahn]** 是 Binary [JSON](http://json.org/) 的简称，是 JSON 文档的二进制表示，支持将文档和数组嵌入到其他文档和数组中，还包含允许表示不属于 JSON 规范的数据类型的扩展。有关 BSON 规范的内容，可以参考 [bsonspec.org](http://bsonspec.org/)，另见 [BSON 类型](https://www.mongodb.com/docs/manual/reference/bson-types/)。
-
-根据维基百科对 BJSON 的介绍，BJSON 的遍历速度优于 JSON，这也是 MongoDB 选择 BSON 的主要原因，但 BJSON 需要更多的存储空间。
-
-> 与 JSON 相比，BSON 着眼于提高存储和扫描效率。BSON 文档中的大型元素以长度字段为前缀以便于扫描。在某些情况下，由于长度前缀和显式数组索引的存在，BSON 使用的空间会多于 JSON。
+- 以下划线 `_` 开头的键是保留的（不是严格要求的）。
 
 #### 集合
 
-MongoDB 集合存在于数据库中，**没有固定的结构**，也就是 **无模式** 的，这意味着可以往集合插入不同格式和类型的数据。不过，通常情况下，插入集合中的数据都会有一定的关联性。
+集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System) 中的表（Table）。集合存在于数据库中，集合没有固定的结构，这意味着你在对集合可以插入不同格式和类型的数据，但通常情况下我们插入集合的数据都会有一定的关联性。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024137.png)
+![MongoDB Collection](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024137.png)
 
-集合不需要事先创建，当第一个文档插入或者第一个索引创建时，如果该集合不存在，则会创建一个新的集合。
+集合不需要事先创建，当第一个文档插入或者第一个索引创建时，如果该集合不存在，则会创建一个新的集合。使用 `.` 字符分隔不同命名空间的子集合是一种组织集合的惯例。例如，有一个具有博客功能的应用程序，可能包含名为 `blog.posts` 和名为 `blog.authors` 的集合。
 
-集合名可以是满足下列条件的任意 UTF-8 字符串：
+合法的集合名：
 
-- 集合名不能是空字符串`""`。
-- 集合名不能含有 `\0` （空字符），这个字符表示集合名的结尾。
-- 集合名不能以"system."开头，这是为系统集合保留的前缀。例如 `system.users` 这个集合保存着数据库的用户信息，`system.namespaces` 集合保存着所有数据库集合的信息。
-- 集合名必须以下划线或者字母符号开始，并且不能包含 `$`。
+- 集合名称不能是空字符串（""）。
+- 集合名称不能含有 `\0`（空字符），因为这个字符用于表示一个集合名称的结束。
+- 集合名称不能以 `system.` 开头，该前缀是为内部集合保留的。例如，`system.users` 集合中保存着数据库的用户，`system.namespaces` 集合中保存着有关数据库所有集合的信息。
+- 用户创建的集合名称中不应包含保留字符 `$`。许多驱动程序确实支持在集合名称中使用 `$`，这是因为某些由系统生成的集合会包含它，但除非你要访问的是这些集合之一，否则不应在名称中使用 `$` 字符。
 
 #### 数据库
 
-数据库用于存储所有集合，而集合又用于存储所有文档。一个 MongoDB 中可以创建多个数据库，每一个数据库都有自己的集合和权限。
+数据库用于存储所有集合，而集合又用于存储所有文档。一个 MongoDB 中可以创建多个数据库，每一个数据库都有自己的集合和权限。MongoDB 的单个实例可以容纳多个独立的数据库，每一个都有自己的集合和权限，不同的数据库也放置在不同的文件中。
 
-MongoDB 预留了几个特殊的数据库。
+MongoDB 的默认数据库为"db"，该数据库存储在 data 目录中。
 
-- **admin** : admin 数据库主要是保存 root 用户和角色。例如，system.users 表存储用户，system.roles 表存储角色。一般不建议用户直接操作这个数据库。将一个用户添加到这个数据库，且使它拥有 admin 库上的名为 dbAdminAnyDatabase 的角色权限，这个用户自动继承所有数据库的权限。一些特定的服务器端命令也只能从这个数据库运行，比如关闭服务器。
-- **local** : local 数据库是不会被复制到其他分片的，因此可以用来存储本地单台服务器的任意 collection。一般不建议用户直接使用 local 库存储任何数据，也不建议进行 CRUD 操作，因为数据无法被正常备份与恢复。
-- **config** : 当 MongoDB 使用分片设置时，config 数据库可用来保存分片的相关信息。
-- **test** : 默认创建的测试库，连接 [mongod](https://mongoing.com/docs/reference/program/mongod.html) 服务时，如果不指定连接的具体数据库，默认就会连接到 test 数据库。
+**"show dbs"** 命令可以显示所有数据的列表。
 
-数据库名可以是满足以下条件的任意 UTF-8 字符串：
+```shell
+$ ./mongo
+MongoDBshell version: 3.0.6
+connecting to: test
+> show dbs
+local  0.078GB
+test   0.078GB
+```
 
-- 不能是空字符串`""`。
-- 不得含有`' '`（空格）、`.`、`$`、`/`、`\`和 `\0` （空字符）。
-- 应全部小写。
-- 最多 64 字节。
+执行 **"db"** 命令可以显示当前数据库对象或集合。
 
-数据库名最终会变成文件系统里的文件，这也就是有如此多限制的原因。
+```shell
+$ ./mongo
+MongoDBshell version: 3.0.6
+connecting to: test
+> db
+test
+```
+
+运行"use"命令，可以连接到一个指定的数据库。
+
+```shell
+> use local
+switched to db local
+> db
+local
+```
+
+数据库按照名称进行标识的。数据库名称可以是任意 UTF-8 字符串，但有以下限制：
+
+- 数据库名称不能是空字符串（""）。
+- 数据库名称不能包含 `/`、`\`、`.`、`"`、`*`、`<`、`>`、`:`、`|`、`?`、`$`、单一的空格以及 `\0`（空字符），基本上只能使用 ASCII 字母和数字。
+- 数据库名称区分大小写。
+- 数据库名称的长度限制为 64 字节。
+
+有一些数据库名是保留的，可以直接访问这些有特殊作用的数据库。
+
+- **admin**：admin 数据库会在身份验证和授权时被使用。此外，某些管理操作需要访问此数据库。
+- **local**：这个数据永远不会被复制，可以用来存储限于本地单台服务器的任意集合
+- **config**：当 Mongo 用于分片设置时，config 数据库在内部使用，用于保存分片的相关信息。
+
+#### 元数据
+
+数据库的信息是存储在集合中。它们使用了系统的命名空间：`dbname.system.*`
+
+在 MongoDB 数据库中命名空间 `<dbname>.system.*` 是包含多种系统信息的特殊集合 (Collection)，如下：
+
+| 集合命名空间               | 描述                                      |
+| :------------------------- | :---------------------------------------- |
+| `dbname.system.namespaces` | 列出所有名字空间。                        |
+| `dbname.system.indexes`    | 列出所有索引。                            |
+| `dbname.system.profile`    | 包含数据库概要 (profile) 信息。           |
+| `dbname.system.users`      | 列出所有可访问数据库的用户。              |
+| `dbname.local.sources`     | 包含复制对端（slave）的服务器信息和状态。 |
+
+对于修改系统集合中的对象有如下限制。
+
+在 `system.indexes` 插入数据，可以创建索引。但除此之外该表信息是不可变的（特殊的 drop index 命令将自动更新相关信息）。`system.users` 是可修改的。`system.profile` 是可删除的。
 
 :::
 
@@ -212,21 +474,85 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 ## 索引
 
+> 扩展阅读：
+>
+> - [MongoDB 官方文档之索引](https://www.mongodb.com/zh-cn/docs/manual/indexes/)
+> - [你真的会用索引么？[Mongo]](https://zhuanlan.zhihu.com/p/77971681)
+
+### 【基础】MongoDB 索引有什么用？
+
+:::details 要点
+
+**MongoDB 在 collection 数据级别上定义索引**。
+
+索引通常能够极大的提高查询的效率。如果**没有索引**，MongoDB 在读取数据时**必须扫描 collection 中的每个 document** 并选取那些符合查询条件的记录。这种扫描全集合的查询是非常低效的，特别是在处理大量的数据时。查询可能要花费几十秒甚至几分钟，这种性能开销是不可接受的。索引可提高查询性能，但**添加索引会影响写入操作的性能**。对于写入读取率高的集合，由于每次插入操作都必须同时更新所有索引，因此会带来较高的索引成本。
+
+索引是一种特殊的数据结构，它以易于遍历的形式存储一小部分集合数据集。**MongoDB 索引使用 [B-tree](https://en.wikipedia.org/wiki/B-tree) 数据结构**。索引可存储某个特定字段或多个字段的值，并按字段的值进行排序。索引条目的排序支持高效的相等匹配和基于范围的查询操作。此外，**MongoDB 还可使用索引中的顺序来返回排序后的结果**。
+
+![MongoDB 索引](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921210621.svg)
+
+:::
+
 ### 【基础】MongoDB 支持哪些类型的索引？
 
 :::details 要点
 
-**MongoDB 支持多种类型的索引，包括单字段索引、复合索引、多键索引、哈希索引、文本索引、 地理位置索引等，每种类型的索引有不同的使用场合。**
+MongoDB 支持多种类型的索引，适用于不同的场景。
 
-- **单字段索引：** 建立在单个字段上的索引，索引创建的排序顺序无所谓，MongoDB 可以头/尾开始遍历。
-- **复合索引：** 建立在多个字段上的索引，也可以称之为组合索引、联合索引。
-- **多键索引**：MongoDB 的一个字段可能是数组，在对这种字段创建索引时，就是多键索引。MongoDB 会为数组的每个值创建索引。就是说你可以按照数组里面的值做条件来查询，这个时候依然会走索引。
-- **哈希索引**：按数据的哈希值索引，用在哈希分片集群上。
-- **文本索引：** 支持对字符串内容的文本搜索查询。文本索引可以包含任何值为字符串或字符串元素数组的字段。一个集合只能有一个文本搜索索引，但该索引可以覆盖多个字段。MongoDB 虽然支持全文索引，但是性能低下，暂时不建议使用。
-- **地理位置索引：** 基于经纬度的索引，适合 2D 和 3D 的位置查询。
-- **唯一索引**：确保索引字段不会存储重复值。如果集合已经存在了违反索引的唯一约束的文档，则后台创建唯一索引会失败。
-- **TTL 索引**：TTL 索引提供了一个过期机制，允许为每一个文档设置一个过期时间，当一个文档达到预设的过期时间之后就会被删除。
-- ……
+#### 单字段索引
+
+单个字段索引收集集合内每个文档中单个字段的数据，并对其排序。
+
+下图显示了单个字段 `score` 上的一个索引：
+
+![单字段索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052211281.svg)
+
+> 要了解详情，请参阅 [单字段索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-single/#std-label-indexes-single-field)。
+
+#### 复合索引
+
+复合索引从集合中每个文档的两个或多个字段收集数据并对其排序。数据先按索引中的第一个字段分组，再按每个后续字段分组。
+
+例如，下图显示了一个复合索引，其中文档首先按 `userid` 分组并以升序（按字母顺序）排序。然后，每个 `userid` 的 `scores` 按降序排序：
+
+![复合索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052213721.svg)
+
+> 要了解详情，请参阅 [复合索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-compound/#std-label-index-type-compound)。
+
+#### 多键索引
+
+多键索引收集数组中存储的数据并进行排序。
+
+无需显式指定多键类型。对包含数组值的字段创建索引时，MongoDB 会自动将该索引设为多键索引。
+
+下图显示了 `addr.zip` 字段的多键索引：
+
+![多键索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052214522.svg)
+
+> 要了解详情，请参阅 [多键索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-multikey/#std-label-index-type-multikey)。
+
+#### 文本索引
+
+文本索引支持对包含字符串内容的字段进行文本搜索查询。
+
+> 要了解详情，请参阅 [自管理部署上的文本索引。](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-text/#std-label-index-type-text)
+
+#### 地理空间索引
+
+地理空间索引可提高对地理空间坐标数据进行查询的性能。
+
+MongoDB 提供两种类型的地理空间索引：
+
+- 使用平面几何返回结果的 [2d 索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/geospatial/2d/#std-label-2d-index)。
+- 使用球面几何返回结果的 [2dsphere 索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/geospatial/2dsphere/#std-label-2dsphere-index)。
+
+> 要了解详情，请参阅 [地理空间索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-geospatial/#std-label-geospatial-index)。
+
+#### 哈希索引
+
+哈希索引支持 [哈希分片](https://www.mongodb.com/zh-cn/docs/manual/core/hashed-sharding/#std-label-sharding-hashed-sharding)。哈希索引对字段值的哈希值进行索引。
+
+> 要了解详情，请参阅 [哈希索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-hashed/#std-label-index-type-hashed)。
 
 :::
 
@@ -234,7 +560,7 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 :::details 要点
 
-复合索引中字段的顺序非常重要，例如下图中的复合索引由`{userid:1, score:-1}`组成，则该复合索引首先按照`userid`升序排序；然后再每个`userid`的值内，再按照`score`降序排序。
+**排序键的排列顺序必须与其在索引中出现的顺序相同**。例如，索引键模式 `{ a: 1, b: 1 }` 可以支持对 `{ a: 1, b: 1 }` 排序，但不支持对 `{ b: 1, a: 1 }` 排序。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041116883.png)
 
@@ -265,28 +591,6 @@ db.s2.find().sort({"score": -1, "userid": 1}).explain()
 ```
 
 **MongoDB 的复合索引遵循左前缀原则**：拥有多个键的索引，可以同时得到所有这些键的前缀组成的索引，但不包括除左前缀之外的其他子集。比如说，有一个类似 `{a: 1, b: 1, c: 1, ..., z: 1}` 这样的索引，那么实际上也等于有了 `{a: 1}`、`{a: 1, b: 1}`、`{a: 1, b: 1, c: 1}` 等一系列索引，但是不会有 `{b: 1}` 这样的非左前缀的索引。
-
-:::
-
-### 【基础】什么是 TTL 索引？
-
-:::details 要点
-
-TTL 索引提供了一个过期机制，允许为每一个文档设置一个过期时间 `expireAfterSeconds` ，当一个文档达到预设的过期时间之后就会被删除。TTL 索引除了有 `expireAfterSeconds` 属性外，和普通索引一样。
-
-数据过期对于某些类型的信息很有用，比如机器生成的事件数据、日志和会话信息，这些信息只需要在数据库中保存有限的时间。
-
-**TTL 索引运行原理**：
-
-- MongoDB 会开启一个后台线程读取该 TTL 索引的值来判断文档是否过期，但不会保证已过期的数据会立马被删除，因后台线程每 60 秒触发一次删除任务，且如果删除的数据量较大，会存在上一次的删除未完成，而下一次的任务已经开启的情况，导致过期的数据也会出现超过了数据保留时间 60 秒以上的现象。
-- 对于副本集而言，TTL 索引的后台进程只会在 Primary 节点开启，在从节点会始终处于空闲状态，从节点的数据删除是由主库删除后产生的 oplog 来做同步。
-
-**TTL 索引限制**：
-
-- TTL 索引是单字段索引。复合索引不支持 TTL
-- `_id`字段不支持 TTL 索引。
-- 无法在上限集合 (Capped Collection) 上创建 TTL 索引，因为 MongoDB 无法从上限集合中删除文档。
-- 如果某个字段已经存在非 TTL 索引，那么在该字段上无法再创建 TTL 索引。
 
 :::
 
@@ -331,115 +635,122 @@ db.users.find({gender:"M"},{user_name:1,_id:0})
 
 :::
 
-## 聚合
-
-### 【基础】MongoDB 聚合有什么用？
-
-:::details 要点
-
-实际项目中，我们经常需要将多个文档甚至是多个集合汇总到一起计算分析（比如求和、取最大值）并返回计算后的结果，这个过程被称为 **聚合操作** 。
-
-根据官方文档介绍，我们可以使用聚合操作来：
-
-- 将来自多个文档的值组合在一起。
-- 对集合中的数据进行的一系列运算。
-- 分析数据随时间的变化。
-
-:::
-
-### 【基础】MongoDB 提供了哪几种执行聚合的方法？
-
-:::details 要点
-
-MongoDB 提供了两种执行聚合的方法：
-
-- **聚合管道（Aggregation Pipeline）**：执行聚合操作的首选方法。
-- **单一目的聚合方法（Single purpose aggregation methods）**：也就是单一作用的聚合函数比如 `count()`、`distinct()`、`estimatedDocumentCount()`。
-
-绝大部分文章中还提到了 **map-reduce** 这种聚合方法。不过，从 MongoDB 5.0 开始，map-reduce 已经不被官方推荐使用了，替代方案是 [聚合管道](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/)。聚合管道提供比 map-reduce 更好的性能和可用性。
-
-MongoDB 聚合管道由多个阶段组成，每个阶段在文档通过管道时转换文档。每个阶段接收前一个阶段的输出，进一步处理数据，并将其作为输入数据发送到下一个阶段。
-
-每个管道的工作流程是：
-
-1. 接受一系列原始数据文档
-2. 对这些文档进行一系列运算
-3. 结果文档输出给下一个阶段
-
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041056046.png)
-
-**常用阶段操作符**：
-
-| 操作符   | 简述                                                         |
-| -------- | ------------------------------------------------------------ |
-| $match   | 匹配操作符，用于对文档集合进行筛选                           |
-| $project | 投射操作符，用于重构每一个文档的字段，可以提取字段，重命名字段，甚至可以对原有字段进行操作后新增字段 |
-| $sort    | 排序操作符，用于根据一个或多个字段对文档进行排序             |
-| $limit   | 限制操作符，用于限制返回文档的数量                           |
-| $skip    | 跳过操作符，用于跳过指定数量的文档                           |
-| $count   | 统计操作符，用于统计文档的数量                               |
-| $group   | 分组操作符，用于对文档集合进行分组                           |
-| $unwind  | 拆分操作符，用于将数组中的每一个值拆分为单独的文档           |
-| $lookup  | 连接操作符，用于连接同一个数据库中另一个集合，并获取指定的文档，类似于 populate |
-
-更多操作符介绍详见官方文档：https://docs.mongodb.com/manual/reference/operator/aggregation/
-
-阶段操作符用于 `db.collection.aggregate` 方法里面，数组参数中的第一层。
-
-```json
-db.collection.aggregate( [ { 阶段操作符：表述 }, { 阶段操作符：表述 }, ... ] )
-```
-
-下面是 MongoDB 官方文档中的一个例子：
-
-```json
-db.orders.aggregate([
-    // 第一阶段：$match 阶段按 status 字段过滤文档，并将 status 等于"A"的文档传递到下一阶段。
-    { $match: { status: "A" } },
-    // 第二阶段：$group 阶段按 cust_id 字段将文档分组，以计算每个 cust_id 唯一值的金额总和。
-    { $group: { _id: "$cust_id", total: { $sum: "$amount" } } }
-])
-```
-
-:::
-
 ## 事务
 
-### 【中级】MongoDB 是否支持事务？
+> 扩展阅读：
+>
+> - [MongoDB 官方文档之事务](https://www.mongodb.com/zh-cn/docs/manual/core/transactions/)
+> - [技术干货| MongoDB 事务原理](https://mongoing.com/archives/82187)
+> - [MongoDB 一致性模型设计与实现](https://developer.aliyun.com/article/782494)
+
+### 【基础】MongoDB 是否支持事务？
 
 :::details 要点
 
-MongoDB 事务想要搞懂原理还是比较花费时间的，我自己也没有搞太明白。因此，我这里只是简单介绍一下 MongoDB 事务，想要了解原理的小伙伴，可以自行搜索查阅相关资料。
+在 MongoDB 中，**对单个文档的操作具有原子性**。由于可以使用嵌入式文档和数组来捕获单个文档结构中数据之间的关系，而无需跨多个文档和集合进行标准化，因此这种单文档原子性消除了许多实际使用案例使用分布式事务的必要性。
 
-这里推荐几篇文章，供大家参考：
+对于需要对多文档（在单个或多个集合中）的读写操作具有原子性的情况，MongoDB 支持多文档事务。利用分布式事务，可以跨多个操作、集合、数据库、文档和分片使用事务。
 
-- [技术干货| MongoDB 事务原理](https://mongoing.com/archives/82187)
-- [MongoDB 一致性模型设计与实现](https://developer.aliyun.com/article/782494)
-- [MongoDB 官方文档对事务的介绍](https://www.mongodb.com/docs/upcoming/core/transactions/)
+分布式事务具有原子性：
 
-我们在介绍 NoSQL 数据的时候也说过，NoSQL 数据库通常不支持事务，为了可扩展和高性能进行了权衡。不过，也有例外，MongoDB 就支持事务。
+- 事务要么应用所有数据更改，要么回滚更改。
+- 在事务提交时，事务中所做的所有数据更改都会保存，并且在事务之外可见。
+  - 在事务进行提交前，在事务中所做的数据更改在事务外不可见。
+  - 不过，当事务写入多个分片时，并非所有外部读取操作都需等待已提交事务的结果在各个分片上可见。例如，如果事务已提交并且写入 1 在分片 A 上可见，但写入 2 在分片 B 上尚不可见，则读关注 [`"local"`](https://www.mongodb.com/zh-cn/docs/manual/reference/read-concern-local/#mongodb-readconcern-readconcern.-local-) 处的外部读取可以在不看到写入 2 的情况下读取写入 1 的结果。
+- 事务中止后，在事务中所做的所有数据更改会被丢弃且不会变得可见。例如，如果事务中的任何操作失败，事务就会中止，事务中所做的所有数据更改将被丢弃且不会变得可见。
 
-与关系型数据库一样，MongoDB 事务同样具有 ACID 特性：
+> 要点：在大多数情况下，与单文档写入操作相比，分布式事务会产生更高的性能成本，并且分布式事务的可用性不应取代有效的模式设计。在许多情况下，[非规范化数据模型（嵌入式文档和数组）](https://www.mongodb.com/zh-cn/docs/manual/data-modeling/concepts/embedding-vs-references/#std-label-data-modeling-embedding) 仍然是数据和使用案例的最佳选择。换言之，对于许多场景，适当的数据建模将最大限度地减少对分布式事务的需求。
 
-- **原子性**（`Atomicity`）：事务是最小的执行单位，不允许分割。事务的原子性确保动作要么全部完成，要么完全不起作用；
-- **一致性**（`Consistency`）：执行事务前后，数据保持一致，例如转账业务中，无论事务是否成功，转账者和收款人的总额应该是不变的；
-- **隔离性**（`Isolation`）：并发访问数据库时，一个用户的事务不被其他事务所干扰，各并发事务之间数据库是独立的。WiredTiger 存储引擎支持读未提交（ read-uncommitted ）、读已提交（ read-committed ）和快照（ snapshot ）隔离，MongoDB 启动时默认选快照隔离。在不同隔离级别下，一个事务的生命周期内，可能出现脏读、不可重复读、幻读等现象。
-- **持久性**（`Durability`）：一个事务被提交之后。它对数据库中数据的改变是持久的，即使数据库发生故障也不应该对其有任何影响。
+:::
 
-关于事务的详细介绍这篇文章就不多说了，感兴趣的可以看看我写的 [MySQL 常见面试题总结]() 这篇文章，里面有详细介绍到。
+### 【中级】MongoDB 事务支持哪些操作？
 
-MongoDB 单文档原生支持原子性，也具备事务的特性。当谈论 MongoDB 事务的时候，通常指的是 **多文档** 。MongoDB 4.0 加入了对多文档 ACID 事务的支持，但只支持复制集部署模式下的 ACID 事务，也就是说事务的作用域限制为一个副本集内。MongoDB 4.2 引入了 **分布式事务** ，增加了对分片集群上多文档事务的支持，并合并了对副本集上多文档事务的现有支持。
+:::details 要点
 
-根据官方文档介绍：
+可以跨多个操作、集合、数据库、文档和分片使用分布式事务。
 
-> 从 MongoDB 4.2 开始，分布式事务和多文档事务在 MongoDB 中是一个意思。分布式事务是指分片集群和副本集上的多文档事务。从 MongoDB 4.2 开始，多文档事务（无论是在分片集群还是副本集上）也称为分布式事务。
+对于事务：
 
-在大多数情况下，多文档事务比单文档写入会产生更大的性能成本。对于大部分场景来说， [非规范化数据模型（嵌入式文档和数组）](https://www.mongodb.com/docs/upcoming/core/data-model-design/#std-label-data-modeling-embedding) 依然是最佳选择。也就是说，适当地对数据进行建模可以最大限度地减少对多文档事务的需求。
+- 可以在事务中创建集合和索引。
+- 事务中使用的集合可以位于不同的数据库中。
 
-**注意**：
+#### 在事务中创建集合和索引
 
-- 从 MongoDB 4.2 开始，多文档事务支持副本集和分片集群，其中：主节点使用 WiredTiger 存储引擎，同时从节点使用 WiredTiger 存储引擎或 In-Memory 存储引擎。在 MongoDB 4.0 中，只有使用 WiredTiger 存储引擎的副本集支持事务。
-- 在 MongoDB 4.2 及更早版本中，你无法在事务中创建集合。从 MongoDB 4.4 开始，您可以在事务中创建集合和索引。有关详细信息，请参阅 [在事务中创建集合和索引](https://www.mongodb.com/docs/upcoming/core/transactions/#std-label-transactions-create-collections-indexes)。
+如果事务不是跨分片写入事务，则可以在 [分布式事务](https://www.mongodb.com/zh-cn/docs/manual/core/transactions/#std-label-transactions) 中执行以下操作：
+
+- 创建集合。
+- 在先前同一事务中创建的新空集合上创建索引。
+
+在事务中创建集合时：
+
+- 可以 [隐式创建一个集合](https://www.mongodb.com/zh-cn/docs/manual/core/transactions-operations/#std-label-transactions-operations-ddl-implicit)，例如：
+  - 对不存在的集合进行 [插入操作](https://www.mongodb.com/zh-cn/docs/manual/core/transactions-operations/#std-label-transactions-operations-ddl-implicit)
+  - 对不存在的集合使用 `upsert: true` 进行 [update/findAndModify 操作](https://www.mongodb.com/zh-cn/docs/manual/core/transactions-operations/#std-label-transactions-operations-ddl-implicit)。
+- 可以使用 [`create`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/create/#mongodb-dbcommand-dbcmd.create) 命令或其辅助程序 [`db.createCollection()`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/create/#mongodb-dbcommand-dbcmd.create)[显式创建集合](https://www.mongodb.com/zh-cn/docs/manual/core/transactions-operations/#std-label-transactions-operations-ddl-explicit)。
+
+[在事务内创建索引](https://www.mongodb.com/zh-cn/docs/manual/core/transactions-operations/#std-label-transactions-operations-ddl-explicit) 时，要创建的索引必须位于以下位置之一：
+
+- 不存在的集合。集合作为操作的一部分创建。
+- 先前在同一事务中创建的新空集合。
+
+#### 计数操作
+
+要在事务内执行计数操作，请使用 [`$count`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/count/#mongodb-pipeline-pipe.-count) 聚合阶段或 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group)（带有 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 表达式）聚合阶段。
+
+MongoDB 驱动程序提供集合级 API `countDocuments(filter, options)` 作为辅助方法，该方法使用 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 和 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 表达式来执行计数。
+
+[`mongosh`](https://www.mongodb.com/zh-cn/docs/mongodb-shell/#mongodb-binary-bin.mongosh) 提供 [`db.collection.countDocuments()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.countDocuments/#mongodb-method-db.collection.countDocuments) 辅助方法，该方法使用 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 和 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 表达式进行计数。
+
+#### 去重操作
+
+如要在事务中执行不同的操作：
+
+- 对于未分片的集合，可以使用 [`db.collection.distinct()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.distinct/#mongodb-method-db.collection.distinct) 方法 /[`distinct`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/distinct/#mongodb-dbcommand-dbcmd.distinct) 命令以及带有 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 阶段的聚合管道。
+
+- 对于分片集合，不能使用 [`db.collection.distinct()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.distinct/#mongodb-method-db.collection.distinct) 方法或 [`distinct`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/distinct/#mongodb-dbcommand-dbcmd.distinct) 命令。
+
+  要查找分片集合的不同值，请改用带有 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 阶段的 aggregation pipeline。例如：
+
+  - 不使用 `db.coll.distinct("x")`，而是使用
+
+    ```javascript
+    db.coll.aggregate([
+      { $group: { _id: null, distinctValues: { $addToSet: '$x' } } },
+      { $project: { _id: 0 } }
+    ])
+    ```
+
+  - 不使用 `db.coll.distinct("x", { status: "A" })`，而是使用
+
+    ```javascript
+    db.coll.aggregate([
+      { $match: { status: 'A' } },
+      { $group: { _id: null, distinctValues: { $addToSet: '$x' } } },
+      { $project: { _id: 0 } }
+    ])
+    ```
+
+  管道返回一个指向文档的游标：
+
+  ```javascript
+  { "distinctValues" : [ 2, 3, 1 ] }
+  ```
+
+  迭代游标以访问结果文档。
+
+#### 信息操作
+
+事务中允许使用诸如 [`hello`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/hello/#mongodb-dbcommand-dbcmd.hello)、[`buildInfo`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/buildInfo/#mongodb-dbcommand-dbcmd.buildInfo)、[`connectionStatus`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/connectionStatus/#mongodb-dbcommand-dbcmd.connectionStatus)（及其辅助方法）之类的信息命令，但它们不能是事务中的第一项操作。
+
+#### 事务操作限制
+
+事务中不允许执行以下操作：
+
+- 在跨分片写事务中创建新集合。例如，如果在一个分片中写入一个现有集合，并在另一个分片中隐式创建一个集合，那么 MongoDB 将无法在同一事务中执行这两项操作。
+- 使用 [`"local"`](https://www.mongodb.com/zh-cn/docs/manual/core/transactions-operations/#std-label-transactions-operations-ddl-explicit) 以外的读关注级别时，[显式创建集合](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.createCollection/#mongodb-method-db.createCollection)（例如 [`db.createCollection()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.createIndexes/#mongodb-method-db.collection.createIndexes) 方法）和索引（例如 [`db.collection.createIndexes()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.createIndex/#mongodb-method-db.collection.createIndex) 和 [`db.collection.createIndex()`](https://www.mongodb.com/zh-cn/docs/manual/reference/read-concern-local/#mongodb-readconcern-readconcern.-local-) 方法）。
+- [`listCollections`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/listCollections/#mongodb-dbcommand-dbcmd.listCollections) 和 [`listIndexes`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/listIndexes/#mongodb-dbcommand-dbcmd.listIndexes) 命令及其辅助方法。
+- 其他非 CRUD 和非信息性操作（例如 [`createUser`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/createUser/#mongodb-dbcommand-dbcmd.createUser)、[`getParameter`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/getParameter/#mongodb-dbcommand-dbcmd.getParameter) 和 [`count`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/count/#mongodb-dbcommand-dbcmd.count)）及其辅助程序。
+- 并行操作。要同时更新多个命名空间，请考虑改用 [`bulkWrite`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/bulkWrite/#mongodb-dbcommand-dbcmd.bulkWrite) 命令。
 
 :::
 
@@ -544,7 +855,7 @@ MongoDB 支持两种分片算法来满足不同的查询需求（摘自 [MongoDB
 
 **1、基于范围的分片**：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042049549.png)
+![基于范围的分片](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042049549.png)
 
 MongoDB 按照分片键（Shard Key）的值的范围将数据拆分为不同的块（Chunk），每个块包含了一段范围内的数据。当分片键的基数大、频率低且值非单调变更时，范围分片更高效。
 
@@ -554,7 +865,7 @@ MongoDB 按照分片键（Shard Key）的值的范围将数据拆分为不同的
 
 **2、基于 Hash 值的分片**
 
-![img](https://oss.javaguide.cn/github/javaguide/database/mongodb/example-of-hash-based-sharding.png)
+![基于 Hash 值的分片](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052222683.png)
 
 MongoDB 计算单个字段的哈希值作为索引值，并以哈希值的范围将数据拆分为不同的块（Chunk）。
 

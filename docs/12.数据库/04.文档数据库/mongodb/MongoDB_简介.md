@@ -18,23 +18,9 @@ permalink: /pages/9eca06f6/
 
 ## 什么是 MongoDB
 
-MongoDB 是一个分布式文档数据库，由 C++ 语言编写。
+MongoDB 是一个**面向文档**的开源 NoSQL 数据库系统，由 **C++** 编写的。MongoDB 支持“**无模式**”的数据建模，可以存储比较复杂的数据类型，是一款非常流行的 **文档类型数据库** 。
 
-面向文档的数据库使用更灵活的“文档”模型取代了“行”的概念。通过嵌入文档和数组，面向文档的方式可以仅用一条记录来表示复杂的层次关系。
-
-## 面向文档
-
-MongoDB 中的记录是一个文档，它是由字段和值对组成的数据结构。MongoDB 文档类似于 JSON 对象。字段值可以包含其他文档、数组和文档数组。
-
-![A MongoDB document.](https://www.mongodb.com/zh-cn/docs/manual/images/crud-annotated-document.bakedsvg.svg)
-
-MongoDB 中没有预定义模式（predefined schema）：文档键值的类型和大小不是固定的。由于没有固定的模式，因此按需添加或删除字段变得更容易。
-
-综上，**MongoDB 支持结构化、半结构化数据模型，可以动态响应结构变化**。
-
-## 为什么使用 MongoDB
-
-### 主要功能
+在高负载的情况下，MongoDB 天然支持水平扩展和高可用，可以很方便地添加更多的节点/实例，以保证服务性能和可用性。在许多场景下，MongoDB 可以用于代替传统的关系型数据库或键/值存储方式，皆在为 Web 应用提供可扩展的高可用高性能数据存储解决方案。
 
 MongoDB 提供了丰富的功能：
 
@@ -44,55 +30,121 @@ MongoDB 提供了丰富的功能：
 - [**地理空间搜索**](https://www.mongodb.com/zh-cn/docs/manual/tutorial/geospatial-tutorial/)
 - ...
 
-### 分布式
+## MongoDB 特性
+
+MongoDB 主要有以下特性：
+
+- **面向文档** - MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/docs/manual/core/document/#std-label-bson-document-format)。BSON 是 [JSON](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-JSON) 文档的二进制表示形式，尽管它包含的数据类型比 JSON 多。最大 BSON 文档大小为 16 MB。
+- **无模式** - MongoDB 中没有预定义模式（predefined schema），文档键值的类型和大小不是固定的。由于没有固定的模式，因此按需添加或删除字段变得更容易。
+- **丰富的查询方式** - MongoDB 支持基本的 CRUD 以及数据聚合、文本搜索和地理空间查询。
+- **丰富的索引类型** - MongoDB 支持多种类型的索引，包括单字段索引、复合索引、多键索引、哈希索引、文本索引、 地理位置索引等，每种类型的索引有不同的使用场合。
+- **支持 ACID 事务** - NoSQL 通常不支持事务，但 MongoDB 支持事务，且 MongoDB 支持 ACID。
+  - MongoDB 单文档支持原子性，也具备事务的特性。
+  - MongoDB 4.0 加入了对多文档事务的支持，但只支持复制集部署模式下的事务，也就是说事务的作用域限制为一个副本集内。
+  - MongoDB 4.2 引入了分布式事务，增加了对分片集群上多文档事务的支持，并合并了对副本集上多文档事务的现有支持。
+- **支持压缩**：存储同样的数据所需的资源更少。
+- **支持 map-reduce** - 通过分治的方式完成复杂的聚合任务。不过，从 MongoDB 5.0 开始，map-reduce 已经不被官方推荐使用了，替代方案是 [聚合管道](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/)。聚合管道提供比 map-reduce 更好的性能和可用性。
+- **支持存储大文件**：MongoDB 的单文档存储空间要求不超过 16MB。对于超过 16MB 的大文件，MongoDB 提供了 GridFS 来进行存储，通过 GridFS，可以将大型数据进行分块处理，然后将这些切分后的小文档保存在数据库中。
 
 MongoDB 作为分布式存储，自然也具备了分布式的一般特性：
 
-- **高可用** - 通过**复制**机制实现**高可用**，提供**数据冗余**和**自动故障转移**能力。在 MongoDB 中，这种机制称为**[副本集](https://www.mongodb.com/zh-cn/docs/manual/replication/)**。**[副本集](https://www.mongodb.com/zh-cn/docs/manual/replication/)** 是一组 MongoDB 服务器，它们维护相同的数据集，并可提供冗余和提高数据可用性。
-- **高性能** - 通过**分片**机制提供**水平扩容**能力，以支撑海量数据，海量并发。从 3.4 开始，MongoDB 支持基于[**分片键**](https://www.mongodb.com/zh-cn/docs/manual/core/zone-sharding/#std-label-zone-sharding)创建数据的[**区域**](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-shard-key)。在均衡的集群中，MongoDB 仅将区域覆盖的读写定向到区域内的那些分片。
+- **高可用** - 通过**复制**机制实现**高可用**，提供**数据冗余**和**自动故障转移**能力。在 MongoDB 中，这种机制称为 [**副本集**](https://www.mongodb.com/zh-cn/docs/manual/replication/)。[**副本集**](https://www.mongodb.com/zh-cn/docs/manual/replication/) 是一组 MongoDB 服务器，它们维护相同的数据集，并可提供冗余和提高数据可用性。
+- **高性能** - 通过**分片**机制提供**水平扩容**能力，以支撑海量数据，海量并发。从 3.4 开始，MongoDB 支持基于 [**分片键**](https://www.mongodb.com/zh-cn/docs/manual/core/zone-sharding/#std-label-zone-sharding) 创建数据的 [**区域**](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-shard-key)。在均衡的集群中，MongoDB 仅将区域覆盖的读写定向到区域内的那些分片。
 
-### 存储引擎
+## MongoDB 简史
 
-MongoDB 支持[多种存储引擎：](https://www.mongodb.com/zh-cn/docs/manual/core/storage-engines/)
+MongoDB 是由 **10gen** 开发的 NoSQL 数据库，该公司由 Dwight Merriman 和 Eliot Horowitz 于 2007 年创立。2013 年，**10gen 更名为 MongoDB Inc**.。以更好地反映其对 MongoDB 数据库开发的关注。2017 年，MongoDB 公司上市。
 
-- [WiredTiger Storage Engine](https://www.mongodb.com/zh-cn/docs/manual/core/wiredtiger/)（包括对[静态加密](https://www.mongodb.com/zh-cn/docs/manual/core/security-encryption-at-rest/)的支持）
-- [用于自我管理部署的内存存储引擎。](https://www.mongodb.com/zh-cn/docs/manual/core/inmemory/)
+里程碑版本：
 
-此外，MongoDB 还提供可插拔的存储引擎 API，从而允许第三方基于 MongoDB 开发存储引擎。
+- **1.0** - 2009 年，MongoDB 发布第一版。
+- **1.6** - 2010 年，引入分片机制（Sharding），支持水平扩展。
+- **2.2** - 2012 年，引入了聚合管道（Pipeline）。
+- **2.4** - 2013 年，引入了全文搜索。
+- **3.0** - 2015 年，全面支持 **WiredTiger** 存储引擎，并支持可插拔存储引擎。
+- **4.0** - 2019 年，支持 ACID 事务。
+- **4.2** - 2020 年，支持分布式事务。
 
-## MongoDB 历史
-
-- 1.x - 支持复制和分片
-- 2.x - 更丰富的数据库功能
-- 3.x - WiredTiger 和周边生态
-- 4.x - 支持分布式事务
+> 扩展阅读：
+>
+> - [MongoDB 简史](https://www.infoq.cn/article/3d4suwkc2fvikykemnvw)
+> - [MongoDB 发展历史及各主要版本新特性概述](https://blog.csdn.net/JiekeXu/article/details/143670868)
 
 ## MongoDB 概念
 
 MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/docs/manual/core/document/#std-label-bson-document-format)。BSON 是 [JSON](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-JSON) 文档的二进制表示形式，尽管它包含的数据类型比 JSON 多。最大 BSON 文档大小为 16 MB。
 
-每个MongoDB 文档都需要一个唯一的 [\_id](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) 字段作为[主键](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-primary-key)。如果插入的文档省略了 `_id` 字段，则 MongoDB 驱动程序会自动为 `_id` 字段生成 [ObjectId](https://www.mongodb.com/zh-cn/docs/manual/reference/bson-types/#std-label-objectid)。
+每个 MongoDB 文档都需要一个唯一的 [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) 字段作为 [主键](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-primary-key)。如果插入的文档省略了 `_id` 字段，则 MongoDB 驱动程序会自动为 `_id` 字段生成 [ObjectId](https://www.mongodb.com/zh-cn/docs/manual/reference/bson-types/#std-label-objectid)。
 
-这些 [MongoDB 文档](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-document)收集在[集合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-collection)中。[数据库](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-database)存储一个或多个文档集合。
+这些 [MongoDB 文档](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-document) 收集在 [集合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-collection) 中。[数据库](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-database) 存储一个或多个文档集合。
 
-为了方便理解MongoDB 概念，下面将MongoDB概念和 RDBM 概念进行对比：
+为了方便理解 MongoDB 概念，下面将 MongoDB 概念和 RDBM 概念进行对比：
 
-| RDBM 概念          | MongoDB 概念                                                                       |
-| :----------------- | :--------------------------------------------------------------------------------- |
-| database（数据库） | database（数据库）                                                                 |
-| table（表）        | collection（集合）                                                                 |
-| row（行）          | document（文档）                                                                   |
-| column（列）       | field（字段）                                                                      |
-| index（索引）      | index（索引）                                                                      |
-| primary key        | [\_id](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) |
+| RDBM 概念          | MongoDB 概念                                                                        |
+| :----------------- | :---------------------------------------------------------------------------------- |
+| database（数据库） | database（数据库）                                                                  |
+| table（表）        | collection（集合）                                                                  |
+| row（行）          | document（文档）                                                                    |
+| column（列）       | field（字段）                                                                       |
+| index（索引）      | index（索引）                                                                       |
+| primary key        | [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) |
+
+### 文档
+
+文档是 MongoDB 中的**基本数据单元**。**文档是一组有序键值对（即 BSON）**。MongoDB 的文档不需要设置相同的字段，并且相同的字段不需要相同的数据类型，这与关系型数据库有很大的区别，也是 MongoDB 非常突出的特点。
+
+![MongoDB Document](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024526.png)
+
+需要注意的是：
+
+- **文档中的键/值对是有序的**。
+
+- 文档的键是字符串。除了少数例外情况，**键可以使用任意 UTF-8 字符**。
+
+- 文档中的值不仅可以是在双引号里面的字符串，还可以是其他几种数据类型（甚至可以是整个嵌入的文档）。
+
+- **MongoDB 区分类型和大小写**。例如，下面这两对文档是不同的：
+
+  ```json
+  {"count" : 5}
+  {"count" : "5"}
+
+  {"count" : 5}
+  {"Count" : 5}
+  ```
+
+- MongoDB 的文档不能有重复的键。例如，下面这个文档是不合法的
+
+  ```json
+  {"greeting" : "Hello, world!", "greeting" : "Hello, MongoDB!"
+  ```
+
+文档键命名规范：
+
+- 键不能含有 `\0` （空字符）。这个字符用来表示键的结尾。
+- `.` 和 `$` 有特别的意义，只有在特定环境下才能使用。
+- 以下划线 `_` 开头的键是保留的（不是严格要求的）。
+
+### 集合
+
+集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System) 中的表（Table）。集合存在于数据库中，集合没有固定的结构，这意味着你在对集合可以插入不同格式和类型的数据，但通常情况下我们插入集合的数据都会有一定的关联性。
+
+![MongoDB Collection](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024137.png)
+
+集合不需要事先创建，当第一个文档插入或者第一个索引创建时，如果该集合不存在，则会创建一个新的集合。使用 `.` 字符分隔不同命名空间的子集合是一种组织集合的惯例。例如，有一个具有博客功能的应用程序，可能包含名为 `blog.posts` 和名为 `blog.authors` 的集合。
+
+合法的集合名：
+
+- 集合名称不能是空字符串（""）。
+- 集合名称不能含有 `\0`（空字符），因为这个字符用于表示一个集合名称的结束。
+- 集合名称不能以 `system.` 开头，该前缀是为内部集合保留的。例如，`system.users` 集合中保存着数据库的用户，`system.namespaces` 集合中保存着有关数据库所有集合的信息。
+- 用户创建的集合名称中不应包含保留字符 `$`。许多驱动程序确实支持在集合名称中使用 `$`，这是因为某些由系统生成的集合会包含它，但除非你要访问的是这些集合之一，否则不应在名称中使用 `$` 字符。
 
 ### 数据库
 
-一个 MongoDB 中可以建立多个数据库。
+数据库用于存储所有集合，而集合又用于存储所有文档。一个 MongoDB 中可以创建多个数据库，每一个数据库都有自己的集合和权限。MongoDB 的单个实例可以容纳多个独立的数据库，每一个都有自己的集合和权限，不同的数据库也放置在不同的文件中。
 
 MongoDB 的默认数据库为"db"，该数据库存储在 data 目录中。
-
-MongoDB 的单个实例可以容纳多个独立的数据库，每一个都有自己的集合和权限，不同的数据库也放置在不同的文件中。
 
 **"show dbs"** 命令可以显示所有数据的列表。
 
@@ -114,7 +166,6 @@ MongoDBshell version: 3.0.6
 connecting to: test
 > db
 test
->
 ```
 
 运行"use"命令，可以连接到一个指定的数据库。
@@ -124,7 +175,6 @@ test
 switched to db local
 > db
 local
->
 ```
 
 数据库按照名称进行标识的。数据库名称可以是任意 UTF-8 字符串，但有以下限制：
@@ -140,74 +190,23 @@ local
 - **local**：这个数据永远不会被复制，可以用来存储限于本地单台服务器的任意集合
 - **config**：当 Mongo 用于分片设置时，config 数据库在内部使用，用于保存分片的相关信息。
 
-### 文档
-
-文档是 MongoDB 中的基本数据单元。
-
-文档是一组有序键值对(即 BSON)。MongoDB 的文档不需要设置相同的字段，并且相同的字段不需要相同的数据类型，这与关系型数据库有很大的区别，也是 MongoDB 非常突出的特点。
-
-需要注意的是：
-
-- 文档中的键/值对是有序的。
-
-- 文档的键是字符串。除了少数例外情况，键可以使用任意 UTF-8 字符。
-
-- 文档中的值不仅可以是在双引号里面的字符串，还可以是其他几种数据类型（甚至可以是整个嵌入的文档)。
-
-- MongoDB 区分类型和大小写。例如，下面这两对文档是不同的：
-
-  ```json
-  {"count" : 5}
-  {"count" : "5"}
-
-  {"count" : 5}
-  {"Count" : 5}
-  ```
-
-- MongoDB 的文档不能有重复的键。例如，下面这个文档是不合法的
-
-  ```json
-  {"greeting" : "Hello, world!", "greeting" : "Hello, MongoDB!"
-  ```
-
-文档键命名规范：
-
-- 键不能含有 `\0` (空字符)。这个字符用来表示键的结尾。
-- `.` 和 `$` 有特别的意义，只有在特定环境下才能使用。
-- 以下划线 `_` 开头的键是保留的(不是严格要求的)。
-
-### 集合
-
-集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System)中的表格。
-
-集合存在于数据库中，集合没有固定的结构，这意味着你在对集合可以插入不同格式和类型的数据，但通常情况下我们插入集合的数据都会有一定的关联性。
-
-使用 `.` 字符分隔不同命名空间的子集合是一种组织集合的惯例。例如，有一个具有博客功能的应用程序，可能包含名为 `blog.posts` 和名为 `blog.authors` 的集合。
-
-合法的集合名：
-
-- 集合名称不能是空字符串（""）。
-- 集合名称不能含有 `\0`（空字符），因为这个字符用于表示一个集合名称的结束。
-- 集合名称不能以 `system.` 开头，该前缀是为内部集合保留的。例如，`system.users` 集合中保存着数据库的用户，`system.namespaces` 集合中保存着有关数据库所有集合的信息。
-- 用户创建的集合名称中不应包含保留字符 `$`。许多驱动程序确实支持在集合名称中使用 `$`，这是因为某些由系统生成的集合会包含它，但除非你要访问的是这些集合之一，否则不应在名称中使用 `$` 字符。
-
 ### 元数据
 
 数据库的信息是存储在集合中。它们使用了系统的命名空间：`dbname.system.*`
 
-在 MongoDB 数据库中名字空间 `<dbname>.system.*` 是包含多种系统信息的特殊集合(Collection)，如下:
+在 MongoDB 数据库中命名空间 `<dbname>.system.*` 是包含多种系统信息的特殊集合 (Collection)，如下：
 
-| 集合命名空间             | 描述                                      |
-| :----------------------- | :---------------------------------------- |
-| dbname.system.namespaces | 列出所有名字空间。                        |
-| dbname.system.indexes    | 列出所有索引。                            |
-| dbname.system.profile    | 包含数据库概要(profile)信息。             |
-| dbname.system.users      | 列出所有可访问数据库的用户。              |
-| dbname.local.sources     | 包含复制对端（slave）的服务器信息和状态。 |
+| 集合命名空间               | 描述                                      |
+| :------------------------- | :---------------------------------------- |
+| `dbname.system.namespaces` | 列出所有命名空间。                        |
+| `dbname.system.indexes`    | 列出所有索引。                            |
+| `dbname.system.profile`    | 包含数据库概要 (profile) 信息。           |
+| `dbname.system.users`      | 列出所有可访问数据库的用户。              |
+| `dbname.local.sources`     | 包含复制对端（slave）的服务器信息和状态。 |
 
 对于修改系统集合中的对象有如下限制。
 
-在 `system.indexes` 插入数据，可以创建索引。但除此之外该表信息是不可变的(特殊的 drop index 命令将自动更新相关信息)。`system.users` 是可修改的。`system.profile` 是可删除的。
+在 `system.indexes` 插入数据，可以创建索引。但除此之外该表信息是不可变的（特殊的 drop index 命令将自动更新相关信息）。`system.users` 是可修改的。`system.profile` 是可删除的。
 
 ## BSON 数据类型
 
@@ -245,6 +244,6 @@ MongoDB 文档由键值对组成。字段名称是字符串；字段的值可以
 
 ## 参考资料
 
-- [MongoDB 官网](https://www.mongodb.com/)
-- [MongoDB Github](https://github.com/mongodb/mongo)
-- [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)
+- [MongoDB 官方文档之 MongoDB 简介](https://www.mongodb.com/zh-cn/docs/manual/introduction/)
+- [MongoDB 简史](https://www.infoq.cn/article/3d4suwkc2fvikykemnvw)
+- [MongoDB 发展历史及各主要版本新特性概述](https://blog.csdn.net/JiekeXu/article/details/143670868)

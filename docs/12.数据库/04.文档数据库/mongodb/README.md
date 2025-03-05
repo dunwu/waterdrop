@@ -27,27 +27,34 @@ index: false
 - [MongoDB 简介](MongoDB_简介.md)
 - [MongoDB CRUD](MongoDB_CRUD.md)
 - [MongoDB 聚合](MongoDB_聚合.md)
+- [MongoDB 索引](MongoDB_索引.md)
 - [MongoDB 事务](MongoDB_事务.md)
 - [MongoDB 建模](MongoDB_建模.md)
-- [MongoDB 索引](MongoDB_索引.md)
 - [MongoDB 复制](MongoDB_复制.md)
 - [MongoDB 分片](MongoDB_分片.md)
 - [MongoDB 运维](MongoDB_运维.md)
+- [MongoDB 面试](MongoDB_面试.md) 💯
 
 ## 📚 资料
 
 - **官方**
   - [MongoDB 官网](https://www.mongodb.com/)
-  - [MongoDB 官方手册](https://www.mongodb.com/zh-cn/docs/manual/)
   - [MongoDB Github](https://github.com/mongodb/mongo)
-  - [MongoDB 官方免费教程](https://university.mongodb.com/)
+  - [MongoDB 官方免费教程](https://learn.mongodb.com/)
+- **书籍**
+  - [《MongoDB 权威指南》](https://book.douban.com/subject/35688800/)
 - **教程**
-  - [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)
-  - [MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
+  - [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.md)
+  - [极客时间教程 - MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
 - **数据**
   - [mongodb-json-files](https://github.com/ozlerhakan/mongodb-json-files)
 - **文章**
   - [Introduction to MongoDB](https://www.slideshare.net/mdirolf/introduction-to-mongodb)
+  - [eBay: Building Mission-Critical Multi-Data Center Applications with MongoDB](https://www.mongodb.com/blog/post/ebay-building-mission-critical-multi-data-center-applications-with-mongodb)
+  - [The AWS and MongoDB Infrastructure of Parse: Lessons Learned](https://medium.baqend.com/parse-is-gone-a-few-secrets-about-their-infrastructure-91b3ab2fcf71)
+  - [Migrating Mountains of Mongo Data](https://medium.com/build-addepar/migrating-mountains-of-mongo-data-63e530539952)
+- **更多资源**
+  - [Github: Awesome MongoDB](https://github.com/ramnes/awesome-mongodb)
 
 ## 🚪 传送
 

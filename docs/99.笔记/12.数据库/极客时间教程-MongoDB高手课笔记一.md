@@ -1040,4 +1040,4 @@ Change Stream 只推送已经在大多数节点上提交的变更操作。即“
 
 ## 参考资料
 
-- [MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
+- [极客时间教程 - MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
