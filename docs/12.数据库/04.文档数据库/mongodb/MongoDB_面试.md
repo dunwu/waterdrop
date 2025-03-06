@@ -1,6 +1,7 @@
 ---
 icon: openmoji:military-medal
 title: MongoDB 面试
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062328094.jpg
 date: 2025-03-04 21:03:08
 categories:
   - 数据库
@@ -15,6 +16,8 @@ permalink: /pages/edc11157/
 ---
 
 # MongoDB 面试
+
+<!-- more -->
 
 ## MongoDB 简介
 

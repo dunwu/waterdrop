@@ -1,6 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 分片
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062347036.avif
 date: 2020-09-20 23:12:17
 categories:
   - 数据库
@@ -10,11 +11,25 @@ tags:
   - 数据库
   - 文档数据库
   - mongodb
-  - 分片
+  - 分区
 permalink: /pages/2b3824ce/
 ---
 
 # MongoDB 分片
+
+::: info 概述
+
+分区通常是这样定义的，即每一条数据（或者每条记录，每行或每个文档）只属于某个特定分区。实际上，每个分区都可以视为一个完整的小型数据库，虽然数据库可能存在一些跨分区的操作。
+
+在不同系统中，分区有着不同的称呼，例如它对应于 MongoDB, Elasticsearch 和 SolrCloud 中的 shard, HBase 的 region, Bigtable 中的 tablet, Cassandra 和 Riak 中的 vnode ，以及 Couch base 中的 vBucket。
+
+数据量如果太大，单台机器进行存储和处理就会成为瓶颈，因此需要引入数据分区机制。分区的目地是通过多台机器均匀分布数据和查询负载，避免出现热点。这需要选择合适的数据分区方案，在节点添加或删除时重新动态平衡分区。
+
+分区通常与复制结合使用，即每个分区在多个节点都存有副本。这意味着某条记录属于特定的分区，而同样的内容会保存在不同的节点上以提高系统的容错性。一个节点上可能存储了多个分区。每个分区都有自己的主副本，例如被分配给某节点，而从副本则分配在其他一些节点。一个节点可能既是某些分区的主副本，同时又是其他分区的从副本。
+
+:::
+
+<!-- more -->
 
 ## 分片集群简介
 

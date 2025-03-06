@@ -1,6 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB CRUD
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062319755.webp
 date: 2020-09-25 21:23:41
 categories:
   - 数据库
@@ -15,9 +16,15 @@ permalink: /pages/773f1695/
 
 # MongoDB CRUD
 
-MongoDB 的 CRUD 操作是针对 document 的读写操作。
+::: info 概述
 
-MongoDB 中的所有写入操作在单个文档级别上都是**原子**的。
+**CRUD** 由英文单词 **C**reate, **R**ead, **U**pdate, **D**elete 的首字母组成，即**增删改查**。
+
+本文通过介绍基本的 MongoDB CRUD 方法，向读者呈现如何访问 MongoDB 数据。
+
+:::
+
+<!-- more -->
 
 ## 插入操作
 
@@ -337,6 +344,12 @@ db.pizzas.bulkWrite([
 
 - 反转分片键的二进制位。这样将保留信息，并避免将插入顺序与递增的值序列相关联。
 - 交换第一个和最后一个 16 位字，“随机打乱”插入。
+
+## 小结
+
+一图胜千言，下面是 MongoDB CRUD 操作的基础要点：
+
+![CRUD - 原图来自 [MongoDB CRUD Operations – Simplified](https://dbversity.com/mongodb-crud-operations-simplified/)](https://raw.githubusercontent.com/dunwu/images/master/snap/202503062320260.png)
 
 ## 参考资料
 

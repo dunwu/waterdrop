@@ -1,6 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 简介
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062317588.webp
 date: 2020-09-07 07:54:19
 categories:
   - 数据库
@@ -10,11 +11,21 @@ tags:
   - 数据库
   - 文档数据库
   - mongodb
-  - BSON
+  - bson
 permalink: /pages/9eca06f6/
 ---
 
 # MongoDB 简介
+
+::: info 概述
+
+**MongoDB 是一个流行的、开源的文档数据库**。
+
+本文简单介绍了 MongoDB 的功能、特性、发行版本、简史、概念，可以让读者在短时间内对于 MongoDB 有一个初步的认识。
+
+:::
+
+<!-- more -->
 
 ## 什么是 MongoDB
 
@@ -50,6 +61,14 @@ MongoDB 作为分布式存储，自然也具备了分布式的一般特性：
 
 - **高可用** - 通过**复制**机制实现**高可用**，提供**数据冗余**和**自动故障转移**能力。在 MongoDB 中，这种机制称为 [**副本集**](https://www.mongodb.com/zh-cn/docs/manual/replication/)。[**副本集**](https://www.mongodb.com/zh-cn/docs/manual/replication/) 是一组 MongoDB 服务器，它们维护相同的数据集，并可提供冗余和提高数据可用性。
 - **高性能** - 通过**分片**机制提供**水平扩容**能力，以支撑海量数据，海量并发。从 3.4 开始，MongoDB 支持基于 [**分片键**](https://www.mongodb.com/zh-cn/docs/manual/core/zone-sharding/#std-label-zone-sharding) 创建数据的 [**区域**](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-shard-key)。在均衡的集群中，MongoDB 仅将区域覆盖的读写定向到区域内的那些分片。
+
+## MongoDB 发行版本
+
+MongoDB 有以下发行版本：
+
+- [MongoDB Atlas](https://www.mongodb.com/zh-cn/docs/atlas?tck=docs_server) - 用于云端 MongoDB 部署的完全托管服务
+- [MongoDB Enterprise](https://www.mongodb.com/zh-cn/docs/manual/administration/install-enterprise/#std-label-install-mdb-enterprise) - 基于订阅、自行管理的 MongoDB 版本
+- [MongoDB Community](https://www.mongodb.com/zh-cn/docs/manual/administration/install-community/#std-label-install-mdb-community-edition) - source-available、可免费使用以及自行管理的 MongoDB 版本
 
 ## MongoDB 简史
 

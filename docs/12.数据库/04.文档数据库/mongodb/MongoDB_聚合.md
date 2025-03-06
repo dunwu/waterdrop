@@ -1,6 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 聚合
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062323072.png
 date: 2020-09-21 21:22:57
 categories:
   - 数据库
@@ -16,7 +17,7 @@ permalink: /pages/02aefb0c/
 
 # MongoDB 聚合
 
-## 聚合简介
+::: info 概述
 
 聚合操作处理多个文档并返回计算结果。可以使用聚合操作来：
 
@@ -24,11 +25,17 @@ permalink: /pages/02aefb0c/
 - 对分组数据执行操作，返回单一结果。
 - 分析一段时间内的数据变化。
 
-若要执行聚合操作，可以使用：
+在 MongoDB 中，支持以下聚合方式：
 
 - [聚合管道](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-aggregation-pipeline-intro)，这是执行聚合的首选方法。
 - [单一目的聚合方法](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-single-purpose-agg-methods)，这些方法很简单，但缺乏聚合管道的功能。
 - [Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/)，从 MongoDB 5.0 开始，[Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/#std-label-Map-Reduce) 已被弃用。聚合管道提供的性能和可用性比 Map-Reduce 更优越。
+
+本文将逐一介绍这三种聚合方式的要点和使用方法。
+
+:::
+
+<!-- more -->
 
 ## 聚合管道简介
 

@@ -1,4 +1,5 @@
 ---
+icon: logos:mongodb
 title: 《MongoDB 权威指南》笔记一
 date: 2024-09-29 07:45:34
 categories:
@@ -7,11 +8,15 @@ categories:
 tags:
   - 数据库
   - 文档数据库
-  - MongoDB
+  - mongodb
 permalink: /pages/ee6834b2/
 ---
 
 # 《MongoDB 权威指南》笔记一
+
+[《MongoDB 权威指南》](https://book.douban.com/subject/35688800/) 学习笔记
+
+<!-- more -->
 
 ## 第 1 章 MongoDB 简介
 

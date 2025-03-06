@@ -1,6 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 复制
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20200920204024.svg
 date: 2020-09-20 23:12:17
 categories:
   - 数据库
@@ -16,99 +17,148 @@ permalink: /pages/57308862/
 
 # MongoDB 复制
 
-## 副本和可用性
+::: info 概述
 
-MongoDB 中*的副本集*是一组维护相同数据集的 [`mongod`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongod/#mongodb-binary-bin.mongod) 进程。复制提供冗余并提高[数据可用性](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-high-availability)。由于数据副本位于不同的数据库服务器上，复制提供了一定程度的容错能力，以防止单个数据库服务器丢失。
+**复制主要指通过网络在多台机器上保存相同数据的副本**。
 
-在某些情况下，副本还可以**提供更大的读取吞吐量**。因为客户端可以将读取操作发送到不同的服务器。在不同数据中心中维护数据副本可以提高数据本地性和分布式应用程序的可用性。您还可以维护其他副本以用于专用目的：例如故障恢复，报告或备份。
+复制数据，可能出于各种各样的原因：
 
-## MongoDB 副本
+- **提高可用性** - 当部分组件出现位障，系统依然可以继续工作，系统依然可以继续工作。
+- **降低访问延迟** - 使数据在地理位置上更接近用户。
+- **提高读吞吐量** - 扩展至多台机器以同时提供数据访问服务。
 
-副本集是一组维护相同数据集的 [`mongod`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongod/#mongodb-binary-bin.mongod) 实例。副本集包含多个数据承载节点和一个（可选）仲裁节点。在数据承载节点中，有且只有一个成员被视为主节点，而其他节点被视为辅助节点。
+综上可知，复制是所有分布式系统的核心特性，是高可用的重要保证。
 
-每个副本集节点必须属于且只能属于一个副本集。
+MongoDB 本身是一个分布式数据库，自然也需要具备复制的能力。MongoDB 复制采用了经典的主从架构。**所有的写入操作都发送到主节点**，由主节点负责将数据更改事件发送到从节点，每个从节点都可以接收读请求。
 
-[主节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/#std-label-replica-set-primary)接收所有写入操作。一个副本集只能有一个主节点，能够通过 [`{ w： “majority” }`](https://www.mongodb.com/zh-cn/docs/manual/reference/write-concern/#mongodb-writeconcern-writeconcern.-majority-) 确认写操作；尽管在某些情况下，另一个 mongod 实例可能会暂时认为自己也是主节点。主节点在其 oplog （即 [oplog](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-oplog/)）中记录对其数据集的所有更改。有关主节点操作的更多信息，请参阅[副本集主节点。](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/)
+本文将逐一阐述 MongoDB 复制的各个要点，以及如何基于复制来保证 MongoDB 的高可用。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165054.svg)
+:::
 
-[从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/#std-label-replica-set-secondary-members-ref)复制主节点的 oplog 并将操作应用于其数据集，以便辅助数据库的数据集反映主数据库的数据集。如果主节点不可用，符合条件的从节点将举行选举，以选举自己为新的主节点。
+<!-- more -->
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165055.svg)
+## 复制模式
 
-在某些情况下（例如，有一个主节点和一个从节点，但由于成本限制，禁止添加另一个从节点），您可以选择将 mongod 实例作为仲裁节点添加到副本集。仲裁节点参加选举但不保存数据（即不提供数据冗余）。
+**复制主要指通过网络在多台机器上保存相同数据的副本**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165053.svg)
+分布式系统复制的模式有以下几种：
 
-仲裁节点将永远是仲裁节点。在选举期间，主节点可能会降级成为次节点，而次节点可能会升级成为主节点。
+- **主从复制** - **所有的写入操作都发送到主节点**，由主节点负责将数据更改事件发送到从节点。每个从节点都可以接收读请求，但内容可能是过期值。
+- **多主复制** - **系统存在多个主节点，每个都可以接收写请求**，客户端将写请求发送到其中的一个主节点上，由该主节点负责将数据更改事件同步到其他主节点和自己的从节点。
+- **无主复制** - **系统中不存在主节点，每一个节点都能接受客户端的写请求**。接受写请求的副本不会将数据变更同步到其他的副本。此外，**读取时从多个节点上并行读取，以此检测和纠正某些过期数据**。
+
+**MongoDB 复制采用了主从架构**。
+
+## 副本集
+
+在 MongoDB 中，**副本集**是一组维护相同数据集的 [`mongod`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongod/#mongodb-binary-bin.mongod) 进程，副本集提供了冗余和[高可用性](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-high-availability)。MongoDB 副本集中有三种节点类型：
+
+- [主节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/#std-label-replica-set-primary) - 主节点接收所有写入操作。
+- [从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/#std-label-replica-set-secondary-members-ref) - 从节点复制主节点的操作以维护相同的数据集。
+- [仲裁节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-arbiter/#std-label-replica-set-arbiter-configuration) - 仲裁节点将参与[主节点的选举](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-elections/#std-label-replica-set-elections)，但仲裁节点**没有**数据集的副本，从而**无法**成为主节点。
+
+一个副本集中，有且只有一个主节点，可以有一个[仲裁节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-arbiter/#std-label-replica-set-arbiter-configuration)（可选），多个[从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/#std-label-replica-set-secondary-members-ref)。
+
+### 主节点
+
+[主节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/#std-label-replica-set-primary)会接收所有写入操作。副本集只能有一个可以使用 [`{ w: "majority" }`](https://www.mongodb.com/zh-cn/docs/manual/reference/write-concern/#mongodb-writeconcern-writeconcern.-majority-) 写关注（write concern）级别对写入请求进行确认的主节点；尽管在某些情况下，另一 mongod 实例可能会暂时将自身视为主节点。主节点在其操作日志（即 [oplog](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-oplog/)）中记录对其数据集的所有更改。
+
+> 扩展阅读：[副本集主节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/)
+
+![读写请求路由到主节点](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165054.svg)
+
+### 从节点
+
+[从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/#std-label-replica-set-secondary-members-ref)负责复制[主节点](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-primary)的数据集副本。为了复制数据，从节点异步的将来自主节点的 [oplog](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-oplog/#std-label-replica-set-oplog) 操作同步到自己的数据集。如果主节点不可用，则某个符合条件的从节点将进行选举，以将自己选举为新的主节点。
+
+尽管客户端无法将数据写入从节点，但客户端可以自从节点读取数据。
+
+> 扩展阅读：[副本集从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/)
+
+![一主两从集群](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165055.svg)
+
+### 仲裁节点
+
+在某些情况下（例如存在一个主节点和一个从节点，但由于成本有限无法再添加另一个从节点），可以选择将一个 [`mongod`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongod/#mongodb-binary-bin.mongod) 实例作为[仲裁节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-arbiter/#std-label-replica-set-arbiter-configuration)添加到副本集中。仲裁节点参与[选举](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-elections/#std-label-replica-set-elections)，但不持有数据（即不提供数据冗余）。
+
+> 扩展阅读：[副本集仲裁节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-arbiter/)
+
+![一主一从一仲裁集群](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165053.svg)
+
+[仲裁节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-arbiter/#std-label-replica-set-arbiter-configuration)将永远是仲裁节点，而在选举期间，[主节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/#std-label-replica-set-primary)可能被降级成为[从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/#std-label-replica-set-secondary-members-ref)，从节点可能变为主节点。
+
+> 注意：不要在同时托管主节点或从节点的服务器上运行投票节点。
 
 ## 异步复制
 
-### 慢操作
+从节点会复制主节点的 oplog 并将操作异步应用于其数据集。通过使从节点的数据集反应主节点数据集的状态，即便一个或多个节点出现故障，副本集也可继续运行。
 
-从节点复制主节点的 oplog ，并将操作异步应用于其数据集。通过从节点同步主节点的数据集，即使一个或多个成员失败，副本集（MongoDB 集群）也可以继续运行。
-
-从 4.2 版本开始，副本集的从节点记录慢操作（操作时间比设置的阈值长）的日志条目。这些慢操作在 [`REPL`](https://docs.mongodb.com/manual/reference/log-messages/#REPL) 组件下的 [诊断日志](https://docs.mongodb.com/manual/reference/program/mongod/#cmdoption-mongod-logpath) 中记录了日志消息，并使用了文本 `op: <oplog entry>` 花费了 `<num>ms`。这些慢 oplog 条目仅取决于慢操作阈值，而不取决于日志级别（在系统级别或组件级别），配置级别或运行缓慢的采样率。探查器不会捕获缓慢的 oplog 条目。
+> 扩展阅读：
+>
+> - [副本集 Oplog](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-oplog/#std-label-replica-set-oplog)
+> - [副本集数据同步](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-sync/#std-label-replica-set-sync)
 
 ### 复制延迟和流控
 
-复制延迟（[Replication lag](https://docs.mongodb.com/manual/reference/glossary/#term-replication-lag)）是指将主节点上的写操作复制到从节点上所花费的时间。较短的延迟时间是可以接受的，但是随着复制延迟的增加，可能会出现严重的问题：比如在主节点上的缓存压力。
+副本集的从节点会记录应用时间超过慢操作阈值的 [oplog 条目](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-oplog/#std-label-slow-oplog-application)。
 
-从 MongoDB 4.2 开始，管理员可以限制主节点的写入速率，使得大多数延迟时间保持在可配置的最大值 [`flowControlTargetLagSeconds`](https://docs.mongodb.com/manual/reference/parameters/#param.flowControlTargetLagSeconds) 以下。
+[复制延迟](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-replication-lag)是指[主节点](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-primary)上的操作与将该操作从 [oplog](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-oplog) 应用到[从节点](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-secondary)之间的延迟。一些小的延迟是可以接受的，但随着复制延迟的增加，会出现严重的问题，包括在主节点上创建缓存压力。
 
-默认情况下，流控是开启的。
+管理员可以限制主节点应用写入的速率，目标是将 [`majority committed`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/replSetGetStatus/#mongodb-data-replSetGetStatus.optimes.lastCommittedOpTime) 延迟保持在可配置的最大 [`flowControlTargetLagSeconds`](https://www.mongodb.com/zh-cn/docs/manual/reference/parameters/#mongodb-parameter-param.flowControlTargetLagSeconds) 值以下。默认情况下，流量控制为 [`enabled`。](https://www.mongodb.com/zh-cn/docs/manual/reference/parameters/#mongodb-parameter-param.enableFlowControl)
 
-启用流控后，随着延迟时间越来越接近 [`flowControlTargetLagSeconds`](https://docs.mongodb.com/manual/reference/parameters/#param.flowControlTargetLagSeconds)，主对象上的写操作必须先获得令牌，然后才能进行锁定并执行写操作。通过限制每秒发出的令牌数量，流控机制尝试将延迟保持在目标以下。
+启用流量控制后，随着延迟接近 [`flowControlTargetLagSeconds`](https://www.mongodb.com/zh-cn/docs/manual/reference/parameters/#mongodb-parameter-param.flowControlTargetLagSeconds)，主节点上的写入操作必须先获取令牌，然后才能进行锁定并执行写操作。通过限制每秒发出的令牌数量，流量控制机制将尝试将延迟保持在目标延迟以下。
 
 ## 故障转移
 
-当主节点与集群中的其他成员通信的时间超过配置的 `electionTimeoutMillis`（默认为 10 秒）时，符合选举要求的从节点将要求选举，并提名自己为新的主节点。集群尝试完成选举新主节点并恢复正常工作。
+当主节点在超过配置的 [`electionTimeoutMillis`](https://www.mongodb.com/zh-cn/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.settings.electionTimeoutMillis) 时间段（默认 10 秒）内未与副本集中的其他节点通信时，一个符合条件的从节点将发起选举，并提名自己成为新的主节点。集群将尝试完成新主节点的选举并恢复其正常运转。
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920175429.svg)
 
-选举完成前，副本集无法处理写入操作。如果将副本集配置为：在主节点处于脱机状态时，在次节点上运行，则副本集可以继续提供读取查询。
+在成功完成选举之前，副本集无法处理写操作。如果将读取查询配置为当主节点离线时[在从节点上运行](https://www.mongodb.com/zh-cn/docs/manual/core/read-preference/#std-label-replica-set-read-preference)，那么副本集可以继续为读取查询提供服务。
 
-假设[副本配置](https://docs.mongodb.com/manual/reference/replica-configuration/#rsconf.settings)采用默认配置，则集群选择新节点的时间通常不应超过 12 秒，这包括：将主节点标记为不可用并完成选举所需的时间。可以通过修改 [`settings.electionTimeoutMillis`](https://docs.mongodb.com/manual/reference/replica-configuration/#rsconf.settings.electionTimeoutMillis) 配置选项来调整此时间。网络延迟等因素可能会延长完成选举所需的时间，进而影响集群在没有主节点的情况下可以运行的时间。这些因素取决于集群实际的情况。
+假设采用默认 [`replica configuration settings`](https://www.mongodb.com/zh-cn/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.settings)（副本配置设置），那么集群选举新的主节点之前的平均时间通常不应超过 12 秒。这包括将主节点标记为[不可用](https://www.mongodb.com/zh-cn/docs/manual/replication/#std-label-replication-auto-failover)以及召集和完成[选举](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-elections/#std-label-replica-set-elections)所需的时间。可以通过修改 [`settings.electionTimeoutMillis`](https://www.mongodb.com/zh-cn/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.settings.electionTimeoutMillis) 复制配置选项来调整该时间段。网络延迟等因素可能会延长副本集选举完成所需的时间，这反过来又会影响集群在没有主节点的情况下运行的时间。这些因素取决于具体集群架构。
 
-将默认为 10 秒的 [`electionTimeoutMillis`](https://docs.mongodb.com/manual/reference/replica-configuration/#rsconf.settings.electionTimeoutMillis) 选项数值缩小，可以更快地检测到主要故障。但是，由于网络延迟等因素，集群可能会更频繁地进行选举，即使该主节点实际上处于健康状态。这可能导致 [w : 1](https://docs.mongodb.com/manual/reference/write-concern/#wc-w) 写操作的回滚次数增加。
+将 [`electionTimeoutMillis`](https://www.mongodb.com/zh-cn/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.settings.electionTimeoutMillis) 复制配置选项从默认的 `10000`（10 秒）降低，可以更快地检测到主节点故障。然而，由于临时网络延迟等因素，即使主节点在其他方面是健康的，集群也可能会更频繁地进行选举。这可能导致 [w: 1](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-rollbacks/#std-label-replica-set-rollback) 写入操作的[回滚次数增加](https://www.mongodb.com/zh-cn/docs/manual/reference/write-concern/#std-label-wc-w)。
 
-应用程序的连接逻辑应包括对自动故障转移和后续选举的容错处理。从 MongoDB 3.6 开始，MongoDB 驱动程序可以检测到主节点的失联，并可以自动重试一次某些写入操作。
+应用程序连接逻辑应包括对自动故障转移和后续选举的容忍度。MongoDB 驱动程序可检测到主节点丢失，并一次性自动[重试某些写入操作](https://www.mongodb.com/zh-cn/docs/manual/core/retryable-writes/#std-label-retryable-writes)，从而为自动故障转移和选举提供额外的内置处理功能：
 
-从 MongoDB4.4 开始，MongoDB 提供镜像读取：将可选举的从节点的最近访问的数据，预热为缓存。预热从节点的缓存可以帮助在选举后更快地恢复。
+MongoDB 提供[镜像读](https://www.mongodb.com/zh-cn/docs/manual/replication/#std-label-mirrored-reads)功能，用最近访问的数据预热可选从节点缓存。预热从节点的缓存有助于在选举后更快地恢复性能。
 
 ## 读操作
 
-### 读取首选项
+### 读取偏好
 
-默认情况下，客户端从主节点读取数据；但是，客户端可以指定读取首选项，以将读取操作发送到从节点。
+默认情况下，客户端从主节点读取数据；但是，客户端可以指定[读取偏好](https://www.mongodb.com/zh-cn/docs/manual/core/read-preference/)以向从节点发送读取操作。
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920204024.svg)
 
-异步复制到从节点意味着向从节点读取数据可能会返回与主节点不一致的数据。
+[异步复制](https://www.mongodb.com/zh-cn/docs/manual/replication/#std-label-asynchronous-replication)到从节点意味着在从节点读取到的数据可能不会反映主节点上数据的状态。
 
-包含读取操作的多文档事务必须使用读取主节点优先。给定事务中的所有操作必须路由到同一成员。
+包含读操作的[分布式事务](https://www.mongodb.com/zh-cn/docs/manual/core/transactions/#std-label-transactions)必须使用读取偏好 [`primary`](https://www.mongodb.com/zh-cn/docs/manual/core/read-preference/#mongodb-readmode-primary)。给定事务中的所有操作必须路由至同一节点。
+
+> 扩展阅读：[读取偏好](https://www.mongodb.com/zh-cn/docs/manual/core/read-preference/)
 
 ### 数据可见性
 
-根据读取的关注点，客户端可以在持久化写入前查看写入结果：
+根据读关注，客户端可在写入操作[持久化](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-durable)之前看到写入结果：
 
-- 不管写的 [write concern](https://docs.mongodb.com/manual/reference/write-concern/) 如何设置，其他使用 [`"local"`](https://docs.mongodb.com/manual/reference/read-concern-local/#readconcern."local") 或 [`"available"`](https://docs.mongodb.com/manual/reference/read-concern-available/#readconcern."available") 的读配置的客户端都可以向发布客户端确认写操作之前看到写操作的结果。
-- 使用 [`"local"`](https://docs.mongodb.com/manual/reference/read-concern-local/#readconcern."local") 或 [`"available"`](https://docs.mongodb.com/manual/reference/read-concern-available/#readconcern."available") 读取配置的客户端可以读取数据，这些数据随后可能会在副本集故障转移期间回滚。
+- 无论写入操作的[写关注级别](https://www.mongodb.com/zh-cn/docs/manual/reference/write-concern/#std-label-write-concern)如何，使用 [`"local"`](https://www.mongodb.com/zh-cn/docs/manual/reference/read-concern-local/#mongodb-readconcern-readconcern.-local-) 或 [`"available"`](https://www.mongodb.com/zh-cn/docs/manual/reference/read-concern-available/#mongodb-readconcern-readconcern.-available-) 读关注（read concern）的其他客户端均可在写入操作被发起它的客户端确认之前，看到该操作的结果。
+- 使用 [`"local"`](https://www.mongodb.com/zh-cn/docs/manual/reference/read-concern-local/#mongodb-readconcern-readconcern.-local-) 或 [`"available"`](https://www.mongodb.com/zh-cn/docs/manual/reference/read-concern-available/#mongodb-readconcern-readconcern.-available-) 读关注的客户端可读取数据，而这些数据后续可能会在副本集故障转移期间进行[回滚](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-rollbacks/)。
 
-对于多文档事务中的操作，当事务提交时，在事务中进行的所有数据更改都将保存，并在事务外部可见。也就是说，事务在回滚其他事务时将不会提交其某些更改。在提交事务前，事务外部看不到在事务中进行的数据更改。
+对于[多文档事务](https://www.mongodb.com/zh-cn/docs/manual/core/transactions/)中的操作，当事务提交时，该事务中进行的所有数据更改都将保存并在事务外部可见。换言之，一个事务不会在回滚其他事务的同时提交某些更改。
 
-但是，当事务写入多个分片时，并非所有外部读操作都需要等待已提交事务的结果在所有分片上可见。例如，如果提交了一个事务，并且在分片 A 上可以看到写 1，但是在分片 B 上还看不到写 2，则在 [`"local"`](https://docs.mongodb.com/manual/reference/read-concern-local/#readconcern."local") 读配置级别，外部读取可以读取写 1 的结果而看不到写 2。
+在事务进行提交前，在事务中所做的数据更改在事务外不可见。不过，当事务写入多个分片时，并非所有外部读取操作都需等待已提交事务的结果在各个分片上可见。例如，如果事务已提交并且写入 1 在分片 A 上可见，但写入 2 在分片 B 上尚不可见，则读关注 [`"local"`](https://www.mongodb.com/zh-cn/docs/manual/reference/read-concern-local/#mongodb-readconcern-readconcern.-local-) 处的外部读取可以在不看到写入 2 的情况下读取写入 1 的结果。
+
+> 有关 MongoDB 读取隔离性、一致性和新近度的更多信息，请参阅[读取隔离性、一致性和新近度](https://www.mongodb.com/zh-cn/docs/manual/core/read-isolation-consistency-recency/)。
 
 ### 镜像读取
 
-从 MongoDB 4.4 开始，MongoDB 提供镜像读取以预热可选从节点（即优先级大于 0 的成员）的缓存。使用镜像读取（默认情况下已启用），主节点可以镜像它接收到的一部分操作，并将其发送给可选择的从节点的子集。子集的大小是可配置的。
+镜像读取可减少由于中断或计划维护后主节点选举对系统的影响。在副本集发生[故障转移](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-failover)后，接管成为新主节点的从节点会在新查询请求传入时更新其缓存。在缓存预热期间，性能可能会受到影响。
+
+镜像读会预热 [`electable`](https://www.mongodb.com/zh-cn/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.members-n-.priority) 从节点副本集成员的缓存。为了预热可选举从节点的缓存，主节点会将其接收到的[受支持操作](https://www.mongodb.com/zh-cn/docs/manual/replication/#std-label-mirrored-reads-supported-operations)的示例镜像到可选举的从节点。
+
+可以使用 [`mirrorReads`](https://www.mongodb.com/zh-cn/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.members-n-.priority) 参数来配置接收镜像读的 [`electable`](https://www.mongodb.com/zh-cn/docs/manual/reference/parameters/#mongodb-parameter-param.mirrorReads) 从节点副本集节点的子集的大小。有关更多详细信息，请参见[启用/禁用对镜像读的支持](https://www.mongodb.com/zh-cn/docs/manual/replication/#std-label-mirrored-reads-parameters)。
 
 ## 参考资料
 
-- **官方**
-  - [MongoDB 官网](https://www.mongodb.com/)
-  - [MongoDB Github](https://github.com/mongodb/mongo)
-  - [MongoDB 官方免费教程](https://learn.mongodb.com/)
-- **教程**
-  - [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)
-  - [极客时间教程 - MongoDB 高手课](https://time.geekbang.org/course/intro/100040001)
+- [MongoDB 官方文档之复制](https://www.mongodb.com/zh-cn/docs/manual/replication/)

@@ -1,6 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 索引
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20200921210621.svg
 date: 2020-09-21 21:22:57
 categories:
   - 数据库
@@ -16,15 +17,23 @@ permalink: /pages/567ecac8/
 
 # MongoDB 索引
 
+::: info 概述
+
+索引通常能够极大的提高查询的效率。如果**没有索引**，MongoDB 在读取数据时**必须扫描 collection 中的每个 document** 并选取那些符合查询条件的记录。这种扫描全集合的查询是非常低效的，特别是在处理大量的数据时。查询可能要花费几十秒甚至几分钟，这种性能开销是不可接受的。索引可提高查询性能，但**添加索引会影响写入操作的性能**。对于写入读取率高的集合，由于每次插入操作都必须同时更新所有索引，因此会带来较高的索引成本。
+
+本文介绍了 MongoDB 的基本索引操作、索引类型，和设置索引的策略。掌握了 MongoDB 索引的要点，有助于提高访问 MongoDB 数据的效率。
+
+:::
+
+<!-- more -->
+
 ## 索引简介
-
-### 索引的作用
-
-**MongoDB 在 collection 数据级别上定义索引**。
 
 索引通常能够极大的提高查询的效率。如果**没有索引**，MongoDB 在读取数据时**必须扫描 collection 中的每个 document** 并选取那些符合查询条件的记录。这种扫描全集合的查询是非常低效的，特别是在处理大量的数据时。查询可能要花费几十秒甚至几分钟，这种性能开销是不可接受的。索引可提高查询性能，但**添加索引会影响写入操作的性能**。对于写入读取率高的集合，由于每次插入操作都必须同时更新所有索引，因此会带来较高的索引成本。
 
 索引是一种特殊的数据结构，它以易于遍历的形式存储一小部分集合数据集。**MongoDB 索引使用 [B-tree](https://en.wikipedia.org/wiki/B-tree) 数据结构**。索引可存储某个特定字段或多个字段的值，并按字段的值进行排序。索引条目的排序支持高效的相等匹配和基于范围的查询操作。此外，**MongoDB 还可使用索引中的顺序来返回排序后的结果**。
+
+**MongoDB 在 collection 数据级别上定义索引**。
 
 ![MongoDB 索引](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921210621.svg)
 
