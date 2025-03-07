@@ -264,7 +264,36 @@ MongoDB 中的所有 Map-Reduce 函数都是 JavaScript，并在 mongod 进程�
 
 :::
 
-## 存储
+## MongoDB 存储
+
+### 【基础】MongoDB 支持哪些数据类型？
+
+:::details 要点
+
+Java 类似数据类型：
+
+| 类型       | 解析                                                                            |
+| :--------- | :------------------------------------------------------------------------------ |
+| `String`   | 字符串。存储数据常用的数据类型。在 `MongoDB` 中，`UTF-8` 编码的字符串才是合法的 |
+| `Integer`  | 整型数值。用于存储数值。根据你所采用的服务器，可分为 32 位或 64 位              |
+| `Double`   | 双精度浮点值。用于存储浮点值                                                    |
+| `Boolean`  | 布尔值。用于存储布尔值（真/假）                                                 |
+| `Arrays`   | 用于将数组或列表或多个值存储为一个键                                            |
+| `Datetime` | 记录文档修改或添加的具体时间                                                    |
+
+MongoDB 特有数据类型：
+
+| 类型                 | 解析                                                                        |
+| :------------------- | :-------------------------------------------------------------------------- |
+| `ObjectId`           | 用于存储文档 `id`,`ObjectId`是基于分布式主键的实现`MongoDB`分片也可继续使用 |
+| `Min/Max Keys`       | 将一个值与 BSON（二进制的 JSON）元素的最低值和最高值相对比                  |
+| `Code`               | 用于在文档中存储 `JavaScript`代码                                           |
+| `Regular Expression` | 用于在文档中存储正则表达式                                                  |
+| `Binary Data`        | 二进制数据。用于存储二进制数据                                              |
+| `Null`               | 用于创建空值                                                                |
+| `Object`             | 用于内嵌文档                                                                |
+
+:::
 
 ### 【基础】MongoDB 的逻辑存储是什么？
 
@@ -475,7 +504,7 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 :::
 
-## 索引
+## MongoDB 索引
 
 > 扩展阅读：
 >
@@ -638,7 +667,9 @@ db.users.find({gender:"M"},{user_name:1,_id:0})
 
 :::
 
-## 事务
+## MongoDB 事务
+
+> 扩展阅读：[MongoDB 官方文档之事务](https://www.mongodb.com/zh-cn/docs/manual/core/transactions/)
 
 > 扩展阅读：
 >
@@ -757,7 +788,9 @@ MongoDB 驱动程序提供集合级 API `countDocuments(filter, options)` 作为
 
 :::
 
-## 复制
+## MongoDB 复制
+
+> 扩展阅读：[MongoDB 官方文档之事务](https://www.mongodb.com/zh-cn/docs/manual/core/transactions/)
 
 ### 【中级】MongoDB 的副本机制是怎样的？
 
@@ -798,7 +831,7 @@ MongoDB 的复制集群又称为副本集群，是一组维护相同数据集合
 
 :::
 
-## 分片
+## MongoDB 分片
 
 ### 【中级】什么是分片集群？
 

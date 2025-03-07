@@ -1,6 +1,7 @@
 ---
 icon: logos:mongodb
-title: MongoDB 建模示例
+title: MongoDB 建模
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503072140127.png
 date: 2020-09-12 10:43:53
 categories:
   - 数据库
@@ -14,7 +15,54 @@ tags:
 permalink: /pages/20ae84ea/
 ---
 
-# MongoDB 建模示例
+# MongoDB 建模
+
+::: info 概述
+
+数据建模是指对数据库中的数据以及相关实体间的链接进行组织。MongoDB 中的数据具有**灵活的模式模型**，因此：
+
+- 单个 [集合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-collection) 中的 [文档](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-document) 不必具有相同的字段集。
+- 字段的数据类型可能因集合中的文档而异。
+
+通常，集合中的文档具有相似的结构。为确保数据模型的一致性，可以创建 [模式验证规则](https://www.mongodb.com/zh-cn/docs/manual/core/schema-validation/#std-label-schema-validation-overview)。
+
+:::
+
+<!-- more -->
+
+## 模式设计：关系数据库和文档数据库的差异
+
+为 MongoDB 等文档数据库设计模式时，需要考虑与关系数据库的一些重要区别。
+
+| 关系数据库行为                                                   | 文档数据库行为                                                                                                                 |
+| :--------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| 在插入数据之前，您必须确定表格的模式。                           | 随着应用程序需求的变化，模式可能会随时间而变化。                                                                               |
+| 您经常需要连接来自多个不同表格的数据，以返回应用程序所需的数据。 | 灵活的数据模型使您可以存储数据以匹配应用程序返回数据的方式，并避免连接。避免多个集合之间的连接可以提高性能，并减少部署工作量。 |
+
+## 文档数据模型
+
+MongoDB 是无模式的，那么文档之间如何关联呢？要关联文档数据，有两种方式：
+
+- 嵌入式数据模型
+- 引用式数据模型
+
+### 嵌入式数据模型
+
+嵌入式文档在单一文档结构中存储相关数据。文档可以包含具有相关数据的数组和子文档。这些**非规范化**数据模型允许应用程序在单个数据库操作中检索相关数据。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503072153634.svg)
+
+> 扩展阅读：[嵌入式数据模型](https://www.mongodb.com/zh-cn/docs/manual/data-modeling/concepts/embedding-vs-references/#std-label-data-modeling-embedding)
+
+### 引用式数据模型
+
+引用通过包含从一个文档到另一个文档的链接（称为**引用**）来存储数据之间的关系。例如，`orders` 集合中的 `customerId` 字段表示对 `customers` 集合中文档的引用。
+
+应用程序可以通过解析这些引用来访问相关数据。从广义上讲，这些是**规范化**数据模型。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503072157794.svg)
+
+> 扩展阅读：[引用式数据模型](https://www.mongodb.com/zh-cn/docs/manual/data-modeling/concepts/embedding-vs-references/#std-label-data-modeling-referencing)
 
 ## 关系型模型
 
@@ -583,4 +631,4 @@ MongoDB 文档格式非常灵活，势必会带来版本维护上的难度。
 
 ## 参考资料
 
-- [Data Model Examples and Patterns](https://docs.mongodb.com/manual/applications/data-models/)
+- [MongoDB 官方文档之数据建模](https://www.mongodb.com/zh-cn/docs/manual/data-modeling/)

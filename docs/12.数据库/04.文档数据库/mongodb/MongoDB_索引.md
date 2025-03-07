@@ -1,7 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 索引
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20200921210621.svg
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503072209292.webp
 date: 2020-09-21 21:22:57
 categories:
   - 数据库
