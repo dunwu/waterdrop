@@ -1,6 +1,7 @@
 ---
 icon: logos:elasticsearch
 title: Elasticsearch 教程
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503092052127.png
 date: 2022-04-11 16:52:35
 categories:
   - 数据库
