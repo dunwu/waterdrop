@@ -18,15 +18,23 @@ permalink: /pages/c6244284/
 
 # Elasticsearch 聚合
 
-聚合将数据汇总为指标、统计数据或其他分析。
+::: info 概述
+
+在数据库中，聚合是指将数据进行分组统计，得到一个汇总的结果。例如，计算总和、平均值、最大值或最小值等操作。
 
 Elasticsearch 将聚合分为三类：
 
-| 类型                                                                                                                          | 说明                               |
-| ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| [**Metric（指标聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics.html)    | 根据字段值进行统计计算             |
-| [**Bucket（桶聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket.html)       | 根据字段值、范围或其他条件进行分组 |
-| [**Pipeline（管道聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html) | 根据其他聚合结果进行聚合           |
+| 类型                                                                                                                          | 说明                                   |
+| ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| [**Metric（指标聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics.html)    | 根据字段值进行**统计**计算             |
+| [**Bucket（桶聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket.html)       | 根据字段值、范围或其他条件进行**分组** |
+| [**Pipeline（管道聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html) | 对其他聚合输出的结果进行**再次聚合**   |
+
+本文将逐一介绍这几种聚合方式的用法和特性。
+
+:::
+
+<!-- more -->
 
 ## 聚合的用法
 
@@ -840,7 +848,6 @@ POST /employees/_search
         "extended_bounds":{
           "min":0,
           "max":100000
-
         }
       }
     }
@@ -1155,16 +1162,25 @@ POST /employees/_search
 
 ## 聚合的执行流程
 
-ES 在进行聚合分析时，协调节点会在每个分片的主分片、副分片中选一个，然后在不同分片上分别进行聚合计算，然后将每个分片的聚合结果进行汇总，返回最终结果。
+在 ES 中，不仅仅是普通搜索，相关性计算（评分）和聚合计算也是先在每个 shard 的本地进行计算，再由 coordinate node 进行汇总。由于分片的本地计算是独立的，只能基于数据子集来进行计算，所以难免出现数据偏差。
 
-由于，并非基于全量数据进行计算，所以聚合结果并非完全准确。
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012144894.png)
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012145912.png)
 
 要解决聚合准确性问题，有两个解决方案：
 
-- 解决方案 1：当数据量不大时，设置 Primary Shard 为 1，这意味着在数据全集上进行聚合。
-- 解决方案 2：设置 [`shard_size`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-shard-size) 参数，将计算数据范围变大，进而使得 ES 的**整体性能变低，精准度变高**。shard_size 值的默认值是 `size * 1.5 + 10`。
+- 解决方案 1：当数据量不大的情况下，**设置主分片数为 1**，这意味着在数据全集上进行聚合。但这种方案不太现实。
+- 解决方案 2：**设置 [`shard_size`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-shard-size) 参数**，将计算数据范围变大，**牺牲整体性能，提高精准度**。shard_size 的默认值是 `size * 1.5 + 10`。
+
+## FAQ
+
+### 如何对海量数据（过亿）进行聚合计算？
+
+Elasticsearch 支持 [`cardinality`（近似计算非重复值）](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html) 。它提供一个字段的基数，即该字段的 distinct 或者 unique 值的数目。它是基于 HLL 算法的。HLL 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 bits 做概率估算从而得到基数。其特点是：可配置的精度，用来控制内存的使用（更精确 ＝ 更多内存）；小的数据集精度是非常高的；我们可以通过配置参数，来设置去重需要的固定内存使用量。无论数千还是数十亿的唯一值，内存使用量只与你配置的精确度相关。
 
 ## 参考资料
 
 - [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
-- [ES 官方文档之 Aggregations](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)
+- [Elasticsearch 官方文档之聚合](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)
+- [Elasticsearch 从入门到实践之聚合](https://www.itshujia.com/read/elasticsearch/348.html)

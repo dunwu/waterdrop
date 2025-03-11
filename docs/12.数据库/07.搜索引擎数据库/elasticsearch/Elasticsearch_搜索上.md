@@ -57,11 +57,11 @@ Elasticsearch 基于 Lucene 开发，并引入了分段搜索的概念。分段�
 
 位于 Elasticsearch 和磁盘之间的是文件系统缓存。内存中索引缓冲区的文档会被写入新的分段，然后写入文件系统缓存，然后才刷新到磁盘。
 
-![A Lucene index with new documents in the in-memory buffer](https://www.elastic.co/guide/en/elasticsearch/reference/current/images/lucene-in-memory-buffer.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110724002.png)
 
 Lucene 允许写入和打开新分段，使其包含的文档对搜索可见，而无需执行完全提交。这是一个比提交到磁盘要轻松得多的过程，并且可以频繁地完成而不会降低性能。
 
-![The buffer contents are written to a segment, which is searchable, but is not yet committed](https://www.elastic.co/guide/en/elasticsearch/reference/current/images/lucene-written-not-committed.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110725002.png)
 
 在 Elasticsearch 中，写入和打开新分段的这一过程称为刷新。刷新使自上次刷新以来对索引执行的所有操作都可用于搜索。
 
@@ -472,4 +472,4 @@ Elasticsearch 允许自定义查询规则来进行搜索。
 ## 参考资料
 
 - [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
-- [ES 官方文档之 Search your data](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-with-elasticsearch.html)
+- [Elasticsearch 官方文档之搜索数据](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-with-elasticsearch.html)

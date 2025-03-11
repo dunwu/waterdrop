@@ -1,6 +1,7 @@
 ---
 icon: logos:elasticsearch
 title: Elasticsearch 文本分析
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110802917.png
 date: 2022-02-22 21:01:01
 categories:
   - 数据库
@@ -25,7 +26,7 @@ permalink: /pages/6bfb0fbf/
 文本分析可以分为两个方面：
 
 - **Tokenization（分词化）** - 分析通过分词化使全文搜索成为可能：将文本分解成更小的块，称为分词。在大多数情况下，这些标记是单独的 term（词项）。
-- **Normalizeation（标准化）** - 经过分词后的文本只能进行词项匹配，但是无法进行同义词匹配。为解决这个问题，可以将文本进行标准化处理。例如：将 `foxes` 标准化为 `fox`。
+- **Normalization（标准化）** - 经过分词后的文本只能进行词项匹配，但是无法进行同义词匹配。为解决这个问题，可以将文本进行标准化处理。例如：将 `foxes` 标准化为 `fox`。
 
 ## Analyzer（分析器）
 
@@ -343,4 +344,4 @@ Elasticsearch 内置了很多分词过滤器，这里列举几个常见的：
 ## 参考资料
 
 - [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
-- [ES 官方文档之 Text Analysis](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html)
+- [Elasticsearch 官方文档之文本分析](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html)

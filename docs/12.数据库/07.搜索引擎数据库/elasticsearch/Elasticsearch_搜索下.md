@@ -50,7 +50,7 @@ Elasticsearch 提供了基于 JSON 的 DSL（Domain Specific Language）来定�
 - [intervals](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-intervals-query.html) - 根据匹配词的顺序和近似度返回文档。
 - [match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html) - **匹配查询**，用于执行全文搜索的标准查询，包括模糊匹配和短语或邻近查询。
 - [match_bool_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-bool-prefix-query.html) - 对检索文本分词，并根据这些分词构造一个布尔查询。除了最后一个分词之外的每个分词都进行 term 查询。最后一个分词用于 `prefix` 查询；其他分词都进行 `term` 查询。
-- [match_phrase](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html) - 短语匹配查询。
+- [match_phrase](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html) - **短语匹配查询**，短语匹配会将检索内容分词，这些词语必须全部出现在被检索内容中，并且顺序必须一致，默认情况下这些词都必须连续。
 - [match_phrase_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html) - 与 `match_phrase` 查询类似，但对最后一个单词执行通配符搜索。
 - [multi_match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html) 支持多字段 match 查询
 - [combined_fields](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-combined-fields-query.html) - 匹配多个字段，就像它们已索引到一个组合字段中一样。
@@ -290,9 +290,7 @@ GET kibana_sample_data_ecommerce/_search
 
 **`Term`（词项）是表达语意的最小单位**。搜索和利用统计语言模型进行自然语言处理都需要处理 Term。
 
-全文查询在执行查询之前会分析查询字符串。
-
-与全文查询不同，**词项级别查询不会分词**，而是将输入作为一个整体，在倒排索引中查找准确的词项。并且使用相关度计算公式为每个包含该词项的文档进行相关度计算。一言以概之：**词项查询是对词项进行精确匹配**。词项查询通常用于结构化数据，如数字、日期和枚举类型。
+全文查询在执行查询之前会分析查询字符串。与全文查询不同，**词项级别查询不会分词**，而是将输入作为一个整体，在倒排索引中查找准确的词项。并且使用相关度计算公式为每个包含该词项的文档进行相关度计算。一言以概之：**词项查询是对词项进行精确匹配**。词项查询通常用于结构化数据，如数字、日期和枚举类型。
 
 词项查询有以下类型：
 
@@ -392,7 +390,7 @@ GET kibana_sample_data_ecommerce/_search
 
 [**`range`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html) 用于匹配在某一范围内的数值型、日期类型或者字符串型字段的文档。比如搜索哪些书籍的价格在 50 到 100 之间、哪些书籍的出版时间在 2015 年到 2019 年之间。**使用 range 查询只能查询一个字段，不能作用在多个字段上**。
 
-`range` 查询支持的参数有以下几种 -
+`range` 查询支持的参数有以下几种：
 
 - **`gt`** - 大于
 - **`gte`** - 大于等于
@@ -467,7 +465,8 @@ GET kibana_sample_data_ecommerce/_search
 
 [**`term`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html) 用来查找指定字段中包含给定单词的文档，term 查询不被解析，只有查询词和文档中的词精确匹配才会被搜索到，应用场景为查询人名、地名等需要精准匹配的需求。
 
-注意：应避免 term 查询对 text 字段使用查询。默认情况下，Elasticsearch 针对 text 字段的值进行解析分词，这会使查找 text 字段值的精确匹配变得困难。要搜索 text 字段值，需改用 match 查询。
+> 注意：**应避免 term 查询对 text 字段使用查询**。默认情况下，Elasticsearch 针对 text 字段的值进行解析分词，这会使查找 text 字段值的精确匹配变得困难。要搜索 text 字段值，需改用 match 查询。
+>
 
 :::details term 示例
 
@@ -623,7 +622,7 @@ GET kibana_sample_data_ecommerce/_search
 
 ### bool （布尔查询）
 
-[`bool`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html) 查询可以把任意多个简单查询组合在一起，使用 must、should、must_not、filter 选项来表示简单查询之间的逻辑，每个选项都可以出现 0 次到多次，它们的含义如下：
+[`bool`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html) 查询可以把任意多个简单查询组合在一起，使用 `must`、`should`、`must_not`、`filter` 选项来表示简单查询之间的逻辑，每个选项都可以出现 0 次到多次，它们的含义如下：
 
 - `must` - 文档必须匹配 must 选项下的查询条件，相当于逻辑运算的 AND，且参与文档相关度的评分。
 - `should` - 文档可以匹配 should 选项下的查询条件也可以不匹配，相当于逻辑运算的 OR，且参与文档相关度的评分。
@@ -704,7 +703,7 @@ GET kibana_sample_data_ecommerce/_search
 
 ### constant_score
 
-使用 [`constant_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html) 可以将 `query` 转化为 `filter`，filter 可以忽略相关性算分的环节，并且 filter 可以有效利用缓存，从而提高查询的性能。
+使用 [`constant_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html) 可以将 `query` 转化为 `filter`，可以忽略相关性算分的环节，并且 filter 可以有效利用缓存，从而提高查询的性能。
 
 :::details constant_score 示例
 
@@ -808,14 +807,14 @@ ES 通过 [**`Suggester`**](https://www.elastic.co/guide/en/elasticsearch/refere
 
 根据使用场景的不同，ES 提供了以下 4 种 Suggester：
 
-- **Term Suggester** - 基于单词的纠错补全。
+- **Term Suggester** - 基于词项的纠错补全。
 - **Phrase Suggester** - 基于短语的纠错补全。
 - **Completion Suggester** - 自动补全单词，输入词语的前半部分，自动补全单词。
 - **Context Suggester** - 基于上下文的补全提示，可以实现上下文感知推荐。
 
 ### Term Suggester
 
-Term Suggester **提供了基于单词的纠错、补全功能，其工作原理是基于编辑距离（edit distance）来运作的，编辑距离的核心思想是一个词需要改变多少个字符就可以和另一个词一致**。
+Term Suggester **提供了基于单词的纠错、补全功能，其工作原理是基于编辑距离（edit distance）来运作的，编辑距离的核心思想是一个词需要改变多少个字符就可以和另一个词一致**。所以如果一个词转化为原词所需要改动的字符数越少，它越有可能是最佳匹配。
 
 :::details term suggester 示例
 
@@ -875,11 +874,11 @@ GET kibana_sample_data_ecommerce/_search
 
 :::
 
-Term Suggester API 有很多参数，比较常用的有以下几个 -
+Term Suggester API 有很多参数，比较常用的有以下几个：
 
 - **text** - 指定了需要产生建议的文本，一般是用户的输入内容。
 - **field** - 指定从文档的哪个字段中获取建议。
-- **suggest_mode** - 设置建议的模式。其值有以下几个选项 -
+- **suggest_mode** - 设置建议的模式。其值有以下几个选项：
   - `missing` - 如果索引中存在就不进行建议，默认的选项。
   - `popular` - 推荐出现频率更高的词。
   - `always` - 不管是否存在，都进行建议。
@@ -1140,8 +1139,12 @@ POST books_context/_search
 ## 参考资料
 
 - [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
-- [Elasticsearch 从入门到实践](https://www.itshujia.com/books/elasticsearch)
-- [Full text queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
-- [Term-level queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html)
-- [Compound queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)
-- [Suggesters](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
+- [Elasticsearch 从入门到实践之全文搜索 API 实践](https://www.itshujia.com/read/elasticsearch/344.html)
+- [Elasticsearch 从入门到实践之 Term Query API 实践](https://www.itshujia.com/read/elasticsearch/345.html)
+- [Elasticsearch 从入门到实践之组合查询](https://www.itshujia.com/read/elasticsearch/346.html)
+- [Elasticsearch 从入门到实践之 Suggesters API](https://www.itshujia.com/read/elasticsearch/347.html)
+- [Elasticsearch 官方文档之全文查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
+- [Elasticsearch 官方文档之词项查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html)
+- [Elasticsearch 官方文档之组合查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)
+- [Elasticsearch 官方文档之推荐查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
+- [Elasticsearch 官方文档之查询和过滤上下文](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html)

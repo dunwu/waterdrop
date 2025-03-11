@@ -1,7 +1,7 @@
 ---
 icon: logos:elasticsearch
-title: Elasticsearch 教程
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503092052127.png
+title: Elasticsearch
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110800267.webp
 date: 2022-04-11 16:52:35
 categories:
   - 数据库
@@ -16,13 +16,21 @@ hidden: true
 index: false
 ---
 
-# Elasticsearch 教程
+# Elasticsearch
 
-> Elasticsearch 是一个基于 Lucene 的搜索和数据分析工具，它提供了一个分布式服务。Elasticsearch 是遵从 Apache 开源条款的一款开源产品，是当前主流的企业级搜索引擎。
+::: info 概述
+
+Elasticsearch 是一个基于 Lucene 的搜索和数据分析工具，它提供了一个分布式服务。Elasticsearch 是遵从 Apache 开源条款的一款开源产品，是当前主流的企业级搜索引擎。
+
+:::
+
+<!-- more -->
 
 ## 📖 内容
 
 - [Elasticsearch 简介](Elasticsearch_简介.md)
+- [Elasticsearch CRUD](Elasticsearch_CRUD.md)
+- [Elasticsearch Mapping](Elasticsearch_Mapping.md)
 - [Elasticsearch 存储](Elasticsearch_存储.md)
 - [Elasticsearch 搜索（上）](Elasticsearch_搜索上.md)
 - [Elasticsearch 搜索（下）](Elasticsearch_搜索下.md)
@@ -53,11 +61,10 @@ index: false
 - **文章**
   - [Elasticsearch+Logstash+Kibana 教程](https://www.cnblogs.com/xing901022/p/4704319.html)
   - [ELK（Elasticsearch、Logstash、Kibana）安装和配置](https://github.com/judasn/Linux-Tutorial/blob/master/ELK-Install-And-Settings.md)
-  - **性能调优相关**的工程实践
-    - [Elasticsearch Performance Tuning Practice at eBay](https://www.ebayinc.com/stories/blogs/tech/elasticsearch-performance-tuning-practice-at-ebay/)
-    - [Elasticsearch at Kickstarter](https://kickstarter.engineering/elasticsearch-at-kickstarter-db3c487887fc)
-    - [9 tips on ElasticSearch configuration for high performance](https://www.loggly.com/blog/nine-tips-configuring-elasticsearch-for-high-performance/)
-    - [Elasticsearch In Production - Deployment Best Practices](https://medium.com/@abhidrona/elasticsearch-deployment-best-practices-d6c1323b25d7)
+  - [Elasticsearch Performance Tuning Practice at eBay](https://www.ebayinc.com/stories/blogs/tech/elasticsearch-performance-tuning-practice-at-ebay/)
+  - [Elasticsearch at Kickstarter](https://kickstarter.engineering/elasticsearch-at-kickstarter-db3c487887fc)
+  - [9 tips on ElasticSearch configuration for high performance](https://www.loggly.com/blog/nine-tips-configuring-elasticsearch-for-high-performance/)
+  - [Elasticsearch In Production - Deployment Best Practices](https://medium.com/@abhidrona/elasticsearch-deployment-best-practices-d6c1323b25d7)
 - **更多资源**
   - [GitHub: Awesome ElasticSearch](https://github.com/dzharii/awesome-elasticsearch)
 

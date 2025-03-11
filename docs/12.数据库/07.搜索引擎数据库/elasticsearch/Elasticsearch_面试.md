@@ -1,6 +1,7 @@
 ---
-icon: logos:elasticsearch
+icon: openmoji:military-medal
 title: Elasticsearch 面试
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
 date: 2020-06-16 07:10:44
 categories:
   - 数据库
@@ -18,24 +19,30 @@ permalink: /pages/6219b063/
 
 ## Elasticsearch 简介
 
+> 扩展阅读：
+>
+> - [Elasticsearch 官方文档之基础知识](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro-what-is-es.html)
+
 ### 【基础】什么是 ES？
 
 :::details 要点
 
-**[Elasticsearch](https://github.com/elastic/elasticsearch) 是一个开源的分布式搜索和分析引擎**。
+![Elasticsearch](https://raw.githubusercontent.com/dunwu/images/master/snap/202411241734774.png)
 
-**[Elasticsearch](https://github.com/elastic/elasticsearch) 基于搜索库 [Lucene](https://github.com/apache/lucene-solr) 开发**。Elasticsearch 隐藏了 Lucene 的复杂性，提供了简单易用的 REST API / Java API 接口（另外还有其他语言的 API 接口）。
+[**Elasticsearch**](https://github.com/elastic/elasticsearch) 是一个开源的分布式**搜索和分析引擎**。
 
-Elasticsearch 是面向文档的，它**将复杂数据结构序列化为 JSON 形式存储**。
+[Elasticsearch](https://github.com/elastic/elasticsearch) **基于搜索库 [Lucene](https://github.com/apache/lucene-solr) 开发**。Elasticsearch 隐藏了 Lucene 的复杂性，提供了简单易用的 REST API / Java API 接口（另外还有其他语言的 API 接口）。
 
-**Elasticsearch 是近实时（Near Realtime，缩写 NRT）的全文搜索**。近实时是指：
+Elasticsearch 是**面向文档**的，它将复杂数据结构序列化为 **JSON** 形式存储。
+
+Elasticsearch 提供**近实时**（Near Realtime，缩写 NRT）的**全文搜索**。近实时是指：
 
 - 从写入数据到数据可以被搜索，存在较小的延迟（大概是 1s）。
 - 基于 Elasticsearch 执行搜索和分析可以达到秒级。
 
 :::
 
-### 【基础】ES 的应用场景有哪些？
+### 【基础】ES 有哪些应用场景？
 
 :::details 要点
 
@@ -59,6 +66,64 @@ Elasticsearch 被广泛应用于以下场景：
 
 :::
 
+### 【基础】Elasticsearch 有哪些里程碑版本？
+
+:::details 要点
+
+Elasticsearch 里程碑版本：
+
+- 1.0（2014 年）
+- 5.0（2016 年）
+  - Lucene 6.x
+  - 默认打分机制从 TD-IDF 改为 BM25
+  - 增加 Keyword 类型
+- 6.0（2017 年）
+  - Lucene 7.x
+  - 跨集群复制
+  - 索引生命周期管理
+  - SQL 的支持
+- 7.0（2019 年）
+  - Lucene 8.0
+  - 移除 Type
+  - ECK （用于支持 K8S）
+  - 集群协调
+  - High Level Rest Client
+  - Script Score 查询
+- 8.0（2022 年）
+  - Lucene 9.0
+  - 向量搜索
+  - 支持 OpenTelemetry
+
+:::
+
+### 【基础】什么是 Elasic Stack(ELK)？
+
+:::details 要点
+
+Elastic Stack 通常被用来作为日志采集、检索、可视化的解决方案。
+
+![ELK](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231210104.png)
+
+Elastic Stack 也常被称为 ELK，这是 Elastic 公司旗下三款产品 [Elasticsearch](https://www.elastic.co/elasticsearch) 、[Logstash](https://www.elastic.co/products/logstash) 、[Kibana](https://www.elastic.co/kibana) 的首字母组合。
+
+- [Elasticsearch](https://www.elastic.co/elasticsearch) 负责存储数据，并提供对数据的检索和分析。
+- [Logstash](https://www.elastic.co/logstash) 传输和处理你的日志、事务或其他数据。
+- [Kibana](https://www.elastic.co/kibana) 将 Elasticsearch 的数据分析并渲染为可视化的报表。
+
+Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](https://www.elastic.co/beats)，这是针对不同类型数据的轻量级采集器套件。
+
+此外，基于 Elastic Stack，其技术生态还可以和一些主流的分布式中间件进行集成，以应对各种不同的场景。
+
+![Elastic Stack](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231211496.png)
+
+:::
+
+## Elasticsearch CRUD
+
+> 扩展阅读：
+>
+> - [Elasticsearch 官方文档之 REST API](https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html)
+
 ### 【基础】如何在 ES 中 CRUD？
 
 :::details 要点
@@ -74,33 +139,124 @@ Elasticsearch 的基本 CRUD 方式如下：
 - **批量更新** - `bulk` API 支持 `index/create/update/delete`
 - **批量查询** - `_mget` 和 `_msearch` 可以用于批量查询
 
-> 扩展：[Quick starts](https://www.elastic.co/guide/en/elasticsearch/reference/current/quickstart.html)
+> 扩展阅读：[Quick starts](https://www.elastic.co/guide/en/elasticsearch/reference/current/quickstart.html)
 
 :::
 
-### 【中级】什么是 Elasic Stack(ELK)？
+## Elasticsearch Mapping
+
+> 扩展阅读：
+>
+> - [Elasticsearch 官方文档之 Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
+> - [Elasticsearch 从入门到实践之 Mapping](https://www.itshujia.com/read/elasticsearch/351.html)
+
+### 【基础】ES 支持哪些数据类型？
 
 :::details 要点
 
-Elastic Stack 通常被用来作为日志采集、检索、可视化的解决方案。
+Elasticsearch 支持丰富的数据类型，常见的有：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231210104.png)
+- 文本类型：[`text`](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html)、[`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#keyword-field-type)、[`constant_keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#constant-keyword-field-type)、 [`wildcard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#wildcard-field-type)
+- 二进制类型：[`binary`](https://www.elastic.co/guide/en/elasticsearch/reference/current/binary.html)
+- 数值类型：`long`、`float` 等
+- 日期类型：[`date`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html)
+- 布尔类型：[`boolean`](https://www.elastic.co/guide/en/elasticsearch/reference/current/boolean.html)
+- 对象类型：[`object`](https://www.elastic.co/guide/en/elasticsearch/reference/current/object.html)、[`nested`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html)
 
-Elastic Stack 也常被称为 ELK，这是 Elastic 公司旗下三款产品 [Elasticsearch](https://www.elastic.co/elasticsearch) 、[Logstash](https://www.elastic.co/products/logstash) 、[Kibana](https://www.elastic.co/kibana) 的首字母组合。
+> 扩展：[数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
 
-- [Elasticsearch](https://www.elastic.co/elasticsearch) 负责存储数据，并提供对数据的检索和分析。
-- [Logstash](https://www.elastic.co/logstash) 传输和处理你的日志、事务或其他数据。
-- [Kibana](https://www.elastic.co/kibana) 将 Elasticsearch 的数据分析并渲染为可视化的报表。
+:::
 
-Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](https://www.elastic.co/beats)，这是针对不同类型数据的轻量级采集器套件。
+### 【基础】ES 如何识别字段的数据类型？
 
-此外，基于 Elastic Stack，其技术生态还可以和一些主流的分布式中间件进行集成，以应对各种不同的场景。
+:::details 要点
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231211496.png)
+在 Elasticsearch 中，`Mapping`（映射），用来定义一个文档以及其所包含的字段如何被存储和索引，可以在映射中事先定义字段的数据类型、字段的权重、分词器等属性，就如同在关系型数据库中创建数据表时会设置字段的类型。简言之，**Mapping 定义了索引中的文档有哪些字段及其类型、这些字段是如何存储和索引的，就好像数据库的表定义一样。**
+
+Mapping 会把 json 文档映射成 Lucene 所需要的扁平格式
+
+一个 Mapping 属于一个索引的 Type
+
+- 每个文档都属于一个 Type
+- 一个 Type 有一个 Mapping 定义
+- 7.0 开始，不需要在 Mapping 定义中指定 type 信息
+
+每个 `document` 都是 `field` 的集合，每个 `field` 都有自己的数据类型。映射数据时，可以创建一个 `mapping`，其中包含与 `document` 相关的 `field` 列表。映射定义还包括元数据 `field`，例如 `_source` ，它自定义如何处理 `document` 的关联元数据。
+
+在 Elasticsearch 中，映射可分为**静态映射**和**动态映射**。在关系型数据库中写入数据之前首先要建表，在建表语句中声明字段的属性，在 Elasticsearch 中，则不必如此，Elasticsearch 最重要的功能之一就是让你尽可能快地开始探索数据，文档写入 Elasticsearch 中，它会根据字段的类型自动识别，这种机制称为**动态映射**，而**静态映射**则是写入数据之前对字段的属性进行手工设置。
+
+#### 静态映射
+
+Elasticsearch 官方将静态映射称为**显式映射（[Explicit mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html)）**。**静态映射**是在创建索引时手工指定索引映射。静态映射和 SQL 中在建表语句中指定字段属性类似。相比动态映射，通过静态映射可以添加更详细、更精准的配置信息。
+
+例如：
+
+- 哪些字符串字段应被视为全文字段。
+- 哪些字段包含数字、日期或地理位置。
+- 日期值的格式。
+- 用于控制动态添加字段的自定义规则。
+
+【示例】创建索引时，显示指定 mapping
+
+```javascript
+PUT /my-index-000001
+{
+  "mappings": {
+    "properties": {
+      "age":    { "type": "integer" },
+      "email":  { "type": "keyword"  },
+      "name":   { "type": "text"  }
+    }
+  }
+}
+```
+
+【示例】在已存在的索引中，指定一个 field 的属性
+
+```javascript
+PUT /my-index-000001/_mapping
+{
+  "properties": {
+    "employee-id": {
+      "type": "keyword",
+      "index": false
+    }
+  }
+}
+```
+
+【示例】查看 mapping
+
+```
+GET /my-index-000001/_mapping
+```
+
+【示例】查看指定 field 的 mapping
+
+```
+GET /my-index-000001/_mapping/field/employee-id
+```
+
+#### 动态映射
+
+动态映射机制，允许用户不手动定义映射，Elasticsearch 会自动识别字段类型。在实际项目中，如果遇到的业务在导入数据之前不确定有哪些字段，也不清楚字段的类型是什么，使用动态映射非常合适。当 Elasticsearch 在文档中碰到一个以前没见过的字段时，它会利用动态映射来决定该字段的类型，并自动把该字段添加到映射中。
+
+示例：创建一个名为 `data` 的索引、其 `mapping` 类型为 `_doc`，并且有一个类型为 `long` 的字段 `count`。
+
+```bash
+PUT data/_doc/1
+{ "count": 5 }
+```
 
 :::
 
 ## Elasticsearch 存储
+
+> 扩展阅读：
+>
+> - [Elasticsearch 官方文档之索引](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html)
+> - [Elasticsearch 从入门到实践之倒排索引的实现](https://www.itshujia.com/read/elasticsearch/354.html)
+> - https://blog.devgenius.io/elasticsearch-solution-to-searching-71116220c82f
 
 ### 【基础】ES 的逻辑存储是怎样设计的？
 
@@ -108,11 +264,11 @@ Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](
 
 Elasticsearch 的逻辑存储被设计为层级结构，自上而下依次为：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260812733.png)
+![Elasticsearch 逻辑存储](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260812733.png)
 
 各层级结构的说明如下：
 
-（1）Document（文档）
+（1）**Document（文档）**
 
 Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文档。Elasticsearch 以 JSON 文档的形式序列化和存储数据。文档是一组字段，这些字段是包含数据的键值对。每个文档都有一个唯一的 ID。
 
@@ -142,7 +298,7 @@ Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文
 
 Elasticsearch 中的 document 是无模式的，也就是并非所有 document 都必须拥有完全相同的字段，它们不受限于同一个模式。
 
-（2）Field（字段）
+（2）**Field（字段）**
 
 field 包含数据的键值对。默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
 
@@ -152,7 +308,7 @@ field 包含数据的键值对。默认情况下，Elasticsearch 对每个字段
 - [`_id`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html) - 文档的 ID
 - [`_source`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html) - 表示文档原文的 JSON
 
-（3）Type（类型）
+（3）**Type（类型）**
 
 在 Elasticsearch 中，**type 是 document 的逻辑分类**。每个 index 里可以有一个或多个 type。
 
@@ -160,7 +316,7 @@ field 包含数据的键值对。默认情况下，Elasticsearch 对每个字段
 
 > 注意：Elasticsearch 7.x 版已彻底移除 type。
 
-（4）Index（索引）
+（4）**Index（索引）**
 
 在 Elasticsearch 中，**可以将 index 视为 document 的集合**。
 
@@ -192,7 +348,7 @@ Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分�
 
 Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。简单来说，Lucene 就是一个 jar 包，里面包含了封装好的构建、管理倒排索引的算法代码。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260815446.png)
+![Elasticsearch 物理存储](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260815446.png)
 
 :::
 
@@ -221,7 +377,14 @@ Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索�
 
 除了要保存词项与 ID 的关系外，还需要保存这个词项在对应文档出现的位置、偏移量等信息，这是因为很多检索的场景中还需要判断关键词前后的内容是否符合搜索要求。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260816781.png)
+![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260816781.png)
+
+有了倒排索引，搜索引擎可以很方便地响应用户的查询。比如用户输入查询 `明月`，搜索系统查找倒排索引，从中读出包含这个单词的文档，这些文档就是提供给用户的搜索结果。
+
+要注意倒排索引的两个重要细节：
+
+- 倒排索引中的所有词项对应一个或多个文档；
+- 倒排索引中的词项**根据字典顺序升序排列**
 
 :::
 
@@ -233,9 +396,9 @@ Trie（字典树），也被称为前缀树，是一种树状数据结构，用�
 
 Trie 遵循一个规则：如果两个字符串有共同的前缀，那么它们在 Trie 中将具有相同的祖先。
 
-Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效。此外，Trie 有 Hash 不具备的优势：Trie 支持前缀搜索和排序。Trie 的主要问题是：存储词项需要额外的空间，对于长文本，空间可能会变得很大。
+Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效。此外，Trie 有 Hash 不具备的**优点**：Trie 支持前缀搜索和排序。Trie 的主要**缺点**是：存储词项需要额外的空间，对于长文本，空间可能会变得很大。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411301547515.png)
+![字典树](https://raw.githubusercontent.com/dunwu/images/master/snap/202411301547515.png)
 
 :::
 
@@ -249,13 +412,13 @@ Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效
 
 Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260817705.png)
+![ES 如何实现倒排索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260817705.png)
 
 倒排索引的组成主要有 3 个部分：
 
 - **Term Dictionary** - **Term Dictionary 用于保存 term（词项）**。由于 ES 会对 document 中的每个 field 都进行分词，所以数据量可能会非常大。
   - Term Dictionary 存储数据时，先将所有的 term 进行排序，然后将 Term Dictionary 中有共同前缀的 term 抽取出来进行分块存储；再对共同前缀做索引，最后通过索引就可以找到公共前缀对应的块在 Term Dictionary 文件中的偏移地址。
-  - 由于每个块中都有共同前缀，所有不需要再保存每个 Term 的全部内容，只需要保存其后缀即可，而且这些后缀都是排好序的。
+  - 由于每个块中都有共同前缀，所以不需要再保存每个 Term 的全部内容，只需要保存其后缀即可，而且这些后缀都是排好序的。
 - **Term Index** - **Term Index 是 Term Dictionary 的索引**。由于 Term Dictionary 存储的 term 可能会非常多，为了提高查询效率，从而设计了 Term Index。
   - 为了提高检索效率以及节省空间，Term Index 只使用公共前缀做索引。
   - **Lucene 中实现 Term Index 采用了 FST 算法**。FST 是一种非常复杂的结构，可以把它简单理解为一个**占用空间小且高效的 KV 数据结构**，有点类似于 Trie（字典树）。FST 有以下的特点：
@@ -267,55 +430,21 @@ Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索�
   - `.pay` 文件，记录了 payload 信息和 term 在 doc 中的偏移信息；
   - `.pos` 文件，记录了 term 在 doc 中的位置信息。
 
-> 扩展：https://www.itshujia.com/read/elasticsearch/354.html
-
-:::
-
-### 【基础】ES 支持哪些数据类型？
-
-:::details 要点
-
-Elasticsearch 支持丰富的数据类型，常见的有：
-
-- 文本类型：[`text`](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html)、[`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#keyword-field-type)、[`constant_keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#constant-keyword-field-type)、 [`wildcard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#wildcard-field-type)
-- 二进制类型：[`binary`](https://www.elastic.co/guide/en/elasticsearch/reference/current/binary.html)
-- 数值类型：`long`、`float` 等
-- 日期类型：[`date`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html)
-- 布尔类型：[`boolean`](https://www.elastic.co/guide/en/elasticsearch/reference/current/boolean.html)
-- 对象类型：[`object`](https://www.elastic.co/guide/en/elasticsearch/reference/current/object.html)、[`nested`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html)
-
-> 扩展：[数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
-
-:::
-
-### 【基础】ES 如何识别字段的数据类型？
-
-:::details 要点
-
-在 Elasticsearch 中，每个文档都是字段的集合，每个字段都有自己的 [数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)。**Elasticsearch 通过映射来定义文档及其包含字段的存储和索引方式**。
-
-Elasticsearch 映射可分为动态映射和静态映射。
-
-在 RDBM 中写入数据之前首先要建表，在建表语句中声明字段的属性，在 Elasticsearch 中，则不必如此。Elasticsearch 最重要的功能之一是：文档写入 Elasticsearch 中，它会自动检测新字段的数据类型，这种机制称为 [**动态映射**](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-mapping.html)。也正是由于这点，所以说 Elasticsearch 是无模式的。
-
-例如，执行下面添加文档的操作，Elasticsearch 会自动将 `count` 字段识别为 `long` 类型。
-
-```bash
-PUT data/_doc/1
-{ "count": 5 }
-```
-
-Elasticsearch 的动态映射无法保证完全符合预期，因此 Elasticsearch 也提供了显示设置映射规则的方法。[**静态映射（显示映射）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html) 是在创建索引时显示设置索引映射（即设置 mapping）。静态映射和 SQL 中在建表语句中指定字段属性类似。相比动态映射，通过静态映射可以添加更详细、更精准的配置信息。
-
-- mapping 是用于定义文档结构的 JSON 对象。它指定文档中允许的字段，以及它们的数据类型和其他属性。mapping 用于控制文档的存储和索引方式，还影响文档的搜索和分析方式。
-
-> 扩展：
->
-> https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
-
 :::
 
 ## Elasticsearch 搜索
+
+> 扩展阅读：
+>
+> - [Elasticsearch 官方文档之搜索数据](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-with-elasticsearch.html)
+> - [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
+> - [Elasticsearch 从入门到实践之分布式文档搜索机制](https://www.itshujia.com/read/elasticsearch/358.html)
+> - [Elasticsearch 官方文档之搜索数据](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-with-elasticsearch.html)
+> - [Elasticsearch 官方文档之全文查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
+> - [Elasticsearch 官方文档之词项查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html)
+> - [Elasticsearch 官方文档之组合查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)
+> - [Elasticsearch 官方文档之推荐查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
+> - [Elasticsearch 官方文档之查询和过滤上下文](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html)
 
 ### 【基础】ES 索引别名有什么用？
 
@@ -323,9 +452,7 @@ Elasticsearch 的动态映射无法保证完全符合预期，因此 Elasticsear
 
 Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允许同时对多个索引执行操作，或者通过隐藏底层索引结构的复杂性来简化索引管理。
 
-扩展：
-
-https://www.elastic.co/guide/en/elasticsearch/reference/current/aliases.html
+> 扩展阅读：https://www.elastic.co/guide/en/elasticsearch/reference/current/aliases.html
 
 :::
 
@@ -335,29 +462,42 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/aliases.html
 
 ES 支持全文搜索的 API 主要有以下几个：
 
-- [match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html) - 匹配查询可以处理全文本、精确字段（日期、数字等）。
-- [match_phrase](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html) - 短语匹配会将检索内容分词，这些词语必须全部出现在被检索内容中，并且顺序必须一致，默认情况下这些词都必须连续。
-- [match_phrase_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html) - 与 match_phrase 类似，但最后一个词项会作为前缀，并且匹配这个词项开头的任何词语。
-- [multi_match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html) - 允许在多个字段上执行相同的查询语句。
+- [intervals](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-intervals-query.html) - 根据匹配词的顺序和近似度返回文档。
+- [match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html) - **匹配查询**，用于执行全文搜索的标准查询，包括模糊匹配和短语或邻近查询。
+- [match_bool_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-bool-prefix-query.html) - 对检索文本分词，并根据这些分词构造一个布尔查询。除了最后一个分词之外的每个分词都进行 term 查询。最后一个分词用于 `prefix` 查询；其他分词都进行 `term` 查询。
+- [match_phrase](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html) - **短语匹配查询**，短语匹配会将检索内容分词，这些词语必须全部出现在被检索内容中，并且顺序必须一致，默认情况下这些词都必须连续。
+- [match_phrase_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html) - 与 `match_phrase` 查询类似，但对最后一个单词执行通配符搜索。
+- [multi_match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html) 支持多字段 match 查询
+- [combined_fields](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-combined-fields-query.html) - 匹配多个字段，就像它们已索引到一个组合字段中一样。
+- [query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html) - 支持紧凑的 Lucene [query string（查询字符串）语法](https://www.elastic.co/guide/en/elasticsearch/reference/8.16/query-dsl-query-string-query.html#query-string-syntax)，允许指定 `AND|OR|NOT` 条件和单个查询字符串中的多字段搜索。仅适用于专家用户。
+- [simple_query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html) - 更简单、更健壮的 `query_string` 语法版本，适合直接向用户公开。
+
+> 扩展阅读：[Elasticsearch 官方文档之全文查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
 
 :::
 
-### 【基础】ES 中有哪些全文搜索 API？
+### 【基础】ES 中有哪些词项搜索 API？
 
 :::details 要点
 
-**词项查询是对词项进行精确匹配**。词项查询通常用于结构化数据，如数字、日期和枚举类型。
+**`Term`（词项）是表达语意的最小单位**。搜索和利用统计语言模型进行自然语言处理都需要处理 Term。
+
+全文查询在执行查询之前会分析查询字符串。与全文查询不同，**词项级别查询不会分词**，而是将输入作为一个整体，在倒排索引中查找准确的词项。并且使用相关度计算公式为每个包含该词项的文档进行相关度计算。一言以概之：**词项查询是对词项进行精确匹配**。词项查询通常用于结构化数据，如数字、日期和枚举类型。
 
 ES 支持词项搜索的 API 主要有以下几个：
 
-- **[exists](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)** - 返回在指定字段上有值的文档，一般用于过滤没有值的文档。
-- **[fuzzy](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)** - 模糊查询返回包含与搜索词相似的词的文档。
-- **[prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)** - 用于查询某个字段中包含指定前缀的文档。
-- **[range](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)** - 范围查询。
-- **[regexp](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)** - 正则查询。
-- **[term](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)** - 返回在指定字段中准确包含了检索内容的文档。
-- **[terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)** - 与 Term 类似，不过可以同时的检索多个词项。
+- **[exists](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)** - 返回在指定字段上有值的文档。
+- **[fuzzy](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)** - 模糊查询，返回包含与搜索词相似的词的文档。
+- **[ids](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html)** - 根据 ID 返回文档。此查询使用存储在 `_id` 字段中的文档 ID。
+- **[prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)** - 前缀查询，用于查询某个字段中包含指定前缀的文档。
+- **[range](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)** - 范围查询，用于匹配在某一范围内的数值型、日期类型或者字符串型字段的文档。
+- **[regexp](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)** - 正则匹配查询，返回与正则表达式相匹配的词项所属的文档。
+- **[term](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)** - 用来查找指定字段中包含给定单词的文档。
+- **[terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)** - 与 [**`term`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html) 相似，但可以搜索多个值。
+- **[terms set](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-set-query.html)** - 与 [**`term`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html) 相似，但可以定义返回文档所需的匹配词数。
 - **[wildcard](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html)** - 通配符查询，返回与通配符模式匹配的文档。
+
+> 扩展阅读：[Elasticsearch 官方文档之词项查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html)
 
 :::
 
@@ -365,13 +505,17 @@ ES 支持词项搜索的 API 主要有以下几个：
 
 :::details 要点
 
-ES 支持以下复合查询：
+复合查询就是把一些简单查询组合在一起实现更复杂的查询需求，除此之外，复合查询还可以控制另外一个查询的行为。
+
+复合查询有以下类型：
 
 - [`bool`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html) - 布尔查询，可以组合多个过滤语句来过滤文档。
-- [`boosting`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-boosting-query.html) - 在 positive 块中指定匹配文档的语句，同时降低在 negative 块中也匹配的文档的得分，提供调整相关性算分的能力。
-- [`constant_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html) - 包装了一个过滤器查询，不进行算分。
+- [`boosting`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-boosting-query.html) - 提供调整相关性打分的能力，在 `positive` 块中指定匹配文档的语句，同时降低在 `negative` 块中也匹配的文档的得分。
+- [`constant_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html) - 使用 `constant_score` 可以将 `query` 转化为 `filter`，filter 可以忽略相关性算分的环节，并且 filter 可以有效利用缓存，从而提高查询的性能。
 - [`dis_max`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html) - 返回匹配了一个或者多个查询语句的文档，但只将最佳匹配的评分作为相关性算分返回。
 - [`function_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html) - 支持使用函数来修改查询返回的分数。
+
+> 扩展阅读：[Elasticsearch 官方文档之组合查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)
 
 :::
 
@@ -384,23 +528,98 @@ ES 支持以下复合查询：
 - `query` context - **有相关性计算**，采用相关性算法，计算文档与查询关键词之间的相关度，并根据评分（`_score`）大小排序。
 - `filter` context - **无相关性计算**，可以利用缓存，性能更好。
 
-> 扩展：https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html
+> 扩展阅读：[Elasticsearch 官方文档之查询和过滤上下文](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html)
+
+:::
+
+### 【中级】ES 支持哪些推荐查询？
+
+:::details 要点
+
+ES 通过 [**`Suggester`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html) 提供了推荐搜索能力，可以用于文本纠错，文本自动补全等场景。
+
+根据使用场景的不同，ES 提供了以下 4 种 Suggester：
+
+- **Term Suggester** - 基于词项的纠错补全。
+- **Phrase Suggester** - 基于短语的纠错补全。
+- **Completion Suggester** - 自动补全单词，输入词语的前半部分，自动补全单词。
+- **Context Suggester** - 基于上下文的补全提示，可以实现上下文感知推荐。
+
+> 扩展阅读：[Elasticsearch 官方文档之推荐查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
+
+:::
+
+### 【高级】ES 搜索数据的流程是怎样的？
+
+:::details 要点
+
+在 Elasticsearch 中，搜索一般分为两个阶段，query 和 fetch 阶段。可以简单的理解，query 阶段确定要取哪些 doc，fetch 阶段取出具体的 doc。
+
+Query 阶段会根据搜索条件遍历每个分片（主分片或者副分片中的其一）中的数据，返回符合条件的前 N 条数据的 ID 和排序值，然后在协调节点中对所有分片的数据进行排序，获取前 N 条数据的 ID。
+
+**Query 阶段的流程**如下：
+
+1. 客户端发送请求到任意一个节点，这个 node 成为 coordinate node（协调节点）。coordinate node 创建一个大小为 from + size 的优先级队列用来存放结果。
+2. coordinate node 对 document 进行路由，将请求转发到对应的 node，此时会使用 round-robin 随机轮询算法，在 primary shard 以及其所有 replica 中随机选择一个，让读请求负载均衡。
+3. 每个分片在本地执行搜索请求，并将查询结果打分排序，然后将结果保存到 from + size 大小的有序队列中。
+4. 接着，每个分片将结果返回给 coordinate node，coordinate node 对数据进行汇总处理：合并、排序、分页，将汇总数据存到一个大小为 from + size 的全局有序队列。
+
+需要注意的是，在协调节点转发搜索请求的时候，如果有 N 个 Shard 位于同一个节点时，并不会合并这些请求，而是发生 N 次请求！
+
+在 Fetch 阶段，协调节点会从 Query 阶段产生的全局排序列表中确定需要取回的文档 ID 列表，然后通过路由算法计算出各个文档对应的分片，并且用 multi get 的方式到对应的分片上获取文档数据。
+
+**Fetch 阶段的流程**如下：
+
+1. coordinate node 确定需要获取哪些文档，然后向相关节点发起 multi get 请求；
+2. 分片所在节点读取文档数据，并且进行 `_source` 字段过滤、处理高亮参数等，然后把处理后的文档数据返回给协调节点；
+3. coordinate node 汇总所有数据后，返回给客户端。
+
+:::
+
+### 【高级】ES 为什么会有深分页问题？
+
+:::details 要点
+
+在 Elasticsearch 中，支持三种分页查询方式：
+
+- from + size - 可以使用 `from` 和 `size` 参数分别指定查询的起始页和每页记录数。
+- [`search_after`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after) - 不支持指定页数，只能向下翻页；并且需要指定 sort，并保证值是唯一的。然后，可以反复使用上次结果中最后一个文档的 sort 值进行查询。
+- [scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#scroll-search-results) - 类似于 RDBMS 中的游标，只允许向下翻页。每次下一页查询后，使用返回结果的 scroll id 来作为下一次翻页的标记。scroll 查询会在搜索初始化阶段会生成快照，后续数据的变化无法及时体现在查询结果，因此更加适合一次性批量查询或非实时数据的分页查询。
+
+前文中，我们已经了解了 ES 两阶段搜索流程（Query 和 Fetch）。从中不难发现，这种搜索方式在分页查询时会出现以下情况：
+
+- 每个 shard 要扫描 `from + size` 条数据；
+- coordinate node 需要接收并处理 `(from + size) * primary_shard_num` 条数据。
+
+**如果 from 或 size 很大，需要处理的数据量也会很大，代价很高，这就是深分页产生的原因**。为了避免深分页，ES 默认限制 `from + size` 不能超过 10000，可以通过 `index.max_result_window` 设置。
+
+如何解决 Elasticsearch 深分页问题？
+
+ES 官方提供了另外两种分页查询方式 [`search_after`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after) + PIT 和 [scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#scroll-search-results)（注意：官方已不再推荐） 来避免深分页问题。
 
 :::
 
 ## Elasticsearch 聚合
 
+> 扩展阅读：
+>
+> - [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
+> - [Elasticsearch 官方文档之聚合](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html)
+> - [Elasticsearch 从入门到实践之聚合](https://www.itshujia.com/read/elasticsearch/348.html)
+
 ### 【基础】什么是聚合？ES 中有哪些聚合？
 
 :::details 要点
 
-Elasticsearch 中的聚合是一项强大的功能，可让您实时分析、汇总和执行复杂的数据集计算。聚合提供了从索引数据中分组和提取可操作见解的功能，这些数据可用于数据可视化、报告和分析目的。
+在数据库中，聚合是指将数据进行分组统计，得到一个汇总的结果。例如，计算总和、平均值、最大值或最小值等操作。
 
-Elasticsearch 中的聚合主要有三种类型：
+Elasticsearch 将聚合分为三类：
 
-- [Bucket](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket.html) - 分组计算
-- [Metric](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics.html) - 统计值计算
-- [Pipeline](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html) -在聚合结果的基础上再次聚合，而非直接处理文档数据
+| 类型                                                                                                                          | 说明                                   |
+| ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| [**Metric（指标聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics.html)    | 根据字段值进行**统计**计算             |
+| [**Bucket（桶聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket.html)       | 根据字段值、范围或其他条件进行**分组** |
+| [**Pipeline（管道聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html) | 对其他聚合输出的结果进行**再次聚合**   |
 
 :::
 
@@ -408,7 +627,7 @@ Elasticsearch 中的聚合主要有三种类型：
 
 :::details 要点
 
-Elasticsearch 提供的首个近似聚合是 cardinality 度量。它提供一个字段的基数，即该字段的 distinct 或者 unique 值的数目。它是基于 HLL 算法的。HLL 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 bits 做概率估算从而得到基数。其特点是：可配置的精度，用来控制内存的使用（更精确 ＝ 更多内存）；小的数据集精度是非常高的；我们可以通过配置参数，来设置去重需要的固定内存使用量。无论数千还是数十亿的唯一值，内存使用量只与你配置的精确度相关。
+Elasticsearch 支持 [`cardinality`（近似计算非重复值）](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html) 。它提供一个字段的基数，即该字段的 distinct 或者 unique 值的数目。它是基于 HLL 算法的。HLL 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 bits 做概率估算从而得到基数。其特点是：可配置的精度，用来控制内存的使用（更精确 ＝ 更多内存）；小的数据集精度是非常高的；我们可以通过配置参数，来设置去重需要的固定内存使用量。无论数千还是数十亿的唯一值，内存使用量只与你配置的精确度相关。
 
 :::
 
@@ -449,8 +668,8 @@ ES 必须满足以下条件才能运行：
 > 扩展：
 >
 > - https://www.elastic.co/guide/en/elasticsearch/reference/current/high-availability.html
-> - https://www.itshujia.com/read/elasticsearch/362.html
-> - https://www.itshujia.com/read/elasticsearch/363.html
+> - [Elasticsearch 从入门到实践之副本策略](https://www.itshujia.com/read/elasticsearch/362.html)
+> - [Elasticsearch 从入门到实践之 ES 的数据副本模型](https://www.itshujia.com/read/elasticsearch/363.html)
 
 :::
 
@@ -623,7 +842,7 @@ ES 中主要有以下节点类型：
 
 :::details 要点
 
-![](https://www.elastic.co/guide/en/elasticsearch/reference/current/images/data_processing_flow.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110752784.png)
 
 ES 存储数据的流程可以从三个角度来阐述：
 
@@ -644,58 +863,8 @@ ES 存储数据的流程可以从三个角度来阐述：
 
 > 扩展：
 >
-> - https://www.itshujia.com/read/elasticsearch/359.html
+> - [Elasticsearch 从入门到实践之分布式文档的存储流程](https://www.itshujia.com/read/elasticsearch/359.html)
 > - https://github.com/doocs/advanced-java/blob/main/docs/high-concurrency/es-write-query-search.md
-
-:::
-
-### 【高级】ES 搜索数据的流程是怎样的？
-
-:::details 要点
-
-在 Elasticsearch 中，搜索一般分为两个阶段，query 和 fetch 阶段。可以简单的理解，query 阶段确定要取哪些 doc，fetch 阶段取出具体的 doc。
-
-Query 阶段会根据搜索条件遍历每个分片（主分片或者副分片中的其一）中的数据，返回符合条件的前 N 条数据的 ID 和排序值，然后在协调节点中对所有分片的数据进行排序，获取前 N 条数据的 ID。
-
-**Query 阶段的流程**如下：
-
-1. 客户端发送请求到任意一个节点，这个 node 成为 coordinate node（协调节点）。coordinate node 创建一个大小为 from + size 的优先级队列用来存放结果。
-2. coordinate node 对 document 进行路由，将请求转发到对应的 node，此时会使用 round-robin 随机轮询算法，在 primary shard 以及其所有 replica 中随机选择一个，让读请求负载均衡。
-3. 每个分片在本地执行搜索请求，并将查询结果打分排序，然后将结果保存到 from + size 大小的有序队列中。
-4. 接着，每个分片将结果返回给 coordinate node，coordinate node 对数据进行汇总处理：合并、排序、分页，将汇总数据存到一个大小为 from + size 的全局有序队列。
-
-需要注意的是，在协调节点转发搜索请求的时候，如果有 N 个 Shard 位于同一个节点时，并不会合并这些请求，而是发生 N 次请求！
-
-在 Fetch 阶段，协调节点会从 Query 阶段产生的全局排序列表中确定需要取回的文档 ID 列表，然后通过路由算法计算出各个文档对应的分片，并且用 multi get 的方式到对应的分片上获取文档数据。
-
-**Fetch 阶段的流程**如下：
-
-1. coordinate node 确定需要获取哪些文档，然后向相关节点发起 multi get 请求；
-2. 分片所在节点读取文档数据，并且进行 `_source` 字段过滤、处理高亮参数等，然后把处理后的文档数据返回给协调节点；
-3. coordinate node 汇总所有数据后，返回给客户端。
-
-:::
-
-### 【高级】ES 为什么会有深分页问题？
-
-:::details 要点
-
-在 Elasticsearch 中，支持三种分页查询方式：
-
-- from + size - 可以使用 `from` 和 `size` 参数分别指定查询的起始页和每页记录数。
-- [`search_after`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after) - 不支持指定页数，只能向下翻页；并且需要指定 sort，并保证值是唯一的。然后，可以反复使用上次结果中最后一个文档的 sort 值进行查询。
-- [scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#scroll-search-results) - 类似于 RDBMS 中的游标，只允许向下翻页。每次下一页查询后，使用返回结果的 scroll id 来作为下一次翻页的标记。scroll 查询会在搜索初始化阶段会生成快照，后续数据的变化无法及时体现在查询结果，因此更加适合一次性批量查询或非实时数据的分页查询。
-
-前文中，我们已经了解了 ES 两阶段搜索流程（Query 和 Fetch）。从中不难发现，这种搜索方式在分页查询时会出现以下情况：
-
-- 每个 shard 要扫描 `from + size` 条数据；
-- coordinate node 需要接收并处理 `(from + size) * primary_shard_num` 条数据。
-
-**如果 from 或 size 很大，需要处理的数据量也会很大，代价很高，这就是深分页产生的原因**。为了避免深分页，ES 默认限制 `from + size` 不能超过 10000，可以通过 `index.max_result_window` 设置。
-
-如何解决 Elasticsearch 深分页问题？
-
-ES 官方提供了另外两种分页查询方式 [`search_after`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after) + PIT 和 [scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#scroll-search-results)（注意：官方已不再推荐） 来避免深分页问题。
 
 :::
 
@@ -742,8 +911,6 @@ ES 官方提供了另外两种分页查询方式 [`search_after`](https://www.el
 > 参考：https://cloud.tencent.com/developer/article/1922613
 
 :::
-
-## Elasticsearch 生产环境
 
 ### 【中级】ES 生产环境部署情况是怎样的？
 

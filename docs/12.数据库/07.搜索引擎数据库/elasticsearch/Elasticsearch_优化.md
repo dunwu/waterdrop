@@ -127,9 +127,9 @@ index.translog.sync_interval: 5s
 index.translog.flush_threshold_size: 512mb
 ```
 
-### 注意 \_id 字段的使用
+### 注意 `_id` 字段的使用
 
-\_id 字段的使用，应尽可能避免自定义 \_id，以避免针对 ID 的版本管理；建议使用 ES 的默认 ID 生成策略或使用数字类型 ID 做为主键。
+`_id` 字段的使用，应尽可能避免自定义 `_id`，以避免针对 ID 的版本管理；建议使用 ES 的默认 ID 生成策略或使用数字类型 ID 做为主键。
 
 ### 注意 \_all 字段及 \_source 字段的使用
 

@@ -60,7 +60,7 @@ ES 的索引有一个或者多个分片，而分片又分为主分片和副本�
 
 ES 的数据持久化流程主要有以下几个过程：**Refresh、写 Translog、Flush、Merge。**
 
-![](https://miro.medium.com/1*mB9Uqv2ECmj-_Rxuw_Mgww.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110726542.png)
 
 #### Refresh
 
@@ -208,7 +208,7 @@ PUT <index>/_doc/<id>?routing=routing_key
 ## 参考资料
 
 - [Elasticsearch 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
-- https://www.itshujia.com/read/elasticsearch/359.html
+- [Elasticsearch 从入门到实践之分布式文档的存储流程](https://www.itshujia.com/read/elasticsearch/359.html)
 - https://github.com/doocs/advanced-java/blob/main/docs/high-concurrency/es-write-query-search.md
 - https://www.elastic.co/blog/found-elasticsearch-top-down
 - https://www.elastic.co/guide/en/elasticsearch/reference/current/preload-data-to-file-system-cache.html
