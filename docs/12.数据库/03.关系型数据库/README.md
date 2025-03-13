@@ -24,6 +24,7 @@ index: false
 
 ### Mysql
 
+- [Mysql 简介](mysql/Mysql_简介.md)
 - [Mysql 架构](mysql/Mysql_架构.md)
 - [Mysql 存储引擎](mysql/Mysql_存储引擎.md)
 - [Mysql 索引](mysql/Mysql_索引.md)
@@ -58,7 +59,7 @@ index: false
     - [《MySQL 技术内幕：InnoDB 存储引擎》](https://book.douban.com/subject/24708143/)
     - [《MySQL 必知必会》](https://book.douban.com/subject/3354490/) - Mysql 的基本概念和语法【入门】
   - **教程**
-    - [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
+    - [极客时间教程 - MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
     - [runoob.com MySQL 教程](http://www.runoob.com/mysql/mysql-tutorial.md) - 入门级 SQL 教程
     - [mysql-tutorial](https://github.com/jaywcjlove/mysql-tutorial)
   - **文章**

@@ -1,6 +1,7 @@
 ---
 icon: logos:mysql
-title: Mysql 教程
+title: Mysql
+cover: https://www.ovhcloud.com/sites/default/files/styles/large_screens_1x/public/2021-09/ECX-1909_Hero_MySQL_600x400%402x-1.webp
 date: 2020-02-10 14:27:39
 categories:
   - 数据库
@@ -15,21 +16,32 @@ hidden: true
 index: false
 ---
 
-# Mysql 教程
+# Mysql
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309212108260.png)
+::: info 概述
+
+MySQL 是一个关系型数据库管理系统，由瑞典 MySQL AB 公司开发，目前属于 Oracle 公司。MySQL是最流行的关系型数据库管理系统之一，在 WEB 应用方面，MySQL是最好的RDBMS应用软件之一。
+
+MySQL 是一种关联数据库管理系统，关联数据库将数据保存在不同的表中，而不是将所有数据放在一个大仓库内，这样就增加了速度并提高了灵活性。
+
+:::
 
 ## 📖 内容
 
-- [Mysql 架构](Mysql_架构)
-- [Mysql 存储引擎](Mysql_存储引擎)
-- [Mysql 索引](Mysql_索引)
-- [Mysql 事务](Mysql_事务)
-- [Mysql 锁](Mysql_锁)
-- [Mysql 高可用](Mysql_高可用)
-- [Mysql 优化](Mysql_优化)
-- [Mysql 运维](Mysql_运维)
-- [Mysql 面试](Mysql_面试)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309212108260.png)
+
+- [Mysql 简介](Mysql_简介.md)
+- [Mysql CRUD](Mysql_CRUD.md)
+- [Mysql 数据类型](Mysql_数据类型.md)
+- [Mysql 架构](Mysql_架构.md)
+- [Mysql 存储引擎](Mysql_存储引擎.md)
+- [Mysql 索引](Mysql_索引.md)
+- [Mysql 事务](Mysql_事务.md)
+- [Mysql 锁](Mysql_锁.md)
+- [Mysql 高可用](Mysql_高可用.md)
+- [Mysql 优化](Mysql_优化.md)
+- [Mysql 运维](Mysql_运维.md)
+- [Mysql 面试](Mysql_面试.md) 💯
 
 ## 📚 资料
 
@@ -50,7 +62,7 @@ index: false
   - [《MySQL 必知必会》](https://book.douban.com/subject/3354490/) - Mysql 的基本概念和语法【入门】
 - **教程**
   - [SQL 必知必会](https://time.geekbang.org/column/intro/192) - 极客 SQL 教程
-  - [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139) - 极客 Mysql 教程
+  - [极客时间教程 - MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139) - 极客 Mysql 教程
   - [runoob.com MySQL 教程](http://www.runoob.com/mysql/mysql-tutorial.md) - 入门级 SQL 教程
   - [mysql-tutorial](https://github.com/jaywcjlove/mysql-tutorial)
 - **文章**

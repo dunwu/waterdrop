@@ -1,6 +1,7 @@
 ---
 icon: openmoji:military-medal
 title: Hive 面试
+date: 2025-02-24 07:36:45
 categories:
   - 大数据
   - hive
@@ -8,6 +9,7 @@ tags:
   - 大数据
   - hive
   - 面试
+permalink: /pages/88e8d921/
 ---
 
 # Hive 面试

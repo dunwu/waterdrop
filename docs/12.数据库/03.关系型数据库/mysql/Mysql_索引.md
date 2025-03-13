@@ -510,6 +510,6 @@ EXPLAIN SELECT comment_id, user_id, comment_text FROM product_comment WHERE comm
 ## 参考资料
 
 - [《高性能 MySQL》](https://book.douban.com/subject/23008813/)
-- [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
+- [极客时间教程 - MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
 - [数据库两大神器【索引和锁】](https://juejin.im/post/5b55b842f265da0f9e589e79)
 - [MySQL 索引背后的数据结构及算法原理](http://blog.codinglabs.org/articles/theory-of-mysql-index.html)

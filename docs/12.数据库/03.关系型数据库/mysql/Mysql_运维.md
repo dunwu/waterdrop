@@ -1,6 +1,7 @@
 ---
 icon: logos:mysql
 title: Mysql 运维
+cover: https://miro.medium.com/v2/resize:fit:720/format:webp/0*7EM_33uoR9UdASR2.png
 date: 2019-11-26 21:37:17
 categories:
   - 数据库
@@ -16,9 +17,13 @@ permalink: /pages/99c68708/
 
 # Mysql 运维
 
-> 如果你的公司有 DBA，那么我恭喜你，你可以无视 Mysql 运维。如果你的公司没有 DBA，那你就好好学两手 Mysql 基本运维操作，行走江湖，防身必备。
+::: info 概述
 
-## 安装部署
+如果你的公司有 DBA，那么我恭喜你，你可以无视 Mysql 运维。如果你的公司没有 DBA，那你就好好学两手 Mysql 基本运维操作，行走江湖，防身必备。
+
+:::
+
+## Mysql 安装
 
 ### Windows 安装
 
@@ -32,19 +37,19 @@ my.ini 文件示例：
 
 ```ini
 [mysqld]
-#设置3306端口
+#设置 3306 端口
 port = 3306
-# 设置mysql的安装目录 这块换成自己解压的路径
+# 设置 mysql 的安装目录 这块换成自己解压的路径
 basedir=D:\\Tools\\DB\\mysql\\mysql-5.7.31
 # 允许最大连接数
 max_connections=200
-# 服务端使用的字符集默认为8比特编码的latin1字符集
+# 服务端使用的字符集默认为 8 比特编码的 latin1 字符集
 character-set-server=utf8
 # 创建新表时将使用的默认存储引擎
 default-storage-engine=INNODB
 
 [client]
-# 设置mysql客户端默认字符集
+# 设置 mysql 客户端默认字符集
 default-character-set=utf8
 ```
 
@@ -123,9 +128,9 @@ mysql-community-server.x86_64 : A very fast and reliable SQL database server
 ## 数据库目录
 /var/lib/mysql/
 ## 配置文件
-/usr/share/mysql（mysql.server命令及配置文件）
+/usr/share/mysql（mysql.server 命令及配置文件）
 ## 相关命令
-/usr/bin（mysqladmin mysqldump等命令）
+/usr/bin（mysqladmin mysqldump 等命令）
 ## 启动脚本
 /usr/lib/systemd/system/mysqld.service （注册为 systemd 服务）
 ```
@@ -201,7 +206,7 @@ vim /etc/my.cnf
 
 执行 `systemctl restart mysqld`，重启 mysql
 
-## 基本运维
+## Mysql 管理
 
 ### 客户端连接
 
@@ -293,7 +298,7 @@ GRANT ALL ON maindataplus.* TO 'pig'@'%';
 
 注意：
 
-用以上命令授权的用户不能给其它用户授权，如果想让该用户可以授权，用以下命令:
+用以上命令授权的用户不能给其它用户授权，如果想让该用户可以授权，用以下命令：
 
 ```sql
 -- 为指定用户配置指定权限
@@ -304,23 +309,23 @@ GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '密码' WITH GRANT OPTION;
 
 ### 撤销授权
 
-命令:
+命令：
 
 ```
 REVOKE privilege ON databasename.tablename FROM 'username'@'host';
 ```
 
-说明:
+说明：
 
 privilege, databasename, tablename：同授权部分
 
-例子:
+例子：
 
 ```sql
 REVOKE SELECT ON *.* FROM 'pig'@'%';
 ```
 
-注意:
+注意：
 
 假如你在给用户`'pig'@'%'`授权的时候是这样的（或类似的）：`GRANT SELECT ON test.user TO 'pig'@'%'`，则在使用`REVOKE SELECT ON *.* FROM 'pig'@'%';`命令并不能撤销该用户对 test 数据库中 user 表的`SELECT` 操作。相反，如果授权使用的是`GRANT SELECT ON *.* TO 'pig'@'%';`则`REVOKE SELECT ON test.user FROM 'pig'@'%';`命令也不能撤销该用户对 test 数据库中 user 表的`Select`权限。
 
@@ -339,7 +344,7 @@ SHOW GRANTS FOR 'root'@'%';
 SET PASSWORD FOR 'username'@'host' = PASSWORD('newpassword');
 ```
 
-如果是当前登陆用户用:
+如果是当前登陆用户用：
 
 ```sql
 SET PASSWORD = PASSWORD("newpassword");
@@ -672,7 +677,7 @@ mysql> show variables like 'transaction_isolation';
 +-----------------------+----------------+
 ```
 
-## 服务器配置
+## Mysql 配置
 
 > **_大部分情况下，默认的基本配置已经足够应付大多数场景，不要轻易修改 Mysql 服务器配置，除非你明确知道修改项是有益的。_**
 >
@@ -709,7 +714,6 @@ Default options are read from the following files in the given order:
 ### 基本配置模板
 
 一个基本的 Mysql 配置模板大概如下：
-
 
 ```ini
 [mysqld]
@@ -845,7 +849,7 @@ open_files_limit = 65535
 # -------------------------------------------------------------------------------
 
 # MySQL 默认的 wait_timeout 值为 8 个小时，interactive_timeout 参数需要同时配置才能生效
-# MySQL 连接闲置超过一定时间后(单位：秒，此处为 1800 秒)将会被强行关闭
+# MySQL 连接闲置超过一定时间后（单位：秒，此处为 1800 秒）将会被强行关闭
 interactive_timeout = 1800
 wait_timeout = 1800
 
@@ -970,7 +974,7 @@ innodb_buffer_pool_size = 512M
 innodb_buffer_pool_instances = 1
 
 # 说明：mysql 5.7 新特性，defines the chunk size for online InnoDB buffer pool resizing operations。
-# 实际缓冲区大小必须为 innodb_buffer_pool_chunk_size*innodb_buffer_pool_instances*倍数，取略大于 innodb_buffer_pool_size
+# 实际缓冲区大小必须为 innodb_buffer_pool_chunk_size*innodb_buffer_pool_instances *倍数，取略大于 innodb_buffer_pool_size
 # 默认值 128M，建议值：默认值就好，乱改反而容易出问题，它会影响实际 buffer pool 大小。
 innodb_buffer_pool_chunk_size = 128M
 
@@ -996,7 +1000,7 @@ innodb_io_capacity = 2000
 # 默认值：innodb_io_capacity 的两倍。建议值：例如用 iometer 测试后的 iops 数值就好
 innodb_io_capacity_max = 4000
 
-# 说明：控制着 innodb 数据文件及 redo log 的打开、刷写模式，三种模式：fdatasync(默认)，O_DSYNC，O_DIRECT
+# 说明：控制着 innodb 数据文件及 redo log 的打开、刷写模式，三种模式：fdatasync（默认），O_DSYNC，O_DIRECT
 # fdatasync：数据文件，buffer pool->os buffer->磁盘；日志文件，buffer pool->os buffer->磁盘；
 # O_DSYNC： 数据文件，buffer pool->os buffer->磁盘；日志文件，buffer pool->磁盘；
 # O_DIRECT： 数据文件，buffer pool->磁盘； 日志文件，buffer pool->os buffer->磁盘；
@@ -1008,7 +1012,7 @@ innodb_flush_method = O_DIRECT
 innodb_file_per_table = 1
 
 # 说明：The path where InnoDB creates undo tablespaces。通常等于 undo log 文件的存放目录。
-# 默认值 ./;自行设置
+# 默认值 ./; 自行设置
 innodb_undo_directory = /usr/local/mysql-5.7.21/log
 
 # 说明：The number of undo tablespaces used by InnoDB 等于 undo log 文件数量。5.7.21 后开始弃用
@@ -1103,27 +1107,27 @@ key_buffer_size = 64M
 
 # 为每个扫描 MyISAM 的线程分配参数设置的内存大小缓冲区。
 # 默认值 128kb，建议值：16G 内存建议 1M，4G：128kb 或者 256kb 吧
-# 注意，该缓冲区是每个连接独占的，所以总缓冲区大小为 128kb*连接数；极端情况 128kb*maxconnectiosns，会超级大，所以要考虑日常平均连接数。
+# 注意，该缓冲区是每个连接独占的，所以总缓冲区大小为 128kb *连接数；极端情况 128kb*maxconnectiosns，会超级大，所以要考虑日常平均连接数。
 # 一般不需要太关心该数值，稍微增大就可以了，
 read_buffer_size = 262144
 
 # 支持任何存储引擎
 # MySQL 的随机读缓冲区大小，适当增大，可以提高性能。
 # 默认值 256kb；建议值：得参考连接数，16G 内存，有人推荐 8M
-# 注意，该缓冲区是每个连接独占的，所以总缓冲区大小为 128kb*连接数；极端情况 128kb*maxconnectiosns，会超级大，所以要考虑日常平均连接数。
+# 注意，该缓冲区是每个连接独占的，所以总缓冲区大小为 128kb *连接数；极端情况 128kb*maxconnectiosns，会超级大，所以要考虑日常平均连接数。
 read_rnd_buffer_size = 1M
 
 # order by 或 group by 时用到
 # 支持所有引擎，innodb 和 myisam 有自己的 innodb_sort_buffer_size 和 myisam_sort_buffer_size 设置
 # 默认值 256kb；建议值：得参考连接数，16G 内存，有人推荐 8M。
-# 注意，该缓冲区是每个连接独占的，所以总缓冲区大小为 1M*连接数；极端情况 1M*maxconnectiosns，会超级大。所以要考虑日常平均连接数。
+# 注意，该缓冲区是每个连接独占的，所以总缓冲区大小为 1M *连接数；极端情况 1M*maxconnectiosns，会超级大。所以要考虑日常平均连接数。
 sort_buffer_size = 1M
 
-# 此缓冲被使用来优化全联合(full JOINs 不带索引的联合)
+# 此缓冲被使用来优化全联合 (full JOINs 不带索引的联合）
 # 类似的联合在极大多数情况下有非常糟糕的性能表现，但是将此值设大能够减轻性能影响。
 # 通过 “Select_full_join” 状态变量查看全联合的数量
-# 注意，该缓冲区是每个连接独占的，所以总缓冲区大小为 1M*连接数；极端情况 1M*maxconnectiosns，会超级大。所以要考虑日常平均连接数。
-# 默认值 256kb;建议值：16G 内存，设置 8M。
+# 注意，该缓冲区是每个连接独占的，所以总缓冲区大小为 1M *连接数；极端情况 1M*maxconnectiosns，会超级大。所以要考虑日常平均连接数。
+# 默认值 256kb; 建议值：16G 内存，设置 8M。
 join_buffer_size = 1M
 
 # 缓存 linux 文件描述符信息，加快数据文件打开速度
@@ -1145,9 +1149,8 @@ table_open_cache_instances = 2
 thread_cache_size = 16
 
 # 默认值 256k，建议值：16/32G 内存，512kb，其他一般不改变，如果报错：Thread stack overrun，就增大看看，
-# 注意，每个线程分配内存空间，所以总内存空间。。。你懂得。
+# 注意，每个线程分配内存空间，所以总内存空间。你懂得。
 thread_stack = 512k
-
 
 [client]
 socket  = /var/lib/mysql/mysql.sock
@@ -1169,12 +1172,12 @@ port = 3306
   - `slow_query_log` - 错误日志文件地址
 - InnoDB
   - `innodb_buffer_pool_size` - InnoDB 使用一个缓冲池来保存索引和原始数据，不像 MyISAM。这里你设置越大，你在存取表里面数据时所需要的磁盘 I/O 越少。
-    - 在一个独立使用的数据库服务器上,你可以设置这个变量到服务器物理内存大小的 60%-80%
+    - 在一个独立使用的数据库服务器上，你可以设置这个变量到服务器物理内存大小的 60%-80%
     - 注意别设置的过大，会导致 system 的 swap 空间被占用，导致操作系统变慢，从而减低 sql 查询的效率
     - 默认值：128M，建议值：物理内存的 60%-80%
   - `innodb_log_file_size` - 日志文件的大小。默认值：48M，建议值：根据你系统的磁盘空间和日志增长情况调整大小
   - `innodb_file_per_table` - 说明：mysql5.7 之后默认开启，意思是，每张表一个独立表空间。默认值 1，开启。
-  - `innodb_flush_method` - 说明：控制着 innodb 数据文件及 redo log 的打开、刷写模式，三种模式：fdatasync(默认)，O_DSYNC，O_DIRECT。默认值为空，建议值：使用 SAN 或者 raid，建议用 O_DIRECT，不懂测试的话，默认生产上使用 O_DIRECT
+  - `innodb_flush_method` - 说明：控制着 innodb 数据文件及 redo log 的打开、刷写模式，三种模式：fdatasync（默认），O_DSYNC，O_DIRECT。默认值为空，建议值：使用 SAN 或者 raid，建议用 O_DIRECT，不懂测试的话，默认生产上使用 O_DIRECT
     - `fdatasync`：数据文件，buffer pool->os buffer->磁盘；日志文件，buffer pool->os buffer->磁盘；
     - `O_DSYNC`： 数据文件，buffer pool->os buffer->磁盘；日志文件，buffer pool->磁盘；
     - `O_DIRECT`： 数据文件，buffer pool->磁盘； 日志文件，buffer pool->os buffer->磁盘；
@@ -1201,7 +1204,7 @@ port = 3306
     - 注意：仍然可能出现报错信息 Can't create a new thread；此时观察系统 `cat /proc/mysql` 进程号/limits，观察进程 ulimit 限制情况
     - 过小的话，考虑修改系统配置表，`/etc/security/limits.conf` 和 `/etc/security/limits.d/90-nproc.conf`
 
-## 常见问题
+## Mysql FAQ
 
 ### Too many connections
 
@@ -1333,7 +1336,7 @@ Query OK, 0 rows affected (0.00 sec)
 
 解决方法：优化索引结构，索引字段不宜过长。
 
-## 脚本
+## Mysql 运维脚本
 
 这里推荐我写的几个一键运维脚本，非常方便，欢迎使用：
 

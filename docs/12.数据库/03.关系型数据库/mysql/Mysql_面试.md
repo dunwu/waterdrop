@@ -1,6 +1,7 @@
 ---
-icon: logos:mysql
+icon: openmoji:military-medal
 title: Mysql 面试
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
 date: 2020-09-12 10:43:53
 categories:
   - 数据库
@@ -16,7 +17,7 @@ permalink: /pages/cf957091/
 
 # Mysql 面试
 
-## 基础
+## Mysql CRUD
 
 ### EXISTS 和 IN 有什么区别？
 
@@ -75,33 +76,47 @@ permalink: /pages/cf957091/
 
 ![SQL JOIN](https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/sql-join.png)
 
+## Mysql 数据类型
+
 ### CHAR 和 VARCHAR 的区别是什么？
 
-CHAR 和 VARCHAR 的主要区别在于：**CHAR 是定长字符串，VARCHAR 是变长字符串。**
+:::details 要点
 
-- CHAR 在存储时会在右边填充空格以达到指定的长度，检索时会去掉空格；VARCHAR 在存储时需要使用 1 或 2 个额外字节记录字符串的长度，检索时不需要处理。
-- CHAR 更适合存储长度较短或者长度都差不多的字符串，例如 Bcrypt 算法、MD5 算法加密后的密码、身份证号码。VARCHAR 类型适合存储长度不确定或者差异较大的字符串，例如用户昵称、文章标题等。
-- CHAR(M) 和 VARCHAR(M) 的 M 都代表能够保存的字符数的最大值，无论是字母、数字还是中文，每个都只占用一个字符。
+`CHAR` 和 `VARCHAR` 的主要区别在于：**CHAR 是定长字符串，VARCHAR 是变长字符串。**
+
+- `CHAR` 在存储时会在右边填充空格以达到指定的长度，检索时会去掉空格；`VARCHAR` 在存储时需要使用 1 或 2 个额外字节记录字符串的长度，检索时不需要处理。
+- `CHAR` 更适合存储长度较短或者长度都差不多的字符串，例如 Bcrypt 算法、MD5 算法加密后的密码、身份证号码；`VARCHAR` 类型适合存储长度不确定或者差异较大的字符串，例如用户昵称、文章标题等。
+- `CHAR(M)` 和 `VARCHAR(M)` 的 M 都代表能够保存的字符数的最大值，无论是字母、数字还是中文，每个都只占用一个字符。
+
+`BINARY` 和 `VARBINARY` 类似于 `CHAR` 和 `VARCHAR`，不同的是它们包含二进制字符串而不要非二进制字符串。也就是说，它们包含字节字符串而不是字符字符串。这说明它们没有字符集，并且排序和比较基于列值字节的数值值。
+
+:::
 
 ### 金钱相关的数据用什么类型存储？
 
-MySQL 中有 3 种类型可以表示浮点数，分别是 `float`、`double` 和 `decimal`。
+:::details 要点
 
-> float 和 double 为什么会丢失精度？
+MySQL 中有 3 种类型可以表示浮点数，分别是 `FLOAT`、`DOUBLE` 和 `DECIMAL`。
 
-**采用 float 和 double 类型会丢失精度**。数据的精确度取决于分配给每种数据类型的存储长度。由于计算机只能存储二进制，所以浮点型数据在存储的时候，必须转化成二进制。
+**采用 `FLOAT` 和 `DOUBLE` 类型会丢失精度**。数据的精确度取决于分配给每种数据类型的存储长度。由于计算机只能存储二进制，所以浮点型数据在存储的时候，必须转化成二进制。
 
-- 单精度类型 float 存储空间为 4 字节，即 32 位。
-- 双精度类型 double 存储空间为 8 字节，即 64 位。
+- 单精度类型 `FLOAT` 存储空间为 4 字节，即 32 位。
+- 双精度类型 `DOUBLE` 存储空间为 8 字节，即 64 位。
 
 如果存储的数据转为二进制后，超过存储的位数，数据就被截断，因此存在丢失精度的可能。
+
+更重要的是，从 MySQL 8.0.17 版本开始，当创建表用到类型 Float 或 Double 时，会抛出下面的警告：MySQL 提醒用户不该用上述浮点类型，甚至提醒将在之后版本中废弃浮点类型。
+
+```
+Specifying number of digits for floating point data types is deprecated and will be removed in a future release
+```
 
 【示例】丢失精度案例
 
 ```sql
 -- 创建表
 CREATE TABLE `test` (
-  `value` float(10,2) DEFAULT NULL
+  `value` FLOAT(10,2) DEFAULT NULL
 );
 
 mysql> insert into test value (131072.32);
@@ -116,26 +131,70 @@ mysql> select * from test;
 1 row in set (0.02 sec)
 ```
 
-说明：示例中，使用 float 类型，明明保留了两位小数。但是写入的数据却从 `131072.32` 变成了 `131072.31` 。
+说明：示例中，使用 FLOAT 类型，明明保留了两位小数。但是写入的数据却从 `131072.32` 变成了 `131072.31` 。
 
-> 选择什么类型可以不丢失精度？
+`DECIMAL` 类型是 MySQL 官方唯一指定能精确存储的类型。因此，对于不允许丢失精度的场景（如金钱相关的业务），可以使用 `DECIMAL` 类型。
 
-`decimal` 类型是 MySQL 官方唯一指定能精确存储的类型。因此，对于不允许丢失精度的场景（如金钱相关的业务），请务必使用 `decimal` 类型。
+然而，在海量并发的互联网业务中使用，金额字段的设计并不推荐使用 `DECIMAL` 类型，而更推荐使用 `BIGINT` 整型类型。这里会用到一个巧思：将资金类型的数据用分为单位存储，而不是用元为单位存储。如 1 元在数据库中用整型类型 100 存储。
+
+为什么更推荐用 `BIGINT` 存储金钱数据？因为 `DECIMAL` 是个变长字段，若要定义金额字段，则定义为 `DECIMAL(8,2)` 是远远不够的。这样只能表示存储最大值为 999999.99，百万级的资金存储。用户的金额至少要存储百亿的字段，而统计局的 GDP 金额字段则可能达到数十万亿级别。用类型 `DECIMAL` 定义，不好统一。另外重要的是，类型 `DECIMAL` 是通过二进制实现的一种编码方式，计算效率远不如整型来的高效。因此，推荐使用 `BIGINT` 来存储金额相关的字段。
 
 > 扩展阅读：[MySQL 如何选择 float, double, decimal](http://blog.leanote.com/post/weibo-007/mysql_float_double_decimal)
 
+:::
+
 ### 如何存储 emoji 😃？
 
-Mysql 中的默认字符集为 utf8，无法存储 emoji，如果要存储 emoji，必须使用 utf8mb4 字符集。
+:::details 要点
 
-设置 utf8mb4 字符集方法如下：
+在表结构设计中，除了将列定义为 `CHAR` 和 `VARCHAR` 用以存储字符以外，还需要额外定义字符对应的字符集，因为每种字符在不同字符集编码下，对应着不同的二进制值。常见的字符集有 `gbk`、`utf8`，通常推荐把默认字符集设置为 `utf8`。
+
+随着移动互联网的飞速发展，**推荐把 MySQL 的默认字符集设置为 `utf8mb4`**，否则，某些 emoji 表情字符无法在 UTF8 字符集下存储。
+
+【示例】设置表的字符集为 `utf8mb4`
 
 ```sql
-ALTER TABLE test
-DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE test CHARSET utf8mb4;
 ```
 
+> 注意：上述修改只是将表的字符集修改为 `utf8mb4`，下次新增列时，若不显式地指定字符集，新列的字符集会变更为 `utf8mb4`，**但对于已经存在的列，其默认字符集并不做修改**。
+
+【示例】设置表的默认字符集为 `utf8mb4`
+
+正确设置 `utf8mb4` 字符集方法如下：
+
+```sql
+ALTER TABLE test CONVERT TO CHARSET utf8mb4;
+```
+
+:::
+
+### 时间数据选择 DATETIME 还是 TIMESTAMP？
+
+:::details 要点
+
+表结构设计时，对时间字段的存储，通常会有 3 种选择：`DATETIME`、`TIMESTAMP`、`INT`。
+
+`INT` 类型就是直接存储 ‘1970-01-01 00:00:00’ 到现在的毫秒数，本质和 `TIMESTAMP` 一样，因此用 `INT` 不如直接使用 `TIMESTAMP`。
+
+`TIMESTAMP` 类型存储的内容为‘1970-01-01 00:00:00’到现在的毫秒数。**`TIMESTAMP` 占用 4 个字节，因此其存储的时间上限只能到 “2038-01-19 03:14:07”**。
+
+此外，`TIMESTAMP` 还存在潜在的性能问题。虽然从毫秒数转换到类型 `TIMESTAMP` 本身需要的 CPU 指令并不多，这并不会带来直接的性能问题。但是如果使用默认的操作系统时区，则每次通过时区计算时间时，要调用操作系统底层系统函数 `__tz_convert()`，而这个函数需要额外的加锁操作，以确保这时操作系统时区没有修改。所以，当大规模并发访问时，由于热点资源竞争，会产生两个问题。
+
+- **性能不如 DATETIME：** `DATETIME` 不存在时区转化问题。
+- **性能抖动：** 海量并发时，存在性能抖动问题。
+
+为了优化 TIMESTAMP 的使用，强烈建议使用显式的时区，而不是操作系统时区。比如在配置文件中显示地设置时区，而不要使用系统时区
+
+综上，由于 `TIMESTAMP` 存在时间上限和潜在性能问题，所以推荐使用 `DATETIME` 类型来存储时间字段。
+
+:::
+
+## Mysql 建模
+
 ### 什么是范式？什么是反范式？
+
+:::details 要点
 
 > 什么是范式？
 
@@ -161,6 +220,8 @@ DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 - 范式 - 消除冗余
 - 反范式 - 适当冗余数据，以提高查询效率——空间换时间
+
+:::
 
 ## 架构
 
@@ -289,7 +350,7 @@ log buffer 的大小是有限的，如果不停的往这个有限大小的 log b
 - 正常关闭服务器时
 - **触发 checkpoint 规则**
 
-重做日志缓存、重做日志文件都是以**块（block）\*\*的方式进行保存的，称之为\*\*重做日志块（redo log block）**,块的大小是固定的 512 字节。我们的 redo log 它是固定大小的，可以看作是一个逻辑上的 **log group**，由一定数量的**log block** 组成。
+重做日志缓存、重做日志文件都是以**块（block）\*\*的方式进行保存的，称之为、\*\*重做日志块（redo log block）**, 块的大小是固定的 512 字节。我们的 redo log 它是固定大小的，可以看作是一个逻辑上的 **log group**，由一定数量的** log block** 组成。
 
 它的写入方式是从头到尾开始写，写到末尾又回到开头循环写。
 
@@ -299,7 +360,7 @@ log buffer 的大小是有限的，如果不停的往这个有限大小的 log b
 
 当`write_pos`追上`checkpoint`时，表示 redo log 日志已经写满。这时候就不能接着往里写数据了，需要执行`checkpoint`规则腾出可写空间。
 
-所谓的**checkpoint 规则**，就是 checkpoint 触发后，将 buffer 中日志页都刷到磁盘。
+所谓的** checkpoint 规则**，就是 checkpoint 触发后，将 buffer 中日志页都刷到磁盘。
 
 ### 日志为什么要两阶段提交？
 
@@ -909,7 +970,7 @@ SQL 中，不等于操作符会导致查询引擎放弃查询索引，引起全�
 
 解决方法：通过把不等于操作符改成 or，可以使用索引，避免全表扫描
 
-例如，把`column<>’aaa’，改成column>’aaa’ or column<’aaa’`，就可以使用索引了
+例如，把`column<>’aaa’，改成 column>’aaa’ or column<’aaa’`，就可以使用索引了
 
 **适当使用前缀索引**
 
@@ -921,7 +982,7 @@ SQL 中，不等于操作符会导致查询引擎放弃查询索引，引起全�
 alter table test add index index2(email(6));
 ```
 
-PS:需要注意的是，前缀索引也存在缺点，MySQL 无法利用前缀索引做 order by 和 group by 操作，也无法作为覆盖索引
+PS: 需要注意的是，前缀索引也存在缺点，MySQL 无法利用前缀索引做 order by 和 group by 操作，也无法作为覆盖索引
 
 **避免列上函数运算**
 
@@ -993,15 +1054,15 @@ MySQL 处理 union 的策略是先创建临时表，然后将各个查询结果�
 
 ### 哪种 COUNT 性能最好？
 
-> 先说结论：按照效率排序的话，`COUNT(字段)` < `COUNT(主键 id)` < `COUNT(1)` ≈ `COUNT(*)`。**推荐采用 `COUNT(*)`** 。
+> 先说结论：按照效率排序的话，`COUNT（字段）` < `COUNT（主键 id)` < `COUNT(1)` ≈ `COUNT(*)`。**推荐采用 `COUNT(*)`** 。
 
-- **对于 `COUNT(主键 id)` 来说**，InnoDB 引擎会遍历整张表，把每一行的 id 值都取出来，返回给 server 层。server 层拿到 id 后，判断是不可能为空的，就按行累加。
+- **对于 `COUNT（主键 id)` 来说**，InnoDB 引擎会遍历整张表，把每一行的 id 值都取出来，返回给 server 层。server 层拿到 id 后，判断是不可能为空的，就按行累加。
 
 - **对于 `COUNT(1)` 来说**，InnoDB 引擎遍历整张表，但不取值。server 层对于返回的每一行，放一个数字“1”进去，判断是不可能为空的，按行累加。
 
-- 单看这两个用法的差别的话，你能对比出来，`COUNT(1)` 执行得要比 `COUNT(主键 id)` 快。因为从引擎返回 id 会涉及到解析数据行，以及拷贝字段值的操作。
+- 单看这两个用法的差别的话，你能对比出来，`COUNT(1)` 执行得要比 `COUNT（主键 id)` 快。因为从引擎返回 id 会涉及到解析数据行，以及拷贝字段值的操作。
 
-- **对于 `COUNT(字段)` 来说**：
+- **对于 `COUNT（字段）` 来说**：
   - 如果这个“字段”是定义为 `not null` 的话，一行行地从记录里面读出这个字段，判断不能为 `null`，按行累加；
   - 如果这个“字段”定义允许为 `null`，那么执行的时候，判断到有可能是 `null`，还要把值取出来再判断一下，不是 `null` 才累加。
   - 也就是前面的第一条原则，server 层要什么字段，InnoDB 就返回什么字段。
@@ -1032,5 +1093,5 @@ InnoDB 是索引组织表，主键索引树的叶子节点是数据，而普通�
 ## 参考资料
 
 - [《高性能 MySQL》](https://book.douban.com/subject/23008813/)
-- [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
+- [极客时间教程 - MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
 - [图解 MySQL 介绍](https://xiaolincoding.com/mysql/)

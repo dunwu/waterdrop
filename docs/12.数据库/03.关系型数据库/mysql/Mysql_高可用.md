@@ -265,4 +265,4 @@ MySQL 读写分离能提高性能的原因在于：
 ## 参考资料
 
 - [《高性能 MySQL》](https://book.douban.com/subject/23008813/)
-- [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
+- [极客时间教程 - MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)

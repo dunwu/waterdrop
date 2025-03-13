@@ -399,7 +399,7 @@ SELECT * FROM post WHERE post.id IN (123,456,567,9098,8904);
 ## 参考资料
 
 - [《高性能 MySQL》](https://book.douban.com/subject/23008813/)
-- [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
+- [极客时间教程 - MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
 - [极客时间教程 - Java 性能调优实战](https://time.geekbang.org/column/intro/100028001)
 - [我必须得告诉大家的 MySQL 优化原理](https://www.jianshu.com/p/d7665192aaaf)
 - [20+ 条 MySQL 性能优化的最佳经验](https://www.jfox.info/20-tiao-mysql-xing-nen-you-hua-de-zui-jia-jing-yan.html)

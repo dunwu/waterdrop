@@ -6,11 +6,15 @@ categories:
   - 数据库
 tags:
   - 数据库
-  - Mysql
+  - mysql
 permalink: /pages/b58ace19/
 ---
 
 # 《MySQL 实战 45 讲》笔记
+
+[极客时间教程 - MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139) 学习笔记
+
+<!-- more -->
 
 ## 基础架构：一条 SQL 查询语句是如何执行的？
 
@@ -1403,4 +1407,4 @@ flush privileges 语句本身会用数据表的数据重建一份内存权限数
 
 ## 参考资料
 
-- [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
+- [极客时间教程 - MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
