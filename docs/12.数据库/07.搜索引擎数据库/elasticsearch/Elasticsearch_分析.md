@@ -17,28 +17,33 @@ permalink: /pages/6bfb0fbf/
 
 # Elasticsearch 文本分析
 
-**文本分析**是将非结构化文本转换为针对搜索优化的结构化格式的过程。
+::: info 概述
+
+Elasticsearch 中存储的数据可以粗略分为：
+
+- **词项数据** - 采用**精确查询**。比较两条词项数据是否相对，实际是比较二者的二进制数据，结果只有相等或不相等。
+- **文本数据** - 采用**全文搜索**。比较两个文本数据是否相等，没有太大意义，一般只会比较二者是否相似。相似性比较，是通过相关性评分来评估的。而计算相关性评分，需要对全文先分词处理，然后对分词后的词项进行统计才能进行相似性评估。
+
+**Elasticsearch 文本分析是将非结构化文本转换为一组词项（term）的过程**。本文将介绍 Elasticsearch 文本分析的各个关键组件，以及文本分析的处理流程。
+
+:::
 
 ## 文本分析简介
 
-文本分析使 Elasticsearch 能够执行全文搜索，其中搜索返回所有相关结果，而不仅仅是完全匹配。
+Elasticsearch 需要先对文本数据进行文本分析，将原文本分词处理，然后对分词后的词项进行统计才能进行相似性评估。有了相似性计算分值，才能进行相似性匹配。由此可见，文本分析是全文搜索的基础。
 
 文本分析可以分为两个方面：
 
-- **Tokenization（分词化）** - 分析通过分词化使全文搜索成为可能：将文本分解成更小的块，称为分词。在大多数情况下，这些标记是单独的 term（词项）。
+- **Tokenization（分词化）** - 分词化将文本分解成更小的块，称为分词。在大多数情况下，这些分词是单独的 term（词项）。
 - **Normalization（标准化）** - 经过分词后的文本只能进行词项匹配，但是无法进行同义词匹配。为解决这个问题，可以将文本进行标准化处理。例如：将 `foxes` 标准化为 `fox`。
 
 ## Analyzer（分析器）
 
-文本分析由 [**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 执行，分析器是一组控制整个过程的规则。无论是索引还是搜索，都需要使用分析器。
+文本分析由 [**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 执行，分析器是一组控制整个过程的规则。在 Elasticsearch 中，无论读写，都需要使用分析器。
 
-[**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 由三个组件组成：零个或多个 [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)、有且仅有一个 [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)、零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)。
+[**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 由三个组件组成：零个或多个 [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)、有且仅有一个 [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)、零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)。分析的执行顺序为：`character filters -> tokenizer -> token filters`。
 
-它的执行顺序如下：
-
-```
-character filters -> tokenizer -> token filters
-```
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012129250.png)
 
 Elasticsearch 内置的分析器：
 
@@ -271,27 +276,9 @@ PUT my-index-000001
 }
 ```
 
-## 中文分词
-
-在英文中，单词有自然的空格作为分隔。
-
-在中文中，分词有以下难点：
-
-- 中文不能根据一个个汉字进行分词
-- 不同于英文可以根据自然的空格进行分词；中文中一般不会有空格。
-- 同一句话，在不同的上下文中，有不同个理解。例如：这个苹果，不大好吃；这个苹果，不大，好吃！
-
-可以使用一些插件来获得对中文更好的分析能力：
-
-- [analysis-icu](https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html) - 添加了扩展的 Unicode 支持，包括更好地分析亚洲语言、Unicode 规范化、Unicode 感知大小写折叠、排序规则支持和音译。
-- [elasticsearch-analysis-ik](https://github.com/infinilabs/analysis-ik) - 支持自定义词库，支持热更新分词字典
-- [elasticsearch-thulac-plugin](https://github.com/microbun/elasticsearch-thulac-plugin) - 清华大学自然语言处理和社会人文计算实验室的一套中文分词器。
-
 ## Character Filters（字符过滤器）
 
-[Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html) 将原始文本作为字符流接收，并可以通过添加、删除或更改字符来转换文本。
-
-分析器可以有**零个或多个** [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)，如果配置了多个，它会按照配置的顺序执行。
+[Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html) 将原始文本作为字符流接收，并可以通过添加、删除或更改字符来转换文本。分析器可以有**零个或多个** [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)，如果配置了多个，它会按照配置的顺序执行。
 
 Elasticsearch 内置的字符过滤器：
 
@@ -301,11 +288,7 @@ Elasticsearch 内置的字符过滤器：
 
 ## Tokenizer（分词器）
 
-[Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html) 接收字符流，将其分解为分词（通常是单个单词），并输出一个分词流。
-
-分词器还负责记录每个 term 的顺序或位置，以及该 term 所代表的原始单词的开始和结束字符偏移量。``
-
-分析器**有且仅有一个** [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)。
+[Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html) 接收字符流，将其分解为分词（通常是单个单词），并输出一个分词流。分词器还负责记录每个 term 的顺序或位置，以及该 term 所代表的原始单词的开始和结束字符偏移量。分析器**有且仅有一个** [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)。
 
 Elasticsearch 内置的分词器：
 
@@ -330,9 +313,7 @@ Elasticsearch 内置的分词器：
 
 ## Token Filters（分词过滤器）
 
-[Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html) 接收分词流，并可以添加、删除或更改分词。常用的分词过滤器有： [`lowercase`（小写转换）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lowercase-tokenfilter.html)、[`stop`（停用词处理）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-tokenfilter.html)、[`synonym`（同义词处理）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-synonym-tokenfilter.html) 等等。
-
-分析器可以有零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)，如果配置了多个，它会按照配置的顺序执行。
+[Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html) 接收分词流，并可以添加、删除或更改分词。常用的分词过滤器有： [`lowercase`（小写转换）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lowercase-tokenfilter.html)、[`stop`（停用词处理）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-tokenfilter.html)、[`synonym`（同义词处理）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-synonym-tokenfilter.html) 等等。分析器可以有零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)，如果配置了多个，它会按照配置的顺序执行。
 
 Elasticsearch 内置了很多分词过滤器，这里列举几个常见的：
 
@@ -341,7 +322,24 @@ Elasticsearch 内置了很多分词过滤器，这里列举几个常见的：
 - [`stop`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-tokenfilter.html) - 从分词中删除 [stop word（停用词）](https://en.wikipedia.org/wiki/Stop_word)。
 - [`synonym`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-synonym-tokenfilter.html) - 允许在分析过程中轻松处理 [近义词](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-with-synonyms.html)。
 
+## 中文分词
+
+在英文中，单词有自然的空格作为分隔。
+
+在中文中，分词有以下难点：
+
+- 中文不能根据一个个汉字进行分词
+- 不同于英文可以根据自然的空格进行分词；中文中一般不会有空格。
+- 同一句话，在不同的上下文中，有不同个理解。例如：这个苹果，不大好吃；这个苹果，不大，好吃！
+
+可以使用一些插件来获得对中文更好的分析能力：
+
+- [analysis-icu](https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html) - 添加了扩展的 Unicode 支持，包括更好地分析亚洲语言、Unicode 规范化、Unicode 感知大小写折叠、排序规则支持和音译。
+- [elasticsearch-analysis-ik](https://github.com/infinilabs/analysis-ik) - 支持自定义词库，支持热更新分词字典
+- [elasticsearch-thulac-plugin](https://github.com/microbun/elasticsearch-thulac-plugin) - 清华大学自然语言处理和社会人文计算实验室的一套中文分词器。
+
 ## 参考资料
 
 - [极客时间教程 - Elasticsearch 核心技术与实战](https://time.geekbang.org/course/detail/100030501-102659)
 - [Elasticsearch 官方文档之文本分析](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html)
+- [Elasticsearch 从入门到实践之分词器](https://www.itshujia.com/read/elasticsearch/356.html)

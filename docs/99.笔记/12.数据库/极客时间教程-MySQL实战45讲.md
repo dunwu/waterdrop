@@ -1,4 +1,5 @@
 ---
+icon: logos:mysql
 title: 《MySQL 实战 45 讲》笔记
 date: 2022-07-20 19:20:08
 categories:

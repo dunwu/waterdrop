@@ -17,7 +17,7 @@ index: false
 ## 📖 内容
 
 - [关系数据库简介](关系数据库简介.md)
-- [SQL 语法](SQL语法.md)
+- [SQL](SQL.md)
 - [PostgreSQL](PostgreSQL.md)
 - [H2](H2.md)
 - [SqLite](Sqlite.md)

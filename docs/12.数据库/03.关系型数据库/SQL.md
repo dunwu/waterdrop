@@ -14,9 +14,15 @@ permalink: /pages/cd3ae5de/
 
 # SQL 语法必知必会
 
-> 本文针对关系型数据库的基本语法。限于篇幅，本文侧重说明用法，不会展开讲解特性、原理。
->
-> 本文语法主要针对 Mysql，但大部分的语法对其他关系型数据库也适用。
+::: info 概述
+
+**SQL（Structured Query Language，结构化查询语言）** 是一种高级的非过程化编程语言，用于管理 **RDBMS（Relational Database Management System，关系数据库管理系统）**。
+
+本文主要介绍关系型数据库的基本语法，限于篇幅，本文侧重说明用法，不会展开讲解特性、原理。
+
+> 注：本文语法主要针对 Mysql，但大部分的语法对其他关系型数据库也适用。
+
+:::
 
 ## SQL 简介
 
@@ -31,7 +37,7 @@ permalink: /pages/cd3ae5de/
 
 ### SQL 语法
 
-> SQL（Structured Query Language)，标准 SQL 由 ANSI 标准委员会管理，从而称为 ANSI SQL。各个 DBMS 都有自己的实现，如 PL/SQL、Transact-SQL 等。
+SQL（Structured Query Language)，标准 SQL 由 ANSI 标准委员会管理，从而称为 ANSI SQL。各个 DBMS 都有自己的实现，如 PL/SQL、Transact-SQL 等。
 
 #### SQL 语法结构
 
@@ -39,9 +45,9 @@ permalink: /pages/cd3ae5de/
 
 SQL 语法结构包括：
 
-- **子句** - 是语句和查询的组成成分。（在某些情况下，这些都是可选的。）
-- **表达式** - 可以产生任何标量值，或由列和行的数据库表
-- **谓词** - 给需要评估的 SQL 三值逻辑（3VL）（true/false/unknown）或布尔真值指定条件，并限制语句和查询的效果，或改变程序流程。
+- **子句** - 是语句和查询的组成成分（在某些情况下，这些都是可选的）。
+- **表达式** - 可以产生任何标量值，或由列和行的数据库表。
+- **谓词** - 给需要评估的 SQL 三值逻辑（3VL）（`true`/`false`/`unknown`）或布尔真值指定条件，并限制语句和查询的效果，或改变程序流程。
 - **查询** - 基于特定条件检索数据。这是 SQL 的一个重要组成部分。
 - **语句** - 可以持久地影响纲要和数据，也可以控制数据库事务、程序流程、连接、会话或诊断。
 
@@ -1019,120 +1025,6 @@ WHERE cust_id IN (SELECT cust_id
                                       WHERE prod_id = 'RGAN01'));
 ```
 
-## 排序和分组
-
-### ORDER BY
-
-`ORDER BY` 用于对结果集进行排序。`ORDER BY` 子句取一个或多个列的名字，据此对输出进行排序。`ORDER BY` 支持两种排序方式：
-
-- `ASC` ：升序（默认）
-- `DESC` ：降序
-
-单列排序示例：
-
-```sql
-SELECT prod_name
-FROM Products
-ORDER BY prod_name;
-```
-
-可以按多个列进行排序，并且为每个列指定不同的排序方式。
-
-多列排序示例：
-
-```sql
-SELECT * FROM Products
-ORDER BY prod_price DESC, prod_name ASC;
-```
-
-按列位置排序（不推荐）：
-
-```sql
-SELECT prod_id, prod_price, prod_name
-FROM Products
-ORDER BY 2, 3;
-```
-
-### GROUP BY
-
-`GROUP BY` 子句将记录分组到汇总行中，`GROUP BY` 为每个组返回一个记录。
-
-GROUP BY 要点：
-
-- GROUP BY 子句可以包含任意数目的列，因而可以对分组进行嵌套，更细致地进行数据分组。
-- 如果在 GROUP BY 子句中嵌套了分组，数据将在最后指定的分组上进行汇总。换句话说，在建立分组时，指定的所有列都一起计算（所以不能从个别的列取回数据）。
-- GROUP BY 子句中列出的每一列都必须是检索列或有效的表达式（但不能是聚集函数）。如果在 SELECT 中使用表达式，则必须在 GROUP BY 子句中指定相同的表达式。不能使用别名。
-- 大多数 SQL 实现不允许 GROUP BY 列带有长度可变的数据类型（如文本或备注型字段）。
-- 除聚集计算语句外，SELECT 语句中的每一列都必须在 GROUP BY 子句中给出。
-- 如果分组列中包含具有 NULL 值的行，则 NULL 将作为一个分组返回。如果列中有多行 NULL 值，它们将分为一组。
-- GROUP BY 子句必须出现在 WHERE 子句之后，ORDER BY 子句之前。
-
-分组示例：
-
-```sql
-SELECT cust_name, COUNT(cust_address) AS addr_num
-FROM Customers GROUP BY cust_name;
-```
-
-分组后排序示例：
-
-```sql
-SELECT cust_name, COUNT(cust_address) AS addr_num
-FROM Customers GROUP BY cust_name
-ORDER BY cust_name DESC;
-```
-
-### HAVING
-
-`HAVING` 用于对汇总的 `GROUP BY` 结果进行过滤。`HAVING` 要求存在一个 `GROUP BY` 子句。
-
-`WHERE` 和 `HAVING` 可以在相同的查询中。
-
-`HAVING` vs `WHERE`：
-
-- `HAVING` 非常类似于 `WHERE`。`WHERE` 和 `HAVING` 都是用于过滤。
-- `WHERE` 过滤行，而 `HAVING` 过滤分组。
-
-使用 `WHERE` 和 `HAVING` 过滤数据示例：
-
-过滤两个以上订单的分组
-
-```sql
-SELECT cust_id, COUNT(*) AS orders
-FROM Orders
-GROUP BY cust_id
-HAVING COUNT(*) >= 2;
-```
-
-列出具有两个以上产品且其价格大于等于 4 的供应商：
-
-```sql
-SELECT vend_id, COUNT(*) AS num_prods
-FROM Products
-WHERE prod_price >= 4
-GROUP BY vend_id
-HAVING COUNT(*) >= 2;
-```
-
-检索包含三个或更多物品的订单号和订购物品的数目：
-
-```sql
-SELECT order_num, COUNT(*) AS items
-FROM orderitems
-GROUP BY order_num
-HAVING COUNT(*) >= 3;
-```
-
-要按订购物品的数目排序输出，需要添加 ORDER BY 子句
-
-```sql
-SELECT order_num, COUNT(*) AS items
-FROM orderitems
-GROUP BY order_num
-HAVING COUNT(*) >= 3
-ORDER BY items, order_num;
-```
-
 ## 联结和组合
 
 ### 联结（JOIN）
@@ -1151,9 +1043,8 @@ ORDER BY items, order_num;
   - **左联结（LEFT JOIN）** - “左外联结”会获取左表所有记录，即使右表没有对应匹配的记录。左外联结使用 `LEFT JOIN` 关键字。
   - **右联结（RIGHT JOIN）** - “右外联结”会获取右表所有记录，即使左表没有对应匹配的记录。右外联结使用 `RIGHT JOIN` 关键字。
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/sql-join.png" alt="sql-join">
-</div>
+![SQL JOIN](https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/sql-join.png)
+
 #### 内联结（INNER JOIN）
 
 内联结又称等值联结，用于获取两个表中字段匹配关系的记录，**使用 `INNER JOIN` 关键字**。在没有条件语句的情况下**返回笛卡尔积**。
@@ -1252,7 +1143,7 @@ ON customers.cust_id = orders.cust_id;
 - 在一个查询中从不同的表返回结构数据；
 - 对一个表执行多个查询，按一个查询返回数据。
 
-把 Illinois、Indiana、Michigan 等州的缩写传递给 IN 子句，检索出这些州的所有行
+把 Illinois、Indiana、Michigan 等州的缩写传递给 `IN` 子句，检索出这些州的所有行
 
 ```sql
 SELECT cust_name, cust_contact, cust_email
@@ -1296,6 +1187,120 @@ WHERE cust_name = 'Fun4All';
 
 - `JOIN` 中联结表的列可能不同，但在 `UNION` 中，所有查询的列数和列顺序必须相同。
 - `UNION` 将查询之后的行放在一起（垂直放置），但 `JOIN` 将查询之后的列放在一起（水平放置），即它构成一个笛卡尔积。
+
+## 排序和分组
+
+### ORDER BY
+
+`ORDER BY` 用于对结果集进行排序。`ORDER BY` 子句取一个或多个列的名字，据此对输出进行排序。`ORDER BY` 支持两种排序方式：
+
+- `ASC` ：升序（默认）
+- `DESC` ：降序
+
+单列排序示例：
+
+```sql
+SELECT prod_name
+FROM Products
+ORDER BY prod_name;
+```
+
+可以按多个列进行排序，并且为每个列指定不同的排序方式。
+
+多列排序示例：
+
+```sql
+SELECT * FROM Products
+ORDER BY prod_price DESC, prod_name ASC;
+```
+
+按列位置排序（不推荐）：
+
+```sql
+SELECT prod_id, prod_price, prod_name
+FROM Products
+ORDER BY 2, 3;
+```
+
+### GROUP BY
+
+`GROUP BY` 子句将记录分组到汇总行中，`GROUP BY` 为每个组返回一个记录。
+
+`GROUP BY` 要点：
+
+- `GROUP BY` 子句可以包含任意数目的列，因而可以对分组进行嵌套，更细致地进行数据分组。
+- 如果在 `GROUP BY` 子句中嵌套了分组，数据将在最后指定的分组上进行汇总。换句话说，在建立分组时，指定的所有列都一起计算（所以不能从个别的列取回数据）。
+- `GROUP BY` 子句中列出的每一列都必须是检索列或有效的表达式（但不能是聚集函数）。如果在 `SELECT` 中使用表达式，则必须在 `GROUP BY` 子句中指定相同的表达式。不能使用别名。
+- 大多数 SQL 实现不允许 `GROUP BY` 列带有长度可变的数据类型（如文本或备注型字段）。
+- 除聚集计算语句外，`SELECT` 语句中的每一列都必须在 `GROUP BY` 子句中给出。
+- 如果分组列中包含具有 `NULL` 值的行，则 `NULL` 将作为一个分组返回。如果列中有多行 `NULL` 值，它们将分为一组。
+- `GROUP BY` 子句必须出现在 `WHERE` 子句之后，`ORDER BY` 子句之前。
+
+分组示例：
+
+```sql
+SELECT cust_name, COUNT(cust_address) AS addr_num
+FROM Customers GROUP BY cust_name;
+```
+
+分组后排序示例：
+
+```sql
+SELECT cust_name, COUNT(cust_address) AS addr_num
+FROM Customers GROUP BY cust_name
+ORDER BY cust_name DESC;
+```
+
+### HAVING
+
+`HAVING` 用于对汇总的 `GROUP BY` 结果进行过滤。`HAVING` 要求存在一个 `GROUP BY` 子句。
+
+`WHERE` 和 `HAVING` 可以在相同的查询中。
+
+`HAVING` vs `WHERE`：
+
+- `HAVING` 非常类似于 `WHERE`。`WHERE` 和 `HAVING` 都是用于过滤。
+- `WHERE` 过滤行，而 `HAVING` 过滤分组。
+
+使用 `WHERE` 和 `HAVING` 过滤数据示例：
+
+过滤两个以上订单的分组
+
+```sql
+SELECT cust_id, COUNT(*) AS orders
+FROM Orders
+GROUP BY cust_id
+HAVING COUNT(*) >= 2;
+```
+
+列出具有两个以上产品且其价格大于等于 4 的供应商：
+
+```sql
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+WHERE prod_price >= 4
+GROUP BY vend_id
+HAVING COUNT(*) >= 2;
+```
+
+检索包含三个或更多物品的订单号和订购物品的数目：
+
+```sql
+SELECT order_num, COUNT(*) AS items
+FROM orderitems
+GROUP BY order_num
+HAVING COUNT(*) >= 3;
+```
+
+要按订购物品的数目排序输出，需要添加 ORDER BY 子句
+
+```sql
+SELECT order_num, COUNT(*) AS items
+FROM orderitems
+GROUP BY order_num
+HAVING COUNT(*) >= 3
+ORDER BY items, order_num;
+```
 
 ## 函数
 
@@ -1536,10 +1541,6 @@ ROLLBACK TO updateA;
 -- 提交事务，只有操作 A 生效
 COMMIT;
 ```
-
-### ACID
-
-### 事务隔离级别
 
 ---
 
