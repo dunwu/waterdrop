@@ -7,6 +7,7 @@ categories:
 tags:
   - 数据库
   - mysql
+permalink: /pages/395e62b0/
 ---
 
 # 《姜承尧的 MySQL 实战宝典》笔记
