@@ -51,48 +51,11 @@ export default sidebar({
       children: [
         { text: '数据库综合', prefix: '01.数据库综合', collapsible: true, children: 'structure' },
         { text: '数据库中间件', prefix: '02.数据库中间件', collapsible: true, children: 'structure' },
-        {
-          text: '关系型数据库',
-          prefix: '03.关系型数据库/',
-          children: [{ text: 'Mysql', icon: 'logos:mysql', prefix: 'mysql', collapsible: true, children: 'structure' }]
-        },
-        {
-          text: '文档数据库',
-          prefix: '04.文档数据库/',
-          children: [
-            { text: 'MongoDB', icon: 'logos:mongodb', prefix: 'mongodb', collapsible: true, children: 'structure' }
-          ]
-        },
-        {
-          text: 'KV数据库',
-          prefix: '05.KV数据库/',
-          children: [{ text: 'Redis', icon: 'logos:redis', prefix: 'redis', collapsible: true, children: 'structure' }]
-        },
-        {
-          text: '列式数据库',
-          prefix: '06.列式数据库/',
-          children: [{ text: 'HBase', icon: 'logos:hbase', prefix: 'hbase', collapsible: true, children: 'structure' }]
-        },
-        {
-          text: '搜索引擎数据库',
-          prefix: '07.搜索引擎数据库/',
-          children: [
-            {
-              text: 'Elasticsearch',
-              icon: 'logos:elasticsearch',
-              prefix: 'elasticsearch',
-              collapsible: true,
-              children: 'structure'
-            },
-            {
-              text: 'Elastic技术栈',
-              icon: 'vscode-icons:file-type-elastic',
-              prefix: 'elastic',
-              collapsible: true,
-              children: 'structure'
-            }
-          ]
-        }
+        { text: '关系型数据库', prefix: '03.关系型数据库', collapsible: true, children: 'structure' },
+        { text: '文档数据库', prefix: '04.文档数据库', collapsible: true, children: 'structure' },
+        { text: 'KV数据库', prefix: '05.KV数据库', collapsible: true, children: 'structure' },
+        { text: '列式数据库', prefix: '06.列式数据库', collapsible: true, children: 'structure' },
+        { text: '搜索引擎数据库', prefix: '07.搜索引擎数据库', collapsible: true, children: 'structure' }
       ]
     },
     {

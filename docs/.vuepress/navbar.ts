@@ -73,7 +73,7 @@ export default navbar([
         text: '关系型数据库',
         link: '/12.数据库/03.关系型数据库/',
         children: [
-          { text: 'Mysql', icon: 'logos:mysql', link: '/12.数据库/03.关系型数据库/mysql/' },
+          { text: 'MySQL', icon: 'logos:mysql', link: '/12.数据库/03.关系型数据库/mysql/' },
         ]
       },
       {

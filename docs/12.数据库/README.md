@@ -63,19 +63,19 @@ index: false
 - [SQL](03.关系型数据库/SQL.md)
 - [PostgreSQL](03.关系型数据库/PostgreSQL.md)
 - [H2](03.关系型数据库/H2.md)
-- [SqLite](03.关系型数据库/Sqlite.md)
+- [SqLite](03.关系型数据库/SqLite.md)
 
-#### [Mysql](03.关系型数据库/mysql)
+#### [MySQL](03.关系型数据库/mysql)
 
-- [Mysql 架构](03.关系型数据库/mysql/Mysql_架构.md)
-- [Mysql 存储引擎](03.关系型数据库/mysql/Mysql_存储引擎.md)
-- [Mysql 索引](03.关系型数据库/mysql/Mysql_索引.md)
-- [Mysql 事务](03.关系型数据库/mysql/Mysql_事务.md)
-- [Mysql 锁](03.关系型数据库/mysql/Mysql_锁.md)
-- [Mysql 高可用](03.关系型数据库/mysql/Mysql_高可用.md)
-- [Mysql 优化](03.关系型数据库/mysql/Mysql_优化.md)
-- [Mysql 运维](03.关系型数据库/mysql/Mysql_运维.md)
-- [Mysql 面试](03.关系型数据库/mysql/Mysql_面试.md) 💯
+- [MySQL 架构](03.关系型数据库/mysql/MySQL_架构.md)
+- [MySQL 存储引擎](03.关系型数据库/mysql/MySQL_存储引擎.md)
+- [MySQL 索引](03.关系型数据库/mysql/MySQL_索引.md)
+- [MySQL 事务](03.关系型数据库/mysql/MySQL_事务.md)
+- [MySQL 锁](03.关系型数据库/mysql/MySQL_锁.md)
+- [MySQL 高可用](03.关系型数据库/mysql/MySQL_高可用.md)
+- [MySQL 优化](03.关系型数据库/mysql/MySQL_优化.md)
+- [MySQL 运维](03.关系型数据库/mysql/MySQL_运维.md)
+- [MySQL 面试](03.关系型数据库/mysql/MySQL_面试.md) 💯
 
 ### 文档数据库
 
@@ -191,11 +191,11 @@ index: false
 - **Oracle 资料**
   - [《Oracle Database 9i/10g/11g 编程艺术》](https://book.douban.com/subject/5402711/)
 
-#### Mysql 资料
+#### MySQL 资料
 
 - **官方**
-  - [Mysql 官网](https://www.mysql.com/)
-  - [Mysql 官方文档](https://dev.mysql.com/doc/)
+  - [MySQL 官网](https://www.mysql.com/)
+  - [MySQL 官方文档](https://dev.mysql.com/doc/)
   - **官方 PPT**
     - [How to Analyze and Tune MySQL Queries for Better Performance](https://www.mysql.com/cn/why-mysql/presentations/tune-mysql-queries-performance/)
     - [MySQL Performance Tuning 101](https://www.mysql.com/cn/why-mysql/presentations/mysql-performance-tuning101/)
@@ -207,7 +207,7 @@ index: false
 - **书籍**
   - [《高性能 MySQL》](https://book.douban.com/subject/23008813/) - 经典，适合 DBA 或作为开发者的参考手册【进阶】
   - [《MySQL 技术内幕：InnoDB 存储引擎》](https://book.douban.com/subject/24708143/)
-  - [《MySQL 必知必会》](https://book.douban.com/subject/3354490/) - Mysql 的基本概念和语法【入门】
+  - [《MySQL 必知必会》](https://book.douban.com/subject/3354490/) - MySQL 的基本概念和语法【入门】
 - **教程**
   - [MySQL 实战 45 讲](https://time.geekbang.org/column/intro/139)
   - [runoob.com MySQL 教程](http://www.runoob.com/mysql/mysql-tutorial.md) - 入门级 SQL 教程
@@ -219,11 +219,11 @@ index: false
   - [Guide to MySQL High Availability](https://www.mysql.com/cn/why-mysql/white-papers/mysql-guide-to-high-availability-solutions/)
   - [Choosing MySQL High Availability Solutions](https://dzone.com/articles/choosing-mysql-high-availability-solutions)
   - [High availability with MariaDB TX: The definitive guide](https://mariadb.com/sites/default/files/content/Whitepaper_High_availability_with_MariaDB-TX.pdf)
-  - Mysql 相关经验
+  - MySQL 相关经验
     - [Booking.com: Evolution of MySQL System Design](https://www.percona.com/live/mysql-conference-2015/sessions/bookingcom-evolution-mysql-system-design) ，Booking.com 的 MySQL 数据库使用的演化，其中有很多不错的经验分享，我相信也是很多公司会遇到的的问题。
     - [Tracking the Money - Scaling Financial Reporting at Airbnb](https://medium.com/airbnb-engineering/tracking-the-money-scaling-financial-reporting-at-airbnb-6d742b80f040) ，Airbnb 的数据库扩展的经验分享。
     - [Why Uber Engineering Switched from Postgres to MySQL](https://eng.uber.com/mysql-migration/) ，无意比较两个数据库谁好谁不好，推荐这篇 Uber 的长文，主要是想让你从中学习到一些经验和技术细节，这是一篇很不错的文章。
-  - Mysql 集群复制
+  - MySQL 集群复制
     - [Monitoring Delayed Replication, With A Focus On MySQL](https://engineering.imvu.com/2013/01/09/monitoring-delayed-replication-with-a-focus-on-mysql/)
     - [Mitigating replication lag and reducing read load with freno](https://githubengineering.com/mitigating-replication-lag-and-reducing-read-load-with-freno/)
     - [Better Parallel Replication for MySQL](https://medium.com/booking-com-infrastructure/better-parallel-replication-for-mysql-14e2d7857813)
@@ -231,12 +231,12 @@ index: false
     - [Evaluating MySQL Parallel Replication Part 3: Benchmarks in Production](https://medium.com/booking-com-infrastructure/evaluating-mysql-parallel-replication-part-3-benchmarks-in-production-db5811058d74)
     - [Evaluating MySQL Parallel Replication Part 4: More Benchmarks in Production](https://medium.com/booking-com-infrastructure/evaluating-mysql-parallel-replication-part-4-more-benchmarks-in-production-49ee255043ab)
     - [Evaluating MySQL Parallel Replication Part 4, Annex: Under the Hood](https://medium.com/booking-com-infrastructure/evaluating-mysql-parallel-replication-part-4-annex-under-the-hood-eb456cf8b2fb)
-  - Mysql 数据分区
+  - MySQL 数据分区
     - [StackOverflow: MySQL sharding approaches?](https://stackoverflow.com/questions/5541421/mysql-sharding-approaches)
     - [Why you don’t want to shard](https://www.percona.com/blog/2009/08/06/why-you-dont-want-to-shard/)
     - [How to Scale Big Data Applications](https://www.percona.com/sites/default/files/presentations/How to Scale Big Data Applications.pdf)
     - [MySQL Sharding with ProxySQL](https://www.percona.com/blog/2016/08/30/mysql-sharding-with-proxysql/)
-  - 各公司的 Mysql 数据分区经验分享
+  - 各公司的 MySQL 数据分区经验分享
     - [MailChimp: Using Shards to Accommodate Millions of Users](https://devs.mailchimp.com/blog/using-shards-to-accommodate-millions-of-users/)
     - [Uber: Code Migration in Production: Rewriting the Sharding Layer of Uber’s Schemaless Datastore](https://eng.uber.com/schemaless-rewrite/)
     - [Sharding & IDs at Instagram](https://instagram-engineering.com/sharding-ids-at-instagram-1cf5a71e5a5c)

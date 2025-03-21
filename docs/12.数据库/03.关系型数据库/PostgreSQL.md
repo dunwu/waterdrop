@@ -1,5 +1,6 @@
 ---
-title: PostgreSQL 应用指南
+icon: logos:postgresql
+title: PostgreSQL
 date: 2019-08-22 09:02:39
 categories:
   - 数据库
@@ -11,7 +12,7 @@ tags:
 permalink: /pages/31bd28da/
 ---
 
-# PostgreSQL 应用指南
+# PostgreSQL
 
 > [PostgreSQL](https://www.postgresql.org/) 是一个关系型数据库（RDBM）。
 >

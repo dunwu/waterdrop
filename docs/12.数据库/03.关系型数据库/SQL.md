@@ -1,5 +1,6 @@
 ---
-title: SQL 语法必知必会
+icon: devicon:azuresqldatabase
+title: SQL
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202410022047122.png
 date: 2018-06-15 16:07:17
 categories:
@@ -12,7 +13,7 @@ tags:
 permalink: /pages/cd3ae5de/
 ---
 
-# SQL 语法必知必会
+# SQL
 
 ::: info 概述
 
