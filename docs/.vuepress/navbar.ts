@@ -1,12 +1,7 @@
 import { navbar } from 'vuepress-theme-hope'
 
 export default navbar([
-  '/',
-  {
-    text: '归档',
-    icon: 'mdi:archive',
-    link: '/article/'
-  },
+  // '/',
   {
     text: 'Java',
     icon: 'mdi:language-java',
@@ -136,13 +131,8 @@ export default navbar([
     ]
   },
   {
-    text: '工作',
-    icon: 'mdi:briefcase',
-    link: '/96.工作/'
-  },
-  {
     text: '笔记',
-    icon: 'mdi:note',
+    icon: 'mdi:notes',
     link: '/99.笔记/'
   }
 ])

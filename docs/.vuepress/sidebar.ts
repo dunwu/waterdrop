@@ -2,12 +2,6 @@ import { sidebar } from 'vuepress-theme-hope'
 
 export default sidebar({
   '/': [
-    '',
-    {
-      text: '归档',
-      icon: 'mdi:archive',
-      link: '/article/'
-    },
     {
       text: 'Java',
       icon: 'mdi:language-java',
@@ -75,6 +69,7 @@ export default sidebar({
     {
       text: '大数据',
       icon: 'devicon-plain:hadoop',
+      collapsible: true,
       children: [
         {
           text: 'Hadoop',
@@ -121,7 +116,7 @@ export default sidebar({
     },
     {
       text: '笔记',
-      icon: 'mdi:note',
+      icon: 'mdi:notes',
       prefix: '99.笔记/',
       children: 'structure',
       collapsible: true
