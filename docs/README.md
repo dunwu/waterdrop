@@ -399,6 +399,8 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 - [MySQL 优化](12.数据库/03.关系型数据库/mysql/MySQL_优化.md)
 - [MySQL 运维](12.数据库/03.关系型数据库/mysql/MySQL_运维.md)
 - [MySQL 面试](12.数据库/03.关系型数据库/mysql/MySQL_面试.md) 💯
+- [MySQL 面试之索引篇](12.数据库/03.关系型数据库/mysql/MySQL_面试_索引.md) 💯
+- [MySQL 面试之事务和锁篇](12.数据库/03.关系型数据库/mysql/MySQL_面试_事务和锁.md) 💯
 
 ### 文档数据库
 

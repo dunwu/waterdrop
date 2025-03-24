@@ -42,6 +42,8 @@ MySQL 是一种关联数据库管理系统，关联数据库将数据保存在�
 - [MySQL 优化](MySQL_优化.md)
 - [MySQL 运维](MySQL_运维.md)
 - [MySQL 面试](MySQL_面试.md) 💯
+- [MySQL 面试之索引篇](MySQL_面试_索引.md) 💯
+- [MySQL 面试之事务和锁篇](MySQL_面试_事务和锁.md) 💯
 
 ## 📚 资料
 

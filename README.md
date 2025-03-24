@@ -361,6 +361,8 @@
 - [MySQL 优化](docs/12.数据库/03.关系型数据库/mysql/MySQL_优化.md)
 - [MySQL 运维](docs/12.数据库/03.关系型数据库/mysql/MySQL_运维.md)
 - [MySQL 面试](docs/12.数据库/03.关系型数据库/mysql/MySQL_面试.md) 💯
+- [MySQL 面试之索引篇](docs/12.数据库/03.关系型数据库/mysql/MySQL_面试_索引.md) 💯
+- [MySQL 面试之事务和锁篇](docs/12.数据库/03.关系型数据库/mysql/MySQL_面试_事务和锁.md) 💯
 
 ### 文档数据库
 

@@ -33,7 +33,9 @@ index: false
 - [MySQL 高可用](mysql/MySQL_高可用.md)
 - [MySQL 优化](mysql/MySQL_优化.md)
 - [MySQL 运维](mysql/MySQL_运维.md)
-- [MySQL 面试](mysql/MySQL_面试.md)
+- [MySQL 面试](mysql/MySQL_面试.md) 💯
+- [MySQL 面试之索引篇](mysql/MySQL_面试_索引.md) 💯
+- [MySQL 面试之事务和锁篇](mysql/MySQL_面试_事务和锁.md) 💯
 
 ## 📚 资料
 

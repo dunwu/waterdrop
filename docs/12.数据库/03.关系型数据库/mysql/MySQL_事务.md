@@ -31,7 +31,7 @@ permalink: /pages/04246a4a/
 
 **“事务”指的是满足 ACID 特性的一组操作**。事务内的 SQL 语句，要么全执行成功，要么全执行失败。可以通过 `Commit` 提交一个事务，也可以使用 `Rollback` 进行回滚。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030701337.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242207831.png)
 
 ### ACID
 
@@ -161,7 +161,7 @@ SET autocommit = 1;
 
 如下图所示，T<sub>1</sub> 和 T<sub>2</sub> 两个事务对同一个数据进行修改，T<sub>1</sub> 先修改，T<sub>2</sub> 随后修改，T<sub>2</sub> 的修改覆盖了 T<sub>1</sub> 的修改。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030706586.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242209867.png)
 
 ### 脏读
 
@@ -169,7 +169,7 @@ SET autocommit = 1;
 
 如下图所示，T<sub>1</sub> 修改一个数据，T<sub>2</sub> 随后读取这个数据。如果 T<sub>1</sub> 撤销了这次修改，那么 T<sub>2</sub> 读取的数据是脏数据。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030706587.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242210430.png)
 
 ### 不可重复读
 
@@ -177,7 +177,7 @@ SET autocommit = 1;
 
 如下图所示，T<sub>2</sub> 读取一个数据，T<sub>1</sub> 对该数据做了修改。如果 T<sub>2</sub> 再次读取这个数据，此时读取的结果和第一次读取的结果不同。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030706588.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242211015.png)
 
 ### 幻读
 
@@ -185,7 +185,7 @@ SET autocommit = 1;
 
 事务 T<sub>1</sub> 读取某个范围内的记录时，事务 T<sub>2</sub> 在该范围内插入了新的记录，T<sub>1</sub> 再次读取这个范围的数据，此时读取的结果和和第一次读取的结果不同。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030706589.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242212639.png)
 
 ## 事务隔离级别
 
@@ -317,7 +317,7 @@ InnoDB 存储引擎中，数据表的每行记录，除了用户显示定义的�
 
 MVCC 的多版本指的是多个版本的快照，快照存储在 UndoLog 中。该日志通过回滚指针 `roll_pointer` 把一个数据行的所有快照链接起来，构成一个**版本链**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030708591.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242213050.png)
 
 #### ReadView
 
@@ -336,7 +336,7 @@ ReadView 有四个重要的字段：
 - 已启动但未提交的事务
 - 未启动的事务
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030708265.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242214504.png)
 
 > ReadView 如何判断版本链中哪个版本可见？
 
@@ -378,7 +378,7 @@ MySQL InnoDB 引擎的默认隔离级别虽然是“可重复读”，但是它�
 
 以上操作，如下图所示。T2 事务在事务过程中，是否可以看到 T1 事务的修改，可以根据 [ReadView](#ReadView) 中描述的规则去判断。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030709235.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242217983.png)
 
 从图中不难看出：
 
@@ -402,7 +402,7 @@ MySQL InnoDB 引擎的默认隔离级别虽然是“可重复读”，但是它�
 
 以上操作，如下图所示，T2 事务在事务过程中，是否可以看到其他事务的修改，可以根据 [ReadView](#ReadView) 中描述的规则去判断。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311030709986.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242218464.png)
 
 从图中不难看出：
 
