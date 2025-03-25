@@ -1,6 +1,6 @@
 ---
 icon: logos:mysql
-title: MySQL 高可用
+title: MySQL 复制
 date: 2023-09-21 21:25:58
 categories:
   - 数据库
@@ -10,40 +10,39 @@ tags:
   - 数据库
   - 关系型数据库
   - mysql
-  - 高可用
+  - 复制
+  - 读写分离
 permalink: /pages/f3f7b97e/
 ---
 
-# MySQL 高可用
+# MySQL 复制
 
 ## 复制
 
 复制是解决系统高可用的常见手段。其思路就是：不要把鸡蛋都放在一个篮子里。
 
-复制解决的基本问题是让一台服务器的数据与其他服务器保持同步。一台主库的数据可以同步到多台备库上，备库本身也可以被配置成另外一台服务器的主库。主库和备库之 间可以有多种不同的组合方式。
+复制解决的基本问题是让一台服务器的数据与其他服务器保持同步。一台主库的数据可以同步到多台从库上，从库本身也可以被配置成另外一台服务器的主库。主库和从库之 间可以有多种不同的组合方式。
 
-MySQL 支持两种复制方式：基于行的复制和基于语句的复制。这两种方式都是通过在主库上记录 bin log、在备库重放日志的方式来实现异步的数据复制。这意味着：复制过程存在时延，这段时间内，主从数据可能不一致。
+MySQL 支持两种复制方式：基于行的复制和基于语句的复制。这两种方式都是通过在主库上记录 bin log、在从库重放日志的方式来实现异步的数据复制。这意味着：复制过程存在时延，这段时间内，主从数据可能不一致。
 
 ### 复制如何工作
 
 在 MySQL 中，复制分为三个步骤，分别由三个线程完成：
 
 - **binlog dump 线程** - 主库上有一个特殊的 binlog dump 线程，负责将主服务器上的数据更改写入 binlog 中。
-- **I/O 线程** - 备库上有一个 I/O 线程，负责从主库上读取 binlog，并写入备库的中继日志（relay log）中。
-- **SQL 线程** - 备库上有一个 SQL 线程，负责读取中继日志（relay log）并重放其中的 SQL 语句。
+- **I/O 线程** - 从库上有一个 I/O 线程，负责从主库上读取 binlog，并写入从库的中继日志（relay log）中。
+- **SQL 线程** - 从库上有一个 SQL 线程，负责读取中继日志（relay log）并重放其中的 SQL 语句。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/master-slave.png" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/master-slave.png)
 
-这种架构实现了数据备份和数据同步的异步解耦。但这种架构也限制了复制的过程，其中最重要 的一点是在主库上并发运行的查询在备库只能串行化执行，因为只有一个 SQL 线程来重放 中继日志中的事件。
+这种架构实现了数据备份和数据同步的异步解耦。但这种架构也限制了复制的过程，其中最重要的一点是在主库上并发运行的查询在从库只能串行化执行，因为只有一个 SQL 线程来重放 中继日志中的事件。
 
 ### 主备配置
 
 假设需要配置一对 MySQL 主备节点，环境如下：
 
 - 主库节点：192.168.8.10
-- 备库节点：192.168.8.11
+- 从库节点：192.168.8.11
 
 #### 主库上的操作
 
@@ -84,7 +83,7 @@ CREATE USER 'slave'@'%' IDENTIFIED WITH mysql_native_password BY '密码';
 GRANT REPLICATION SLAVE ON *.* TO 'slave'@'%';
 
 -- b. 或者，创建 slave 用户，并指定该用户能在任意主机上登录
--- 如果有多个备库，又想让所有备库都使用统一的用户名、密码认证，可以考虑这种方式
+-- 如果有多个从库，又想让所有从库都使用统一的用户名、密码认证，可以考虑这种方式
 CREATE USER 'slave'@'%' IDENTIFIED WITH mysql_native_password BY '密码';
 GRANT REPLICATION SLAVE ON *.* TO 'slave'@'%';
 
@@ -148,13 +147,13 @@ mysqldump -u root -p --all-databases --master-data > dbdump.sql
 mysql> UNLOCK TABLES;
 ```
 
-（7）将 sql 远程传送到备库上
+（7）将 sql 远程传送到从库上
 
 ```shell
 scp dbdump.sql root@192.168.8.11:/home
 ```
 
-#### 备库上的操作
+#### 从库上的操作
 
 （1）修改配置并重启
 
@@ -181,7 +180,7 @@ systemctl restart mysql
 mysql -u root -p < /home/dbdump.sql
 ```
 
-（3）在备库上建立与主库的连接
+（3）在从库上建立与主库的连接
 
 进入 mysql 命令控制台：
 
@@ -193,7 +192,7 @@ Password:
 执行以下 SQL：
 
 ```sql
--- 停止备库服务
+-- 停止从库服务
 STOP SLAVE;
 
 -- 注意：MASTER_USER 和
@@ -226,7 +225,7 @@ mysql> show slave status\G;
 - `Slave_IO_Running`
 - `Slave_SQL_Running`
 
-（6）将备库设为只读
+（6）将从库设为只读
 
 ```sql
 mysql> set global read_only=1;
@@ -243,8 +242,6 @@ mysql> show global variables like "%read_only%";
 ```
 
 > 注：设置 slave 服务器为只读，并不影响主从同步。
-
-## 复制的原理
 
 ## 读写分离
 

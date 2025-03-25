@@ -84,7 +84,7 @@ perl mysqldumpslow.pl -s t -t 2 "C:\ProgramData\MySQL\MySQL Server 8.0\Data\slow
 【示例】MySQL 执行计划示例
 
 ```sql
-mysql> explain select * from user_info where id = 2\G
+mysql> explain select * from user_info where id = 2
 *************************** 1. row ***************************
            id: 1
   select_type: SIMPLE

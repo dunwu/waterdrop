@@ -2,6 +2,7 @@
 icon: logos:mysql
 title: MySQL 面试之索引篇
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+date: 2025-03-24 22:42:57
 categories:
   - 数据库
   - 关系型数据库
@@ -11,6 +12,7 @@ tags:
   - 关系型数据库
   - mysql
   - 面试
+permalink: /pages/9303ab78/
 ---
 
 # MySQL 面试之索引篇
