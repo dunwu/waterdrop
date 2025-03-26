@@ -395,7 +395,7 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 - [MySQL 索引](12.数据库/03.关系型数据库/mysql/MySQL_索引.md)
 - [MySQL 事务](12.数据库/03.关系型数据库/mysql/MySQL_事务.md)
 - [MySQL 锁](12.数据库/03.关系型数据库/mysql/MySQL_锁.md)
-- [MySQL 高可用](12.数据库/03.关系型数据库/mysql/MySQL_高可用.md)
+- [MySQL 复制](12.数据库/03.关系型数据库/mysql/MySQL_复制.md)
 - [MySQL 优化](12.数据库/03.关系型数据库/mysql/MySQL_优化.md)
 - [MySQL 运维](12.数据库/03.关系型数据库/mysql/MySQL_运维.md)
 - [MySQL 面试](12.数据库/03.关系型数据库/mysql/MySQL_面试.md) 💯

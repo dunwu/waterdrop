@@ -5,11 +5,11 @@ cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20230923113143
 date: 2020-07-13 17:03:42
 categories:
   - 数据库
-  - KV数据库
+  - KV 数据库
   - redis
 tags:
   - 数据库
-  - KV数据库
+  - KV 数据库
   - redis
   - 面试
 permalink: /pages/4431bbfc/
@@ -19,17 +19,11 @@ permalink: /pages/4431bbfc/
 
 ## Redis 简介
 
-### 什么是 Redis
+### 【基础】什么是 Redis？
 
-**典型问题**
+::: details 要点
 
-（1）什么是 Redis？
-
-（2）Redis 有什么功能和特性？
-
-**知识点**
-
-（1）什么是 Redis？
+> 什么是 Redis？
 
 **Redis 是一个开源的、数据存于内存中的 K-V 数据库**。由于，Redis 的读写操作都是在内存中完成，因此其**读写速度非常快**。
 
@@ -38,29 +32,27 @@ permalink: /pages/4431bbfc/
 
 Redis 常被用于**缓存，消息队列、分布式锁等场景**。
 
-（2）Redis 有什么功能和特性？
+> Redis 有什么功能和特性？
 
 Redis 的功能和特性：
 
 - **Redis 支持多种数据类型**。如：String（字符串）、Hash（哈希）、 List （列表）、Set（集合）、Zset（有序集合）、Bitmaps（位图）、HyperLogLog（基数统计）、GEO（地理空间）、Stream（流）。
 - **Redis 的读写采用“单线程”模型**，因此，其操作天然就具有**原子性**。需要注意的是，Redis 6.0 后在其网络模块中引入了多线程 I/O 机制。
 - Redis 支持两种持久化策略：RDB 和 AOF。
-
 - Redis 有多种高可用方案：**主从复制**模式、**哨兵**模式、**集群**模式。
-
 - Redis 支持很多丰富的特性，如：**事务** 、**Lua 脚本**、**发布订阅**、**过期删除**、**内存淘汰**等等。
 
 ![](https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F778a7e21-455b-45f6-8487-63f9eb41e88b_2000x1414.jpeg)
 
 _图来自 [Redis Explained](https://architecturenotes.co/p/redis)_
 
-### Redis 有哪些应用场景
+:::
 
-**典型问题**
+### 【基础】Redis 有哪些应用场景？
 
-- Redis 有哪些应用场景？
+::: details 要点
 
-**知识点**
+Redis 常见应用场景如下：
 
 - **缓存** - 将热点数据放到内存中，设置内存的最大使用量以及过期淘汰策略来保证缓存的命中率。
 - **计数器** - Redis 这种内存数据库能支持计数器频繁的读写操作。
@@ -72,71 +64,13 @@ _图来自 [Redis Explained](https://architecturenotes.co/p/redis)_
 - **分布式 Session** - 多个应用服务器的 Session 都存储到 Redis 中来保证 Session 的一致性。
 - **分布式锁** - 除了可以使用 SETNX 实现分布式锁之外，还可以使用官方提供的 RedLock 分布式锁实现。
 
-### Redis 为什么快
+:::
 
-**典型问题**
+### 【基础】Redis 有哪些里程碑版本？
 
-- Redis 有多快？
-- Redis 为什么这么快？
+::: details 要点
 
-**知识点**
-
-根据 [Redis 官方 Benchmark](https://redis.io/docs/management/optimization/benchmarks/) 文档的描述，Redis 单机 QPS 能达到 10w+，将近是 Mysql 的 10 倍。
-
-![Redis 官方 Benchmark QPS 图](https://redis.io/docs/management/optimization/benchmarks/Connections_chart.png)
-
-Redis 是单线程模型（Redis 6.0 已经支持多线程模型），为什么还能有这么高的并发？
-
-- **Redis 读写基于内存**
-- **IO 多路复用** + **读写单线程模型**
-  - IO 多路复用是利用 select、poll、epoll 可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有 I/O 事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll 是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。
-  - 单线程模型避免了由于并发而产生的线程切换、锁竞争等开销。
-  - 由于，Redis 读写基于内存，性能很高，所以 CPU 并不是制约 Redis 性能表现的瓶颈所在。更多情况下是受到内存大小和网络 I/O 的限制，所以 Redis 核心网络模型使用单线程并没有什么问题。
-- **高效的数据结构**
-
-![](https://pbs.twimg.com/media/FoYNzdcacAAMjy5?format=jpg&name=4096x4096)
-
-图来自 [Why is redis so fast?](https://blog.bytebytego.com/p/why-is-redis-so-fast)
-
-> 扩展阅读：
->
-> [【视频】Why is Redis so FAST](https://www.youtube.com/shorts/x8lcdDbKZto)
-
-### Redis 模块
-
-**经典问题**
-
-什么是 Redis 模块？
-
-Redis 模块有什么用？
-
-**经典问题**
-
-Redis 从 4.0 版本开始，支持通过 Module 来扩展其功能以满足特殊的需求。这些 Module 以动态链接库（so 文件）的形式被加载到 Redis 中，这是一种非常灵活的动态扩展功能的实现方式，值得借鉴学习！
-
-我们每个人都可以基于 Redis 去定制化开发自己的 Module，比如实现搜索引擎功能、自定义分布式锁和分布式限流。
-
-目前，被 Redis 官方推荐的 Module 有：
-
-- [RediSearch](https://github.com/RediSearch/RediSearch)：用于实现搜索引擎的模块。
-- [RedisJSON](https://github.com/RedisJSON/RedisJSON)：用于处理 JSON 数据的模块。
-- [RedisGraph](https://github.com/RedisGraph/RedisGraph)：用于实现图形数据库的模块。
-- [RedisTimeSeries](https://github.com/RedisTimeSeries/RedisTimeSeries)：用于处理时间序列数据的模块。
-- [RedisBloom](https://github.com/RedisBloom/RedisBloom)：用于实现布隆过滤器的模块。
-- [RedisAI](https://github.com/RedisAI/RedisAI)：用于执行深度学习/机器学习模型并管理其数据的模块。
-- [RedisCell](https://github.com/brandur/redis-cell)：用于实现分布式限流的模块。
-
-关于 Redis 模块的详细介绍，可以查看官方文档：https://redis.io/modules。
-
-### Redis 发展
-
-**经典问题**
-
-- Redis 架构经历了哪些变化？
-
-**知识点**
-
-![](https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_lossy/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fac67c4db-99e0-4d6c-a7e4-163d962141ea_1280x1664.gif)
+Redis 里程碑版本如下：
 
 - Redis 1.0（2010 年） - Redis 1.0 发布，采用单机架构，一般作为业务应用的缓存。但是 Redis 的数据是存在内存中的，重启 Redis 时，数据会全部丢失，流量直接打到数据库。
 - Redis 2.8（2013 年）
@@ -147,20 +81,22 @@ Redis 从 4.0 版本开始，支持通过 Module 来扩展其功能以满足特�
 - Redis 5.0（2017 年） - 新增 Stream 数据类型。
 - Redis 6.0（2020 年） - 在网络模块中引入了多线程 I/O。Redis 模型分为网络模块和主处理模块。特别注意：Redis 不再完全是单线程架构。
 
-### Redis vs. Memcached
+![](https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_lossy/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fac67c4db-99e0-4d6c-a7e4-163d962141ea_1280x1664.gif)
 
-**典型问题**
+:::
 
-- Redis 和 Memcached 有什么相同点？
-- Redis 和 Memcached 有什么差异？
-- 分布式缓存技术选型，选 Redis 还是 Memcached，为什么？
+### 【基础】对比一下 Redis 和 Memcached？
 
-**知识点**
+::: details 要点
+
+> - Redis 和 Memcached 有什么相同点？
+> - Redis 和 Memcached 有什么差异？
+> - 分布式缓存技术选型，选 Redis 还是 Memcached，为什么？
 
 Redis 与 Memcached 的**共性**：
 
-1. 都是内存数据库，因此性能都很高。
-2. 都有过期策略。
+- 都是内存数据库，因此性能都很高。
+- 都有过期策略。
 
 因为以上两点，所以常被作为缓存使用。
 
@@ -176,32 +112,95 @@ Redis 与 Memcached 的**差异**：
 
 通过以上分析，可以看出，Redis 在很多方面都占有优势。因此，绝大多数情况下，优先选择 Redis 作为分布式缓存。
 
-> 参考：[《脚踏两只船的困惑 - Memcached 与 Redis》](https://www.imooc.com/article/23549)
+> **扩展**：[《脚踏两只船的困惑 - Memcached 与 Redis》](https://www.imooc.com/article/23549)
+
+:::
+
+### 【基础】Redis 有哪些 Java 客户端？各有什么优劣？
+
+::: details 要点
+
+Redis 的主流 Java 客户端有三种，对比如下：
+
+| 客户端       | 线程安全 | 自动重连 | 编程模型         | 适用场景                 |
+| :----------- | :------- | :------- | :--------------- | :----------------------- |
+| **Jedis**    | ❌       | ❌       | 同步             | 简单应用、快速开发       |
+| **Lettuce**  | ✅       | ✅       | 同步/异步/响应式 | 高并发、Spring Boot 项目 |
+| **Redisson** | ✅       | ✅       | 同步/异步        | 分布式系统、高级功能需求 |
+
+**推荐选择**：
+
+- **基础需求** → Jedis（简单直接）。
+- **高并发/Spring 项目** → Lettuce（默认选择）。
+- **分布式锁/队列等** → Redisson（功能强大）。
+
+:::
+
+::: details 细节
+
+#### Jedis
+
+**✅ 优点**
+
+- **简单易用**：API 直观，适合快速上手。
+- **广泛使用**：社区支持丰富，文档齐全。
+- **性能良好**：常规操作高效。
+- **功能全面**：支持字符串、哈希、列表等基础数据结构。
+
+**❌ 缺点**
+
+- **非线程安全**：需为每个线程创建独立实例。
+- **无自动重连**：网络异常需手动处理。
+- **同步阻塞**：高并发时可能成为性能瓶颈。
+
+#### Lettuce
+
+**✅ 优点**
+
+- **线程安全**：多线程共享同一连接。
+- **高性能**：基于 Netty 实现，支持高并发。
+- **自动重连**：网络中断后自动恢复。
+- **多编程模型**：支持同步、异步、响应式（如 Reactive API）。
+
+**❌ 缺点**
+
+- **API 较复杂**：学习成本高于 Jedis。
+- **资源消耗**：异步模式可能占用更多内存/CPU。
+
+#### Redisson
+
+**✅ 优点**
+
+- **分布式支持**：内置分布式锁、队列、缓存等高级功能。
+- **线程安全**：天然适配多线程场景。
+- **集群友好**：完善支持 Redis 集群模式。
+- **稳定性高**：企业级应用验证。
+
+**❌ 缺点**
+
+- **学习曲线陡峭**：需掌握分布式概念。
+- **依赖兼容性**：可能与其他库冲突需调优。
+
+:::
 
 ## Redis 数据类型
 
-### Redis 支持哪些数据类型
+### 【基础】Redis 支持哪些数据类型
 
-**典型问题**
-
-- Redis 支持哪些数据类型？
-
-**知识点**
+::: details 要点
 
 - Redis 支持五种基本数据类型：String（字符串）、Hash（哈希）、List（列表）、Set（集合）、Zset（有序集合）。
 - 随着 Redis 版本升级，又陆续支持以下数据类型： BitMap（2.2 版新增）、HyperLogLog（2.8 版新增）、GEO（3.2 版新增）、Stream（5.0 版新增）。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309232155082.png)
 
-> [What Redis data structures look like](https://redislabs.com/ebook/part-1-getting-started/chapter-1-getting-to-know-redis/1-2-what-redis-data-structures-look-like/)
+> **扩展**：[What Redis data structures look like](https://redislabs.com/ebook/part-1-getting-started/chapter-1-getting-to-know-redis/1-2-what-redis-data-structures-look-like/)
 
-### Redis 各数据类型的应用场景
+:::
 
-**典型问题**
+### 【中级】Redis 各数据类型的应用场景
 
-Redis 各数据类型有哪些应用场景？
-
-**知识点**
+::: details 要点
 
 - **String（字符串）** - 缓存对象、分布式 Session、分布式锁、计数器、限流器、分布式 ID 等。
 - **Hash（哈希）** - 缓存对象、购物车等。
@@ -215,7 +214,11 @@ Redis 各数据类型有哪些应用场景？
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309232144470.jpg)
 
-### Redis 基本数据类型的底层实现
+:::
+
+### 【高级】Redis 基本数据类型的底层实现
+
+::: details 要点
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309241112034.png)
 
@@ -223,29 +226,78 @@ Redis 各数据类型有哪些应用场景？
   - 常数复杂度获取字符串长度
   - 杜绝缓冲区溢出
   - 减少修改字符串长度时所需的内存重分配次数
-- **List 类型** - 列表对象的编码可以是 `ziplist` 或者 `linkedlist` 。当列表对象可以同时满足以下两个条件时， 列表对象使用 `ziplist` 编码；否则，使用 `linkedlist` 编码。
+- **List 类型** - 列表对象的编码可以是 `ziplist` 或者 `linkedlist`。当列表对象可以同时满足以下两个条件时，列表对象使用 `ziplist` 编码；否则，使用 `linkedlist` 编码。
   - 列表对象保存的所有字符串元素的长度都小于 `64` 字节；
   - 列表对象保存的元素数量小于 `512` 个；
-- **Hash 类型** - 哈希对象的编码可以是 `ziplist` 或者 `hashtable` 。当哈希对象同时满足以下两个条件时， 使用 `ziplist` 编码；否则，使用 `hashtable` 编码。
+- **Hash 类型** - 哈希对象的编码可以是 `ziplist` 或者 `hashtable`。当哈希对象同时满足以下两个条件时，使用 `ziplist` 编码；否则，使用 `hashtable` 编码。
   - 哈希对象保存的所有键值对的键和值的字符串长度都小于 `64` 字节；
   - 哈希对象保存的键值对数量小于 `512` 个；
-- **Set 类型** - 集合对象的编码可以是 `intset` 或者 `hashtable` 。当集合对象可以同时满足以下两个条件时，集合对象使用 `intset` 编码；否则，使用 `hashtable` 编码。
+- **Set 类型** - 集合对象的编码可以是 `intset` 或者 `hashtable`。当集合对象可以同时满足以下两个条件时，集合对象使用 `intset` 编码；否则，使用 `hashtable` 编码。
   - 集合对象保存的所有元素都是整数值；
   - 集合对象保存的元素数量不超过 `512` 个；
-- **Zset 类型** - 有序集合的编码可以是 `ziplist` 或者 `skiplist` 。当有序集合对象可以同时满足以下两个条件时，有序集合对象使用 `ziplist` 编码；否则，使用 `skiplist` 编码。
+- **Zset 类型** - 有序集合的编码可以是 `ziplist` 或者 `skiplist`。当有序集合对象可以同时满足以下两个条件时，有序集合对象使用 `ziplist` 编码；否则，使用 `skiplist` 编码。
   - 有序集合保存的元素数量小于 `128` 个；
   - 有序集合保存的所有元素成员的长度都小于 `64` 字节；
 
+:::
+
+### 【高级】Redis 为什么用 `listpack` 替代 `ziplist`？
+
+::: details 要点
+
+**`listpack` 是 Redis 5.0 引入的优化结构，用来替代 `ziplist`**，作为 `hash`、`list`、`zset` 数据类型的实现编码之一。
+
+二者对比如下：
+
+| 特性         | `ziplist`               | `listpack`                  |
+| :----------- | :---------------------- | :-------------------------- |
+| **级联更新** | 可能发生（最坏 `O(n)`） | 完全避免（稳定 `O(1)`）     |
+| **内存占用** | 预留空间可能浪费        | 按需分配，更紧凑            |
+| **安全性**   | 需手动校验边界          | 内置长度校验，防溢出        |
+| **版本**     | Redis 旧版本            | Redis 5.0+ 的 Hash、ZSet 等 |
+
+:::
+
+::: details 细节
+
+**`ziplist` 的缺陷**
+
+- **级联更新问题** - 当修改或删除中间某个元素时，可能引发后续所有节点的内存重分配（因为 `ziplist` 用 **前驱节点长度** 定位数据）。最坏情况下时间复杂度从 `O(1)` 退化到 `O(n)`，影响性能。
+- **内存浪费** - `ziplist` 为每个节点预留 **1~5字节** 存储前驱节点长度（即使实际不需要这么多空间）。对于短小的数据（如小整数），存储开销比例过高。
+- **安全性风险** - `ziplist` 对内存布局的强依赖可能导致 **缓冲区溢出**（需严格校验边界）。
+
+**`listpack` 的改进**
+
+- **消除级联更新** - 每个节点 **独立存储自身长度**（不再依赖前驱节点）。修改任意节点仅影响当前节点，时间复杂度稳定为 `O(1)`。
+- **更紧凑的内存布局** - 节点长度字段采用 **变长编码**（类似 Protobuf 的 Varint），根据实际需求分配 1~5 字节。存储小整数时，长度字段仅需 1 字节。
+- **更强的安全性** - 每个节点记录 **总长度** 和 **校验字段**，避免解析越界。
+- **兼容性与平滑替换** - `listpack` 的 API 设计兼容 `ziplist`，Redis 内部可无缝迁移（如 Hash、ZSet 的底层实现）。
+
+:::
+
+### 【高级】为什么 Redis Zset 用跳表实现而不是红黑树、B+树？
+
+::: details 要点
+:::
+
+【数据类型】
+
+- 【高级】Redis 中跳表的实现原理是什么？
+- 
+- 【中级】Redis 中的 Geo 数据结构是什么？
+- 【中级】如何使用 Redis 快速实现排行榜？
+- 【中级】如何使用 Redis 快速实现布隆过滤器？
+- 【中级】如何使用 Redis 统计大量用户唯一访问量（UV）？
+- 【中级】如何在 Redis 中实现队列和栈数据结构？
+
 ## Redis 内存管理
 
-### Redis 过期删除策略
+### 【中级】Redis 支持哪些过期删除策略？
 
-**典型问题**
+::: details 要点
 
-- Redis 的过期删除策略是什么？
+- Redis 支持哪些过期删除策略？
 - 常见的过期策略有哪些，Redis 的选择考量是什么？
-
-**知识点**
 
 Redis 采用的过期策略是：**定期删除+惰性删除**。
 
@@ -255,11 +307,15 @@ Redis 采用的过期策略是：**定期删除+惰性删除**。
 - **惰性删除** - 放任 key 过期不管，但是每次访问 key 时，都检查 key 是否过期，如果过期的话，就删除该 key ；如果没有过期，就返回该 key。
   - 优点 - 占用 CPU 最少。程序只会在读写键时，对当前键进行过期检查，因此不会有额外的 CPU 开销。
   - 缺点 - **过期的 key 可能因为没有被访问，而一直无法释放，造成内存的浪费，有内存泄漏的风险**。
-- **定期删除** - 每隔一段时间，程序就对数据库进行一次检查，删除里面的过期 key 。至于要删除多少过期 key ，以及要检查多少个数据库，则由算法决定。定期删除是前两种策略的一种折中方案。定期删除策略的难点是删除操作执行的时长和频率。
+- **定期删除** - 每隔一段时间，程序就对数据库进行一次检查，删除里面的过期 key。至于要删除多少过期 key ，以及要检查多少个数据库，则由算法决定。定期删除是前两种策略的一种折中方案。定期删除策略的难点是删除操作执行的时长和频率。
   - 执行太频或执行时间过长，就会出现和定时删除相同的问题；
   - 执行太少或执行时间过短，就会出现和惰性删除相同的问题；
 
-### 持久化时，对过期键会如何处理
+:::
+
+### 【中级】Redis 持久化时，对过期键会如何处理？
+
+::: details 要点
 
 RDB 持久化
 
@@ -273,15 +329,21 @@ AOF 持久化
 - **AOF 文件写入阶段** - 当 Redis 以 AOF 模式持久化时，**如果数据库某个过期键还没被删除，那么 AOF 文件会保留此过期键，当此过期键被删除后，Redis 会向 AOF 文件追加一条 DEL 命令来显式地删除该键值**。
 - **AOF 重写阶段** - 执行 AOF 重写时，会对 Redis 中的键值对进行检查，**已过期的键不会被保存到重写后的 AOF 文件中**，因此不会对 AOF 重写造成任何影响。
 
-### 主从复制时，对过期键会如何处理
+:::
+
+### 【中级】Redis 主从复制时，对过期键会如何处理？
+
+::: details 要点
 
 当 Redis 运行在主从模式下时，**从库不会进行过期扫描，从库对过期的处理是被动的**。也就是即使从库中的 key 过期了，如果有客户端访问从库时，依然可以得到 key 对应的值，像未过期的键值对一样返回。
 
 从库的过期键处理依靠主服务器控制，**主库在 key 到期时，会在 AOF 文件里增加一条 del 指令，同步到所有的从库**，从库通过执行这条 del 指令来删除过期的 key。
 
-### Redis 内存淘汰策略
+:::
 
-**典型问题**
+### 【中级】Redis 有哪些内存淘汰策略？
+
+::: details 要点
 
 - Redis 内存不足时，怎么办？
 - Redis 有哪些内存淘汰策略？
@@ -316,16 +378,16 @@ AOF 持久化
 - 若 Redis 既用于缓存，也用于持久化存储时，适用 `volatile-lru` 、`volatile-lfu`、`volatile-random`。但是，这种情况下，也可以部署两个 Redis 集群来达到同样目的。
 - 为 key 设置过期时间实际上会消耗更多的内存。因此，如果条件允许，建议使用 `allkeys-lru` 或 `allkeys-lfu`，从而更高效的使用内存。
 
+:::
+
 ## Redis 持久化
 
-### Redis 如何保证数据不丢失
+### 【中级】Redis 如何保证数据不丢失？
 
-**典型问题**
+::: details 要点
 
 - Redis 如何保证数据不丢失？
 - Redis 有几种持久化方式？
-
-**知识点**
 
 为了追求性能，Redis 的读写都是在内存中完成的。一旦重启，内存中的数据就会清空，为了保证数据不丢失，Redis 支持持久化机制。
 
@@ -335,16 +397,18 @@ Redis 有三种持久化方式
 - AOF 日志
 - 混合持久化
 
-### RDB 的实现原理
+:::
 
-**典型问题**
+### 【中级】RDB 的实现原理？
+
+::: details 要点
 
 - RDB 的实现原理是什么？
 - 生成 RDB 快照时，Redis 可以响应请求吗？
 
 **知识点**
 
-有两个 Redis 命令可以用于生成 RDB 文件：[**`SAVE`**](https://redis.io/commands/save) 和 [**`BGSAVE`**](https://redis.io/commands/bgsave) 。
+有两个 Redis 命令可以用于生成 RDB 文件：[**`SAVE`**](https://redis.io/commands/save) 和 [**`BGSAVE`**](https://redis.io/commands/bgsave)。
 
 [**`SAVE`**](https://redis.io/commands/save) 命令由服务器进程直接执行保存操作，直到 RDB 创建完成为止。所以**该命令“会阻塞”服务器**，在阻塞期间，服务器不能响应任何命令请求。
 
@@ -358,9 +422,11 @@ Redis 有三种持久化方式
 >
 > `BGSAVE` 命令执行期间，`SAVE`、`BGSAVE`、`BGREWRITEAOF` 三个命令会被拒绝，以免与当前的 `BGSAVE` 操作产生竞态条件，降低性能。
 
-### AOF 的实现原理
+:::
 
-**典型问题**
+### 【中级】AOF 的实现原理？
+
+::: details 要点
 
 - AOF 的实现原理是什么？
 - 为什么先执行命令，再把数据写入日志呢？
@@ -386,7 +452,11 @@ AOF 的实现可以分为命令追加（append）、文件写入、文件同步�
 - **数据可能会丢失：**
 - **可能阻塞其他操作：**
 
-### AOF 的回写策略有几种
+:::
+
+### 【中级】AOF 的回写策略有几种？
+
+::: details 要点
 
 **Redis 命令请求会先保存到 AOF 缓冲区，再定期写入并同步到 AOF 文件**。
 
@@ -398,9 +468,11 @@ AOF 的实现可以分为命令追加（append）、文件写入、文件同步�
 
 `appendfsync` 选项的不同值对 AOF 持久化功能的安全性、以及 Redis 服务器的性能有很大的影响。
 
-### AOF 重写机制
+:::
 
-**典型问题**
+### 【中级】AOF 的重写机制是怎样的？
+
+::: details 要点
 
 - AOF 日志过大时，怎么办？
 - AOF 重写流程是怎样的？
@@ -420,13 +492,17 @@ AOF 重写机制是，读取当前数据库中的所有键值对，然后将每�
 
 ![BGREWRITEAOF 流程](https://raw.githubusercontent.com/dunwu/images/master/snap/202309171957918.png)
 
-### 为什么会有混合持久化？
+:::
+
+### 【中级】Redis 为什么要支持混合持久化？
+
+::: details 要点
 
 RDB 优点是数据恢复速度快，但是快照的频率不好把握。频率太低，丢失的数据就会比较多，频率太高，就会影响性能。
 
 AOF 优点是丢失数据少，但是数据恢复不快。
 
-为了集成了两者的优点， Redis 4.0 提出了**混合使用 AOF 日志和内存快照**，也叫混合持久化，既保证了 Redis 重启速度，又降低数据丢失风险。
+为了集成了两者的优点，Redis 4.0 提出了**混合使用 AOF 日志和内存快照**，也叫混合持久化，既保证了 Redis 重启速度，又降低数据丢失风险。
 
 混合持久化工作在 **AOF 日志重写过程**，当开启了混合持久化时，在 AOF 重写日志时，fork 出来的重写子进程会先将与主线程共享的内存数据以 RDB 方式写入到 AOF 文件，然后主线程处理的操作命令会被记录在重写缓冲区里，重写缓冲区里的增量命令会以 AOF 方式写入到 AOF 文件，写入完成后通知主进程将新的含有 RDB 格式和 AOF 格式的 AOF 文件替换旧的的 AOF 文件。
 
@@ -436,24 +512,22 @@ AOF 优点是丢失数据少，但是数据恢复不快。
 
 加载完 RDB 的内容后，才会加载后半部分的 AOF 内容，这里的内容是 Redis 后台子进程重写 AOF 期间，主线程处理的操作命令，可以使得**数据更少的丢失**。
 
-**混合持久化优点：**
+**混合持久化优点**：
 
 - 混合持久化结合了 RDB 和 AOF 持久化的优点，开头为 RDB 的格式，使得 Redis 可以更快的启动，同时结合 AOF 的优点，有减低了大量数据丢失的风险。
 
-**混合持久化缺点：**
+**混合持久化缺点**：
 
 - AOF 文件中添加了 RDB 格式的内容，使得 AOF 文件的可读性变得很差；
 - 兼容性差，如果开启混合持久化，那么此混合持久化 AOF 文件，就不能用在 Redis 4.0 之前版本了。
 
+:::
+
 ## Redis 高可用
 
-**典型问题**
+### 【中级】Redis 如何实现主从复制？
 
-Redis 如何保证高可用？
-
-### Redis 主从复制
-
-**典型问题**
+::: details 要点
 
 - Redis 复制的工作原理？Redis 旧版复制和新版复制有何不同？
 - Redis 主从节点间如何复制数据？
@@ -483,9 +557,11 @@ Redis 如何保证高可用？
 
 （4）由于主从复制是**异步**的，具体来说，在主从服务器命令传播阶段，主服务器收到新的写命令后，会发送给从服务器。但是，主服务器并不会等到从服务器实际执行完命令后，再把结果返回给客户端，而是主服务器自己在本地执行完命令后，就会向客户端返回结果了。如果从服务器还没有执行主服务器同步过来的命令，主从服务器间的数据就不一致了。所以，无法实现强一致性保证（主从数据时时刻刻保持一致），数据不一致是难以避免的。
 
-### Redis 哨兵
+:::
 
-**典型问题**
+### 【中级】Redis 哨兵是如何工作的？
+
+::: details 要点
 
 - Redis 哨兵的功能？
 - Redis 哨兵的原理？
@@ -500,7 +576,11 @@ Redis 如何保证高可用？
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200131135847.png)
 
-### Redis 集群
+:::
+
+### 【中级】Redis 集群是如何工作的？
+
+::: details 要点
 
 当 Redis 数据量超出单机的极限，就需要通过分区技术来分而治之。
 
@@ -508,9 +588,11 @@ Redis 采用的分区策略是：使用虚拟哈希槽来映射节点和数据�
 
 当客户端向服务端发起读写请求时，先要根据 key 计算其所属的哈希槽（计算公式：CRC16(KEY) mod 16384），然后获取该哈希槽所属的节点。这样，就完成了寻址过程。
 
-## Redis 脑裂
+:::
 
-### 什么是脑裂
+### 【中级】什么是脑裂？
+
+::: details 要点
 
 分布式系统的脑裂问题（Split-Brain Problem）是一个严重的一致性问题，通常发生在分布式系统中的节点之间失去通信或部分通信时。这个问题的名称源自脑裂的比喻，就像一个分布式系统被分成多个部分的"脑"，每个部分独立运行，而没有协调一致的方式。
 
@@ -529,7 +611,11 @@ Redis 采用的分区策略是：使用虚拟哈希槽来映射节点和数据�
 
 为了解决脑裂问题，分布式系统通常需要采用一些机制，如投票算法、选举协议、心跳检测等，以确保在出现网络分区或节点故障时，系统能够正确地识别和处理问题，并维护一致性。这些机制可以帮助系统中的节点协同工作，避免脑裂问题的发生。然而，脑裂问题是分布式系统设计和管理中的复杂挑战之一，需要细致的规划和测试来确保系统的可靠性和稳定性。
 
-### Redis 中的脑裂问题是如何产生的
+:::
+
+### 【高级】Redis 中的脑裂问题是如何产生的？
+
+::: details 要点
 
 在 Redis 主从架构中，部署方式一般是“一主多从”，主节点提供写操作，从节点提供读操作。 如果主节点的网络突然发生了问题，它与所有的从节点都失联了，但是此时的主节点和客户端的网络是正常的，这个客户端并不知道 Redis 内部已经出现了问题，还在照样的向这个失联的主节点写数据（过程 A），此时这些数据被旧主节点缓存到了缓冲区里，因为主从节点之间的网络问题，这些数据都是无法同步给从节点的。
 
@@ -539,7 +625,11 @@ Redis 采用的分区策略是：使用虚拟哈希槽来映射节点和数据�
 
 总结一句话就是：由于网络问题，集群节点之间失去联系。主从数据不同步；重新平衡选举，产生两个主服务。等网络恢复，旧主节点会降级为从节点，再与新主节点进行同步复制的时候，由于从节点会清空自己的缓冲区，所以导致之前客户端写入的数据丢失了。
 
-### 如何解决 Redis 中的脑裂问题
+:::
+
+### 【高级】如何解决 Redis 中的脑裂问题？
+
+::: details 要点
 
 当主节点发现从节点下线或者通信超时的总数量小于阈值时，那么禁止主节点进行写数据，直接把错误返回给客户端。
 
@@ -564,41 +654,13 @@ Redis 采用的分区策略是：使用虚拟哈希槽来映射节点和数据�
 
 这样一来，主从切换完成后，也只有新主库能接收请求，不会发生脑裂，也就不会发生数据丢失的问题了。
 
-## Redis 线程模型
-
-### Redis 真的只有单线程吗？
-
-Redis 并非真的只有单线程。
-
-- Redis 的主要工作包括接收客户端请求、解析请求和进行数据读写等操作，是由单线程来执行的，这也是常说 Redis 是单线程程序的原因。
-- Redis 还启动了 3 个线程来执行**文件关闭**、**AOF 同步写**和**惰性删除**等操作。
-- 此外，Redis 6.0 版本之后引入了多线程来处理网络请求（提高网络 IO 读写性能）。
-
-### Redis 单线程模式是怎样的？
-
-Redis 单线程模式指的是其核心网络模型为单线程模式。这个模式为 IO 多路复用+单线程读写请求，其中，IO 多路复用使得 Redis 可以同时处理多个客户端连接。
-
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309241133046.png)
-
-### Redis 采用单线程为什么还这么快？
-
-> 参考：[Redis 为什么快](#Redis 为什么快)
-
-### Redis 6.0 之后为什么引入了多线程？
-
-随着网络硬件的性能提升，Redis 的性能瓶颈有时会出现在网络 IO 的处理上，也就是说，**单个主线程处理网络请求的速度跟不上底层网络硬件的速度。**
-
-为了提高网络 I/O 的并行度，Redis 6.0 对于网络 I/O 采用多线程来处理。但是，对于命令的执行，Redis 仍然使用单线程来处理。
-
-Redis 官方表示，**Redis 6.0 版本引入的多线程 I/O 特性对性能提升至少是一倍以上**。
-
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309241148273.png)
+:::
 
 ## Redis 事务
 
-### Redis 事务功能
+### 【中级】Redis 支持事务吗？
 
-**典型问题**
+::: details 要点
 
 - Redis 支持事务吗？
 - Redis 事务如何工作？
@@ -607,16 +669,16 @@ Redis 官方表示，**Redis 6.0 版本引入的多线程 I/O 特性对性能提
 
 Redis 支持事务。[`MULTI`](https://redis.io/commands/multi)、[`EXEC`](https://redis.io/commands/exec)、[`DISCARD`](https://redis.io/commands/discard) 和 [`WATCH`](https://redis.io/commands/watch) 是 Redis 事务相关的命令。
 
-**[`MULTI`](https://redis.io/commands/multi) 命令用于开启一个事务，它总是返回 OK 。**`MULTI` 执行之后， 客户端可以继续向服务器发送任意多条命令， 这些命令不会立即被执行， 而是被放到一个队列中， 当 EXEC 命令被调用时， 所有队列中的命令才会被执行。
+**[`MULTI`](https://redis.io/commands/multi) 命令用于开启一个事务，它总是返回 OK。**`MULTI` 执行之后，客户端可以继续向服务器发送任意多条命令，这些命令不会立即被执行，而是被放到一个队列中，当 EXEC 命令被调用时，所有队列中的命令才会被执行。
 
 **[`EXEC`](https://redis.io/commands/exec) 命令负责触发并执行事务中的所有命令。**
 
 - 如果客户端在使用 `MULTI` 开启了一个事务之后，却因为断线而没有成功执行 `EXEC` ，那么事务中的所有命令都不会被执行。
 - 另一方面，如果客户端成功在开启事务之后执行 `EXEC` ，那么事务中的所有命令都会被执行。
 
-**当执行 [`DISCARD`](https://redis.io/commands/discard) 命令时， 事务会被放弃， 事务队列会被清空， 并且客户端会从事务状态中退出。**
+**当执行 [`DISCARD`](https://redis.io/commands/discard) 命令时，事务会被放弃，事务队列会被清空，并且客户端会从事务状态中退出。**
 
-**[`WATCH`](https://redis.io/commands/watch) 命令可以为 Redis 事务提供 check-and-set （CAS）行为。**被 `WATCH` 的键会被监视，并会发觉这些键是否被改动过了。 如果有至少一个被监视的键在 `EXEC` 执行之前被修改了， 那么整个事务都会被取消， `EXEC` 返回 `nil-reply` 来表示事务已经失败。
+**[`WATCH`](https://redis.io/commands/watch) 命令可以为 Redis 事务提供 check-and-set （CAS）行为。**被 `WATCH` 的键会被监视，并会发觉这些键是否被改动过了。 如果有至少一个被监视的键在 `EXEC` 执行之前被修改了，那么整个事务都会被取消，`EXEC` 返回 `nil-reply` 来表示事务已经失败。
 
 `WATCH` 可以用于创建 Redis 没有内置的原子操作。
 
@@ -630,9 +692,11 @@ ZREM zset element
 EXEC
 ```
 
-### Redis 事务的不足
+:::
 
-**典型问题**
+### 【中级】Redis 事务是严格意义的事务吗？
+
+::: details 要点
 
 Redis 事务是严格意义的事务吗？
 
@@ -656,43 +720,109 @@ ACID 是数据库事务正确执行的四个基本要素。
 
 **一个支持事务（Transaction）中的数据库系统，必需要具有这四种特性，否则在事务过程（Transaction processing）当中无法保证数据的正确性。**
 
-![ACID](https://raw.githubusercontent.com/dunwu/images/master/cs/database/RDB/数据库ACID.png)
+![ACID](https://raw.githubusercontent.com/dunwu/images/master/cs/database/RDB/数据库 ACID.png)
 
 **Redis 仅支持“非严格”的事务**。所谓“非严格”是指：
 
 - **Redis 事务保证全部执行命令** - Redis 事务中的多个命令会被打包到事务队列中，然后按先进先出（FIFO）的顺序执行。事务在执行过程中不会被中断，当事务队列中的所有命令都被执行完毕之后，事务才会结束。
 - **Redis 事务不支持回滚** - 如果命令执行失败不会回滚，而是会继续执行下去。
 
-Redis 官方的[事务特性文档](https://redis.io/docs/interact/transactions/)给出的不支持回滚的理由是：
+Redis 官方的 [事务特性文档](https://redis.io/docs/interact/transactions/) 给出的不支持回滚的理由是：
 
 - Redis 命令只会因为错误的语法而失败，或是命令用在了错误类型的键上面。
 - 因为不需要对回滚进行支持，所以 Redis 的内部可以保持简单且快速。
 
-### Redis 事务的替代
+:::
+
+### 【中级】Redis 中有没有替代事务的方案？
+
+::: details 要点
 
 Redis 从 2.6 版本开始支持执行 Lua 脚本，它的功能和事务非常类似。我们可以利用 Lua 脚本来批量执行多条 Redis 命令，这些 Redis 命令会被提交到 Redis 服务器一次性执行完成，大幅减小了网络开销。
 
 一段 Lua 脚本可以视作一条命令执行，一段 Lua 脚本执行过程中不会有其他脚本或 Redis 命令同时执行，保证了操作不会被其他指令插入或打扰。
 
-不过，如果 Lua 脚本运行时出错并中途结束，出错之后的命令是不会被执行的。并且，出错之前执行的命令是无法被撤销的，无法实现类似关系型数据库执行失败可以回滚的那种原子性效果。因此， **严格来说的话，通过 Lua 脚本来批量执行 Redis 命令实际也是不完全满足原子性的。**
+不过，如果 Lua 脚本运行时出错并中途结束，出错之后的命令是不会被执行的。并且，出错之前执行的命令是无法被撤销的，无法实现类似关系型数据库执行失败可以回滚的那种原子性效果。因此，**严格来说的话，通过 Lua 脚本来批量执行 Redis 命令实际也是不完全满足原子性的。**
 
 如果想要让 Lua 脚本中的命令全部执行，必须保证语句语法和命令都是对的。
 
 另外，Redis 7.0 新增了 [Redis functions](https://redis.io/docs/manual/programmability/functions-intro/) 特性，你可以将 Redis functions 看作是比 Lua 更强大的脚本。
 
-## Redis 管道
+:::
 
-**典型问题**
+### 【中级】除了事务，还有其他批量执行 Redis 命令的方式吗？
 
-- 除了事务，还有其他批量执行 Redis 命令的方式吗？
-
-**知识点**
+::: details 要点
 
 Redis 是一种基于 C/S 模型以及请求/响应协议的 TCP 服务。Redis 支持管道技术。管道技术允许请求以异步方式发送，即旧请求的应答还未返回的情况下，允许发送新请求。这种方式可以大大提高传输效率。使用管道发送命令时，Redis Server 会将部分请求放到缓存队列中（占用内存），执行完毕后一次性发送结果。如果需要发送大量的命令，会占用大量的内存，因此应该按照合理数量分批次的处理。
 
-## Redis 慢查询
+:::
+
+## Redis 架构
+
+### 【中级】Redis 为什么快？
+
+::: details 要点
+
+根据 [Redis 官方 Benchmark](https://redis.io/docs/management/optimization/benchmarks/) 文档的描述，Redis 单机 QPS 能达到 10w+，将近是 Mysql 的 10 倍。
+
+![Redis 官方 Benchmark QPS 图](https://redis.io/docs/management/optimization/benchmarks/Connections_chart.png)
+
+Redis 是单线程模型（Redis 6.0 已经支持多线程模型），为什么还能有这么高的并发？
+
+- **Redis 读写基于内存**
+- **IO 多路复用** + **读写单线程模型**
+  - IO 多路复用是利用 select、poll、epoll 可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有 I/O 事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll 是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。
+  - 单线程模型避免了由于并发而产生的线程切换、锁竞争等开销。
+  - 由于，Redis 读写基于内存，性能很高，所以 CPU 并不是制约 Redis 性能表现的瓶颈所在。更多情况下是受到内存大小和网络 I/O 的限制，所以 Redis 核心网络模型使用单线程并没有什么问题。
+- **高效的数据结构**
+
+![](https://pbs.twimg.com/media/FoYNzdcacAAMjy5?format=jpg&name=4096x4096)
+
+图来自 [Why is redis so fast?](https://blog.bytebytego.com/p/why-is-redis-so-fast)
+
+> **扩展**：[【视频】Why is Redis so FAST](https://www.youtube.com/shorts/x8lcdDbKZto)
+
+:::
+
+### 【中级】Redis 真的只有单线程吗？
+
+::: details 要点
+Redis 并非真的只有单线程。
+
+- Redis 的主要工作包括接收客户端请求、解析请求和进行数据读写等操作，是由单线程来执行的，这也是常说 Redis 是单线程程序的原因。
+- Redis 还启动了 3 个线程来执行**文件关闭**、**AOF 同步写**和**惰性删除**等操作。
+- 此外，Redis 6.0 版本之后引入了多线程来处理网络请求（提高网络 IO 读写性能）。
+
+:::
+
+### Redis 单线程模式是怎样的？
+
+::: details 要点
+
+Redis 单线程模式指的是其核心网络模型为单线程模式。这个模式为 IO 多路复用+单线程读写请求，其中，IO 多路复用使得 Redis 可以同时处理多个客户端连接。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309241133046.png)
+
+:::
+
+### Redis 6.0 之后为什么引入了多线程？
+
+::: details 要点
+
+随着网络硬件的性能提升，Redis 的性能瓶颈有时会出现在网络 IO 的处理上，也就是说，**单个主线程处理网络请求的速度跟不上底层网络硬件的速度。**
+
+为了提高网络 I/O 的并行度，Redis 6.0 对于网络 I/O 采用多线程来处理。但是，对于命令的执行，Redis 仍然使用单线程来处理。
+
+Redis 官方表示，**Redis 6.0 版本引入的多线程 I/O 特性对性能提升至少是一倍以上**。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309241148273.png)
+
+:::
 
 ### 为什么会有慢查询命令？
+
+::: details 要点
 
 我们知道一个 Redis 命令的执行可以简化为以下 4 步：
 
@@ -705,7 +835,7 @@ Redis 慢查询统计的是命令执行这一步骤的耗时，慢查询命令�
 
 Redis 为什么会有慢查询命令呢？
 
-Redis 中的大部分命令都是 O(1)时间复杂度，但也有少部分 O(n) 时间复杂度的命令，例如：
+Redis 中的大部分命令都是 O(1) 时间复杂度，但也有少部分 O(n) 时间复杂度的命令，例如：
 
 - `KEYS *`：会返回所有符合规则的 key。
 - `HGETALL`：会返回一个 Hash 中所有的键值对。
@@ -714,23 +844,27 @@ Redis 中的大部分命令都是 O(1)时间复杂度，但也有少部分 O(n) 
 - `SINTER`/`SUNION`/`SDIFF`：计算多个 Set 的交集/并集/差集。
 - ……
 
-由于这些命令时间复杂度是 O(n)，有时候也会全表扫描，随着 n 的增大，执行耗时也会越长。不过， 这些命令并不是一定不能使用，但是需要明确 N 的值。另外，有遍历的需求可以使用 `HSCAN`、`SSCAN`、`ZSCAN` 代替。
+由于这些命令时间复杂度是 O(n)，有时候也会全表扫描，随着 n 的增大，执行耗时也会越长。不过，这些命令并不是一定不能使用，但是需要明确 N 的值。另外，有遍历的需求可以使用 `HSCAN`、`SSCAN`、`ZSCAN` 代替。
 
-除了这些 O(n)时间复杂度的命令可能会导致慢查询之外， 还有一些时间复杂度可能在 O(N) 以上的命令，例如：
+除了这些 O(n) 时间复杂度的命令可能会导致慢查询之外，还有一些时间复杂度可能在 O(N) 以上的命令，例如：
 
-- `ZRANGE`/`ZREVRANGE`：返回指定 Sorted Set 中指定排名范围内的所有元素。时间复杂度为 O(log(n)+m)，n 为所有元素的数量， m 为返回的元素数量，当 m 和 n 相当大时，O(n) 的时间复杂度更小。
-- `ZREMRANGEBYRANK`/`ZREMRANGEBYSCORE`：移除 Sorted Set 中指定排名范围/指定 score 范围内的所有元素。时间复杂度为 O(log(n)+m)，n 为所有元素的数量， m 被删除元素的数量，当 m 和 n 相当大时，O(n) 的时间复杂度更小。
+- `ZRANGE`/`ZREVRANGE`：返回指定 Sorted Set 中指定排名范围内的所有元素。时间复杂度为 O(log(n)+m)，n 为所有元素的数量，m 为返回的元素数量，当 m 和 n 相当大时，O(n) 的时间复杂度更小。
+- `ZREMRANGEBYRANK`/`ZREMRANGEBYSCORE`：移除 Sorted Set 中指定排名范围/指定 score 范围内的所有元素。时间复杂度为 O(log(n)+m)，n 为所有元素的数量，m 被删除元素的数量，当 m 和 n 相当大时，O(n) 的时间复杂度更小。
 - ……
+
+:::
 
 ### 如何找到慢查询命令？
 
+::: details 要点
+
 在 `redis.conf` 文件中，我们可以使用 `slowlog-log-slower-than` 参数设置耗时命令的阈值，并使用 `slowlog-max-len` 参数设置耗时命令的最大记录条数。
 
-当 Redis 服务器检测到执行时间超过 `slowlog-log-slower-than`阈值的命令时，就会将该命令记录在慢查询日志(slow log) 中，这点和 MySQL 记录慢查询语句类似。当慢查询日志超过设定的最大记录条数之后，Redis 会把最早的执行命令依次舍弃。
+当 Redis 服务器检测到执行时间超过 `slowlog-log-slower-than`阈值的命令时，就会将该命令记录在慢查询日志 (slow log) 中，这点和 MySQL 记录慢查询语句类似。当慢查询日志超过设定的最大记录条数之后，Redis 会把最早的执行命令依次舍弃。
 
 ⚠️注意：由于慢查询日志会占用一定内存空间，如果设置最大记录条数过大，可能会导致内存占用过高的问题。
 
-`slowlog-log-slower-than`和`slowlog-max-len`的默认配置如下(可以自行修改)：
+`slowlog-log-slower-than`和`slowlog-max-len`的默认配置如下（可以自行修改）：
 
 ```
 # The following time is expressed in microseconds, so 1000000 is equivalent
@@ -746,7 +880,7 @@ slowlog-max-len 128
 除了修改配置文件之外，你也可以直接通过 `CONFIG` 命令直接设置：
 
 ```
-# 命令执行耗时超过 10000 微妙（即10毫秒）就会被记录
+# 命令执行耗时超过 10000 微妙（即 10 毫秒）就会被记录
 CONFIG SET slowlog-log-slower-than 10000
 # 只保留最近 128 条耗时命令
 CONFIG SET slowlog-max-len 128
@@ -788,358 +922,82 @@ CONFIG SET slowlog-max-len 128
 OK
 ```
 
-## Redis 应用
+:::
 
-### 缓存
+### 什么是 Redis 模块？有什么用？
 
-**典型问题**
+::: details 要点
 
-如何避免缓存雪崩、缓存击穿、缓存穿透？
+Redis 从 4.0 版本开始，支持通过 Module 来扩展其功能以满足特殊的需求。这些 Module 以动态链接库（so 文件）的形式被加载到 Redis 中，这是一种非常灵活的动态扩展功能的实现方式，值得借鉴学习！
 
-有哪些更新缓存策略？采用那种策略比较好？
+我们每个人都可以基于 Redis 去定制化开发自己的 Module，比如实现搜索引擎功能、自定义分布式锁和分布式限流。
 
-如何保证缓存一致性？
+目前，被 Redis 官方推荐的 Module 有：
 
-有哪些常见的内存淘汰算法
+- [RediSearch](https://github.com/RediSearch/RediSearch)：用于实现搜索引擎的模块。
+- [RedisJSON](https://github.com/RedisJSON/RedisJSON)：用于处理 JSON 数据的模块。
+- [RedisGraph](https://github.com/RedisGraph/RedisGraph)：用于实现图形数据库的模块。
+- [RedisTimeSeries](https://github.com/RedisTimeSeries/RedisTimeSeries)：用于处理时间序列数据的模块。
+- [RedisBloom](https://github.com/RedisBloom/RedisBloom)：用于实现布隆过滤器的模块。
+- [RedisAI](https://github.com/RedisAI/RedisAI)：用于执行深度学习/机器学习模型并管理其数据的模块。
+- [RedisCell](https://github.com/brandur/redis-cell)：用于实现分布式限流的模块。
 
-LRU 算法的原理是什么
+关于 Redis 模块的详细介绍，可以查看官方文档：https://redis.io/modules。
 
-LFU 算法的原理是什么
+:::
 
-### 分布式锁
+## TODO
 
-### 消息队列
+【事务】
 
-**经典问题**
+- 【中级】Redis 支持事务吗？如何实现？
+- 【中级】Redis 的 Lua 脚本功能是什么？如何使用？
+- 【中级】Redis 的 Pipeline 功能是什么？
+- 【中级】Redis 中原生批处理命令（MSET、MGET）与 Pipeline 的区别是什么？
+- 【中级】Redis 事务与关系型数据库事务的主要区别是什么？
+  【内存管理】
 
-Redis 可以做消息队列吗？
+- 【中级】Redis 数据过期后的删除策略是什么？
+- 【中级】Redis 中有哪些内存淘汰策略？
+- 【中级】Redis 中的内存碎片化是什么？如何进行优化？
+- 【高级】Redis 的虚拟内存（VM）机制是什么？
 
-Redis 有哪些实现消息队列的方式？
+【持久化】
 
-**知识点**
+- 【中级】Redis 的持久化机制有哪些？
+- 【中级】Redis 在生成 RDB 文件时如何处理请求？
 
-先说结论：**可以是可以，但不建议使用 Redis 来做消息队列。和专业的消息队列相比，还是有很多欠缺的地方。**
+【高可用】
 
-**Redis 2.0 之前，如果想要使用 Redis 来做消息队列的话，只能通过 List 来实现。**
+- 【中级】Redis 主从复制的实现原理是什么？
+- 【中级】Redis 集群的实现原理是什么？
+- 【中级】Redis 的哨兵机制是什么？
+- 【中级】Redis 集群会出现脑裂问题吗？
+- 【中级】Redis 主从复制的常见拓扑结构有哪些？
+- 【中级】Redis 复制延迟的常见原因有哪些？
+- 【中级】在 Redis 集群中，如何根据键定位到对应的节点？
+- 【中级】Redis Cluster 模式与 Sentinel 模式的区别是什么？
 
-通过 `RPUSH/LPOP` 或者 `LPUSH/RPOP`即可实现简易版消息队列：
+【架构】
 
-```shell
-# 生产者生产消息
-> RPUSH myList msg1 msg2
-(integer) 2
-> RPUSH myList msg3
-(integer) 3
-# 消费者消费消息
-> LPOP myList
-"msg1"
-```
+- 【中级】Redis 为什么这么快？
+- 【中级】为什么 Redis 设计为单线程？6.0 版本为何引入多线程？
+- 【中级】Redis 中的 Big Key 问题是什么？如何解决？
+- 【中级】如何解决 Redis 中的热点 key 问题？
+- 【中级】Redis 性能瓶颈时如何处理？
+- 【高级】Redis 源码中有哪些巧妙的设计，举几个典型的例子？
 
-不过，通过 `RPUSH/LPOP` 或者 `LPUSH/RPOP`这样的方式存在性能问题，我们需要不断轮询去调用 `RPOP` 或 `LPOP` 来消费消息。当 List 为空时，大部分的轮询的请求都是无效请求，这种方式大量浪费了系统资源。
+【应用】
 
-因此，Redis 还提供了 `BLPOP`、`BRPOP` 这种阻塞式读取的命令（带 B-Blocking 的都是阻塞式），并且还支持一个超时参数。如果 List 为空，Redis 服务端不会立刻返回结果，它会等待 List 中有新数据后再返回或者是等待最多一个超时时间后返回空。如果将超时时间设置为 0 时，即可无限等待，直到弹出消息
-
-```shell
-# 超时时间为 10s
-# 如果有数据立刻返回，否则最多等待10秒
-> BRPOP myList 10
-null
-```
-
-**List 实现消息队列功能太简单，像消息确认机制等功能还需要我们自己实现，最要命的是没有广播机制，消息也只能被消费一次。**
-
-**Redis 2.0 引入了发布订阅 (pub/sub) 功能，解决了 List 实现消息队列没有广播机制的问题。**
-
-![Redis 发布订阅 (pub/sub) 功能](https://oss.javaguide.cn/github/javaguide/database/redis/redis-pub-sub.png)
-
-Redis 发布订阅 (pub/sub) 功能
-
-pub/sub 中引入了一个概念叫 **channel（频道）**，发布订阅机制的实现就是基于这个 channel 来做的。
-
-pub/sub 涉及发布者（Publisher）和订阅者（Subscriber，也叫消费者）两个角色：
-
-- 发布者通过 `PUBLISH` 投递消息给指定 channel。
-- 订阅者通过`SUBSCRIBE`订阅它关心的 channel。并且，订阅者可以订阅一个或者多个 channel。
-
-我们这里启动 3 个 Redis 客户端来简单演示一下：
-
-pub/sub 既能单播又能广播，还支持 channel 的简单正则匹配。不过，消息丢失（客户端断开连接或者 Redis 宕机都会导致消息丢失）、消息堆积（发布者发布消息的时候不会管消费者的具体消费能力如何）等问题依然没有一个比较好的解决办法。
-
-为此，Redis 5.0 新增加的一个数据结构 `Stream` 来做消息队列。`Stream` 支持：
-
-- 发布 / 订阅模式
-- 按照消费者组进行消费（借鉴了 Kafka 消费者组的概念）
-- 消息持久化（ RDB 和 AOF）
-- ACK 机制（通过确认机制来告知已经成功处理了消息）
-- 阻塞式获取消息
-
-`Stream` 的结构如下：
-
-![img](https://oss.javaguide.cn/github/javaguide/database/redis/redis-stream-structure.png)
-
-这是一个有序的消息链表，每个消息都有一个唯一的 ID 和对应的内容。ID 是一个时间戳和序列号的组合，用来保证消息的唯一性和递增性。内容是一个或多个键值对（类似 Hash 基本数据类型），用来存储消息的数据。
-
-这里再对图中涉及到的一些概念，进行简单解释：
-
-- `Consumer Group`：消费者组用于组织和管理多个消费者。消费者组本身不处理消息，而是再将消息分发给消费者，由消费者进行真正的消费
-- `last_delivered_id`：标识消费者组当前消费位置的游标，消费者组中任意一个消费者读取了消息都会使 last_delivered_id 往前移动。
-- `pending_ids`：记录已经被客户端消费但没有 ack 的消息的 ID。
-
-`Stream` 使用起来相对要麻烦一些，这里就不演示了。
-
-总的来说，`Stream` 已经可以满足一个消息队列的基本要求了。不过，`Stream` 在实际使用中依然会有一些小问题不太好解决比如在 Redis 发生故障恢复后不能保证消息至少被消费一次。
-
-综上，和专业的消息队列相比，使用 Redis 来实现消息队列还是有很多欠缺的地方比如消息丢失和堆积问题不好解决。因此，我们通常建议不要使用 Redis 来做消息队列，你完全可以选择市面上比较成熟的一些消息队列比如 RocketMQ、Kafka。不过，如果你就是想要用 Redis 来做消息队列的话，那我建议你优先考虑 `Stream`，这是目前相对最优的 Redis 消息队列实现。
-
-相关阅读：[Redis 消息队列发展历程 - 阿里开发者 - 2022](https://mp.weixin.qq.com/s/gCUT5TcCQRAxYkTJfTRjJw)
-
-### 延时任务
-
-**经典问题**
-
-如何基于 Redis 实现延时任务？
-
-**知识点**
-
-基于 Redis 实现延时任务的功能无非就下面两种方案：
-
-1. Redis 过期事件监听
-2. Redisson 内置的延时队列
-
-Redis 过期事件监听的存在时效性较差、丢消息、多服务实例下消息重复消费等问题，不被推荐使用。
-
-Redisson 内置的延时队列具备下面这些优势：
-
-1. **减少了丢消息的可能**：DelayedQueue 中的消息会被持久化，即使 Redis 宕机了，根据持久化机制，也只可能丢失一点消息，影响不大。当然了，你也可以使用扫描数据库的方法作为补偿机制。
-2. **消息不存在重复消费问题**：每个客户端都是从同一个目标队列中获取任务的，不存在重复消费的问题。
-
-### 批处理
-
-一个 Redis 命令的执行可以简化为以下 4 步：
-
-1. 发送命令
-2. 命令排队
-3. 命令执行
-4. 返回结果
-
-其中，第 1 步和第 4 步耗费时间之和称为 **Round Trip Time (RTT,往返时间)** ，也就是数据在网络上传输的时间。
-
-使用批量操作可以减少网络传输次数，进而有效减小网络开销，大幅减少 RTT。
-
-另外，除了能减少 RTT 之外，发送一次命令的 socket I/O 成本也比较高（涉及上下文切换，存在`read()`和`write()`系统调用），批量操作还可以减少 socket I/O 成本。这个在官方对 pipeline 的介绍中有提到：https://redis.io/docs/manual/pipelining/ 。
-
-#### [原生批量操作命令](#原生批量操作命令)
-
-Redis 中有一些原生支持批量操作的命令，比如：
-
-- `MGET`(获取一个或多个指定 key 的值)、`MSET`(设置一个或多个指定 key 的值)、
-- `HMGET`(获取指定哈希表中一个或者多个指定字段的值)、`HMSET`(同时将一个或多个 field-value 对设置到指定哈希表中)、
-- `SADD`（向指定集合添加一个或多个元素）
-- ……
-
-不过，在 Redis 官方提供的分片集群解决方案 Redis Cluster 下，使用这些原生批量操作命令可能会存在一些小问题需要解决。就比如说 `MGET` 无法保证所有的 key 都在同一个 **hash slot**（哈希槽）上，`MGET`可能还是需要多次网络传输，原子操作也无法保证了。不过，相较于非批量操作，还是可以节省不少网络传输次数。
-
-整个步骤的简化版如下（通常由 Redis 客户端实现，无需我们自己再手动实现）：
-
-1. 找到 key 对应的所有 hash slot；
-2. 分别向对应的 Redis 节点发起 `MGET` 请求获取数据；
-3. 等待所有请求执行结束，重新组装结果数据，保持跟入参 key 的顺序一致，然后返回结果。
-
-如果想要解决这个多次网络传输的问题，比较常用的办法是自己维护 key 与 slot 的关系。不过这样不太灵活，虽然带来了性能提升，但同样让系统复杂性提升。
-
-#### [原生批量操作命令](#原生批量操作命令)
-
-Redis 中有一些原生支持批量操作的命令，比如：
-
-- `MGET`(获取一个或多个指定 key 的值)、`MSET`(设置一个或多个指定 key 的值)、
-- `HMGET`(获取指定哈希表中一个或者多个指定字段的值)、`HMSET`(同时将一个或多个 field-value 对设置到指定哈希表中)、
-- `SADD`（向指定集合添加一个或多个元素）
-- ……
-
-不过，在 Redis 官方提供的分片集群解决方案 Redis Cluster 下，使用这些原生批量操作命令可能会存在一些小问题需要解决。就比如说 `MGET` 无法保证所有的 key 都在同一个 **hash slot**（哈希槽）上，`MGET`可能还是需要多次网络传输，原子操作也无法保证了。不过，相较于非批量操作，还是可以节省不少网络传输次数。
-
-整个步骤的简化版如下（通常由 Redis 客户端实现，无需我们自己再手动实现）：
-
-1. 找到 key 对应的所有 hash slot；
-2. 分别向对应的 Redis 节点发起 `MGET` 请求获取数据；
-3. 等待所有请求执行结束，重新组装结果数据，保持跟入参 key 的顺序一致，然后返回结果。
-
-如果想要解决这个多次网络传输的问题，比较常用的办法是自己维护 key 与 slot 的关系。不过这样不太灵活，虽然带来了性能提升，但同样让系统复杂性提升。
-
-#### Pipeline
-
-对于不支持批量操作的命令，我们可以利用 **pipeline（流水线)** 将一批 Redis 命令封装成一组，这些 Redis 命令会被一次性提交到 Redis 服务器，只需要一次网络传输。不过，需要注意控制一次批量操作的 **元素个数**(例如 500 以内，实际也和元素字节数有关)，避免网络传输的数据量过大。
-
-与`MGET`、`MSET`等原生批量操作命令一样，pipeline 同样在 Redis Cluster 上使用会存在一些小问题。原因类似，无法保证所有的 key 都在同一个 **hash slot**（哈希槽）上。如果想要使用的话，客户端需要自己维护 key 与 slot 的关系。
-
-原生批量操作命令和 pipeline 的是有区别的，使用的时候需要注意：
-
-- 原生批量操作命令是原子操作，pipeline 是非原子操作。
-- pipeline 可以打包不同的命令，原生批量操作命令不可以。
-- 原生批量操作命令是 Redis 服务端支持实现的，而 pipeline 需要服务端和客户端的共同实现。
-
-顺带补充一下 pipeline 和 Redis 事务的对比：
-
-- 事务是原子操作，pipeline 是非原子操作。两个不同的事务不会同时运行，而 pipeline 可以同时以交错方式执行。
-- Redis 事务中每个命令都需要发送到服务端，而 Pipeline 只需要发送一次，请求次数更少。
-
-另外，pipeline 不适用于执行顺序有依赖关系的一批命令。就比如说，你需要将前一个命令的结果给后续的命令使用，pipeline 就没办法满足你的需求了。对于这种需求，我们可以使用 **Lua 脚本** 。
-
-#### Lua 脚本
-
-Lua 脚本同样支持批量操作多条命令。一段 Lua 脚本可以视作一条命令执行，可以看作是 **原子操作** 。也就是说，一段 Lua 脚本执行过程中不会有其他脚本或 Redis 命令同时执行，保证了操作不会被其他指令插入或打扰，这是 pipeline 所不具备的。
-
-并且，Lua 脚本中支持一些简单的逻辑处理比如使用命令读取值并在 Lua 脚本中进行处理，这同样是 pipeline 所不具备的。
-
-不过， Lua 脚本依然存在下面这些缺陷：
-
-- 如果 Lua 脚本运行时出错并中途结束，之后的操作不会进行，但是之前已经发生的写操作不会撤销，所以即使使用了 Lua 脚本，也不能实现类似数据库回滚的原子性。
-- Redis Cluster 下 Lua 脚本的原子操作也无法保证了，原因同样是无法保证所有的 key 都在同一个 **hash slot**（哈希槽）上。
-
-### 大 Key 处理
-
-#### 什么是大 Key
-
-大 key 并不是指 key 的值很大，而是 key 对应的 value 很大。
-
-一般而言，下面这两种情况被称为大 key：
-
-- String 类型的值大于 10 KB；
-- Hash、List、Set、ZSet 类型的元素的个数超过 5000 个；
-
-#### 大 Key 的影响
-
-大 key 会带来以下四种影响：
-
-- **客户端超时阻塞**。由于 Redis 执行命令是单线程处理，然后在操作大 key 时会比较耗时，那么就会阻塞 Redis，从客户端这一视角看，就是很久很久都没有响应。
-- **引发网络阻塞**。每次获取大 key 产生的网络流量较大，如果一个 key 的大小是 1 MB，每秒访问量为 1000，那么每秒会产生 1000MB 的流量，这对于普通千兆网卡的服务器来说是灾难性的。
-- **阻塞工作线程**。如果使用 del 删除大 key 时，会阻塞工作线程，这样就没办法处理后续的命令。
-- **内存分布不均**。集群模型在 slot 分片均匀情况下，会出现数据和查询倾斜情况，部分有大 key 的 Redis 节点占用内存多，QPS 也会比较大。
-
-#### 如何找到大 Key
-
-**_1、redis-cli --bigkeys 查找大 key_**
-
-可以通过 redis-cli --bigkeys 命令查找大 key：
-
-```shell
-redis-cli -h 127.0.0.1 -p6379 -a "password" -- bigkeys
-```
-
-使用的时候注意事项：
-
-- 最好选择在从节点上执行该命令。因为主节点上执行时，会阻塞主节点；
-- 如果没有从节点，那么可以选择在 Redis 实例业务压力的低峰阶段进行扫描查询，以免影响到实例的正常运行；或者可以使用 -i 参数控制扫描间隔，避免长时间扫描降低 Redis 实例的性能。
-
-该方式的不足之处：
-
-- 这个方法只能返回每种类型中最大的那个 bigkey，无法得到大小排在前 N 位的 bigkey；
-- 对于集合类型来说，这个方法只统计集合元素个数的多少，而不是实际占用的内存量。但是，一个集合中的元素个数多，并不一定占用的内存就多。因为，有可能每个元素占用的内存很小，这样的话，即使元素个数有很多，总内存开销也不大；
-
-**_2、使用 SCAN 命令查找大 key_**
-
-`SCAN` 命令可以按照一定的模式和数量返回匹配的 key。获取了 key 之后，可以利用 `STRLEN`、`HLEN`、`LLEN`等命令返回其长度或成员数量。
-
-| 数据结构   | 命令   | 复杂度 | 结果（对应 key）   |
-| ---------- | ------ | ------ | ------------------ |
-| String     | STRLEN | O(1)   | 字符串值的长度     |
-| Hash       | HLEN   | O(1)   | 哈希表中字段的数量 |
-| List       | LLEN   | O(1)   | 列表元素数量       |
-| Set        | SCARD  | O(1)   | 集合元素数量       |
-| Sorted Set | ZCARD  | O(1)   | 有序集合的元素数量 |
-
-对于集合类型还可以使用 `MEMORY USAGE` 命令（Redis 4.0+），这个命令会返回键值对占用的内存空间。
-
-**_3、使用 RdbTools 工具查找大 key_**
-
-使用 RdbTools 第三方开源工具，可以用来解析 Redis 快照（RDB）文件，找到其中的大 key。
-
-比如，下面这条命令，将大于 10 kb 的 key 输出到一个表格文件。
-
-```shell
-rdb dump.rdb -c memory --bytes 10240 -f redis.csv
-```
-
-#### 如何处理大 Key
-
-bigkey 的常见处理以及优化办法如下（这些方法可以配合起来使用）：
-
-- **分割 bigkey**：将一个 bigkey 分割为多个小 key。例如，将一个含有上万字段数量的 Hash 按照一定策略（比如二次哈希）拆分为多个 Hash。
-- **手动清理**：Redis 4.0+ 可以使用 `UNLINK` 命令来异步删除一个或多个指定的 key。Redis 4.0 以下可以考虑使用 `SCAN` 命令结合 `DEL` 命令来分批次删除。
-- **采用合适的数据结构**：例如，文件二进制数据不使用 String 保存、使用 HyperLogLog 统计页面 UV、Bitmap 保存状态信息（0/1）。
-- **开启 lazy-free（惰性删除/延迟释放）** ：lazy-free 特性是 Redis 4.0 开始引入的，指的是让 Redis 采用异步方式延迟释放 key 使用的内存，将该操作交给单独的子线程处理，避免阻塞主线程。
-
-### 热点 Key 处理
-
-#### 什么是 hotkey？
-
-如果一个 key 的访问次数比较多且明显多于其他 key 的话，那这个 key 就可以看作是 **hotkey（热 Key）**。例如在 Redis 实例的每秒处理请求达到 5000 次，而其中某个 key 的每秒访问量就高达 2000 次，那这个 key 就可以看作是 hotkey。
-
-hotkey 出现的原因主要是某个热点数据访问量暴增，如重大的热搜事件、参与秒杀的商品。
-
-#### hotkey 有什么危害？
-
-处理 hotkey 会占用大量的 CPU 和带宽，可能会影响 Redis 实例对其他请求的正常处理。此外，如果突然访问 hotkey 的请求超出了 Redis 的处理能力，Redis 就会直接宕机。这种情况下，大量请求将落到后面的数据库上，可能会导致数据库崩溃。
-
-因此，hotkey 很可能成为系统性能的瓶颈点，需要单独对其进行优化，以确保系统的高可用性和稳定性
-
-#### [如何发现 hotkey？](#如何发现-hotkey)
-
-**1、使用 Redis 自带的 `--hotkeys` 参数来查找。**
-
-Redis 4.0.3 版本中新增了 `hotkeys` 参数，该参数能够返回所有 key 的被访问次数。
-
-使用该方案的前提条件是 Redis Server 的 `maxmemory-policy` 参数设置为 LFU 算法，不然就会出现如下所示的错误。
-
-```
-# redis-cli -p 6379 --hotkeys
-
-# Scanning the entire keyspace to find hot keys as well as
-# average sizes per key type.  You can use -i 0.1 to sleep 0.1 sec
-# per 100 SCAN commands (not usually needed).
-
-Error: ERR An LFU maxmemory policy is not selected, access frequency not tracked. Please note that when switching between policies at runtime LRU and LFU data will take some time to adjust.
-```
-
-Redis 中有两种 LFU 算法：
-
-1. **volatile-lfu（least frequently used）**：从已设置过期时间的数据集（`server.db[i].expires`）中挑选最不经常使用的数据淘汰。
-2. **allkeys-lfu（least frequently used）**：当内存不足以容纳新写入数据时，在键空间中，移除最不经常使用的 key。
-
-以下是配置文件 `redis.conf` 中的示例：
-
-```
-# 使用 volatile-lfu 策略
-maxmemory-policy volatile-lfu
-
-# 或者使用 allkeys-lfu 策略
-maxmemory-policy allkeys-lfu
-```
-
-需要注意的是，`hotkeys` 参数命令也会增加 Redis 实例的 CPU 和内存消耗（全局扫描），因此需要谨慎使用。
-
-1. **volatile-lfu（least frequently used）**：从已设置过期时间的数据集（`server.db[i].expires`）中挑选最不经常使用的数据淘汰。
-2. **allkeys-lfu（least frequently used）**：当内存不足以容纳新写入数据时，在键空间中，移除最不经常使用的 key。
-
-以下是配置文件 `redis.conf` 中的示例：
-
-```
-# 使用 volatile-lfu 策略
-maxmemory-policy volatile-lfu
-
-# 或者使用 allkeys-lfu 策略
-maxmemory-policy allkeys-lfu
-```
-
-需要注意的是，`hotkeys` 参数命令也会增加 Redis 实例的 CPU 和内存消耗（全局扫描），因此需要谨慎使用。
-
-#### 如何解决 hotkey？
-
-hotkey 的常见处理以及优化办法如下（这些方法可以配合起来使用）：
-
-- **读写分离**：主节点处理写请求，从节点处理读请求。
-- **使用 Redis Cluster**：将热点数据分散存储在多个 Redis 节点上。
-- **二级缓存**：hotkey 采用二级缓存的方式进行处理，将 hotkey 存放一份到 JVM 本地内存中（可以用 Caffeine）。
+- 【中级】Redis 中如何实现分布式锁？
+- 【高级】分布式锁在未完成逻辑前过期怎么办？
+- 【中级】Redis 的 Red Lock 是什么？你了解吗？
+- 【中级】Redis 实现分布式锁时可能遇到的问题有哪些？
+- 【中级】Redis 中的缓存击穿、缓存穿透和缓存雪崩是什么？
+- 【中级】Redis 中如何保证缓存与数据库的数据一致性？
+- 【中级】说说 Redisson 分布式锁的原理？
+- 【中级】Redisson 看门狗（watch dog）机制了解吗？
+- 【中级】Redis 的订阅发布功能是什么？你了解吗？
 
 ## 参考资料
 
