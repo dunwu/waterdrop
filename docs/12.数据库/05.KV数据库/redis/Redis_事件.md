@@ -103,9 +103,8 @@ def main():
 
 从事件处理的角度来看，服务器运行流程如下：
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-event.png" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-event.png)
+
 ## 线程模型
 
 虽然说 Redis 是单线程模型，但实际上，**Redis 在 4.0 之后的版本中就已经加入了对多线程的支持。**

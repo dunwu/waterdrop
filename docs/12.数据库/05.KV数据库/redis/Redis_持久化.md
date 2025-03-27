@@ -26,8 +26,6 @@ permalink: /pages/2504588d/
 
 ## RDB 快照
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309150718907.png)
-
 ### RDB 简介
 
 **RDB 即“快照”，它将某时刻的所有 Redis 数据库中的所有键值对数据保存到一个经过压缩的“二进制文件”（RDB 文件）中**。
@@ -66,7 +64,7 @@ permalink: /pages/2504588d/
 
 [**`BGSAVE`**](https://redis.io/commands/bgsave) 命令会**“派生”**（fork）一个子进程，由子进程负责创建 RDB 文件，服务器进程继续处理命令请求，所以**该命令“不会阻塞”服务器**。
 
-![BGSAVE 流程](https://raw.githubusercontent.com/dunwu/images/master/snap/202309172009198.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272238061.png)
 
 ```shell
 >BGSAVE
@@ -149,7 +147,7 @@ redisServer 中的 `saveparams` 数组维护了多个自动间隔保存条件。
 
 对于不同类型（STRING、HASH、LIST、SET、SORTED SET）的键值对，RDB 文件会使用不同的方式来保存它们。
 
-![RDB 的文件结构](https://raw.githubusercontent.com/dunwu/images/master/snap/202309171645336.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272240429.png)
 
 Redis 本身提供了一个 RDB 文件检查工具 `redis-check-dump`。
 
@@ -179,8 +177,6 @@ Redis 的配置文件 `redis.conf` 中与 RDB 有关的选项：
 - `dir` - RDB 文件和 AOF 文件的存储路径
 
 ## AOF 日志
-
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309150718055.png)
 
 ### AOF 简介
 
@@ -234,7 +230,7 @@ AOF 载入过程如下：
 5. 循环执行步骤 3、4，直到所有写命令都被处理完毕为止。
 6. 载入完毕。
 
-![AOF 文件载入](https://raw.githubusercontent.com/dunwu/images/master/snap/202309171705818.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272247006.png)
 
 ### AOF 的重写
 
@@ -244,6 +240,8 @@ AOF 载入过程如下：
 - Redis 重启后需要执行 AOF 文件记录的所有写命令来还原数据集，如果 AOF 过大，则还原操作执行的时间就会非常长。
 
 为了解决 AOF 体积膨胀问题，Redis 提供了 AOF 重写功能，来对 AOF 文件进行压缩。**AOF 重写可以产生一个新的 AOF 文件，这个新的 AOF 文件和原来的 AOF 文件所保存的数据库状态一致，但体积更小**。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272248857.png)
 
 AOF 重写并非读取和分析现有 AOF 文件的内容，而是直接从数据库中读取当前的数据库状态。即**从数据库中读取键的当前值，然后用一条命令去记录该键值对**，以此代替之前可能存在冗余的命令。
 
@@ -255,7 +253,7 @@ AOF 重写并非读取和分析现有 AOF 文件的内容，而是直接从数�
 - 由于彼此不是在同一个进程中工作，AOF 重写不影响 AOF 写入和同步。当子进程完成创建新 AOF 文件的工作之后，服务器会将重写缓冲区中的所有内容追加到新 AOF 文件的末尾，使得新旧两个 AOF 文件所保存的数据库状态一致。
 - 最后，服务器用新的 AOF 文件替换就的 AOF 文件，以此来完成 AOF 重写操作。
 
-![BGREWRITEAOF 流程](https://raw.githubusercontent.com/dunwu/images/master/snap/202309171957918.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272248959.png)
 
 > `BGREWRITEAOF` 命令的实现采用的是写时复制技术（Copy-On-Write，缩写为 CoW）。
 
@@ -331,11 +329,26 @@ AOF 持久化通过在 `redis.conf` 中的 `appendonly yes` 配置选项来开�
 
 ### 混合持久化
 
-Redis 4.0 提出了**混合使用 AOF 日志和内存快照**，也叫混合持久化，既保证了 Redis 重启速度，又降低数据丢失风险。
+RDB 优点是数据恢复速度快，但是快照的频率不好把握。频率太低，丢失的数据就会比较多，频率太高，就会影响性能。AOF 优点是丢失数据少，但是数据恢复不快。
+
+为了集成了两者的优点，Redis 4.0 提出了**混合使用 AOF 日志和内存快照**，也叫混合持久化，既保证了 Redis 重启速度，又降低数据丢失风险。
 
 混合持久化工作在 **AOF 日志重写过程**，当开启了混合持久化时，在 AOF 重写日志时，fork 出来的重写子进程会先将与主线程共享的内存数据以 RDB 方式写入到 AOF 文件，然后主线程处理的操作命令会被记录在重写缓冲区里，重写缓冲区里的增量命令会以 AOF 方式写入到 AOF 文件，写入完成后通知主进程将新的含有 RDB 格式和 AOF 格式的 AOF 文件替换旧的的 AOF 文件。
 
 也就是说，使用了混合持久化，AOF 文件的**前半部分是 RDB 格式的全量数据，后半部分是 AOF 格式的增量数据**。
+
+这样的好处在于，重启 Redis 加载数据的时候，由于前半部分是 RDB 内容，这样**加载的时候速度会很快**。
+
+加载完 RDB 的内容后，才会加载后半部分的 AOF 内容，这里的内容是 Redis 后台子进程重写 AOF 期间，主线程处理的操作命令，可以使得**数据更少的丢失**。
+
+**混合持久化优点**：
+
+- 混合持久化结合了 RDB 和 AOF 持久化的优点，开头为 RDB 的格式，使得 Redis 可以更快的启动，同时结合 AOF 的优点，有减低了大量数据丢失的风险。
+
+**混合持久化缺点**：
+
+- AOF 文件中添加了 RDB 格式的内容，使得 AOF 文件的可读性变得很差；
+- 兼容性差，如果开启混合持久化，那么此混合持久化 AOF 文件，就不能用在 Redis 4.0 之前版本了。
 
 ## Redis 备份
 

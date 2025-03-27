@@ -29,7 +29,7 @@ Redis 是一种基于 C/S 模型以及请求/响应协议的 TCP 服务。通常
 
 **管道技术（`Pipeline`）**。Pipeline 的工作原理就是：**将多个 Redis 命令一次性发送给服务端，服务端处理后，统一返回给客户端**。由于减少了通信次数，自然提升了处理效率。
 
-![](https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/7268887661/p514690.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272224006.jpg)
 
 ## Pipeline 限制
 

@@ -572,7 +572,7 @@ _3、如何保证消息可靠性？_
 
 维护最近信息列表的常见操作如下：
 
-- 如果指定信息经存在于最近信息列表里，那么从列表里移除。使用 `LREM` 命令。
+- 如果指定信息已经存在于最近信息列表里，那么从列表里移除。使用 `LREM` 命令。
 - 将指定信息添加到最近信息列表的头部。使用 `LPUSH` 命令。
 - 添加操作完成后，如果最近信息列表中的数量超过上限 N，进行裁剪操作。使用 `LTRIM` 命令。
 
@@ -935,62 +935,62 @@ Zset 类型（Sorted Set，有序集合）可以根据元素的权重来排序�
 
 有序集合比较典型的使用场景就是排行榜。例如学生成绩的排名榜、游戏积分排行榜、视频播放排名、电商系统中商品的销量排名等。
 
-我们以博文点赞排名为例，小林发表了五篇博文，分别获得赞为 200、40、100、50、150。
+我们以博文点赞排名为例，dunwu 发表了五篇博文，分别获得赞为 200、40、100、50、150。
 
 ```shell
-# arcticle:1 文章获得了 200 个赞
-> ZADD user:xiaolin:ranking 200 arcticle:1
+# article:1 文章获得了 200 个赞
+> ZADD user:dunwu:ranking 200 article:1
 (integer) 1
-# arcticle:2 文章获得了 40 个赞
-> ZADD user:xiaolin:ranking 40 arcticle:2
+# article:2 文章获得了 40 个赞
+> ZADD user:dunwu:ranking 40 article:2
 (integer) 1
-# arcticle:3 文章获得了 100 个赞
-> ZADD user:xiaolin:ranking 100 arcticle:3
+# article:3 文章获得了 100 个赞
+> ZADD user:dunwu:ranking 100 article:3
 (integer) 1
-# arcticle:4 文章获得了 50 个赞
-> ZADD user:xiaolin:ranking 50 arcticle:4
+# article:4 文章获得了 50 个赞
+> ZADD user:dunwu:ranking 50 article:4
 (integer) 1
-# arcticle:5 文章获得了 150 个赞
-> ZADD user:xiaolin:ranking 150 arcticle:5
+# article:5 文章获得了 150 个赞
+> ZADD user:dunwu:ranking 150 article:5
 (integer) 1
 ```
 
-文章 arcticle:4 新增一个赞，可以使用 ZINCRBY 命令（为有序集合 key 中元素 member 的分值加上 increment）：
+文章 article:4 新增一个赞，可以使用 ZINCRBY 命令（为有序集合 key 中元素 member 的分值加上 increment）：
 
 ```shell
-> ZINCRBY user:xiaolin:ranking 1 arcticle:4
+> ZINCRBY user:dunwu:ranking 1 article:4
 "51"
 ```
 
 查看某篇文章的赞数，可以使用 ZSCORE 命令（返回有序集合 key 中元素个数）：
 
 ```shell
-> ZSCORE user:xiaolin:ranking arcticle:4
+> ZSCORE user:dunwu:ranking article:4
 "50"
 ```
 
-获取小林文章赞数最多的 3 篇文章，可以使用 ZREVRANGE 命令（倒序获取有序集合 key 从 start 下标到 stop 下标的元素）：
+获取 dunwu 文章赞数最多的 3 篇文章，可以使用 ZREVRANGE 命令（倒序获取有序集合 key 从 start 下标到 stop 下标的元素）：
 
 ```shell
 # WITHSCORES 表示把 score 也显示出来
-> ZREVRANGE user:xiaolin:ranking 0 2 WITHSCORES
-1) "arcticle:1"
+> ZREVRANGE user:dunwu:ranking 0 2 WITHSCORES
+1) "article:1"
 2) "200"
-3) "arcticle:5"
+3) "article:5"
 4) "150"
-5) "arcticle:3"
+5) "article:3"
 6) "100"
 ```
 
-获取小林 100 赞到 200 赞的文章，可以使用 ZRANGEBYSCORE 命令（返回有序集合中指定分数区间内的成员，分数由低到高排序）：
+获取 dunwu 100 赞到 200 赞的文章，可以使用 ZRANGEBYSCORE 命令（返回有序集合中指定分数区间内的成员，分数由低到高排序）：
 
 ```shell
-> ZRANGEBYSCORE user:xiaolin:ranking 100 200 WITHSCORES
-1) "arcticle:3"
+> ZRANGEBYSCORE user:dunwu:ranking 100 200 WITHSCORES
+1) "article:3"
 2) "100"
-3) "arcticle:5"
+3) "article:5"
 4) "150"
-5) "arcticle:1"
+5) "article:1"
 6) "200"
 ```
 
@@ -1122,4 +1122,4 @@ Redis 后续版本又支持四种数据类型，它们的应用场景如下：
 
 - [《Redis 实战》](https://item.jd.com/11791607.html)
 - [《Redis 设计与实现》](https://item.jd.com/11486101.html)
-- [Redis 常见数据类型和应用场景](https://xiaolincoding.com/redis/data_struct/command.html#string)
+- [Redis 常见数据类型和应用场景](https://dunwucoding.com/redis/data_struct/command.html#string)

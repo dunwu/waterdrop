@@ -12,6 +12,7 @@ tags:
   - KV数据库
   - redis
   - 面试
+permalink: /pages/f18c87b0/
 ---
 
 # Redis 面试之应用篇

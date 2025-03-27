@@ -35,7 +35,7 @@ Redis 发布订阅应用了设计模式中经典的“观察者模式”。
 - 当一个对象状态的改变需要改变其他对象，或实际对象是事先未知的或动态变化的时，可使用观察者模式。
 - 当应用中的一些对象必须观察其他对象时，可使用该模式。但仅能在有限时间内或特定情况下使用。
 
-![观察者模式](https://d1.awsstatic.com/product-marketing/Messaging/sns_img_topic.e024462ec88e79ed63d690a2eed6e050e33fb36f.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272225857.png)
 
 ## Redis 订阅模式
 

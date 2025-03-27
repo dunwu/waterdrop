@@ -261,8 +261,6 @@ Redis 3.0 后支持集群模式。
 
 `Redis` 集群一般由 **多个节点** 组成，节点数量至少为 `6` 个，才能保证组成 **完整高可用** 的集群。
 
-![img](https://user-gold-cdn.xitu.io/2019/10/10/16db5250b0d1c392?w=1467&h=803&f=png&s=43428)
-
 理想情况当然是所有节点各自在不同的机器上，首先于资源，本人在部署 Redis 集群时，只得到 3 台服务器。所以，我计划每台服务器部署 2 个 Redis 节点。
 
 【示例】最简高可用 Redis 集群规划
@@ -633,10 +631,6 @@ rebalance：表明让 Redis 自动根据节点数进行均衡哈希槽分配。
 > 命令详细用法，请参考 [**Redis 命令官方文档**](https://redis.io/commands)
 >
 > 搬迁两张 cheat sheet 图，原址：https://www.cheatography.com/tasjaevan/cheat-sheets/redis/
-
-![img](https://user-gold-cdn.xitu.io/2019/10/10/16db5250b0b8ea57?w=2230&h=2914&f=png&s=246433)
-
-![img](https://user-gold-cdn.xitu.io/2019/10/10/16db5250b0e9ba3c?w=2229&h=2890&f=png&s=192997)
 
 ### 集群命令
 
