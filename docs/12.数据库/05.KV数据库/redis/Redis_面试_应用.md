@@ -76,7 +76,7 @@ null
 
 **Redis 2.0 引入了发布订阅 (pub/sub) 功能，解决了 List 实现消息队列没有广播机制的问题。**
 
-![Redis 发布订阅 (pub/sub) 功能](https://oss.javaguide.cn/github/javaguide/database/redis/redis-pub-sub.png)
+![Redis 发布订阅 (pub/sub) 功能](https://raw.githubusercontent.com/dunwu/images/master/snap/202503270822194.png)
 
 Redis 发布订阅 (pub/sub) 功能
 
@@ -101,7 +101,7 @@ pub/sub 既能单播又能广播，还支持 channel 的简单正则匹配。不
 
 `Stream` 的结构如下：
 
-![img](https://oss.javaguide.cn/github/javaguide/database/redis/redis-stream-structure.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503270823833.png)
 
 这是一个有序的消息链表，每个消息都有一个唯一的 ID 和对应的内容。ID 是一个时间戳和序列号的组合，用来保证消息的唯一性和递增性。内容是一个或多个键值对（类似 Hash 基本数据类型），用来存储消息的数据。
 

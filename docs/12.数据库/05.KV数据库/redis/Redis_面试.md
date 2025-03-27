@@ -42,7 +42,7 @@ Redis 的功能和特性：
 - Redis 有多种高可用方案：**主从复制**模式、**哨兵**模式、**集群**模式。
 - Redis 支持很多丰富的特性，如：**事务** 、**Lua 脚本**、**发布订阅**、**过期删除**、**内存淘汰**等等。
 
-![](https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F778a7e21-455b-45f6-8487-63f9eb41e88b_2000x1414.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231010326.png)
 
 _图来自 [Redis Explained](https://architecturenotes.co/p/redis)_
 
@@ -81,7 +81,7 @@ Redis 里程碑版本如下：
 - Redis 5.0（2017 年） - 新增 Stream 数据类型。
 - Redis 6.0（2020 年） - 在网络模块中引入了多线程 I/O。Redis 模型分为网络模块和主处理模块。特别注意：Redis 不再完全是单线程架构。
 
-![](https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_lossy/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fac67c4db-99e0-4d6c-a7e4-163d962141ea_1280x1664.gif)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503270820508.gif)
 
 :::
 
@@ -283,7 +283,7 @@ Redis 的主流 Java 客户端有三种，对比如下：
 【数据类型】
 
 - 【高级】Redis 中跳表的实现原理是什么？
-- 
+-
 - 【中级】Redis 中的 Geo 数据结构是什么？
 - 【中级】如何使用 Redis 快速实现排行榜？
 - 【中级】如何使用 Redis 快速实现布隆过滤器？
@@ -766,7 +766,7 @@ Redis 是一种基于 C/S 模型以及请求/响应协议的 TCP 服务。Redis 
 
 根据 [Redis 官方 Benchmark](https://redis.io/docs/management/optimization/benchmarks/) 文档的描述，Redis 单机 QPS 能达到 10w+，将近是 Mysql 的 10 倍。
 
-![Redis 官方 Benchmark QPS 图](https://redis.io/docs/management/optimization/benchmarks/Connections_chart.png)
+![Redis 官方 Benchmark QPS 图](https://raw.githubusercontent.com/dunwu/images/master/snap/202503270821660.png)
 
 Redis 是单线程模型（Redis 6.0 已经支持多线程模型），为什么还能有这么高的并发？
 
