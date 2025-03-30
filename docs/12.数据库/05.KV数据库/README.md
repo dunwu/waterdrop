@@ -34,6 +34,8 @@ index: false
 - [Redis 运维](redis/Redis_运维.md) - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
 - [Redis 实战](redis/Redis_实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
 - [Redis 面试](redis/Redis_面试.md) - 关键词：`面试`
+- [Redis 面试之数据类型篇](redis/Redis_面试_数据类型.md) - 关键词：`面试`
+- [Redis 面试之应用篇](redis/Redis_面试_应用.md) - 关键词：`面试`
 
 ### [Memcached](Memcached)
 

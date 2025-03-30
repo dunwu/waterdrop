@@ -5,7 +5,7 @@ cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20230923113143
 date: 2020-07-13 17:03:42
 categories:
   - 数据库
-  - KV数据库
+  - KV 数据库
   - redis
 tags:
   - 数据库
@@ -447,7 +447,7 @@ Redis HyperLogLog 是 Redis 2.8.9 版本新增的数据类型，是一种**用�
 - **获取统计值**：`PFCOUNT key`
 
   ```shell
-  PFCOUNT page1:uv  # 返回近似 UV 数（如 100万）
+  PFCOUNT page1:uv  # 返回近似 UV 数（如 100 万）
   ```
 
 :::
@@ -524,7 +524,7 @@ RedisBloom 是 Redis 官方提供的模块，是一种简化的布隆过滤器�
 **创建**：
 
 ```shell
-BF.RESERVE myBloomFilter 0.01 1000000  # 误判率1%，容量100万
+BF.RESERVE myBloomFilter 0.01 1000000  # 误判率 1%，容量 100 万
 ```
 
 **添加元素**：
@@ -536,8 +536,8 @@ BF.ADD myBloomFilter "item1"
 **检查元素**：
 
 ```shell
-BF.EXISTS myBloomFilter "item1"  # 返回1（可能存在）
-BF.EXISTS myBloomFilter "item2"  # 返回0（一定不存在）
+BF.EXISTS myBloomFilter "item1"  # 返回 1（可能存在）
+BF.EXISTS myBloomFilter "item2"  # 返回 0（一定不存在）
 ```
 
 **适用场景**
