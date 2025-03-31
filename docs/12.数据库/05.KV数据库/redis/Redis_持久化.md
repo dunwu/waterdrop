@@ -297,6 +297,8 @@ AOF 持久化通过在 `redis.conf` 中的 `appendonly yes` 配置选项来开�
 
 > 当 Redis 启动时， 如果 RDB 和 AOF 功能都开启了，那么程序会优先使用 AOF 文件来恢复数据集，因为 AOF 文件所保存的数据通常是最完整的。
 
+![](https://substackcdn.com/image/fetch/w_1456,c_limit,f_webp,q_auto:good,fl_lossy/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F89970b2c-fd40-47ea-bd39-18db11b69fe8_1280x1664.gif)
+
 ### 如何选择持久化
 
 - 如果不关心数据丢失，可以不持久化。
