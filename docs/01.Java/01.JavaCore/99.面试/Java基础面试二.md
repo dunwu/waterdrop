@@ -1,6 +1,7 @@
 ---
 title: Java 基础面试二
 date: 2024-07-03 07:44:02
+cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
 categories:
   - Java
   - JavaCore
