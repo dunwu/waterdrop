@@ -118,3 +118,34 @@ Object obj = new Object();
 PhantomReference<Object> pf = new PhantomReference<Object>(obj);
 obj = null;
 ```
+
+## 工具
+
+### 【简单】JDK 内置了哪些工具？
+
+::: details 要点
+
+**基础开发工具**  
+
+- **`javac`** – Java 编译器（`.java` → `.class`）  
+- **`java`** – 运行 Java 程序（启动 JVM）  
+- **`javadoc`** – 生成 API 文档（基于源码注释）  
+- **`jar`** – 打包 `.class` 文件为 JAR  
+- **`jdb`** – 命令行调试工具（断点、变量查看）  
+
+**性能监控与分析工具**  
+
+- **`jps`** – 查看 Java 进程  
+- **`jstack`** – 线程堆栈分析（排查死锁、线程阻塞）  
+- **`jmap`** – 内存快照（生成 Heap Dump）  
+- **`jhat`** – 分析 Heap Dump（内存泄漏排查）  
+- **`jstat`** – JVM 统计（GC、内存、类加载监控）  
+- **`jconsole`** – 图形化 JVM 监控（内存、线程、类）  
+- **`jvisualvm`** – 综合性能分析（CPU、内存、GC）  
+
+**诊断工具**  
+
+- **`jinfo`** – 查看/修改 JVM 运行参数  
+- **`jstatd`** – 远程 JVM 监控（分布式支持）
+
+:::
