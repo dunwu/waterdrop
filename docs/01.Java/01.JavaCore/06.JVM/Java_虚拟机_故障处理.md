@@ -14,7 +14,7 @@ tags:
 permalink: /pages/78327955/
 ---
 
-# Java虚拟机之故障处理
+# Java_虚拟机_故障处理
 
 ## 故障定位思路
 

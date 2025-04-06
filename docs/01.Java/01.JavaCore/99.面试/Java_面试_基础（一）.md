@@ -8,7 +8,7 @@ categories:
   - 面试
 tags:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
 permalink: /pages/5fe7db38/
 ---
@@ -1174,10 +1174,3 @@ catch (IOException e) {
 **一句话总结**：`final`管**不变性**，`finally`管**必执行**，`finalize`是**过时的清理机制**。
 
 （注：现代Java开发用`try-with-resources`替代`finalize`）
-
-## 参考资料
-
-- [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
-- [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
-- [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
-- [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82)

@@ -7,7 +7,7 @@ categories:
   - 面试
 tags:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
   - 并发
 permalink: /pages/b1e468f4/

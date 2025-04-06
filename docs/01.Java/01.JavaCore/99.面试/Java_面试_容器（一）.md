@@ -7,7 +7,7 @@ categories:
   - 面试
 tags:
   - Java
-  - JavaSE
+  - JavaCore
   - 面试
   - 容器
 permalink: /pages/e896e1d0/
