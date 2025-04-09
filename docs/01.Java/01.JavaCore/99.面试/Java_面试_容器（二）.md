@@ -17,504 +17,554 @@ permalink: /pages/e3c58d1f/
 
 ## Map
 
-### HashMap 和 Hashtable 的区别
+### 【中等】HashMap 和 Hashtable 有什么区别？
 
-Hashtable 是早期 Java 类库提供的一个哈希表实现，本身是同步的，不支持 null 键和值，由于同步导致的性能开销，所以已经很少被推荐使用。
+`HashMap` 更高效且灵活，`Hashtable` 线程安全但过时，推荐用 `ConcurrentHashMap` 替代。
 
-HashMap 是应用更加广泛的哈希表实现，行为上大致上与 HashTable 一致，主要区别在于 HashMap 不是同步的，支持 null 键和值等。
+| **对比项**         | **HashMap** (JDK 1.2+)                      | **Hashtable** (JDK 1.0)                   |
+| ------------------ | ------------------------------------------- | ----------------------------------------- |
+| **线程安全**       | ❌ 非线程安全（需额外同步）                 | ✅ 线程安全（方法用 `synchronized` 修饰） |
+| **性能**           | ⚡ 更高（无锁竞争）                         | ⏳ 较低（同步开销）                       |
+| **Null 键/值**     | ✅ 允许 `null` 键和值                       | ❌ 不允许 `null`                          |
+| **迭代器**         | **`fail-fast`**（快速失败，并发修改抛异常） | **`enumerator`**（不抛异常）              |
+| **继承体系**       | 继承 `AbstractMap`                          | 继承 `Dictionary`（已过时）               |
+| **初始容量与扩容** | 默认 16，扩容为 2 倍                        | 默认 11，扩容为 2 倍 + 1                  |
+| **哈希冲突解决**   | 链表 + 红黑树（JDK 8+）                     | 仅链表                                    |
 
-二者的主要差别如下：
+**使用建议**：
 
-|              | HashMap                       | Hashtable                                    |
-| ------------ | ----------------------------- | -------------------------------------------- |
-| 线程安全     | 非线程安全                    | 线程安全（主要方法都用 `synchronized` 修饰） |
-| 效率         | 性能好                        | 性能差：互斥锁，势必影响性能                 |
-| 初始化容量   | 初始容量为 16                 | 初始容量为 11                                |
-| 扩容方式     | 2N（N 为当前容量）             | 2N + 1                                       |
-| 是否允许空值 | 允许存储 null 的 key 和 value | 不允许存储 null 的 key 和 value              |
+- **优先用 `HashMap`**：大多数场景（性能更好），搭配 `Collections.synchronizedMap()` 或 `ConcurrentHashMap` 实现线程安全。
+- **`Hashtable` 适用场景**：遗留系统兼容，或需要简单线程安全且不介意性能损耗时（现代开发已少用）。
 
-- **线程是否安全：** `HashMap` 是非线程安全的，`Hashtable` 是线程安全的，因为 `Hashtable` 内部的方法基本都经过`synchronized` 修饰。（如果你要保证线程安全的话就使用 `ConcurrentHashMap` 吧！）；
-- **效率：** 因为线程安全的问题，`HashMap` 要比 `Hashtable` 效率高一点。另外，`Hashtable` 基本被淘汰，不要在代码中使用它；
-- **对 Null key 和 Null value 的支持：** `HashMap` 可以存储 null 的 key 和 value，但 null 作为键只能有一个，null 作为值可以有多个；Hashtable 不允许有 null 键和 null 值，否则会抛出 `NullPointerException`。
-- **初始容量大小和每次扩充容量大小的不同：** ① 创建时如果不指定容量初始值，`Hashtable` 默认的初始大小为 11，之后每次扩充，容量变为原来的 2n+1。`HashMap` 默认的初始化大小为 16。之后每次扩充，容量变为原来的 2 倍。② 创建时如果给定了容量初始值，那么 `Hashtable` 会直接使用你给定的大小，而 `HashMap` 会将其扩充为 2 的幂次方大小（`HashMap` 中的`tableSizeFor()`方法保证，下面给出了源代码）。也就是说 `HashMap` 总是使用 2 的幂作为哈希表的大小，后面会介绍到为什么是 2 的幂次方。
-- **底层数据结构：** JDK1.8 以后的 `HashMap` 在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）时，将链表转化为红黑树（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树），以减少搜索时间（后文中我会结合源码对这一过程进行分析）。`Hashtable` 没有这样的机制。
+### 【中等】对比一下 HashMap 和 HashSet？
 
-**`HashMap` 中带有初始容量的构造函数：**
+- `HashMap` 是 **键值对容器**，适合快速键值查询。
+- `HashSet` 是 **唯一元素集合**，基于 `HashMap` 实现，仅关注元素是否存在。
 
-```
-    public HashMap(int initialCapacity, float loadFactor) {
-        if (initialCapacity < 0)
-            throw new IllegalArgumentException("Illegal initial capacity: " +
-                                               initialCapacity);
-        if (initialCapacity > MAXIMUM_CAPACITY)
-            initialCapacity = MAXIMUM_CAPACITY;
-        if (loadFactor <= 0 || Float.isNaN(loadFactor))
-            throw new IllegalArgumentException("Illegal load factor: " +
-                                               loadFactor);
-        this.loadFactor = loadFactor;
-        this.threshold = tableSizeFor(initialCapacity);
+**核心区别**
+
+| **特性**      | **HashMap**                         | **HashSet**                                |
+| ------------- | ----------------------------------- | ------------------------------------------ |
+| **数据结构**  | 哈希表（键值对存储）                | 基于 `HashMap`（仅用键，值固定为虚拟对象） |
+| **存储内容**  | 键（Key） + 值（Value）             | 仅存储元素（Key）                          |
+| **重复规则**  | **Key 不可重复**（Value 可重复）    | **元素（Key）不可重复**                    |
+| **Null 支持** | 允许 1 个 `null` 键和多个 `null` 值 | 允许 1 个 `null` 元素                      |
+
+**常用方法对比**
+
+| **操作**     | **HashMap**          | **HashSet**                       |
+| ------------ | -------------------- | --------------------------------- |
+| **添加元素** | `put(key, value)`    | `add(element)`                    |
+| **查询元素** | `get(key)`（返回值） | `contains(element)`（返回布尔值） |
+| **删除元素** | `remove(key)`        | `remove(element)`                 |
+
+**底层机制**
+
+`HashSet` 内部直接使用 `HashMap` 实现，元素作为 `Key`，值固定为一个虚拟的 `PRESENT` 对象（占位符）。
+
+两者均依赖哈希表，平均时间复杂度为 `O(1)`（冲突时可能退化为 `O(n)`）。
+
+```java
+// HashSet 的简化实现（本质是 HashMap 的包装）
+public class HashSet<E> {
+    private HashMap<E, Object> map;  // 键存储元素，值固定为 PRESENT
+    private static final Object PRESENT = new Object();
+    public boolean add(E e) {
+        return map.put(e, PRESENT) == null;  // 若 Key 已存在，返回 false
     }
-     public HashMap(int initialCapacity) {
-        this(initialCapacity, DEFAULT_LOAD_FACTOR);
-    }
-```
-
-下面这个方法保证了 `HashMap` 总是使用 2 的幂作为哈希表的大小。
-
-```
-    /**
-     * Returns a power of two size for the given target capacity.
-     */
-    static final int tableSizeFor(int cap) {
-        int n = cap - 1;
-        n |= n >>> 1;
-        n |= n >>> 2;
-        n |= n >>> 4;
-        n |= n >>> 8;
-        n |= n >>> 16;
-        return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
-    }
-```
-
-### HashMap 和 HashSet 区别
-
-如果你看过 `HashSet` 源码的话就应该知道：`HashSet` 底层就是基于 `HashMap` 实现的。（`HashSet` 的源码非常非常少，因为除了 `clone()`、`writeObject()`、`readObject()`是 `HashSet` 自己不得不实现之外，其他方法都是直接调用 `HashMap` 中的方法。
-
-| `HashMap`                              | `HashSet`                                                                                                                |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| 实现了 `Map` 接口                      | 实现 `Set` 接口                                                                                                          |
-| 存储键值对                             | 仅存储对象                                                                                                               |
-| 调用 `put()`向 map 中添加元素          | 调用 `add()`方法向 `Set` 中添加元素                                                                                      |
-| `HashMap` 使用键（Key）计算 `hashcode` | `HashSet` 使用成员对象来计算 `hashcode` 值，对于两个对象来说 `hashcode` 可能相同，所以`equals()`方法用来判断对象的相等性 |
-
-### HashMap、TreeMap、LinkedHashMap 的区别
-
-大部分使用 Map 的场景，通常就是放入、访问或者删除，而对顺序没有特别要求，HashMap 在这种情况下基本是最好的选择。**HashMap 的性能表现非常依赖于哈希码的有效性，请务必掌握 hashCode 和 equals 的一些基本约定**，比如：
-
-- equals 相等，hashCode 一定要相等。
-- 重写了 hashCode 也要重写 equals。
-- hashCode 需要保持一致性，状态改变返回的哈希值仍然要一致。
-- equals 的对称、反射、传递等特性。
-
-LinkedHashMap 和 TreeMap 都可以保证某种顺序，但二者还是非常不同的。
-
-- LinkedHashMap 通常提供的是遍历顺序符合插入顺序，它的实现是通过为条目（键值对）维护一个双向链表。注意，通过特定构造函数，我们可以创建反映访问顺序的实例，所谓的 put、get、compute 等，都算作“访问”。
-- 对于 TreeMap，它的整体顺序是由键的顺序关系决定的，通过 Comparator 或 Comparable（自然顺序）来决定。
-
-### HashSet 如何检查重复？
-
-以下内容摘自我的 Java 启蒙书《Head first java》第二版：
-
-> 当你把对象加入`HashSet`时，`HashSet` 会先计算对象的`hashcode`值来判断对象加入的位置，同时也会与其他加入的对象的 `hashcode` 值作比较，如果没有相符的 `hashcode`，`HashSet` 会假设对象没有重复出现。但是如果发现有相同 `hashcode` 值的对象，这时会调用`equals()`方法来检查 `hashcode` 相等的对象是否真的相同。如果两者相同，`HashSet` 就不会让加入操作成功。
-
-在 JDK1.8 中，`HashSet`的`add()`方法只是简单的调用了`HashMap`的`put()`方法，并且判断了一下返回值以确保是否有重复元素。直接看一下`HashSet`中的源码：
-
-```
-// Returns: true if this set did not already contain the specified element
-// 返回值：当 set 中没有包含 add 的元素时返回真
-public boolean add(E e) {
-        return map.put(e, PRESENT)==null;
 }
 ```
 
-而在`HashMap`的`putVal()`方法中也能看到如下说明：
+**使用场景**
 
-```
-// Returns : previous value, or null if none
-// 返回值：如果插入位置没有元素返回 null，否则返回上一个元素
-final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
-                   boolean evict) {
-...
-}
-```
+- **`HashMap`**：需通过键快速访问值的场景（如缓存、数据库索引）。 示例：`用户 ID → 用户详细信息`。
+- **`HashSet`**： 需存储唯一元素的集合（如去重、黑名单）。示例：`IP 黑名单`、`单词去重`。
 
-也就是说，在 JDK1.8 中，实际上无论`HashSet`中是否已经存在了某元素，`HashSet`都会直接插入，只是会在`add()`方法的返回值处告诉我们插入前是否存在相同元素。
+### 【中等】HashMap、TreeMap、LinkedHashMap 有什么区别？
 
-### HashMap 的底层实现
+**核心特性**
 
-#### JDK1.8 之前
+| **特性**       | **HashMap**                     | **TreeMap**                        | **LinkedHashMap**             |
+| -------------- | ------------------------------- | ---------------------------------- | ----------------------------- |
+| **底层结构**   | 哈希表（数组+链表/红黑树）      | 红黑树（平衡二叉搜索树）           | 哈希表 + 双向链表             |
+| **顺序性**     | 无序                            | 按键的自然顺序或自定义顺序排序     | 保持插入顺序或访问顺序（LRU） |
+| **null 支持**  | 允许 1 个 null 键和多个 null 值 | 不允许 null 键（除非自定义比较器） | 同 HashMap                    |
+| **线程安全**   | 非线程安全                      | 非线程安全                         | 非线程安全                    |
+| **时间复杂度** | 平均 O(1)                       | 增删查 O(log n)                    | 平均 O(1)                     |
 
-JDK1.8 之前 `HashMap` 底层是 **数组和链表** 结合在一起使用也就是 **链表散列**。HashMap 通过 key 的 `hashcode` 经过扰动函数处理过后得到 hash 值，然后通过 `(n - 1) & hash` 判断当前元素存放的位置（这里的 n 指的是数组的长度），如果当前位置存在元素的话，就判断该元素与要存入的元素的 hash 值以及 key 是否相同，如果相同的话，直接覆盖，不相同就通过拉链法解决冲突。
+**排序与顺序**
 
-所谓扰动函数指的就是 HashMap 的 `hash` 方法。使用 `hash` 方法也就是扰动函数是为了防止一些实现比较差的 `hashCode()` 方法 换句话说使用扰动函数之后可以减少碰撞。
+- **HashMap**：完全无序，迭代顺序不可预测。
+- **TreeMap**：默认按键的自然顺序排序（Key 需实现`Comparable`）。可通过`Comparator`自定义排序规则。
+- **LinkedHashMap**：默认保持**插入顺序**。可配置为**访问顺序**（最近最少使用 LRU）。
 
-**JDK 1.8 HashMap 的 hash 方法源码：**
+**使用场景**
 
-JDK 1.8 的 hash 方法相比于 JDK 1.7 hash 方法更加简化，但是原理不变。
+- **HashMap**：
+  - 需要最高效的查找、插入和删除操作。
+  - 不关心元素的顺序。
+  - 示例：缓存、快速查找表。
+- **TreeMap**：
+  - 需要元素按键排序。
+  - 需要范围查询（如`subMap()`、`headMap()`、`tailMap()`）。
+  - 示例：字典、有序事件调度。
+- **LinkedHashMap**：
+  - 需要保持插入顺序或实现 LRU 缓存。
+  - 示例：记录访问顺序的缓存、需要按插入顺序迭代的场景。
 
-```
-    static final int hash(Object key) {
+**性能对比**
+
+| **操作**     | **HashMap** | **TreeMap** | **LinkedHashMap** |
+| ------------ | ----------- | ----------- | ----------------- |
+| **插入**     | O(1)        | O(log n)    | O(1)              |
+| **删除**     | O(1)        | O(log n)    | O(1)              |
+| **查找**     | O(1)        | O(log n)    | O(1)              |
+| **迭代顺序** | 无序        | 有序（Key） | 插入/访问顺序     |
+
+**选择依据**
+
+- 要**速度**：选`HashMap`。
+- 要**排序**：选`TreeMap`。
+- 要**顺序**（插入或访问顺序）：选`LinkedHashMap`。
+
+**扩展**
+
+- `LinkedHashMap`可通过`accessOrder`参数实现 LRU 缓存。
+- `TreeMap`支持丰富的导航方法（如`ceilingKey()`、`floorKey()`）。
+
+### 【困难】HashMap 底层实现原理是什么？
+
+HashMap 通过哈希函数定位桶，用链表和红黑树解决冲突，动态扩容平衡性能，但非线程安全。
+
+**数据结构**
+
+HashMap 的数据结构是：**数组 + 链表（JDK 8 以前）** ；**数组 + 链表 + 红黑树（JDK 8+）**
+
+- **数组（桶）**：`Node<K,V>[] table`，初始长度默认为 `16`。
+- **链表**：相同哈希值的元素组成链表，以解决哈希冲突（拉链地址法）。
+- **红黑树**：当链表长度 ≥ 8 且数组长度 ≥ 64 时，链表转为红黑树（提升查询效率至 `O(log n)`）。
+
+**哈希计算**
+
+- **计算哈希值**：高位与低位异或，使哈希分布更均匀。
+
+  ```java
+  // JDK 8 的哈希扰动函数（减少碰撞）
+  static final int hash(Object key) {
       int h;
-      // key.hashCode()：返回散列值也就是 hashcode
-      // ^：按位异或
-      // >>>: 无符号右移，忽略符号位，空位都以 0 补齐
       return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
   }
-```
+  ```
 
-对比一下 JDK1.7 的 HashMap 的 hash 方法源码。
+- **计算桶索引**：
 
-```
-static int hash(int h) {
-    // This function ensures that hashCodes that differ only by
-    // constant multiples at each bit position have a bounded
-    // number of collisions (approximately 8 at default load factor).
+  ```java
+  index = (table.length - 1) & hash;  // 等价于 hash % table.length
+  ```
 
-    h ^= (h >>> 20) ^ (h >>> 12);
-    return h ^ (h >>> 7) ^ (h >>> 4);
-}
-```
+**解决哈希冲突**
 
-相比于 JDK1.8 的 hash 方法 ，JDK 1.7 的 hash 方法的性能会稍差一点点，因为毕竟扰动了 4 次。
+- **拉链地址法**：冲突的键值对以链表形式存储在同一桶中。
+- **红黑树优化**：长链表（≥8）转为红黑树，避免极端情况下性能退化至 `O(n)`。
 
-所谓 **“拉链法”** 就是：将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中即可。
+**扩容机制（Rehash）**
 
-#### JDK1.8 之后
+- **触发条件**：当元素数量 > `容量 × 负载因子`（默认负载因子 0.75，容量 16 时阈值为 12）。
+- **扩容操作**：
+  - 新建 2 倍大小的数组（`newCap = oldCap << 1`）。
+  - 重新计算键的索引位置（`newIndex = (newCap - 1) & hash`）。
+  - **JDK 8 优化**：无需重新计算哈希，**通过高位掩码判断新索引位置**（`原索引` 或 `原索引 + oldCap`）。
 
-相比于之前的版本， JDK1.8 之后在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树）时，将链表转化为红黑树，以减少搜索时间。
+**关键参数**
 
-> TreeMap、TreeSet 以及 JDK1.8 之后的 HashMap 底层都用到了红黑树。红黑树就是为了解决二叉查找树的缺陷，因为二叉查找树在某些情况下会退化成一个线性结构。
+| **参数**                | **默认值**         | **说明**                                           |
+| ----------------------- | ------------------ | -------------------------------------------------- |
+| 初始容量                | 16                 | 必须为 2 的幂（方便位运算计算索引）。              |
+| 负载因子（Load Factor） | 0.75               | 权衡空间与时间效率（过高增加冲突，过低浪费内存）。 |
+| 树化阈值                | 8（链表 → 红黑树） | 需同时满足数组长度 ≥ 64，否则优先扩容。            |
+| 退化阈值                | 6（红黑树 → 链表） | 扩容或删除节点时检查。                             |
 
-我们来结合源码分析一下 `HashMap` 链表到红黑树的转换。
+**线程安全问题**
 
-**1、 `putVal` 方法中执行链表转红黑树的判断逻辑。**
+- **非线程安全**：多线程下可能导致：
+  - **死循环**（JDK 7 头插法扩容时产生环形链表）。
+  - **数据丢失**（并发插入覆盖节点）。
+- **解决方案**：
+  - 使用 `ConcurrentHashMap`。
+  - 或通过 `Collections.synchronizedMap()` 包装。
 
-链表的长度大于 8 的时候，就执行 `treeifyBin` （转换红黑树）的逻辑。
+**JDK 8 的优化**
 
-```
-// 遍历链表
-for (int binCount = 0; ; ++binCount) {
-    // 遍历到链表最后一个节点
-    if ((e = p.next) == null) {
-        p.next = newNode(hash, key, value, null);
-        // 如果链表元素个数大于 TREEIFY_THRESHOLD（8）
-        if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
-            // 红黑树转换（并不会直接转换成红黑树）
-            treeifyBin(tab, hash);
-        break;
-    }
-    if (e.hash == hash &&
-        ((k = e.key) == key || (key != null && key.equals(k))))
-        break;
-    p = e;
-}
-```
+- **链表 → 红黑树**：解决哈希攻击导致的性能退化。
+- **尾插法**：扩容时保持链表顺序，避免环形链表。
+- **高位掩码优化扩容**：减少哈希重计算开销。
 
-**2、`treeifyBin` 方法中判断是否真的转换为红黑树。**
+**PUT 流程源码**
 
-```
-final void treeifyBin(Node<K,V>[] tab, int hash) {
-    int n, index; Node<K,V> e;
-    // 判断当前数组的长度是否小于 64
-    if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY)
-        // 如果当前数组的长度小于 64，那么会选择先进行数组扩容
-        resize();
-    else if ((e = tab[index = (n - 1) & hash]) != null) {
-        // 否则才将列表转换为红黑树
-
-        TreeNode<K,V> hd = null, tl = null;
-        do {
-            TreeNode<K,V> p = replacementTreeNode(e, null);
-            if (tl == null)
-                hd = p;
-            else {
-                p.prev = tl;
-                tl.next = p;
-            }
-            tl = p;
-        } while ((e = e.next) != null);
-        if ((tab[index] = hd) != null)
-            hd.treeify(tab);
-    }
-}
-```
-
-将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树。
-
-### HashMap 的长度为什么是 2 的幂次方
-
-为了能让 HashMap 存取高效，尽量较少碰撞，也就是要尽量把数据分配均匀。我们上面也讲到了过了，Hash 值的范围值-2147483648 到 2147483647，前后加起来大概 40 亿的映射空间，只要哈希函数映射得比较均匀松散，一般应用是很难出现碰撞的。但问题是一个 40 亿长度的数组，内存是放不下的。所以这个散列值是不能直接拿来用的。用之前还要先做对数组的长度取模运算，得到的余数才能用来要存放的位置也就是对应的数组下标。
-
-**这个算法应该如何设计呢？**
-
-我们首先可能会想到采用 % 取余的操作来实现。但是，重点来了：“**取余 (%) 操作中如果除数是 2 的幂次则等价于与其除数减一的与 (&) 操作**（也就是说 hash%length==hash&(length-1) 的前提是 length 是 2 的 n 次方；）。” 并且 **采用二进制位操作 & 相对于 % 能够提高运算效率**，这就解释了 HashMap 的长度为什么是 2 的幂次方。
-
-### HashMap 多线程操作导致死循环问题
-
-JDK1.7 及之前版本的 `HashMap` 在多线程环境下扩容操作可能存在死循环问题，这是由于当一个桶位中有多个元素需要进行扩容时，多个线程同时对链表进行操作，头插法可能会导致链表中的节点指向错误的位置，从而形成一个环形链表，进而使得查询元素的操作陷入死循环无法结束。
-
-为了解决这个问题，JDK1.8 版本的 HashMap 采用了尾插法而不是头插法来避免链表倒置，使得插入的节点永远都是放在链表的末尾，避免了链表中的环形结构。但是还是不建议在多线程下使用 `HashMap`，因为多线程下使用 `HashMap` 还是会存在数据覆盖的问题。并发环境下，推荐使用 `ConcurrentHashMap` 。
-
-一般面试中这样介绍就差不多，不需要记各种细节，个人觉得也没必要记。如果想要详细了解 `HashMap` 扩容导致死循环问题，可以看看耗子叔的这篇文章：[Java HashMap 的死循环](https://coolshell.cn/articles/9606.html)。
-
-### HashMap 为什么线程不安全？
-
-JDK1.7 及之前版本，在多线程环境下，`HashMap` 扩容时会造成死循环和数据丢失的问题。
-
-数据丢失这个在 JDK1.7 和 JDK 1.8 中都存在，这里以 JDK 1.8 为例进行介绍。
-
-JDK 1.8 后，在 `HashMap` 中，多个键值对可能会被分配到同一个桶（bucket），并以链表或红黑树的形式存储。多个线程对 `HashMap` 的 `put` 操作会导致线程不安全，具体来说会有数据覆盖的风险。
-
-举个例子：
-
-- 两个线程 1,2 同时进行 put 操作，并且发生了哈希冲突（hash 函数计算出的插入下标是相同的）。
-- 不同的线程可能在不同的时间片获得 CPU 执行的机会，当前线程 1 执行完哈希冲突判断后，由于时间片耗尽挂起。线程 2 先完成了插入操作。
-- 随后，线程 1 获得时间片，由于之前已经进行过 hash 碰撞的判断，所有此时会直接进行插入，这就导致线程 2 插入的数据被线程 1 覆盖了。
-
-```
-public V put(K key, V value) {
-    return putVal(hash(key), key, value, false, true);
-}
-
-final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
-                   boolean evict) {
-    // ...
-    // 判断是否出现 hash 碰撞
-    // (n - 1) & hash 确定元素存放在哪个桶中，桶为空，新生成结点放入桶中（此时，这个结点是放在数组中）
+```java
+final V putVal(int hash, K key, V value, boolean onlyIfAbsent) {
+    Node<K,V>[] tab; Node<K,V> p; int n, i;
+    // 1. 数组为空时初始化
+    if ((tab = table) == null || (n = tab.length) == 0)
+        n = (tab = resize()).length;
+    // 2. 计算索引，若桶为空直接插入
     if ((p = tab[i = (n - 1) & hash]) == null)
         tab[i] = newNode(hash, key, value, null);
-    // 桶中已经存在元素（处理 hash 冲突）
     else {
-    // ...
+        // 3. 处理哈希冲突（链表/红黑树）
+        // ...（省略冲突处理逻辑）
+    }
+    // 4. 检查扩容
+    if (++size > threshold) resize();
 }
 ```
 
-还有一种情况是这两个线程同时 `put` 操作导致 `size` 的值不正确，进而导致数据覆盖的问题：
+### 【困难】HashMap 为什么线程不安全？
 
-1. 线程 1 执行 `if(++size > threshold)` 判断时，假设获得 `size` 的值为 10，由于时间片耗尽挂起。
-2. 线程 2 也执行 `if(++size > threshold)` 判断，获得 `size` 的值也为 10，并将元素插入到该桶位中，并将 `size` 的值更新为 11。
-3. 随后，线程 1 获得时间片，它也将元素放入桶位中，并将 size 的值更新为 11。
-4. 线程 1、2 都执行了一次 `put` 操作，但是 `size` 的值只增加了 1，也就导致实际上只有一个元素被添加到了 `HashMap` 中。
+HashMap 在多线程环境下会出现：
 
-```
-public V put(K key, V value) {
-    return putVal(hash(key), key, value, false, true);
-}
+- **JDK 7**：死循环 + 数据丢失（头插法导致）。
+- **JDK 8+**：数据丢失 + 脏读（无死循环，但依然非线程安全）。
+- **替代方案**：高并发场景始终优先选择 `ConcurrentHashMap`。
 
-final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
-                   boolean evict) {
-    // ...
-    // 实际大小大于阈值则扩容
-    if (++size > threshold)
-        resize();
-    // 插入后回调
-    afterNodeInsertion(evict);
-    return null;
-}
-```
+**一句话**：HashMap 的线程不安全源于非原子操作和并发修改冲突，多线程环境下必须使用同步机制。
 
-### ConcurrentHashMap 和 Hashtable 的区别
+**（1）并发修改导致数据丢失**
 
-`ConcurrentHashMap` 和 `Hashtable` 的区别主要体现在实现线程安全的方式上不同。
+**问题场景（JDK 8+）**
 
-- **底层数据结构：** JDK1.7 的 `ConcurrentHashMap` 底层采用 **分段的数组+链表** 实现，JDK1.8 采用的数据结构跟 `HashMap1.8` 的结构一样，数组+链表/红黑二叉树。`Hashtable` 和 JDK1.8 之前的 `HashMap` 的底层数据结构类似都是采用 **数组+链表** 的形式，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的；
-- 实现线程安全的方式（重要）：
-  - 在 JDK1.7 的时候，`ConcurrentHashMap` 对整个桶数组进行了分割分段 (`Segment`，分段锁），每一把锁只锁容器其中一部分数据（下面有示意图），多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。
-  - 到了 JDK1.8 的时候，`ConcurrentHashMap` 已经摒弃了 `Segment` 的概念，而是直接用 `Node` 数组+链表+红黑树的数据结构来实现，并发控制使用 `synchronized` 和 CAS 来操作。（JDK1.6 以后 `synchronized` 锁做了很多优化） 整个看起来就像是优化过且线程安全的 `HashMap`，虽然在 JDK1.8 中还能看到 `Segment` 的数据结构，但是已经简化了属性，只是为了兼容旧版本；
-  - **`Hashtable`（同一把锁）** : 使用 `synchronized` 来保证线程安全，效率非常低下。当一个线程访问同步方法时，其他线程也访问同步方法，可能会进入阻塞或轮询状态，如使用 put 添加元素，另一个线程不能使用 put 添加元素，也不能使用 get，竞争会越来越激烈效率越低。
+- 两个线程同时执行 `put()`，计算出的 **桶索引相同**，且该位置为 `null`。
+- **预期**：两个键值对都成功插入。
+- **实际**：后一个线程的 `put` 可能覆盖前一个线程的写入，导致数据丢失。
 
-下面，我们再来看看两者底层数据结构的对比图。
+示例代码（伪并发）：
 
-**Hashtable** :
-
-[![Hashtable 的内部结构](https://camo.githubusercontent.com/944543a8d68c07837ae4e21d1109bf590808e261cb508bdc7a94f1e7f11d5864/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a646b312e375f686173686d61702e706e67)](https://camo.githubusercontent.com/944543a8d68c07837ae4e21d1109bf590808e261cb508bdc7a94f1e7f11d5864/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a646b312e375f686173686d61702e706e67)
-
-https://www.cnblogs.com/chengxiao/p/6842045.html%3E
-
-**JDK1.7 的 ConcurrentHashMap**：
-
-[![Java7 ConcurrentHashMap 存储结构](https://camo.githubusercontent.com/0645f636024f751eec39d72725429f531081e88caec417355d6b153c8b3362f8/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a617661375f636f6e63757272656e74686173686d61702e706e67)](https://camo.githubusercontent.com/0645f636024f751eec39d72725429f531081e88caec417355d6b153c8b3362f8/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a617661375f636f6e63757272656e74686173686d61702e706e67)
-
-`ConcurrentHashMap` 是由 `Segment` 数组结构和 `HashEntry` 数组结构组成。
-
-`Segment` 数组中的每个元素包含一个 `HashEntry` 数组，每个 `HashEntry` 数组属于链表结构。
-
-**JDK1.8 的 ConcurrentHashMap**：
-
-[![Java8 ConcurrentHashMap 存储结构](https://camo.githubusercontent.com/2a0628afc8c086f443e6c989246737ab99c88d774f376b05df2853ed7d48dffe/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a617661385f636f6e63757272656e74686173686d61702e706e67)](https://camo.githubusercontent.com/2a0628afc8c086f443e6c989246737ab99c88d774f376b05df2853ed7d48dffe/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a617661385f636f6e63757272656e74686173686d61702e706e67)
-
-JDK1.8 的 `ConcurrentHashMap` 不再是 **Segment 数组 + HashEntry 数组 + 链表**，而是 **Node 数组 + 链表 / 红黑树**。不过，Node 只能用于链表的情况，红黑树的情况需要使用 **`TreeNode`**。当冲突链表达到一定长度时，链表会转换成红黑树。
-
-`TreeNode`是存储红黑树节点，被`TreeBin`包装。`TreeBin`通过`root`属性维护红黑树的根结点，因为红黑树在旋转的时候，根结点可能会被它原来的子节点替换掉，在这个时间点，如果有其他线程要写这棵红黑树就会发生线程不安全问题，所以在 `ConcurrentHashMap` 中`TreeBin`通过`waiter`属性维护当前使用这棵红黑树的线程，来防止其他线程的进入。
-
-```
-static final class TreeBin<K,V> extends Node<K,V> {
-        TreeNode<K,V> root;
-        volatile TreeNode<K,V> first;
-        volatile Thread waiter;
-        volatile int lockState;
-        // values for lockState
-        static final int WRITER = 1; // set while holding write lock
-        static final int WAITER = 2; // set when waiting for write lock
-        static final int READER = 4; // increment value for setting read lock
-...
+```java
+// 线程 1 和线程 2 同时执行：
+if ((p = tab[i = (n - 1) & hash]) == null) {
+    tab[i] = newNode(hash, key, value, null); // 可能被覆盖
 }
 ```
 
-### ConcurrentHashMap 线程安全的具体实现方式/底层具体实现
+**（2）JDK 7 扩容死循环问题**
 
-#### JDK1.8 之前
+**问题原因（仅 JDK 7）**
 
-[![Java7 ConcurrentHashMap 存储结构](https://camo.githubusercontent.com/0645f636024f751eec39d72725429f531081e88caec417355d6b153c8b3362f8/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a617661375f636f6e63757272656e74686173686d61702e706e67)](https://camo.githubusercontent.com/0645f636024f751eec39d72725429f531081e88caec417355d6b153c8b3362f8/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a617661375f636f6e63757272656e74686173686d61702e706e67)
+- 扩容时采用 **头插法** 迁移链表，多线程并发可能导致 **环形链表**。
+- 后续调用 `get()` 或 `put()` 时，遍历链表进入死循环（CPU 100%）。
 
-首先将数据分为一段一段（这个“段”就是 `Segment`）的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据时，其他段的数据也能被其他线程访问。
-
-**`ConcurrentHashMap` 是由 `Segment` 数组结构和 `HashEntry` 数组结构组成**。
-
-`Segment` 继承了 `ReentrantLock`, 所以 `Segment` 是一种可重入锁，扮演锁的角色。`HashEntry` 用于存储键值对数据。
+示意图：
 
 ```
-static class Segment<K,V> extends ReentrantLock implements Serializable {
+线程 1：A -> B → null
+线程 2：B -> A → null
+最终：A ⇄ B（环形链表）
+```
+
+**（3）并发扩容导致数据错乱**
+
+多个线程同时触发 `resize()`，可能导致：
+
+- **部分节点丢失**（未正确迁移到新数组）。
+- **链表断裂**（节点 `next` 指针被错误修改）。
+
+**（4）非原子操作导致脏读**
+
+`size++`、`modCount++` 等操作非原子性，可能导致：
+
+- `size` 不准确（影响扩容判断）。
+- 迭代时触发 `ConcurrentModificationException`（快速失败机制）。
+
+**解决方案**
+
+| **问题**        | **解决方案**                             |
+| --------------- | ---------------------------------------- |
+| 数据丢失/覆盖   | 使用 `ConcurrentHashMap`（CAS + 分段锁） |
+| 死循环（JDK 7） | 升级到 JDK 8+（改用尾插法）              |
+| 脏读            | 用 `Collections.synchronizedMap()` 包装  |
+
+### 【中等】WeakHashMap 有什么用？
+
+`WeakHashMap` 通过弱引用键实现自动清理，适合管理临时性、生命周期与键对象绑定的数据，但需注意值对象的引用管理和线程安全问题。
+
+**基于弱引用的键（Key）管理**
+
+- **键是弱引用**：当 `WeakHashMap` 的键（Key）不再被其他强引用指向时，该键值对会被垃圾回收器自动回收，避免内存泄漏。
+- **适用场景**：适合存储与对象生命周期相关的临时数据（如缓存），当键对象外部不再使用时，自动清理对应条目。
+
+**自动清理无引用键值对**
+
+- **依赖垃圾回收机制**：当键对象仅被 `WeakHashMap` 弱引用时，GC 会回收该键，并移除对应的键值对（通过内部 `ReferenceQueue` 机制触发清理）。
+- **无需手动移除**：与普通 `HashMap` 不同，无需显式调用 `remove()` 方法避免内存泄漏。
+
+**典型应用场景**
+
+- **缓存系统**：缓存数据时，若缓存键（如临时对象）不再使用，自动释放对应值（如大对象），防止内存堆积。
+- **监听器/元数据存储**：存储对象的附加信息，当对象销毁时，关联数据自动清除。
+
+**注意事项**
+
+- **值（Value）不是弱引用**：仅键是弱引用，值仍可能因强引用导致内存泄漏（需确保值未在其他地方被强引用）。
+- **非线程安全**：需外部同步（如使用 `Collections.synchronizedMap`）。
+- **不可预测的清理时机**：依赖 GC 运行，条目移除时机不确定。
+
+**示例代码**
+
+```java
+WeakHashMap<Object, String> weakMap = new WeakHashMap<>();
+Object key = new Object();
+weakMap.put(key, "Value");
+
+// 当 key 的强引用置为 null，且发生 GC 后，weakMap 中的条目会被自动移除
+key = null;
+System.gc(); // 仅示例，实际中不推荐显式调用 GC
+
+// 此时 weakMap 可能已为空（条目被回收）
+```
+
+### 【中等】ConcurrentHashMap 和 Hashtable 有什么区别？
+
+- **优先使用 `ConcurrentHashMap`**：适用于现代高并发程序，性能更优。
+- **避免 `Hashtable`**：除非维护历史代码，否则建议替换为 `ConcurrentHashMap` 或 `Collections.synchronizedMap()`（非高并发场景）。
+
+以下是 **ConcurrentHashMap 和 Hashtable 的区别对比表格**，清晰展示核心差异：
+
+| **对比项**       | **Hashtable**                                          | **ConcurrentHashMap**                                   |
+| ---------------- | ------------------------------------------------------ | ------------------------------------------------------- |
+| **线程安全实现** | 全表锁（`synchronized` 方法）                          | **分段锁（JDK7）** 或 **CAS + `synchronized`（JDK8+）** |
+| **并发性能**     | 低（串行化操作，高并发时阻塞严重）                     | 高（读写并发优化，锁粒度更细）                          |
+| **Null 支持**    | **不允许** `null` 键或值（抛出异常）                   | **不允许** `null` 键或值（避免并发歧义）                |
+| **迭代器行为**   | 强一致性（修改会抛 `ConcurrentModificationException`） | 弱一致性（可能部分反映修改，不抛异常）                  |
+| **版本与演进**   | JDK1.0 遗留类，已过时                                  | JDK1.5 引入，持续优化（如 JDK8 改用 CAS）               |
+| **适用场景**     | 旧代码兼容（不推荐新项目使用）                         | **高并发首选**（缓存、计数器等场景）                    |
+
+### 【困难】ConcurrentHashMap 的底层实现原理是什么？
+
+`ConcurrentHashMap` 是 Java 并发编程中最常用的线程安全 `Map`，其底层实现经历了 **JDK7（分段锁）** 和 **JDK8+（CAS + `synchronized` 优化）** 两个重要阶段。以下是核心实现原理：
+
+::: info JDK7 中，`ConcurrentHashMap` 的实现原理是什么？
+:::
+
+JDK7 中，`ConcurrentHashMap` 的核心实现思想是：将整个哈希表分成多个 `Segment`（默认 16 个），每个 `Segment` 是一个独立的 `HashEntry` 数组，**锁粒度细化到`Segment` 级别**，不同 `Segment` 可并发操作。
+
+**数据结构**
+
+```java
+ConcurrentHashMap
+  ├── Segment[]（默认 16 个，每个 Segment 继承 ReentrantLock）
+  │    └── HashEntry[]（链表结构，存储键值对）
+  └── 全局的并发控制参数（如 loadFactor）
+```
+
+**关键特点**
+
+- **锁分段（Segment Locking）**
+  - 写操作仅锁对应的 `Segment`，其他 `Segment` 仍可并发访问。
+  - 读操作无锁（`HashEntry` 的 `value` 用 `volatile` 修饰，保证可见性）。
+- **并发度（Concurrency Level）**
+  - 默认 16 个 `Segment`，即最多支持 16 个线程并发写。
+
+**缺点**
+
+- 内存占用较高（每个 `Segment` 独立维护数组）。
+- 查询时需要两次哈希计算（先定位 `Segment`，再定位 `HashEntry`）。
+
+::: info JDK8 中，`ConcurrentHashMap` 的实现原理是什么？
+:::
+
+JDK8 中，`ConcurrentHashMap` 的核心实现思想是：抛弃 `Segment`，改用 **`Node` 数组 + 链表/红黑树**，锁粒度细化到 **单个桶（链表头节点）**，并引入 **CAS（无锁化）** 和 `synchronized` 结合的方式提升并发性能。
+
+**数据结构**
+
+```java
+ConcurrentHashMap
+  ├── Node[] table（数组 + 链表/红黑树）
+  │    ├── Node（普通链表节点）
+  │    └── TreeBin（红黑树封装，维护平衡）
+  └── volatile 变量（如 sizeCtl，控制扩容）
+```
+
+**关键优化**
+
+- **锁粒度更细（桶级别锁）**
+
+  - 写操作仅锁当前桶（链表头节点），其他桶仍可并发访问。
+  - 读操作完全无锁（`Node` 的 `value` 和 `next` 用 `volatile` 修饰）。
+
+- **CAS + `synchronized` 结合**
+
+  - **插入数据**：先尝试 CAS 无锁插入，失败后 `synchronized` 锁住头节点。
+  - **扩容**：支持多线程协同扩容（通过 `sizeCtl` 标志位控制）。
+
+- **链表转红黑树（优化查询）**
+
+  - 当链表长度 ≥ 8 且数组长度 ≥ 64 时，链表转为红黑树（`TreeBin`），防止哈希冲突导致性能退化。
+
+- **更高效的计算方式**
+  - 使用 `spread()` 方法优化哈希计算，减少冲突。
+  - `size()` 方法通过 `CounterCell` 分段统计，避免全局锁。
+
+::: info JDK8 中，`ConcurrentHashMap` 关键操作流程是怎样的？
+:::
+
+**（1）PUT 操作（JDK8）**
+
+1. 计算 `key` 的哈希，定位到桶（数组下标）。
+2. 如果桶为空，**CAS 插入新节点**（无锁化）。
+3. 如果桶不为空，`synchronized` 锁住头节点，处理链表或红黑树插入。
+4. 如果链表长度 ≥ 8，尝试转红黑树。
+
+**（2）GET 操作（完全无锁）**
+
+1. 计算 `key` 的哈希，定位到桶。
+2. 遍历链表或红黑树（依赖 `volatile` 保证可见性）。
+
+**（3）扩容（多线程协同）**
+
+1. 当元素数量超过阈值（`sizeCtl`），触发扩容。
+2. 其他线程检测到扩容时，可协助迁移数据（`transfer` 方法）。
+
+::: info `ConcurrentHashMap` 在 JDK7 和 JDK8 中的实现有哪些差异？
+:::
+
+| **对比项**       | **JDK7（分段锁）**            | **JDK8+（CAS + `synchronized`）** |
+| ---------------- | ----------------------------- | --------------------------------- |
+| **锁粒度**       | Segment 级别（粗粒度）        | 桶级别（更细粒度）                |
+| **并发度**       | 固定 16 个 Segment            | 动态调整，更高并发                |
+| **内存占用**     | 较高（每个 Segment 维护数组） | 更低（单层 Node 数组）            |
+| **哈希冲突处理** | 链表                          | 链表 + 红黑树（优化查询）         |
+| **扩容机制**     | 单 Segment 扩容               | 多线程协同扩容                    |
+
+**小结**
+
+**JDK7**：分段锁降低冲突，但并发度固定，内存开销大。
+
+**JDK8+**：
+
+- 更细粒度的锁（桶级别），CAS 无锁化优化。
+- 红黑树优化极端哈希冲突场景。
+- 多线程协同扩容，提升性能。
+
+**适用场景**：高并发读写（如缓存、计数器），是 `Hashtable` 和 `Collections.synchronizedMap()` 的现代替代方案。
+
+### 【中等】ConcurrentHashMap 为什么 key 和 value 不能为 null？
+
+`ConcurrentHashMap` 在设计上明确禁止 `null` 作为 **key** 或 **value**，而普通的 `HashMap` 是允许的。
+
+**`ConcurrentHashMap` 禁止 `null` 是为了避免并发场景下的二义性问题**。
+
+- **替代方案**：使用特殊标记（如 `Optional`）或额外方法（如 `containsKey()`）明确语义。
+- **设计一致性**：延续 `Hashtable` 的严格约束，确保线程安全行为的清晰性。
+
+如果业务必须使用 `null`，可以考虑：
+
+- 使用 `HashMap` + 外部同步（如 `synchronized`）。
+- 用 `Optional` 或自定义空对象代替 `null`。
+
+`ConcurrentHashMap` 禁止 `null` 的详细原因如下：
+
+**（1）并发场景下的歧义问题（核心原因）**
+
+`ConcurrentHashMap` 是线程安全的，但在高并发环境下，`null` 值会导致 **二义性（Ambiguity）**，无法区分：
+
+- **Key 不存在**（返回 `null`）。
+- **Key 存在，但 Value 本身就是 `null`**。
+
+示例场景：
+
+```java
+ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
+map.get("non_existent_key");  // 返回 null（表示 key 不存在）
+map.put("key", null);        // 如果允许，这里存储 null 值
+map.get("key");              // 仍然返回 null，无法区分是 "key 不存在" 还是 "value 是 null"
+```
+
+**问题**：在并发环境下，这种歧义会导致业务逻辑错误（比如缓存系统无法判断数据是否有效）。
+
+**（2）`HashMap` 为什么允许 `null`？**
+
+`HashMap` 是单线程使用的，开发者可以自行约束 `null` 的使用逻辑，例如：
+
+```java
+if (map.get(key) == null) {
+    // 明确知道是 key 不存在，或者 value 是 null（需业务逻辑保证）
 }
 ```
 
-一个 `ConcurrentHashMap` 里包含一个 `Segment` 数组，`Segment` 的个数一旦**初始化就不能改变**。 `Segment` 数组的大小默认是 16，也就是说默认可以同时支持 16 个线程并发写。
+但在并发环境下，这种约束不可靠，因为其他线程可能同时修改数据。
 
-`Segment` 的结构和 `HashMap` 类似，是一种数组和链表结构，一个 `Segment` 包含一个 `HashEntry` 数组，每个 `HashEntry` 是一个链表结构的元素，每个 `Segment` 守护着一个 `HashEntry` 数组里的元素，当对 `HashEntry` 数组的数据进行修改时，必须首先获得对应的 `Segment` 的锁。也就是说，对同一 `Segment` 的并发写入会被阻塞，不同 `Segment` 的写入是可以并发执行的。
+**（3）`ConcurrentHashMap` 的设计哲学**
 
-#### JDK1.8 之后
+为了保证 **线程安全** 和 **明确语义**，`ConcurrentHashMap` 直接禁止 `null`，强制开发者：
 
-[![Java8 ConcurrentHashMap 存储结构](https://camo.githubusercontent.com/2a0628afc8c086f443e6c989246737ab99c88d774f376b05df2853ed7d48dffe/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a617661385f636f6e63757272656e74686173686d61702e706e67)](https://camo.githubusercontent.com/2a0628afc8c086f443e6c989246737ab99c88d774f376b05df2853ed7d48dffe/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6c6c656374696f6e2f6a617661385f636f6e63757272656e74686173686d61702e706e67)
+- **用特殊占位符（如 `Optional.empty()`）代替 `null`**。
+- **显式处理 `key` 不存在的情况**（如 `containsKey()` 检查）。
 
-Java 8 几乎完全重写了 `ConcurrentHashMap`，代码量从原来 Java 7 中的 1000 多行，变成了现在的 6000 多行。
+替代方案示例：
 
-`ConcurrentHashMap` 取消了 `Segment` 分段锁，采用 `Node + CAS + synchronized` 来保证并发安全。数据结构跟 `HashMap` 1.8 的结构类似，数组+链表/红黑二叉树。Java 8 在链表长度超过一定阈值（8）时将链表（寻址时间复杂度为 O(N)）转换为红黑树（寻址时间复杂度为 O(log(N))）。
-
-Java 8 中，锁粒度更细，`synchronized` 只锁定当前链表或红黑二叉树的首节点，这样只要 hash 不冲突，就不会产生并发，就不会影响其他 Node 的读写，效率大幅提升。
-
-### JDK 1.7 和 JDK 1.8 的 ConcurrentHashMap 实现有什么不同？
-
-- **线程安全实现方式**：JDK 1.7 采用 `Segment` 分段锁来保证安全， `Segment` 是继承自 `ReentrantLock`。JDK1.8 放弃了 `Segment` 分段锁的设计，采用 `Node + CAS + synchronized` 保证线程安全，锁粒度更细，`synchronized` 只锁定当前链表或红黑二叉树的首节点。
-- **Hash 碰撞解决方法** : JDK 1.7 采用拉链法，JDK1.8 采用拉链法结合红黑树（链表长度超过一定阈值时，将链表转换为红黑树）。
-- **并发度**：JDK 1.7 最大并发度是 Segment 的个数，默认是 16。JDK 1.8 最大并发度是 Node 数组的大小，并发度更大。
-
-### ConcurrentHashMap 为什么 key 和 value 不能为 null？
-
-`ConcurrentHashMap` 的 key 和 value 不能为 null 主要是为了避免二义性。null 是一个特殊的值，表示没有对象或没有引用。如果你用 null 作为键，那么你就无法区分这个键是否存在于 `ConcurrentHashMap` 中，还是根本没有这个键。同样，如果你用 null 作为值，那么你就无法区分这个值是否是真正存储在 `ConcurrentHashMap` 中的，还是因为找不到对应的键而返回的。
-
-拿 get 方法取值来说，返回的结果为 null 存在两种情况：
-
-- 值没有在集合中 ；
-- 值本身就是 null。
-
-这也就是二义性的由来。
-
-具体可以参考 [ConcurrentHashMap 源码分析](https://javaguide.cn/java/collection/concurrent-hash-map-source-code.html) 。
-
-多线程环境下，存在一个线程操作该 `ConcurrentHashMap` 时，其他的线程将该 `ConcurrentHashMap` 修改的情况，所以无法通过 `containsKey(key)` 来判断否存在这个键值对，也就没办法解决二义性问题了。
-
-与此形成对比的是，`HashMap` 可以存储 null 的 key 和 value，但 null 作为键只能有一个，null 作为值可以有多个。如果传入 null 作为参数，就会返回 hash 值为 0 的位置的值。单线程环境下，不存在一个线程操作该 HashMap 时，其他的线程将该 `HashMap` 修改的情况，所以可以通过 `contains(key)`来做判断是否存在这个键值对，从而做相应的处理，也就不存在二义性问题。
-
-也就是说，多线程下无法正确判定键值对是否存在（存在其他线程修改的情况），单线程是可以的（不存在其他线程修改的情况）。
-
-如果你确实需要在 ConcurrentHashMap 中使用 null 的话，可以使用一个特殊的静态空对象来代替 null。
-
-```
-public static final Object NULL = new Object();
-```
-
-最后，再分享一下 `ConcurrentHashMap` 作者本人 (Doug Lea) 对于这个问题的回答：
-
-> The main reason that nulls aren't allowed in ConcurrentMaps (ConcurrentHashMaps, ConcurrentSkipListMaps) is that ambiguities that may be just barely tolerable in non-concurrent maps can't be accommodated. The main one is that if `map.get(key)` returns `null`, you can't detect whether the key explicitly maps to `null` vs the key isn't mapped. In a non-concurrent map, you can check this via `map.contains(key)`, but in a concurrent one, the map might have changed between calls.
-
-翻译过来之后的，大致意思还是单线程下可以容忍歧义，而多线程下无法容忍。
-
-### ConcurrentHashMap 能保证复合操作的原子性吗？
-
-`ConcurrentHashMap` 是线程安全的，意味着它可以保证多个线程同时对它进行读写操作时，不会出现数据不一致的情况，也不会导致 JDK1.7 及之前版本的 `HashMap` 多线程操作导致死循环问题。但是，这并不意味着它可以保证所有的复合操作都是原子性的，一定不要搞混了！
-
-复合操作是指由多个基本操作（如`put`、`get`、`remove`、`containsKey`等）组成的操作，例如先判断某个键是否存在`containsKey(key)`，然后根据结果进行插入或更新`put(key, value)`。这种操作在执行过程中可能会被其他线程打断，导致结果不符合预期。
-
-例如，有两个线程 A 和 B 同时对 `ConcurrentHashMap` 进行复合操作，如下：
-
-```
-// 线程 A
-if (!map.containsKey(key)) {
-map.put(key, value);
-}
-// 线程 B
-if (!map.containsKey(key)) {
-map.put(key, anotherValue);
+```java
+ConcurrentHashMap<String, Optional<String>> map = new ConcurrentHashMap<>();
+map.put("key", Optional.empty());  // 用 Optional 表示空值
+if (!map.containsKey("key")) {
+    // key 不存在
+} else {
+    Optional<String> value = map.get("key");
+    if (value.isEmpty()) {
+        // value 是 "逻辑上的 null"
+    }
 }
 ```
 
-如果线程 A 和 B 的执行顺序是这样：
+**（4）历史原因（兼容性）**
 
-1. 线程 A 判断 map 中不存在 key
-2. 线程 B 判断 map 中不存在 key
-3. 线程 B 将 (key, anotherValue) 插入 map
-4. 线程 A 将 (key, value) 插入 map
+- `Hashtable`（早期线程安全 `Map`）也不允许 `null`，`ConcurrentHashMap` 延续了这一设计。
+- 如果允许 `null`，会导致从 `Hashtable` 迁移到 `ConcurrentHashMap` 时出现兼容性问题。
 
-那么最终的结果是 (key, value)，而不是预期的 (key, anotherValue)。这就是复合操作的非原子性导致的问题。
+（5）对比其他 Map
 
-**那如何保证 `ConcurrentHashMap` 复合操作的原子性呢？**
+| **Map 类型**                  | **允许 `null` Key** | **允许 `null` Value** | **原因**                      |
+| ----------------------------- | ------------------- | --------------------- | ----------------------------- |
+| `HashMap`                     | ✅ 是               | ✅ 是                 | 单线程使用，无并发歧义        |
+| `Hashtable`                   | ❌ 否               | ❌ 否                 | 线程安全，避免歧义            |
+| `ConcurrentHashMap`           | ❌ 否               | ❌ 否                 | 并发安全，避免歧义            |
+| `Collections.synchronizedMap` | 取决于底层 Map      | 取决于底层 Map        | 包装类，行为与被包装 Map 一致 |
 
-`ConcurrentHashMap` 提供了一些原子性的复合操作，如 `putIfAbsent`、`compute`、`computeIfAbsent` 、`computeIfPresent`、`merge`等。这些方法都可以接受一个函数作为参数，根据给定的 key 和 value 来计算一个新的 value，并且将其更新到 map 中。
+### 【中等】ConcurrentHashMap 能保证复合操作的原子性吗？
 
-上面的代码可以改写为：
+**ConcurrentHashMap 不能保证复合操作的原子性**，尽管它本身提供了高并发性能和线程安全的单个操作。
 
-```
-// 线程 A
-map.putIfAbsent(key, value);
-// 线程 B
-map.putIfAbsent(key, anotherValue);
-```
+**说明如下**：
 
-或者：
+**单个操作的原子性**：
 
-```
-// 线程 A
-map.computeIfAbsent(key, k -> value);
-// 线程 B
-map.computeIfAbsent(key, k -> anotherValue);
-```
+- `put()`, `get()`, `remove()` 等单个操作是线程安全的
+- 这些操作在内部使用分段锁或 CAS 操作保证原子性
 
-很多同学可能会说了，这种情况也能加锁同步呀！确实可以，但不建议使用加锁的同步机制，违背了使用 `ConcurrentHashMap` 的初衷。在使用 `ConcurrentHashMap` 的时候，尽量使用这些原子性的复合操作方法来保证原子性。
+**复合操作的非原子性**：
 
-## Collections 工具类（不重要）
+像【检查然后执行（check-then-act）】这样的复合操作不是原子的。例如：`if (!map.containsKey(key)) { map.put(key, value); }`，在检查和方法调用之间，其他线程可能已经修改了 `map`。
 
-**`Collections` 工具类常用方法**:
+**解决方案**：
 
-- 排序
-- 查找，替换操作
-- 同步控制（不推荐，需要线程安全的集合类型时请考虑使用 JUC 包下的并发集合）
+- 使用 `putIfAbsent()`, `computeIfAbsent()`, `computeIfPresent()` 等原子性复合方法
+- 使用显式同步（但会降低并发性能）
+- 使用 `compute()` 方法原子性地更新值
 
-### 排序操作
+示例：
 
-```
-void reverse(List list)//反转
-void shuffle(List list)//随机排序
-void sort(List list)//按自然排序的升序排序
-void sort(List list, Comparator c)//定制排序，由 Comparator 控制排序逻辑
-void swap(List list, int i , int j)//交换两个索引位置的元素
-void rotate(List list, int distance)//旋转。当 distance 为正数时，将 list 后 distance 个元素整体移到前面。当 distance 为负数时，将 list 的前 distance 个元素整体移到后面
-```
+```java
+ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
 
-### 查找，替换操作
+// 非原子性复合操作 - 不安全
+if (!map.containsKey("key")) {
+    map.put("key", 1);  // 可能有竞态条件
+}
 
-```
-int binarySearch(List list, Object key)//对 List 进行二分查找，返回索引，注意 List 必须是有序的
-int max(Collection coll)//根据元素的自然顺序，返回最大的元素。 类比 int min(Collection coll)
-int max(Collection coll, Comparator c)//根据定制排序，返回最大元素，排序规则由 Comparatator 类控制。类比 int min(Collection coll, Comparator c)
-void fill(List list, Object obj)//用指定的元素代替指定 list 中的所有元素
-int frequency(Collection c, Object o)//统计元素出现次数
-int indexOfSubList(List list, List target)//统计 target 在 list 中第一次出现的索引，找不到则返回-1，类比 int lastIndexOfSubList(List source, list target)
-boolean replaceAll(List list, Object oldVal, Object newVal)//用新元素替换旧元素
+// 原子性替代方案
+map.putIfAbsent("key", 1);
+
+// 或者使用 computeIfAbsent
+map.computeIfAbsent("key", k -> 1);
 ```
 
-### 同步控制
-
-`Collections` 提供了多个`synchronizedXxx()`方法·，该方法可以将指定集合包装成线程同步的集合，从而解决多线程并发访问集合时的线程安全问题。
-
-我们知道 `HashSet`，`TreeSet`，`ArrayList`,`LinkedList`,`HashMap`,`TreeMap` 都是线程不安全的。`Collections` 提供了多个静态方法可以把他们包装成线程同步的集合。
-
-**最好不要用下面这些方法，效率非常低，需要线程安全的集合类型时请考虑使用 JUC 包下的并发集合。**
-
-方法如下：
-
-```
-synchronizedCollection(Collection<T>  c) //返回指定 collection 支持的同步（线程安全的）collection。
-synchronizedList(List<T> list)//返回指定列表支持的同步（线程安全的）List。
-synchronizedMap(Map<K,V> m) //返回由指定映射支持的同步（线程安全的）Map。
-synchronizedSet(Set<T> s) //返回指定 set 支持的同步（线程安全的）set。
-```
+总结：ConcurrentHashMap 只保证单个方法的原子性，复合操作需要特别处理才能保证线程安全。

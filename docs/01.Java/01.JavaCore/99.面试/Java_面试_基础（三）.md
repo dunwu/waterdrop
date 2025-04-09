@@ -15,7 +15,7 @@ permalink: /pages/2fad4724/
 
 # Java 基础面试三
 
-## 泛型
+## Java 泛型
 
 ### 【中等】Java 泛型的作用是什么？
 
@@ -192,14 +192,14 @@ void addNumbers(List<? super Integer> list) {
 | 泛型数组创建（`new T[]`）                                                | 使用 `Object[]` 转换或反射（`Array.newInstance`） |
 | 方法重载冲突（如 `void foo(List<String>)` 和 `void foo(List<Integer>)`） | 编译报错（擦除后方法签名相同）                    |
 
-## 反射
+## Java 反射
 
 ### 【简单】什么是反射？反射有什么作用？
 
 **反射（Reflection）是 Java 提供的动态机制**，允许程序在**运行时**：
 
-- **获取类的信息**（类名、方法、字段、注解等） 
-- **操作类的成员**（调用方法、访问/修改字段、创建对象等） 
+- **获取类的信息**（类名、方法、字段、注解等）
+- **操作类的成员**（调用方法、访问/修改字段、创建对象等）
 - **绕过访问控制**（如调用私有方法）
 
 **反射核心类**：
@@ -326,13 +326,13 @@ Java 动态代理通过 `Proxy` 和 `InvocationHandler` 在运行时生成接口
 
 - **运行时生成**：代理类在运行时动态生成，无需手动编写。
 - **基于接口**：只能代理接口（不能代理普通类）。
-- **非侵入性**：无需修改原始代码即可增强功能。  
+- **非侵入性**：无需修改原始代码即可增强功能。
 
 **应用场景**
 
-- **AOP（面向切面编程）**：如日志、事务管理（Spring AOP 基于动态代理）。  
-- **远程方法调用（RPC）**：如 Dubbo 的消费者代理。  
-- **权限控制**：拦截方法调用检查权限。  
+- **AOP（面向切面编程）**：如日志、事务管理（Spring AOP 基于动态代理）。
+- **远程方法调用（RPC）**：如 Dubbo 的消费者代理。
+- **权限控制**：拦截方法调用检查权限。
 
 **动态代理 vs 静态代理**
 
@@ -344,13 +344,13 @@ Java 动态代理通过 `Proxy` 和 `InvocationHandler` 在运行时生成接口
 
 **局限性**
 
-- **仅支持接口代理**：不能代理普通类（CGLIB 可弥补此问题）。  
-- **性能开销**：反射调用比直接调用略慢（现代 JVM 已优化）。  
+- **仅支持接口代理**：不能代理普通类（CGLIB 可弥补此问题）。
+- **性能开销**：反射调用比直接调用略慢（现代 JVM 已优化）。
 
 **扩展：CGLIB 动态代理**
 
-- **原理**：通过字节码技术生成目标类的子类代理。  
-- **特点**：可代理普通类，但无法代理 `final` 类/方法。  
+- **原理**：通过字节码技术生成目标类的子类代理。
+- **特点**：可代理普通类，但无法代理 `final` 类/方法。
 
 ### 【中等】JDK 动态代理和 CGLIB 动态代理有什么区别？
 
@@ -436,18 +436,18 @@ UserService proxy = (UserService) enhancer.create();  // 生成子类对象
 **主流框架的选择**
 
 - **Spring AOP**：
-  - 默认使用 **JDK 动态代理**（如果目标有接口）  
-  - 无接口时自动切换为 **CGLIB**  
-  - 可通过 `@EnableAspectJAutoProxy(proxyTargetClass=true)` 强制使用 CGLIB  
-- **MyBatis**：Mapper 接口代理使用 **JDK 动态代理** 
+  - 默认使用 **JDK 动态代理**（如果目标有接口）
+  - 无接口时自动切换为 **CGLIB**
+  - 可通过 `@EnableAspectJAutoProxy(proxyTargetClass=true)` 强制使用 CGLIB
+- **MyBatis**：Mapper 接口代理使用 **JDK 动态代理**
 
 **一句话总结**
 
-- **JDK 动态代理**：基于接口，反射实现，轻量但功能有限。  
-- **CGLIB**：基于继承，字节码增强，功能强但有 `final` 限制。  
+- **JDK 动态代理**：基于接口，反射实现，轻量但功能有限。
+- **CGLIB**：基于继承，字节码增强，功能强但有 `final` 限制。
 - **选择依据**：目标是否有接口、性能需求、是否允许第三方依赖。
 
-## 注解
+## Java 注解
 
 ### 【中等】Java 中的注解原理是什么？
 
@@ -482,13 +482,14 @@ UserService proxy = (UserService) enhancer.create();  // 生成子类对象
 - **代码生成**：Lombok 的 `@Data`
 - **静态检查**：`@Nullable`、`@Deprecated`
 
-## SPI
+## Java SPI
 
-### 【中级】什么是 SPI，有什么用
+### 【中等】什么是 SPI，有什么用？
 
 SPI 通过`接口+配置文件`实现**运行时服务发现**，是解耦和扩展的利器，JDBC/日志等经典框架均基于此机制。
 
 SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**，实现：
+
 - **运行时动态加载实现类**
 - **解耦接口与实现**
 - **可插拔式扩展**
@@ -535,7 +536,7 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 - **Dubbo SPI**：增加按需加载、扩展点缓存等优化
 - **Spring Factories**：`META-INF/spring.factories`机制
 
-## 序列化
+## Java IO
 
 ### 【简单】什么是序列化？什么是反序列化？
 
@@ -561,17 +562,19 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 **关键注意事项**
 
 - **`serialVersionUID`**：显式声明版本号，避免反序列化失败
-  
+
   ```java
   private static final long serialVersionUID = 1L;
   ```
+
 - **敏感字段处理**：用`transient`跳过序列化
-  
+
   ```java
   private transient String password;  // 不会被序列化
   ```
+
 - **性能优化**：
-  
+
   - 避免序列化大对象
   - 第三方库（如Protobuf）比Java原生序列化更快
 
@@ -591,81 +594,416 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
   - 使用白名单控制反序列化类
   - 替换为JSON等文本协议
 
-## IO
+### 【中等】Java 提供了哪些 IO 方式？
 
-### Java 提供了哪些 IO 方式？
+Java 提供了多种 I/O（输入输出）方式，主要分为 **传统 I/O（BIO）、NIO（New I/O）、AIO（异步 I/O）** 三大类，并支持 **文件操作、网络通信、序列化** 等场景。以下是主要 I/O 方式的概述及要点：
 
-- **BIO** - 优点是代码比较简单、直观；缺点则是 IO 效率和扩展性存在局限性，容易成为应用性能的瓶颈。
-  - 传统的 java.io 包，它基于流模型实现，提供了我们最熟知的一些 IO 功能，如：字节流（InputStream/OutputStream）、字符流（Reader/Writer）、File、RandomAccessFile 等。交互方式是同步、阻塞的方式，也就是说，在读取输入流或者写入输出流时，在读、写动作完成之前，线程会一直阻塞在那里，它们之间的调用是可靠的线性顺序。
-  - 很多时候，人们也把 java.net 下面提供的部分网络 API，比如 Socket、ServerSocket、HttpURLConnection 也归类到同步阻塞 IO 类库，因为网络通信同样是 IO 行为。
-  - BufferedOutputStream 等带缓冲区的实现，可以避免频繁的磁盘读写，进而提高 IO 处理效率。这种设计利用了缓冲区，将批量数据进行一次操作，但在使用中千万别忘了 flush。
-  - 很多 IO 工具类都实现了 Closeable 接口，因为需要进行资源的释放。需要利用 try-with-resources、 try-finally 等机制保证资源被明确关闭，否则将导致资源无法被释放。
-- **NIO** - java.nio 包，提供了 Channel、Selector、Buffer 等新的抽象，可以构建多路复用的、同步非阻塞 IO 程序，同时提供了更接近操作系统底层的高性能数据操作方式。
-  - Buffer，高效的数据容器，除了布尔类型，所有原始数据类型都有相应的 Buffer 实现。
-  - Channel，类似在 Linux 之类操作系统上看到的文件描述符，是 NIO 中被用来支持批量式 IO 操作的一种抽象。
-    - File 或者 Socket，通常被认为是比较高层次的抽象，而 Channel 则是更加底层的一种抽象，这也使得 NIO 得以充分利用现代操作系统底层机制，获得特定场景的性能优化，例如，DMA（Direct Memory Access）等。不同层次的抽象是相互关联的，我们可以通过 Socket 获取 Channel，反之亦然。
-  - Selector，是 NIO 实现多路复用的基础，它提供了一种高效的机制，可以检测到注册在 Selector 上的多个 Channel 中，是否有 Channel 处于就绪状态，进而实现了单线程对多 Channel 的高效管理。Selector 同样是基于底层操作系统机制，不同模式、不同版本都存在区别。Linux 上依赖于 [epoll](http://hg.openjdk.java.net/jdk/jdk/file/d8327f838b88/src/java.base/linux/classes/sun/nio/ch/EPollSelectorImpl.java)，Windows 上 NIO2（AIO）模式则是依赖于 [iocp](http://hg.openjdk.java.net/jdk/jdk/file/d8327f838b88/src/java.base/windows/classes/sun/nio/ch/Iocp.java)。
-- **AIO** - 在 Java 7 中，NIO 有了进一步的改进，也就是 NIO 2，引入了异步非阻塞 IO 方式，也有很多人叫它 AIO（Asynchronous IO）。异步 IO 操作基于事件和回调机制，可以简单理解为，应用操作直接返回，而不会阻塞在那里，当后台处理完成，操作系统会通知相应线程进行后续工作。
+::: info 什么是 BIO？
 
-### NIO 如何实现多路复用？
+:::
+
+传统 I/O（BIO，Blocking I/O）是同步阻塞式 I/O，适用于连接数较少、延迟不敏感的场景。
+
+**核心类**：
+
+- **字节流**：`InputStream` / `OutputStream`（如 `FileInputStream`、`FileOutputStream`）
+- **字符流**：`Reader` / `Writer`（如 `FileReader`、`FileWriter`）
+- **缓冲流**：`BufferedReader`、`BufferedWriter`（提升性能）
+- **标准 I/O**：`System.in`（输入）、`System.out`（输出）
+
+**示例**：
 
 ```java
-    public class NIOServer extends Thread {
-        public void run() {
-            try (Selector selector = Selector.open();
-                 ServerSocketChannel serverSocket = ServerSocketChannel.open();) {// 创建 Selector 和 Channel
-                serverSocket.bind(new InetSocketAddress(InetAddress.getLocalHost(), 8888));
-                serverSocket.configureBlocking(false);
-                // 注册到 Selector，并说明关注点
-                serverSocket.register(selector, SelectionKey.OP_ACCEPT);
-                while (true) {
-                    selector.select();// 阻塞等待就绪的 Channel，这是关键点之一
-                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                    Iterator<SelectionKey> iter = selectedKeys.iterator();
-                    while (iter.hasNext()) {
-                        SelectionKey key = iter.next();
-                       // 生产系统中一般会额外进行就绪状态检查
-                        sayHelloWorld((ServerSocketChannel) key.channel());
-                        iter.remove();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        private void sayHelloWorld(ServerSocketChannel server) throws IOException {
-            try (SocketChannel client = server.accept();) {          client.write(Charset.defaultCharset().encode("Hello world!"));
-            }
-        }
-       // 省略了与前面类似的 main
+try (BufferedReader reader = new BufferedReader(new FileReader("file.txt"))) {
+    String line;
+    while ((line = reader.readLine()) != null) {
+        System.out.println(line);
     }
+}
 ```
 
-这个非常精简的样例掀开了 NIO 多路复用的流程
+**缺点**：每个连接需要独立的线程，高并发时资源消耗大。
 
-- 首先，通过 Selector.open() 创建一个 Selector，作为类似调度员的角色。
-- 然后，创建一个 ServerSocketChannel，并且向 Selector 注册，通过指定 SelectionKey.OP_ACCEPT，告诉调度员，它关注的是新的连接请求。
-  - **注意**，为什么我们要明确配置非阻塞模式呢？这是因为阻塞模式下，注册操作是不允许的，会抛出 IllegalBlockingModeException 异常。
-- Selector 阻塞在 select 操作，当有 Channel 发生接入请求，就会被唤醒。
-- 在 sayHelloWorld 方法中，通过 SocketChannel 和 Buffer 进行数据操作，在本例中是发送了一段字符串。
+::: info 什么是 NIO？
 
-## 语法糖
+:::
 
-### 什么是语法糖？
+NIO（New I/O，Non-blocking I/O）是同步非阻塞 I/O，基于 **通道（Channel）** 和 **缓冲区（Buffer）**，支持多路复用（Selector）。
+
+**核心类**：
+
+- **Buffer**：`ByteBuffer`、`CharBuffer`（数据存储）
+- **Channel**：`FileChannel`、`SocketChannel`、`ServerSocketChannel`（数据传输）
+- **Selector**：监听多个通道的事件（如连接、读、写）
+
+**示例（NIO 文件复制）**：
+
+```java
+try (FileChannel src = FileChannel.open(Paths.get("src.txt"));
+     FileChannel dest = FileChannel.open(Paths.get("dest.txt"), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+    src.transferTo(0, src.size(), dest);
+}
+```
+
+- **优点**：单线程可处理多个连接，适合高并发（如 Netty 框架底层）。
+- **缺点**：编程复杂度较高。
+
+::: info 什么是 AIO？
+
+:::
+
+AIO（Asynchronous I/O）是异步非阻塞 I/O，基于回调或 Future 机制，适用于高吞吐场景。
+
+**核心类**：
+
+- `AsynchronousFileChannel`（文件操作）
+- `AsynchronousSocketChannel`（网络通信）
+- `CompletionHandler`（回调接口）
+
+**示例（AIO 文件读取）**：
+
+```java
+AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(Paths.get("file.txt"));
+ByteBuffer buffer = ByteBuffer.allocate(1024);
+fileChannel.read(buffer, 0, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+    @Override
+    public void completed(Integer result, ByteBuffer attachment) {
+        System.out.println("Read " + result + " bytes");
+    }
+    @Override
+    public void failed(Throwable exc, ByteBuffer attachment) {
+        exc.printStackTrace();
+    }
+});
+```
+
+- **优点**：真正异步，适合长连接、高吞吐场景（如大文件传输）。
+- **缺点**：JDK 实现较少，Linux 支持有限（底层依赖 epoll）。
+
+::: info 有哪些常见的 IO 工具？
+
+:::
+
+- **序列化**：`ObjectInputStream` / `ObjectOutputStream`（Java 原生序列化）
+- **压缩流**：`GZIPInputStream`、`ZipOutputStream`
+- **内存映射文件**：`MappedByteBuffer`（NIO 高性能文件访问）
+- **Files 工具类**（Java 7+）：
+  ```java
+  Files.readAllLines(Paths.get("file.txt")); // 快速读取文件
+  ```
+
+::: info BIO vs. NIO vs. AIO？
+
+:::
+
+| 类型 | 模型       | 适用场景           | 典型框架          |
+| ---- | ---------- | ------------------ | ----------------- |
+| BIO  | 同步阻塞   | 低并发、简单 I/O   | Java Socket       |
+| NIO  | 同步非阻塞 | 高并发、网络通信   | Netty、Tomcat NIO |
+| AIO  | 异步非阻塞 | 高吞吐、大文件操作 | 较少使用          |
+
+**选择建议**：
+
+- **BIO**：简单文件操作或低并发场景。
+- **NIO**：高并发网络编程（如 Netty）。
+- **AIO**：需要真正异步 I/O 的场景（但实际使用较少）。
+
+如果需要更高层次的封装，可以考虑 **Apache Commons IO**、**Guava** 等工具库。
+
+### 【困难】NIO 如何实现多路复用？
+
+::: info Java NIO 的核心组件有哪些？
+
+:::
+
+Java NIO 多路复用的核心是通过 **Selector 轮询事件** + **非阻塞 Channel** + **Buffer 数据交换**，允许单线程管理多个通道的 I/O 操作。这是构建高性能网络应用的基础，也是 Netty 等框架的底层原理。
+
+**Java NIO 核心组件**
+
+- **Selector（选择器）**：核心多路复用器，可监控多个 `Channel` 的 I/O 事件（如连接、读、写）
+  - 通过 `Selector.open()` 创建
+  - 一个 `Selector` 可绑定多个 `Channel`
+- **Channel（通道）**：非阻塞 I/O 操作的抽象，支持读写。主要类型：
+  - `SocketChannel`：TCP 网络通信
+  - `ServerSocketChannel`：监听 TCP 连接
+  - `FileChannel`：文件 I/O（不支持 Selector）
+- **Buffer（缓冲区）**：数据容器（如 `ByteBuffer`），`Channel` 通过 `Buffer` 读写数据。
+
+::: info Java NIO 多路复用的实现步骤是怎样的？
+
+:::
+
+**多路复用实现步骤**
+
+**(1) 创建 Selector 并注册 Channel**
+
+```java
+Selector selector = Selector.open();
+ServerSocketChannel serverChannel = ServerSocketChannel.open();
+serverChannel.configureBlocking(false); // 必须设为非阻塞
+serverChannel.register(selector, SelectionKey.OP_ACCEPT); // 注册监听事件
+```
+
+**(2) 事件类型**
+
+- `SelectionKey.OP_ACCEPT`：接受连接（`ServerSocketChannel`）
+- `SelectionKey.OP_CONNECT`：连接就绪（`SocketChannel`）
+- `SelectionKey.OP_READ`：数据可读
+- `SelectionKey.OP_WRITE`：数据可写
+
+**(3) 事件轮询**
+
+```java
+while (true) {
+    int readyChannels = selector.select(); // 阻塞直到有事件就绪
+    if (readyChannels == 0) continue;
+
+    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+    Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+
+    while (keyIterator.hasNext()) {
+        SelectionKey key = keyIterator.next();
+
+        if (key.isAcceptable()) {
+            // 处理新连接
+        } else if (key.isReadable()) {
+            // 处理读事件
+        } else if (key.isWritable()) {
+            // 处理写事件
+        }
+
+        keyIterator.remove(); // 必须移除已处理的键
+    }
+}
+```
+
+::: info Java NIO 的关键机制有哪些？
+
+:::
+
+**(1) 非阻塞模式**
+
+- Channel 必须设置为非阻塞：`channel.configureBlocking(false)`
+- 避免单线程因 I/O 操作阻塞
+
+**(2) 事件驱动**
+
+- Selector 通过操作系统级轮询（如 Linux 的 `epoll`）监听事件
+- 仅处理活跃的 `Channel`，避免无效遍历
+
+**(3) SelectionKey**
+
+- 绑定 Channel 与 Selector 的关系
+- 可通过 `key.attachment()` 附加自定义对象（如会话状态）
+
+::: info Java NIO 的底层原理是什么？
+
+:::
+
+- **Linux**：基于 `epoll` 实现（高效监控大量文件描述符）
+- **Windows**：基于 `IOCP`（完成端口）
+- 相比传统 BIO 的线程池模型，NIO 单线程可处理数千连接
+
+**NIO 优点**
+
+- 单线程管理多连接，资源消耗低
+- 高并发支持（如 Netty 框架底层依赖 NIO）
+- 避免线程上下文切换开销
+
+**NIO 适用场景**
+
+- 高并发网络服务（如聊天服务器、API 网关）
+- 需要长连接的应用（如 WebSocket）
+- 大数据量、低延迟的 I/O 操作
+
+## Java 语法糖
+
+### 【中等】Java 中有哪些常见的语法糖？
 
 **语法糖（Syntactic sugar）** 代指的是编程语言为了方便程序员开发程序而设计的一种特殊语法，这种语法对编程语言的功能并没有影响。实现相同的功能，基于语法糖写出来的代码往往更简单简洁且更易阅读。
 
-举个例子，Java 中的 `for-each` 就是一个常用的语法糖，其原理其实就是基于普通的 for 循环和迭代器。
+Java 中最常用的语法糖主要有泛型、自动拆装箱、变长参数、枚举、内部类、增强 for 循环、try-with-resources 语法、lambda 表达式等。所有这些语法糖在编译阶段都会被"脱糖"(desugar)，即转换为更基础的Java语法结构。可以使用`javap -c`命令查看字节码来验证这一点。语法糖虽然不增加语言功能，但能显著提高代码的可读性和编写效率，是Java语言不断演进的重要组成部分。
+
+**自动装箱与拆箱 (Autoboxing/Unboxing)**
 
 ```java
-String[] strs = {"JavaGuide", "公众号：JavaGuide", "博客：https://javaguide.cn/"};
-for (String s : strs) {
+// 自动装箱
+Integer i = 10;  // 实际编译为 Integer.valueOf(10)
+
+// 自动拆箱
+int n = i;      // 实际编译为 i.intValue()
+```
+
+**增强 for 循环 (foreach)**
+
+```java
+List<String> list = Arrays.asList("a", "b", "c");
+// 语法糖形式
+for (String s : list) {
+    System.out.println(s);
+}
+// 实际编译为迭代器模式
+for (Iterator<String> it = list.iterator(); it.hasNext();) {
+    String s = it.next();
     System.out.println(s);
 }
 ```
 
-不过，JVM 其实并不能识别语法糖，Java 语法糖要想被正确执行，需要先通过编译器进行解糖，也就是在程序编译阶段将其转换成 JVM 认识的基本语法。这也侧面说明，Java 中真正支持语法糖的是 Java 编译器而不是 JVM。如果你去看`com.sun.tools.javac.main.JavaCompiler`的源码，你会发现在`compile()`中有一个步骤就是调用`desugar()`，这个方法就是负责解语法糖的实现的。
+**变长参数 (Varargs)**
 
-### Java 中有哪些常见的语法糖？
+```java
+public void print(String... args) {
+    for (String arg : args) {
+        System.out.println(arg);
+    }
+}
+// 实际编译为数组参数
+public void print(String[] args) { ... }
+```
 
-Java 中最常用的语法糖主要有泛型、自动拆装箱、变长参数、枚举、内部类、增强 for 循环、try-with-resources 语法、lambda 表达式等。
+**数值字面量下划线**
+
+```java
+int million = 1_000_000;  // 编译后等同于 1000000
+```
+
+**字符串拼接**
+
+```java
+String s = "a" + "b" + "c";
+// 编译优化为
+String s = "abc";
+
+// 变量拼接会转为 StringBuilder
+String a = "a", b = "b";
+String result = a + b;
+// 编译为
+String result = new StringBuilder().append(a).append(b).toString();
+```
+
+**switch 支持字符串 (Java 7+)**
+
+```java
+String fruit = "apple";
+switch (fruit) {
+    case "apple":
+        System.out.println("It's an apple");
+        break;
+    // 实际编译为基于hashCode()和equals()的比较
+}
+```
+
+**默认构造方法**
+
+```java
+public class Person {}
+// 如果没有显式定义构造方法，编译器会自动添加无参构造方法
+```
+
+**枚举类 (Java 5+)**
+
+```java
+enum Color { RED, GREEN, BLUE }
+// 实际编译为继承java.lang.Enum的类
+```
+
+**内部类访问外部类成员**
+
+```java
+class Outer {
+    private int x = 10;
+    class Inner {
+        void print() {
+            System.out.println(x);  // 实际通过 Outer.this.x 访问
+        }
+    }
+}
+```
+
+**方法引用 (Java 8+)**
+
+```java
+List<String> list = Arrays.asList("a", "b", "c");
+list.forEach(System.out::println);
+// 编译为lambda表达式
+list.forEach(s -> System.out.println(s));
+```
+
+**钻石操作符 (Diamond Operator, Java 7+)**
+
+```java
+List<String> list = new ArrayList<>();  // 类型推断
+// Java 7之前需要
+List<String> list = new ArrayList<String>();
+```
+
+**集合字面量 (Java 9+ 的List.of等)**
+
+```java
+List<String> list = List.of("a", "b", "c");
+Set<Integer> set = Set.of(1, 2, 3);
+Map<String, Integer> map = Map.of("a", 1, "b", 2);
+```
+
+**Lambda 表达式 (Java 8+)**
+
+```java
+// Lambda表达式
+Runnable r = () -> System.out.println("Hello");
+// 实际生成实现Runnable的匿名类
+```
+
+**try-with-resources (Java 7+)**
+
+```java
+try (InputStream is = new FileInputStream("file.txt")) {
+    // 使用资源
+}  // 自动调用close()
+// 编译为try-finally块
+```
+
+**接口中的默认方法和静态方法 (Java 8+)**
+
+```java
+interface MyInterface {
+    default void defaultMethod() {
+        System.out.println("Default method");
+    }
+
+    static void staticMethod() {
+        System.out.println("Static method");
+    }
+}
+```
+
+**记录类 (Record, Java 14+)**
+
+```java
+record Point(int x, int y) {}
+// 编译后自动生成:
+// - 私有final字段x和y
+// - 公共构造方法
+// - 访问器方法x()和y()
+// - equals(), hashCode(), toString()
+```
+
+**`instanceof` 模式匹配**
+
+```java
+if (obj instanceof String s) {
+    // 可以直接使用s
+    System.out.println(s.length());
+}
+```
+
+**文本块 (Text Blocks, Java 15+)**
+
+```java
+String html = """
+    <html>
+        <body>
+            <p>Hello, world</p>
+        </body>
+    </html>
+    """;
+```

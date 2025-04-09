@@ -15,397 +15,524 @@ permalink: /pages/e896e1d0/
 
 # Java 容器面试一
 
-## Java 容器综合
+## Java 容器简介
 
-### Java 容器框架概览
+### 【简单】Java 中有哪些集合类？
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/java-container-structure.png)
 
-Java 容器框架主要分为 `Collection` 和 `Map` 两种。其中，`Collection` 又分为 `List`、`Set` 以及 `Queue`。
+Java 容器类主要位于 `java.util` 包，分为 **Collection** 和 **Map** 两大类：
 
-- `Collection` - 一个独立元素的序列，这些元素都服从一条或者多条规则。
-  - `List` - 可以视为有序线性表。
-    - `ArrayList` - 数据结构为 `Object[]` 数组。
-    - `LinkedList` - 数据结构为双链表（JDK1.6 之前为循环链表，JDK1.7 取消了循环）。
-    - `Vector` - 数据结构为 `Object[]` 数组。
-  - `Set` - 不存储重复的元素。
-    - `HashSet` - 基于 `HashMap` 实现，不保证存储元素有序。
-    - `LinkedHashSet` - 基于 `LinkedHashMap` 实现，保证元素按插入顺序存储。
-    - `TreeSet` - 基于 `TreeMap` 实现，排序根据元素类型的 `Comparator` 而定。
-  - `Queue` - 按照排队规则来确定对象产生的顺序（通常与它们被插入的顺序相同）。
-    - `ArrayDeque` - 用一个动态数组实现了栈和队列所需的所有操作。
-    - `PriorityQueue` - 优先级队列。
-- `Map` - 一组成对的“键值对”对象，允许你使用键来查找值。
-  - `HashMap` - 储存无序的键值对，而 `Hash` 也体现了它的查找效率很高。`HashMap` 是使用最广泛的 `Map`。
-  - `TreeMap` - 储存有序的键值对，排序根据元素类型的 `Comparator` 而定。
-  - `LinkedHashMap` - `LinkedHashMap` 继承了 `HashMap`，并以此为基础，增加了一条双向链表，以保持键值对的插入顺序。同时通过对链表进行相应的操作，实现了访问顺序相关逻辑。
-  - `Hashtable` - `Hashtable` 在它的主要方法中使用 `synchronized` 关键字修饰，来保证线程安全。但是，由于它的锁粒度太大，非常影响读写速度，所以，现代 Java 程序几乎不会使用。如果需要保证线程安全，一般会用 `ConcurrentHashMap` 来替代。
+- **Collection（存储独立元素）**
+  - **List（有序、可重复）**
+    - **ArrayList**：基于 `Object[]` 动态数组，查询快，增删慢
+    - **LinkedList**：基于**双链表**（JDK1.6 前是循环链表，1.7 取消循环），增删快，查询慢
+    - **Vector**：线程安全的 `Object[]` 动态数组（已过时，推荐 `ArrayList` + `Collections.synchronizedList`）
+  - **Set（无序、不可重复）**
+    - **HashSet**：基于 `HashMap` 实现，不保证顺序
+    - **LinkedHashSet**：基于 `LinkedHashMap`，维护**插入顺序**
+    - **TreeSet**：基于 `TreeMap`，支持**自然排序**或**自定义 `Comparator`**
+  - **Queue（队列，FIFO 或优先级）**
+    - **ArrayDeque**：基于动态数组，实现**栈和队列**
+    - **PriorityQueue**：基于堆，**优先级队列**（按 `Comparator` 排序）
+    - **LinkedList**：也可作为队列/双端队列
+- **Map（键值对存储）**
+  - **HashMap**：基于哈希表，**无序**，查找高效（最常用）
+  - **LinkedHashMap**：继承 `HashMap`，额外维护**双向链表**，保持**插入顺序**或**访问顺序**
+  - **TreeMap**：基于红黑树，**键有序**（自然排序或 `Comparator`）
+  - **Hashtable**：线程安全（`synchronized` 修饰方法），但性能差，已被 `ConcurrentHashMap` 取代
+  - **ConcurrentHashMap**：分段锁（JDK7）或 CAS + `synchronized`（JDK8+），高并发优化
+- **工具类**
+  - **Collections**：提供集合操作（排序、查找、同步化等）
+  - **Arrays**：提供数组操作（排序、二分查找等）
+  - **Stream（Java 8+）**：支持函数式编程的流式处理
 
-### 为什么要使用容器
+**关键区别**：
 
-在 Java 中，存储一组同类型的数据，可以选择数组或容器。
+| 类型      | 特点           | 主要实现类                            |
+| --------- | -------------- | ------------------------------------- |
+| **List**  | 有序、可重复   | `ArrayList`、`LinkedList`             |
+| **Set**   | 无序、不可重复 | `HashSet`、`LinkedHashSet`、`TreeSet` |
+| **Queue** | 队列/栈        | `ArrayDeque`、`PriorityQueue`         |
+| **Map**   | 键值对         | `HashMap`、`LinkedHashMap`、`TreeMap` |
 
-**相对于数组，容器更灵活、更便捷**。
+**线程安全**：
 
-|              | 数组                                   | 容器                                     |
-| ------------ | -------------------------------------- | ---------------------------------------- |
-| 大小         | 存储大小固定，且必须在声明时就指定大小 | 可以根据实际存储数量，动态扩容、缩容     |
-| 存储数据类型 | 无限制                                 | 只能存储引用数据类型                     |
-| 类型安全     | 不支持                                 | 基于泛型来确保类型安全                   |
-| 操作         | 基于数组下标访问                       | 基于泛型，支持了丰富的内置算法，操作便捷 |
+- 单线程：`ArrayList`、`HashMap`
+- 多线程：`ConcurrentHashMap`、`CopyOnWriteArrayList`
+
+### 【简单】Comparable 和 Comparator 有什么区别？
+
+`Comparable` 接口和 `Comparator` 接口都是 Java 中用于排序的接口，它们在实现类对象之间比较大小、排序等方面发挥了重要作用。
+
+- **Comparable** → "我能比较"（类自己实现的比较能力）
+- **Comparator** → "比较器"（外部提供的比较工具）
+
+两者通常一起使用，为Java对象提供灵活多样的排序能力。
+
+**Comparable vs. Comparator**：
+
+| 特性             | Comparable               | Comparator                           |
+| ---------------- | ------------------------ | ------------------------------------ |
+| **包位置**       | java.lang                | java.util                            |
+| **接口方法**     | compareTo(T o)           | compare(T o1, T o2)                  |
+| **排序逻辑位置** | 定义在要排序的类内部     | 定义在单独的类或匿名类中             |
+| **使用场景**     | 类的"自然排序"           | 多种排序方式或无法修改类时的排序     |
+| **调用方式**     | `Collections.sort(list)` | `Collections.sort(list, comparator)` |
+| **影响范围**     | 修改类的原始定义         | 不修改原有类                         |
+
+**设计目的不同**
+
+- `Comparable`：定义对象的**自然排序**（如String按字母顺序，Integer按数值大小）
+- `Comparator`：定义**多种排序策略**或为无法修改源代码的类提供排序
+
+**实现方式不同**
+
+- `Comparable`：需要修改类本身，实现`compareTo()`方法
+
+```java
+class Person implements Comparable<Person> {
+    public int compareTo(Person other) {
+        return this.age - other.age;
+    }
+}
+```
+
+- `Comparator`：独立实现，通常使用匿名类或lambda表达式
+
+```java
+Comparator<Person> byName = (p1, p2) -> p1.getName().compareTo(p2.getName());
+```
+
+**使用场景选择**
+
+- 用`Comparable`当：
+  - 类有明确的自然排序标准
+  - 你能修改类的源代码
+  - 只需要一种主要排序方式
+- 用`Comparator`当：
+  - 需要多种排序方式（如按姓名、年龄、工资等）
+  - 不能修改类的源代码（如第三方库的类）
+  - 需要临时或特殊的排序规则
+
+**Java 8+的便利支持**
+
+- Comparator提供了许多方便的静态方法：
+
+```java
+// 多级排序
+Comparator<Person> comparator =
+    Comparator.comparing(Person::getLastName)
+              .thenComparing(Person::getFirstName);
+
+// 逆序排序
+Comparator<Person> reverseAge =
+    Comparator.comparingInt(Person::getAge).reversed();
+```
 
 ## List
 
-### ArrayList 和 Array（数组）的区别？
+### 【简单】ArrayList 和 Array（数组）的区别？
 
-`ArrayList` 内部基于动态数组实现，比 `Array`（静态数组） 使用起来更加灵活：
+**ArrayList vs. 数组**
 
-- `ArrayList`会根据实际存储的元素动态地扩容或缩容，而 `Array` 被创建之后就不能改变它的长度了。
-- `ArrayList` 允许你使用泛型来确保类型安全，`Array` 则不可以。
-- `ArrayList` 中只能存储对象。对于基本类型数据，需要使用其对应的包装类（如 Integer、Double 等）。`Array` 可以直接存储基本类型数据，也可以存储对象。
-- `ArrayList` 支持插入、删除、遍历等常见操作，并且提供了丰富的 API 操作方法，比如 `add()`、`remove()`等。`Array` 只是一个固定长度的数组，只能按照下标访问其中的元素，不具备动态添加、删除元素的能力。
-- `ArrayList`创建时不需要指定大小，而`Array`创建时必须指定大小。
+| **对比点**     | **数组 (Array)**                                   | **ArrayList**                                                                                  |
+| -------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **长度可变性** | 固定长度，创建后无法调整大小                       | 动态扩容（默认扩容1.5倍）                                                                      |
+| **存储类型**   | 支持基本类型（`int[]`）和对象类型                  | 仅支持引用类型（基本类型需装箱，如 `Integer`）                                                 |
+| **内存占用**   | 更紧凑（无额外对象开销）                           | 有额外内存开销（记录大小、扩容预留空间等）                                                     |
+| **访问方式**   | 通过索引直接访问（`arr[0]`）                       | 通过 `get(index)`/`set(index)` 方法访问                                                        |
+| **操作效率**   | - 查询：O(1)（极快）<br>- 增删：O(n)（需移动元素） | - 查询：O(1)（底层是数组）<br>- 增删：<br> - 尾部操作：O(1)<br> - 中间操作：O(n)（需移动元素） |
+| **功能方法**   | 功能简单（依赖 `Arrays` 工具类）                   | 提供丰富方法（`add()`、`remove()`、`contains()` 等）                                           |
+| **线程安全**   | 非线程安全                                         | 非线程安全（需用 `Collections.synchronizedList` 包装）                                         |
+| **泛型支持**   | 不支持泛型（类型检查在运行时）                     | 支持泛型（编译时类型安全）                                                                     |
 
-下面是二者使用的简单对比：
+**小结**：
 
-`Array`：
+- **动态性**：`ArrayList` 自动扩容，数组长度固定。
+- **类型支持**：数组可直接存基本类型，`ArrayList` 需包装类。
+- **性能**：
+  - 数组的随机访问稍快（少一次方法调用）。
+  - `ArrayList` 的尾部插入高效，但中间插入/删除需移动元素。
+- **功能**：`ArrayList` 提供更多便捷方法（如迭代、搜索）。
+- **内存**：数组更节省内存，`ArrayList` 有额外结构开销。
 
-```java
- // 初始化一个 String 类型的数组
- String[] stringArr = new String[]{"hello", "world", "!"};
- // 修改数组元素的值
- stringArr[0] = "goodbye";
- System.out.println(Arrays.toString(stringArr));// [goodbye, world, !]
- // 删除数组中的元素，需要手动移动后面的元素
- for (int i = 0; i < stringArr.length - 1; i++) {
-     stringArr[i] = stringArr[i + 1];
- }
- stringArr[stringArr.length - 1] = null;
- System.out.println(Arrays.toString(stringArr));// [world, !, null]
-```
+**应用**：
 
-`ArrayList` ：
+- **选数组**：需极致性能、固定长度或存储基本类型时（如数学计算）。
+- **选ArrayList**：需要动态大小、便捷操作或泛型安全时（大多数业务场景）。
 
-```java
-// 初始化一个 String 类型的 ArrayList
- ArrayList<String> stringList = new ArrayList<>(Arrays.asList("hello", "world", "!"));
-// 添加元素到 ArrayList 中
- stringList.add("goodbye");
- System.out.println(stringList);// [hello, world, !, goodbye]
- // 修改 ArrayList 中的元素
- stringList.set(0, "hi");
- System.out.println(stringList);// [hi, world, !, goodbye]
- // 删除 ArrayList 中的元素
- stringList.remove(0);
- System.out.println(stringList); // [world, !, goodbye]
-```
+### 【简单】ArrayList 可以添加 null 值吗？
 
-### ArrayList 可以添加 null 值吗？
+`ArrayList` **可以添加任意数量的 `null` 值**，包括重复 `null`，但需谨慎处理潜在的空指针问题。
 
-`ArrayList` 中可以存储任何类型的对象，包括 `null` 值。不过，不建议向`ArrayList` 中添加 `null` 值， `null` 值无意义，会让代码难以维护比如忘记做判空处理就会导致空指针异常。
+`ArrayList`底层基于 `Object[]` 数组实现，天然支持 `null`。
 
-示例代码：
+**注意**：
 
-```
-ArrayList<String> listOfStrings = new ArrayList<>();
-listOfStrings.add(null);
-listOfStrings.add("java");
-System.out.println(listOfStrings);
-```
+- **可能引发 `NullPointerException`**：
+  - 直接调用 `null` 的方法（如 `list.get(0).length()`）会报错。
+  - 使用 `contains(null)` 或遍历时需判空。
+- **慎用于特定场景**：如数据库映射、JSON 序列化工具可能对 `null` 有特殊限制。
 
-输出：
+**与其他容器对比**：
 
-```
-[null, java]
-```
+- **HashSet**：允许一个 `null`。
+- **TreeSet**：若用自然排序，添加 `null` 会抛 `NullPointerException`。
+- **HashMap**：允许 `null` 键和值。
+- **Hashtable**：禁止 `null` 键和值。
 
-### ArrayList 插入和删除元素的时间复杂度？
+**建议**：
 
-对于插入：
+- 明确是否需要 `null`，避免滥用导致代码健壮性问题。
+- 必要时用 `Optional` 或默认值替代 `null`。
 
-- 头部插入：由于需要将所有元素都依次向后移动一个位置，因此时间复杂度是 O(n)。
-- 尾部插入：当 `ArrayList` 的容量未达到极限时，往列表末尾插入元素的时间复杂度是 O(1)，因为它只需要在数组末尾添加一个元素即可；当容量已达到极限并且需要扩容时，则需要执行一次 O(n) 的操作将原数组复制到新的更大的数组中，然后再执行 O(1) 的操作添加元素。
-- 指定位置插入：需要将目标位置之后的所有元素都向后移动一个位置，然后再把新元素放入指定位置。这个过程需要移动平均 n/2 个元素，因此时间复杂度为 O(n)。
+### 【简单】对比一下 ArrayList 和 LinkedList？
 
-对于删除：
+**`ArrayList` vs. `LinkedList`**
 
-- 头部删除：由于需要将所有元素依次向前移动一个位置，因此时间复杂度是 O(n)。
-- 尾部删除：当删除的元素位于列表末尾时，时间复杂度为 O(1)。
-- 指定位置删除：需要将目标元素之后的所有元素向前移动一个位置以填补被删除的空白位置，因此需要移动平均 n/2 个元素，时间复杂度为 O(n)。
+| **对比维度**      | **ArrayList**                                                         | **LinkedList**                                                   |
+| ----------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **底层数据结构**  | 动态数组（`Object[]`）                                                | 双向链表（`Node` 节点）                                          |
+| **内存占用**      | 更紧凑（连续内存）                                                    | 更高（每个元素需额外存储前后节点指针）                           |
+| **随机访问性能**  | ⚡ **O(1)**（通过索引直接访问）                                       | 🐢 **O(n)**（需遍历链表）                                        |
+| **插入/删除性能** | - 尾部操作：⚡ **O(1)**<br>- 中间/头部操作：🐢 **O(n)**（需移动元素） | - 头尾操作：⚡ **O(1)**<br>- 中间操作：🐢 **O(n)**（需遍历定位） |
+| **适用场景**      | - 频繁随机访问<br>- 数据量稳定或尾部操作多                            | - 频繁头尾插入/删除<br>- 数据动态性强                            |
+| **额外功能**      | 仅基础列表操作                                                        | 实现了 `Deque` 接口（可作队列/栈使用）                           |
+| **空间局部性**    | ✅ 更好（CPU 缓存友好）                                               | ❌ 较差（节点分散存储）                                          |
 
-这里简单列举一个例子：
+**对比小结**：
 
-```
-// ArrayList 的底层数组大小为 10，此时存储了 7 个元素
-+---+---+---+---+---+---+---+---+---+---+
-| 1 | 2 | 3 | 4 | 5 | 6 | 7 |   |   |   |
-+---+---+---+---+---+---+---+---+---+---+
-  0   1   2   3   4   5   6   7   8   9
-// 在索引为 1 的位置插入一个元素 8，该元素后面的所有元素都要向右移动一位
-+---+---+---+---+---+---+---+---+---+---+
-| 1 | 8 | 2 | 3 | 4 | 5 | 6 | 7 |   |   |
-+---+---+---+---+---+---+---+---+---+---+
-  0   1   2   3   4   5   6   7   8   9
-// 删除索引为 1 的位置的元素，该元素后面的所有元素都要向左移动一位
-+---+---+---+---+---+---+---+---+---+---+
-| 1 | 2 | 3 | 4 | 5 | 6 | 7 |   |   |   |
-+---+---+---+---+---+---+---+---+---+---+
-  0   1   2   3   4   5   6   7   8   9
-```
+1. **访问速度**：`ArrayList` 随机访问极快（数组索引），`LinkedList` 需遍历链表。
+2. **增删效率**：`ArrayList` 尾部插入快，中间/头部插入慢；`LinkedList` 头尾插入快，中间插入仍需遍历。
+3. **内存开销**：`LinkedList` 每个元素多消耗 2 个指针空间（前驱+后继）。
+4. **功能扩展**：`LinkedList` 支持队列/栈操作（如 `addFirst()`, `pollLast()`）。
 
-### LinkedList 插入和删除元素的时间复杂度？
+**选型建议**：
 
-- 头部插入/删除：只需要修改头结点的指针即可完成插入/删除操作，因此时间复杂度为 O(1)。
-- 尾部插入/删除：只需要修改尾结点的指针即可完成插入/删除操作，因此时间复杂度为 O(1)。
-- 指定位置插入/删除：需要先移动到指定位置，再修改指定节点的指针完成插入/删除，因此需要遍历平均 n/2 个元素，时间复杂度为 O(n)。
+- 优先用 **`ArrayList`**（大多数场景性能更优）。
+- 仅当需要频繁在 **头部/中间插入删除**，或需要 **队列/栈功能** 时选 `LinkedList`。
 
-### ArrayList 和 Vector 的比较
-
-- `Vector` 是 Java 早期提供的**线程安全的动态数组**。Vector 内部是使用对象数组来保存数据，可以根据需要自动的增加容量，当数组已满时，会创建新的数组，并拷贝原有数组数据。
-- `ArrayList` 是应用更加广泛的**动态数组**实现，它本身不是线程安全的，所以性能要好很多。与 Vector 近似，ArrayList 也是可以根据需要调整容量，不过两者的调整逻辑有所区别，Vector 在扩容时会提高 1 倍，而 ArrayList 则是增加 50%。
-
-### Vector 和 Stack 的比较
-
-- `Vector` 和 `Stack` 两者都是线程安全的，都是使用 `synchronized` 关键字进行同步处理。
-- `Stack` 继承自 `Vector`，是一个后进先出的栈，而 `Vector` 是一个列表。
-
-随着 Java 并发编程的发展，`Vector` 和 `Stack` 已经被淘汰，推荐使用并发集合类（例如 `ConcurrentHashMap`、`CopyOnWriteArrayList` 等）或者手动实现线程安全的方法来提供安全的多线程操作支持。
-
-### ArrayList 与 LinkedList 的比较
-
-|                  | ArrayList   | LinkedList                                         |
-| ---------------- | ----------- | -------------------------------------------------- |
-| 数据结构         | Object 数组 | 双链表（JDK1.6 之前为循环链表，JDK1.7 取消了循环） |
-| 是否支持随机访问 | 支持        | 不支持                                             |
-| 线程安全         | 不保证      | 不保证                                             |
-
-- **是否保证线程安全：** `ArrayList` 和 `LinkedList` 都是不同步的，也就是不保证线程安全；
-- **底层数据结构：** `ArrayList` 底层使用的是 **`Object` 数组**；`LinkedList` 底层使用的是 **双向链表** 数据结构（JDK1.6 之前为循环链表，JDK1.7 取消了循环。注意双向链表和双向循环链表的区别，下面有介绍到！）
-- 插入和删除是否受元素位置的影响：
-  - `ArrayList` 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。 比如：执行`add(E e)`方法的时候， `ArrayList` 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是 O(1)。但是如果要在指定位置 i 插入和删除元素的话（`add(int index, E element)`），时间复杂度就为 O(n)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的 (n-i) 个元素都要执行向后位/向前移一位的操作。
-  - `LinkedList` 采用链表存储，所以在头尾插入或者删除元素不受元素位置的影响（`add(E e)`、`addFirst(E e)`、`addLast(E e)`、`removeFirst()`、 `removeLast()`），时间复杂度为 O(1)，如果是要在指定位置 `i` 插入和删除元素的话（`add(int index, E element)`，`remove(Object o)`,`remove(int index)`）， 时间复杂度为 O(n) ，因为需要先移动到指定位置再插入和删除。
-- **是否支持快速随机访问：** `LinkedList` 不支持高效的随机元素访问，而 `ArrayList`（实现了 `RandomAccess` 接口） 支持。快速随机访问就是通过元素的序号快速获取元素对象（对应于`get(int index)`方法）。
-- **内存空间占用：** `ArrayList` 的空间浪费主要体现在在 list 列表的结尾会预留一定的容量空间，而 LinkedList 的空间花费则体现在它的每一个元素都需要消耗比 ArrayList 更多的空间（因为要存放直接后继和直接前驱以及数据）。
+> 💡 **Java 实践提示**：
+>
+> - 默认情况下，`Collections.synchronizedList` 包装的 `ArrayList` 比 `LinkedList` 线程安全开销更低。
+> - Java 8+ 的 `Stream` 操作在 `ArrayList` 上效率更高。
 
 ## Set
 
-### Comparable 和 Comparator 的区别
+### 【简单】比较 HashSet、LinkedHashSet 和 TreeSet 三者的异同？
 
-`Comparable` 接口和 `Comparator` 接口都是 Java 中用于排序的接口，它们在实现类对象之间比较大小、排序等方面发挥了重要作用：
+| 特性             | HashSet              | LinkedHashSet           | TreeSet                          |
+| ---------------- | -------------------- | ----------------------- | -------------------------------- |
+| **底层实现**     | 哈希表 (HashMap)     | 哈希表 + 链表           | 红黑树                           |
+| **排序保证**     | 无顺序               | 插入顺序                | 自然顺序/自定义排序              |
+| **时间复杂度**   | 添加/删除/查找: O(1) | 添加/删除/查找: O(1)    | 添加/删除/查找: O(log n)         |
+| **允许null元素** | 允许1个null          | 允许1个null             | 不允许(除非自定义Comparator允许) |
+| **线程安全**     | 非线程安全           | 非线程安全              | 非线程安全                       |
+| **性能特点**     | 最快的基础操作       | 比HashSet稍慢但保持顺序 | 最慢但自动排序                   |
+| **使用场景**     | 只需唯一性不关心顺序 | 需要保持插入顺序        | 需要排序的集合                   |
 
-- `Comparable` 接口实际上是出自`java.lang`包 它有一个 `compareTo(Object obj)`方法用来排序
-- `Comparator`接口实际上是出自 `java.util` 包它有一个`compare(Object obj1, Object obj2)`方法用来排序
+**顺序特性**
 
-一般我们需要对一个集合使用自定义排序时，我们就要重写`compareTo()`方法或`compare()`方法，当我们需要对某一个集合实现两种排序方式，比如一个 `song` 对象中的歌名和歌手名分别采用一种排序方法的话，我们可以重写`compareTo()`方法和使用自制的`Comparator`方法或者以两个 `Comparator` 来实现歌名排序和歌星名排序，第二种代表我们只能使用两个参数版的 `Collections.sort()`.
+- `HashSet`：完全不保证任何顺序（基于哈希值存储）
+- `LinkedHashSet`：维护元素**插入顺序**（迭代时按插入顺序返回）
+- `TreeSet`：根据元素的**自然顺序**或**Comparator**进行排序
 
-#### Comparator 定制排序
+**性能比较**
 
-```
-ArrayList<Integer> arrayList = new ArrayList<Integer>();
-arrayList.add(-1);
-arrayList.add(3);
-arrayList.add(-5);
-arrayList.add(7);
-arrayList.add(4);
-arrayList.add(-9);
-arrayList.add(-7);
-System.out.println("原始数组：");
-System.out.println(arrayList);
-// void reverse(List list)：反转
-Collections.reverse(arrayList);
-System.out.println("Collections.reverse(arrayList):");
-System.out.println(arrayList);
+- **操作速度**：HashSet ≈ LinkedHashSet > TreeSet
+- **内存占用**：LinkedHashSet > HashSet > TreeSet
+- **迭代性能**：LinkedHashSet最优（顺序访问快）
 
-// void sort(List list), 按自然排序的升序排序
-Collections.sort(arrayList);
-System.out.println("Collections.sort(arrayList):");
-System.out.println(arrayList);
-// 定制排序的用法
-Collections.sort(arrayList, new Comparator<Integer>() {
-    @Override
-    public int compare(Integer o1, Integer o2) {
-        return o2.compareTo(o1);
-    }
-});
-System.out.println("定制排序后：");
-System.out.println(arrayList);
-```
+**实现原理**
 
-Output:
+- `HashSet`：基于HashMap实现，只使用键
+- `LinkedHashSet`：继承HashSet，通过链表维护插入顺序
+- `TreeSet`：基于TreeMap实现（红黑树结构）
 
-```
-原始数组：
-[-1, 3, 3, -5, 7, 4, -9, -7]
-Collections.reverse(arrayList):
-[-7, -9, 4, 7, -5, 3, 3, -1]
-Collections.sort(arrayList):
-[-9, -7, -5, -1, 3, 3, 4, 7]
-定制排序后：
-[7, 4, 3, 3, -1, -5, -7, -9]
+**构造方式**
+
+```java
+// HashSet
+Set<String> hashSet = new HashSet<>();
+
+// LinkedHashSet
+Set<String> linkedHashSet = new LinkedHashSet<>();
+
+// TreeSet - 自然排序
+Set<String> treeSet = new TreeSet<>();
+
+// TreeSet - 自定义排序
+Set<String> customTreeSet = new TreeSet<>(Comparator.reverseOrder());
 ```
 
-#### 重写 compareTo 方法实现按年龄来排序
+**使用场景建议**
 
-```
-// person 对象没有实现 Comparable 接口，所以必须实现，这样才不会出错，才可以使 treemap 中的数据按顺序排列
-// 前面一个例子的 String 类已经默认实现了 Comparable 接口，详细可以查看 String 类的 API 文档，另外其他
-// 像 Integer 类等都已经实现了 Comparable 接口，所以不需要另外实现了
-public  class Person implements Comparable<Person> {
-    private String name;
-    private int age;
+- 需要**最快查询**且不关心顺序 → HashSet
+- 需要**保持插入顺序** → LinkedHashSet
+- 需要**自动排序**或**范围查询** → TreeSet
+- 需要**频繁迭代** → LinkedHashSet
 
-    public Person(String name, int age) {
-        super();
-        this.name = name;
-        this.age = age;
-    }
+**特殊注意事项**
 
-    public String getName() {
-        return name;
-    }
+- **相等性判断**：
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  - 三者都使用`equals()`方法判断元素是否相同
+  - TreeSet同时会使用`compareTo()`或`compare()`方法（必须与equals逻辑一致）
 
-    public int getAge() {
-        return age;
-    }
+- **TreeSet排序规则**：
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+  - 元素必须实现`Comparable`接口，或在构造时提供`Comparator`
+  - 否则会抛出`ClassCastException`
 
-    /**
-     * T 重写 compareTo 方法实现按年龄来排序
-     */
-    @Override
-    public int compareTo(Person o) {
-        if (this.age > o.getAge()) {
-            return 1;
-        }
-        if (this.age < o.getAge()) {
-            return -1;
-        }
-        return 0;
-    }
-}
-```
+- **线程安全替代方案**：
+  ```java
+  Set<String> syncSet = Collections.synchronizedSet(new HashSet<>());
+  Set<String> syncTreeSet = Collections.synchronizedSet(new TreeSet<>());
+  ```
 
-```
-    public static void main(String[] args) {
-        TreeMap<Person, String> pdata = new TreeMap<Person, String>();
-        pdata.put(new Person("张三", 30), "zhangsan");
-        pdata.put(new Person("李四", 20), "lisi");
-        pdata.put(new Person("王五", 10), "wangwu");
-        pdata.put(new Person("小红", 5), "xiaohong");
-        // 得到 key 的值的同时得到 key 所对应的值
-        Set<Person> keys = pdata.keySet();
-        for (Person key : keys) {
-            System.out.println(key.getAge() + "-" + key.getName());
-
-        }
-    }
-```
-
-Output：
-
-```
-5-小红
-10-王五
-20-李四
-30-张三
-```
-
-### 无序性和不可重复性的含义是什么
-
-- 无序性不等于随机性 ，无序性是指存储的数据在底层数组中并非按照数组索引的顺序添加 ，而是根据数据的哈希值决定的。
-- 不可重复性是指添加的元素按照 `equals()` 判断时 ，返回 false，需要同时重写 `equals()` 方法和 `hashCode()` 方法。
-
-### 比较 HashSet、LinkedHashSet 和 TreeSet 三者的异同
-
-- `HashSet`、`LinkedHashSet` 和 `TreeSet` 都是 `Set` 接口的实现类，都能保证元素唯一，并且都不是线程安全的。
-- `HashSet`、`LinkedHashSet` 和 `TreeSet` 的主要区别在于底层数据结构不同。`HashSet` 的底层数据结构是哈希表（基于 `HashMap` 实现）。`LinkedHashSet` 的底层数据结构是链表和哈希表，元素的插入和取出顺序满足 FIFO。`TreeSet` 底层数据结构是红黑树，元素是有序的，排序的方式有自然排序和定制排序。
-- 底层数据结构不同又导致这三者的应用场景不同。`HashSet` 用于不需要保证元素插入和取出顺序的场景，`LinkedHashSet` 用于保证元素的插入和取出顺序满足 FIFO 的场景，`TreeSet` 用于支持对元素自定义排序规则的场景。
+选择哪种Set实现取决于你的具体需求：要速度（HashSet）、要插入顺序（LinkedHashSet）还是要自动排序（TreeSet）。
 
 ## Queue
 
-### Queue 与 Deque 的区别
+### 【简单】Queue 与 Deque 的区别
 
-`Queue` 是单端队列，只能从一端插入元素，另一端删除元素，实现上一般遵循 **先进先出（FIFO）** 规则。
+::: info Queue vs. Deque
+:::
 
-`Queue` 扩展了 `Collection` 的接口，根据 **因为容量问题而导致操作失败后处理方式的不同** 可以分为两类方法：一种在操作失败后会抛出异常，另一种则会返回特殊值。
+| 特性         | Queue (队列)                               | Deque (双端队列)              |
+| ------------ | ------------------------------------------ | ----------------------------- |
+| **进出原则** | 先进先出 (FIFO)                            | 两端都可进出 (FIFO + LIFO)    |
+| **主要操作** | 队尾入队(add/offer)，队首出队(remove/poll) | 支持队首/队尾的入队和出队操作 |
+| **继承关系** | 基础接口                                   | 继承自 Queue 接口             |
+| **代表子类** | LinkedList, PriorityQueue                  | ArrayDeque, LinkedList        |
+| **特殊功能** | -                                          | 支持栈操作(push/pop/peek)     |
 
-| `Queue` 接口 | 抛出异常  | 返回特殊值 |
-| ------------ | --------- | ---------- |
-| 插入队尾     | add(E e)  | offer(E e) |
-| 删除队首     | remove()  | poll()     |
-| 查询队首元素 | element() | peek()     |
+**基本操作对比**
 
-`Deque` 是双端队列，在队列的两端均可以插入或删除元素。
+::: code-tabs#重载和重写的示例
 
-`Deque` 扩展了 `Queue` 的接口，增加了在队首和队尾进行插入和删除的方法，同样根据失败后处理方式的不同分为两类：
+@tab **Queue 操作**
 
-| `Deque` 接口 | 抛出异常      | 返回特殊值      |
-| ------------ | ------------- | --------------- |
-| 插入队首     | addFirst(E e) | offerFirst(E e) |
-| 插入队尾     | addLast(E e)  | offerLast(E e)  |
-| 删除队首     | removeFirst() | pollFirst()     |
-| 删除队尾     | removeLast()  | pollLast()      |
-| 查询队首元素 | getFirst()    | peekFirst()     |
-| 查询队尾元素 | getLast()     | peekLast()      |
-
-事实上，`Deque` 还提供有 `push()` 和 `pop()` 等其他方法，可用于模拟栈。
-
-### ArrayDeque 与 LinkedList 的区别
-
-`ArrayDeque` 和 `LinkedList` 都实现了 `Deque` 接口，两者都具有队列的功能，但两者有什么区别呢？
-
-- `ArrayDeque` 是基于可变长的数组和双指针来实现，而 `LinkedList` 则通过链表来实现。
-- `ArrayDeque` 不支持存储 `NULL` 数据，但 `LinkedList` 支持。
-- `ArrayDeque` 是在 JDK1.6 才被引入的，而`LinkedList` 早在 JDK1.2 时就已经存在。
-- `ArrayDeque` 插入时可能存在扩容过程，不过均摊后的插入操作依然为 O(1)。虽然 `LinkedList` 不需要扩容，但是每次插入数据时均需要申请新的堆空间，均摊性能相比更慢。
-
-从性能的角度上，选用 `ArrayDeque` 来实现队列要比 `LinkedList` 更好。此外，`ArrayDeque` 也可以用于实现栈。
-
-### 说一说 PriorityQueue
-
-`PriorityQueue` 是在 JDK1.5 中被引入的，其与 `Queue` 的区别在于元素出队顺序是与优先级相关的，即总是优先级最高的元素先出队。
-
-这里列举其相关的一些要点：
-
-- `PriorityQueue` 利用了二叉堆的数据结构来实现的，底层使用可变长的数组来存储数据
-- `PriorityQueue` 通过堆元素的上浮和下沉，实现了在 O(logn) 的时间复杂度内插入元素和删除堆顶元素。
-- `PriorityQueue` 是非线程安全的，且不支持存储 `NULL` 和 `non-comparable` 的对象。
-- `PriorityQueue` 默认是小顶堆，但可以接收一个 `Comparator` 作为构造参数，从而来自定义元素优先级的先后。
-
-`PriorityQueue` 在面试中可能更多的会出现在手撕算法的时候，典型例题包括堆排序、求第 K 大的数、带权图的遍历等，所以需要会熟练使用才行。
-
-### BlockingQueue
-
-`BlockingQueue` （阻塞队列）是一个接口，继承自 `Queue`。`BlockingQueue` 阻塞的原因是其支持当队列没有元素时一直阻塞，直到有元素；还支持如果队列已满，一直等到队列可以放入新元素时再放入。
-
-```
-public interface BlockingQueue<E> extends Queue<E> {
-  // ...
-}
+```java
+queue.offer(e);  // 队尾添加（推荐）
+queue.add(e);    // 队尾添加（可能抛异常）
+queue.poll();    // 队首移除并返回（推荐）
+queue.remove();  // 队首移除并返回（可能抛异常）
+queue.peek();    // 查看队首（不移除）
+queue.element(); // 查看队首（可能抛异常）
 ```
 
-`BlockingQueue` 常用于生产者-消费者模型中，生产者线程会向队列中添加数据，而消费者线程会从队列中取出数据进行处理。
+@tab **Deque 扩展操作**
 
-Java 中常用的阻塞队列实现类有以下几种：
+```java
+// 队首操作
+deque.offerFirst(e);  deque.addFirst(e);
+deque.pollFirst();    deque.removeFirst();
+deque.peekFirst();    deque.getFirst();
 
-- `ArrayBlockingQueue`：使用数组实现的有界阻塞队列。在创建时需要指定容量大小，并支持公平和非公平两种方式的锁访问机制。
-- `LinkedBlockingQueue`：使用单向链表实现的可选有界阻塞队列。在创建时可以指定容量大小，如果不指定则默认为 `Integer.MAX_VALUE`。和 `ArrayBlockingQueue` 不同的是， 它仅支持非公平的锁访问机制。
-- `PriorityBlockingQueue`：支持优先级排序的无界阻塞队列。元素必须实现 `Comparable` 接口或者在构造函数中传入`Comparator` 对象，并且不能插入 null 元素。
-- `SynchronousQueue`：同步队列，是一种不存储元素的阻塞队列。每个插入操作都必须等待对应的删除操作，反之删除操作也必须等待插入操作。因此，`SynchronousQueue` 通常用于线程之间的直接传递数据。
-- `DelayQueue`：延迟队列，其中的元素只有到了其指定的延迟时间，才能够从队列中出队。
+// 队尾操作
+deque.offerLast(e);   deque.addLast(e);
+deque.pollLast();     deque.removeLast();
+deque.peekLast();     deque.getLast();
 
-### ArrayBlockingQueue 和 LinkedBlockingQueue 有什么区别？
+// 栈操作
+deque.push(e);        // = addFirst(e)
+deque.pop();          // = removeFirst()
+```
 
-`ArrayBlockingQueue` 和 `LinkedBlockingQueue` 是 Java 并发包中常用的两种阻塞队列实现，它们都是线程安全的。不过，不过它们之间也存在下面这些区别：
+:::
 
-- 底层实现：`ArrayBlockingQueue` 基于数组实现，而 `LinkedBlockingQueue` 基于链表实现。
-- 是否有界：`ArrayBlockingQueue` 是有界队列，必须在创建时指定容量大小。`LinkedBlockingQueue` 创建时可以不指定容量大小，默认是 `Integer.MAX_VALUE`，也就是无界的。但也可以指定队列大小，从而成为有界的。
-- 锁是否分离： `ArrayBlockingQueue`中的锁是没有分离的，即生产和消费用的是同一个锁；`LinkedBlockingQueue`中的锁是分离的，即生产用的是`putLock`，消费是`takeLock`，这样可以防止生产者和消费者线程之间的锁争夺。
-- 内存占用：`ArrayBlockingQueue` 需要提前分配数组内存，而 `LinkedBlockingQueue` 则是动态分配链表节点内存。这意味着，`ArrayBlockingQueue` 在创建时就会占用一定的内存空间，且往往申请的内存比实际所用的内存更大，而`LinkedBlockingQueue` 则是根据元素的增加而逐渐占用内存空间。
+**使用场景差异**
+
+- **Queue 适用场景（标准的先进先出场景）**：
+  - 任务调度系统（先来先服务）
+  - 消息队列（生产者-消费者模型）
+  - 广度优先搜索（BFS）
+- **Deque 适用场景（需要两端操作的场景）**：
+  - 撤销操作历史（两端添加，一端移除）
+  - 滑动窗口算法
+  - 可同时作为队列和栈使用
+  - 工作窃取算法（如ForkJoinPool使用Deque）
+  - 实现高效的头尾操作（ArrayDeque比LinkedList更高效）
+
+> 小结：
+>
+> - 需要**标准队列行为** → 选择 Queue
+> - 需要**两端操作**或**栈功能** → 选择 Deque
+> - 需要**优先级排序** → 使用 PriorityQueue（Queue实现）
+> - 追求**高性能** → 优先考虑 ArrayDeque（优于 LinkedList）
+
+**性能特点**
+
+- `ArrayDeque`（Deque实现）比`LinkedList`：
+  - 内存更紧凑（数组实现）
+  - 大多数操作更高效（O(1)时间）
+  - 但不适合频繁的中间插入/删除
+- `PriorityQueue`（Queue实现）：
+  - 基于堆结构
+  - 保证每次取出的都是优先级最高的元素（O(log n)时间）
+
+**线程安全注意**
+
+- 两者主要实现类（LinkedList/ArrayDeque）都**非线程安全**
+- 线程安全替代方案：
+  ```java
+  Queue<String> safeQueue = new ConcurrentLinkedQueue<>();
+  Deque<String> safeDeque = new ConcurrentLinkedDeque<>();
+  ```
+
+### 【简单】ArrayDeque 与 LinkedList 的区别？
+
+- **性能优先选 `ArrayDeque`**：队列/栈场景，追求更高吞吐和更低内存。
+- **功能灵活选 `LinkedList`**：需要中间操作、随机访问或混合数据结构时。
+
+以下是 **ArrayDeque** 和 **LinkedList** 的对比表格，清晰概括两者的核心差异：
+
+| **对比项**        | **ArrayDeque**                          | **LinkedList**                                 |
+| ----------------- | --------------------------------------- | ---------------------------------------------- |
+| **底层数据结构**  | 动态数组（循环数组）                    | 双向链表                                       |
+| **内存占用**      | 更低（连续存储，无节点开销）            | 更高（每个元素需存储前后节点引用）             |
+| **头部/尾部操作** | `O(1)`，常数时间更优                    | `O(1)`，但实际更慢（需操作节点）               |
+| **中间插入/删除** | `O(n)`（需移动元素）                    | `O(1)`（已知位置时）                           |
+| **随机访问**      | 理论上 `O(1)`，但通常不支持直接索引操作 | `O(n)`（需遍历链表）                           |
+| **扩容机制**      | 动态扩容（默认翻倍），扩容时有开销      | 无扩容概念，按需分配节点                       |
+| **功能支持**      | 仅双端队列操作（`Deque`）               | 同时实现 `List` 和 `Deque`，支持索引和中间操作 |
+| **线程安全**      | 非线程安全                              | 非线程安全                                     |
+| **迭代效率**      | 更高（连续内存访问）                    | 较低（非连续内存访问）                         |
+| **适用场景**      | 高频双端操作（如栈、队列）              | 需要中间操作或混合 `List/Deque` 需求的场景     |
+
+### 【简单】PriorityQueue 有什么用？
+
+PriorityQueue 是自动排序的堆结构队列，默认小顶堆，适用优先级调度，但线程不安全。
+
+**基本特性**
+
+- **基于堆（默认小顶堆）**，元素按优先级出队（最小/最大值先出）。
+- **无界队列**（自动扩容），但初始容量为 `11`。
+- **不允许 `null`**，且元素需实现 `Comparable` 或提供 `Comparator`。
+
+**关键操作**  
+| 方法 | 时间复杂度 | 说明 |
+| ------------------------- | ---------- | ------------------------------ |
+| `add(E e)` / `offer(E e)` | O(log n) | 插入元素，触发堆调整。 |
+| `poll()` | O(log n) | 移除并返回队首（优先级最高）。 |
+| `peek()` | O(1) | 查看队首但不移除。 |
+| `remove(Object o)` | O(n) | 删除指定元素（需遍历堆）。 |
+
+**排序规则**
+
+- **默认自然排序**（元素需实现 `Comparable`）。
+- **自定义排序**：通过 `Comparator` 指定（如大顶堆）。
+  ```java
+  PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+  ```
+
+**使用场景**
+
+- **任务调度**（按优先级执行）。
+- **Top K 问题**（维护前 K 个最大/最小值）。
+- **Dijkstra 算法**（优先处理最短路径）。
+
+**注意事项**
+
+- **非线程安全**：多线程需用 `PriorityBlockingQueue`。
+- **迭代无序**：遍历顺序不等于优先级顺序。
+- **性能权衡**：插入/删除 O(log n)，但查找 O(n)。
+
+### 【简单】BlockingQueue 有什么用？
+
+**BlockingQueue 是线程安全的队列**，支持阻塞操作（队列满时阻塞插入，空时阻塞取出）。主要用于**生产者-消费者模型**，协调多线程数据交换。
+
+**关键方法**：
+
+| 方法         | 说明                                            |
+| ------------ | ----------------------------------------------- |
+| `put(E e)`   | 队列满时**阻塞**，直到有空间插入。              |
+| `take()`     | 队列空时**阻塞**，直到有元素可取。              |
+| `offer(E e)` | 非阻塞插入，成功返回 `true`，失败返回 `false`。 |
+| `poll()`     | 非阻塞取出，有元素返回元素，无元素返回 `null`。 |
+| `peek()`     | 查看队首元素但不移除（无元素返回 `null`）。     |
+
+**常见实现类**
+
+- **`ArrayBlockingQueue`**：固定大小数组，单锁，适合低并发。
+- **`LinkedBlockingQueue`**：链表，双锁（高并发），默认几乎无界。
+- **`PriorityBlockingQueue`**：优先级队列（堆实现），无界。
+- **`SynchronousQueue`**：不存储元素，直接传递任务（一对一通信）。
+
+**适用场景**
+
+- **任务调度**（线程池任务队列）。
+- **数据缓冲**（生产者-消费者模型）。
+- **流量控制**（通过固定容量限制并发）。
+
+**注意事项**
+
+- **线程安全**：所有实现均线程安全，但需注意 `peek()` 和 `poll()` 的竞态条件。
+- **阻塞策略**：`put()`/`take()` 会阻塞，`offer()`/`poll()` 可设置超时。
+- **无界队列风险**：`LinkedBlockingQueue` 默认无界，可能导致 `OOM`，建议设置容量。
+
+**一句话总结**： 多线程间安全传递数据的阻塞队列，核心方法是 `put()`（阻塞插入）和 `take()`（阻塞取出），按场景选实现类。
+
+### 【中等】ArrayBlockingQueue 和 LinkedBlockingQueue 有什么区别？
+
+`ArrayBlockingQueue` 和 `LinkedBlockingQueue` 都是 Java 并发包（`java.util.concurrent`）中的**线程安全阻塞队列**，但它们在底层实现、性能和适用场景上有显著区别。
+
+- **`ArrayBlockingQueue`**：固定容量，单锁，适合低并发或内存敏感场景。
+- **`LinkedBlockingQueue`**：动态扩容，双锁，适合高并发和高吞吐场景。
+- **避免 `OOM`**：如果使用 `LinkedBlockingQueue`，建议设置合理容量（默认 `MAX_VALUE` 可能导致内存问题）。
+
+**`ArrayBlockingQueue` vs. `LinkedBlockingQueue`**
+
+| **对比项**       | **ArrayBlockingQueue**             | **LinkedBlockingQueue**                  |
+| ---------------- | ---------------------------------- | ---------------------------------------- |
+| **底层数据结构** | **固定大小的数组**（循环队列）     | **链表**（可动态扩容）                   |
+| **初始化容量**   | **必须指定容量**（无默认构造方法） | 可选指定容量（默认 `Integer.MAX_VALUE`） |
+| **内存占用**     | 更紧凑（连续存储）                 | 稍高（每个节点存储前后指针）             |
+| **锁机制**       | **单锁（入队和出队共用同一把锁）** | **双锁（入队和出队分离锁，减少竞争）**   |
+| **吞吐量**       | 较低（锁竞争更激烈）               | 较高（读写分离，并发性能更好）           |
+| **适用场景**     | 固定大小队列，避免 OOM             | 高并发、动态扩容场景                     |
+
+**底层数据结构**
+
+- **`ArrayBlockingQueue`**
+
+  - 基于**数组**（循环队列），初始化时必须指定固定容量。
+  - 存储连续，内存局部性好，但扩容需重建数组（不支持动态扩容）。
+
+- **`LinkedBlockingQueue`**
+  - 基于**链表**，默认容量 `Integer.MAX_VALUE`（几乎无界）。
+  - 可动态增长，但每个节点需额外存储前后指针，内存开销稍大。
+
+**锁机制**
+
+- **`ArrayBlockingQueue`**
+
+  - 使用**单锁**（`ReentrantLock`），入队和出队操作共用同一把锁，竞争较激烈。
+  - 适合**低并发**或**容量固定**的场景。
+
+- **`LinkedBlockingQueue`**
+  - 采用**双锁**（`putLock` 和 `takeLock`），入队和出队操作互不阻塞。
+  - **高并发**下吞吐量更高（如生产者-消费者模型）。
+
+**性能对比**
+
+| **操作**           | **ArrayBlockingQueue** | **LinkedBlockingQueue** |
+| ------------------ | ---------------------- | ----------------------- |
+| **入队（`put`）**  | 较慢（单锁竞争）       | 更快（双锁分离）        |
+| **出队（`take`）** | 较慢（单锁竞争）       | 更快（双锁分离）        |
+| **内存占用**       | 更紧凑                 | 稍高（链表节点开销）    |
+
+**使用场景建议**
+
+**选择 `ArrayBlockingQueue` 的情况**：
+
+- ✅ **队列大小固定**，防止内存耗尽（如任务队列有严格上限）。
+- ✅ **低/中并发**，且对内存占用敏感。
+
+**选择 `LinkedBlockingQueue` 的情况**：
+
+- ✅ **高并发**（生产者-消费者模型）。
+- ✅ **队列大小不固定**（默认几乎无界，但可手动指定容量）。
+- ✅ **需要更高的吞吐量**（双锁机制减少竞争）。
