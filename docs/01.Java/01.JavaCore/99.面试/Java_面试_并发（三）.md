@@ -15,177 +15,20 @@ permalink: /pages/8ede3b07/
 
 # Java 并发面试三
 
-## ThreadLocal
+## Java 线程池
 
-### ThreadLocal 有什么用？
-
-通常情况下，我们创建的变量是可以被任何一个线程访问并修改的。**如果想实现每一个线程都有自己的专属本地变量该如何解决呢？**
-
-JDK 中自带的`ThreadLocal`类正是为了解决这样的问题。 **`ThreadLocal`类主要解决的就是让每个线程绑定自己的值，可以将`ThreadLocal`类形象的比喻成存放数据的盒子，盒子中可以存储每个线程的私有数据。**
-
-如果你创建了一个`ThreadLocal`变量，那么访问这个变量的每个线程都会有这个变量的本地副本，这也是`ThreadLocal`变量名的由来。他们可以使用 `get()` 和 `set()` 方法来获取默认值或将其值更改为当前线程所存的副本的值，从而避免了线程安全问题。
-
-再举个简单的例子：两个人去宝屋收集宝物，这两个共用一个袋子的话肯定会产生争执，但是给他们两个人每个人分配一个袋子的话就不会出现这样的问题。如果把这两个人比作线程的话，那么 ThreadLocal 就是用来避免这两个线程竞争的。
-
-### 如何使用 ThreadLocal？
-
-相信看了上面的解释，大家已经搞懂 `ThreadLocal` 类是个什么东西了。下面简单演示一下如何在项目中实际使用 `ThreadLocal` 。
-
-```
-import java.text.SimpleDateFormat;
-import java.util.Random;
-
-public class ThreadLocalExample implements Runnable{
-
-     // SimpleDateFormat 不是线程安全的，所以每个线程都要有自己独立的副本
-    private static final ThreadLocal<SimpleDateFormat> formatter = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyyMMdd HHmm"));
-
-    public static void main(String[] args) throws InterruptedException {
-        ThreadLocalExample obj = new ThreadLocalExample();
-        for(int i=0 ; i<10; i++){
-            Thread t = new Thread(obj, ""+i);
-            Thread.sleep(new Random().nextInt(1000));
-            t.start();
-        }
-    }
-
-    @Override
-    public void run() {
-        System.out.println("Thread Name= "+Thread.currentThread().getName()+" default Formatter = "+formatter.get().toPattern());
-        try {
-            Thread.sleep(new Random().nextInt(1000));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        //formatter pattern is changed here by thread, but it won't reflect to other threads
-        formatter.set(new SimpleDateFormat());
-
-        System.out.println("Thread Name= "+Thread.currentThread().getName()+" formatter = "+formatter.get().toPattern());
-    }
-
-}
-```
-
-输出结果 :
-
-```
-Thread Name= 0 default Formatter = yyyyMMdd HHmm
-Thread Name= 0 formatter = yy-M-d ah:mm
-Thread Name= 1 default Formatter = yyyyMMdd HHmm
-Thread Name= 2 default Formatter = yyyyMMdd HHmm
-Thread Name= 1 formatter = yy-M-d ah:mm
-Thread Name= 3 default Formatter = yyyyMMdd HHmm
-Thread Name= 2 formatter = yy-M-d ah:mm
-Thread Name= 4 default Formatter = yyyyMMdd HHmm
-Thread Name= 3 formatter = yy-M-d ah:mm
-Thread Name= 4 formatter = yy-M-d ah:mm
-Thread Name= 5 default Formatter = yyyyMMdd HHmm
-Thread Name= 5 formatter = yy-M-d ah:mm
-Thread Name= 6 default Formatter = yyyyMMdd HHmm
-Thread Name= 6 formatter = yy-M-d ah:mm
-Thread Name= 7 default Formatter = yyyyMMdd HHmm
-Thread Name= 7 formatter = yy-M-d ah:mm
-Thread Name= 8 default Formatter = yyyyMMdd HHmm
-Thread Name= 9 default Formatter = yyyyMMdd HHmm
-Thread Name= 8 formatter = yy-M-d ah:mm
-Thread Name= 9 formatter = yy-M-d ah:mm
-```
-
-从输出中可以看出，虽然 `Thread-0` 已经改变了 `formatter` 的值，但 `Thread-1` 默认格式化值与初始化值相同，其他线程也一样。
-
-上面有一段代码用到了创建 `ThreadLocal` 变量的那段代码用到了 Java8 的知识，它等于下面这段代码，如果你写了下面这段代码的话，IDEA 会提示你转换为 Java8 的格式 (IDEA 真的不错！)。因为 ThreadLocal 类在 Java 8 中扩展，使用一个新的方法`withInitial()`，将 Supplier 功能接口作为参数。
-
-```
-private static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>(){
-    @Override
-    protected SimpleDateFormat initialValue(){
-        return new SimpleDateFormat("yyyyMMdd HHmm");
-    }
-};
-```
-
-### ThreadLocal 原理了解吗？
-
-从 `Thread`类源代码入手。
-
-```
-public class Thread implements Runnable {
-    //......
-    //与此线程有关的 ThreadLocal 值。由 ThreadLocal 类维护
-    ThreadLocal.ThreadLocalMap threadLocals = null;
-
-    //与此线程有关的 InheritableThreadLocal 值。由 InheritableThreadLocal 类维护
-    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
-    //......
-}
-```
-
-从上面`Thread`类 源代码可以看出`Thread` 类中有一个 `threadLocals` 和 一个 `inheritableThreadLocals` 变量，它们都是 `ThreadLocalMap` 类型的变量，我们可以把 `ThreadLocalMap` 理解为`ThreadLocal` 类实现的定制化的 `HashMap`。默认情况下这两个变量都是 null，只有当前线程调用 `ThreadLocal` 类的 `set`或`get`方法时才创建它们，实际上调用这两个方法的时候，我们调用的是`ThreadLocalMap`类对应的 `get()`、`set()`方法。
-
-`ThreadLocal`类的`set()`方法
-
-```
-public void set(T value) {
-    //获取当前请求的线程
-    Thread t = Thread.currentThread();
-    //取出 Thread 类内部的 threadLocals 变量（哈希表结构）
-    ThreadLocalMap map = getMap(t);
-    if (map != null)
-        // 将需要存储的值放入到这个哈希表中
-        map.set(this, value);
-    else
-        createMap(t, value);
-}
-ThreadLocalMap getMap(Thread t) {
-    return t.threadLocals;
-}
-```
-
-通过上面这些内容，我们足以通过猜测得出结论：**最终的变量是放在了当前线程的 `ThreadLocalMap` 中，并不是存在 `ThreadLocal` 上，`ThreadLocal` 可以理解为只是`ThreadLocalMap`的封装，传递了变量值。** `ThrealLocal` 类中可以通过`Thread.currentThread()`获取到当前线程对象后，直接通过`getMap(Thread t)`可以访问到该线程的`ThreadLocalMap`对象。
-
-**每个`Thread`中都具备一个`ThreadLocalMap`，而`ThreadLocalMap`可以存储以`ThreadLocal`为 key ，Object 对象为 value 的键值对。**
-
-```
-ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
-    //......
-}
-```
-
-比如我们在同一个线程中声明了两个 `ThreadLocal` 对象的话， `Thread`内部都是使用仅有的那个`ThreadLocalMap` 存放数据的，`ThreadLocalMap`的 key 就是 `ThreadLocal`对象，value 就是 `ThreadLocal` 对象调用`set`方法设置的值。
-
-`ThreadLocal` 数据结构如下图所示：
-
-[![ThreadLocal 数据结构](https://camo.githubusercontent.com/1819d183385b93268378cf890d4b70cbc31c12bbe8e153deb4f3f8337bc0ebd7/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f7468726561646c6f63616c2d646174612d7374727563747572652e706e67)](https://camo.githubusercontent.com/1819d183385b93268378cf890d4b70cbc31c12bbe8e153deb4f3f8337bc0ebd7/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f7468726561646c6f63616c2d646174612d7374727563747572652e706e67)
-
-`ThreadLocalMap`是`ThreadLocal`的静态内部类。
-
-[![ThreadLocal 内部类](https://camo.githubusercontent.com/c8e18827ce59c5dfed521f3c5a1d7fcacf559da6b472b4f782013b362c513795/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f7468726561642d6c6f63616c2d696e6e65722d636c6173732e706e67)](https://camo.githubusercontent.com/c8e18827ce59c5dfed521f3c5a1d7fcacf559da6b472b4f782013b362c513795/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f7468726561642d6c6f63616c2d696e6e65722d636c6173732e706e67)
-
-### ThreadLocal 内存泄露问题是怎么导致的？
-
-`ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用，而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。
-
-这样一来，`ThreadLocalMap` 中就会出现 key 为 null 的 Entry。假如我们不做任何措施的话，value 永远无法被 GC 回收，这个时候就可能会产生内存泄露。`ThreadLocalMap` 实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后最好手动调用`remove()`方法
-
-```
-static class Entry extends WeakReference<ThreadLocal<?>> {
-    /** The value associated with this ThreadLocal. */
-    Object value;
-
-    Entry(ThreadLocal<?> k, Object v) {
-        super(k);
-        value = v;
-    }
-}
-```
-
-**弱引用介绍：**
-
-> 如果一个对象只具有弱引用，那就类似于**可有可无的生活用品**。弱引用与软引用的区别在于：只具有弱引用的对象拥有更短暂的生命周期。在垃圾回收器线程扫描它 所管辖的内存区域的过程中，一旦发现了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。不过，由于垃圾回收器是一个优先级很低的线程， 因此不一定会很快发现那些只具有弱引用的对象。
->
-> 弱引用可以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回收，Java 虚拟机就会把这个弱引用加入到与之关联的引用队列中。
-
-## 线程池
+【中等】你了解 Java 线程池的原理吗？
+【中等】如何合理地设置 Java 线程池的线程数？
+【中等】Java 线程池有哪些拒绝策略？
+【中等】Java 并发库中提供了哪些线程池实现？它们有什么区别？
+【困难】Java 线程池核心线程数在运行过程中能修改吗？如何修改？
+【中等】Java 线程池中 shutdown 与 shutdownNow 的区别是什么？
+【中等】Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？
+【中等】Java 中的 DelayQueue 和 ScheduledThreadPool 有什么区别？
+【中等】Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？
+【中等】Java 线程池中 shutdown 与 shutdownNow 的区别是什么？
+【困难】Java 线程池核心线程数在运行过程中能修改吗？如何修改？
+【简单】Java 创建线程池有哪些方式？
 
 ### 什么是线程池？
 
@@ -203,24 +46,7 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 - **提高响应速度**。当任务到达时，任务可以不需要等到线程创建就能立即执行。
 - **提高线程的可管理性**。线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。
 
-### 如何创建线程池？
-
-**方式一：通过`ThreadPoolExecutor`构造函数来创建（推荐）。**
-
-[![通过构造方法实现](https://github.com/Snailclimb/JavaGuide/raw/main/docs/java/concurrent/images/java-thread-pool-summary/threadpoolexecutor%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0.png)](https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/concurrent/images/java-thread-pool-summary/threadpoolexecutor 构造函数。png)
-
-**方式二：通过 `Executor` 框架的工具类 `Executors` 来创建。**
-
-`Executors`工具类提供的创建线程池的方法如下图所示：
-
-[![img](https://camo.githubusercontent.com/bdfb503aac4225d5cf902e997970b57cdacf3fbce9a2b0d3d111870046fff376/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f6578656375746f72732d6e65772d7468726561642d706f6f6c2d6d6574686f64732e706e67)](https://camo.githubusercontent.com/bdfb503aac4225d5cf902e997970b57cdacf3fbce9a2b0d3d111870046fff376/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f6578656375746f72732d6e65772d7468726561642d706f6f6c2d6d6574686f64732e706e67)
-
-可以看出，通过`Executors`工具类可以创建多种类型的线程池，包括：
-
-- `FixedThreadPool`：固定线程数量的线程池。该线程池中的线程数量始终不变。当有一个新的任务提交时，线程池中若有空闲线程，则立即执行。若没有，则新的任务会被暂存在一个任务队列中，待有线程空闲时，便处理在任务队列中的任务。
-- `SingleThreadExecutor`： 只有一个线程的线程池。若多余一个任务被提交到该线程池，任务会被保存在一个任务队列中，待线程空闲，按先入先出的顺序执行队列中的任务。
-- `CachedThreadPool`： 可根据实际情况调整线程数量的线程池。线程池的线程数量不确定，但若有空闲线程可以复用，则会优先使用可复用的线程。若所有线程均在工作，又有新的任务提交，则会创建新的线程处理任务。所有线程在当前任务执行完毕后，将返回线程池进行复用。
-- `ScheduledThreadPool`：给定的延迟后运行任务或者定期执行任务的线程池。
+### 【简单】Java 创建线程池有哪些方式？
 
 ### 为什么不推荐使用内置线程池？
 
@@ -787,66 +613,11 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
 
 [![img](https://camo.githubusercontent.com/bae81809cbfbee278ea8553cb9f67f0a656e8ca3c71b21050d5ac13b0d3a89c9/68747470733a2f2f6f73732e6a61766167756964652e636e2f6a61766167756964652f696d6167652d32303231303930323039333032363035392e706e67)](https://camo.githubusercontent.com/bae81809cbfbee278ea8553cb9f67f0a656e8ca3c71b21050d5ac13b0d3a89c9/68747470733a2f2f6f73732e6a61766167756964652e636e2f6a61766167756964652f696d6167652d32303231303930323039333032363035392e706e67)
 
-## AQS
+## Java 并发工具
 
-### AQS 是什么？
-
-AQS 的全称为 `AbstractQueuedSynchronizer` ，翻译过来的意思就是抽象队列同步器。这个类在 `java.util.concurrent.locks` 包下面。
-
-[![img](https://camo.githubusercontent.com/f005531c065284d60ab560110b41e0d91de345807cfd658e7539602b2a8e916c/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f4151532e706e67)](https://camo.githubusercontent.com/f005531c065284d60ab560110b41e0d91de345807cfd658e7539602b2a8e916c/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f4151532e706e67)
-
-AQS 就是一个抽象类，主要用来构建锁和同步器。
-
-```
-public abstract class AbstractQueuedSynchronizer extends AbstractOwnableSynchronizer implements java.io.Serializable {
-}
-```
-
-AQS 为构建锁和同步器提供了一些通用功能的实现，因此，使用 AQS 能简单且高效地构造出应用广泛的大量的同步器，比如我们提到的 `ReentrantLock`，`Semaphore`，其他的诸如 `ReentrantReadWriteLock`，`SynchronousQueue`等等皆是基于 AQS 的。
-
-### AQS 的原理是什么？
-
-AQS 核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制 AQS 是用 **CLH 队列锁** 实现的，即将暂时获取不到锁的线程加入到队列中。
-
-CLH(Craig,Landin,and Hagersten) 队列是一个虚拟的双向队列（虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系）。AQS 是将每条请求共享资源的线程封装成一个 CLH 锁队列的一个结点（Node）来实现锁的分配。在 CLH 同步队列中，一个节点表示一个线程，它保存着线程的引用（thread）、 当前节点在队列中的状态（waitStatus）、前驱节点（prev）、后继节点（next）。
-
-CLH 队列结构如下图所示：
-
-[![img](https://camo.githubusercontent.com/889c9071ff9311e4692e51259330c5aa977cbe8920e2b3f83b7fcb99e0c6c120/68747470733a2f2f6f73732e6a61766167756964652e636e2f70332d6a75656a696e2f34306362393332613634363934323632393933393037656264613661306266657e74706c762d6b3375316662706663702d7a6f6f6d2d312e706e67)](https://camo.githubusercontent.com/889c9071ff9311e4692e51259330c5aa977cbe8920e2b3f83b7fcb99e0c6c120/68747470733a2f2f6f73732e6a61766167756964652e636e2f70332d6a75656a696e2f34306362393332613634363934323632393933393037656264613661306266657e74706c762d6b3375316662706663702d7a6f6f6d2d312e706e67)
-
-AQS(`AbstractQueuedSynchronizer`) 的核心原理图（图源 [Java 并发之 AQS 详解](https://www.cnblogs.com/waterystone/p/4920797.html)）如下：
-
-[![img](https://camo.githubusercontent.com/fc9871754fb4d8fec38abcba2837d12765c800432241be11fc8892e5b9f2fe50/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f434c482e706e67)](https://camo.githubusercontent.com/fc9871754fb4d8fec38abcba2837d12765c800432241be11fc8892e5b9f2fe50/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f434c482e706e67)
-
-AQS 使用 **int 成员变量 `state` 表示同步状态**，通过内置的 **线程等待队列** 来完成获取资源线程的排队工作。
-
-`state` 变量由 `volatile` 修饰，用于展示当前临界资源的获锁情况。
-
-```
-// 共享变量，使用 volatile 修饰保证线程可见性
-private volatile int state;
-```
-
-另外，状态信息 `state` 可以通过 `protected` 类型的`getState()`、`setState()`和`compareAndSetState()` 进行操作。并且，这几个方法都是 `final` 修饰的，在子类中无法被重写。
-
-```
-//返回同步状态的当前值
-protected final int getState() {
-     return state;
-}
- // 设置同步状态的值
-protected final void setState(int newState) {
-     state = newState;
-}
-//原子地（CAS 操作）将同步状态值设置为给定值 update 如果当前同步状态的值等于 expect（期望值）
-protected final boolean compareAndSetState(int expect, int update) {
-      return unsafe.compareAndSwapInt(this, stateOffset, expect, update);
-}
-```
-
-以 `ReentrantLock` 为例，`state` 初始值为 0，表示未锁定状态。A 线程 `lock()` 时，会调用 `tryAcquire()` 独占该锁并将 `state+1` 。此后，其他线程再 `tryAcquire()` 时就会失败，直到 A 线程 `unlock()` 到 `state=`0（即释放锁）为止，其它线程才有机会获取该锁。当然，释放锁之前，A 线程自己是可以重复获取此锁的（`state` 会累加），这就是可重入的概念。但要注意，获取多少次就要释放多少次，这样才能保证 state 是能回到零态的。
-
-再以 `CountDownLatch` 以例，任务分为 N 个子线程去执行，`state` 也初始化为 N（注意 N 要与线程个数一致）。这 N 个子线程是并行执行的，每个子线程执行完后`countDown()` 一次，state 会 CAS(Compare and Swap) 减 1。等到所有子线程都执行完后（即 `state=0` )，会 `unpark()` 主调用线程，然后主调用线程就会从 `await()` 函数返回，继续后余动作。
+【中等】你使用过哪些 Java 并发工具类？
+【中等】什么是 Java 的 Semaphore？
+【困难】什么是 Java 的 CyclicBarrier？
 
 ### Semaphore 有什么用？
 
@@ -1154,12 +925,6 @@ public int await() throws InterruptedException, BrokenBarrierException {
         }
     }
 ```
-
-## 虚拟线程
-
-虚拟线程在 Java 21 正式发布，这是一项重量级的更新。
-
-虽然目前面试中问的不多，但还是建议大家去简单了解一下，具体可以阅读这篇文章：[虚拟线程极简入门](https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/concurrent/virtual-thread.md) 。重点搞清楚虚拟线程和平台线程的关系以及虚拟线程的优势即可。
 
 ## 案例
 

@@ -683,102 +683,194 @@ Java 中的线程优先级的范围是 `[1,10]`，一般来说，高优先级的
 
 即使设置了线程的优先级，也**无法保证高优先级的线程一定先执行**。这是因为 **Java 线程优先级依赖于操作系统的支持**，然而，不同的操作系统支持的线程优先级并不相同，不能很好的和 Java 中线程优先级一一对应。因此，Java 线程优先级控制并不可靠。
 
-## volatile
+## Java 内存模型
 
-被 `volatile` 关键字修饰的变量有两层含义：
+### 【中等】什么是 Java 内存模型？
 
-- **保证变量的可见性**
-- **防止 JVM 的指令重排序**
+**Java Memory Model (JMM)** 是 Java 规范定义的一套**多线程内存访问规则**，用于解决并发编程中的**可见性、原子性、有序性**问题。目的是让 Java 程序在不同硬件和操作系统上都能正确执行并发操作。
 
-### volatile 保证线程可见性
+**CPU、内存、I/O 设备存在很大的速度差异** - CPU 远快于内存，内存远快于 I/O 设备。
 
-**典型问题**
+为了合理利用 CPU 的高性能，平衡这三者的速度差异，计算机体系机构、操作系统、编译程序都做出了贡献，主要体现为：
 
-- `volatile` 有什么作用？
-- Java 中，如何保证变量的可见性？
+- **CPU 增加了缓存**，以均衡与 CPU 内存的速度差异；
+- **编译程序优化指令执行次序**，使得缓存能够得到更加合理地利用。
+- **操作系统增加了进程、线程**，以分时复用 CPU，进而均衡 CPU 与 I/O 的速度差异；
 
-**知识点**
+**缓存一致性**
 
-**在 Java 并发场景中，`volatile` 可以保证线程可见性**。保证了不同线程对这个变量进行操作时的可见性，即一个线程修改了某个共享变量，另外一个线程能读到这个修改的值。
+**缓存**导致的可见性问题，**编译优化**带来的有序性问题，**线程切换**带来的原子性问题。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210102230327.png)
+为了解决缓存一致性问题，**需要各个处理器访问缓存时都遵循一些协议，在读写时要根据协议来进行操作**。
 
-`volatile` 关键字其实并非是 Java 语言特有的，在 C 语言里也有，它最原始的意义就是禁用 CPU 缓存。如果我们将一个变量使用 `volatile` 修饰，这就指示 编译器，这个变量是共享且不稳定的，每次使用它都到主存中进行读取。
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290755550.png)
 
-`volatile` 关键字能保证数据的可见性，但不能保证数据的原子性。`synchronized` 关键字两者都能保证。
+**指令重排序**
 
-### volatile 防止 JVM 的指令重排序
+为了使缓存得到更加合理地使用，计算机在执行程序代码的时候，会对指令进行重排序。常见的指令重排序有下面 2 种情况：
 
-**典型问题**
+- **编译器优化重排**：编译器在不改变单线程语义的前提下调整语句顺序。
+- **指令并行重排**：处理器利用指令级并行技术（ILP）调整指令执行顺序（无数据依赖时）。
 
-- `volatile` 有什么作用？
-- Java 中，如何防止 JVM 的指令重排序？
+Java 源代码会经历 **编译器优化重排 —> 指令并行重排 —> 内存系统重排** 的过程，最终才变成操作系统可执行的指令序列。指令重排序**可以保证串行语义一致，但是没有义务保证多线程间的语义也一致 ，所以在多线程下，指令重排序可能会导致一些问题。**
 
-**知识点**
+解决方案：
 
-观察加入 `volatile` 关键字和没有加入 `volatile` 关键字时所生成的汇编代码发现，**加入 `volatile` 关键字时，会多出一个 `lock` 前缀指令**。
+- **编译器**：禁止特定类型的编译器重排序。
+- **处理器**：通过插入**内存屏障（Memory Barrier/Fence）**禁止特定处理器重排序。
 
-**`lock` 前缀指令实际上相当于一个内存屏障**（也成内存栅栏），内存屏障会提供 3 个功能：
+> 👉 扩展阅读：[全面理解 Java 内存模型](https://blog.csdn.net/suifeng3051/article/details/52611310)
 
-- 它确保指令重排序时不会把其后面的指令排到内存屏障之前的位置，也不会把前面的指令排到内存屏障的后面；即在执行到内存屏障这句指令时，在它前面的操作已经全部完成；
-- 它会强制将对缓存的修改操作立即写入主存；
-- 如果是写操作，它会导致其他 CPU 中对应的缓存行无效。
+### 【困难】什么是 Happens-Before 规则？有什么用？
 
-在 Java 中，`Unsafe` 类提供了三个开箱即用的内存屏障相关的方法，屏蔽了操作系统底层的差异：
+JMM 为程序中所有的操作定义了一个偏序关系，称之为 **`先行发生原则（Happens-Before）`**。**Happens-Before 是 JMM 的核心规则，用于约束指令重排序和保证多线程可见性。**
+
+**Happens-Before** 非常重要，它是判断数据是否存在竞争、线程是否安全的主要依据，依靠这个原则，我们可以通过几条规则一揽子地解决并发环境下两个操作间是否可能存在冲突的所有问题。
+
+1. **程序顺序规则**：单线程内代码顺序执行（但不影响多线程重排序）。
+2. **`volatile` 规则**：**`volatile` 写** Happens-Before **后续的 `volatile` 读**。**volatile 保证可见性 + 禁止指令重排序**。
+3. **锁规则**：**解锁** Happens-Before **后续的加锁**（如 `synchronized`、`ReentrantLock`）。
+4. **线程启动规则**：**`Thread.start()`** Happens-Before **线程内的所有操作**。
+5. **线程终止规则**：**线程中的所有操作** Happens-Before **`Thread.join()` 完成**。
+6. **线程中断规则**：**`Thread.interrupt()`** Happens-Before **被中断线程检测到中断（`isInterrupted()` 或 `InterruptedException`）**。
+7. **对象终结规则**：**对象的构造函数执行结束** Happens-Before **`finalize()` 方法被调用**。
+8. **传递性**：若 A → B 且 B → C，则 A → C。
+
+> 1978 年，Lamport 在论文 [**Time, Clocks, and the Ordering of Events in a Distributed System**](https://lamport.azurewebsites.net/pubs/time-clocks.pdf) （[**译文**](https://cloud.tencent.com/developer/article/1163428)，[**解读**](https://zhuanlan.zhihu.com/p/56146800) ）中第一次提出了 Happens-Before，阐述了偏序关系（partial ordering）、逻辑时钟（Logical Clocks）概念，提出解决分布式系统中区分事件发生的时序问题的方法。Happens-Before 的语义是一种因果关系：如果 A 事件是导致 B 事件的起因，那么 A 事件一定是先于（Happens-Before）B 事件发生的。
+
+### 【困难】什么是 Java 内存屏障？有什么用？
+
+内存屏障（Memory Barrier/Fence）是 JMM 的底层机制，通过 **限制重排序** 和 **强制缓存同步**，实现多线程程序的 **可见性** 和 **有序性**。
+
+- **禁止特定类型的指令重排序**（编译器和处理器优化可能导致乱序执行）。
+- **强制刷新 CPU 缓存**，确保多线程间的 **内存可见性**。
+
+JVM 依赖底层 CPU 的内存屏障指令（如 x86 的 `mfence`/`lfence`/`sfence`），抽象为以下四种：
+
+- **LoadLoad**：确保 `Load1` 的读取操作在 `Load2` 及后续读取之前完成。 示例：`volatile` 读后的普通读。
+- **StoreStore**：确保 `Store1` 的写入操作在 `Store2` 及后续写入之前对其他线程可见。示例：`volatile` 写前的普通写。
+- **LoadStore**：确保 `Load1` 的读取操作在 `Store2` 及后续写入之前完成。
+- **StoreLoad**：确保 `Store1` 的写入对所有线程可见后，才执行 `Load2` 的读取。 **开销最大**（如 `volatile` 写后的 `volatile` 读会插入此屏障）。
+
+**内存屏障的应用场景**
+
+- **`volatile` 变量**
+  - **写操作**：插入 `StoreStore` + `StoreLoad` 屏障。
+  - **读操作**：插入 `LoadLoad` + `LoadStore` 屏障。
+- **`synchronized` 锁**
+  - 进入临界区（加锁）和退出（解锁）时插入屏障，保证可见性和有序性。
+- **`final` 字段**
+  - 构造函数中的 `final` 字段写入后插入屏障，确保正确初始化对其他线程可见。
+
+**内存屏障的作用**
+
+- **禁止重排序**：防止编译器和 CPU 优化破坏多线程逻辑（如单例模式的 DCL 问题）。
+- **保证可见性**：强制将工作内存的修改刷回主内存，并失效其他线程的缓存。
+- **保证有序性**：确保临界区代码按预期顺序执行（如 `happens-before` 规则的实现基础）。
+
+**底层实现**
+
+- **x86 CPU**：`StoreLoad` 对应 `mfence` 指令，其他屏障通常无实际指令（因 x86 强内存模型已满足大部分需求）。
+- **ARM/PowerPC**：弱内存模型需显式插入更多屏障指令。
+- **JVM 的封装**：通过 `Unsafe` 类提供 `loadFence()`/`storeFence()`/`fullFence()` 方法（如 `VarHandle` 内部使用）。
+
+**示例：`volatile` 的屏障插入**
 
 ```java
-public native void loadFence();
-public native void storeFence();
-public native void fullFence();
-```
+volatile int flag = 0;
+int value = 0;
 
-理论上来说，你通过这个三个方法也可以实现和 `volatile` 禁止重排序一样的效果，只是会麻烦一些。
+void write() {
+    value = 42;          // 普通写
+    // StoreStore 屏障（确保 value=42 先刷入主内存）
+    flag = 1;            // volatile 写
+    // StoreLoad 屏障（保证写操作对所有线程可见）
+}
 
-下面我以一个常见的面试题为例讲解一下 `volatile` 关键字禁止指令重排序的效果。
-
-面试中面试官经常会说：“单例模式了解吗？来给我手写一下！给我解释一下双重检验锁方式实现单例模式的原理呗！”
-
-**双重校验锁实现对象单例（线程安全）**：
-
-```java
-public class Singleton {
-
-    private volatile static Singleton uniqueInstance;
-
-    private Singleton() {
-    }
-
-    public  static Singleton getUniqueInstance() {
-       // 先判断对象是否已经实例过，没有实例化过才进入加锁代码
-        if (uniqueInstance == null) {
-            // 类对象加锁
-            synchronized (Singleton.class) {
-                if (uniqueInstance == null) {
-                    uniqueInstance = new Singleton();
-                }
-            }
-        }
-        return uniqueInstance;
+void read() {
+    if (flag == 1) {     // volatile 读
+        // LoadLoad + LoadStore 屏障
+        System.out.println(value); // 保证读到 value=42
     }
 }
 ```
 
-`uniqueInstance` 采用 `volatile` 关键字修饰也是很有必要的， `uniqueInstance = new Singleton();` 这段代码其实是分为三步执行：
+### 【中等】`volatile` 有什么作用？
 
-1. 为 `uniqueInstance` 分配内存空间
-2. 初始化 `uniqueInstance`
-3. 将 `uniqueInstance` 指向分配的内存地址
+`volatile` 是轻量级的线程同步工具。**`volatile` 可以保证可见性和有序性，但不保证原子性**。适用于状态标志、DCL 单例等场景。
 
-但是由于 JVM 具有指令重排的特性，执行顺序有可能变成 1->3->2。指令重排在单线程环境下不会出现问题，但是在多线程环境下会导致一个线程获得还没有初始化的实例。例如，线程 T1 执行了 1 和 3，此时 T2 调用 `getUniqueInstance`() 后发现 `uniqueInstance` 不为空，因此返回 `uniqueInstance`，但此时 `uniqueInstance` 还未被初始化。
+**注意事项**
 
-### volatile 不保证原子性
+- **不要滥用**：仅适用于简单状态同步，复杂操作仍需锁或原子类。
+- **不适用于复合操作**：如 `check-then-act`（需 `synchronized` 或 CAS）。
 
-**问题点**
+::: info 保证可见性
 
-- volatile 能保证原子性吗？
-- volatile 能完全保证并发安全吗？
+:::
 
-**知识点**
+- **强制线程每次读取 `volatile` 变量时**，直接从主内存获取最新值（跳过工作内存缓存）。
+- **强制线程每次写入 `volatile` 变量时**，立即同步到主内存，使其他线程立即可见。
+
+::: info 禁止指令重排序
+
+:::
+
+- 通过插入 **内存屏障（Memory Barrier）** 禁止编译器和 CPU 对 `volatile` 变量的读写操作进行重排序。
+- **双重检查锁（DCL）单例模式** 中必须用 `volatile` 修饰实例变量，防止对象未初始化完成就被使用。
+
+::: info 不保证原子性
+
+:::
+
+`volatile` **不能替代 `synchronized`**，例如 `volatile int i++;` 仍存在竞态条件（需用 `AtomicInteger`）。
+
+适用场景：**单线程写、多线程读** 的变量（如开关标志）。
+
+::: info volatile 底层实现原理
+
+:::
+
+- **写操作**：插入 `StoreStore` + `StoreLoad` 屏障，确保写入前所有操作完成，且结果全局可见。
+- **读操作**：插入 `LoadLoad` + `LoadStore` 屏障，确保读取后所有操作依赖最新值。
+
+::: info volatile 应用场景
+
+:::
+
+**状态标志位**
+
+```java
+volatile boolean running = true;
+
+void stop() { running = false; }  // 线程 A
+void run() { while (running) { ... } } // 线程 B
+```
+
+**双重检查锁（DCL）**
+
+```java
+class Singleton {
+    private static volatile Singleton instance;
+    static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton(); // 禁止重排序
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+**发布不可变对象**
+
+```java
+volatile Map<String, String> config = readConfig(); // 保证引用可见性
+```
+
+### 【中等】volatile 能完全保证并发安全吗？
 
 线程安全需要具备：可见性、原子性、顺序性。**`volatile` 不保证原子性，所以决定了它不能彻底地保证线程安全**。
 
@@ -863,23 +955,33 @@ public void increase() {
 }
 ```
 
-### volatile 和 synchronized
-
-**典型问题**
-
-`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` ？
-
-**知识点**
+### 【中等】`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？
 
 **`volatile` 无法替代 `synchronized` ，因为 `volatile` 无法保证操作的原子性**。
 
-- `volatile` 本质是在告诉 jvm 当前变量在寄存器（工作内存）中的值是不确定的，需要从主存中读取；`synchronized` 则是锁定当前变量，只有当前线程可以访问该变量，其他线程被阻塞住。
-- `volatile` 仅能修饰变量；`synchronized` 可以修饰方法和代码块。
-- `volatile` 仅能实现变量的修改可见性，不能保证原子性；而 `synchronized` 则可以保证变量的修改可见性和原子性
-- `volatile` 不会造成线程的阻塞；`synchronized` 可能会造成线程的阻塞。
-- `volatile` 标记的变量不会被编译器优化；`synchronized` 标记的变量可以被编译器优化。
+**volatile 和 synchronized 的特性区别**：
 
-## synchronized
+| 特性       | `volatile`            | `synchronized`        |
+| ---------- | --------------------- | --------------------- |
+| **原子性** | ❌ 不保证（如 `i++`） | ✅ 保证               |
+| **可见性** | ✅ 强制主内存读写     | ✅ 通过锁机制保证     |
+| **有序性** | ✅ 禁止重排序         | ✅ 串行化执行         |
+| **性能**   | ⚡ 轻量级（无锁）     | 🔒 较重（上下文切换） |
+
+**volatile 和 synchronized 的实现区别**：
+
+- **volatile**：
+  - 通过 **内存屏障** 禁止指令重排序
+  - 强制 **CPU 缓存失效** 保证可见性
+  - 底层使用 **LoadLoad/StoreStore 等屏障指令**
+- **synchronized**：
+  - 通过 **Monitor 监视器锁**（对象头 Mark Word）
+  - 包含 **偏向锁→轻量级锁→重量级锁** 的升级过程
+  - 保证 **代码块/方法** 的排他性访问
+
+### 【中等】`synchronized` 有什么作用？
+
+`synchronized` 是 Java 最基础的线程同步机制，通过 **原子性、可见性、有序性** 保障线程安全，适用于需要 **强一致性** 的场景，但需合理控制锁粒度以避免性能问题。
 
 `synchronized` 有 3 种应用方式：
 
@@ -887,328 +989,183 @@ public void increase() {
 - **同步静态方法** - 对于静态同步方法，锁是当前类的 `Class` 对象
 - **同步代码块** - 对于同步方法块，锁是 `synchonized` 括号里配置的对象
 
-**原理**
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409090719904.png)
 
-`synchronized` 经过编译后，会在同步块的前后分别形成 `monitorenter` 和 `monitorexit` 这两个字节码指令，这两个字节码指令都需要一个引用类型的参数来指明要锁定和解锁的对象。如果 `synchronized` 明确制定了对象参数，那就是这个对象的引用；如果没有明确指定，那就根据 `synchronized` 修饰的是实例方法还是静态方法，去对对应的对象实例或 `Class` 对象来作为锁对象。
+### 【中等】`synchronized` 的实现原理是什么？
 
-`synchronized` 同步块对同一线程来说是可重入的，不会出现锁死问题。
+`synchronized` 的底层实现涉及 **Java 对象头、Monitor（监视器）、锁升级机制** 等。
 
-`synchronized` 同步块是互斥的，即已进入的线程执行完成前，会阻塞其他试图进入的线程。
+**`synchronized` 修饰代码块时，在代码块前后植入 monitorenter 和 monitorexit 字节码指令，相当于加锁和解锁**。
 
-**优化**
+**`synchronized` 修饰方法时，会在方法的访问标志上设置一个 `ACC_SYNCHRONIZED` 标记**。线程每次访问方法，会进行检查，若设置了 `ACC_SYNCHRONIZED` 标记，执行线程将先持有 `Monitor` 对象，然后再执行方法。在该方法运行期间，其它线程将无法获取到该 Mointor 对象，当方法执行完成后，再释放该 Monitor 对象。
 
-Java 1.6 以后，`synchronized` 做了大量的优化，其性能已经与 `Lock` 、`ReadWriteLock` 基本上持平。
+**（1）对象头与 Mark Word**
 
-`synchronized` 的优化是将锁粒度分为不同级别，`synchronized` 会根据运行状态动态的由低到高调整锁级别（**偏向锁** -> **轻量级锁** -> **重量级锁**），以减少阻塞。
+每个 Java 对象在内存中由 **对象头（Header）、实例数据（Instance Data）、对齐填充（Padding）** 组成。
+`synchronized` 的锁信息存储在 **对象头** 的 **Mark Word** 中，主要包括：
 
-**同步方法 or 同步块？**
+- **锁状态**（无锁、偏向锁、轻量级锁、重量级锁）
+- **持有锁的线程 ID**
+- **GC 分代年龄**
+- **哈希码（HashCode）**
 
-- 同步块是更好的选择。
-- 因为它不会锁住整个对象（当然你也可以让它锁住整个对象）。同步方法会锁住整个对象，哪怕这个类中有多个不相关联的同步块，这通常会导致他们停止执行并需要等待获得这个对象上的锁。
+Mark Word 记录了对象和锁有关的信息。Mark Word 在 64 位 JVM 中的长度是 64bit，我们可以一起看下 64 位 JVM 的存储结构是怎么样的。如下图所示：
 
-### synchronized 作用
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200629191250.png)
 
-**典型问题**
+**（2）Monitor（监视器）**
 
-`synchronized` 有什么作用？
+每个 Java 对象都关联一个 **Monitor（监视器）**，用于实现同步机制。Monitor 的主要结构：
 
-**知识点**
+- **`_owner`**：持有锁的线程
+- **`_EntryList`**：等待获取锁的线程队列（阻塞状态）
+- **`_WaitSet`**：调用 `wait()` 后进入等待状态的线程队列
 
-**`synchronized` 可以保证在同一个时刻，只有一个线程可以执行某个方法或者某个代码块**。
+### 【困难】JDK6 对`synchronized` 进行了哪些优化？
 
-`synchronized` 同步块对同一线程来说是可重入的，不会出现锁死问题。
+**JDK 6 以后，`synchronized` 做了大量的优化，其性能已经与 `Lock` 、`ReadWriteLock` 基本上持平**。
 
-`synchronized` 同步块是互斥的，即已进入的线程执行完成前，会阻塞其他试图进入的线程。
-
-在 Java 早期版本中，`synchronized` 属于 **重量级锁**，效率低下。这是因为监视器锁（monitor）是依赖于底层的操作系统的 `Mutex Lock` 来实现的，Java 的线程是映射到操作系统的原生线程之上的。如果要挂起或者唤醒一个线程，都需要操作系统帮忙完成，而操作系统实现线程之间的切换时需要从用户态转换到内核态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高。
-
-不过，在 Java 6 之后， `synchronized` 引入了大量的优化如自旋锁、适应性自旋锁、锁消除、锁粗化、偏向锁、轻量级锁等技术来减少锁操作的开销，这些优化让 `synchronized` 锁的效率提升了很多。因此， `synchronized` 还是可以在实际项目中使用的，像 JDK 源码、很多开源框架都大量使用了 `synchronized` 。
-
-关于偏向锁多补充一点：由于偏向锁增加了 JVM 的复杂性，同时也并没有为所有应用都带来性能提升。因此，在 JDK15 中，偏向锁被默认关闭（仍然可以使用 `-XX:+UseBiasedLocking` 启用偏向锁），在 JDK18 中，偏向锁已经被彻底废弃（无法通过命令行打开）。
-
-### synchronized 用法
-
-**典型问题**
-
-- synchronized 可以用在哪些场景？
-- synchronized 如何使用？
-
-**知识点**
-
-`synchronized` 关键字的使用方式主要有下面 3 种：
-
-1. 修饰实例方法
-2. 修饰静态方法
-3. 修饰代码块
-
-**1、修饰实例方法** （锁当前对象实例）
-
-给当前对象实例加锁，进入同步代码前要获得 **当前对象实例的锁** 。
-
-```
-synchronized void method() {
-    // 业务代码
-}
-```
-
-**2、修饰静态方法** （锁当前类）
-
-给当前类加锁，会作用于类的所有对象实例 ，进入同步代码前要获得 **当前 class 的锁**。
-
-这是因为静态成员不属于任何一个实例对象，归整个类所有，不依赖于类的特定实例，被类的所有实例共享。
-
-```
-synchronized static void method() {
-    // 业务代码
-}
-```
-
-静态 `synchronized` 方法和非静态 `synchronized` 方法之间的调用互斥么？不互斥！如果一个线程 A 调用一个实例对象的非静态 `synchronized` 方法，而线程 B 需要调用这个实例对象所属类的静态 `synchronized` 方法，是允许的，不会发生互斥现象，因为访问静态 `synchronized` 方法占用的锁是当前类的锁，而访问非静态 `synchronized` 方法占用的锁是当前实例对象锁。
-
-**3、修饰代码块** （锁指定对象 / 类）
-
-对括号里指定的对象 / 类加锁：
-
-- `synchronized(object)` 表示进入同步代码库前要获得 **给定对象的锁**。
-- `synchronized（类。class)` 表示进入同步代码前要获得 **给定 Class 的锁**
-
-```
-synchronized(this) {
-    // 业务代码
-}
-```
-
-**总结：**
-
-- `synchronized` 关键字加到 `static` 静态方法和 `synchronized(class)` 代码块上都是是给 Class 类上锁；
-- `synchronized` 关键字加到实例方法上是给对象实例上锁；
-- 尽量不要使用 `synchronized(String a)` 因为 JVM 中，字符串常量池具有缓存功能。
-
-### 构造方法可以用 synchronized 修饰么？
-
-构造方法不能使用 synchronized 关键字修饰。不过，可以在构造方法内部使用 synchronized 代码块。
-
-另外，构造方法本身是线程安全的，但如果在构造方法中涉及到共享资源的操作，就需要采取适当的同步措施来保证整个构造过程的线程安全。
-
-### synchronized 底层原理了解吗？
-
-`synchronized` 经过编译后，会在同步块的前后分别形成 `monitorenter` 和 `monitorexit` 这两个字节码指令，这两个字节码指令都需要一个引用类型的参数来指明要锁定和解锁的对象。如果 `synchronized` 明确制定了对象参数，那就是这个对象的引用；如果没有明确指定，那就根据 `synchronized` 修饰的是实例方法还是静态方法，去对对应的对象实例或 `Class` 对象来作为锁对象。
-
-synchronized 关键字底层原理属于 JVM 层面的东西。
-
-#### synchronized 同步语句块的情况
-
-```
-public class SynchronizedDemo {
-    public void method() {
-        synchronized (this) {
-            System.out.println("synchronized 代码块");
-        }
-    }
-}
-```
-
-通过 JDK 自带的 `javap` 命令查看 `SynchronizedDemo` 类的相关字节码信息：首先切换到类的对应目录执行 `javac SynchronizedDemo.java` 命令生成编译后的 .class 文件，然后执行 `javap -c -s -v -l SynchronizedDemo.class`。
-
-[![synchronized 关键字原理](https://camo.githubusercontent.com/669b67b48f1e58c37ac12eb80239cc5df7df55d7d75f9187e1622ee401a0c230/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d7072696e6369706c652e706e67)](https://camo.githubusercontent.com/669b67b48f1e58c37ac12eb80239cc5df7df55d7d75f9187e1622ee401a0c230/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d7072696e6369706c652e706e67)
-
-从上面我们可以看出：**`synchronized` 同步语句块的实现使用的是 `monitorenter` 和 `monitorexit` 指令，其中 `monitorenter` 指令指向同步代码块的开始位置，`monitorexit` 指令则指明同步代码块的结束位置。**
-
-上面的字节码中包含一个 `monitorenter` 指令以及两个 `monitorexit` 指令，这是为了保证锁在同步代码块代码正常执行以及出现异常的这两种情况下都能被正确释放。
-
-当执行 `monitorenter` 指令时，线程试图获取锁也就是获取 **对象监视器 `monitor`** 的持有权。
-
-> 在 Java 虚拟机 (HotSpot) 中，Monitor 是基于 C++ 实现的，由 [ObjectMonitor](https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/runtime/objectMonitor.cpp) 实现的。每个对象中都内置了一个 `ObjectMonitor` 对象。
->
-> 另外，`wait/notify` 等方法也依赖于 `monitor` 对象，这就是为什么只有在同步的块或者方法中才能调用 `wait/notify` 等方法，否则会抛出 `java.lang.IllegalMonitorStateException` 的异常的原因。
-
-在执行 `monitorenter` 时，会尝试获取对象的锁，如果锁的计数器为 0 则表示锁可以被获取，获取后将锁计数器设为 1 也就是加 1。
-
-[![ 执行 monitorenter 获取锁](https://camo.githubusercontent.com/9b5986778b36cc58ea99abe6df0a892dc46acae65bbb73fba6b6dcfc4834da6b/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d6765742d6c6f636b2d636f64652d626c6f636b2e706e67)](https://camo.githubusercontent.com/9b5986778b36cc58ea99abe6df0a892dc46acae65bbb73fba6b6dcfc4834da6b/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d6765742d6c6f636b2d636f64652d626c6f636b2e706e67)
-
-对象锁的的拥有者线程才可以执行 `monitorexit` 指令来释放锁。在执行 `monitorexit` 指令后，将锁计数器设为 0，表明锁被释放，其他线程可以尝试获取锁。
-
-[![ 执行 monitorexit 释放锁](https://camo.githubusercontent.com/ff0fb002626c445b1adc69507f430bc0ffd1202c9e0decfc58749f71c8183587/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d72656c656173652d6c6f636b2d626c6f636b2e706e67)](https://camo.githubusercontent.com/ff0fb002626c445b1adc69507f430bc0ffd1202c9e0decfc58749f71c8183587/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f6a6176612f636f6e63757272656e742f73796e6368726f6e697a65642d72656c656173652d6c6f636b2d626c6f636b2e706e67)
-
-如果获取对象锁失败，那当前线程就要阻塞等待，直到锁被另外一个线程释放为止。
-
-#### synchronized 修饰方法的的情况
-
-```
-public class SynchronizedDemo2 {
-    public synchronized void method() {
-        System.out.println("synchronized 方法");
-    }
-}
-```
-
-[![synchronized 关键字原理](https://camo.githubusercontent.com/0ac6ee1ed5d3ca201bd9243767f5a3d239419b6381c9053c7ccfba00890bd4b7/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f73796e6368726f6e697a6564254535253835254233254539253934254145254535254144253937254535253845253946254537253930253836322e706e67)](https://camo.githubusercontent.com/0ac6ee1ed5d3ca201bd9243767f5a3d239419b6381c9053c7ccfba00890bd4b7/68747470733a2f2f6f73732e6a61766167756964652e636e2f6769746875622f6a61766167756964652f73796e6368726f6e697a6564254535253835254233254539253934254145254535254144253937254535253845253946254537253930253836322e706e67)
-
-`synchronized` 修饰的方法并没有 `monitorenter` 指令和 `monitorexit` 指令，取得代之的确实是 `ACC_SYNCHRONIZED` 标识，该标识指明了该方法是一个同步方法。JVM 通过该 `ACC_SYNCHRONIZED` 访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用。
-
-如果是实例方法，JVM 会尝试获取实例对象的锁。如果是静态方法，JVM 会尝试获取当前 class 的锁。
-
-#### 总结
-
-`synchronized` 同步语句块的实现使用的是 `monitorenter` 和 `monitorexit` 指令，其中 `monitorenter` 指令指向同步代码块的开始位置，`monitorexit` 指令则指明同步代码块的结束位置。
-
-`synchronized` 修饰的方法并没有 `monitorenter` 指令和 `monitorexit` 指令，取得代之的确实是 `ACC_SYNCHRONIZED` 标识，该标识指明了该方法是一个同步方法。
-
-**不过两者的本质都是对对象监视器 monitor 的获取。**
-
-相关推荐：[Java 锁与线程的那些事 - 有赞技术团队](https://tech.youzan.com/javasuo-yu-xian-cheng-de-na-xie-shi/) 。
-
-🧗🏻 进阶一下：学有余力的小伙伴可以抽时间详细研究一下对象监视器 `monitor`。
-
-### JDK1.6 之后的 synchronized 底层做了哪些优化？锁升级原理了解吗？
-
-在 Java 6 之后， `synchronized` 引入了大量的优化如自旋锁、适应性自旋锁、锁消除、锁粗化、偏向锁、轻量级锁等技术来减少锁操作的开销，这些优化让 `synchronized` 锁的效率提升了很多（JDK18 中，偏向锁已经被彻底废弃，前面已经提到过了）。
-
-锁主要存在四种状态，依次是：无锁状态、偏向锁状态、轻量级锁状态、重量级锁状态，他们会随着竞争的激烈而逐渐升级。注意锁可以升级不可降级，这种策略是为了提高获得锁和释放锁的效率。
-
-`synchronized` 锁升级是一个比较复杂的过程，面试也很少问到，如果你想要详细了解的话，可以看看这篇文章：[浅析 synchronized 锁升级的原理与实现](https://www.cnblogs.com/star95/p/17542850.html)。
-
-### synchronized 和 volatile 有什么区别？
-
-`synchronized` 关键字和 `volatile` 关键字是两个互补的存在，而不是对立的存在！
-
-- `volatile` 关键字是线程同步的轻量级实现，所以 `volatile` 性能肯定比 `synchronized` 关键字要好 。但是 `volatile` 关键字只能用于变量而 `synchronized` 关键字可以修饰方法以及代码块 。
-- `volatile` 关键字能保证数据的可见性，但不能保证数据的原子性。`synchronized` 关键字两者都能保证。
-- `volatile` 关键字主要用于解决变量在多个线程之间的可见性，而 `synchronized` 关键字解决的是多个线程之间访问资源的同步性。
-
-## CAS
-
-> 什么是 CAS？
->
-> CAS 有什么作用？
->
-> CAS 的原理是什么？
->
-> CAS 的三大问题？
-
-**作用**
-
-**CAS（Compare and Swap）**，字面意思为**比较并交换**。CAS 有 3 个操作数，分别是：内存值 V，旧的预期值 A，要修改的新值 B。当且仅当预期值 A 和内存值 V 相同时，将内存值 V 修改为 B，否则什么都不做。
-
-**原理**
-
-Java 主要利用 `Unsafe` 这个类提供的 CAS 操作。`Unsafe` 的 CAS 依赖的是 JV M 针对不同的操作系统实现的 `Atomic::cmpxchg` 指令。
-
-**三大问题**
-
-1. **ABA 问题**：因为 CAS 需要在操作值的时候检查下值有没有发生变化，如果没有发生变化则更新，但是如果一个值原来是 A，变成了 B，又变成了 A，那么使用 CAS 进行检查时会发现它的值没有发生变化，但是实际上却变化了。ABA 问题的解决思路就是使用版本号。在变量前面追加上版本号，每次变量更新的时候把版本号加一，那么 A－B－A 就会变成 1A-2B－3A。
-2. **循环时间长开销大**。自旋 CAS 如果长时间不成功，会给 CPU 带来非常大的执行开销。如果 JVM 能支持处理器提供的 pause 指令那么效率会有一定的提升，pause 指令有两个作用，第一它可以延迟流水线执行指令（de-pipeline）, 使 CPU 不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零。第二它可以避免在退出循环的时候因内存顺序冲突（memory order violation）而引起 CPU 流水线被清空（CPU pipeline flush），从而提高 CPU 的执行效率。
-3. **只能保证一个共享变量的原子操作**。当对一个共享变量执行操作时，我们可以使用循环 CAS 的方式来保证原子操作，但是对多个共享变量操作时，循环 CAS 就无法保证操作的原子性，这个时候就可以用锁，或者有一个取巧的办法，就是把多个共享变量合并成一个共享变量来操作。比如有两个共享变量 i ＝ 2,j=a，合并一下 ij=2a，然后用 CAS 来操作 ij。从 Java1.5 开始 JDK 提供了 AtomicReference 类来保证引用对象之间的原子性，你可以把多个变量放在一个对象里来进行 CAS 操作。
-
-## ThreadLocal
-
-> `ThreadLocal` 有什么作用？
->
-> `ThreadLocal` 的原理是什么？
->
-> 如何解决 `ThreadLocal` 内存泄漏问题？
-
-**作用**
-
-**`ThreadLocal` 是一个存储线程本地副本的工具类**。
-
-**原理**
-
-`Thread` 类中维护着一个 `ThreadLocal.ThreadLocalMap` 类型的成员 `threadLocals`。这个成员就是用来存储当前线程独占的变量副本。
-
-`ThreadLocalMap` 是 `ThreadLocal` 的内部类，它维护着一个 `Entry` 数组， `Entry` 用于保存键值对，其 key 是 `ThreadLocal` 对象，value 是传递进来的对象（变量副本）。 `Entry` 继承了 `WeakReference` ，所以是弱引用。
-
-**内存泄漏问题**
-
-ThreadLocalMap 的 `Entry` 继承了 `WeakReference`，所以它的 key （`ThreadLocal` 对象）是弱引用，而 value （变量副本）是强引用。
-
-- 如果 `ThreadLocal` 对象没有外部强引用来引用它，那么 `ThreadLocal` 对象会在下次 GC 时被回收。
-- 此时，`Entry` 中的 key 已经被回收，但是 value 由于是强引用不会被垃圾收集器回收。如果创建 `ThreadLocal` 的线程一直持续运行，那么 value 就会一直得不到回收，产生内存泄露。
-
-那么如何避免内存泄漏呢？方法就是：**使用 `ThreadLocal` 的 `set` 方法后，显示的调用 `remove` 方法** 。
-
-## Java 内存模型
-
-### 【中等】什么是 Java 内存模型？
-
-Java 内存模型（Java Memory Model），简称 **JMM**。Java 内存模型的目标是为了解决由可见性和有序性导致的并发安全问题。Java 内存模型通过 **屏蔽各种硬件和操作系统的内存访问差异，以实现让 Java 程序在各种平台下都能达到一致的内存访问效果**。
-
-::: info 物理内存模型存在的问题
+::: info 锁升级
 
 :::
 
-**CPU、内存、I/O 设备存在很大的速度差异** - CPU 远快于内存，内存远快于 I/O 设备。
+JDK 1.6 后，`synchronized` 采用 **锁升级** 机制优化性能，避免直接使用重量级锁带来的性能损耗。锁的状态变化如下：
 
-为了合理利用 CPU 的高性能，平衡这三者的速度差异，计算机体系机构、操作系统、编译程序都做出了贡献，主要体现为：
+| 锁状态       | 适用场景     | 实现方式              |
+| :----------- | :----------- | :-------------------- |
+| **无锁**     | 初始状态     | Mark Word 无锁标记    |
+| **偏向锁**   | 单线程访问   | Mark Word 记录线程 ID |
+| **轻量级锁** | 少量线程竞争 | CAS 自旋              |
+| **重量级锁** | 高并发竞争   | 操作系统 Mutex 锁     |
 
-- **CPU 增加了缓存**，以均衡与 CPU 内存的速度差异；
-- **编译程序优化指令执行次序**，使得缓存能够得到更加合理地利用。
-- **操作系统增加了进程、线程**，以分时复用 CPU，进而均衡 CPU 与 I/O 的速度差异；
+**偏向锁**
 
-**缓存**导致的可见性问题，**编译优化**带来的有序性问题，**线程切换**带来的原子性问题。
+- **适用场景**：只有一个线程访问同步块。
+- **实现方式**：
+  - 在 Mark Word 中记录 **线程 ID**，后续该线程进入时无需 CAS 操作。
+  - 如果其他线程尝试获取锁，偏向锁会 **撤销**（Revoke）并升级为轻量级锁。
 
-为了解决缓存一致性问题，**需要各个处理器访问缓存时都遵循一些协议，在读写时要根据协议来进行操作**。
+**轻量级锁**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290755550.png)
+- **适用场景**：少量线程竞争，且线程交替执行。
+- **实现方式**：
+  - 线程通过 **CAS（Compare-And-Swap）** 尝试获取锁。
+  - 如果失败，会进行 **自旋（Spin）**（循环尝试），避免直接进入阻塞状态。
+  - 如果自旋失败，升级为 **重量级锁**。
 
-> 👉 扩展阅读：[全面理解 Java 内存模型](https://blog.csdn.net/suifeng3051/article/details/52611310)
+**重量级锁**
 
-## 同步容器和并发容器
+- **适用场景**：高并发竞争。
+- **实现方式**：
+  - 依赖 **操作系统 Mutex 锁**（互斥量）。
+  - 未获取锁的线程会被 **挂起（Blocked）**，进入 `_EntryList` 等待唤醒。
 
-> 👉 扩展阅读：[Java 并发容器](https://dunwu.github.io/waterdrop/pages/6fd8d836/)
+Mark Word 记录了对象和锁有关的信息。Mark Word 在 64 位 JVM 中的长度是 64bit，我们可以一起看下 64 位 JVM 的存储结构是怎么样的。如下图所示：
 
-### ⭐ 同步容器
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200629191250.png)
 
-> 什么是同步容器？
->
-> 有哪些常见同步容器？
->
-> 它们是如何实现线程安全的？
->
-> 同步容器真的线程安全吗？
+锁升级功能主要依赖于 Mark Word 中的锁标志位和释放偏向锁标志位，`synchronized` 同步锁就是从偏向锁开始的，随着竞争越来越激烈，偏向锁升级到轻量级锁，最终升级到重量级锁。
 
-**类型**
+::: info 锁消除
 
-`Vector`、`Stack`、`Hashtable`
+:::
 
-**作用/原理**
+锁消除是指在即时编译（JIT）时，JVM 会对代码进行逃逸分析。如果发现一段代码中使用的锁对象不会逃逸到方法外部，也就是其他线程无法访问到该锁对象，那么 JVM 会认为该锁是无意义的，从而将锁的代码消除，避免不必要的锁竞争，提高程序的性能。
 
-同步容器的同步原理就是在方法上用 `synchronized` 修饰。 **`synchronized` 可以保证在同一个时刻，只有一个线程可以执行某个方法或者某个代码块**。
+**锁消除实现原理**：
 
-`synchronized` 的互斥同步会产生阻塞和唤醒线程的开销。显然，这种方式比没有使用 `synchronized` 的容器性能要差。
+（1）**逃逸分析**：JVM 会分析对象的作用域。如果一个对象在方法内部创建，并且不会被外部方法引用，那么这个对象就不会逃逸出该方法。
 
-**线程安全**
+（2）**锁消除**：由于 `StringBuffer` 的 `append` 方法是 `synchronized` 方法，但 `sb` 对象不会逃逸，JVM 经过逃逸分析后，会将 `append` 方法中的锁代码消除，从而避免了锁的开销。
 
-同步容器真的绝对安全吗？
+【示例】锁消除
 
-其实也未必。在做复合操作（非原子操作）时，仍然需要加锁来保护。常见复合操作如下：
+```java
+public class LockEliminationExample {
+    public static String concatString(String s1, String s2, String s3) {
+        // 创建一个 StringBuffer 对象，它不会逃逸出该方法
+        StringBuffer sb = new StringBuffer();
+        sb.append(s1);
+        sb.append(s2);
+        sb.append(s3);
+        return sb.toString();
+    }
 
-- **迭代**：反复访问元素，直到遍历完全部元素；
-- **跳转**：根据指定顺序寻找当前元素的下一个（下 n 个）元素；
-- **条件运算**：例如若没有则添加等；
+    public static void main(String[] args) {
+        String result = concatString("Hello", " ", "World");
+        System.out.println(result);
+    }
+}
+```
 
-### ⭐⭐⭐ ConcurrentHashMap
+在这个示例中，`StringBuffer` 对象 `sb` 只在 `concatString` 方法内部使用，不会被其他方法访问。因此，JVM 在即时编译时会进行逃逸分析，并将 `append` 方法中的锁代码消除。
 
-> 请描述 ConcurrentHashMap 的实现原理？
->
-> ConcurrentHashMap 为什么放弃了分段锁？
+::: info 锁粗化
 
-基础数据结构原理和 `HashMap` 一样，JDK 1.7 采用 数组＋单链表；JDK 1.8 采用数组＋单链表＋红黑树。
+:::
 
-并发安全特性的实现：
+锁粗化是指：在 JIT 编译器动态编译时，如果发现几个相邻的同步块使用的是同一个锁实例，那么 JIT 编译器将会把这几个同步块合并为一个大的同步块，从而避免一个线程“反复申请、释放同一个锁“所带来的性能开销。
 
-JDK 1.7：
+如果**一系列的连续操作都对同一个对象反复加锁和解锁**，频繁的加锁操作就会导致性能损耗。
 
-- 使用分段锁，设计思路是缩小锁粒度，提高并发吞吐。也就是将内部进行分段（Segment），里面则是 HashEntry 的数组，和 HashMap 类似，哈希相同的条目也是以链表形式存放。
-- 写数据时，会使用可重入锁去锁住分段（segment）：HashEntry 内部使用 volatile 的 value 字段来保证可见性，也利用了不可变对象的机制以改进利用 Unsafe 提供的底层能力，比如 volatile access，去直接完成部分操作，以最优化性能，毕竟 Unsafe 中的很多操作都是 JVM intrinsic 优化过的。
+### 【中等】final 关键字可以保证线程的可见性吗？
 
-JDK 1.8：
+**final 本身不能直接保证线程间的可见性**。
 
-- 取消分段锁，直接采用 `transient volatile HashEntry<K,V>[] table` 保存数据，采用 table 数组元素作为锁，从而实现了对每一行数据进行加锁，进一步减少并发冲突的概率。
-- 写数据时，使用是 CAS + `synchronized`。
-  - 根据 key 计算出 hashcode 。
-  - 判断是否需要进行初始化。
-  - `f` 即为当前 key 定位出的 Node，如果为空表示当前位置可以写入数据，利用 CAS 尝试写入，失败则自旋保证成功。
-  - 如果当前位置的 `hashcode == MOVED == -1`, 则需要进行扩容。
-  - 如果都不满足，则利用 synchronized 锁写入数据。
-  - 如果数量大于 `TREEIFY_THRESHOLD` 则要转换为红黑树。
+**但 final 修饰的字段在正确初始化后，对其他线程是可见的（JMM 保证）**。对象构造完成时，final 字段的初始化值对所有线程立即可见。不需要额外的同步措施（如 volatile/synchronized）。
+
+final 的线程可见性仅限于**初始化阶段**，适用于：
+
+- 声明不可变常量（如 `final int MAX = 100`）
+- 构造线程安全对象（如 `final AtomicReference`）
+
+如果需要**持续可见性**（如状态标志位），仍需使用 `volatile` 或同步机制。
+
+非 final 字段对比：
+
+```java
+class Example {
+    final int x = 42;  // 构造后所有线程看到x=42
+    int y = 10;        // 其他线程可能看到y=0（默认值）或10
+}
+```
+
+**底层实现机制**
+
+- **JVM 会插入内存屏障**：确保 final 字段初始化后对所有线程可见。
+- **与 happens-before 规则关联**：对象构造结束 happens-before 于其他线程看到该对象。
+
+**使用限制**
+
+| 场景               | 是否线程安全 | 说明                               |
+| ------------------ | ------------ | ---------------------------------- |
+| **final 基本类型** | ✔️ 安全       | int/long 等初始化后不可变          |
+| **final 引用类型** | ⚠️ 部分安全   | 引用不可变，但对象内部状态可能变化 |
+| **非 final 字段**  | ❌ 不安全     | 需要额外同步                       |
+
+危险示例：
+```java
+final Map<String, Integer> map = new HashMap<>();
+// map引用不可变，但map.put()操作非线程安全！
+```
+
+**最佳实践**
+
+（1）**优先用 final 修饰不可变数据**
+
+```java
+public class SafeCounter {
+    private final AtomicLong count = new AtomicLong(0); // 线程安全
+}
+```
+
+（2）**需要跨线程可见的变量应使用 volatile**
+```java
+private volatile boolean running = true;
+```
+
+（3）**避免以下错误用法**：
+```java
+// 错误！final 不能保证对象内部线程安全
+final List<String> unsafeList = new ArrayList<>();
+```
