@@ -123,12 +123,11 @@ permalink: /pages/b1e468f4/
 | **对比维度**         | **公平锁 (Fair Lock)**                               | **非公平锁 (Nonfair Lock)**                |
 | -------------------- | ---------------------------------------------------- | ------------------------------------------ |
 | **锁获取顺序**       | 严格按照线程请求顺序（FIFO）分配锁                   | 允许插队，新请求的线程可能直接抢到锁       |
-| **实现原理**         | 通过队列维护等待线程，先到先得                       | 线程直接尝试 CAS 抢锁，失败才进入队列      |
 | **性能表现**         | 吞吐量较低（上下文切换频繁）                         | 吞吐量较高（减少线程切换，但可能线程饥饿） |
 | **响应时间**         | 等待时间稳定（适合长任务）                           | 短任务可能更快获取锁（适合高并发短任务）   |
 | **适用场景**         | - 需要严格公平性<br>- 线程执行时间差异大（避免饥饿） | - 高并发短任务<br>- 追求吞吐量             |
 | **锁实现类**         | `ReentrantLock(true)`                                | `ReentrantLock(false)`（默认）             |
-| **底层机制**         | 依赖 `AbstractQueuedSynchronizer (AQS)` 的严格队列   | 先尝试 CAS 抢锁，失败后进入 AQS 队列       |
+| **实现**             | 依赖 AQS 维护等待线程，先到先得                      | 先尝试 CAS 抢锁，失败后进入 AQS 队列       |
 | **线程饥饿**         | 不会发生                                             | 可能发生（高并发时某些线程长期无法获取锁） |
 | **操作系统调度影响** | 依赖系统线程调度，可能因优先级反转影响公平性         | 更依赖 JVM 的锁优化策略                    |
 | **锁重入性**         | 支持（与公平性无关）                                 | 支持（与公平性无关）                       |
@@ -202,21 +201,19 @@ public void test () throw Exception {
 
 ---
 
-| **对比维度**     | **`synchronized`**                                                | **`ReentrantLock`**                                                 |
-| ---------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
-| **锁类型**       | JVM 内置关键字（隐式锁）                                          | JDK 提供的类（显式锁）                                              |
-| **是否可重入**   | 支持（同一线程可重复获取）                                        | 支持（同一线程可重复获取）                                          |
-| **锁的公平性**   | 仅支持非公平锁                                                    | 可配置公平锁或非公平锁（构造函数传参 `true/false`）                 |
-| **锁的获取方式** | 自动加锁/释放锁（进入同步代码块加锁，退出时释放）                 | 需手动调用 `lock()` 和 `unlock()`（必须配合 `try-finally` 使用）    |
-| **是否可中断**   | 不支持中断                                                        | 支持 `lockInterruptibly()`，可响应中断                              |
-| **超时获取锁**   | 不支持超时                                                        | 支持 `tryLock(timeout, unit)`，可设置超时时间                       |
-| **条件变量**     | 通过 `wait()`/`notify()` 实现，单一等待队列                       | 支持多个 `Condition`，可精确控制线程唤醒（如 `await()`/`signal()`） |
-| **性能优化**     | JDK 6+ 优化后（偏向锁→轻量级锁→重量级锁）性能接近 `ReentrantLock` | 在高竞争场景下性能略优（减少上下文切换）                            |
-| **死锁检测**     | 无内置死锁检测                                                    | 可通过 `tryLock` 避免死锁                                           |
-| **代码可读性**   | 简洁（无需手动释放）                                              | 复杂（需显式加锁/解锁）                                             |
-| **适用场景**     | 简单同步场景（如单方法同步）                                      | 复杂同步需求（如公平锁、可中断锁、超时锁）                          |
-| **底层实现**     | JVM 通过 `monitorenter`/`monitorexit` 字节码实现                  | 基于 `AbstractQueuedSynchronizer (AQS)` 实现                        |
-| **锁释放保证**   | 自动释放（即使抛出异常）                                          | 需在 `finally` 中手动释放，否则可能死锁                             |
+| **对比维度**       | **`synchronized`**                                                | **`ReentrantLock`**                                                 |
+| ------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **锁类型**         | JVM 内置关键字（隐式锁）                                          | JDK 提供的类（显式锁）                                              |
+| **加锁解锁方式**   | 自动加锁/释放锁（进入同步代码块加锁，退出时释放）                 | 需手动调用 `lock()` 和 `unlock()`（必须配合 `try-finally` 使用）    |
+| **是否可重入**     | 支持（同一线程可重复获取）                                        | 支持（同一线程可重复获取）                                          |
+| **是否支持公平**   | 仅支持非公平锁                                                    | 可配置公平锁或非公平锁（构造函数传参 `true/false`）                 |
+| **是否可中断**     | 不支持中断                                                        | 支持 `lockInterruptibly()`，可响应中断                              |
+| **是否支持超时**   | 不支持超时                                                        | 支持 `tryLock(timeout, unit)`，可设置超时时间                       |
+| **是否支持多条件** | 通过 `wait()`/`notify()` 实现，单一等待队列                       | 支持多个 `Condition`，可精确控制线程唤醒（如 `await()`/`signal()`） |
+| **性能**           | JDK 6+ 优化后（偏向锁→轻量级锁→重量级锁）性能接近 `ReentrantLock` | 在高竞争场景下性能略优（减少上下文切换）                            |
+| **死锁检测**       | 无内置死锁检测                                                    | 可通过 `tryLock` 避免死锁                                           |
+| **适用场景**       | 简单同步场景（如单方法同步）                                      | 复杂同步需求（如公平锁、可中断锁、超时锁）                          |
+| **底层实现**       | JVM 通过 `monitorenter`/`monitorexit` 字节码实现                  | 基于 `AbstractQueuedSynchronizer (AQS)` 实现                        |
 
 **关键区别总结**
 
@@ -377,7 +374,210 @@ protected final boolean compareAndSetState(int expect, int update) {
 
 :::
 
-> 扩展：[从 ReentrantLock 的实现看 AQS 的原理及应用](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)
+::: tip 扩展
+
+[从 ReentrantLock 的实现看 AQS 的原理及应用](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)
+
+:::
+
+### 【困难】ReentrantReadWriteLock 的实现原理是什么？
+
+**ReentrantReadWriteLock 是为【读多写少】的并发场景设计的锁实现**。
+
+**ReentrantReadWriteLock 允许多个线程同时持有读锁，但同一时刻只允许一个线程持有写锁**。此外，存在读锁时无法获取写锁，存在写锁时无法获取读锁。
+
+ReentrantReadWriteLock 有以下特性：
+
+- **可重入**：读写锁都支持可重入。
+- **支持公平锁**，默认为非公平锁。
+- **支持锁降级**：**持有写锁可以获取读锁；反之不允许**。
+
+**ReentrantReadWriteLock 基于 AQS 实现的读写锁**，其**核心设计思想是将一个 32 位的 int 状态变量拆分为两部分**：
+
+- **高 16 位**：表示读锁的持有数量（包括重入次数）
+- **低 16 位**：表示写锁的重入次数
+
+```
+状态变量结构：
++-------------------------------+-------------------------------+
+|         读锁状态 (16 位）        |         写锁状态 (16 位）        |
++-------------------------------+-------------------------------+
+```
+
+**写锁实现（WriteLock）**
+
+- 排他锁，使用 AQS 的独占模式
+- 获取条件：
+  - 读锁计数为 0（没有读锁）
+  - 写锁计数为 0 或当前线程已持有写锁（可重入）
+- 实现方法：
+  ```java
+  protected final boolean tryAcquire(int acquires) {
+      // 检查是否有读锁或其他线程持有写锁
+      if (c != 0 && w == 0) return false;
+      // 检查重入或 CAS 设置状态
+      // ...
+  }
+  ```
+
+**读锁实现（ReadLock）**
+
+- 共享锁，使用 AQS 的共享模式
+- 获取条件：
+  - 没有线程持有写锁，或写锁被当前线程持有（锁降级）
+- 实现特点：
+  - 使用 ThreadLocal 记录每个线程的重入次数
+  - 第一个获取读锁的线程会记录自己（firstReader）
+  - 后续线程使用 cachedHoldCounter 优化性能
+
+**锁降级实现**
+
+```java
+// 锁降级示例代码
+writeLock.lock();         // 获取写锁
+try {
+    // 修改数据。..
+    readLock.lock();      // 在保持写锁的情况下获取读锁（锁降级关键步骤）
+} finally {
+    writeLock.unlock();  // 释放写锁，降级为读锁
+}
+// 此时仍持有读锁，其他线程可以获取读锁但不能获取写锁
+```
+
+**关键数据结构**
+
+**HoldCounter**
+
+```java
+static final class HoldCounter {
+    int count;          // 重入次数
+    final long tid = Thread.currentThread().getId(); // 线程 ID
+}
+```
+
+**ThreadLocalHoldCounter**
+
+```0java
+static final class ThreadLocalHoldCounter
+    extends ThreadLocal<HoldCounter> {
+    public HoldCounter initialValue() {
+        return new HoldCounter();
+    }
+}
+```
+
+**性能优化技巧**
+
+- **firstReader 优化**：记录第一个获取读锁的线程，避免 ThreadLocal 查找
+- **cachedHoldCounter**：缓存最近一个获取读锁的线程计数器
+- **读锁计数存储**：使用 ThreadLocal 保存每个线程的重入次数，避免竞争
+
+### 【困难】StampedLock 的实现原理是什么？
+
+`StampedLock`是 JDK8 引入的高性能锁，**适合读多写少且追求极致吞吐的场景**，但需谨慎处理乐观读失败和死锁风险。
+
+StampedLock 通过**版本号+状态位拆分**实现无锁读，牺牲重入性和公平性换取更高吞吐，适合短期读操作的并发场景。
+
+**StampedLock 支持三种锁模式**：
+
+- **写锁（独占锁）**：类似`ReentrantLock`，同一时刻只有一个线程能获取。阻塞其他所有读锁和写锁请求。
+- **悲观读锁（共享锁）**：允许多线程并发读，但会阻塞写锁请求（类似`ReentrantReadWriteLock`的读锁）。
+- **乐观读（无锁优化）**：不阻塞写操作，仅通过`tryOptimisticRead()`获取一个"邮戳"（版本号），读完后需校验邮戳是否有效（未被写操作修改）。
+
+**特性**
+
+- **更高的并发度**：乐观读允许读操作与写操作并发执行（无阻塞）。
+- **不可重入**：锁不可重入，嵌套获取可能导致死锁。
+- **支持锁升级/降级**：
+  - **锁降级**：写锁→悲观读锁（类似`ReentrantReadWriteLock`）。
+  - **锁升级**：乐观读→悲观读锁或写锁（需校验邮戳后尝试转换）。
+- **不支持 `Condition`**：不能像`ReentrantLock`那样使用`await()`/`signal()`。
+
+**StampedLock vs. ReentrantReadWriteLock**
+
+| 特性         | `StampedLock`        | `ReentrantReadWriteLock` |
+| ------------ | -------------------- | ------------------------ |
+| **读并发度** | 最高（乐观读无阻塞） | 高（悲观读阻塞写）       |
+| **写饥饿**   | 可能发生             | 非公平模式下可能发生     |
+| **锁重入**   | 不支持               | 支持                     |
+| **公平性**   | 仅非公平             | 支持公平/非公平          |
+| **条件变量** | 不支持               | 支持                     |
+
+**状态设计**
+
+- **64 位长整型状态变量**（`state`）拆分为三部分：
+  - **写锁标记**（最低位）：`WBIT`（写锁占用标志）
+  - **版本号**（中间 7 位）：乐观读的邮戳版本
+  - **读锁计数**（剩余 56 位）：记录悲观读锁的持有数量
+
+```
+State 结构：
+[读锁计数 (56 位） | 版本号 (7 位） | 写锁标记 (1 位）]
+```
+
+**关键操作实现**
+
+**写锁获取**
+
+- **CAS 设置 WBIT 位**：若成功则获取写锁，失败则进入队列等待
+- **版本号+1**：每次写锁释放时递增版本号（保证乐观读的可见性）
+
+**悲观读锁获取**
+
+- **检查无写锁**（WBIT=0）时通过 CAS 增加读计数
+- **写锁占用时**：进入等待队列（类似 AQS 的 CLH 队列）
+
+**乐观读实现**
+
+1. 调用`tryOptimisticRead()`获取当前版本号（不修改状态）
+2. 读取共享数据
+3. 调用`validate(stamp)`检查版本号是否变化（无写操作则有效）
+
+**锁转换机制**
+
+**tryConvertToXLock()**：核心转换方法（避免释放再获取的开销）
+
+- 乐观读→悲观读：验证邮戳后直接获取读锁
+- 读锁→写锁：当读计数=1 且当前线程唯一持有读锁时可转换
+
+**性能优化手段**
+
+- **无锁乐观读**：完全不阻塞写操作（通过版本号校验）
+- **延迟唤醒**：读锁释放时不立即唤醒等待线程（减少竞争）
+- **自旋优化**：短时冲突时先自旋再入队（类似 AQS）
+
+**与 AQS 的差异**
+
+- **非 AQS 实现**：独立的状态机设计（更轻量）
+- **无公平性**：所有锁均为非公平模式
+- **无条件队列**：不支持`Condition`功能
+
+**典型使用示例**
+
+```java
+StampedLock lock = new StampedLock();
+
+// 乐观读示例
+long stamp = lock.tryOptimisticRead();
+// 读取共享数据。..
+if (!lock.validate(stamp)) {
+    // 版本失效，转悲观读
+    stamp = lock.readLock();
+    try {
+        // 重新读取数据。..
+    } finally {
+        lock.unlockRead(stamp);
+    }
+}
+
+// 写锁示例
+long stamp = lock.writeLock();
+try {
+    // 修改数据。..
+} finally {
+    lock.unlockWrite(stamp);
+}
+```
 
 ## Java 无锁
 
@@ -458,7 +658,7 @@ public final boolean compareAndSet(int expect, int update) {
 
 **CAS 的典型应用**
 
-**（1）原子类（AtomicXXX）**
+**（1）原子类**
 
 ```java
 AtomicInteger atomicInt = new AtomicInteger(0);
@@ -473,7 +673,7 @@ public final int incrementAndGet() {
 }
 ```
 
-**（2）自旋锁（SpinLock）**
+**（2）自旋锁**
 
 ```java
 while (!CAS(lock, 0, 1)) {  // 尝试获取锁
@@ -816,6 +1016,69 @@ public void afterCompletion(HttpServletRequest request,
 - 自动清理不彻底（只清理部分无效 Entry）
 - 高并发场景可能清理不及时
 - **必须显式调用 remove()**
+
+### 【中等】InheritableThreadLocal 的实现原理是什么？
+
+**核心设计目标**
+
+- **线程间值继承**：子线程自动继承父线程的 ThreadLocal 值
+- **与 ThreadLocal 兼容**：继承自`ThreadLocal`，保持相同 API
+
+**数据存储位置**
+
+继承自`ThreadLocal`，但使用线程对象的**独立字段**；`Thread.inheritableThreadLocals`（专门存储可继承的变量）
+
+**线程创建时的值拷贝**
+
+- **触发时机**：当父线程创建子线程（`Thread.init()`方法）
+- **拷贝逻辑**：
+
+  ```java
+  if (parent.inheritableThreadLocals != null) {
+      this.inheritableThreadLocals =
+          ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+  }
+  ```
+
+- **深拷贝保证隔离**：子线程获得父线程值的独立副本（修改互不影响）
+
+**值传递规则**
+
+- **仅初始化时拷贝**：子线程创建后父线程对值的修改不再影响子线程
+- **浅拷贝问题**：若存储引用对象，父子线程仍共享同一对象（需开发者自行处理线程安全）
+
+**与 ThreadLocal 的对比**
+
+| 特性         | `InheritableThreadLocal`           | `ThreadLocal`         |
+| ------------ | ---------------------------------- | --------------------- |
+| **继承性**   | 子线程自动继承父线程值             | 完全隔离              |
+| **存储字段** | `Thread.inheritableThreadLocals`   | `Thread.threadLocals` |
+| **性能开销** | 略高（需初始化时拷贝数据）         | 更低                  |
+| **使用场景** | 需要跨线程传递上下文（如 TraceID） | 线程私有数据          |
+
+**使用注意事项**
+
+- **对象共享风险**：若值是可变的引用对象，需自行保证线程安全
+- **线程池陷阱**：线程池复用线程时会导致旧值残留（需手动清理）
+- **性能影响**：大量线程创建时，值拷贝可能成为瓶颈
+
+**典型应用场景**
+
+```java
+// 父线程设置值
+InheritableThreadLocal<String> itl = new InheritableThreadLocal<>();
+itl.set("parent_value");
+
+new Thread(() -> {
+    // 子线程自动读取到父线程设置的值
+    System.out.println(itl.get()); // 输出：parent_value
+}).start();
+```
+
+**实现局限**
+
+- **不支持动态更新**：子线程启动后父线程的修改不可见
+- **无回调机制**：无法像`ThreadLocal`的`initialValue()`那样自定义子线程初始值
 
 ### 【中等】Java 中支持哪些原子类？
 
