@@ -430,7 +430,7 @@ Java 不可能实现 100% 的公平性，我们依然可以通过同步结构在
 - **同步** - 是指线程之间如何协作。
 - **互斥** - 是指保证同一时刻只允许一个线程访问共享资源。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409042338029.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202504221021138.png)
 
 ## J.U.C 简介
 
