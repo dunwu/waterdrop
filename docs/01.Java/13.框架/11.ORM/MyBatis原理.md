@@ -1,5 +1,5 @@
 ---
-title: Mybatis原理
+title: MyBatis 原理
 date: 2022-02-17 22:34:30
 order: 02
 categories:
@@ -10,17 +10,17 @@ tags:
   - Java
   - 框架
   - ORM
-  - Mybatis
+  - MyBatis
 permalink: /pages/20966ea3/
 ---
 
-# Mybatis 原理
+# MyBatis 原理
 
-> Mybatis 的前身就是 iBatis ，是一款优秀的持久层框架，它支持自定义 SQL、存储过程以及高级映射。本文以一个 Mybatis 完整示例为切入点，结合 Mybatis 底层源码分析，图文并茂的讲解 Mybatis 的核心工作机制。
+> MyBatis 的前身就是 iBatis ，是一款优秀的持久层框架，它支持自定义 SQL、存储过程以及高级映射。本文以一个 MyBatis 完整示例为切入点，结合 MyBatis 底层源码分析，图文并茂的讲解 MyBatis 的核心工作机制。
 
-## Mybatis 完整示例
+## MyBatis 完整示例
 
-> 这里，我将以一个入门级的示例来演示 Mybatis 是如何工作的。
+> 这里，我将以一个入门级的示例来演示 MyBatis 是如何工作的。
 >
 > 注：本文后面章节中的原理、源码部分也将基于这个示例来进行讲解。
 >
@@ -46,30 +46,30 @@ INSERT INTO user (name, age, address, email)
 VALUES ('李四', 19, '上海', 'xxx@163.com');
 ```
 
-### 添加 Mybatis
+### 添加 MyBatis
 
 如果使用 Maven 来构建项目，则需将下面的依赖代码置于 pom.xml 文件中：
 
 ```xml
 <dependency>
-  <groupId>org.Mybatis</groupId>
-  <artifactId>Mybatis</artifactId>
+  <groupId>org.mybatis</groupId>
+  <artifactId>mybatis</artifactId>
   <version>x.x.x</version>
 </dependency>
 ```
 
-### Mybatis 配置
+### MyBatis 配置
 
-XML 配置文件中包含了对 Mybatis 系统的核心设置，包括获取数据库连接实例的数据源（DataSource）以及决定事务作用域和控制方式的事务管理器（TransactionManager）。
+XML 配置文件中包含了对 MyBatis 系统的核心设置，包括获取数据库连接实例的数据源（DataSource）以及决定事务作用域和控制方式的事务管理器（TransactionManager）。
 
 本示例中只是给出最简化的配置。
 
-【示例】Mybatis-config.xml 文件
+【示例】MyBatis-config.xml 文件
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE configuration PUBLIC "-//Mybatis.org//DTD Config 3.0//EN"
-  "http://Mybatis.org/dtd/Mybatis-3-config.dtd">
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <configuration>
   <environments default="development">
     <environment id="development">
@@ -84,7 +84,7 @@ XML 配置文件中包含了对 Mybatis 系统的核心设置，包括获取数�
     </environment>
   </environments>
   <mappers>
-    <mapper resource="Mybatis/mapper/UserMapper.xml" />
+    <mapper resource="mybatis/mapper/UserMapper.xml" />
   </mappers>
 </configuration>
 ```
@@ -95,15 +95,15 @@ XML 配置文件中包含了对 Mybatis 系统的核心设置，包括获取数�
 
 #### Mapper.xml
 
-个人理解，Mapper.xml 文件可以看做是 Mybatis 的 JDBC SQL 模板。
+个人理解，Mapper.xml 文件可以看做是 MyBatis 的 JDBC SQL 模板。
 
 【示例】UserMapper.xml 文件
 
-下面是一个通过 Mybatis Generator 自动生成的完整的 Mapper 文件。
+下面是一个通过 MyBatis Generator 自动生成的完整的 Mapper 文件。
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//Mybatis.org//DTD Mapper 3.0//EN" "http://Mybatis.org/dtd/Mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.dunwu.spring.orm.mapper.UserMapper">
   <resultMap id="BaseResultMap" type="io.github.dunwu.spring.orm.entity.User">
     <id column="id" jdbcType="BIGINT" property="id" />
@@ -168,7 +168,7 @@ public interface UserMapper {
 
 UserMapper.java 中的方法和 UserMapper.xml 的 CRUD 语句元素（ `<insert>`、`<delete>`、`<update>`、`<select>`）存在一一对应关系。
 
-在 Mybatis 中，正是通过方法的全限定名，将二者绑定在一起。
+在 MyBatis 中，正是通过方法的全限定名，将二者绑定在一起。
 
 #### 数据实体.java
 
@@ -199,9 +199,9 @@ public class User {
 public class MybatisDemo {
 
     public static void main(String[] args) throws Exception {
-        // 1. 加载 Mybatis 配置文件，创建 SqlSessionFactory
+        // 1. 加载 MyBatis 配置文件，创建 SqlSessionFactory
         // 注：在实际的应用中，SqlSessionFactory 应该是单例
-        InputStream inputStream = Resources.getResourceAsStream("Mybatis/Mybatis-config.xml");
+        InputStream inputStream = Resources.getResourceAsStream("MyBatis/MyBatis-config.xml");
         SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
         SqlSessionFactory factory = builder.build(inputStream);
 
@@ -222,12 +222,12 @@ public class MybatisDemo {
 
 > 说明：
 >
-> `SqlSession` 接口是 Mybatis API 核心中的核心，它代表了 Mybatis 和数据库的一次完整会话。
+> `SqlSession` 接口是 MyBatis API 核心中的核心，它代表了 MyBatis 和数据库的一次完整会话。
 >
-> - Mybatis 会解析配置，并根据配置创建 `SqlSession` 。
-> - 然后，Mybatis 将 Mapper 映射为 `SqlSession`，然后传递参数，执行 SQL 语句并获取结果。
+> - MyBatis 会解析配置，并根据配置创建 `SqlSession` 。
+> - 然后，MyBatis 将 Mapper 映射为 `SqlSession`，然后传递参数，执行 SQL 语句并获取结果。
 
-## Mybatis 生命周期
+## MyBatis 生命周期
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210510113446.png)
 
@@ -298,9 +298,9 @@ Configuration getConfiguration();
 
 #### SqlSession 职责
 
-**Mybatis 的主要 Java 接口就是 `SqlSession`。它包含了所有执行语句，获取映射器和管理事务等方法。**
+**MyBatis 的主要 Java 接口就是 `SqlSession`。它包含了所有执行语句，获取映射器和管理事务等方法。**
 
-> 详细内容可以参考：“ [Mybatis 官方文档之 SqlSessions](http://www.Mybatis.org/Mybatis-3/zh/java-api.html#sqlSessions) ” 。
+> 详细内容可以参考：“ [MyBatis 官方文档之 SqlSessions](http://www.mybatis.org/mybatis-3/zh/java-api.html#sqlSessions) ” 。
 
 SqlSession 类的方法可以按照下图进行大致分类：
 
@@ -310,7 +310,7 @@ SqlSession 类的方法可以按照下图进行大致分类：
 
 `SqlSessions` 是由 `SqlSessionFactory` 实例创建的；而 `SqlSessionFactory` 是由 `SqlSessionFactoryBuilder` 创建的。
 
-> 🔔 注意：当 Mybatis 与一些依赖注入框架（如 Spring 或者 Guice）同时使用时，`SqlSessions` 将被依赖注入框架所创建，所以你不需要使用 `SqlSessionFactoryBuilder` 或者 `SqlSessionFactory`。
+> 🔔 注意：当 MyBatis 与一些依赖注入框架（如 Spring 或者 Guice）同时使用时，`SqlSessions` 将被依赖注入框架所创建，所以你不需要使用 `SqlSessionFactoryBuilder` 或者 `SqlSessionFactory`。
 
 **每个线程都应该有它自己的 `SqlSession` 实例。**
 
@@ -332,9 +332,9 @@ try (SqlSession session = sqlSessionFactory.openSession()) {
 
 `SqlSession` 中的 `insert`、`update`、`delete` 和 `select` 方法都很强大，但也有些繁琐。更通用的方式是使用映射器类来执行映射语句。**一个映射器类就是一个仅需声明与 `SqlSession` 方法相匹配的方法的接口类**。
 
-Mybatis 将配置文件中的每一个 `<mapper>` 节点抽象为一个 `Mapper` 接口，而这个接口中声明的方法和跟 `<mapper>` 节点中的 `<select|update|delete|insert>` 节点相对应，即 `<select|update|delete|insert>` 节点的 id 值为 Mapper 接口中的方法名称，`parameterType` 值表示 Mapper 对应方法的入参类型，而 `resultMap` 值则对应了 Mapper 接口表示的返回值类型或者返回结果集的元素类型。
+MyBatis 将配置文件中的每一个 `<mapper>` 节点抽象为一个 `Mapper` 接口，而这个接口中声明的方法和跟 `<mapper>` 节点中的 `<select|update|delete|insert>` 节点相对应，即 `<select|update|delete|insert>` 节点的 id 值为 Mapper 接口中的方法名称，`parameterType` 值表示 Mapper 对应方法的入参类型，而 `resultMap` 值则对应了 Mapper 接口表示的返回值类型或者返回结果集的元素类型。
 
-Mybatis 会根据相应的接口声明的方法信息，通过动态代理机制生成一个 Mapper 实例；Mybatis 会根据这个方法的方法名和参数类型，确定 Statement Id，然后和 SqlSession 进行映射，底层还是通过 SqlSession 完成和数据库的交互。
+MyBatis 会根据相应的接口声明的方法信息，通过动态代理机制生成一个 Mapper 实例；MyBatis 会根据这个方法的方法名和参数类型，确定 Statement Id，然后和 SqlSession 进行映射，底层还是通过 SqlSession 完成和数据库的交互。
 
 下面的示例展示了一些方法签名以及它们是如何映射到 `SqlSession` 上的。
 
@@ -360,18 +360,18 @@ try (SqlSession session = sqlSessionFactory.openSession()) {
 
 - **映射器注解**
 
-Mybatis 是一个 XML 驱动的框架。配置信息是基于 XML 的，而且映射语句也是定义在 XML 中的。Mybatis 3 以后，支持注解配置。注解配置基于配置 API；而配置 API 基于 XML 配置。
+MyBatis 是一个 XML 驱动的框架。配置信息是基于 XML 的，而且映射语句也是定义在 XML 中的。MyBatis 3 以后，支持注解配置。注解配置基于配置 API；而配置 API 基于 XML 配置。
 
-Mybatis 支持诸如 `@Insert`、`@Update`、`@Delete`、`@Select`、`@Result` 等注解。
+MyBatis 支持诸如 `@Insert`、`@Update`、`@Delete`、`@Select`、`@Result` 等注解。
 
-> 详细内容请参考：[Mybatis 官方文档之 sqlSessions](http://www.Mybatis.org/Mybatis-3/zh/java-api.html#sqlSessions)，其中列举了 Mybatis 支持的注解清单，以及基本用法。
+> 详细内容请参考：[MyBatis 官方文档之 sqlSessions](http://www.mybatis.org/v-3/zh/java-api.html#sqlSessions)，其中列举了 MyBatis 支持的注解清单，以及基本用法。
 
-## Mybatis 的架构
+## MyBatis 的架构
 
-从 Mybatis 代码实现的角度来看，Mybatis 的主要组件有以下几个：
+从 MyBatis 代码实现的角度来看，MyBatis 的主要组件有以下几个：
 
-- **SqlSession** - 作为 Mybatis 工作的主要顶层 API，表示和数据库交互的会话，完成必要数据库增删改查功能。
-- **Executor** - Mybatis 执行器，是 Mybatis 调度的核心，负责 SQL 语句的生成和查询缓存的维护。
+- **SqlSession** - 作为 MyBatis 工作的主要顶层 API，表示和数据库交互的会话，完成必要数据库增删改查功能。
+- **Executor** - MyBatis 执行器，是 MyBatis 调度的核心，负责 SQL 语句的生成和查询缓存的维护。
 - **StatementHandler** - 封装了 JDBC Statement 操作，负责对 JDBC statement 的操作，如设置参数、将 Statement 结果集转换成 List 集合。
 - **ParameterHandler** - 负责对用户传递的参数转换成 JDBC Statement 所需要的参数。
 - **ResultSetHandler** - 负责将 JDBC 返回的 ResultSet 结果集对象转换成 List 类型的集合。
@@ -379,7 +379,7 @@ Mybatis 支持诸如 `@Insert`、`@Update`、`@Delete`、`@Select`、`@Result` �
 - **MappedStatement** - `MappedStatement` 维护了一条 `<select|update|delete|insert>` 节点的封装。
 - **SqlSource** - 负责根据用户传递的 parameterObject，动态地生成 SQL 语句，将信息封装到 BoundSql 对象中，并返回。
 - **BoundSql** - 表示动态生成的 SQL 语句以及相应的参数信息。
-- **Configuration** - Mybatis 所有的配置信息都维持在 Configuration 对象之中。
+- **Configuration** - MyBatis 所有的配置信息都维持在 Configuration 对象之中。
 
 这些组件的架构层次如下：
 
@@ -387,9 +387,9 @@ Mybatis 支持诸如 `@Insert`、`@Update`、`@Delete`、`@Select`、`@Result` �
 
 ### 配置层
 
-配置层决定了 Mybatis 的工作方式。
+配置层决定了 MyBatis 的工作方式。
 
-Mybatis 提供了两种配置方式：
+MyBatis 提供了两种配置方式：
 
 - 基于 XML 配置文件的方式
 - 基于 Java API 的方式
@@ -402,34 +402,34 @@ Mybatis 提供了两种配置方式：
 
 接口层负责和数据库交互的方式。
 
-Mybatis 和数据库的交互有两种方式：
+MyBatis 和数据库的交互有两种方式：
 
 - **使用 SqlSession**：SqlSession 封装了所有执行语句，获取映射器和管理事务的方法。
   - 用户只需要传入 Statement Id 和查询参数给 SqlSession 对象，就可以很方便的和数据库进行交互。
   - 这种方式的缺点是不符合面向对象编程的范式。
-- **使用 Mapper 接口**：Mybatis 会根据相应的接口声明的方法信息，通过动态代理机制生成一个 Mapper 实例；Mybatis 会根据这个方法的方法名和参数类型，确定 Statement Id，然后和 SqlSession 进行映射，底层还是通过 SqlSession 完成和数据库的交互。
+- **使用 Mapper 接口**：MyBatis 会根据相应的接口声明的方法信息，通过动态代理机制生成一个 Mapper 实例；MyBatis 会根据这个方法的方法名和参数类型，确定 Statement Id，然后和 SqlSession 进行映射，底层还是通过 SqlSession 完成和数据库的交互。
 
 ### 数据处理层
 
-数据处理层可以说是 Mybatis 的核心，从大的方面上讲，它要完成两个功能：
+数据处理层可以说是 MyBatis 的核心，从大的方面上讲，它要完成两个功能：
 
 - 根据传参 `Statement` 和参数构建动态 SQL 语句
-  - 动态语句生成可以说是 Mybatis 框架非常优雅的一个设计，Mybatis 通过传入的参数值，**使用 Ognl 来动态地构造 SQL 语句**，使得 Mybatis 有很强的灵活性和扩展性。
+  - 动态语句生成可以说是 MyBatis 框架非常优雅的一个设计，MyBatis 通过传入的参数值，**使用 Ognl 来动态地构造 SQL 语句**，使得 MyBatis 有很强的灵活性和扩展性。
   - 参数映射指的是对于 java 数据类型和 jdbc 数据类型之间的转换：这里有包括两个过程：查询阶段，我们要将 java 类型的数据，转换成 jdbc 类型的数据，通过 `preparedStatement.setXXX()` 来设值；另一个就是对 resultset 查询结果集的 jdbcType 数据转换成 java 数据类型。
 - 执行 SQL 语句以及处理响应结果集 ResultSet
-  - 动态 SQL 语句生成之后，Mybatis 将执行 SQL 语句，并将可能返回的结果集转换成 `List<E>` 列表。
-  - Mybatis 在对结果集的处理中，支持结果集关系一对多和多对一的转换，并且有两种支持方式，一种为嵌套查询语句的查询，还有一种是嵌套结果集的查询。
+  - 动态 SQL 语句生成之后，MyBatis 将执行 SQL 语句，并将可能返回的结果集转换成 `List<E>` 列表。
+  - MyBatis 在对结果集的处理中，支持结果集关系一对多和多对一的转换，并且有两种支持方式，一种为嵌套查询语句的查询，还有一种是嵌套结果集的查询。
 
 ### 框架支撑层
 
-- **事务管理机制** - Mybatis 将事务抽象成了 Transaction 接口。Mybatis 的事务管理分为两种形式：
+- **事务管理机制** - MyBatis 将事务抽象成了 Transaction 接口。MyBatis 的事务管理分为两种形式：
   - 使用 JDBC 的事务管理机制：即利用 `java.sql.Connection` 对象完成对事务的提交（`commit`）、回滚（`rollback`）、关闭（`close`）等。
-  - 使用 MANAGED 的事务管理机制：Mybatis 自身不会去实现事务管理，而是让程序的容器如（JBOSS，Weblogic）来实现对事务的管理。
+  - 使用 MANAGED 的事务管理机制：MyBatis 自身不会去实现事务管理，而是让程序的容器如（JBOSS，Weblogic）来实现对事务的管理。
 - **连接池管理**
 - **SQL 语句的配置** - 支持两种方式：
   - xml 配置
   - 注解配置
-- 缓存机制 - Mybatis 采用两级缓存结构
+- 缓存机制 - MyBatis 采用两级缓存结构
 
   - **一级缓存是 Session 会话级别的缓存** - 一级缓存又被称之为本地缓存。一般而言，一个 `SqlSession` 对象会使用一个 `Executor` 对象来完成会话操作，`Executor` 对象会维护一个 Cache 缓存，以提高查询性能。
     - 一级缓存的生命周期是 Session 会话级别的。
@@ -441,7 +441,7 @@ Mybatis 和数据库的交互有两种方式：
 
 ## SqlSession 内部工作机制
 
-从前文，我们已经了解了，Mybatis 封装了对数据库的访问，把对数据库的会话和事务控制放到了 SqlSession 对象中。那么具体是如何工作的呢？接下来，我们通过源码解读来进行分析。
+从前文，我们已经了解了，MyBatis 封装了对数据库的访问，把对数据库的会话和事务控制放到了 SqlSession 对象中。那么具体是如何工作的呢？接下来，我们通过源码解读来进行分析。
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210512173437.png)
 
@@ -449,7 +449,7 @@ Mybatis 和数据库的交互有两种方式：
 
 ### SqlSession 子组件
 
-前面的内容已经介绍了：SqlSession 是 Mybatis 的顶层接口，它提供了所有执行语句，获取映射器和管理事务等方法。
+前面的内容已经介绍了：SqlSession 是 MyBatis 的顶层接口，它提供了所有执行语句，获取映射器和管理事务等方法。
 
 实际上，SqlSession 是通过聚合多个子组件，让每个子组件负责各自功能的方式，实现了任务的下发。
 
@@ -504,7 +504,7 @@ TypeHandler 负责将 Java 对象类型和 JDBC 类型进行相互转换。
 
 ### SqlSession 和 Mapper
 
-先来回忆一下 Mybatis 完整示例章节的 测试程序部分的代码。
+先来回忆一下 MyBatis 完整示例章节的 测试程序部分的代码。
 
 MybatisDemo.java 文件中的代码片段：
 
@@ -534,7 +534,7 @@ UserMapper.xml 文件中的代码片段：
   </select>
 ```
 
-Mybatis 通过方法的全限定名，将 SqlSession 和 Mapper 相互映射起来。
+MyBatis 通过方法的全限定名，将 SqlSession 和 Mapper 相互映射起来。
 
 ### SqlSession 和 Executor
 
@@ -568,7 +568,7 @@ public <E> List<E> selectList(String statement, Object parameter, RowBounds rowB
 
 说明：
 
-Mybatis 所有的配置信息都维持在 `Configuration` 对象之中。中维护了一个 `Map<String, MappedStatement>` 对象。其中，key 为 Mapper 方法的全限定名（对于本例而言，key 就是 `io.github.dunwu.spring.orm.mapper.UserMapper.selectByPrimaryKey` ），value 为 `MappedStatement` 对象。所以，传入 Statement Id 就可以从 Map 中找到对应的 `MappedStatement`。
+MyBatis 所有的配置信息都维持在 `Configuration` 对象之中。中维护了一个 `Map<String, MappedStatement>` 对象。其中，key 为 Mapper 方法的全限定名（对于本例而言，key 就是 `io.github.dunwu.spring.orm.mapper.UserMapper.selectByPrimaryKey` ），value 为 `MappedStatement` 对象。所以，传入 Statement Id 就可以从 Map 中找到对应的 `MappedStatement`。
 
 `MappedStatement` 维护了一个 Mapper 方法的元数据信息，其数据组织可以参考下面的 debug 截图：
 
@@ -855,9 +855,9 @@ public List<Object> handleResultSets(Statement stmt) throws SQLException {
 ## 参考资料
 
 - **官方**
-  - [Mybatis Github](https://github.com/Mybatis/Mybatis-3)
-  - [Mybatis 官网](http://www.Mybatis.org/Mybatis-3/)
+  - [MyBatis Github](https://github.com/mybatis/mybatis-3)
+  - [MyBatis 官网](http://www.mybatis.org/mybatis-3/)
 - **文章**
-  - [深入理解 Mybatis 原理](https://blog.csdn.net/luanlouis/article/details/40422941)
-  - [Mybatis 源码中文注释](https://github.com/tuguangquan/Mybatis)
-  - [Mybatis 中强大的 resultMap](https://juejin.im/post/5cee8b61e51d455d88219ea4)
+  - [深入理解 MyBatis 原理](https://blog.csdn.net/luanlouis/article/details/40422941)
+  - [MyBatis 源码中文注释](https://github.com/tuguangquan/mybatis)
+  - [MyBatis 中强大的 resultMap](https://juejin.im/post/5cee8b61e51d455d88219ea4)

@@ -1,5 +1,5 @@
 ---
-title: Mybatis快速入门
+title: MyBatis 快速入门
 date: 2022-02-17 22:34:30
 order: 01
 categories:
@@ -10,7 +10,7 @@ tags:
   - Java
   - 框架
   - ORM
-  - Mybatis
+  - MyBatis
 permalink: /pages/5a2da192/
 ---
 

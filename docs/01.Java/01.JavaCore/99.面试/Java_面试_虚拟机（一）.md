@@ -36,17 +36,271 @@ JVM（Java 虚拟机）主要由以下核心部分组成：
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-hotspot-architecture.png)
 
-### 【中等】JVM 的 TLAB（Thread-Local Allocation Buffer）是什么？
-
 ### 【中等】Java 是如何实现跨平台的？
 
-### 【中等】什么是 Java 的 PLAB？
+Java 实现跨平台的本质是：**源码 → 统一字节码 → JVM 按需转换为目标平台机器码**，通过分层抽象实现跨平台。
+
+Java **【一次编写，到处执行（Write Once, Run Anywhere）】**的要点：
+
+- **JVM（Java 虚拟机）—— 统一运行环境**
+  - 不同操作系统（Windows/Linux/macOS）安装对应的 JVM，**屏蔽底层硬件和系统差异**。
+  - JVM 负责加载、验证并执行字节码，确保相同字节码在不同平台表现一致。
+- **字节码（Bytecode）—— 平台无关的中间代码**
+  - Java 代码编译成**平台无关的字节码（.class 文件）**，而非直接生成机器码。
+  - 由 JVM 解释或 JIT 编译为当前平台的机器指令。
+- **标准化的 Java API**：提供统一的 API（如 `java.io`、`java.net`），底层通过 JVM 适配不同操作系统的具体实现。
+- **严格的规范与兼容性**：JVM 规范（如字节码格式、内存管理）和 Java 语言规范由 Oracle 统一制定，确保各厂商实现的 JVM 行为一致。
+
+**例外情况（需注意）**
+
+- **JNI（本地方法调用）**：依赖系统原生库时，需为不同平台编译对应的动态库（如 `.dll`、`.so`）。
+- **平台相关细节**：如文件路径分隔符、字符编码、GUI 渲染等可能需要适配。
+
+### 【中等】JVM 的 TLAB（Thread-Local Allocation Buffer）是什么？
+
+### 【中等】Java 是编译型语言还是解释型语言？
+
+结论：**Java 既是编译型语言，也是解释型语言**。
+
+::: info 什么是编译型语言？什么是解释型语言？
+:::
+
+- [**编译型语言**](https://zh.wikipedia.org/wiki/編譯語言) - 程序在执行之前**需要一个专门的编译过程，把程序编译成为机器语言的文件**，运行时不需要重新翻译，直接使用编译的结果就行了。一般情况下，编译型语言的执行速度比较快，开发效率比较低。常见的编译型语言有 C、C++、Go 等。
+- [**解释型语言**](https://zh.wikipedia.org/wiki/直譯語言） - 程序不需要编译，只是在程序运行时通过 [解释器](https://zh.wikipedia.org/wiki/直譯器) ，将代码一句一句解释为机器代码后再执行。一般情况下，解释型语言的执行速度比较慢，开发效率比较高。常见的解释型语言有 JavaScript、Python、Ruby 等。
+
+::: info 为什么说 Java 既是编译型语言，也是解释型语言？
+:::
+
+Java 语言既具有编译型语言的特征，也具有解释型语言的特征。因此，我们说 Java 是编译和解释并存的。
+
+- **编译**：源码 → 字节码（`.java` → `.class`）。
+- **解释/JIT**：字节码 → 机器码（解释执行 + 热点代码编译优化）。
+
+Java 的源代码，首先，**通过 Javac 编译成为字节码（bytecode）**，即 `*.java` 文件转为 `*.class` 文件；然后，在运行时，**通过 Java 虚拟机（JVM）内嵌的解释器将字节码转换成为最终的机器码来执行**。正是由于 JVM 这套机制，使得 Java 可以【**一次编写，到处执行（Write Once, Run Anywhere）**】。
+
+为了改善解释语言的效率而发展出的 [即时编译](https://zh.wikipedia.org/wiki/即時編譯） 技术，已经缩小了这两种语言间的差距。这种技术混合了编译语言与解释型语言的优点，它像编译语言一样，先把程序源代码编译成 [字节码](https://zh.wikipedia.org/wiki/字节码） 。到执行期时，再将字节码直译，之后执行。[Java](https://zh.wikipedia.org/wiki/Java) 与 [LLVM](https://zh.wikipedia.org/wiki/LLVM) 是这种技术的代表产物。常见的 JVM（如 Hotspot JVM），都提供了 JIT（Just-In-Time）编译器，JIT 能够在运行时将热点代码编译成机器码，这种情况下部分热点代码就属于**编译执行**，而不是解释执行了。
+
+::: tip 扩展
+
+[基本功 | Java 即时编译器原理解析及实践](https://tech.meituan.com/2020/10/22/java-jit-practice-in-meituan.html)
+
+:::
 
 ### 【中等】编译执行与解释执行的区别是什么？JVM 使用哪种方式？
 
-### 【中等】什么是 Java 中的 logging write barrier？
+### 【困难】AOT 有什么优点？为什么不全部使用 AOT 呢？
+
+::: info 什么是 AOT？
+:::
+
+JDK 9 引入静态编译模式 **AOT(Ahead of Time Compilation)** 。AOT 模式下，**程序运行前直接编译为机器码**（类似 C/C++/Rust）。
+
+::: info AOT 和 JIT 有什么区别？
+:::
+
+**AOT vs. JIT**
+
+| **维度**     | **AOT**          | **JIT**            |
+| :----------- | :--------------- | :----------------- |
+| **启动速度** | ⭐⭐⭐（极快）   | ⭐（依赖预热）     |
+| **内存占用** | ⭐⭐⭐（低）     | ⭐⭐（较高）       |
+| **峰值性能** | ⭐⭐（静态优化） | ⭐⭐⭐（动态优化） |
+| **动态支持** | ❌（受限）       | ✅（完整支持）     |
+| **适合场景** | 云原生/微服务    | 高吞吐/动态框架    |
+
+提到 AOT 就不得不提 [GraalVM](https://www.graalvm.org/) 了！GraalVM 是一种高性能的 JDK（完整的 JDK 发行版本），它可以运行 Java 和其他 JVM 语言，以及 JavaScript、Python 等非 JVM 语言。 GraalVM 不仅能提供 AOT 编译，还能提供 JIT 编译。感兴趣的同学，可以去看看 [GraalVM 的官方文档](https://www.graalvm.org/latest/docs/)。如果觉得官方文档看着比较难理解的话，也可以找一些文章来看看，比如：
+
+::: tip 扩展
+
+- [基于静态编译构建微服务应用](https://mp.weixin.qq.com/s/4haTyXUmh8m-dBQaEzwDJw)
+- [走向 Native 化：Spring&Dubbo AOT 技术示例与原理讲解](https://cn.dubbo.apache.org/zh-cn/blog/2023/06/28/走向-native-化 springdubbo-aot-技术示例与原理讲解/)
+
+:::
+
+::: info 既然 AOT 这么多优点，那为什么不全部使用这种编译方式呢？
+:::
+
+**AOT 的局限性在于不支持动态特性**：
+
+- 不支持反射、动态代理、运行时类加载、JNI 等
+- 影响框架兼容性（如 Spring、CGLIB 依赖 ASM 技术生成动态字节码）
+
+**AOT 的适用场景**：
+
+- **适合**：启动敏感的微服务、云原生应用
+- **不适合**：需动态特性的复杂框架或高频优化的长运行任务
 
 ### 【中等】说说 Java 的执行流程？
+
+Java 程序的执行流程经历了从编译到字节码的生成，再到类加载和 JIT 编译的过程，最终在 JVM 中执行。并且在程序运行过程中，JVM 负责内存管理、垃圾回收和线程调度等工作。
+
+主要流程如下：
+
+1. 源代码：编写 .java 文件。
+2. 编译：使用 javac 编译器生成 .class 字节码文件。
+3. 类加载：JVM 的类加载器加载 .class 文件到内存中。
+4. 解释执行：JVM 将字节码转为机器码执行。
+5. JIT 编译：JVM 根据需要将热点代码编译为机器码。
+6. 运行：执行 main 方法中的逻辑。
+7. 垃圾回收：JVM 管理内存，并回收不再使用的对象。
+8. 程序结束：main 方法结束，JVM 清理资源，退出程序。
+
+### 【中等】什么是 Java 中的 JIT（Just-In-Time）?
+
+**JIT（Just-In-Time Compilation）**：即时编译，在运行时将**热点代码**（频繁执行的字节码）动态编译为**本地机器码**，提升执行效率。
+
+- **JIT 是 Java 高性能的关键**：通过运行时编译热点代码，平衡解释执行的灵活性和原生代码的速度。
+- **核心优化**：方法内联、逃逸分析、分层编译。
+- **调优方向**：根据应用特点调整编译阈值、代码缓存大小。
+
+**与解释器的区别**：
+
+- **解释器**：逐行解释执行字节码，启动快但运行慢。
+- **JIT**：编译后直接执行机器码，运行快但有编译开销。
+
+**JIT 作用**
+
+- **性能优化**：对重复执行的代码（如循环、高频方法）编译为机器码，避免重复解释。
+- **自适应优化**：根据运行时数据（如方法调用次数、分支预测）动态优化代码。
+
+**JIT 工作流程**
+
+- **热点检测**：通过计数器统计方法调用次数或循环执行次数（如 `-XX:CompileThreshold` 默认阈值 10000）。
+- **编译优化**：将热点字节码编译为机器码，存入**代码缓存（Code Cache）**。
+- **替换执行**：后续调用直接执行编译后的机器码。
+
+**JIT 优化技术**
+
+- **方法内联（Inlining）**：将小方法调用替换为方法体代码（如 `-XX:+InlineSmallMethods`）。
+- **逃逸分析（Escape Analysis）**：判断对象作用域，优化为栈分配或标量替换。
+- **JIT 分层编译（Tiered Compilation）**
+  - **混合模式**：结合解释器、C1（Client Compiler）和 C2（Server Compiler）：
+    - **C1**：快速编译，优化启动速度（如 `-client` 模式）。
+    - **C2**：深度优化，提升峰值性能（如 `-server` 模式）。
+  - **JDK 8+ 默认启用**：`-XX:+TieredCompilation`。
+- **循环展开（Loop Unrolling）**：减少循环控制开销。
+- **去虚拟化（Devirtualization）**：将虚方法调用转为直接调用。
+
+**JIT 关键参数**
+
+| **参数**                     | **作用**                       |
+| ---------------------------- | ------------------------------ |
+| `-XX:+UseJIT`                | 启用 JIT（默认开启）           |
+| `-XX:CompileThreshold=10000` | 触发 JIT 编译的方法调用阈值    |
+| `-XX:+PrintCompilation`      | 打印 JIT 编译日志              |
+| `-XX:ReservedCodeCacheSize`  | 设置代码缓存大小（默认 240MB） |
+| `-XX:+TieredCompilation`     | 启用分层编译（JDK 8+ 默认）    |
+
+**JIT 特点**
+
+- **优点**：
+  - 显著提升热点代码性能（接近原生代码速度）。
+  - 自适应优化更灵活。
+- **缺点**：
+  - 编译开销导致**启动变慢**（如短生命周期应用不适用）。
+  - 代码缓存占用内存。
+
+**JIT 适用场景**
+
+- **长期运行应用**：如 Web 服务、大数据处理（JIT 优势明显）。
+- **短时任务**：如命令行工具，解释器可能更高效。
+
+### 【困难】什么是逃逸分析？
+
+**逃逸分析** 是 JVM 在 **即时编译（JIT）阶段** 进行的一种优化技术，用于分析对象的动态作用域，判断对象是否会“逃逸”出当前方法或线程，从而决定是否可以进行栈上分配、锁消除或标量替换等优化。
+
+逃逸分析通过判断对象作用域，实现**栈分配、锁消除、标量替换**等优化，是 JVM 提升性能的关键技术之一，尤其在高频代码中效果显著。
+
+- **对象逃逸（Escape）**
+
+  - **方法逃逸**：对象被其他方法引用（如作为参数传递或返回值）。
+  - **线程逃逸**：对象被其他线程访问（如赋值给静态变量或共享实例变量）。
+
+- **非逃逸对象（Non-Escaping）**：对象仅在当前方法内创建和使用，未被外部引用。
+
+**逃逸分析的优化场景**
+
+- **栈上分配（Stack Allocation）**
+
+  - 对于**非逃逸对象**，JVM 直接在栈帧中分配内存（而非堆），对象随方法调用结束自动销毁，减少 GC 压力。
+  - _示例_：方法内部的临时对象。
+
+- **标量替换（Scalar Replacement）**
+
+  - 将非逃逸对象的字段拆解为局部变量（标量），避免创建完整对象。
+  - _示例_：`Point` 对象的 `x`、`y` 字段被替换为两个局部变量。
+
+- **锁消除（Lock Elision）**
+  - 若对象未线程逃逸且同步块无竞争，JVM 会移除不必要的锁（如 `synchronized`）。
+  - _示例_：局部 `StringBuffer` 的同步操作会被优化掉。
+
+**逃逸分析的触发条件**
+
+- 需 JVM 启用逃逸分析（默认开启）：
+  ```bash
+  -XX:+DoEscapeAnalysis  # 开启（默认）
+  -XX:-DoEscapeAnalysis  # 关闭
+  ```
+- 配合 JIT 编译器（如 C2）在热点代码中应用。
+
+**性能影响**
+
+- **优点**：减少堆分配、降低 GC 开销、提升局部性。
+- **限制**：分析本身有开销，复杂对象可能无法优化。
+
+**示例代码**
+
+```java
+public void example() {
+    // 非逃逸对象（可能被栈分配或标量替换）
+    Point p = new Point(1, 2);
+    System.out.println(p.x + p.y);
+}
+
+static class Point {
+    int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+}
+```
+
+### 【中等】什么是 Java 的 AOT（Ahead-Of-Time）？
+
+**AOT（Ahead-Of-Time，预编译）**，是一种在程序运行之前，将 Java 字节码（`.class`）直接编译为**本地机器码**（如 ELF 二进制文件）的技术。
+
+AOT 编译是在构建阶段对 Java 字节码进行静态分析，并将其编译为目标平台的机器码。编译后的代码可以直接运行在目标硬件上，无需在运行时通过 JVM 进行解释或即时编译。
+
+**AOT vs. JIT**
+
+| **特性**       | **AOT**                                | **JIT**                       |
+| -------------- | -------------------------------------- | ----------------------------- |
+| **编译时机**   | 运行前（静态编译）                     | 运行时（动态编译热点代码）    |
+| **启动速度**   | 极快（无解释/JIT 预热）                | 较慢（需解释执行 + JIT 预热） |
+| **运行时性能** | 峰值性能可能略低于 JIT（缺少动态优化） | 峰值性能高（自适应优化）      |
+| **内存占用**   | 更低（无代码缓存）                     | 更高（需维护代码缓存）        |
+| **适用场景**   | 短生命周期、快速启动需求               | 长期运行、高吞吐应用          |
+
+- **AOT 适合场景**：快速启动、低内存开销、容器化部署。
+- **技术选型**：
+  - 选 **JIT**：长期运行的高吞吐应用（如后端服务）。
+  - 选 **AOT**：短生命周期或瞬时扩展需求（如 FaaS）。
+- **推荐工具**：GraalVM Native Image（目前最成熟方案）。
+
+**AOT 优点**
+
+- **瞬时启动**：由于代码已经编译为本地机器码，AOT 减少了程序启动时的编译开销，适合需要快速启动的应用场景。如 Spring Boot 应用启动从秒级降至毫秒级。
+- **更低内存**：在不需要 JIT 编译器的情况下，AOT 编译减少了 JVM 的内存占用。
+- **适合容器化**：镜像体积小，冷启动快（如 Serverless 场景）。
+
+**AOT 缺点**
+
+- **兼容性限制**：不支持动态类加载、部分反射（需手动配置）。
+- **调试困难**：堆栈信息可能不如 JVM 详细。
+- **编译时间长**：构建 Native Image 耗时较久。
+
+**Java 的 AOT 工具**
+
+- GraalVM：GraalVM 是一个多语言虚拟机，支持 Java 的 AOT 编译。它可以将 Java 应用程序编译成独立的本地可执行文件，这些文件不依赖于 JVM，即可直接在目标操作系统上运行。
+- jaotc：在 Java 9 中引入的 jaotc 工具可以将 Java 字节码编译为 AOT 的本地代码。不过，jaotc 的使用在生产环境中并不广泛。
 
 ## JVM 内存管理
 
@@ -398,8 +652,28 @@ s2.intern();                     // 将 s2 的值加入字符串常量池（若�
 
 ### 【中等】什么是 Java 字节码？它与机器码有什么区别？
 
-- 字节码是 JVM 的中间表示，需要 JVM 解释或编译执行
-- 机器码是直接由 CPU 执行的二进制指令
+Java 字节码（Java Bytecode）是 Java 源代码编译后生成的中间代码，它是 Java 虚拟机（JVM）执行的指令集。**JVM 通过解释器或即时编译（JIT）将字节码转换为机器码执行**。字节码是 Java 实现【**一次编写，到处执行（Write Once, Run Anywhere）**】的核心技术之一。
+
+机器码是直接由 CPU 执行的二进制指令。
+
+**Java 字节码要点**：
+
+- **基本概念**
+  - 平台无关的中间代码，存储在 `.class` 文件中。
+  - 包含类结构、字段、方法及对应的字节码指令。
+- **指令集**：包含加载（`aload`/`iload`）、存储（`astore`）、运算（`iadd`）、控制流（`if_icmpgt`）等操作。
+- **执行方式**
+  - **解释执行**：JVM 逐条解释字节码。
+  - **JIT 编译**：热点代码动态编译为机器码优化性能。
+- **动态能力**
+  - **反射**：运行时动态解析/修改字节码（如生成代理类）。
+  - **字节码增强**：框架（Spring AOP 等）通过 ASM、Javassist 等工具修改字节码，实现 AOP 等功能。
+
+::: tip 扩展
+
+[美团 - 字节码增强技术探索](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
+
+:::
 
 ### 【中等】.class 文件的结构包含哪些主要部分？
 
@@ -439,163 +713,373 @@ s2.intern();                     // 将 s2 的值加入字符串常量池（若�
 - **动态能力**（热修复、Mock 测试）
 - **跨语言支持**（JVM 生态多语言）
 
-## 故障处理
+## 类加载
+
+### 【中等】Java 里的对象在虚拟机里面是怎么存储的？
+
+64 位 JVM 中，一个空`Object`占 16 字节（12 字节头 + 4 字节填充）。
+
+每个 Java 对象在堆内存中分为 **3 个部分**：
+
+- **对象头（Header）**
+  - **Mark Word**：存储哈希码、GC 年龄、锁状态（如偏向锁信息）。
+  - **Klass Pointer**：指向类元数据的指针（压缩后占 4 字节，否则 8 字节）。
+- **实例数据（Fields）**：对象的所有成员变量（包括继承的字段），按类型对齐存储。
+- **对齐填充（Padding）**：确保对象大小为 8 字节的整数倍（优化 CPU 缓存行访问）。
+
+**对象分配策略**
+
+- **新生代分配**：大多数对象优先分配在** Eden 区**（若开启 TLAB，线程先分配至私有缓冲区）。触发 Young GC 后，存活对象移至 Survivor 区或晋升老年代。
+- **老年代分配**：大对象（如`-XX:PretenureSizeThreshold=1MB`）直接进入老年代。长期存活对象（年龄 > `MaxTenuringThreshold`）从 Survivor 晋升。
+
+**分配方式**：
+
+- **指针碰撞**（堆内存规整时，如 Serial 收集器）。
+- **空闲列表**（堆内存碎片化时，如 CMS 收集器）。
+
+### 【中等】Java 类的生命周期是怎样的？
+
+Java 类的生命周期可以分为 7 个阶段：加载 → 链接（验证→准备→解析） → 初始化 → 使用 → （可能）卸载。
+
+- **加载（Loading）**
+  - 读取 `.class` 文件，生成 `Class<?>` 对象。
+  - 触发条件：`new`、访问静态成员、反射等。
+- **链接（Linking）**
+  - **验证（Verification）**：检查字节码合法性（如魔数、继承规则）。
+  - **准备（Preparation）**：为 `static` 变量分配内存，赋默认值（如 `int` 为 `0`）。
+  - **解析（Resolution）**：将符号引用（如类名）转为直接引用（内存地址）。
+- **初始化（Initialization）**
+  - 执行 `<clinit>()`，完成 `static` 赋值和静态代码块。
+  - 触发条件：首次 `new`、访问非 `final` 静态变量、反射初始化等。
+- **使用（Using）**
+  - 正常调用方法、创建实例。
+- **卸载（Unloading）**
+  - 条件：类无实例、`ClassLoader` 被回收、无 `Class<?>` 引用。
+  - 典型场景：动态加载的类（如热部署）。
+
+### 【困难】什么是类加载器吗？
+
+Java 类加载器是 **JVM（Java 虚拟机）** 的核心组件之一，负责在运行时动态加载 Java 类（`.class` 文件）到内存，并生成对应的 `Class<?>` 对象。
+
+#### 类加载器层次结构
+
+类加载器采用 **"双亲委派模型"** 进行层次化管理，确保类的唯一性和安全性。按层级自上而下有 4 种类加载器：
+
+![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200617115936.png)
+
+| 类加载器                                    | 加载范围                                     | 说明                                             |
+| :------------------------------------------ | :------------------------------------------- | :----------------------------------------------- |
+| **Bootstrap ClassLoader**（启动类加载器）   | `JRE/lib` 或 `-Xbootclasspath`               | 由 C++ 实现，是 JVM 的一部分，无 Java 父类加载器 |
+| **Extension ClassLoader**（扩展类加载器）   | `JRE/lib/ext` 或 `-Djava.ext.dirs`           | 加载 Java 扩展库（如 `javax.*`）                 |
+| **Application ClassLoader**（应用类加载器） | `-Djava.class.path` 或 `-cp` 或 `-classpath` | 默认加载用户编写的类（`main()` 方法所在类）      |
+| **Custom ClassLoader**（自定义类加载器）    | 用户自定义路径（如网络、加密类）             | 可继承 `ClassLoader` 实现个性化加载逻辑          |
+
+#### 双亲委派模型
+
+双亲委派模型（Parents Delegation Model）要求除了顶层的 Bootstrap ClassLoader 外，其余的类加载器都应有自己的父类加载器。这里类加载器之间的父子关系一般通过组合（Composition）关系来实现，而不是通过继承（Inheritance）的关系实现。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408200807340.png)
+
+**工作原理**：**只有当父类加载器加载失败的情况下，才会用子类加载器去加载类**。
+
+**优势**
+
+- **避免重复加载**：双亲委派模型使得 Java 类随着它的类加载器一起具有一种带有优先级的层次关系，从而确保类在 JVM 中唯一（如 `java.lang.Object` 只由 `Bootstrap` 加载）。
+- **安全性**：防止用户伪造核心类（如自定义 `java.lang.String` 会被父类加载器拦截）。
+
+以下是抽象类 `java.lang.ClassLoader` 的代码片段，其中的 `loadClass()` 方法运行过程如下：
+
+```java
+public abstract class ClassLoader {
+    // The parent class loader for delegation
+    private final ClassLoader parent;
+
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        return loadClass(name, false);
+    }
+
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        synchronized (getClassLoadingLock(name)) {
+            // 首先判断该类型是否已经被加载
+            Class<?> c = findLoadedClass(name);
+            if (c == null) {
+                // 如果没有被加载，就委托给父类加载或者委派给启动类加载器加载
+                try {
+                    if (parent != null) {
+                        // 如果存在父类加载器，就委派给父类加载器加载
+                        c = parent.loadClass(name, false);
+                    } else {
+                        // 如果不存在父类加载器，就检查是否是由启动类加载器加载的类，通过调用本地方法native Class findBootstrapClass(String name)
+                        c = findBootstrapClassOrNull(name);
+                    }
+                } catch (ClassNotFoundException e) {
+                    // 如果父类加载器加载失败，会抛出 ClassNotFoundException
+                }
+
+                if (c == null) {
+                    // 如果父类加载器和启动类加载器都不能完成加载任务，才调用自身的加载功能
+                    c = findClass(name);
+                }
+            }
+            if (resolve) {
+                resolveClass(c);
+            }
+            return c;
+        }
+    }
+
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
+        throw new ClassNotFoundException(name);
+    }
+}
+```
+
+【说明】
+
+- 先检查类是否已经加载过，如果没有则让父类加载器去加载。
+- 当父类加载器加载失败时抛出 `ClassNotFoundException`，此时尝试自己去加载。
+
+## 调优
 
 ### 【简单】JDK 内置了哪些工具？
 
 ::: details 要点
 
-**基础开发工具**
+以下是较常用的 JDK 命令行工具：
 
-- **`javac`** – Java 编译器（`.java` → `.class`）
-- **`java`** – 运行 Java 程序（启动 JVM）
-- **`javadoc`** – 生成 API 文档（基于源码注释）
-- **`jar`** – 打包 `.class` 文件为 JAR
-- **`jdb`** – 命令行调试工具（断点、变量查看）
+| 名称     | 描述                                                                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `jps`    | 查看 Java 进程。显示系统内的所有 JVM 进程。                                                                                           |
+| `jstat`  | JVM 统计监控工具。监控虚拟机运行时状态信息，它可以显示出 JVM 进程中的类装载、内存、GC、JIT 编译等运行数据。                           |
+| `jmap`   | 生成内存快照（Heap Dump）。用于打印 JVM 进程对象直方图、类加载统计。并且可以生成堆转储快照（一般称为 heapdump 或 dump 文件）。        |
+| `jstack` | 线程堆栈分析（排查死锁、线程阻塞）。用于打印 JVM 进程的线程和锁的情况。并且可以生成线程快照（一般称为 threaddump 或 javacore 文件）。 |
+| `jhat`   | 用来分析 jmap 生成的 dump 文件。                                                                                                      |
+| `jinfo`  | 查看/修改 JVM 运行参数。用于实时查看和调整 JVM 进程参数。                                                                             |
 
-**性能监控与分析工具**
+扩展命令行工具：
 
-- **`jps`** – 查看 Java 进程
-- **`jstack`** – 线程堆栈分析（排查死锁、线程阻塞）
-- **`jmap`** – 内存快照（生成 Heap Dump）
-- **`jhat`** – 分析 Heap Dump（内存泄漏排查）
-- **`jstat`** – JVM 统计（GC、内存、类加载监控）
-- **`jconsole`** – 图形化 JVM 监控（内存、线程、类）
-- **`jvisualvm`** – 综合性能分析（CPU、内存、GC）
+- **Arthas**：**Arthas 是阿里开源的 Java 诊断工具**，无需重启应用，实时**监控方法调用、查看类加载、分析性能瓶颈、热修复代码**，快速定位线上问题（如 CPU 飙高、内存泄漏、方法阻塞等）。
 
-**诊断工具**
+以下是较常见的 JVM GUI 工具：
 
-- **`jinfo`** – 查看/修改 JVM 运行参数
-- **`jstatd`** – 远程 JVM 监控（分布式支持）
+| **工具名称**                           | **主要功能**                                                        | **适用场景**                 | **优点**                                 | **缺点**                             |
+| :------------------------------------- | :------------------------------------------------------------------ | :--------------------------- | :--------------------------------------- | :----------------------------------- |
+| **VisualVM**                           | - 监控内存、CPU、线程、GC - 堆转储分析 - 插件扩展（如 MBeans 监控） | 开发调试、性能分析           | 免费、轻量、JDK 自带                     | 功能较基础，对大堆支持有限           |
+| **JConsole**                           | - 监控堆、类、线程、MBean - 简单的 GC 分析                          | 快速监控 JVM 状态            | JDK 自带，使用简单                       | 功能较少，无法深入分析               |
+| **Eclipse MAT** (Memory Analyzer Tool) | - 分析堆转储（`heapdump`） - 检测内存泄漏、大对象                   | 内存泄漏排查、OOM 分析       | 强大的内存分析能力，可视化展示对象引用链 | 需要手动导出堆转储，对超大堆分析较慢 |
+| **JProfiler**                          | - CPU 分析、内存分析、线程分析 - 实时监控、方法级调用追踪           | 企业级性能调优、生产环境监控 | 功能全面，支持多种分析模式               | 商业软件（付费），学习成本较高       |
+| **Java Mission Control** (JMC)         | - 实时监控 JVM - 飞行记录（Flight Recorder） - 低开销性能分析       | 生产环境监控、性能诊断       | JDK 商业版自带，低开销                   | 部分功能需商业授权（Oracle JDK）     |
 
 :::
 
-### 【中等】你常用哪些工具来分析 JVM 性能？
+### 【中等】常用的 JVM 配置参数有哪些？
+
+**内存相关参数**
+
+| **参数**                 | **作用**                                | **适用场景**                                 |
+| :----------------------- | :-------------------------------------- | :------------------------------------------- |
+| `-Xss`                   | 设置每个线程的栈大小                    |                                              |
+| `-Xms`                   | 初始堆大小                              | 避免堆动态扩展带来的性能波动                 |
+| `-Xmx`                   | 最大堆大小                              | 防止 OOM，需留 20% 系统内存余量              |
+| `-Xmn`                   | 新生代大小（建议占堆 1/3~1/2）          | 优化 GC 频率和停顿时间                       |
+| `-XX:PermSize`           | 永久代空间的初始值                      | Java 7 及以前用于设置方法区大小，Java 8 废弃 |
+| `-XX:MaxPermSize`        | 永久代空间的最大值                      | Java 7 及以前用于设置方法区大小，Java 8 废弃 |
+| `-XX:MetaspaceSize`      | 元空间初始大小（JDK8+）                 | 避免频繁 Full GC 扩容                        |
+| `-XX:MaxMetaspaceSize`   | 元空间最大大小（默认无限制）            | 防止元空间占用过多内存                       |
+| `-XX:+UseCompressedOops` | 启用压缩指针（64位系统默认开启）        | 减少内存占用（堆 < 32GB 时有效）             |
+| `-XX:NewRatio`           | 新生代与年老代的比例（默认为 2）        |                                              |
+| `-XX:SurvivorRatio`      | Eden 区与 Survivor 区比例（默认 8:1:1） | 调整新生代对象晋升速度                       |
+
+**GC 相关参数**
+
+| **参数**                          | **作用**                              | **示例/默认值**                     | **适用场景**             |
+| :-------------------------------- | :------------------------------------ | :---------------------------------- | :----------------------- |
+| `-XX:+UseG1GC`                    | 启用 G1 垃圾收集器（JDK9+ 默认）      | `-XX:+UseG1GC`                      | 大堆（>4GB）低延迟场景   |
+| `-XX:MaxGCPauseMillis`            | G1 最大停顿时间目标（毫秒）           | `-XX:MaxGCPauseMillis=200`          | 控制 GC 延迟             |
+| `-XX:ParallelGCThreads`           | 并行 GC 线程数（默认=CPU 核数）       | `-XX:ParallelGCThreads=4`           | 多核服务器优化 GC 效率   |
+| `-XX:+UseConcMarkSweepGC`         | 启用 CMS 收集器（已废弃，JDK14 移除） | 不推荐使用                          | 老年代低延迟（历史项目） |
+| `-XX:+PrintGCDetails`             | 打印详细 GC 日志                      | 配合 `-Xloggc:/path/gc.log`         | 调试 GC 问题             |
+| `-XX:+HeapDumpOnOutOfMemoryError` | OOM 时自动生成堆转储文件              | `-XX:HeapDumpPath=/path/dump.hprof` | 内存泄漏分析             |
 
 ### 【中等】如何在 Java 中进行内存泄漏分析？
 
-### 【中等】常用的 JVM 配置参数有哪些？
+- 内存泄漏的本质是**对象被意外持有无法回收**，通过引用链分析找到“谁在引用它”。
+- 生产环境优先配置 `-XX:+HeapDumpOnOutOfMemoryError` 防患未然。
 
-## 类加载
+#### 确认内存泄漏现象
 
-### Java 支持哪些引用类型？分别用于什么场景？
+- 堆内存持续增长（通过 `jstat -gcutil <pid>` 观察 `Old Gen` 或 `Metaspace` 使用率）。
+- Full GC 频繁但无法回收内存（`jstat` 显示 `Full GC` 次数增加）。
+- 最终触发 `OutOfMemoryError: Java heap space`。
 
-无论是通过引用计算算法判断对象的引用数量，还是通过可达性分析算法判断对象的引用链是否可达，判定对象是否可被回收都与引用有关。
+#### 获取内存快照
 
-Java 具有四种强度不同的引用类型：
+**方法 1：主动触发堆转储（Heap Dump）**
 
-- 强引用（Strong Reference）
-- 软引用（Soft Reference）
-- 弱引用（Weak Reference）
-- 虚引用
+```bash
+# 使用 jmap 导出堆转储文件（需进程权限）
+jmap -dump:format=b,file=heap.hprof <pid>
 
-**（1）强引用**
-
-**被强引用（Strong Reference）关联的对象不会被垃圾收集器回收。**
-
-使用 `new` 一个新对象的方式来创建强引用。
-
-```java
-Object obj = new Object();
+# 或配置 JVM 参数自动生成（OOM 时触发）
+-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/heap.hprof
 ```
 
-**（2）软引用**
+**方法 2：通过工具生成**
 
-**被软引用（Soft Reference）关联的对象，只有在 JVM 内存不够的情况下才会被回收。**JVM 会确保在抛出 `OutOfMemoryError` 之前，清理软引用指向的对象。软引用通常用来实现内存敏感的缓存，如果还有空闲内存，就可以暂时保留缓存，当内存不足时清理掉，这样就保证了使用缓存的同时，不会耗尽内存。
+- **VisualVM**：右键进程 → "Heap Dump"。
+- **JConsole**："MBeans" → "com.sun.management" → "HotSpotDiagnostic" → "dumpHeap"。
 
-使用 `SoftReference` 类来创建软引用。
+#### 分析堆转储文件
 
-```java
-Object obj = new Object();
-SoftReference<Object> sf = new SoftReference<Object>(obj);
-obj = null; // 使对象只被软引用关联
+**工具选择**
+
+| **工具**        | **特点**                                                 |
+| --------------- | -------------------------------------------------------- |
+| **Eclipse MAT** | 功能强大，支持对象引用链分析、泄漏嫌疑报告（推荐首选）。 |
+| **VisualVM**    | 基础分析，适合快速查看大对象分布。                       |
+| **JProfiler**   | 商业工具，可视化交互好，支持实时监控。                   |
+
+**MAT 关键操作步骤**
+
+1. **打开堆转储文件**：`File` → `Open Heap Dump`。
+2. **查看泄漏报告**：
+   - 首页会提示 `Leak Suspects`（泄漏嫌疑对象）。
+   - 示例报告：`"java.lang.Thread" instances retained by thread stack`（线程未释放）。
+3. **分析对象引用链**：
+   - 右键对象 → `Path to GC Roots` → `exclude weak/soft references`（排除弱引用）。
+   - 查找意外被持有的对象（如静态集合、未关闭的资源）。
+4. **统计对象占比**：`Histogram` 视图按类/包名分组，排序 `Retained Heap`（对象总占用内存）。
+
+#### 常见内存泄漏场景与修复
+
+| **泄漏类型**     | **典型原因**                             | **修复方案**                            |
+| ---------------- | ---------------------------------------- | --------------------------------------- |
+| **静态集合**     | 静态 `Map`/`List` 持续添加对象未清除。   | 使用弱引用（`WeakHashMap`）或定期清理。 |
+| **未关闭资源**   | 数据库连接、文件流未调用 `close()`。     | 用 `try-with-resources` 自动关闭。      |
+| **线程未终止**   | 线程池或 `Thread` 未销毁（如定时任务）。 | 调用 `shutdown()` 或设为守护线程。      |
+| **缓存未清理**   | 本地缓存（如 Guava Cache）无过期策略。   | 设置大小限制或过期时间。                |
+| **监听器未注销** | 事件监听器未移除（如 Spring Bean）。     | 在销毁时手动注销监听器。                |
+
+#### 实时诊断工具（无需堆转储）
+
+**Arthas（阿里开源）**
+
+```bash
+# 监控对象增长
+watch java.util.HashMap size '{params,returnObj}' -n 5
+
+# 查看类实例数量
+sc -d *MyClass | grep classLoaderHash
+jad --source-only com.example.LeakClass > LeakClass.java
+
+# 生成火焰图分析 CPU/内存
+profiler start -d 30 -f /tmp/flamegraph.html
 ```
 
-**（3）弱引用**
-
-**被弱引用（Weak Reference）关联的对象一定会被垃圾收集器回收，也就是说它只能存活到下一次垃圾收集发生之前。**
-
-使用 `WeakReference` 类来实现弱引用。
-
-```java
-Object obj = new Object();
-WeakReference<Object> wf = new WeakReference<Object>(obj);
-obj = null;
-```
-
-`WeakHashMap` 的 `Entry` 继承自 `WeakReference`，主要用来实现缓存。
-
-```java
-private static class Entry<K,V> extends WeakReference<Object> implements Map.Entry<K,V>
-```
-
-Tomcat 中的 `ConcurrentCache` 就使用了 `WeakHashMap` 来实现缓存功能。`ConcurrentCache` 采取的是分代缓存，经常使用的对象放入 eden 中，而不常用的对象放入 longterm。eden 使用 `ConcurrentHashMap` 实现，longterm 使用 `WeakHashMap`，保证了不常使用的对象容易被回收。
-
-```java
-public final class ConcurrentCache<K, V> {
-
-    private final int size;
-
-    private final Map<K, V> eden;
-
-    private final Map<K, V> longterm;
-
-    public ConcurrentCache(int size) {
-        this.size = size;
-        this.eden = new ConcurrentHashMap<>(size);
-        this.longterm = new WeakHashMap<>(size);
-    }
-
-    public V get(K k) {
-        V v = this.eden.get(k);
-        if (v == null) {
-            v = this.longterm.get(k);
-            if (v != null)
-                this.eden.put(k, v);
-        }
-        return v;
-    }
-
-    public void put(K k, V v) {
-        if (this.eden.size() >= size) {
-            this.longterm.putAll(this.eden);
-            this.eden.clear();
-        }
-        this.eden.put(k, v);
-    }
-}
-```
-
-**（4）虚引用**
-
-又称为幽灵引用或者幻影引用。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用取得一个对象实例。
-
-**为一个对象设置虚引用关联的唯一目的就是能在这个对象被收集器回收时收到一个系统通知。**
-
-使用 `PhantomReference` 来实现虚引用。
-
-```java
-Object obj = new Object();
-PhantomReference<Object> pf = new PhantomReference<Object>(obj);
-obj = null;
-```
-
-### 【中等】Java 中的强引用、软引用、弱引用和虚引用分别是什么？
-
-### 【中等】Java 里的对象在虚拟机里面是怎么存储的？
-
-### 【中等】什么是 Java 中的 JIT（Just-In-Time）?
-
-### 【中等】JIT 编译后的代码存在哪？
-
-### 【中等】什么是 Java 的 AOT（Ahead-Of-Time）？
-
-### 【困难】你了解 Java 的逃逸分析吗？
-
-### 【困难】你了解 Java 的类加载器吗？
-
-## 调优
-
-### 【中等】JVM 垃圾回收调优的主要目标是什么？
+**JVisualVM**：安装 **VisualGC** 插件，实时观察各内存区域变化。
 
 ### 【中等】如何对 Java 的垃圾回收进行调优？
+
+#### 调优核心目标
+
+- **降低延迟（Latency）**：减少 GC 停顿时间（STW），提升响应速度。
+- **提高吞吐量（Throughput）**：最大化应用处理业务的时间占比（GC 时间占比最小化）。
+- **控制内存占用（Footprint）**：合理分配堆内存，避免浪费或频繁扩容。
+
+#### 调优原则
+
+- **数据驱动**：基于监控而非猜测调整参数。
+- **渐进式修改**：每次只改一个参数，观察效果。
+- **权衡取舍**：低延迟可能牺牲吞吐量，需根据业务需求选择。
+
+通过以上步骤，可系统性地优化 Java GC 性能，解决停顿时间长、吞吐不足等问题。
+
+#### 调优步骤
+
+**监控与基线分析**
+
+- **工具**：
+  - `jstat -gcutil <pid>`：实时监控 GC 各区域使用率。
+  - `GC 日志`：通过 `-Xlog:gc*` 或 `-XX:+PrintGCDetails` 记录详细 GC 行为。
+  - **VisualVM**/**Grafana + Prometheus**：可视化内存和 GC 趋势。
+- **关键指标**：Young GC / Full GC 频率、平均停顿时间、吞吐量（`1 - GC时间/总时间`）。
+
+**选择垃圾收集器**
+
+| **收集器**      | **适用场景**                 | **关键参数**                                 |
+| --------------- | ---------------------------- | -------------------------------------------- |
+| **G1 GC**       | 平衡延迟与吞吐（JDK8+ 默认） | `-XX:MaxGCPauseMillis=200`（目标停顿时间）   |
+| **ZGC**         | 超低延迟（JDK11+，大堆）     | `-XX:+UseZGC -Xmx>8G`                        |
+| **Parallel GC** | 高吞吐量（批处理任务）       | `-XX:+UseParallelGC -XX:ParallelGCThreads=8` |
+
+**堆内存分配优化**
+
+- **总堆大小**（`-Xms`/`-Xmx`）：
+  - 建议设为物理内存的 50%~70%（预留空间给 OS 和其他进程）。
+  - 容器化环境需启用 `-XX:+UseContainerSupport`。
+- **新生代与老年代比例**：G1 无需手动设置（自动调整），Parallel GC 可设 `-Xmn`（如堆的 1/3）。
+
+**关键参数调优**
+
+- **G1 专用参数**：
+
+  ```bash
+  -XX:InitiatingHeapOccupancyPercent=45  # 老年代占用阈值触发Mixed GC
+  -XX:G1NewSizePercent=20               # 新生代最小占比
+  -XX:G1MaxNewSizePercent=50            # 新生代最大占比
+  ```
+
+- **通用参数**：
+
+  ```bash
+  -XX:MetaspaceSize=512M                # 避免元空间动态扩容
+  -XX:+HeapDumpOnOutOfMemoryError       # OOM时自动转储内存
+  ```
+
+**避免常见陷阱**
+
+- **Full GC 频繁**：
+  - 检查老年代对象晋升过快（调整 `-XX:MaxTenuringThreshold`）。
+  - 避免大对象直接进入老年代（如 `-XX:G1HeapRegionSize` 适配对象大小）。
+- **MetaSpace OOM**：
+  - 增加 `-XX:MaxMetaspaceSize`（如 `1G`），并检查动态类生成（反射/CGLIB）。
+
+**验证与迭代**
+
+- **压测对比**：使用相同负载对比调优前后的 GC 日志。
+- **持续监控**：生产环境通过 APM（如 SkyWalking）观察长周期效果。
+
+**调优示例**
+
+**场景：Web 服务（低延迟优先）**
+
+```bash
+# G1 GC 配置示例
+-Xms4G -Xmx4G
+-XX:+UseG1GC
+-XX:MaxGCPauseMillis=150
+-XX:InitiatingHeapOccupancyPercent=40
+-XX:G1HeapRegionSize=4M
+-Xlog:gc*,gc+heap=debug:file=gc.log:time,uptime
+```
+
+**场景：大数据计算（高吞吐优先）**
+
+```bash
+# Parallel GC 配置示例
+-Xms8G -Xmx8G
+-XX:+UseParallelGC
+-XX:ParallelGCThreads=4
+-XX:MaxGCPauseMillis=500
+-XX:+UseAdaptiveSizePolicy  # 自动调整新生代/老年代比例
+```
+
+#### 高级工具
+
+- **JFR（Java Flight Recorder）**：
+
+  ```bash
+  -XX:StartFlightRecording=duration=60s,settings=profile,jfr=memory=on
+  ```
+
+- **Arthas**：实时诊断内存泄漏（如 `heapdump` 命令）。

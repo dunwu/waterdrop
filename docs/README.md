@@ -128,7 +128,7 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 #### [Java 虚拟机](01.Java/01.JavaCore/06.JVM)
 
-- [Java 虚拟机简介](01.Java/01.JavaCore/06.JVM/Java虚拟机简介.md)
+- [Java 虚拟机简介](01.Java/01.JavaCore/06.JVM/Java_虚拟机_简介.md)
 - [Java 虚拟机之内存区域](01.Java/01.JavaCore/06.JVM/Java_虚拟机_内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
 - [Java 虚拟机之垃圾收集](01.Java/01.JavaCore/06.JVM/Java_虚拟机_垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
 - [Java 虚拟机之字节码](01.Java/01.JavaCore/06.JVM/Java_虚拟机_字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
@@ -313,8 +313,9 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 
 #### ORM
 
-- [Mybatis 快速入门](01.Java/13.框架/11.ORM/01.Mybatis快速入门.md)
-- [Mybatis 原理](01.Java/13.框架/11.ORM/02.Mybatis原理.md)
+- [MyBatis 快速入门](01.Java/13.框架/11.ORM/MyBatis快速入门.md)
+- [MyBatis 原理](01.Java/13.框架/11.ORM/MyBatis原理.md)
+- [MyBatis 原理](01.Java/13.框架/11.ORM/MyBatis面试.md)
 
 #### 安全
 

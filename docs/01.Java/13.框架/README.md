@@ -91,8 +91,9 @@ index: false
 
 ### ORM
 
-- [Mybatis 快速入门](11.ORM/01.Mybatis快速入门.md)
-- [Mybatis 原理](11.ORM/02.Mybatis原理.md)
+- [MyBatis 快速入门](11.ORM/MyBatis快速入门.md)
+- [MyBatis 原理](11.ORM/MyBatis原理.md)
+- [MyBatis 原理](11.ORM/MyBatis面试.md)
 
 ### 安全
 
