@@ -287,12 +287,12 @@
 >
 > spring-security 功能更丰富，也比 shiro 更复杂。值得一提的是由于 spring-security 是 spring 团队开发，所以集成 spring 和 spring-boot 框架更容易。
 
-- [Shiro](docs/01.Java/13.框架/12.安全/01.Shiro.md)
-- [SpringSecurity](docs/01.Java/13.框架/12.安全/02.SpringSecurity.md)
+- [Shiro](docs/01.Java/13.框架/12.安全/Shiro.md)
+- [SpringSecurity](docs/01.Java/13.框架/12.安全/SpringSecurity.md)
 
 #### IO
 
-- [Shiro](docs/01.Java/13.框架/13.IO/01.Netty.md)
+- [Netty](docs/01.Java/13.框架/13.IO/Netty.md)
 
 ### Java 中间件
 

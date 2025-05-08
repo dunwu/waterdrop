@@ -1,5 +1,6 @@
 ---
 title: Java 虚拟机面试二
+date: 2025-04-30 06:33:26
 categories:
   - Java
   - JavaCore
@@ -9,6 +10,7 @@ tags:
   - JavaCore
   - 面试
   - JVM
+permalink: /pages/14f9d9b0/
 ---
 
 # Java 虚拟机面试二

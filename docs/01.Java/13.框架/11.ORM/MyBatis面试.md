@@ -1,5 +1,6 @@
 ---
 title: MyBatis 面试
+date: 2025-04-30 06:33:26
 order: 99
 categories:
   - Java
@@ -10,6 +11,7 @@ tags:
   - 框架
   - ORM
   - MyBatis
+permalink: /pages/4dec9ccb/
 ---
 
 # MyBatis 面试

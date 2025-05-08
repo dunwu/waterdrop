@@ -5,8 +5,8 @@ date: 2021-04-29 08:17:17
 categories:
   - 分布式
   - 分布式通信
-  - mq
-  - kafka
+  - MQ
+  - Kafka
 tags:
   - mq
   - kafka

@@ -21,8 +21,6 @@ permalink: /pages/02820fbd/
 
 ### 【基础】Dubbo 是什么？为什么使用 Dubbo？
 
-:::details 要点
-
 [Dubbo](https://dubbo.apache.org/zh-cn/) 是一款高性能、轻量级的开源 Java RPC 框架。
 
 Dubbo 提供了三大核心能力：
@@ -31,11 +29,7 @@ Dubbo 提供了三大核心能力：
 - **智能容错和负载均衡**：内置多种负载均衡策略，智能感知下游节点健康状况，显著减少调用延迟，提高系统吞吐量。
 - **服务自动注册和发现**：支持多种注册中心服务，服务实例上下线实时感知。
 
-:::
-
 ### 【基础】Dubbo3 有什么新特性？
-
-:::details 要点
 
 Dubbo3 的核心新特性：
 
@@ -47,13 +41,9 @@ Dubbo3 的核心新特性：
 
 > 扩展：[技术创想66 | Dubbo3.0应用级服务注册原理](https://zhuanlan.zhihu.com/p/581776302)
 
-:::
-
 ## 架构
 
 ### 【基础】Dubbo 有哪些核心组件？
-
-:::details 要点
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/distributed/rpc/dubbo/dubbo基本架构.png)
 
@@ -87,11 +77,7 @@ Dubbo3 的核心新特性：
 - 服务提供者无状态，任意一台宕掉后，不影响使用。
 - 服务提供者全部宕掉后，服务消费者应用将无法使用，并无限次重连等待服务提供者恢复。
 
-:::
-
 ### 【高级】Dubbo 框架整体如何设计的？
-
-:::details 要点
 
 Dubbo 的整体设计原则如下：
 
@@ -145,11 +131,7 @@ Dubbo 的整体设计原则如下：
 
 > 扩展阅读：[Dubbo 框架设计](https://cn.dubbo.apache.org/zh-cn/docsv2.7/dev/design/)
 
-:::
-
 ### 【高级】Dubbo 架构是如何实现高度可扩展的？
-
-:::details 要点
 
 #### 微内核+插件架构
 
@@ -209,11 +191,7 @@ Dubbo 很多服务治理的核心能力都是通过上图描述的几个关键�
 
 > 扩展阅读：[Dubbo 官方文档之扩展适配](https://cn.dubbo.apache.org/zh-cn/overview/what/core-features/extensibility/)
 
-:::
-
 ### 【高级】Dubbo 的 SPI 机制是如何设计的？
-
-:::details 要点
 
 #### Java SPI
 
@@ -254,11 +232,7 @@ Dubbo SPI 的相关逻辑被封装在了 `ExtensionLoader` 类中，通过 `Exte
 > - [Dubbo SPI 概述](https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/reference-manual/spi/overview/)
 > - [源码级深度理解 Java SPI](https://dunwu.github.io/waterdrop/pages/2131c240/)
 
-:::
-
 ### 【高级】Dubbo 中的时钟轮机制是如何设计的？
-
-:::details 要点
 
 #### JDK 中定时任务的实现
 
@@ -299,11 +273,7 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 - **失败重试，** 例如，Provider 向注册中心进行注册失败时的重试操作，或是 Consumer 向注册中心订阅时的失败重试等。
 - **周期性定时任务，** 例如，定期发送心跳请求，请求超时的处理，或是网络连接断开后的重连机制。
 
-:::
-
 ### 【高级】Dubbo 中的线程模型是如何设计的？
-
-:::details 要点
 
 #### Consumer 线程模型
 
@@ -423,11 +393,7 @@ Dubbo 框架的线程模型与以上这五种行为息息相关，Dubbo 协议 P
 1. `received`、`connected`、`disconnected`、`caught` 都是在 Dubbo 线程上执行的。但是 `connected` 和 `disconnected` 两个行为是与其他两个行为通过线程池隔离开的。并且在 Dubbo connected thread pool 中提供了链接限制、告警灯能力。
 2. 反序列化请求的行为在 Dubbo 中做的。
 
-:::
-
 ### 【中级】Dubbo 中用到哪些设计模式？
-
-:::details 要点
 
 **单例模式**
 
@@ -480,13 +446,9 @@ Dubbo 中 `RegistryProtocol` 类负责将不同的注册中心协议适配到统
 
 > 扩展：[长文详解：DUBBO源码使用了哪些设计模式](https://juejin.cn/post/7126675470107541534#heading-24)
 
-:::
-
 ## 服务注册和发现
 
 ### 【基础】服务注册和发现的流程是怎样的？
-
-:::details 要点
 
 服务提供者注册服务的过程：
 
@@ -508,11 +470,7 @@ registry://multicast://224.5.6.7:1234/com.alibaba.dubbo.registry.RegistryService
 
 然后基于扩展点自适应机制，通过 URL 的 `registry://` 协议头识别，就会调用 `RegistryProtocol` 的 `refer` 方法，基于 `refer` 参数中的条件，查询服务 `demoService` 的地址。
 
-:::
-
 ### 【基础】Dubbo 支持哪些注册中心？
-
-:::details 要点
 
 不同于传统的 Dubbo2，Dubbo3 中定义了三种中心：注册中心、配置中心、元数据中心。配置中心、元数据中心是实现 Dubbo 高阶服务治理能力会依赖的组件，如流量管控规则等，相比于注册中心通常这两个组件的配置是可选的。
 
@@ -541,11 +499,7 @@ Dubbo 目前支持的主流注册中心实现包括：
 
 同时也支持 Kubernetes、Mesh 体系的服务发现，具体请参考 [使用教程 - kubernetes部署](http://localhost:1313/zh-cn/overview/mannual/java-sdk/tasks/deploy/)
 
-:::
-
 ### 【中级】注册中心是选择 CP 还是 AP？
-
-:::details 要点
 
 #### 什么是 CAP
 
@@ -573,8 +527,6 @@ CAP 就是取 Consistency、Availability、Partition Tolerance 的首字母而�
 
 选择 CP 还是 AP，根据实际需要来定：如果业务场景要求强一致，优先选择 CP 型注册中心；如果业务场景强调可用性，优先选择 AP 型注册中心。
 
-:::
-
 ### 【基础】注册中心挂了可以继续通信吗？
 
 可以。Dubbo 消费者在应用启动时会从注册中心拉取已注册的生产者的地址接口，并缓存在本地。每次调用时，按照本地存储的地址进行调用。
@@ -582,8 +534,6 @@ CAP 就是取 Consistency、Availability、Partition Tolerance 的首字母而�
 ## 通信协议和序列化
 
 ### 【基础】Dubbo 支持哪些通信协议，各有什么利弊？
-
-:::details 要点
 
 Dubbo 框架提供了自定义的高性能 RPC 通信协议：基于 HTTP/2 的 Triple 协议 和 基于 TCP 的 Dubbo2 协议。除此之外，Dubbo 框架支持任意第三方通信协议，如官方支持的 gRPC、Thrift、REST、JsonRPC、Hessian2 等，更多协议可以通过自定义扩展实现。这对于微服务实践中经常要处理的多协议通信场景非常有用。
 
@@ -604,13 +554,9 @@ Dubbo 官方支持的协议如下：
 
 扩展：[Dubbo 官方文档之通信协议](https://cn.dubbo.apache.org/zh-cn/overview/what/core-features/protocols/)
 
-:::
-
 ## 负载均衡
 
 ### 【中级】Dubbo 支持哪些负载均衡方式？各有什么利弊？
-
-:::details 要点
 
 Dubbo 提供了多种均衡策略，缺省为 `weighted random` 基于权重的随机负载均衡策略。
 
@@ -697,13 +643,9 @@ Adaptive 即自适应负载均衡，是一种能根据后端实例负载自动�
 > - [Dubbo 官方文档之负载均衡](https://cn.dubbo.apache.org/zh-cn/overview/what/core-features/load-balance/)
 > - [负载均衡](https://dunwu.github.io/waterdrop/pages/bcf0fb8c/)
 
-:::
-
 ## 路由
 
 ### 【中级】Dubbo 路由是怎样工作的？
-
-:::details 要点
 
 以下是 Dubbo 单个路由器的工作过程，路由器接收一个服务的实例地址集合作为输入，基于请求上下文 (Request Context) 和 (Router Rule) 实际的路由规则定义对输入地址进行匹配，所有匹配成功的实例组成一个地址子集，最终地址子集作为输出结果继续交给下一个路由器或者负载均衡组件处理。
 
@@ -716,11 +658,7 @@ Adaptive 即自适应负载均衡，是一种能根据后端实例负载自动�
 
 ![Router](https://cn.dubbo.apache.org/imgs/v3/feature/traffic/router2.png)
 
-:::
-
 ### 【中级】Dubbo 支持哪些路由方式？分别适用于什么场景？
-
-:::details 要点
 
 Dubbo 的路由规则可以基于应用、服务、方法、参数等粒度精准的控制请求分发，根据请求的目标服务、方法以及请求体中的其他附加参数进行匹配，符合匹配条件的请求会进一步的按照特定规则转发到一个地址子集。
 
@@ -785,13 +723,9 @@ script: |
   } (invokers, invocation, context)); // 表示立即执行方法
 ```
 
-:::
-
 ## 服务治理
 
 ### 【中级】Dubbo 有哪些集群容错策略？
-
-:::details 要点
 
 在集群调用失败时，Dubbo 提供了多种容错方案，缺省为 failover 重试。
 
@@ -821,11 +755,7 @@ Dubbo 支持的容错策略：
 <dubbo:reference cluster="failsafe" />
 ```
 
-:::
-
 ### 【中级】Dubbo 提供了哪些监控能力？
-
-:::details 要点
 
 Dubbo 内部维护了多个纬度的可观测指标，并且支持多种方式的可视化监测。可观测性指标从总体上来说分为三个度量纬度：
 
@@ -834,13 +764,9 @@ Dubbo 内部维护了多个纬度的可观测指标，并且支持多种方式�
 - **Tracing** - Dubbo 与业界主流的链路追踪工作做了适配，包括 Skywalking、Zipkin、Jaeger 都支持 Dubbo 服务的链路追踪。
 - **Logging** - Dubbo 支持多种日志框架适配。以 Java 体系为例，支持包括 Slf4j、Log4j2、Log4j、Logback、Jcl 等，用户可以基于业务需要选择合适的框架；同时 Dubbo 还支持 Access Log 记录请求踪迹。
 
-:::
-
 ## 应用
 
 ### 【基础】接口不同版本如何兼容？
-
-:::details 要点
 
 #### 版本和分组
 
@@ -943,7 +869,74 @@ public class DevelopProviderServiceV2 implements DevelopService{
 
 > 扩展阅读：[Dubbo 官方文档之版本与分组](https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/tasks/framework/version_group/)
 
-:::
+## TODO
+
+【中等】如何监控 Dubbo 的服务性能？
+【中等】如何配置 Dubbo 的服务治理（Governance）？
+【中等】如何在 Dubbo 中使用直连提供者（Direct Provider）？
+【简单】Dubbo 的配置方式有哪些？
+【中等】Dubbo 的超时问题如何排查与调优？
+【中等】如何在 Dubbo 中优化网络通信性能？
+【困难】如何处理 Dubbo 中的跨机房服务调用问题？
+【中等】如何排查 Dubbo 的网络延迟问题？
+【中等】如何调优 Dubbo 的线程池？
+【困难】Dubbo 在大规模分布式场景中的性能优化策略有哪些？
+【中等】什么是 Dubbo 的 Filter 机制？
+【中等】Dubbo 的服务自动上线与下线机制是怎样的？
+【中等】Dubbo 如何进行服务路由控制？
+【中等】Dubbo 的服务上线后无法调用，可能的原因有哪些？
+【困难】如何在 Dubbo 中处理服务调用链路追踪？
+【中等】Dubbo 如何支持异步调用？
+【简单】Dubbo 的核心架构是什么？
+【中等】如何自定义一个 Dubbo 的 SPI 扩展？
+【中等】Dubbo 中的连接数过多如何处理？
+【中等】Dubbo 支持哪些负载均衡策略？
+【困难】Dubbo 如何保证服务的高可用性？
+【中等】Dubbo 的监控中心（Monitor）是如何工作的？
+【中等】什么是 Dubbo 的 Mock 机制？如何使用？
+【中等】Dubbo 中的线程模型是什么？
+【中等】如何在 Dubbo 中进行服务限流和熔断的实现？
+【中等】Dubbo 中的流量控制策略有哪些？
+【中等】Dubbo 中的 SPI 是什么？Java 的 SPI 有什么区别？
+【中等】Dubbo 中的分组（Group）是如何使用的？
+【中等】如何在 Dubbo 中实现动态配置的实时生效？
+【中等】Dubbo 的启动慢是什么原因？
+【困难】Dubbo 中如何实现分布式事务？
+【中等】如何在 Dubbo 中配置服务的超时与重试策略？
+【中等】Dubbo 的工作原理是什么？
+【中等】Dubbo 的服务调用流程是怎样的？
+【中等】Dubbo 的延迟加载（Lazy Loading）是如何实现的？
+【中等】Dubbo 的异步调用如何与主线程同步？
+【中等】Dubbo 中如何实现服务版本控制？
+【中等】Dubbo 中如何使用本地存根（Stub）和本地伪装（Mock）？
+【中等】Dubbo 中如何配置和使用服务限流？
+【简单】如何在 Dubbo 中配置动态服务发现？
+【中等】Dubbo 中如何实现服务端与客户端的版本兼容？
+【简单】Dubbo 支持哪些序列化方式？
+【中等】如何调试 Dubbo 的服务调用失败问题？
+【中等】Dubbo 中如何配置多协议、多注册中心？
+【中等】如何在 Dubbo 中实现服务的多协议暴露？
+【困难】Dubbo 的服务间调用如何保证幂等性？
+【简单】什么是 Dubbo？它解决了什么问题？
+【中等】Dubbo 的通信协议有哪些？
+【困难】Dubbo 的内存泄漏问题如何排查与修复？
+【中等】Dubbo 的服务依赖问题如何解决？
+【简单】Dubbo 的 XML 配置与注解配置有什么区别？
+【中等】Dubbo 的服务无法发现，可能的原因有哪些？
+【中等】Dubbo 中的集群容错机制有哪些？
+【中等】什么是服务注册与发现？Dubbo 如何实现？
+【中等】如何在 Dubbo 中使用健康检查（Health Check）？
+【中等】Dubbo 的 Telnet 命令支持哪些操作？
+【中等】什么是 Dubbo 的治理中心？
+【中等】Dubbo 中的服务降级策略有哪些？
+【中等】Dubbo 如何优化序列化性能？
+【中等】如何在 Dubbo 中配置服务的访问控制（ACL）？
+【中等】Dubbo 的序列化异常如何解决？
+【中等】Dubbo 中的统计与监控数据如何采集？
+【中等】如何在 Dubbo 中实现服务的灰度发布？
+【困难】Dubbo 和 Spring Cloud Gateway 有什么区别？
+【中等】Feign 和 Dubbo 的区别？
+【中等】你在项目中是如何使用 Dubbo RPC 框架的，讲述一下使用流程？
 
 ## 参考资料
 

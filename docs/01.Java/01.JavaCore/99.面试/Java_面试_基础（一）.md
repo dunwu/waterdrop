@@ -1,7 +1,7 @@
 ---
 title: Java 基础面试一
-date: 2024-06-18 22:46:20
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+date: 2024-06-18 22:46:20
 categories:
   - Java
   - JavaCore
