@@ -24,7 +24,7 @@ permalink: /pages/bc315f0e/
 - Redis 支持五种基本数据类型：String（字符串）、Hash（哈希）、List（列表）、Set（集合）、Zset（有序集合）。
 - 随着 Redis 版本升级，又陆续支持以下数据类型： BitMap（2.2 版新增）、HyperLogLog（2.8 版新增）、GEO（3.2 版新增）、Stream（5.0 版新增）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309232155082.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202506152022430.png)
 
 > **扩展**：[What Redis data structures look like](https://redislabs.com/ebook/part-1-getting-started/chapter-1-getting-to-know-redis/1-2-what-redis-data-structures-look-like/)
 
@@ -115,7 +115,7 @@ permalink: /pages/bc315f0e/
 
 ### 【困难】Redis 基础数据类型的底层实现是怎样的？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309241112034.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202506152022257.png)
 
 - **String 类型** - String 类型的底层数据结构是 SDS。SDS 是 Redis 针对字符串类型的优化，具有以下特性：
   - 常数复杂度获取字符串长度
