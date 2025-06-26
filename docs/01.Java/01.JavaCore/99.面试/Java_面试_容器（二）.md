@@ -342,7 +342,7 @@ System.gc(); // 仅示例，实际中不推荐显式调用 GC
 
 `ConcurrentHashMap` 是 Java 并发编程中最常用的线程安全 `Map`，其底层实现经历了 **JDK7（分段锁）** 和 **JDK8+（CAS + `synchronized` 优化）** 两个重要阶段。以下是核心实现原理：
 
-::: info JDK7 中，`ConcurrentHashMap` 的实现原理是什么？
+::: info JDK7 中，ConcurrentHashMap 的实现原理是什么？
 :::
 
 JDK7 中，`ConcurrentHashMap` 的核心实现思想是：将整个哈希表分成多个 `Segment`（默认 16 个），每个 `Segment` 是一个独立的 `HashEntry` 数组，**锁粒度细化到`Segment` 级别**，不同 `Segment` 可并发操作。
@@ -369,7 +369,7 @@ ConcurrentHashMap
 - 内存占用较高（每个 `Segment` 独立维护数组）。
 - 查询时需要两次哈希计算（先定位 `Segment`，再定位 `HashEntry`）。
 
-::: info JDK8 中，`ConcurrentHashMap` 的实现原理是什么？
+::: info JDK8 中，ConcurrentHashMap 的实现原理是什么？
 :::
 
 JDK8 中，`ConcurrentHashMap` 的核心实现思想是：抛弃 `Segment`，改用 **`Node` 数组 + 链表/红黑树**，锁粒度细化到 **单个桶（链表头节点）**，并引入 **CAS（无锁化）** 和 `synchronized` 结合的方式提升并发性能。
@@ -404,7 +404,7 @@ ConcurrentHashMap
   - 使用 `spread()` 方法优化哈希计算，减少冲突。
   - `size()` 方法通过 `CounterCell` 分段统计，避免全局锁。
 
-::: info JDK8 中，`ConcurrentHashMap` 关键操作流程是怎样的？
+::: info JDK8 中，ConcurrentHashMap 关键操作流程是怎样的？
 :::
 
 **（1）PUT 操作（JDK8）**
@@ -424,7 +424,7 @@ ConcurrentHashMap
 1. 当元素数量超过阈值（`sizeCtl`），触发扩容。
 2. 其他线程检测到扩容时，可协助迁移数据（`transfer` 方法）。
 
-::: info `ConcurrentHashMap` 在 JDK7 和 JDK8 中的实现有哪些差异？
+::: info ConcurrentHashMap 在 JDK7 和 JDK8 中的实现有哪些差异？
 :::
 
 | **对比项**       | **JDK7（分段锁）**            | **JDK8+（CAS + `synchronized`）** |

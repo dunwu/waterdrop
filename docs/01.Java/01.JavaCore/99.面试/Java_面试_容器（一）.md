@@ -187,7 +187,7 @@ Comparator<Person> reverseAge =
 - 明确是否需要 `null`，避免滥用导致代码健壮性问题。
 - 必要时用 `Optional` 或默认值替代 `null`。
 
-### 【简单】对比一下 ArrayList 和 LinkedList？
+### 【简单】ArrayList 和 LinkedList 有什么区别？
 
 **`ArrayList` vs. `LinkedList`**
 
@@ -202,9 +202,9 @@ Comparator<Person> reverseAge =
 | **空间局部性**    | ✅ 更好（CPU 缓存友好）                                               | ❌ 较差（节点分散存储）                                          |
 
 **对比小结**：
-
-1. **访问速度**：`ArrayList` 随机访问极快（数组索引），`LinkedList` 需遍历链表。
-2. **增删效率**：`ArrayList` 尾部插入快，中间/头部插入慢；`LinkedList` 头尾插入快，中间插入仍需遍历。
+List` 需遍历链表。
+2. **增删效率**：`ArrayList` 尾部插入快，中间/头部插入慢；`Lin
+1. **访问速度**：`ArrayList` 随机访问极快（数组索引），`LinkedkedList` 头尾插入快，中间插入仍需遍历。
 3. **内存开销**：`LinkedList` 每个元素多消耗 2 个指针空间（前驱+后继）。
 4. **功能扩展**：`LinkedList` 支持队列/栈操作（如 `addFirst()`, `pollLast()`）。
 
@@ -220,7 +220,7 @@ Comparator<Person> reverseAge =
 
 ## Set
 
-### 【简单】比较 HashSet、LinkedHashSet 和 TreeSet 三者的异同？
+### 【简单】HashSet、LinkedHashSet 和 TreeSet 有什么区别？
 
 | 特性             | HashSet              | LinkedHashSet           | TreeSet                          |
 | ---------------- | -------------------- | ----------------------- | -------------------------------- |
@@ -295,7 +295,7 @@ Set<String> customTreeSet = new TreeSet<>(Comparator.reverseOrder());
 
 ## Queue
 
-### 【简单】Queue 与 Deque 的区别
+### 【简单】Queue 与 Deque 有什么区别？
 
 ::: info Queue vs. Deque
 :::
@@ -382,7 +382,7 @@ deque.pop();          // = removeFirst()
   Deque<String> safeDeque = new ConcurrentLinkedDeque<>();
   ```
 
-### 【简单】ArrayDeque 与 LinkedList 的区别？
+### 【简单】ArrayDeque 与 LinkedList 有什么区别？
 
 - **性能优先选 `ArrayDeque`**：队列/栈场景，追求更高吞吐和更低内存。
 - **功能灵活选 `LinkedList`**：需要中间操作、随机访问或混合数据结构时。
