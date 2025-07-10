@@ -324,7 +324,7 @@ Dubbo 的整体设计原则如下：
 - **transport 网络传输层**：抽象 mina 和 netty 为统一接口，以 `Message` 为中心，扩展接口为 `Channel`、`Transporter`、`Client`、`Server`、`Codec`。
 - **serialize 数据序列化层**：可复用的一些工具，扩展接口为 `Serialization`、`ObjectInput`、`ObjectOutput`、`ThreadPool`。
 
-::: 组件间的关系
+::: info 组件间的关系
 
 :::
 
@@ -335,7 +335,7 @@ Dubbo 的整体设计原则如下：
 - 而 Remoting 实现是 Dubbo 协议的实现，如果你选择 RMI 协议，整个 Remoting 都不会用上，Remoting 内部再划为 Transport 传输层和 Exchange 信息交换层，**Transport 层只负责单向消息传输**，是对 Mina, Netty, Grizzly 的抽象，它也可以扩展 UDP 传输，而 **Exchange 层是在传输层之上封装了 Request-Response 语义**。
 - Registry 和 Monitor 实际上不算一层，而是一个独立的节点，只是为了全局概览，用层的方式画在一起。
 
-::: 核心组件交互
+::: info 核心组件交互
 
 :::
 
@@ -346,7 +346,7 @@ Dubbo 的整体设计原则如下：
 - 图中蓝色虚线为初始化时调用，红色虚线为运行时异步调用，红色实线为运行时同步调用。
 - 图中只包含 RPC 的层，不包含 Remoting 的层，Remoting 整体都隐含在 Protocol 中。
 
-::: 调用链路
+::: info 调用链路
 
 :::
 
