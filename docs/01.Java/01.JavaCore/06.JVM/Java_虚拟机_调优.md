@@ -9,7 +9,7 @@ tags:
   - Java
   - JavaCore
   - JVM
-permalink: /pages/395de487/
+permalink: /pages/78e07005/
 ---
 
 # Java 虚拟机之调优

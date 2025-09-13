@@ -10,7 +10,7 @@ tags:
   - JavaCore
   - 面试
   - 容器
-permalink: /pages/e3c58d1f/
+permalink: /pages/670b8cb5/
 ---
 
 # Java 容器面试二

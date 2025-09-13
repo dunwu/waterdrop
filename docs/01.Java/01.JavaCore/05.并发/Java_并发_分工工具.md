@@ -14,7 +14,7 @@ tags:
   - CompletionStage
   - CompletionService
   - ForkJoinPool
-permalink: /pages/5420c8d3/
+permalink: /pages/d7fa17f4/
 ---
 
 # Java 并发之分工工具

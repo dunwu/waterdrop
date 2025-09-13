@@ -11,7 +11,7 @@ tags:
   - JavaCore
   - 编码
   - 加密
-permalink: /pages/f4cf5533/
+permalink: /pages/c1c96765/
 ---
 
 # Java 编码和加密

@@ -15,7 +15,7 @@ tags:
   - OutputStream
   - Reader
   - Writer
-permalink: /pages/a4dba16e/
+permalink: /pages/eba7ad38/
 ---
 
 # Java I/O 之 BIO

@@ -11,7 +11,7 @@ tags:
   - 框架
   - ORM
   - MyBatis
-permalink: /pages/20966ea3/
+permalink: /pages/ae7b258f/
 ---
 
 # MyBatis 原理

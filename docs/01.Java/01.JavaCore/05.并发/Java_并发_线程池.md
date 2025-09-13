@@ -10,7 +10,7 @@ tags:
   - JavaCore
   - 并发
   - 线程池
-permalink: /pages/123b90fb/
+permalink: /pages/84721ba0/
 ---
 
 # Java 并发之线程池

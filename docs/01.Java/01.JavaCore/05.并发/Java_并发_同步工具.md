@@ -12,7 +12,7 @@ tags:
   - CountDownLatch
   - CyclicBarrier
   - Semaphore
-permalink: /pages/8e4455a2/
+permalink: /pages/eca43004/
 ---
 
 # Java 并发之同步工具

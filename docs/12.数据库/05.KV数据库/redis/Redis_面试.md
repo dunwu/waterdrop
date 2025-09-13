@@ -5,14 +5,14 @@ cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20250311080391
 date: 2020-07-13 17:03:42
 categories:
   - 数据库
-  - KV 数据库
+  - KV数据库
   - redis
 tags:
   - 数据库
   - KV 数据库
   - redis
   - 面试
-permalink: /pages/4431bbfc/
+permalink: /pages/ce594f11/
 ---
 
 # Redis 面试

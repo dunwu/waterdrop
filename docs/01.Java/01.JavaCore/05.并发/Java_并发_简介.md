@@ -15,7 +15,7 @@ tags:
   - 性能
   - 死锁
   - 活锁
-permalink: /pages/97c73d27/
+permalink: /pages/d63c0ffb/
 ---
 
 # Java 并发简介

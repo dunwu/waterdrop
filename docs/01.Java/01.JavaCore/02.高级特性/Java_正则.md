@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 正则
-permalink: /pages/f09a35e3/
+permalink: /pages/6726e7a6/
 ---
 
 # Java 正则从入门到精通

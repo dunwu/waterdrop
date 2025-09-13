@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 数组
-permalink: /pages/00d8985a/
+permalink: /pages/b5e16557/
 ---
 
 # 深入理解 Java 数组

@@ -15,7 +15,7 @@ tags:
   - Buffer
   - Selector
   - 多路复用
-permalink: /pages/291c7061/
+permalink: /pages/cfd35751/
 ---
 
 # Java NIO

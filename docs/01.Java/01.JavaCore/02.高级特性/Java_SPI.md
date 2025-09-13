@@ -14,7 +14,7 @@ tags:
   - Spring Boot
   - common-logging
   - JDBC
-permalink: /pages/2131c240/
+permalink: /pages/8f3dccd5/
 ---
 
 # 源码级深度理解 Java SPI

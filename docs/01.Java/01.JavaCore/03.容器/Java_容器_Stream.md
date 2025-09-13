@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 容器
-permalink: /pages/4f97753f/
+permalink: /pages/c7eb7d7d/
 ---
 
 # Java 容器之 Stream

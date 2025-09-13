@@ -14,7 +14,7 @@ tags:
   - Serializable
   - Externalizable
   - transient
-permalink: /pages/dc9f1331/
+permalink: /pages/737e5233/
 ---
 
 # 深入理解 Java 序列化

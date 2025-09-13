@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 枚举
-permalink: /pages/4e47d423/
+permalink: /pages/fe2da6cf/
 ---
 
 # 深入理解 Java 枚举

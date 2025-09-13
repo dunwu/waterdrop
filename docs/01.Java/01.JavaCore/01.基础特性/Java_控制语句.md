@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 控制语句
-permalink: /pages/2357b621/
+permalink: /pages/c318904e/
 ---
 
 # Java 控制语句

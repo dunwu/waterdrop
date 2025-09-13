@@ -3,8 +3,13 @@ import { navbar } from 'vuepress-theme-hope'
 export default navbar([
   // '/',
   {
+    text: '笔记',
+    icon: 'mdi:notes',
+    link: '/00.笔记/'
+  },
+  {
     text: 'Java',
-    icon: 'mdi:language-java',
+    icon: 'ri:java-line',
     prefix: '/01.Java/',
     children: [
       {
@@ -53,9 +58,9 @@ export default navbar([
     link: '/04.DevOps/'
   },
   {
-    text: '数据结构和算法',
+    text: '算法',
     icon: 'carbon:data-structured',
-    link: '/11.数据结构和算法/'
+    link: '/11.算法/'
   },
   {
     text: '数据库',
@@ -67,9 +72,7 @@ export default navbar([
       {
         text: '关系型数据库',
         link: '/12.数据库/03.关系型数据库/',
-        children: [
-          { text: 'MySQL', icon: 'logos:mysql', link: '/12.数据库/03.关系型数据库/mysql/' },
-        ]
+        children: [{ text: 'MySQL', icon: 'logos:mysql', link: '/12.数据库/03.关系型数据库/mysql/' }]
       },
       {
         text: '文档数据库',
@@ -91,7 +94,11 @@ export default navbar([
         link: '/12.数据库/07.搜索引擎数据库/',
         children: [
           { text: 'Elasticsearch', icon: 'logos:elasticsearch', link: '/12.数据库/07.搜索引擎数据库/elasticsearch/' },
-          { text: 'Elastic技术栈', icon: 'vscode-icons:file-type-elastic', link: '/12.数据库/07.搜索引擎数据库/elastic/' }
+          {
+            text: 'Elastic技术栈',
+            icon: 'vscode-icons:file-type-elastic',
+            link: '/12.数据库/07.搜索引擎数据库/elastic/'
+          }
         ]
       }
     ]
@@ -106,17 +113,17 @@ export default navbar([
     icon: 'mdi:resistor-nodes',
     prefix: '/15.分布式/',
     children: [
-      { text: '分布式综合', link: '00.分布式综合/' },
-      { text: '分布式协同', link: '11.分布式协同/' },
-      { text: '分布式调度', link: '12.分布式调度/' },
+      { text: '分布式综合', link: '分布式综合/' },
+      { text: '分布式协同', link: '分布式协同/' },
+      { text: '分布式调度', link: '分布式调度/' },
       {
         text: '分布式通信',
         children: [
-          { text: 'RPC', icon: 'file-icons:powerpc', link: '21.分布式通信/01.RPC' },
-          { text: 'MQ', icon: 'mdi:mq', link: '21.分布式通信/02.MQ' }
+          { text: 'RPC', icon: 'file-icons:powerpc', link: '分布式通信/RPC' },
+          { text: 'MQ', icon: 'mdi:mq', link: '分布式通信/MQ' }
         ]
       },
-      { text: '分布式存储', link: '22.分布式存储/' }
+      { text: '分布式存储', link: '分布式存储/' }
     ]
   },
   {
@@ -126,13 +133,13 @@ export default navbar([
       { text: 'Hadoop', icon: 'devicon:hadoop', link: '/16.大数据/hadoop/' },
       { text: 'Hive', icon: 'simple-icons:apachehive', link: '/16.大数据/hive/' },
       { text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/06.列式数据库/hbase/' },
-      { text: 'ZooKeeper', link: '/15.分布式/11.分布式协同/02.ZooKeeper/' },
-      { text: 'Kafka', icon: 'logos:kafka-icon', link: '/15.分布式/21.分布式通信/02.MQ/01.Kafka/' }
+      { text: 'ZooKeeper', link: '/15.分布式/分布式协同/ZooKeeper/' },
+      { text: 'Kafka', icon: 'logos:kafka-icon', link: '/15.分布式/分布式通信/MQ/Kafka/' }
     ]
   },
   {
-    text: '笔记',
-    icon: 'mdi:notes',
-    link: '/99.笔记/'
+    text: '面试',
+    icon: 'fluent-color:chat-bubbles-question-16',
+    link: '/99.面试/'
   }
 ])

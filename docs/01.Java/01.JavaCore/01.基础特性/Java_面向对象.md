@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 面向对象
-permalink: /pages/e5542773/
+permalink: /pages/8bc397b5/
 ---
 
 # Java 面向对象
@@ -21,14 +21,14 @@ permalink: /pages/e5542773/
 
 每种编程语言，都有自己的操纵内存中元素的方式。
 
-Java 中提供了[基本数据类型](https://dunwu.github.io/waterdrop/pages/e1e559ed/)，但这还不能满足编写程序时，需要抽象更加复杂数据类型的需要。因此，Java 中，允许开发者通过类（类的机制下面会讲到）创建自定义类型。
+Java 中提供了[基本数据类型](https://dunwu.github.io/waterdrop/pages/17bf2e10/)，但这还不能满足编写程序时，需要抽象更加复杂数据类型的需要。因此，Java 中，允许开发者通过类（类的机制下面会讲到）创建自定义类型。
 
 有了自定义类型，那么数据类型自然会千变万化，所以，必须要有一定的机制，使得它们仍然保持一些必要的、通用的特性。
 
 Java 世界有一句名言：一切皆为对象。这句话，你可能第一天学 Java 时，就听过了。这不仅仅是一句口号，也体现在 Java 的设计上。
 
 - 首先，所有 Java 类都继承自 `Object` 类（从这个名字，就可见一斑）。
-- 几乎所有 Java 对象初始化时，都要使用 `new` 创建对象（[基本数据类型](https://dunwu.github.io/waterdrop/pages/e1e559ed/)、String、枚举特殊处理），对象存储在堆中。
+- 几乎所有 Java 对象初始化时，都要使用 `new` 创建对象（[基本数据类型](https://dunwu.github.io/waterdrop/pages/17bf2e10/)、String、枚举特殊处理），对象存储在堆中。
 
 ```java
 // 下面两

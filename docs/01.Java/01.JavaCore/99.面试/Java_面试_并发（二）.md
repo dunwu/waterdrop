@@ -10,7 +10,7 @@ tags:
   - JavaCore
   - 面试
   - 并发
-permalink: /pages/b1e468f4/
+permalink: /pages/696ebf40/
 ---
 
 # Java 并发面试二
@@ -1094,7 +1094,7 @@ new Thread(() -> {
   - `AtomicBoolean` - 布尔类型原子类
   - `AtomicInteger` - 整型原子类
   - `AtomicLong` - 长整型原子类
-- **引用数据类型**：Java 数据类型分为 **基本数据类型** 和 **引用数据类型** 两大类（不了解 Java 数据类型划分可以参考： [Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/3f3649ee/) ）。如果想针对引用类型做原子操作怎么办？Java 也提供了相关的原子类：
+- **引用数据类型**：Java 数据类型分为 **基本数据类型** 和 **引用数据类型** 两大类（不了解 Java 数据类型划分可以参考： [Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/17bf2e10/) ）。如果想针对引用类型做原子操作怎么办？Java 也提供了相关的原子类：
   - `AtomicReference` - 引用类型原子类
   - `AtomicMarkableReference` - 带有标记位的引用类型原子类
   - `AtomicStampedReference` - 带有版本号的引用类型原子类

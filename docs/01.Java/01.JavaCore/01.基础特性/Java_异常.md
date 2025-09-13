@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 异常
-permalink: /pages/f328743a/
+permalink: /pages/9003d665/
 ---
 
 # 深入理解 Java 异常

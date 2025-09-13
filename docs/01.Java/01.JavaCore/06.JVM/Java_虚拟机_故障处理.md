@@ -11,7 +11,7 @@ tags:
   - JavaCore
   - JVM
   - 故障诊断
-permalink: /pages/78327955/
+permalink: /pages/d429143b/
 ---
 
 # Java_虚拟机_故障处理

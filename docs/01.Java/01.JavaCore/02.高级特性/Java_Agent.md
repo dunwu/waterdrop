@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - JavaAgent
-permalink: /pages/9d88f435/
+permalink: /pages/3a533985/
 ---
 
 # JavaAgent

@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 容器
-permalink: /pages/de2c0744/
+permalink: /pages/8d5643ca/
 ---
 
 # Java 容器之 Map

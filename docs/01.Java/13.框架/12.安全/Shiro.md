@@ -11,7 +11,7 @@ tags:
   - 框架
   - 安全
   - Shiro
-permalink: /pages/312bd026/
+permalink: /pages/35e2d3ba/
 ---
 
 # Shiro 快速入门

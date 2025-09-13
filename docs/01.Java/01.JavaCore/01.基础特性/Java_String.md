@@ -11,7 +11,7 @@ tags:
   - JavaCore
   - 工具类
   - 字符串
-permalink: /pages/89de55cf/
+permalink: /pages/f23795fd/
 ---
 
 # 深入理解 Java String 类型

@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 面试
-permalink: /pages/dd562d6e/
+permalink: /pages/46f290c1/
 ---
 
 # Java 基础面试二

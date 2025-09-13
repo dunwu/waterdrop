@@ -9,7 +9,7 @@ tags:
   - Java
   - JavaCore
   - JVM
-permalink: /pages/5f839231/
+permalink: /pages/be8c745f/
 hidden: true
 index: false
 dir:

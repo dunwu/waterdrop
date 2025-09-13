@@ -9,7 +9,7 @@ tags:
   - Java
   - JavaCore
   - 并发
-permalink: /pages/6615822b/
+permalink: /pages/deea6eca/
 hidden: true
 index: false
 dir:

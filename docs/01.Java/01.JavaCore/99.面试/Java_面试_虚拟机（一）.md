@@ -10,7 +10,7 @@ tags:
   - JavaCore
   - 面试
   - JVM
-permalink: /pages/46c1e340/
+permalink: /pages/b2f6beb8/
 ---
 
 # Java 虚拟机面试一

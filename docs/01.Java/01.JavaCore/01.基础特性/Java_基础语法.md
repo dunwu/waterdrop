@@ -9,7 +9,7 @@ categories:
 tags:
   - Java
   - JavaCore
-permalink: /pages/2d948841/
+permalink: /pages/734610a7/
 ---
 
 # Java 基础语法特性
@@ -40,7 +40,7 @@ public class HelloWorld {
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java基本数据类型.svg)
 
-> 👉 扩展阅读：[深入理解 Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/e1e559ed/)
+> 👉 扩展阅读：[深入理解 Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/17bf2e10/)
 
 ## 变量和常量
 
@@ -143,4 +143,4 @@ Java 中支持的操作符类型如下：
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java序列化.svg)
 
-> 👉 扩展阅读：[Java 序列化](https://dunwu.github.io/waterdrop/pages/76ab164b/)
+> 👉 扩展阅读：[Java 序列化](https://dunwu.github.io/waterdrop/pages/737e5233/)

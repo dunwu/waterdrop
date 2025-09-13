@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 数据类型
-permalink: /pages/3f3649ee/
+permalink: /pages/17bf2e10/
 ---
 
 # 深入理解 Java 基本数据类型

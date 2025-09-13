@@ -8,7 +8,7 @@ tags:
   - 数据库
   - 综合
   - nosql
-permalink: /pages/d94c7395/
+permalink: /pages/c02058fe/
 ---
 
 # Nosql 技术选型

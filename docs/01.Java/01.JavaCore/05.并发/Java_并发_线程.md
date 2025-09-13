@@ -16,7 +16,7 @@ tags:
   - Future
   - FutureTask
   - 线程生命周期
-permalink: /pages/162ef13a/
+permalink: /pages/cec05f27/
 ---
 
 # Java 并发之线程

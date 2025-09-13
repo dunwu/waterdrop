@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - JVM
-permalink: /pages/f847eacd/
+permalink: /pages/09aa72ff/
 ---
 
 # Java 虚拟机简介

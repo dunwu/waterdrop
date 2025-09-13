@@ -11,7 +11,7 @@ tags:
   - JavaCore
   - 反射
   - 动态代理
-permalink: /pages/31248a53/
+permalink: /pages/1337a0f7/
 ---
 
 # 深入理解 Java 反射和动态代理

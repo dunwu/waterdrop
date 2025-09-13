@@ -15,7 +15,7 @@ tags:
   - ReentrantLock
   - ReentrantReadWriteLock
   - StampedLock
-permalink: /pages/2061f1f6/
+permalink: /pages/2eb6fa01/
 ---
 
 # Java 并发之锁
@@ -220,7 +220,7 @@ Java 1.5 之前，协调对共享对象的访问时可以使用的机制只有 `
 
 Java 1.5 之后，增加了新的机制：`ReentrantLock`、`ReentrantReadWriteLock` ，这类锁的申请和释放都可以由程序所控制，所以常被称为显示锁。
 
-> 💡 `synchronized` 的用法和原理可以参考：[Java 并发基础机制 - synchronized](https://dunwu.github.io/waterdrop/pages/25767945/#%E4%BA%8Csynchronized) 。
+> 💡 `synchronized` 的用法和原理可以参考：[Java 并发之内存模型](https://dunwu.github.io/waterdrop/pages/e98ae9d2/) 。
 >
 > :bell: 注意：如果不需要 `ReentrantLock`、`ReentrantReadWriteLock` 所提供的高级同步特性，**应该优先考虑使用 `synchronized`**。理由如下：
 >

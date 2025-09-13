@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 容器
-permalink: /pages/798a4c63/
+permalink: /pages/8dea5b95/
 ---
 
 # Java 容器之 Queue

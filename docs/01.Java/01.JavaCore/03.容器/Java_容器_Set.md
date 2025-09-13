@@ -14,7 +14,7 @@ tags:
   - HashSet
   - TreeSet
   - LinkedHashSet
-permalink: /pages/da7e5eeb/
+permalink: /pages/af44fa8f/
 ---
 
 # Java 容器之 Set

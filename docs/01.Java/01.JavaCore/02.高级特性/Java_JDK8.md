@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - JDK8
-permalink: /pages/f47a45e7/
+permalink: /pages/bcc7c02f/
 ---
 
 # JDK8 入门指南

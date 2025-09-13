@@ -12,7 +12,7 @@ tags:
   - 搜索引擎数据库
   - elasticsearch
   - 面试
-permalink: /pages/6219b063/
+permalink: /pages/be9ae09c/
 ---
 
 # Elasticsearch 面试

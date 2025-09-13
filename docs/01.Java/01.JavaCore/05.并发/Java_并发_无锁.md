@@ -14,7 +14,7 @@ tags:
   - ThreadLocal
   - Immutability
   - Copy-on-Write
-permalink: /pages/56a038ac/
+permalink: /pages/f9872f67/
 ---
 
 # Java 并发之无锁
@@ -419,7 +419,7 @@ private volatile int value;
 
 ### 原子类之引用数据类型
 
-Java 数据类型分为 **基本数据类型** 和 **引用数据类型** 两大类（不了解 Java 数据类型划分可以参考： [Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/3f3649ee/) ）。
+Java 数据类型分为 **基本数据类型** 和 **引用数据类型** 两大类（不了解 Java 数据类型划分可以参考： [Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/17bf2e10/) ）。
 
 上一节中提到了针对基本数据类型的原子类，那么如果想针对引用类型做原子操作怎么办？Java 也提供了相关的原子类：
 
@@ -504,7 +504,7 @@ public class AtomicReferenceDemo2 {
 
 【示例】`AtomicMarkableReference` 使用示例（解决 ABA 问题）
 
-原子类的实现基于 CAS 机制，而 CAS 存在 ABA 问题（不了解 ABA 问题，可以参考：[Java 并发基础机制 - CAS 的问题](https://dunwu.github.io/waterdrop/pages/25767945/#cas-%E7%9A%84%E9%97%AE%E9%A2%98)）。正是为了解决 ABA 问题，才有了 `AtomicMarkableReference` 和 `AtomicStampedReference`。
+原子类的实现基于 CAS 机制，而 CAS 存在 ABA 问题（不了解 ABA 问题，可以参考：[Java 并发之内存模型](https://dunwu.github.io/waterdrop/pages/e98ae9d2)）。正是为了解决 ABA 问题，才有了 `AtomicMarkableReference` 和 `AtomicStampedReference`。
 
 `AtomicMarkableReference` 使用一个布尔值作为标记，修改时在 true / false 之间切换。这种策略不能根本上解决 ABA 问题，但是可以降低 ABA 发生的几率。常用于缓存或者状态描述这样的场景。
 

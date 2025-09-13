@@ -12,7 +12,7 @@ tags:
   - AQS
   - 独占锁
   - 共享锁
-permalink: /pages/3c5ce4e8/
+permalink: /pages/521e1ee3/
 ---
 
 # Java 并发之 AQS

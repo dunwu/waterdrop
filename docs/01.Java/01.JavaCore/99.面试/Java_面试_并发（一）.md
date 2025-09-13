@@ -10,7 +10,7 @@ tags:
   - JavaCore
   - 面试
   - 并发
-permalink: /pages/bbf8a81d/
+permalink: /pages/76e764a2/
 ---
 
 # Java 并发面试一

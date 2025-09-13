@@ -11,7 +11,7 @@ tags:
   - 框架
   - IO
   - Netty
-permalink: /pages/f2c7208b/
+permalink: /pages/85652fa3/
 ---
 
 # Netty 快速入门

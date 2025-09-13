@@ -3,8 +3,15 @@ import { sidebar } from 'vuepress-theme-hope'
 export default sidebar({
   '/': [
     {
+      text: '笔记',
+      icon: 'mdi:notes',
+      prefix: '00.笔记/',
+      children: 'structure',
+      collapsible: true
+    },
+    {
       text: 'Java',
-      icon: 'mdi:language-java',
+      icon: 'ri:java-line',
       prefix: '01.Java/',
       collapsible: true,
       children: 'structure'
@@ -33,7 +40,7 @@ export default sidebar({
     {
       text: '数据结构和算法',
       icon: 'carbon:data-structured',
-      prefix: '11.数据结构和算法/',
+      prefix: '11.算法/',
       collapsible: true,
       children: 'structure'
     },
@@ -94,14 +101,14 @@ export default sidebar({
         },
         {
           text: 'ZooKeeper',
-          prefix: '15.分布式/11.分布式协同/02.ZooKeeper/',
+          prefix: '15.分布式/分布式协同/ZooKeeper/',
           collapsible: true,
           children: 'structure'
         },
         {
           text: 'Kafka',
           icon: 'logos:kafka-icon',
-          prefix: '15.分布式/21.分布式通信/02.MQ/01.Kafka/',
+          prefix: '15.分布式/分布式通信/MQ/Kafka/',
           collapsible: true,
           children: 'structure'
         }
@@ -111,13 +118,6 @@ export default sidebar({
       text: '工作',
       icon: 'mdi:briefcase',
       prefix: '96.工作/',
-      children: 'structure',
-      collapsible: true
-    },
-    {
-      text: '笔记',
-      icon: 'mdi:notes',
-      prefix: '99.笔记/',
       children: 'structure',
       collapsible: true
     }

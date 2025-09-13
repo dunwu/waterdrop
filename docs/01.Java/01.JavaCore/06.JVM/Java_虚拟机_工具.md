@@ -11,7 +11,7 @@ tags:
   - JavaCore
   - JVM
   - 命令行
-permalink: /pages/dd0d3c68/
+permalink: /pages/8703ac66/
 ---
 
 # Java 虚拟机之工具

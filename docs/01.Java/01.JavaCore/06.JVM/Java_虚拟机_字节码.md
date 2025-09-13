@@ -11,7 +11,7 @@ tags:
   - JavaCore
   - JVM
   - 字节码
-permalink: /pages/885f081c/
+permalink: /pages/1da350fe/
 ---
 
 # Java 虚拟机之字节码

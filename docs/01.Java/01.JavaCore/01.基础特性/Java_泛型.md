@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - 泛型
-permalink: /pages/4c266ac0/
+permalink: /pages/ff687d6e/
 ---
 
 # 深入理解 Java 泛型

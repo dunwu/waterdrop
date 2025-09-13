@@ -11,7 +11,7 @@ tags:
   - 框架
   - 安全
   - SpringSecurity
-permalink: /pages/6425eb64/
+permalink: /pages/eea88ac8/
 ---
 
 # Spring Security 快速入门

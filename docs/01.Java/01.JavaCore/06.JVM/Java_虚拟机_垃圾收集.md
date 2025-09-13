@@ -11,7 +11,7 @@ tags:
   - JavaCore
   - JVM
   - GC
-permalink: /pages/587898a0/
+permalink: /pages/8eb835ba/
 ---
 
 # Java 虚拟机之垃圾收集

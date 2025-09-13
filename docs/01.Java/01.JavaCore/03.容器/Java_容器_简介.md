@@ -17,7 +17,7 @@ tags:
   - Comparator
   - Cloneable
   - fail-fast
-permalink: /pages/1bacccd8/
+permalink: /pages/0aab260c/
 ---
 
 # Java 容器简介
@@ -35,7 +35,7 @@ Java 中常用的存储容器就是数组和容器，二者有以下区别：
   - **数组可以存储基本数据类型，也可以存储引用数据类型**；
   - **容器只能存储引用数据类型**，基本数据类型的变量要转换成对应的包装类才能放入容器类中。
 
-> :bulb: 不了解什么是基本数据类型、引用数据类型、包装类这些概念，可以参考：[Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/3f3649ee/)
+> :bulb: 不了解什么是基本数据类型、引用数据类型、包装类这些概念，可以参考：[Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/17bf2e10/)
 
 ### 容器框架
 
@@ -90,7 +90,7 @@ list.add("123");
 list.add(123);
 ```
 
-> :bulb: 想深入了解 Java 泛型技术的用法和原理可以参考：[深入理解 Java 泛型](https://dunwu.github.io/waterdrop/pages/4c266ac0/)
+> :bulb: 想深入了解 Java 泛型技术的用法和原理可以参考：[深入理解 Java 泛型](https://dunwu.github.io/waterdrop/pages/ff687d6e/)
 
 ### Iterable 和 Iterator
 
@@ -459,7 +459,7 @@ fail-fast 有两种解决方案：
 
 为了在并发环境下安全地使用容器，Java 提供了同步容器和并发容器。
 
-> 同步容器和并发容器详情请参考：[Java 并发之容器](https://dunwu.github.io/waterdrop/pages/6fd8d836/)
+> 同步容器和并发容器详情请参考：[Java 并发之容器](https://dunwu.github.io/waterdrop/pages/5d509ca6/)
 
 ## 参考资料
 

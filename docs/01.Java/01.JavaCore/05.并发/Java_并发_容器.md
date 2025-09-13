@@ -12,7 +12,7 @@ tags:
   - 容器
   - synchronized
   - AQS
-permalink: /pages/6fd8d836/
+permalink: /pages/5d509ca6/
 ---
 
 # Java 并发之容器
@@ -33,7 +33,7 @@ permalink: /pages/6fd8d836/
 
 同步容器的同步原理就是在其 `get`、`set`、`size` 等主要方法上用 `synchronized` 修饰。 **`synchronized` 可以保证在同一个时刻，只有一个线程可以执行某个方法或者某个代码块**。
 
-> 想详细了解 `synchronized` 用法和原理可以参考：[Java 并发核心机制](https://dunwu.github.io/waterdrop/pages/25767945/)
+> 想详细了解 `synchronized` 用法和原理可以参考：[Java 并发之内存模型](https://dunwu.github.io/waterdrop/pages/e98ae9d2/)
 
 #### 性能问题
 

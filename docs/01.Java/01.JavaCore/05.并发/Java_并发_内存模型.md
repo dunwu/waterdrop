@@ -16,7 +16,7 @@ tags:
   - synchronized
   - final
   - 指令重排序
-permalink: /pages/3bafe85f/
+permalink: /pages/e98ae9d2/
 ---
 
 # Java 并发之内存模型
@@ -77,7 +77,7 @@ Java 源代码会经历 **编译器优化重排 —> 指令并行重排 —> 内
 
 JVM 中试图定义一种 Java 内存模型（Java Memory Model, JMM）来**屏蔽各种硬件和操作系统的内存访问差异**，以实现让 Java 程序 **在各种平台下都能达到一致的内存访问效果**。
 
-在 [Java 并发简介](https://dunwu.github.io/waterdrop/pages/97c73d27/) 中已经介绍了，并发安全需要满足可见性、有序性、原子性。其中，导致可见性的原因是缓存，导致有序性的原因是编译优化。那解决可见性、有序性最直接的办法就是**禁用缓存和编译优化** 。但这么做，性能就堪忧了。
+在 [Java 并发简介](https://dunwu.github.io/waterdrop/pages/d63c0ffb/) 中已经介绍了，并发安全需要满足可见性、有序性、原子性。其中，导致可见性的原因是缓存，导致有序性的原因是编译优化。那解决可见性、有序性最直接的办法就是**禁用缓存和编译优化** 。但这么做，性能就堪忧了。
 
 合理的方案应该是**按需禁用缓存以及编译优化**。那么，如何做到呢？，Java 内存模型规范了 JVM 如何提供按需禁用缓存和编译优化的方法。具体来说，这些方法包括 **volatile**、**synchronized** 和 **final** 三个关键字，以及 **Happens-Before 规则**。
 

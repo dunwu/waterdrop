@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaCore
   - IO
-permalink: /pages/11934510/
+permalink: /pages/a1199302/
 ---
 
 # Java I/O 之 简介

@@ -9,7 +9,7 @@ tags:
   - Java
   - JavaCore
   - JVM
-permalink: /pages/682c2df6/
+permalink: /pages/ce17fc18/
 ---
 
 # Java 虚拟机之内存区域

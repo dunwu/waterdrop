@@ -13,7 +13,7 @@ tags:
   - List
   - ArrayList
   - LinkedList
-permalink: /pages/c7adc138/
+permalink: /pages/28621e55/
 ---
 
 # Java 容器之 List
@@ -115,7 +115,7 @@ public ArrayList(int initialCapacity) {
 - 存储元素的 `Object` 数组（即 `elementData`）使用 `transient` 修饰，使得它可以被 Java 序列化所忽略。
 - `ArrayList` 重写了 `writeObject()` 和 `readObject()` 来控制序列化数组中有元素填充那部分内容。
 
-> :bulb: 不了解 Java 序列化方式，可以参考：[Java 序列化](https://dunwu.github.io/waterdrop/pages/dc9f1331/)
+> :bulb: 不了解 Java 序列化方式，可以参考：[Java 序列化](https://dunwu.github.io/waterdrop/pages/737e5233/)
 
 ### ArrayList 访问元素
 
