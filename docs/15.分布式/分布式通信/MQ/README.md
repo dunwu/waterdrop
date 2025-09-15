@@ -1,5 +1,6 @@
 ---
 title: 消息队列
+cover: https://raw.githubusercontent.com/dunwu/images/master/202509132339376.png
 date: 2022-02-17 22:34:30
 categories:
   - 分布式

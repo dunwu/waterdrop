@@ -1,5 +1,6 @@
 ---
 title: RPC
+cover: https://raw.githubusercontent.com/dunwu/images/master/202509132339299.png
 date: 2022-06-23 17:34:43
 categories:
   - 分布式

@@ -1,5 +1,5 @@
 ---
-icon: logos:mongodb
+icon: logos:MongoDB
 title: 《极客时间教程 - MongoDB 高手课》笔记一
 date: 2024-10-17 07:19:53
 categories:
@@ -8,7 +8,7 @@ categories:
 tags:
   - 数据库
   - 文档数据库
-  - mongodb
+  - MongoDB
 permalink: /pages/112e2d41/
 ---
 

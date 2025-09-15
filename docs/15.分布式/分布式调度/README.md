@@ -1,5 +1,6 @@
 ---
 title: 分布式调度
+cover: https://raw.githubusercontent.com/dunwu/images/master/202509132328552.png
 date: 2022-06-23 17:21:19
 categories:
   - 分布式

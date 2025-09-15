@@ -25,16 +25,16 @@ index: false
 >
 > MongoDB 最大的特点是它支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引。
 
-- [MongoDB 简介](mongodb/MongoDB_简介.md)
-- [MongoDB CRUD](mongodb/MongoDB_CRUD.md)
-- [MongoDB 聚合](mongodb/MongoDB_聚合.md)
-- [MongoDB 索引](mongodb/MongoDB_索引.md)
-- [MongoDB 事务](mongodb/MongoDB_事务.md)
-- [MongoDB 建模](mongodb/MongoDB_建模.md)
-- [MongoDB 复制](mongodb/MongoDB_复制.md)
-- [MongoDB 分片](mongodb/MongoDB_分片.md)
-- [MongoDB 运维](mongodb/MongoDB_运维.md)
-- [MongoDB 面试](mongodb/MongoDB_面试.md) 💯
+- [MongoDB 简介](MongoDB/MongoDB_简介.md)
+- [MongoDB CRUD](MongoDB/MongoDB_CRUD.md)
+- [MongoDB 聚合](MongoDB/MongoDB_聚合.md)
+- [MongoDB 索引](MongoDB/MongoDB_索引.md)
+- [MongoDB 事务](MongoDB/MongoDB_事务.md)
+- [MongoDB 建模](MongoDB/MongoDB_建模.md)
+- [MongoDB 复制](MongoDB/MongoDB_复制.md)
+- [MongoDB 分片](MongoDB/MongoDB_分片.md)
+- [MongoDB 运维](MongoDB/MongoDB_运维.md)
+- [MongoDB 面试](MongoDB/MongoDB_面试.md) 💯
 
 
 ## 📚 资料

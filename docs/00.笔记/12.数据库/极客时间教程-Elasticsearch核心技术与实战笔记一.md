@@ -7,7 +7,7 @@ categories:
 tags:
   - 数据库
   - 搜索引擎数据库
-  - elasticsearch
+  - Elasticsearch
 permalink: /pages/007adf25/
 ---
 
@@ -63,21 +63,21 @@ X-Pack - 商业化套件
 
 ```shell
 #启动单节点
-bin/elasticsearch -E node.name=node0 -E cluster.name=geektime -E path.data=node0_data
+bin/Elasticsearch -E node.name=node0 -E cluster.name=geektime -E path.data=node0_data
 
 #安装插件
-bin/elasticsearch-plugin install analysis-icu
+bin/Elasticsearch-plugin install analysis-icu
 
 #查看插件
-bin/elasticsearch-plugin list
+bin/Elasticsearch-plugin list
 #查看安装的插件
 GET http://localhost:9200/_cat/plugins?v
 
 #start multi-nodes Cluster
-bin/elasticsearch -E node.name=node0 -E cluster.name=geektime -E path.data=node0_data
-bin/elasticsearch -E node.name=node1 -E cluster.name=geektime -E path.data=node1_data
-bin/elasticsearch -E node.name=node2 -E cluster.name=geektime -E path.data=node2_data
-bin/elasticsearch -E node.name=node3 -E cluster.name=geektime -E path.data=node3_data
+bin/Elasticsearch -E node.name=node0 -E cluster.name=geektime -E path.data=node0_data
+bin/Elasticsearch -E node.name=node1 -E cluster.name=geektime -E path.data=node1_data
+bin/Elasticsearch -E node.name=node2 -E cluster.name=geektime -E path.data=node2_data
+bin/Elasticsearch -E node.name=node3 -E cluster.name=geektime -E path.data=node3_data
 
 #查看集群
 GET http://localhost:9200

@@ -1,12 +1,13 @@
 ---
 title: 分布式协同
+cover: https://raw.githubusercontent.com/dunwu/images/master/202509132327408.png
 date: 2022-06-11 10:46:35
 categories:
   - 分布式
   - 分布式协同
 tags:
   - 分布式
-  - 分布式协同
+  - 协同
 permalink: /pages/ad8b7f0a/
 hidden: true
 index: false
@@ -34,7 +35,6 @@ dir:
   - [ZooKeeper 运维](ZooKeeper/ZooKeeper运维.md)
   - [ZooKeeper Acl](ZooKeeper/ZooKeeperAcl.md)
   - [ZooKeeper 面试](ZooKeeper/ZooKeeper面试.md) 💯
-
 
 ## 🚪 传送
 

@@ -1,5 +1,5 @@
 ---
-icon: logos:mysql
+icon: logos:MySQL
 title: 《姜承尧的 MySQL 实战宝典》笔记
 date: 2025-03-17 07:17:11
 categories:
@@ -7,7 +7,7 @@ categories:
   - 数据库
 tags:
   - 数据库
-  - mysql
+  - MySQL
 permalink: /pages/8c04ec1b/
 ---
 

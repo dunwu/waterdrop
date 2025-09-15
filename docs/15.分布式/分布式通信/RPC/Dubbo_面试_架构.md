@@ -1114,7 +1114,7 @@ Dubbo SPI 的相关逻辑被封装在了 `ExtensionLoader` 类中，通过 `Exte
 > 扩展阅读：
 >
 > - [Dubbo SPI 概述](https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/reference-manual/spi/overview/)
-> - [源码级深度理解 Java SPI](https://dunwu.github.io/waterdrop/pages/8f3dccd5/)
+> - [源码级深度理解 Java SPI](https://dunwu.github.io/waterdrop/pages/daaf071f/)
 
 ### 【中等】什么是 Dubbo 的 Filter 机制？
 

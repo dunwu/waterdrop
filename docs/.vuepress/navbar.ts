@@ -17,7 +17,7 @@ export default navbar([
         icon: 'mdi:numeric-1-box-multiple-outline',
         prefix: '01.JavaCore/',
         link: '01.JavaCore/',
-        children: ['01.基础特性/', '02.高级特性/', '03.容器/', '04.IO/', '05.并发/', '06.JVM/', '99.面试/']
+        children: ['基础特性/', '高级特性/', '容器/', 'IO/', '并发/', 'JVM/', '面试/']
       },
       { text: 'JavaEE', icon: 'mdi:numeric-2-box-multiple-outline', link: '02.JavaEE/' },
       { text: '软件', icon: 'mdi:numeric-3-box-multiple-outline', link: '11.软件/' },
@@ -38,18 +38,18 @@ export default navbar([
     children: [
       {
         text: '架构',
-        prefix: '01.架构/',
+        prefix: '架构/',
         children: [
-          { text: '综合', link: '00.综合/' },
-          { text: '微服务', link: '01.微服务/' },
-          { text: '安全', link: '02.安全/' },
-          { text: '解决方案', link: '99.解决方案/' }
+          { text: '综合', link: '综合/' },
+          { text: '微服务', link: '微服务/' },
+          { text: '安全', link: '安全/' },
+          { text: '解决方案', link: '解决方案/' }
         ]
       },
-      { text: '设计模式', link: '02.设计模式/' },
-      { text: '重构', link: '03.重构/' },
-      { text: 'DDD', link: '04.DDD/' },
-      { text: 'UML', link: '05.UML/' }
+      { text: '设计模式', link: '设计模式/' },
+      { text: '重构', link: '重构/' },
+      { text: 'DDD', link: 'DDD/' },
+      { text: 'UML', link: 'UML/' }
     ]
   },
   {
@@ -72,32 +72,32 @@ export default navbar([
       {
         text: '关系型数据库',
         link: '/12.数据库/03.关系型数据库/',
-        children: [{ text: 'MySQL', icon: 'logos:mysql', link: '/12.数据库/03.关系型数据库/mysql/' }]
+        children: [{ text: 'MySQL', icon: 'logos:MySQL', link: '/12.数据库/03.关系型数据库/MySQL/' }]
       },
       {
         text: '文档数据库',
         link: '/12.数据库/04.文档数据库/',
-        children: [{ text: 'MongoDB', icon: 'logos:mongodb', link: '/12.数据库/04.文档数据库/mongodb/' }]
+        children: [{ text: 'MongoDB', icon: 'logos:MongoDB', link: '/12.数据库/04.文档数据库/MongoDB/' }]
       },
       {
         text: 'KV数据库',
         link: '/12.数据库/05.KV数据库/',
-        children: [{ text: 'Redis', icon: 'logos:redis', link: '/12.数据库/05.KV数据库/redis/' }]
+        children: [{ text: 'Redis', icon: 'logos:Redis', link: '/12.数据库/05.KV数据库/Redis/' }]
       },
       {
         text: '列式数据库',
         link: '/12.数据库/06.列式数据库/',
-        children: [{ text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/06.列式数据库/hbase/' }]
+        children: [{ text: 'HBase', icon: 'logos:HBase', link: '/12.数据库/06.列式数据库/HBase/' }]
       },
       {
         text: '搜索引擎数据库',
         link: '/12.数据库/07.搜索引擎数据库/',
         children: [
-          { text: 'Elasticsearch', icon: 'logos:elasticsearch', link: '/12.数据库/07.搜索引擎数据库/elasticsearch/' },
+          { text: 'Elasticsearch', icon: 'logos:Elasticsearch', link: '/12.数据库/07.搜索引擎数据库/Elasticsearch/' },
           {
             text: 'Elastic技术栈',
-            icon: 'vscode-icons:file-type-elastic',
-            link: '/12.数据库/07.搜索引擎数据库/elastic/'
+            icon: 'vscode-icons:file-type-Elastic',
+            link: '/12.数据库/07.搜索引擎数据库/Elastic/'
           }
         ]
       }
@@ -113,7 +113,7 @@ export default navbar([
     icon: 'mdi:resistor-nodes',
     prefix: '/15.分布式/',
     children: [
-      { text: '分布式综合', link: '分布式综合/' },
+      { text: '分布式理论', link: '分布式理论/' },
       { text: '分布式协同', link: '分布式协同/' },
       { text: '分布式调度', link: '分布式调度/' },
       {
@@ -132,7 +132,7 @@ export default navbar([
     children: [
       { text: 'Hadoop', icon: 'devicon:hadoop', link: '/16.大数据/hadoop/' },
       { text: 'Hive', icon: 'simple-icons:apachehive', link: '/16.大数据/hive/' },
-      { text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/06.列式数据库/hbase/' },
+      { text: 'HBase', icon: 'logos:HBase', link: '/12.数据库/06.列式数据库/HBase/' },
       { text: 'ZooKeeper', link: '/15.分布式/分布式协同/ZooKeeper/' },
       { text: 'Kafka', icon: 'logos:kafka-icon', link: '/15.分布式/分布式通信/MQ/Kafka/' }
     ]
@@ -140,6 +140,6 @@ export default navbar([
   {
     text: '面试',
     icon: 'fluent-color:chat-bubbles-question-16',
-    link: '/99.面试/'
+    link: '/面试/'
   }
 ])

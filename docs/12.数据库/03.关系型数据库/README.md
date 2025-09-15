@@ -24,18 +24,18 @@ index: false
 
 ### MySQL
 
-- [MySQL 简介](mysql/MySQL_简介.md)
-- [MySQL 架构](mysql/MySQL_架构.md)
-- [MySQL 存储引擎](mysql/MySQL_存储引擎.md)
-- [MySQL 索引](mysql/MySQL_索引.md)
-- [MySQL 事务](mysql/MySQL_事务.md)
-- [MySQL 锁](mysql/MySQL_锁.md)
-- [MySQL 复制](mysql/MySQL_复制.md)
-- [MySQL 优化](mysql/MySQL_优化.md)
-- [MySQL 运维](mysql/MySQL_运维.md)
-- [MySQL 面试](mysql/MySQL_面试.md) 💯
-- [MySQL 面试之索引篇](mysql/MySQL_面试_索引.md) 💯
-- [MySQL 面试之事务和锁篇](mysql/MySQL_面试_事务和锁.md) 💯
+- [MySQL 简介](MySQL/MySQL_简介.md)
+- [MySQL 架构](MySQL/MySQL_架构.md)
+- [MySQL 存储引擎](MySQL/MySQL_存储引擎.md)
+- [MySQL 索引](MySQL/MySQL_索引.md)
+- [MySQL 事务](MySQL/MySQL_事务.md)
+- [MySQL 锁](MySQL/MySQL_锁.md)
+- [MySQL 复制](MySQL/MySQL_复制.md)
+- [MySQL 优化](MySQL/MySQL_优化.md)
+- [MySQL 运维](MySQL/MySQL_运维.md)
+- [MySQL 面试](MySQL/MySQL_面试.md) 💯
+- [MySQL 面试之索引篇](MySQL/MySQL_面试_索引.md) 💯
+- [MySQL 面试之事务和锁篇](MySQL/MySQL_面试_事务和锁.md) 💯
 
 ## 📚 资料
 

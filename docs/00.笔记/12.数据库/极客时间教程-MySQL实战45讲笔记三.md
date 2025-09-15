@@ -1,5 +1,5 @@
 ---
-icon: logos:mysql
+icon: logos:MySQL
 title: 《MySQL 实战 45 讲》笔记三
 date: 2022-07-20 19:20:08
 categories:
@@ -7,7 +7,7 @@ categories:
   - 数据库
 tags:
   - 数据库
-  - mysql
+  - MySQL
 permalink: /pages/183a3fd4/
 ---
 

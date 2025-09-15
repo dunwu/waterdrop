@@ -1,5 +1,5 @@
 ---
-icon: logos:mongodb
+icon: logos:MongoDB
 title: 《MongoDB 权威指南》笔记一
 date: 2024-09-29 07:45:34
 categories:
@@ -8,7 +8,7 @@ categories:
 tags:
   - 数据库
   - 文档数据库
-  - mongodb
+  - MongoDB
 permalink: /pages/a3867b8f/
 ---
 

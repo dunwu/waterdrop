@@ -7,7 +7,7 @@ categories:
 tags:
   - 数据库
   - 搜索引擎数据库
-  - elasticsearch
+  - Elasticsearch
 permalink: /pages/5399bd35/
 ---
 

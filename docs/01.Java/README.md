@@ -52,69 +52,69 @@ index: false
 
 ### JavaCore
 
-#### [Java 基础特性](01.JavaCore/01.基础特性)
+#### [Java 基础特性](01.JavaCore/基础特性)
 
-- [Java 基础语法特性](01.JavaCore/01.基础特性/Java_基础语法.md)
-- [Java 基本数据类型](01.JavaCore/01.基础特性/Java_数据类型.md)
-- [Java 面向对象](01.JavaCore/01.基础特性/Java_面向对象.md)
-- [Java 方法](01.JavaCore/01.基础特性/Java_方法.md)
-- [Java 数组](01.JavaCore/01.基础特性/Java_数组.md)
-- [Java 枚举](01.JavaCore/01.基础特性/Java_枚举.md)
-- [Java 控制语句](01.JavaCore/01.基础特性/Java_控制语句.md)
-- [Java 异常](01.JavaCore/01.基础特性/Java_异常.md)
-- [Java 泛型](01.JavaCore/01.基础特性/Java_泛型.md)
-- [Java 反射](01.JavaCore/01.基础特性/Java_反射.md)
-- [Java 注解](01.JavaCore/01.基础特性/Java_注解.md)
-- [Java String 类型](01.JavaCore/01.基础特性/Java_String.md)
+- [Java 基础语法特性](01.JavaCore/基础特性/Java_基础语法.md)
+- [Java 基本数据类型](01.JavaCore/基础特性/Java_数据类型.md)
+- [Java 面向对象](01.JavaCore/基础特性/Java_面向对象.md)
+- [Java 方法](01.JavaCore/基础特性/Java_方法.md)
+- [Java 数组](01.JavaCore/基础特性/Java_数组.md)
+- [Java 枚举](01.JavaCore/基础特性/Java_枚举.md)
+- [Java 控制语句](01.JavaCore/基础特性/Java_控制语句.md)
+- [Java 异常](01.JavaCore/基础特性/Java_异常.md)
+- [Java 泛型](01.JavaCore/基础特性/Java_泛型.md)
+- [Java 反射](01.JavaCore/基础特性/Java_反射.md)
+- [Java 注解](01.JavaCore/基础特性/Java_注解.md)
+- [Java String 类型](01.JavaCore/基础特性/Java_String.md)
 
-#### [Java 高级特性](01.JavaCore/02.高级特性)
+#### [Java 高级特性](01.JavaCore/高级特性)
 
-- [Java 正则](01.JavaCore/02.高级特性/Java_正则.md) - 关键词：Pattern、Matcher、捕获与非捕获、反向引用、零宽断言、贪婪与懒惰、元字符、DFA、NFA
-- [Java 编码和加密](01.JavaCore/02.高级特性/Java_编码和加密.md) - 关键词：Base64、消息摘要、数字签名、对称加密、非对称加密、MD5、SHA、HMAC、AES、DES、DESede、RSA
-- [Java 国际化](01.JavaCore/02.高级特性/Java_国际化.md) - 关键词：Locale、ResourceBundle、NumberFormat、DateFormat、MessageFormat
-- [Java JDK8](01.JavaCore/02.高级特性/Java_JDK8.md) - 关键词：Stream、lambda、Optional、@FunctionalInterface
-- [Java SPI](01.JavaCore/02.高级特性/Java_SPI.md) - 关键词：SPI、ClassLoader
-- [JavaAgent](01.JavaCore/02.高级特性/Java_Agent.md)
+- [Java 正则](01.JavaCore/高级特性/Java_正则.md) - 关键词：Pattern、Matcher、捕获与非捕获、反向引用、零宽断言、贪婪与懒惰、元字符、DFA、NFA
+- [Java 编码和加密](01.JavaCore/高级特性/Java_编码和加密.md) - 关键词：Base64、消息摘要、数字签名、对称加密、非对称加密、MD5、SHA、HMAC、AES、DES、DESede、RSA
+- [Java 国际化](01.JavaCore/高级特性/Java_国际化.md) - 关键词：Locale、ResourceBundle、NumberFormat、DateFormat、MessageFormat
+- [Java JDK8](01.JavaCore/高级特性/Java_JDK8.md) - 关键词：Stream、lambda、Optional、@FunctionalInterface
+- [Java SPI](01.JavaCore/高级特性/Java_SPI.md) - 关键词：SPI、ClassLoader
+- [JavaAgent](01.JavaCore/高级特性/Java_Agent.md)
 
-#### [Java 容器](01.JavaCore/03.容器)
+#### [Java 容器](01.JavaCore/容器)
 
-- [Java 容器简介](01.JavaCore/03.容器/Java_容器_简介.md) - 关键词：泛型、Iterable、Iterator、Comparable、Comparator、Cloneable、fail-fast
-- [Java 容器之 List](01.JavaCore/03.容器/Java_容器_List.md) - 关键词：List、ArrayList、LinkedList
-- [Java 容器之 Map](01.JavaCore/03.容器/Java_容器_Map.md) - 关键词：Map、HashMap、TreeMap、LinkedHashMap、WeakHashMap
-- [Java 容器之 Set](01.JavaCore/03.容器/Java_容器_Set.md) - 关键词：Set、HashSet、TreeSet、LinkedHashSet、EnumSet
-- [Java 容器之 Queue](01.JavaCore/03.容器/Java_容器_Queue.md) - 关键词：Queue、Deque、ArrayDeque、LinkedList、PriorityQueue
-- [Java 容器之 Stream](01.JavaCore/03.容器/Java_容器_Stream.md)
+- [Java 容器简介](01.JavaCore/容器/Java_容器_简介.md) - 关键词：泛型、Iterable、Iterator、Comparable、Comparator、Cloneable、fail-fast
+- [Java 容器之 List](01.JavaCore/容器/Java_容器_List.md) - 关键词：List、ArrayList、LinkedList
+- [Java 容器之 Map](01.JavaCore/容器/Java_容器_Map.md) - 关键词：Map、HashMap、TreeMap、LinkedHashMap、WeakHashMap
+- [Java 容器之 Set](01.JavaCore/容器/Java_容器_Set.md) - 关键词：Set、HashSet、TreeSet、LinkedHashSet、EnumSet
+- [Java 容器之 Queue](01.JavaCore/容器/Java_容器_Queue.md) - 关键词：Queue、Deque、ArrayDeque、LinkedList、PriorityQueue
+- [Java 容器之 Stream](01.JavaCore/容器/Java_容器_Stream.md)
 
-#### [Java IO](01.JavaCore/04.IO)
+#### [Java IO](01.JavaCore/IO)
 
-- [Java I/O 之 简介](01.JavaCore/04.IO/Java_IO_简介.md) - 关键词：BIO、NIO、AIO
-- [Java I/O 之 BIO](01.JavaCore/04.IO/Java_IO_BIO.md) - 关键词：BIO、InputStream、OutputStream、Reader、Writer、File、Socket、ServerSocket
-- [Java I/O 之 NIO](01.JavaCore/04.IO/Java_IO_NIO.md) - 关键词：NIO、Channel、Buffer、Selector、多路复用
-- [Java I/O 之序列化](01.JavaCore/04.IO/Java_IO_序列化.md) - 关键词：Serializable、serialVersionUID、transient、Externalizable
+- [Java IO 之 简介](01.JavaCore/IO/Java_IO_简介.md) - 关键词：BIO、NIO、AIO
+- [Java IO 之 BIO](01.JavaCore/IO/Java_IO_BIO.md) - 关键词：BIO、InputStream、OutputStream、Reader、Writer、File、Socket、ServerSocket
+- [Java IO 之 NIO](01.JavaCore/IO/Java_IO_NIO.md) - 关键词：NIO、Channel、Buffer、Selector、多路复用
+- [Java IO 之序列化](01.JavaCore/IO/Java_IO_序列化.md) - 关键词：Serializable、serialVersionUID、transient、Externalizable
 
-#### [Java 并发](01.JavaCore/05.并发)
+#### [Java 并发](01.JavaCore/并发)
 
-- [Java 并发简介](01.JavaCore/05.并发/Java_并发_简介.md) - 关键词：并发、线程、安全性、活跃性、性能、死锁、活锁
-- [Java 并发之内存模型](01.JavaCore/05.并发/Java_并发_内存模型.md) - 关键词：JMM、Happens-Before、内存屏障、volatile、synchronized、final、指令重排序
-- [Java 并发之线程](01.JavaCore/05.并发/Java_并发_线程.md) - 关键词：Thread、Runnable、Callable、Future、FutureTask、线程生命周期
-- [Java 并发之锁](01.JavaCore/05.并发/Java_并发_锁.md) - 关键词：锁、Lock、Condition、ReentrantLock、ReentrantReadWriteLock、StampedLock
-- [Java 并发之无锁](01.JavaCore/05.并发/Java_并发_无锁.md) - 关键词：CAS、ThreadLocal、Immutability、Copy-on-Write
-- [Java 并发之 AQS](01.JavaCore/05.并发/Java_并发_AQS.md) - 关键词：AQS、独占锁、共享锁
-- [Java 并发之容器](01.JavaCore/05.并发/Java_并发_容器.md) - 关键词：ConcurrentHashMap、CopyOnWriteArrayList
-- [Java 并发之线程池](01.JavaCore/05.并发/Java_并发_线程池.md) - 关键词：Executor、ExecutorService、ThreadPoolExecutor、Executors
-- [Java 并发之同步工具](01.JavaCore/05.并发/Java_并发_同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
-- [Java 并发之分工工具](01.JavaCore/05.并发/Java_并发_分工工具.md) - 关键词：CompletableFuture、CompletionStage、ForkJoinPool
+- [Java 并发简介](01.JavaCore/并发/Java_并发_简介.md) - 关键词：并发、线程、安全性、活跃性、性能、死锁、活锁
+- [Java 并发之内存模型](01.JavaCore/并发/Java_并发_内存模型.md) - 关键词：JMM、Happens-Before、内存屏障、volatile、synchronized、final、指令重排序
+- [Java 并发之线程](01.JavaCore/并发/Java_并发_线程.md) - 关键词：Thread、Runnable、Callable、Future、FutureTask、线程生命周期
+- [Java 并发之锁](01.JavaCore/并发/Java_并发_锁.md) - 关键词：锁、Lock、Condition、ReentrantLock、ReentrantReadWriteLock、StampedLock
+- [Java 并发之无锁](01.JavaCore/并发/Java_并发_无锁.md) - 关键词：CAS、ThreadLocal、Immutability、Copy-on-Write
+- [Java 并发之 AQS](01.JavaCore/并发/Java_并发_AQS.md) - 关键词：AQS、独占锁、共享锁
+- [Java 并发之容器](01.JavaCore/并发/Java_并发_容器.md) - 关键词：ConcurrentHashMap、CopyOnWriteArrayList
+- [Java 并发之线程池](01.JavaCore/并发/Java_并发_线程池.md) - 关键词：Executor、ExecutorService、ThreadPoolExecutor、Executors
+- [Java 并发之同步工具](01.JavaCore/并发/Java_并发_同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
+- [Java 并发之分工工具](01.JavaCore/并发/Java_并发_分工工具.md) - 关键词：CompletableFuture、CompletionStage、ForkJoinPool
 
-#### [Java 虚拟机](01.JavaCore/06.JVM)
+#### [Java 虚拟机](01.JavaCore/JVM)
 
-- [Java 虚拟机简介](01.JavaCore/06.JVM/Java_虚拟机_简介.md)
-- [Java 虚拟机之内存区域](01.JavaCore/06.JVM/Java_虚拟机_内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
-- [Java 虚拟机之垃圾收集](01.JavaCore/06.JVM/Java_虚拟机_垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
-- [Java 虚拟机之字节码](01.JavaCore/06.JVM/Java_虚拟机_字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
-- [Java 虚拟机之类加载](01.JavaCore/06.JVM/Java_虚拟机_类加载.md) - 关键词：`ClassLoader`、`双亲委派`
-- [Java 虚拟机之工具](01.JavaCore/06.JVM/Java_虚拟机_工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`、`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
-- [Java 虚拟机之故障处理](01.JavaCore/06.JVM/Java_虚拟机_故障处理.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
-- [Java 虚拟机之调优](01.JavaCore/06.JVM/Java_虚拟机_调优.md) - 关键词：`配置`、`调优`
+- [Java 虚拟机简介](01.JavaCore/JVM/Java_虚拟机_简介.md)
+- [Java 虚拟机之内存区域](01.JavaCore/JVM/Java_虚拟机_内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
+- [Java 虚拟机之垃圾收集](01.JavaCore/JVM/Java_虚拟机_垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
+- [Java 虚拟机之字节码](01.JavaCore/JVM/Java_虚拟机_字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
+- [Java 虚拟机之类加载](01.JavaCore/JVM/Java_虚拟机_类加载.md) - 关键词：`ClassLoader`、`双亲委派`
+- [Java 虚拟机之工具](01.JavaCore/JVM/Java_虚拟机_工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`、`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
+- [Java 虚拟机之故障处理](01.JavaCore/JVM/Java_虚拟机_故障处理.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
+- [Java 虚拟机之调优](01.JavaCore/JVM/Java_虚拟机_调优.md) - 关键词：`配置`、`调优`
 
 ### JavaEE
 
@@ -221,80 +221,80 @@ index: false
 
 ##### 综合
 
-- [Spring 概述](13.框架/01.Spring/00.Spring综合/01.Spring概述.md)
-- [SpringBoot 知识图谱](13.框架/01.Spring/00.Spring综合/21.SpringBoot知识图谱.md)
-- [SpringBoot 基本原理](13.框架/01.Spring/00.Spring综合/22.SpringBoot基本原理.md)
-- [Spring 面试](13.框架/01.Spring/00.Spring综合/99.Spring面试.md)
+- [Spring 概述](13.框架/Spring/Spring综合/Spring概述.md)
+- [SpringBoot 知识图谱](13.框架/Spring/Spring综合/SpringBoot知识图谱.md)
+- [SpringBoot 基本原理](13.框架/Spring/Spring综合/SpringBoot基本原理.md)
+- [Spring 面试](13.框架/Spring/Spring面试.md)
 
 ##### 核心
 
-- [Spring Bean](13.框架/01.Spring/01.Spring核心/01.SpringBean.md)
-- [Spring IoC](13.框架/01.Spring/01.Spring核心/02.SpringIoC.md)
-- [Spring 依赖查找](13.框架/01.Spring/01.Spring核心/03.Spring依赖查找.md)
-- [Spring 依赖注入](13.框架/01.Spring/01.Spring核心/04.Spring依赖注入.md)
-- [Spring IoC 依赖来源](13.框架/01.Spring/01.Spring核心/05.SpringIoC依赖来源.md)
-- [Spring Bean 作用域](13.框架/01.Spring/01.Spring核心/06.SpringBean作用域.md)
-- [Spring Bean 生命周期](13.框架/01.Spring/01.Spring核心/07.SpringBean生命周期.md)
-- [Spring 配置元数据](13.框架/01.Spring/01.Spring核心/08.Spring配置元数据.md)
-- [Spring AOP](13.框架/01.Spring/01.Spring核心/10.SpringAop.md)
-- [Spring 资源管理](13.框架/01.Spring/01.Spring核心/20.Spring资源管理.md)
-- [Spring 校验](13.框架/01.Spring/01.Spring核心/21.Spring校验.md)
-- [Spring 数据绑定](13.框架/01.Spring/01.Spring核心/22.Spring数据绑定.md)
-- [Spring 类型转换](13.框架/01.Spring/01.Spring核心/23.Spring类型转换.md)
-- [Spring EL 表达式](13.框架/01.Spring/01.Spring核心/24.SpringEL.md)
-- [Spring 事件](13.框架/01.Spring/01.Spring核心/25.Spring事件.md)
-- [Spring 国际化](13.框架/01.Spring/01.Spring核心/26.Spring国际化.md)
-- [Spring 泛型处理](13.框架/01.Spring/01.Spring核心/27.Spring泛型处理.md)
-- [Spring 注解](13.框架/01.Spring/01.Spring核心/28.Spring注解.md)
-- [Spring Environment 抽象](13.框架/01.Spring/01.Spring核心/29.SpringEnvironment抽象.md)
-- [SpringBoot 教程之快速入门](13.框架/01.Spring/01.Spring核心/31.SpringBoot之快速入门.md)
-- [SpringBoot 之属性加载](13.框架/01.Spring/01.Spring核心/32.SpringBoot之属性加载.md)
-- [SpringBoot 之 Profile](13.框架/01.Spring/01.Spring核心/33.SpringBoot之Profile.md)
+- [Spring Bean](13.框架/Spring/Spring核心/SpringBean.md)
+- [Spring IoC](13.框架/Spring/Spring核心/SpringIoC.md)
+- [Spring 依赖查找](13.框架/Spring/Spring核心/Spring依赖查找.md)
+- [Spring 依赖注入](13.框架/Spring/Spring核心/Spring依赖注入.md)
+- [Spring IoC 依赖来源](13.框架/Spring/Spring核心/SpringIoC依赖来源.md)
+- [Spring Bean 作用域](13.框架/Spring/Spring核心/SpringBean作用域.md)
+- [Spring Bean 生命周期](13.框架/Spring/Spring核心/SpringBean生命周期.md)
+- [Spring 配置元数据](13.框架/Spring/Spring核心/Spring配置元数据.md)
+- [Spring AOP](13.框架/Spring/Spring核心/SpringAop.md)
+- [Spring 资源管理](13.框架/Spring/Spring核心/Spring资源管理.md)
+- [Spring 校验](13.框架/Spring/Spring核心/Spring校验.md)
+- [Spring 数据绑定](13.框架/Spring/Spring核心/Spring数据绑定.md)
+- [Spring 类型转换](13.框架/Spring/Spring核心/Spring类型转换.md)
+- [Spring EL 表达式](13.框架/Spring/Spring核心/SpringEL.md)
+- [Spring 事件](13.框架/Spring/Spring核心/Spring事件.md)
+- [Spring 国际化](13.框架/Spring/Spring核心/Spring国际化.md)
+- [Spring 泛型处理](13.框架/Spring/Spring核心/Spring泛型处理.md)
+- [Spring 注解](13.框架/Spring/Spring核心/Spring注解.md)
+- [Spring Environment 抽象](13.框架/Spring/Spring核心/SpringEnvironment抽象.md)
+- [SpringBoot 教程之快速入门](13.框架/Spring/Spring核心/SpringBoot之快速入门.md)
+- [SpringBoot 之属性加载](13.框架/Spring/Spring核心/SpringBoot之属性加载.md)
+- [SpringBoot 之 Profile](13.框架/Spring/Spring核心/SpringBoot之Profile.md)
 
 ##### 数据
 
-- [Spring 之数据源](13.框架/01.Spring/02.Spring数据/01.Spring之数据源.md)
-- [Spring 之 JDBC](13.框架/01.Spring/02.Spring数据/02.Spring之JDBC.md)
-- [Spring 之事务](13.框架/01.Spring/02.Spring数据/03.Spring之事务.md)
-- [Spring 之 JPA](13.框架/01.Spring/02.Spring数据/04.Spring之JPA.md)
-- [Spring 集成 Mybatis](13.框架/01.Spring/02.Spring数据/10.Spring集成Mybatis.md)
-- [Spring 访问 Redis](13.框架/01.Spring/02.Spring数据/21.Spring访问Redis.md)
-- [Spring 访问 MongoDB](13.框架/01.Spring/02.Spring数据/22.Spring访问MongoDB.md)
-- [Spring 访问 Elasticsearch](13.框架/01.Spring/02.Spring数据/23.Spring访问Elasticsearch.md)
+- [Spring 之数据源](13.框架/Spring/Spring数据/Spring之数据源.md)
+- [Spring 之 JDBC](13.框架/Spring/Spring数据/Spring之JDBC.md)
+- [Spring 之事务](13.框架/Spring/Spring数据/Spring之事务.md)
+- [Spring 之 JPA](13.框架/Spring/Spring数据/Spring之JPA.md)
+- [Spring 集成 Mybatis](13.框架/Spring/Spring数据/Spring集成Mybatis.md)
+- [Spring 访问 Redis](13.框架/Spring/Spring数据/Spring访问Redis.md)
+- [Spring 访问 MongoDB](13.框架/Spring/Spring数据/Spring访问MongoDB.md)
+- [Spring 访问 Elasticsearch](13.框架/Spring/Spring数据/Spring访问Elasticsearch.md)
 
 ##### Web
 
-- [SpringWeb 综述](13.框架/01.Spring/03.SpringWeb/01.SpringWeb综述.md)
-- [SpringWeb 应用](13.框架/01.Spring/03.SpringWeb/02.SpringWeb应用.md)
-- [DispatcherServlet](13.框架/01.Spring/03.SpringWeb/03.DispatcherServlet.md)
-- [Spring 过滤器](13.框架/01.Spring/03.SpringWeb/04.Spring过滤器.md)
-- [Spring 跨域](13.框架/01.Spring/03.SpringWeb/05.Spring跨域.md)
-- [Spring 视图](13.框架/01.Spring/03.SpringWeb/06.Spring视图.md)
-- [SpringBoot 之应用 EasyUI](13.框架/01.Spring/03.SpringWeb/21.SpringBoot之应用EasyUI.md)
+- [SpringWeb 综述](13.框架/Spring/SpringWeb/SpringWeb综述.md)
+- [SpringWeb 应用](13.框架/Spring/SpringWeb/SpringWeb应用.md)
+- [DispatcherServlet](13.框架/Spring/SpringWeb/DispatcherServlet.md)
+- [Spring 过滤器](13.框架/Spring/SpringWeb/Spring过滤器.md)
+- [Spring 跨域](13.框架/Spring/SpringWeb/Spring跨域.md)
+- [Spring 视图](13.框架/Spring/SpringWeb/Spring视图.md)
+- [SpringBoot 之应用 EasyUI](13.框架/Spring/SpringWeb/SpringBoot之应用EasyUI.md)
 
 ##### IO
 
-- [SpringBoot 之异步请求](13.框架/01.Spring/04.SpringIO/01.SpringBoot之异步请求.md)
-- [SpringBoot 之 Json](13.框架/01.Spring/04.SpringIO/02.SpringBoot之Json.md)
-- [SpringBoot 之邮件](13.框架/01.Spring/04.SpringIO/03.SpringBoot之邮件.md)
+- [SpringBoot 之异步请求](13.框架/Spring/SpringIO/SpringBoot之异步请求.md)
+- [SpringBoot 之 Json](13.框架/Spring/SpringIO/SpringBoot之Json.md)
+- [SpringBoot 之邮件](13.框架/Spring/SpringIO/SpringBoot之邮件.md)
 
 ##### 集成
 
-- [Spring 集成缓存中间件](13.框架/01.Spring/05.Spring集成/01.Spring集成缓存.md)
-- [Spring 集成定时任务中间件](13.框架/01.Spring/05.Spring集成/02.Spring集成调度器.md)
-- [Spring 集成 Dubbo](13.框架/01.Spring/05.Spring集成/03.Spring集成Dubbo.md)
+- [Spring 集成缓存中间件](13.框架/Spring/Spring集成/Spring集成缓存.md)
+- [Spring 集成定时任务中间件](13.框架/Spring/Spring集成/Spring集成调度器.md)
+- [Spring 集成 Dubbo](13.框架/Spring/Spring集成/Spring集成Dubbo.md)
 
 ##### 其他
 
-- [Spring4 升级](13.框架/01.Spring/99.Spring其他/01.Spring4升级.md)
-- [SpringBoot 之 banner](13.框架/01.Spring/99.Spring其他/21.SpringBoot之banner.md)
-- [SpringBoot 之 Actuator](13.框架/01.Spring/99.Spring其他/22.SpringBoot之Actuator.md)
+- [Spring4 升级](13.框架/Spring/Spring其他/Spring4升级.md)
+- [SpringBoot 之 banner](13.框架/Spring/Spring其他/SpringBoot之banner.md)
+- [SpringBoot 之 Actuator](13.框架/Spring/Spring其他/SpringBoot之Actuator.md)
 
 #### ORM
 
-- [MyBatis 快速入门](13.框架/11.ORM/MyBatis快速入门.md)
-- [MyBatis 原理](13.框架/11.ORM/MyBatis原理.md)
-- [MyBatis 原理](13.框架/11.ORM/MyBatis面试.md)
+- [MyBatis 快速入门](13.框架/ORM/MyBatis快速入门.md)
+- [MyBatis 原理](13.框架/ORM/MyBatis原理.md)
+- [MyBatis 原理](13.框架/ORM/MyBatis面试.md)
 
 #### 安全
 
@@ -304,12 +304,12 @@ index: false
 >
 > spring-security 功能更丰富，也比 shiro 更复杂。值得一提的是由于 spring-security 是 spring 团队开发，所以集成 spring 和 spring-boot 框架更容易。
 
-- [Shiro](13.框架/12.安全/Shiro.md)
-- [SpringSecurity](13.框架/12.安全/SpringSecurity.md)
+- [Shiro](13.框架/安全/Shiro.md)
+- [SpringSecurity](13.框架/安全/SpringSecurity.md)
 
 #### IO
 
-- [Netty](13.框架/13.IO/Netty.md)
+- [Netty](13.框架/IO/Netty.md)
 
 ### Java 中间件
 

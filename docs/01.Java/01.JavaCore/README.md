@@ -16,69 +16,69 @@ index: false
 
 ## 📖 内容
 
-### [Java 基础特性](01.基础特性)
+### [Java 基础特性](基础特性)
 
-- [Java 基础语法特性](01.基础特性/Java_基础语法.md)
-- [Java 基本数据类型](01.基础特性/Java_数据类型.md)
-- [Java 面向对象](01.基础特性/Java_面向对象.md)
-- [Java 方法](01.基础特性/Java_方法.md)
-- [Java 数组](01.基础特性/Java_数组.md)
-- [Java 枚举](01.基础特性/Java_枚举.md)
-- [Java 控制语句](01.基础特性/Java_控制语句.md)
-- [Java 异常](01.基础特性/Java_异常.md)
-- [Java 泛型](01.基础特性/Java_泛型.md)
-- [Java 反射](01.基础特性/Java_反射.md)
-- [Java 注解](01.基础特性/Java_注解.md)
-- [Java String 类型](01.基础特性/Java_String.md)
+- [Java 基础语法特性](基础特性/Java_基础语法.md)
+- [Java 基本数据类型](基础特性/Java_数据类型.md)
+- [Java 面向对象](基础特性/Java_面向对象.md)
+- [Java 方法](基础特性/Java_方法.md)
+- [Java 数组](基础特性/Java_数组.md)
+- [Java 枚举](基础特性/Java_枚举.md)
+- [Java 控制语句](基础特性/Java_控制语句.md)
+- [Java 异常](基础特性/Java_异常.md)
+- [Java 泛型](基础特性/Java_泛型.md)
+- [Java 反射](基础特性/Java_反射.md)
+- [Java 注解](基础特性/Java_注解.md)
+- [Java String 类型](基础特性/Java_String.md)
 
-### [Java 高级特性](02.高级特性)
+### [Java 高级特性](高级特性)
 
-- [Java 正则](02.高级特性/Java_正则.md) - 关键词：Pattern、Matcher、捕获与非捕获、反向引用、零宽断言、贪婪与懒惰、元字符、DFA、NFA
-- [Java 编码和加密](02.高级特性/Java_编码和加密.md) - 关键词：Base64、消息摘要、数字签名、对称加密、非对称加密、MD5、SHA、HMAC、AES、DES、DESede、RSA
-- [Java 国际化](02.高级特性/Java_国际化.md) - 关键词：Locale、ResourceBundle、NumberFormat、DateFormat、MessageFormat
-- [Java JDK8](02.高级特性/Java_JDK8.md) - 关键词：Stream、lambda、Optional、@FunctionalInterface
-- [Java SPI](02.高级特性/Java_SPI.md) - 关键词：SPI、ClassLoader
-- [JavaAgent](02.高级特性/Java_Agent.md)
+- [Java 正则](高级特性/Java_正则.md) - 关键词：Pattern、Matcher、捕获与非捕获、反向引用、零宽断言、贪婪与懒惰、元字符、DFA、NFA
+- [Java 编码和加密](高级特性/Java_编码和加密.md) - 关键词：Base64、消息摘要、数字签名、对称加密、非对称加密、MD5、SHA、HMAC、AES、DES、DESede、RSA
+- [Java 国际化](高级特性/Java_国际化.md) - 关键词：Locale、ResourceBundle、NumberFormat、DateFormat、MessageFormat
+- [Java JDK8](高级特性/Java_JDK8.md) - 关键词：Stream、lambda、Optional、@FunctionalInterface
+- [Java SPI](高级特性/Java_SPI.md) - 关键词：SPI、ClassLoader
+- [JavaAgent](高级特性/Java_Agent.md)
 
-### [Java 容器](03.容器)
+### [Java 容器](容器)
 
-- [Java 容器简介](03.容器/Java_容器_简介.md) - 关键词：泛型、Iterable、Iterator、Comparable、Comparator、Cloneable、fail-fast
-- [Java 容器之 List](03.容器/Java_容器_List.md) - 关键词：List、ArrayList、LinkedList
-- [Java 容器之 Map](03.容器/Java_容器_Map.md) - 关键词：Map、HashMap、TreeMap、LinkedHashMap、WeakHashMap
-- [Java 容器之 Set](03.容器/Java_容器_Set.md) - 关键词：Set、HashSet、TreeSet、LinkedHashSet、EnumSet
-- [Java 容器之 Queue](03.容器/Java_容器_Queue.md) - 关键词：Queue、Deque、ArrayDeque、LinkedList、PriorityQueue
-- [Java 容器之 Stream](03.容器/Java_容器_Stream.md)
+- [Java 容器简介](容器/Java_容器_简介.md) - 关键词：泛型、Iterable、Iterator、Comparable、Comparator、Cloneable、fail-fast
+- [Java 容器之 List](容器/Java_容器_List.md) - 关键词：List、ArrayList、LinkedList
+- [Java 容器之 Map](容器/Java_容器_Map.md) - 关键词：Map、HashMap、TreeMap、LinkedHashMap、WeakHashMap
+- [Java 容器之 Set](容器/Java_容器_Set.md) - 关键词：Set、HashSet、TreeSet、LinkedHashSet、EnumSet
+- [Java 容器之 Queue](容器/Java_容器_Queue.md) - 关键词：Queue、Deque、ArrayDeque、LinkedList、PriorityQueue
+- [Java 容器之 Stream](容器/Java_容器_Stream.md)
 
-### [Java IO](04.IO)
+### [Java IO](IO)
 
-- [Java I/O 之 简介](04.IO/Java_IO_简介.md) - 关键词：BIO、NIO、AIO
-- [Java I/O 之 BIO](04.IO/Java_IO_BIO.md) - 关键词：BIO、InputStream、OutputStream、Reader、Writer、File、Socket、ServerSocket
-- [Java I/O 之 NIO](04.IO/Java_IO_NIO.md) - 关键词：NIO、Channel、Buffer、Selector、多路复用
-- [Java I/O 之序列化](04.IO/Java_IO_序列化.md) - 关键词：Serializable、serialVersionUID、transient、Externalizable
+- [Java IO 之 简介](IO/Java_IO_简介.md) - 关键词：BIO、NIO、AIO
+- [Java IO 之 BIO](IO/Java_IO_BIO.md) - 关键词：BIO、InputStream、OutputStream、Reader、Writer、File、Socket、ServerSocket
+- [Java IO 之 NIO](IO/Java_IO_NIO.md) - 关键词：NIO、Channel、Buffer、Selector、多路复用
+- [Java IO 之序列化](IO/Java_IO_序列化.md) - 关键词：Serializable、serialVersionUID、transient、Externalizable
 
-### [Java 并发](05.并发)
+### [Java 并发](并发)
 
-- [Java 并发简介](05.并发/Java_并发_简介.md) - 关键词：并发、线程、安全性、活跃性、性能、死锁、活锁
-- [Java 并发之内存模型](05.并发/Java_并发_内存模型.md) - 关键词：JMM、Happens-Before、内存屏障、volatile、synchronized、final、指令重排序
-- [Java 并发之线程](05.并发/Java_并发_线程.md) - 关键词：Thread、Runnable、Callable、Future、FutureTask、线程生命周期
-- [Java 并发之锁](05.并发/Java_并发_锁.md) - 关键词：锁、Lock、Condition、ReentrantLock、ReentrantReadWriteLock、StampedLock
-- [Java 并发之无锁](05.并发/Java_并发_无锁.md) - 关键词：CAS、ThreadLocal、Immutability、Copy-on-Write
-- [Java 并发之 AQS](05.并发/Java_并发_AQS.md) - 关键词：AQS、独占锁、共享锁
-- [Java 并发之容器](05.并发/Java_并发_容器.md) - 关键词：ConcurrentHashMap、CopyOnWriteArrayList
-- [Java 并发之线程池](05.并发/Java_并发_线程池.md) - 关键词：Executor、ExecutorService、ThreadPoolExecutor、Executors
-- [Java 并发之同步工具](05.并发/Java_并发_同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
-- [Java 并发之分工工具](05.并发/Java_并发_分工工具.md) - 关键词：CompletableFuture、CompletionStage、ForkJoinPool
+- [Java 并发简介](并发/Java_并发_简介.md) - 关键词：并发、线程、安全性、活跃性、性能、死锁、活锁
+- [Java 并发之内存模型](并发/Java_并发_内存模型.md) - 关键词：JMM、Happens-Before、内存屏障、volatile、synchronized、final、指令重排序
+- [Java 并发之线程](并发/Java_并发_线程.md) - 关键词：Thread、Runnable、Callable、Future、FutureTask、线程生命周期
+- [Java 并发之锁](并发/Java_并发_锁.md) - 关键词：锁、Lock、Condition、ReentrantLock、ReentrantReadWriteLock、StampedLock
+- [Java 并发之无锁](并发/Java_并发_无锁.md) - 关键词：CAS、ThreadLocal、Immutability、Copy-on-Write
+- [Java 并发之 AQS](并发/Java_并发_AQS.md) - 关键词：AQS、独占锁、共享锁
+- [Java 并发之容器](并发/Java_并发_容器.md) - 关键词：ConcurrentHashMap、CopyOnWriteArrayList
+- [Java 并发之线程池](并发/Java_并发_线程池.md) - 关键词：Executor、ExecutorService、ThreadPoolExecutor、Executors
+- [Java 并发之同步工具](并发/Java_并发_同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
+- [Java 并发之分工工具](并发/Java_并发_分工工具.md) - 关键词：CompletableFuture、CompletionStage、ForkJoinPool
 
-### [Java 虚拟机](06.JVM)
+### [Java 虚拟机](JVM)
 
-- [Java 虚拟机简介](06.JVM/Java_虚拟机_简介.md)
-- [Java 虚拟机之内存区域](06.JVM/Java_虚拟机_内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
-- [Java 虚拟机之垃圾收集](06.JVM/Java_虚拟机_垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
-- [Java 虚拟机之字节码](06.JVM/Java_虚拟机_字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
-- [Java 虚拟机之类加载](06.JVM/Java_虚拟机_类加载.md) - 关键词：`ClassLoader`、`双亲委派`
-- [Java 虚拟机之工具](06.JVM/Java_虚拟机_工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`、`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
-- [Java 虚拟机之故障处理](06.JVM/Java_虚拟机_故障处理.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
-- [Java 虚拟机之调优](06.JVM/Java_虚拟机_调优.md) - 关键词：`配置`、`调优`
+- [Java 虚拟机简介](JVM/Java_虚拟机_简介.md)
+- [Java 虚拟机之内存区域](JVM/Java_虚拟机_内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
+- [Java 虚拟机之垃圾收集](JVM/Java_虚拟机_垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
+- [Java 虚拟机之字节码](JVM/Java_虚拟机_字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
+- [Java 虚拟机之类加载](JVM/Java_虚拟机_类加载.md) - 关键词：`ClassLoader`、`双亲委派`
+- [Java 虚拟机之工具](JVM/Java_虚拟机_工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`、`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
+- [Java 虚拟机之故障处理](JVM/Java_虚拟机_故障处理.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
+- [Java 虚拟机之调优](JVM/Java_虚拟机_调优.md) - 关键词：`配置`、`调优`
 
 ## 📚 资料
 
