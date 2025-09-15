@@ -120,6 +120,13 @@ export default sidebar({
       prefix: '96.工作/',
       children: 'structure',
       collapsible: true
+    },
+    {
+      text: '面试',
+      icon: 'fluent-color:chat-bubbles-question-16',
+      prefix: '99.面试/',
+      children: 'structure',
+      collapsible: true
     }
     // "intro",
     // "slides",

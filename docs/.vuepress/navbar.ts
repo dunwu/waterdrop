@@ -15,8 +15,8 @@ export default navbar([
       {
         text: 'JavaCore',
         icon: 'mdi:numeric-1-box-multiple-outline',
-        prefix: '01.JavaCore/',
-        link: '01.JavaCore/',
+        prefix: 'JavaCore/',
+        link: 'JavaCore/',
         children: ['基础特性/', '高级特性/', '容器/', 'IO/', '并发/', 'JVM/', '面试/']
       },
       { text: 'JavaEE', icon: 'mdi:numeric-2-box-multiple-outline', link: '02.JavaEE/' },
@@ -140,6 +140,6 @@ export default navbar([
   {
     text: '面试',
     icon: 'fluent-color:chat-bubbles-question-16',
-    link: '/面试/'
+    link: '/99.面试/'
   }
 ])
