@@ -116,9 +116,9 @@ void addNumbers(List<? super Integer> list) {
 
 | 类型 | 语法          | 读取          | 写入            | 应用           |
 | :--- | :------------ | :------------ | :-------------- | :------------- |
-| 上界 | `? extends T` | 安全（作为T） | 禁止            | 生产者场景     |
-| 下界 | `? super T`   | 需转Object    | 安全（T及子类） | 消费者场景     |
-| 无界 | `?`           | 作为Object    | 禁止            | 完全不确定类型 |
+| 上界 | `? extends T` | 安全（作为 T） | 禁止            | 生产者场景     |
+| 下界 | `? super T`   | 需转 Object    | 安全（T 及子类） | 消费者场景     |
+| 无界 | `?`           | 作为 Object    | 禁止            | 完全不确定类型 |
 
 **小结**
 
@@ -566,16 +566,16 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 | **优势**       | **局限**                                |
 | -------------- | --------------------------------------- |
 | 实现热插拔     | 配置文件需严格规范                      |
-| 解耦接口与实现 | 原生SPI会加载所有实现类（可能浪费资源） |
+| 解耦接口与实现 | 原生 SPI 会加载所有实现类（可能浪费资源） |
 | 扩展性强       | 无默认实现筛选机制                      |
 
-**与API的区别**
+**与 API 的区别**
 
 | **维度** | **SPI**                  | **API**                  |
 | -------- | ------------------------ | ------------------------ |
 | 调用方向 | 由实现方提供，调用方选择 | 由提供方定义，调用方使用 |
 | 控制权   | 调用方控制               | 提供方控制               |
-| 典型场景 | JDBC驱动、日志实现       | Java标准库               |
+| 典型场景 | JDBC 驱动、日志实现       | Java 标准库               |
 
 **改进方案**
 
@@ -594,16 +594,16 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 **核心用途**
 
 - **持久化存储**（如保存到文件/数据库）
-- **网络传输**（如RPC调用）
+- **网络传输**（如 RPC 调用）
 - **深拷贝实现**（通过序列化+反序列化）
 
-**Java实现方式**
+**Java 实现方式**
 
 | 方式                            | 特点                     | 示例                                   |
 | ------------------------------- | ------------------------ | -------------------------------------- |
-| **`Serializable`接口**          | 标记接口，默认Java序列化 | `class User implements Serializable`   |
+| **`Serializable`接口**          | 标记接口，默认 Java 序列化 | `class User implements Serializable`   |
 | **`Externalizable`接口**        | 需手动实现读写逻辑       | 覆盖`writeExternal()`/`readExternal()` |
-| **第三方库**（JSON/Protobuf等） | 跨语言、高效             | Gson、Jackson、Protobuf                |
+| **第三方库**（JSON/Protobuf 等） | 跨语言、高效             | Gson、Jackson、Protobuf                |
 
 **关键注意事项**
 
@@ -622,13 +622,13 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 - **性能优化**：
 
   - 避免序列化大对象
-  - 第三方库（如Protobuf）比Java原生序列化更快
+  - 第三方库（如 Protobuf）比 Java 原生序列化更快
 
 **常见序列化协议对比**
 
 | 协议         | 语言支持 | 可读性 | 性能 | 典型应用 |
 | ------------ | -------- | ------ | ---- | -------- |
-| **Java原生** | 仅Java   | 差     | 低   | Java RMI |
+| **Java 原生** | 仅 Java   | 差     | 低   | Java RMI |
 | **JSON**     | 多语言   | 好     | 中   | Web API  |
 | **Protobuf** | 多语言   | 差     | 高   | gRPC     |
 | **Hessian**  | 多语言   | 差     | 中   | Dubbo    |
@@ -638,7 +638,7 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 - **反序列化漏洞**：恶意字节流可触发代码执行（需校验数据来源）
 - **解决方案**：
   - 使用白名单控制反序列化类
-  - 替换为JSON等文本协议
+  - 替换为 JSON 等文本协议
 
 ### 【中等】Java 提供了哪些 IO 方式？
 
@@ -868,7 +868,7 @@ while (true) {
 
 **语法糖（Syntactic sugar）** 代指的是编程语言为了方便程序员开发程序而设计的一种特殊语法，这种语法对编程语言的功能并没有影响。实现相同的功能，基于语法糖写出来的代码往往更简单简洁且更易阅读。
 
-Java 中最常用的语法糖主要有泛型、自动拆装箱、变长参数、枚举、内部类、增强 for 循环、try-with-resources 语法、lambda 表达式等。所有这些语法糖在编译阶段都会被"脱糖"(desugar)，即转换为更基础的Java语法结构。可以使用`javap -c`命令查看字节码来验证这一点。语法糖虽然不增加语言功能，但能显著提高代码的可读性和编写效率，是Java语言不断演进的重要组成部分。
+Java 中最常用的语法糖主要有泛型、自动拆装箱、变长参数、枚举、内部类、增强 for 循环、try-with-resources 语法、lambda 表达式等。所有这些语法糖在编译阶段都会被"脱糖"(desugar)，即转换为更基础的 Java 语法结构。可以使用`javap -c`命令查看字节码来验证这一点。语法糖虽然不增加语言功能，但能显著提高代码的可读性和编写效率，是 Java 语言不断演进的重要组成部分。
 
 **自动装箱与拆箱 (Autoboxing/Unboxing)**
 
@@ -935,7 +935,7 @@ switch (fruit) {
     case "apple":
         System.out.println("It's an apple");
         break;
-    // 实际编译为基于hashCode()和equals()的比较
+    // 实际编译为基于 hashCode() 和 equals() 的比较
 }
 ```
 
@@ -950,7 +950,7 @@ public class Person {}
 
 ```java
 enum Color { RED, GREEN, BLUE }
-// 实际编译为继承java.lang.Enum的类
+// 实际编译为继承 java.lang.Enum 的类
 ```
 
 **内部类访问外部类成员**
@@ -971,7 +971,7 @@ class Outer {
 ```java
 List<String> list = Arrays.asList("a", "b", "c");
 list.forEach(System.out::println);
-// 编译为lambda表达式
+// 编译为 lambda 表达式
 list.forEach(s -> System.out.println(s));
 ```
 
@@ -979,11 +979,11 @@ list.forEach(s -> System.out.println(s));
 
 ```java
 List<String> list = new ArrayList<>();  // 类型推断
-// Java 7之前需要
+// Java 7 之前需要
 List<String> list = new ArrayList<String>();
 ```
 
-**集合字面量 (Java 9+ 的List.of等)**
+**集合字面量 (Java 9+ 的 List.of 等）**
 
 ```java
 List<String> list = List.of("a", "b", "c");
@@ -994,9 +994,9 @@ Map<String, Integer> map = Map.of("a", 1, "b", 2);
 **Lambda 表达式 (Java 8+)**
 
 ```java
-// Lambda表达式
+// Lambda 表达式
 Runnable r = () -> System.out.println("Hello");
-// 实际生成实现Runnable的匿名类
+// 实际生成实现 Runnable 的匿名类
 ```
 
 **try-with-resources (Java 7+)**
@@ -1004,8 +1004,8 @@ Runnable r = () -> System.out.println("Hello");
 ```java
 try (InputStream is = new FileInputStream("file.txt")) {
     // 使用资源
-}  // 自动调用close()
-// 编译为try-finally块
+}  // 自动调用 close()
+// 编译为 try-finally 块
 ```
 
 **接口中的默认方法和静态方法 (Java 8+)**
@@ -1026,10 +1026,10 @@ interface MyInterface {
 
 ```java
 record Point(int x, int y) {}
-// 编译后自动生成:
-// - 私有final字段x和y
+// 编译后自动生成：
+// - 私有 final 字段 x 和 y
 // - 公共构造方法
-// - 访问器方法x()和y()
+// - 访问器方法 x() 和 y()
 // - equals(), hashCode(), toString()
 ```
 
@@ -1037,7 +1037,7 @@ record Point(int x, int y) {}
 
 ```java
 if (obj instanceof String s) {
-    // 可以直接使用s
+    // 可以直接使用 s
     System.out.println(s.length());
 }
 ```

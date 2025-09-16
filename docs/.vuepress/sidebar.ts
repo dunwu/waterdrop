@@ -50,13 +50,13 @@ export default sidebar({
       prefix: '12.数据库/',
       collapsible: true,
       children: [
-        { text: '数据库综合', prefix: '01.数据库综合', collapsible: true, children: 'structure' },
-        { text: '数据库中间件', prefix: '02.数据库中间件', collapsible: true, children: 'structure' },
-        { text: '关系型数据库', prefix: '03.关系型数据库', collapsible: true, children: 'structure' },
-        { text: '文档数据库', prefix: '04.文档数据库', collapsible: true, children: 'structure' },
-        { text: 'KV数据库', prefix: '05.KV数据库', collapsible: true, children: 'structure' },
-        { text: '列式数据库', prefix: '06.列式数据库', collapsible: true, children: 'structure' },
-        { text: '搜索引擎数据库', prefix: '07.搜索引擎数据库', collapsible: true, children: 'structure' }
+        { text: '数据库综合', prefix: '数据库综合', collapsible: true, children: 'structure' },
+        { text: '数据库中间件', prefix: '数据库中间件', collapsible: true, children: 'structure' },
+        { text: '关系型数据库', prefix: '关系型数据库', collapsible: true, children: 'structure' },
+        { text: '文档数据库', prefix: '文档数据库', collapsible: true, children: 'structure' },
+        { text: 'KV数据库', prefix: 'KV数据库', collapsible: true, children: 'structure' },
+        { text: '列式数据库', prefix: '列式数据库', collapsible: true, children: 'structure' },
+        { text: '搜索引擎数据库', prefix: '搜索引擎数据库', collapsible: true, children: 'structure' }
       ]
     },
     {
@@ -95,7 +95,7 @@ export default sidebar({
         {
           text: 'HBase',
           icon: 'logos:HBase',
-          prefix: '12.数据库/06.列式数据库/HBase/',
+          prefix: '12.数据库/列式数据库/HBase/',
           collapsible: true,
           children: 'structure'
         },

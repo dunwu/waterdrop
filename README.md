@@ -333,37 +333,37 @@
 
 ### 数据库综合
 
-- [Nosql 技术选型](docs/12.数据库/01.数据库综合/Nosql技术选型.md)
-- [数据结构与数据库索引](docs/12.数据库/01.数据库综合/数据结构与数据库索引.md)
+- [Nosql 技术选型](docs/12.数据库/数据库综合/Nosql技术选型.md)
+- [数据结构与数据库索引](docs/12.数据库/数据库综合/数据结构与数据库索引.md)
 
 ### 数据库中间件
 
-- [ShardingSphere](docs/12.数据库/02.数据库中间件/ShardingSphere.md)
-- [Flyway](docs/12.数据库/02.数据库中间件/Flyway.md)
+- [ShardingSphere](docs/12.数据库/数据库中间件/ShardingSphere.md)
+- [Flyway](docs/12.数据库/数据库中间件/Flyway.md)
 
 ### 关系型数据库
 
-> [关系型数据库](docs/12.数据库/03.关系型数据库) 整理主流关系型数据库知识点。
+> [关系型数据库](docs/12.数据库/关系型数据库) 整理主流关系型数据库知识点。
 
-- [关系数据库简介](docs/12.数据库/03.关系型数据库/关系数据库简介.md)
-- [SQL](docs/12.数据库/03.关系型数据库/SQL.md)
-- [PostgreSQL](docs/12.数据库/03.关系型数据库/PostgreSQL.md)
-- [H2](docs/12.数据库/03.关系型数据库/H2.md)
-- [SqLite](docs/12.数据库/03.关系型数据库/SqLite.md)
+- [关系数据库简介](docs/12.数据库/关系型数据库/关系数据库简介.md)
+- [SQL](docs/12.数据库/关系型数据库/SQL.md)
+- [PostgreSQL](docs/12.数据库/关系型数据库/PostgreSQL.md)
+- [H2](docs/12.数据库/关系型数据库/H2.md)
+- [SqLite](docs/12.数据库/关系型数据库/SqLite.md)
 
-#### [MySQL](docs/12.数据库/03.关系型数据库/MySQL)
+#### [MySQL](docs/12.数据库/关系型数据库/MySQL)
 
-- [MySQL 架构](docs/12.数据库/03.关系型数据库/MySQL/MySQL_架构.md)
-- [MySQL 存储引擎](docs/12.数据库/03.关系型数据库/MySQL/MySQL_存储引擎.md)
-- [MySQL 索引](docs/12.数据库/03.关系型数据库/MySQL/MySQL_索引.md)
-- [MySQL 事务](docs/12.数据库/03.关系型数据库/MySQL/MySQL_事务.md)
-- [MySQL 锁](docs/12.数据库/03.关系型数据库/MySQL/MySQL_锁.md)
-- [MySQL 复制](docs/12.数据库/03.关系型数据库/MySQL/MySQL_复制.md)
-- [MySQL 优化](docs/12.数据库/03.关系型数据库/MySQL/MySQL_优化.md)
-- [MySQL 运维](docs/12.数据库/03.关系型数据库/MySQL/MySQL_运维.md)
-- [MySQL 面试](docs/12.数据库/03.关系型数据库/MySQL/MySQL_面试.md) 💯
-- [MySQL 面试之索引篇](docs/12.数据库/03.关系型数据库/MySQL/MySQL_面试_索引.md) 💯
-- [MySQL 面试之事务和锁篇](docs/12.数据库/03.关系型数据库/MySQL/MySQL_面试_事务和锁.md) 💯
+- [MySQL 架构](docs/12.数据库/关系型数据库/MySQL/MySQL_架构.md)
+- [MySQL 存储引擎](docs/12.数据库/关系型数据库/MySQL/MySQL_存储引擎.md)
+- [MySQL 索引](docs/12.数据库/关系型数据库/MySQL/MySQL_索引.md)
+- [MySQL 事务](docs/12.数据库/关系型数据库/MySQL/MySQL_事务.md)
+- [MySQL 锁](docs/12.数据库/关系型数据库/MySQL/MySQL_锁.md)
+- [MySQL 复制](docs/12.数据库/关系型数据库/MySQL/MySQL_复制.md)
+- [MySQL 优化](docs/12.数据库/关系型数据库/MySQL/MySQL_优化.md)
+- [MySQL 运维](docs/12.数据库/关系型数据库/MySQL/MySQL_运维.md)
+- [MySQL 面试](docs/12.数据库/关系型数据库/MySQL/MySQL_面试.md) 💯
+- [MySQL 面试之索引篇](docs/12.数据库/关系型数据库/MySQL/MySQL_面试_索引.md) 💯
+- [MySQL 面试之事务和锁篇](docs/12.数据库/关系型数据库/MySQL/MySQL_面试_事务和锁.md) 💯
 
 ### 文档数据库
 
@@ -375,57 +375,57 @@
 >
 > MongoDB 最大的特点是它支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引。
 
-- [MongoDB 简介](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_简介.md)
-- [MongoDB CRUD](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_CRUD.md)
-- [MongoDB 聚合](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_聚合.md)
-- [MongoDB 索引](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_索引.md)
-- [MongoDB 事务](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_事务.md)
-- [MongoDB 建模](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_建模.md)
-- [MongoDB 复制](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_复制.md)
-- [MongoDB 分片](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_分片.md)
-- [MongoDB 运维](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_运维.md)
-- [MongoDB 面试](docs/12.数据库/04.文档数据库/MongoDB/MongoDB_面试.md) 💯
+- [MongoDB 简介](docs/12.数据库/文档数据库/MongoDB/MongoDB_简介.md)
+- [MongoDB CRUD](docs/12.数据库/文档数据库/MongoDB/MongoDB_CRUD.md)
+- [MongoDB 聚合](docs/12.数据库/文档数据库/MongoDB/MongoDB_聚合.md)
+- [MongoDB 索引](docs/12.数据库/文档数据库/MongoDB/MongoDB_索引.md)
+- [MongoDB 事务](docs/12.数据库/文档数据库/MongoDB/MongoDB_事务.md)
+- [MongoDB 建模](docs/12.数据库/文档数据库/MongoDB/MongoDB_建模.md)
+- [MongoDB 复制](docs/12.数据库/文档数据库/MongoDB/MongoDB_复制.md)
+- [MongoDB 分片](docs/12.数据库/文档数据库/MongoDB/MongoDB_分片.md)
+- [MongoDB 运维](docs/12.数据库/文档数据库/MongoDB/MongoDB_运维.md)
+- [MongoDB 面试](docs/12.数据库/文档数据库/MongoDB/MongoDB_面试.md) 💯
 
 ### KV 数据库
 
-#### [Redis](docs/12.数据库/05.KV数据库/Redis)
+#### [Redis](docs/12.数据库/KV数据库/Redis)
 
-- [Redis 基本数据类型](docs/12.数据库/05.KV数据库/Redis/Redis_数据类型.md) - 关键词：`String`、`Hash`、`List`、`Set`、`Zset`
-- [Redis 高级数据类型](docs/12.数据库/05.KV数据库/Redis/Redis_数据类型二.md) - 关键词：`BitMap`、`HyperLogLog`、`Geo`、`Stream`
-- [Redis 数据结构](docs/12.数据库/05.KV数据库/Redis/Redis_数据结构.md) - 关键词：`对象`、`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`
-- [Redis 内存管理](docs/12.数据库/05.KV数据库/Redis/Redis_内存管理.md) - 关键词：`定时删除`、`惰性删除`、`定期删除`、`LRU`、`LFU`
-- [Redis 持久化](docs/12.数据库/05.KV数据库/Redis/Redis_持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
-- [Redis 事件](docs/12.数据库/05.KV数据库/Redis/Redis_事件.md) - 关键词：`文件事件`、`时间事件`
-- [Redis 复制](docs/12.数据库/05.KV数据库/Redis/Redis_复制.md) - 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`命令传播`、`心跳`
-- [Redis 哨兵](docs/12.数据库/05.KV数据库/Redis/Redis_哨兵.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`Raft`
-- [Redis 集群](docs/12.数据库/05.KV数据库/Redis/Redis_集群.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`分区`、`Raft`、`Gossip`
-- [Redis 订阅](docs/12.数据库/05.KV数据库/Redis/Redis_订阅.md) - 关键词：`订阅`、`SUBSCRIBE`、`PSUBSCRIBE`、`PUBLISH`、`观察者模式`
-- [Redis 独立功能](docs/12.数据库/05.KV数据库/Redis/Redis_事务.md) - 关键词：`事务`、`ACID`、`MULTI`、`EXEC`、`DISCARD`、`WATCH`
-- [Redis 管道](docs/12.数据库/05.KV数据库/Redis/Redis_管道.md) - 关键词：`Pipeline`
-- [Redis 脚本](docs/12.数据库/05.KV数据库/Redis/Redis_脚本.md) - 关键词：`Lua`
-- [Redis 运维](docs/12.数据库/05.KV数据库/Redis/Redis_运维.md) - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
-- [Redis 实战](docs/12.数据库/05.KV数据库/Redis/Redis_实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
-- [Redis 面试](docs/12.数据库/05.KV数据库/Redis/Redis_面试.md) - 关键词：`面试`
-- [Redis 面试之数据类型篇](docs/12.数据库/05.KV数据库/Redis/Redis_面试_数据类型.md) - 关键词：`面试`
-- [Redis 面试之应用篇](docs/12.数据库/05.KV数据库/Redis/Redis_面试_应用.md) - 关键词：`面试`
+- [Redis 基本数据类型](docs/12.数据库/KV数据库/Redis/Redis_数据类型.md) - 关键词：`String`、`Hash`、`List`、`Set`、`Zset`
+- [Redis 高级数据类型](docs/12.数据库/KV数据库/Redis/Redis_数据类型二.md) - 关键词：`BitMap`、`HyperLogLog`、`Geo`、`Stream`
+- [Redis 数据结构](docs/12.数据库/KV数据库/Redis/Redis_数据结构.md) - 关键词：`对象`、`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`
+- [Redis 内存管理](docs/12.数据库/KV数据库/Redis/Redis_内存管理.md) - 关键词：`定时删除`、`惰性删除`、`定期删除`、`LRU`、`LFU`
+- [Redis 持久化](docs/12.数据库/KV数据库/Redis/Redis_持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
+- [Redis 事件](docs/12.数据库/KV数据库/Redis/Redis_事件.md) - 关键词：`文件事件`、`时间事件`
+- [Redis 复制](docs/12.数据库/KV数据库/Redis/Redis_复制.md) - 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`命令传播`、`心跳`
+- [Redis 哨兵](docs/12.数据库/KV数据库/Redis/Redis_哨兵.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`Raft`
+- [Redis 集群](docs/12.数据库/KV数据库/Redis/Redis_集群.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`分区`、`Raft`、`Gossip`
+- [Redis 订阅](docs/12.数据库/KV数据库/Redis/Redis_订阅.md) - 关键词：`订阅`、`SUBSCRIBE`、`PSUBSCRIBE`、`PUBLISH`、`观察者模式`
+- [Redis 独立功能](docs/12.数据库/KV数据库/Redis/Redis_事务.md) - 关键词：`事务`、`ACID`、`MULTI`、`EXEC`、`DISCARD`、`WATCH`
+- [Redis 管道](docs/12.数据库/KV数据库/Redis/Redis_管道.md) - 关键词：`Pipeline`
+- [Redis 脚本](docs/12.数据库/KV数据库/Redis/Redis_脚本.md) - 关键词：`Lua`
+- [Redis 运维](docs/12.数据库/KV数据库/Redis/Redis_运维.md) - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
+- [Redis 实战](docs/12.数据库/KV数据库/Redis/Redis_实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
+- [Redis 面试](docs/12.数据库/KV数据库/Redis/Redis_面试.md) - 关键词：`面试`
+- [Redis 面试之数据类型篇](docs/12.数据库/KV数据库/Redis/Redis_面试_数据类型.md) - 关键词：`面试`
+- [Redis 面试之应用篇](docs/12.数据库/KV数据库/Redis/Redis_面试_应用.md) - 关键词：`面试`
 
-#### [Memcached](docs/12.数据库/05.KV数据库/Memcached.md)
+#### [Memcached](docs/12.数据库/KV数据库/Memcached.md)
 
 ### 列式数据库
 
 #### HBase
 
-- [HBase 快速入门](docs/12.数据库/06.列式数据库/HBase/HBase_快速入门.md)
-- [HBase 数据模型](docs/12.数据库/06.列式数据库/HBase/HBase_数据模型.md)
-- [HBase Schema 设计](docs/12.数据库/06.列式数据库/HBase/HBase_Schema.md)
-- [HBase 架构](docs/12.数据库/06.列式数据库/HBase/HBase_架构.md)
-- [HBase Java API 基础特性](docs/12.数据库/06.列式数据库/HBase/HBase_API_基础特性.md)
-- [HBase Java API 高级特性](docs/12.数据库/06.列式数据库/HBase/HBase_API_高级特性.md)
-- [HBase Java API 高级特性之过滤器](docs/12.数据库/06.列式数据库/HBase/HBase_API_高级特性_过滤器.md)
-- [HBase Java API 高级特性之协处理器](docs/12.数据库/06.列式数据库/HBase/HBase_API_高级特性_协处理器.md)
-- [HBase 运维](docs/12.数据库/06.列式数据库/HBase/HBase_运维.md)
-- [HBase 命令](docs/12.数据库/06.列式数据库/HBase/HBase_命令.md)
-- [HBase 面试](docs/12.数据库/06.列式数据库/HBase/HBase_面试.md) 💯
+- [HBase 快速入门](docs/12.数据库/列式数据库/HBase/HBase_快速入门.md)
+- [HBase 数据模型](docs/12.数据库/列式数据库/HBase/HBase_数据模型.md)
+- [HBase Schema 设计](docs/12.数据库/列式数据库/HBase/HBase_Schema.md)
+- [HBase 架构](docs/12.数据库/列式数据库/HBase/HBase_架构.md)
+- [HBase Java API 基础特性](docs/12.数据库/列式数据库/HBase/HBase_API_基础特性.md)
+- [HBase Java API 高级特性](docs/12.数据库/列式数据库/HBase/HBase_API_高级特性.md)
+- [HBase Java API 高级特性之过滤器](docs/12.数据库/列式数据库/HBase/HBase_API_高级特性_过滤器.md)
+- [HBase Java API 高级特性之协处理器](docs/12.数据库/列式数据库/HBase/HBase_API_高级特性_协处理器.md)
+- [HBase 运维](docs/12.数据库/列式数据库/HBase/HBase_运维.md)
+- [HBase 命令](docs/12.数据库/列式数据库/HBase/HBase_命令.md)
+- [HBase 面试](docs/12.数据库/列式数据库/HBase/HBase_面试.md) 💯
 
 ### 搜索引擎数据库
 
@@ -433,25 +433,25 @@
 
 > Elasticsearch 是一个基于 Lucene 的搜索和数据分析工具，它提供了一个分布式服务。Elasticsearch 是遵从 Apache 开源条款的一款开源产品，是当前主流的企业级搜索引擎。
 
-- [Elasticsearch 简介](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_简介.md)
-- [Elasticsearch 存储](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_存储.md)
-- [Elasticsearch 搜索（上）](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_搜索上.md)
-- [Elasticsearch 搜索（下）](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_搜索下.md)
-- [Elasticsearch 聚合](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_聚合.md)
-- [Elasticsearch 分析](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_分析.md)
-- [Elasticsearch 集群](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_集群.md)
-- [Elasticsearch 优化](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_优化.md)
-- [Elasticsearch 运维](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_运维.md)
-- [Elasticsearch API](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_API.md)
-- [ElasticSearch API 之 High Level REST Client](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_API_HighLevelRest.md)
-- [Elasticsearch 面试](docs/12.数据库/07.搜索引擎数据库/Elasticsearch/Elasticsearch_面试.md) 💯
+- [Elasticsearch 简介](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_简介.md)
+- [Elasticsearch 存储](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_存储.md)
+- [Elasticsearch 搜索（上）](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_搜索上.md)
+- [Elasticsearch 搜索（下）](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_搜索下.md)
+- [Elasticsearch 聚合](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_聚合.md)
+- [Elasticsearch 分析](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_分析.md)
+- [Elasticsearch 集群](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_集群.md)
+- [Elasticsearch 优化](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_优化.md)
+- [Elasticsearch 运维](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_运维.md)
+- [Elasticsearch API](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_API.md)
+- [ElasticSearch API 之 High Level REST Client](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_API_HighLevelRest.md)
+- [Elasticsearch 面试](docs/12.数据库/搜索引擎数据库/Elasticsearch/Elasticsearch_面试.md) 💯
 
 #### Elastic
 
-- [Elastic](docs/12.数据库/07.搜索引擎数据库/Elastic/Elastic.md)
-- [Kibana](docs/12.数据库/07.搜索引擎数据库/Elastic/Kibana.md)
-- [Logstash](docs/12.数据库/07.搜索引擎数据库/Elastic/Logstash.md)
-- [Filebeat](docs/12.数据库/07.搜索引擎数据库/Elastic/Filebeat.md)
+- [Elastic](docs/12.数据库/搜索引擎数据库/Elastic/Elastic.md)
+- [Kibana](docs/12.数据库/搜索引擎数据库/Elastic/Kibana.md)
+- [Logstash](docs/12.数据库/搜索引擎数据库/Elastic/Logstash.md)
+- [Filebeat](docs/12.数据库/搜索引擎数据库/Elastic/Filebeat.md)
 
 ## 网络
 
