@@ -10,7 +10,7 @@ tags:
   - Java
   - 模板引擎
   - Velocity
-permalink: /pages/4f9c9f68/
+permalink: /pages/99935766/
 ---
 
 # Velocity 快速入门

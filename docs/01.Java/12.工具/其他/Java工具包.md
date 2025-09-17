@@ -9,7 +9,7 @@ categories:
 tags:
   - Java
   - 工具包
-permalink: /pages/38604da2/
+permalink: /pages/175f1079/
 ---
 
 # 细说 Java 主流工具包

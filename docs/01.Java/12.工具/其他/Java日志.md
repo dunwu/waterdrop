@@ -9,7 +9,7 @@ categories:
 tags:
   - Java
   - 日志
-permalink: /pages/02c18ea3/
+permalink: /pages/a9170388/
 ---
 
 # 细说 Java 主流日志工具库

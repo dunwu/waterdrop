@@ -9,7 +9,7 @@ categories:
 tags:
   - Java
   - 邮件
-permalink: /pages/2c1194a5/
+permalink: /pages/f483524f/
 ---
 
 # JavaMail 快速入门

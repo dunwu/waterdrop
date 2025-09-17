@@ -10,7 +10,7 @@ tags:
   - Java
   - 测试
   - JMeter
-permalink: /pages/6e001e03/
+permalink: /pages/7ca5762a/
 ---
 
 # JMeter 快速入门

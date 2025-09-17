@@ -10,7 +10,7 @@ tags:
   - Java
   - 条形码
   - ZXing
-permalink: /pages/c0f3f9b8/
+permalink: /pages/08f2dba9/
 ---
 
 # ZXing 快速入门

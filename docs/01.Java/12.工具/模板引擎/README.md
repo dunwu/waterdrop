@@ -8,7 +8,7 @@ categories:
 tags:
   - Java
   - 模板引擎
-permalink: /pages/cad15f3b/
+permalink: /pages/7628bb49/
 hidden: true
 index: false
 ---
@@ -41,9 +41,9 @@ index: false
 
 ## 内容
 
-- [Freemark](01.Freemark.md)
-- [Thymeleaf](02.Thymeleaf.md)
-- [Velocity](03.Velocity.md)
+- [Freemark](Freemark.md)
+- [Thymeleaf](Thymeleaf.md)
+- [Velocity](Velocity.md)
 
 ## 资源
 

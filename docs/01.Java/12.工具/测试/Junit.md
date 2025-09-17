@@ -10,7 +10,7 @@ tags:
   - Java
   - 测试
   - JUnit
-permalink: /pages/86c4aae6/
+permalink: /pages/986e6e41/
 ---
 
 # JUnit5 快速入门

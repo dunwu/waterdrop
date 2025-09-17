@@ -10,7 +10,7 @@ tags:
   - Java
   - Html
   - Jsoup
-permalink: /pages/1f697c93/
+permalink: /pages/f5892d2b/
 ---
 
 # Jsoup 快速入门

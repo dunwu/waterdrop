@@ -10,7 +10,7 @@ tags:
   - Java
   - 测试
   - JUnit
-permalink: /pages/b3025684/
+permalink: /pages/d28384a6/
 ---
 
 # JMH 快速入门

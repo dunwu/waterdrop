@@ -10,7 +10,7 @@ tags:
   - Java
   - 反射
   - Reflections
-permalink: /pages/59298a81/
+permalink: /pages/03c02d8a/
 ---
 
 # Reflections 快速入门

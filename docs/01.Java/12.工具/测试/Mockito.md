@@ -10,7 +10,7 @@ tags:
   - Java
   - 测试
   - Mockito
-permalink: /pages/4ab12dfe/
+permalink: /pages/e6adafb1/
 ---
 
 # Mockito 快速入门

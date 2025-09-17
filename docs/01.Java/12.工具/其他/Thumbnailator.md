@@ -10,7 +10,7 @@ tags:
   - Java
   - 图形处理
   - Thumbnailator
-permalink: /pages/a550913b/
+permalink: /pages/76437e5b/
 ---
 
 # Thumbnailator 快速入门

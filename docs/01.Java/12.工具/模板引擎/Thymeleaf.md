@@ -10,7 +10,7 @@ tags:
   - Java
   - 模板引擎
   - Thymeleaf
-permalink: /pages/6e1de5aa/
+permalink: /pages/d44e74af/
 ---
 
 # Thymeleaf 快速入门

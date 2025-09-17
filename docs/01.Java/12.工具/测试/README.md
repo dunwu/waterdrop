@@ -8,7 +8,7 @@ categories:
 tags:
   - Java
   - 测试
-permalink: /pages/cffa3952/
+permalink: /pages/337023a9/
 hidden: true
 index: false
 ---
@@ -17,7 +17,7 @@ index: false
 
 ## 内容
 
-- [Junit](01.Junit.md)
-- [Mockito](02.Mockito.md)
-- [Jmeter](03.Jmeter.md)
-- [JMH](04.JMH.md)
+- [Junit](Junit.md)
+- [Mockito](Mockito.md)
+- [Jmeter](Jmeter.md)
+- [JMH](JMH.md)

@@ -10,7 +10,7 @@ tags:
   - Java
   - 模板引擎
   - Freemark
-permalink: /pages/a3b0ff35/
+permalink: /pages/7ec58998/
 ---
 
 # Freemark 快速入门

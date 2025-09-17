@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaBean
   - Lombok
-permalink: /pages/74f4e649/
+permalink: /pages/cd530210/
 ---
 
 # Lombok 快速入门

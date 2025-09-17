@@ -10,7 +10,7 @@ tags:
   - Java
   - JavaBean
   - Dozer
-permalink: /pages/bdde0815/
+permalink: /pages/08d7907f/
 ---
 
 # Dozer 快速入门
