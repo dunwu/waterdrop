@@ -8,53 +8,86 @@ categories:
   - MQ
   - RocketMQ
 tags:
-  - Java
-  - 中间件
+  - 分布式
+  - 通信
   - MQ
   - RocketMQ
+  - 面试
 permalink: /pages/2a32dcde/
 ---
 
 # RocketMQ 面试
 
-## API 问题
+### 【困难】事务消息是如何工作的？
 
-### connect to `<172.17.0.1:10909>` failed
+MQ 事务方案本质是利用 MQ 功能实现的本地消息表。事务消息需要消息队列提供相应的功能才能实现，Kafka 和 RocketMQ 都提供了事务相关功能。
 
-启动后，Producer 客户端连接 RocketMQ 时报错：
+- **Kafka** 的解决方案是：直接抛出异常，让用户自行处理。用户可以在业务代码中反复重试提交，直到提交成功，或者删除之前修改的数据记录进行事务补偿。
+- **RocketMQ** 的解决方案是：通过事务反查机制来解决事务消息提交失败的问题。如果 Producer 在提交或者回滚事务消息时发生网络异常，RocketMQ 的 Broker 没有收到提交或者回滚的请求，Broker 会定期去 Producer 上反查这个事务对应的本地事务的状态，然后根据反查结果决定提交或者回滚这个事务。为了支撑这个事务反查机制，业务代码需要实现一个反查本地事务状态的接口，告知 RocketMQ 本地事务是成功还是失败。
 
-```java
-org.apache.rocketmq.remoting.exception.RemotingConnectException: connect to <172.17.0.1:10909> failed
-    at org.apache.rocketmq.remoting.netty.NettyRemotingClient.invokeSync(NettyRemotingClient.java:357)
-    at org.apache.rocketmq.client.impl.MQClientAPIImpl.sendMessageSync(MQClientAPIImpl.java:343)
-    at org.apache.rocketmq.client.impl.MQClientAPIImpl.sendMessage(MQClientAPIImpl.java:327)
-    at org.apache.rocketmq.client.impl.MQClientAPIImpl.sendMessage(MQClientAPIImpl.java:290)
-    at org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl.sendKernelImpl(DefaultMQProducerImpl.java:688)
-    at org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl.sendSelectImpl(DefaultMQProducerImpl.java:901)
-    at org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl.send(DefaultMQProducerImpl.java:878)
-    at org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl.send(DefaultMQProducerImpl.java:873)
-    at org.apache.rocketmq.client.producer.DefaultMQProducer.send(DefaultMQProducer.java:369)
-    at com.emrubik.uc.mdm.sync.utils.MdmInit.sendMessage(MdmInit.java:62)
-    at com.emrubik.uc.mdm.sync.utils.MdmInit.main(MdmInit.java:2149)
-```
+::: info RocketMQ 事务消息实现
+:::
 
-原因：RocketMQ 部署在虚拟机上，内网 ip 为 10.10.30.63，该虚拟机一个 docker0 网卡，ip 为 172.17.0.1。RocketMQ broker 启动时默认使用了 docker0 网卡，Producer 客户端无法连接 172.17.0.1，造成以上问题。
+事务消息是 Apache RocketMQ 提供的一种困难消息类型，支持在分布式场景下保障消息生产和本地事务的最终一致性。
 
-解决方案
+![RocketMQ 事务消息](https://raw.githubusercontent.com/dunwu/images/master/snap/202405140759853.png)
 
-（1）干掉 docker0 网卡或修改网卡名称
+**事务消息处理流程**
 
-（2）停掉 broker，修改 broker 配置文件，重启 broker。
+1. 生产者将消息发送至 Apache RocketMQ 服务端。
+2. Apache RocketMQ 服务端将消息持久化成功之后，向生产者返回 Ack 确认消息已经发送成功，此时消息被标记为"暂不能投递"，这种状态下的消息即为半事务消息。
+3. 生产者开始执行本地事务逻辑。
+4. 生产者根据本地事务执行结果向服务端提交二次确认结果（Commit 或是 Rollback），服务端收到确认结果后处理逻辑如下：
+   - 二次确认结果为 Commit：服务端将半事务消息标记为可投递，并投递给消费者。
+   - 二次确认结果为 Rollback：服务端将回滚事务，不会将半事务消息投递给消费者。
+5. 在断网或者是生产者应用重启的特殊情况下，若服务端未收到发送者提交的二次确认结果，或服务端收到的二次确认结果为 Unknown 未知状态，经过固定时间后，服务端将对消息生产者即生产者集群中任一生产者实例发起消息回查。 **说明** 服务端回查的间隔时间和最大回查次数，请参见 [参数限制](https://rocketmq.apache.org/zh/docs/introduction/03limits)。
+6. 生产者收到消息回查后，需要检查对应消息的本地事务执行的最终结果。
+7. 生产者根据检查到的本地事务的最终状态再次提交二次确认，服务端仍按照步骤 4 对半事务消息进行处理。
 
-修改 conf/broker.conf，增加两行来指定启动 broker 的 IP：
+::: info 本地消息表 vs. 事务消息
+:::
 
-```
-namesrvAddr = 10.10.30.63:9876
-brokerIP1 = 10.10.30.63
-```
+- **本地消息表**：**业务与消息耦合**，通过**数据库+自研任务**保证可靠性。
+- **RocketMQ 事务消息**：**业务与消息解耦**，通过** MQ 框架机制**保证可靠性。
 
-启动时需要指定配置文件
+**本地消息表 vs. 事务消息**
 
-```bash
-nohup sh bin/mqbroker -n localhost:9876 -c conf/broker.conf &
-```
+| 维度         | 本地消息表                 | RocketMQ 事务消息        |
+| :----------- | :------------------------- | :----------------------- |
+| **核心机制** | 数据库事务 + 定时任务扫表  | 半消息 + 事务回查        |
+| **性能**     | 中（受数据库限制）         | **高**（由 MQ 保障）     |
+| **侵入性**   | **低**（只需写库）         | 中（需实现回查接口）     |
+| **复杂度**   | 中（在应用侧，需自研任务） | 中（在框架侧，开箱即用） |
+| **耦合度**   | **与数据库耦合**           | **与 RocketMQ 耦合**     |
+| **通用性**   | **高**（适配任何 MQ）      | 低（仅限 RocketMQ）      |
+
+**技术选型**
+
+- **选本地消息表**：追求**通用解**、技术栈多样、消息量适中。
+- **选 RocketMQ 事务消息**：技术栈已定、追求**高性能**、希望减少自研成本。
+
+### 【中等】RocketMQ 的事务消息有什么缺点？
+
+RocketMQ 事务消息主要缺点：
+
+- **最终一致性**：非强一致，消息有**延迟可见**窗口，不适用金融核心交易等场景。
+- **回查复杂性**：需实现回查接口，逻辑必须**幂等**，状态判断困难，增加了业务代码复杂度和侵入性。
+- **性能开销**：相比普通消息，多了 RPC 交互和回查，存在性能和延迟损耗。
+- **依赖生产者**：若生产者宕机，未决消息会阻塞，引入单点风险。
+
+### 【中等】为什么 RocketMQ 不用 ZooKeeper，而是自己开发 NameServer？
+
+RocketMQ 自研 NameServer 的根本原因在于：**ZooKeeper 的强一致性保障带来了不必要的性能和复杂度开销，而消息队列的路由发现场景本身是一个更注重高可用和高性能的 AP 场景**。
+
+- **ZooKeeper (CP)**：**太重**。为强一致性牺牲性能，功能冗余，运维复杂。
+- **NameServer (AP)**：**专为消息队列设计**。轻量、无状态、节点间无同步，实现最终一致性，延迟极低。
+
+概括来说，核心是为了**简单、高效、专注**。
+
+RocketMQ 自研轻量级 NameServer 而非使用 ZooKeeper，主要基于以下考量：
+
+1.  **简洁专用**：NameServer 设计简单，专为 RocketMQ 定制，更轻量、易部署。
+2.  **高可用性**：NameServer 无状态、对等部署，通过 DNS/VIP 实现负载均衡，避免 ZooKeeper 在强一致性下可能出现的可用性问题。
+3.  **性能优化**：无需复杂同步协议，处理更高效； ZooKeeper 写操作依赖主节点，难以扩展，而 NameServer 更适应消息队列的高频需求。
+4.  **降低依赖**：减少对外部组件的依赖，简化架构，自主掌控实现与优化。
+5.  **定制化支持**：更好满足消息队列特有的动态路由等需求，不受外部框架限制。

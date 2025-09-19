@@ -7,7 +7,10 @@ categories:
   - MQ
   - RocketMQ
 tags:
+  - 分布式
+  - 通信
   - MQ
+  - RocketMQ
 permalink: /pages/72c656c7/
 hidden: true
 index: false

@@ -9,10 +9,10 @@ categories:
   - MQ
   - Kafka
 tags:
-  - Java
-  - 中间件
-  - mq
-  - kafka
+  - 分布式
+  - 分布式通信
+  - MQ
+  - Kafka
   - 面试
 permalink: /pages/4abfcc49/
 ---

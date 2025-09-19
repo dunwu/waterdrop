@@ -6,7 +6,7 @@ categories:
   - 分布式通信
 tags:
   - 分布式
-  - 分布式通信
+  - 通信
 permalink: /pages/f2e9ac63/
 hidden: true
 index: false

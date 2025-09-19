@@ -22,7 +22,7 @@ export default navbar([
       { text: 'JavaEE', icon: 'mdi:numeric-2-box-multiple-outline', link: '02.JavaEE/' },
       { text: '软件', icon: 'mdi:numeric-3-box-multiple-outline', link: '11.软件/' },
       { text: '工具', icon: 'mdi:numeric-4-box-multiple-outline', link: '12.工具/' },
-      { text: '框架', icon: 'mdi:numeric-5-box-multiple-outline', link: '13.框架/' },
+      { text: '框架', icon: 'mdi:numeric-5-box-multiple-outline', link: '框架/' },
       { text: '中间件', icon: 'mdi:numeric-6-box-multiple-outline', link: '14.中间件/' }
     ]
   },

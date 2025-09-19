@@ -8,8 +8,10 @@ categories:
   - MQ
   - Kafka
 tags:
-  - mq
-  - kafka
+  - 分布式
+  - 通信
+  - MQ
+  - Kafka
 permalink: /pages/6469929f/
 ---
 

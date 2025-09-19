@@ -7,8 +7,8 @@ categories:
   - 分布式通信
   - MQ
 tags:
-  - Java
-  - 中间件
+  - 分布式
+  - 通信
   - MQ
 permalink: /pages/8a1e3989/
 hidden: true
