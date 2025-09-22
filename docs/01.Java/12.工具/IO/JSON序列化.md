@@ -11,7 +11,7 @@ tags:
   - IO
   - 序列化
   - JSON
-permalink: /pages/e796e770/
+permalink: /pages/88aa5a95/
 ---
 
 # Java 和 JSON 序列化

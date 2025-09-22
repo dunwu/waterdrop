@@ -445,19 +445,15 @@ Kafka 通过分区策略平衡吞吐量、延迟与稳定性。
 **Kafka 分区分配策略**
 
 - **Range（范围）**
-
   - **原理**：按分区范围顺序分配给消费者。
   - **适用场景**：分区数与消费者数接近时。
   - **优势**：实现简单，避免单消费者过载。
   - **劣势**：分区/消费者数差异大时易负载不均。
-
 - **RoundRobin（轮询）**
-
   - **原理**：均匀轮询分配分区。
   - **适用场景**：分区和消费者数量均较大的场景。
   - **优势**：负载均衡效果佳。
   - **劣势**：消费者动态变化时易触发频繁重平衡，增加延迟。
-
 - **Sticky（粘性）**
   - **原理**：优先保留原有分配，减少变动。
   - **适用场景**：消费者频繁动态调整（如扩缩容）。
@@ -546,15 +542,11 @@ ISR 是一个动态调整的集合，会不断将同步副本加入集合，将�
 **核心机制**
 
 - **多副本机制**
-
   - 每个分区（Partition）有多个副本，分布在不同的 Broker 上，确保数据冗余。
   - 副本分为 **Leader**（处理读写请求）和 **Follower**（同步数据）。
-
 - **主从架构**
-
   - 生产者和消费者仅与 Leader 副本交互。
   - 当 Leader 宕机时，从 Follower 副本中选举新 Leader，保证服务连续性。
-
 - **ZooKeeper 协调**
   - 管理集群元数据（如 Broker 状态、分区 Leader 信息）。
   - 检测 Broker 故障并触发 Leader 选举。
@@ -677,7 +669,7 @@ bin/kafka-preferred-replica-election.sh --zookeeper localhost:2181
 - **复杂需求**：优先选择 MirrorMaker 2.0 或 Confluent Replicator。
 - **核心原则**：监控延迟、保障网络稳定性、合理规划拓扑。
 
-### 【困难】ZooKeeper 在 Kafka 中的作用是什么？
+### 【困难】ZooKeeper 在 Kafka 中的作用是什么？🌟🌟
 
 ZooKeeper 在 Kafka 中扮演着**核心的协调者角色**，主要负责集群的元数据管理、Broker 协调和状态维护。
 
@@ -685,13 +677,13 @@ Zookeeper 仍是 Kafka 2.8 之前版本的"大脑"，承担关键协调职能。
 
 **Zookeeper 的核心作用**
 
-| **功能**               | **说明**                                                     |
-| ---------------------- | ------------------------------------------------------------ |
+| **功能**               | **说明**                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
 | **管理 Broker 元数据** | 维护 Broker 注册信息（在线/离线状态）；Broker 的 ID、主机名、端口等元数据；Topic/Partition 元数据 |
-| **Controller 选举**    | 通过临时节点（Ephemeral ZNode）选举集群唯一 Controller，负责分区 Leader 选举 |
-| **故障恢复**           | 监测节点故障并触发分区 Leader 重选举                         |
-| **消费者组 Offset**    | 旧版本（≤0.8）将消费者 Offset 存储在 Zookeeper，新版本改用内部 主题 `_consumer_offsets`。 |
-| **配置中心**           | 存储 Kafka 配置和拓扑信息                                    |
+| **Controller 选举**    | 通过临时节点（Ephemeral ZNode）选举集群唯一 Controller，负责分区 Leader 选举                      |
+| **故障恢复**           | 监测节点故障并触发分区 Leader 重选举                                                              |
+| **消费者组 Offset**    | 旧版本（≤0.8）将消费者 Offset 存储在 Zookeeper，新版本改用内部 主题 `_consumer_offsets`。         |
+| **配置中心**           | 存储 Kafka 配置和拓扑信息                                                                         |
 
 **Zookeeper 的局限性**
 
@@ -735,7 +727,7 @@ Kafka 的 Controller 是集群中负责管理各种元数据（如主题创建�
 1. Zookeeper 作为协调者：每个 Kafka Broker 启动时都会尝试在 Zookeeper 中创建一个特殊的节点（`/controller`）。因为这个节点使用的是 Ephemeral（临时）节点类型，当创建该节点的 Broker 宕机时，这个节点会自动删除。
 2. 竞争成为 Controller：一旦当前的 Controller 宕机，所有活着的 Broker 都会尝试在 Zookeeper 中创建 `/controller` 节点。第一个成功创建这个节点的 Broker 会成为新的 Controller，剩下的则会收到失败通知。
 3. 通知机制：新的 Controller 会在 Zookeeper 中写入它的选举结果，并通过监听机制通知所有 Broker。这些 Broker 会更新它们本地的 Controller 缓存，从而指向新的 Controller。
-4. 恢复任务：新当选的 Controller 需要快速完成集群状态的接管，包括重新分配分区副本、添加主题、调整副本同步等等。这些操作通过监听 Zookeeper 节点和操作 Kafka 内部 Topic（如\_\_consumer_offsets）完成。
+4. 恢复任务：新当选的 Controller 需要快速完成集群状态的接管，包括重新分配分区副本、添加主题、调整副本同步等等。这些操作通过监听 Zookeeper 节点和操作 Kafka 内部 Topic（如、\_\_consumer_offsets）完成。
 
 ### 【困难】Kafka 中的 Controller 是什么角色？它在集群中的作用是什么？
 
@@ -829,11 +821,9 @@ Controller 在集群中的主要作用包括：
 **优化建议**
 
 - **可靠性优先**：
-
   - 设置`acks=all`
   - 配合`min.insync.replicas=2`
   - 禁用`unclean.leader.election.enable=false`
-
 - **性能优先**：
   - 选择`acks=0`或`1`
   - 适当降低`replication.factor`（如 2）
@@ -1116,55 +1106,45 @@ producer.initTransactions();  // 初始化事务
 
 ## 事务
 
-### 【中等】Kafka 是否支持事务？如何支持事务？
-
-**Kafka 的事务概念是指一系列的生产者生产消息和消费者提交偏移量的操作在一个事务，或者说是是一个原子操作），同时成功或者失败**。
-
-消息可靠性保障，由低到高为：
-
-- 最多一次（at most once）：消息可能会丢失，但绝不会被重复发送。
-- 至少一次（at least once）：消息不会丢失，但有可能被重复发送。
-- 精确一次（exactly once）：消息不会丢失，也不会被重复发送。
-
-Kafka 支持事务功能主要是为了实现精确一次处理语义的，而精确一次处理是实现流处理的基石。
+### 【中等】Kafka 是否支持事务？如何支持事务？🌟
 
 Kafka 自 0.11 版本开始提供了对事务的支持，目前主要是在 read committed 隔离级别上做事情。它能**保证多条消息原子性地写入到目标分区，同时也能保证 Consumer 只能看到事务成功提交的消息**。
 
-**Kafka 事务机制核心要点：**
+:::info exactly once
 
-- **事务管理器（Transaction Coordinator）**：协调事务生命周期（开始/提交/中止），跟踪生产者状态。
-- **生产者（Producer）**：将多条消息绑定为一个事务，提交后生效，失败则回滚。
-- **消费者（Consumer）**：仅读取已提交事务的消息，避免中间状态数据。
-- **事务日志（Transaction Log）**：持久化记录事务状态（进行中/已提交/已中止）。
-- **两阶段提交（2PC）**
-  - **阶段 1**：生产者发送消息但不提交。
-  - **阶段 2**：事务管理器决定提交或中止，通知生产者执行。
+:::
 
-**总结**：Kafka 事务通过协调器、2PC 和日志追踪实现原子消息组，适用于需严格一致的分布式场景。
+Kafka 事务非严格意义的事务，其主要目标是为了**实现 exactly once 语义**的，确保消息在生产、传输和消费过程中不被重复处理或丢失。
 
-#### 事务型 Producer
+消息可靠性保障，由低到高为：
 
-事务型 Producer 能够保证将消息原子性地写入到多个分区中。这批消息要么全部写入成功，要么全部失败。另外，事务型 Producer 也不惧进程的重启。Producer 重启回来后，Kafka 依然保证它们发送消息的精确一次处理。
+- **最多一次（at most once）**：消息可能会丢失，但绝不会被重复发送。
+- **至少一次（at least once）**：消息不会丢失，但有可能被重复发送。
+- **精确一次（exactly once）**：消息不会丢失，也不会被重复发送。
 
-**事务属性实现前提是幂等性**，即在配置事务属性 `transaction.id` 时，必须还得配置幂等性；但是幂等性是可以独立使用的，不需要依赖事务属性。
+:::info Kafka 事务实现机制
 
-在事务属性之前先引入了生产者幂等性，它的作用为：
+:::
 
-- **生产者多次发送消息可以封装成一个原子操作**，要么都成功，要么失败。
-- consumer-transform-producer 模式下，因为消费者提交偏移量出现问题，导致**重复消费**。需要将这个模式下消费者提交偏移量操作和生产者一系列生成消息的操作封装成一个原子操作。
+- **事务协调器**
+  - 负责管理事务的整个生命周期（启动、提交、中止）。
+  - 将事务状态持久化到内部主题 `__transaction_state` 中。
+- **幂等生产者**
+  - 通过唯一的 `Producer ID (PID)` 和 `Sequence Number` 来标识和区分消息。
+  - 确保同一生产者发送的同一消息**只会被 Broker 写入一次**，避免因重试导致的消息重复。
+- **事务性消费**
+  - 消费者可配置 `isolation.level` 参数。
+  - 设置为 `read_committed` 时，消费者**只会读取已提交事务**的消息，过滤掉未提交（中止）的消息，保证最终一致性。
 
-**消费者提交偏移量导致重复消费消息的场景**：消费者在消费消息完成提交便宜量 o2 之前挂掉了（假设它最近提交的偏移量是 o1），此时执行再均衡时，其它消费者会重复消费消息 (o1 到 o2 之间的消息）。
+:::info Kafka 事务工作流程
 
-#### Kafka 事务相关配置
+:::
 
-使用 kafka 的事务 api 时的一些注意事项：
+- **Prepare**: 生产者向事务协调器发起事务，获取事务 ID。生产者在事务内发送消息，消息携带 PID 和序列号以保证幂等性。
+- **Commit/Abort**: 生产者结束事务，向协调器发送提交或中止请求。
+- **Consume**: 配置为 `read_committed` 的消费者只消费已提交的消息，实现端到端的一致性。
 
-- 需要消费者的自动模式设置为 false，并且不能子再手动的进行执行 `consumer#commitSync` 或者 `consumer#commitAsyc`
-- 设置 Producer 端参数 `transctional.id`。最好为其设置一个有意义的名字。
-- 和幂等性 Producer 一样，开启 `enable.idempotence = true`。如果配置了 `transaction.id`，则此时 `enable.idempotence` 会被设置为 true
-- 消费者需要配置事务隔离级别 `isolation.level`。在 `consume-trnasform-produce` 模式下使用事务时，必须设置为 `READ_COMMITTED`。
-  - `read_uncommitted`：这是默认值，表明 Consumer 能够读取到 Kafka 写入的任何消息，不论事务型 Producer 提交事务还是终止事务，其写入的消息都可以读取。很显然，如果你用了事务型 Producer，那么对应的 Consumer 就不要使用这个值。
-  - `read_committed`：表明 Consumer 只会读取事务型 Producer 成功提交事务写入的消息。当然了，它也能看到非事务型 Producer 写入的所有消息。
+**总结**：Kafka 通过**事务协调器、幂等生产者和事务性消费**三者协同，在消息系统内部实现了生产端的精确一次发送和消费端的事务隔离，从而达成了 Exactly-Once 语义。
 
 ### 【困难】Kafka 的事务机制与幂等性机制如何协同工作？它们在保证消息一致性上有什么作用？
 
@@ -1187,7 +1167,6 @@ Kafka 的事务机制与幂等性机制结合实现**端到端的 Exactly Once**
   ```
 
 - **幂等性实现**：
-
   - 每个生产者分配唯一** PID**，消息附带**递增序列号**。
   - Broker 通过 PID + 序列号去重，拒绝重复消息。
 
@@ -1210,15 +1189,11 @@ Kafka 通过`幂等生产`+`事务`+`精准 offset 控制`，在分布式环境�
 **核心机制**
 
 - **幂等生产者**
-
   - 通过唯一`Producer ID`和消息`序列号`实现去重
   - 确保单条消息**不重复**（网络重试场景）
-
 - **事务生产者**
-
   - 提供跨分区的原子操作（`commitTransaction`/`abortTransaction`）
   - 保证一组消息**全成功或全失败**
-
 - **消费端去重**
   - 基于`offset`管理 + 消费者组机制
   - 避免消息被重复处理
@@ -1681,10 +1656,8 @@ KStream<String, Long> stream = table.toStream();  // 输出表的更新事件
 **典型应用场景**
 
 - **电商实时统计**
-
   - **Stream**：处理用户订单事件（如 `order-created`）。
   - **Table**：维护用户总订单数（`user_id → total_orders`）。
-
 - **视频播放分析**
   - **Stream**：接收视频点击事件（`video_id, timestamp`）。
   - **Table**：存储当前视频播放量（`video_id → play_count`）。
