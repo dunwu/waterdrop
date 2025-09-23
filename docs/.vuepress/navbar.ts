@@ -19,11 +19,11 @@ export default navbar([
         link: 'JavaCore/',
         children: ['基础特性/', '高级特性/', '容器/', 'IO/', '并发/', 'JVM/', '面试/']
       },
-      { text: 'JavaEE', icon: 'mdi:numeric-2-box-multiple-outline', link: '02.JavaEE/' },
-      { text: '软件', icon: 'mdi:numeric-3-box-multiple-outline', link: '11.软件/' },
-      { text: '工具', icon: 'mdi:numeric-4-box-multiple-outline', link: '12.工具/' },
+      { text: 'JavaEE', icon: 'mdi:numeric-2-box-multiple-outline', link: 'JavaEE/' },
+      { text: '软件', icon: 'mdi:numeric-3-box-multiple-outline', link: '软件/' },
+      { text: '工具', icon: 'mdi:numeric-4-box-multiple-outline', link: '工具/' },
       { text: '框架', icon: 'mdi:numeric-5-box-multiple-outline', link: '框架/' },
-      { text: '中间件', icon: 'mdi:numeric-6-box-multiple-outline', link: '14.中间件/' }
+      { text: '中间件', icon: 'mdi:numeric-6-box-multiple-outline', link: '中间件/' }
     ]
   },
   {
@@ -72,28 +72,28 @@ export default navbar([
       {
         text: '关系型数据库',
         link: '/12.数据库/关系型数据库/',
-        children: [{ text: 'MySQL', icon: 'logos:MySQL', link: '/12.数据库/关系型数据库/MySQL/' }]
+        children: [{ text: 'MySQL', icon: 'logos:mysql', link: '/12.数据库/关系型数据库/MySQL/' }]
       },
       {
         text: '文档数据库',
         link: '/12.数据库/文档数据库/',
-        children: [{ text: 'MongoDB', icon: 'logos:MongoDB', link: '/12.数据库/文档数据库/MongoDB/' }]
+        children: [{ text: 'MongoDB', icon: 'logos:mongodb', link: '/12.数据库/文档数据库/MongoDB/' }]
       },
       {
         text: 'KV数据库',
         link: '/12.数据库/KV数据库/',
-        children: [{ text: 'Redis', icon: 'logos:Redis', link: '/12.数据库/KV数据库/Redis/' }]
+        children: [{ text: 'Redis', icon: 'logos:redis', link: '/12.数据库/KV数据库/Redis/' }]
       },
       {
         text: '列式数据库',
         link: '/12.数据库/列式数据库/',
-        children: [{ text: 'HBase', icon: 'logos:HBase', link: '/12.数据库/列式数据库/HBase/' }]
+        children: [{ text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/列式数据库/HBase/' }]
       },
       {
         text: '搜索引擎数据库',
         link: '/12.数据库/搜索引擎数据库/',
         children: [
-          { text: 'Elasticsearch', icon: 'logos:Elasticsearch', link: '/12.数据库/搜索引擎数据库/Elasticsearch/' },
+          { text: 'Elasticsearch', icon: 'logos:elasticsearch', link: '/12.数据库/搜索引擎数据库/Elasticsearch/' },
           {
             text: 'Elastic技术栈',
             icon: 'vscode-icons:file-type-Elastic',
@@ -132,7 +132,7 @@ export default navbar([
     children: [
       { text: 'Hadoop', icon: 'devicon:hadoop', link: '/16.大数据/hadoop/' },
       { text: 'Hive', icon: 'simple-icons:apachehive', link: '/16.大数据/hive/' },
-      { text: 'HBase', icon: 'logos:HBase', link: '/12.数据库/列式数据库/HBase/' },
+      { text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/列式数据库/HBase/' },
       { text: 'ZooKeeper', link: '/15.分布式/分布式协同/ZooKeeper/' },
       { text: 'Kafka', icon: 'logos:kafka-icon', link: '/15.分布式/分布式通信/MQ/Kafka/' }
     ]

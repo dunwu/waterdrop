@@ -1,5 +1,5 @@
 ---
-icon: openmoji:military-medal
+icon: logos:hbase
 title: HBase 面试
 date: 2025-03-04 10:05:51
 categories:

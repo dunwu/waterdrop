@@ -1,5 +1,5 @@
 ---
-icon: logos:Elasticsearch
+icon: logos:elasticsearch
 title: Elasticsearch 搜索（上）
 date: 2024-11-22 07:37:46
 categories:

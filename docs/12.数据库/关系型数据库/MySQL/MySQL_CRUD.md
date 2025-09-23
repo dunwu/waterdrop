@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL CRUD
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062319755.webp
 date: 2025-03-13 08:05:53

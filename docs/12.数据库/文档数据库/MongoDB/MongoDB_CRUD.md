@@ -1,5 +1,5 @@
 ---
-icon: logos:MongoDB
+icon: logos:mongodb
 title: MongoDB CRUD
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062319755.webp
 date: 2020-09-25 21:23:41

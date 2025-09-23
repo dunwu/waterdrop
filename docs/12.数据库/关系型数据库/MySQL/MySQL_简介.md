@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 简介
 cover: https://www.ovhcloud.com/sites/default/files/styles/large_screens_1x/public/2021-09/ECX-1909_Hero_MySQL_600x400%402x-1.webp
 date: 2025-03-13 08:05:53

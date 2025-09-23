@@ -23,7 +23,7 @@ index: false
 - [Dubbo 面试之服务治理](Dubbo_面试_服务治理.md)
 - [Dubbo 面试之架构](Dubbo_面试_架构.md)
 - [Dubbo 面试之应用](Dubbo_面试_应用.md)
-- [RPC 面试](RPC面试.md)
+- [RPC 面试](RPC_面试.md)
 
 ## 📚 资料
 

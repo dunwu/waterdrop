@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 数据结构
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20230901071535.png
 date: 2023-08-23 15:14:13

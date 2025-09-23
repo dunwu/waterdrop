@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 数据类型
 date: 2025-03-13 08:05:53
 categories:

@@ -1,5 +1,5 @@
 ---
-icon: logos:Elasticsearch
+icon: logos:elasticsearch
 title: Elasticsearch 简介
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202411241734774.png
 date: 2020-06-16 07:10:44

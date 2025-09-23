@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 哨兵
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202309190748787.png
 date: 2020-06-24 10:45:38

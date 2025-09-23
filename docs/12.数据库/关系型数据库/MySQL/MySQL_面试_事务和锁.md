@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 面试之事务和锁篇
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
 date: 2025-03-24 22:42:57

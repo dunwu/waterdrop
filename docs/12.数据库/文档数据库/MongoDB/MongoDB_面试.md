@@ -1,5 +1,5 @@
 ---
-icon: logos:MongoDB
+icon: logos:mongodb
 title: MongoDB 面试
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062328094.jpg
 date: 2025-03-04 21:03:08

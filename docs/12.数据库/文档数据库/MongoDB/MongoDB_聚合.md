@@ -1,5 +1,5 @@
 ---
-icon: logos:MongoDB
+icon: logos:mongodb
 title: MongoDB 聚合
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062323072.png
 date: 2020-09-21 21:22:57

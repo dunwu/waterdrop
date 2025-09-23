@@ -1,5 +1,5 @@
 ---
-icon: logos:HBase
+icon: logos:hbase
 title: HBase 命令
 date: 2020-06-02 22:28:18
 categories:

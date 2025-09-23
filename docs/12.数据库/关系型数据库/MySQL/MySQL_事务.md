@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 事务
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202310260703504.png
 date: 2020-06-03 19:32:09

@@ -1,5 +1,5 @@
 ---
-icon: logos:Elasticsearch
+icon: logos:elasticsearch
 title: Elasticsearch
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110800267.webp
 date: 2022-04-11 16:52:35

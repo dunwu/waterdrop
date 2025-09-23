@@ -1,5 +1,5 @@
 ---
-icon: logos:HBase
+icon: logos:hbase
 title: HBase Java API 高级特性之协处理器
 date: 2023-03-16 09:46:37
 categories:

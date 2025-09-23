@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 存储引擎
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503210715759.webp
 date: 2020-07-13 10:08:37

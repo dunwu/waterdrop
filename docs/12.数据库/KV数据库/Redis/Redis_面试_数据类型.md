@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 面试之数据类型篇
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
 date: 2020-07-13 17:03:42

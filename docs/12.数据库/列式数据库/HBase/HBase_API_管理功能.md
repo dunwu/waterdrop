@@ -1,5 +1,5 @@
 ---
-icon: logos:HBase
+icon: logos:hbase
 title: HBase Java API 管理功能
 date: 2023-04-13 16:36:48
 categories:

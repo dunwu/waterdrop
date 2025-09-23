@@ -1,4 +1,5 @@
 ---
+icon: simple-icons:apacherocketmq
 title: RocketMQ
 date: 2022-07-07 21:12:25
 categories:
@@ -20,8 +21,9 @@ index: false
 
 ## 📖 内容
 
-- [RocketMQ 快速入门](RocketMQ快速入门)
-- [RocketMQ 基本原理](RocketMQ基本原理)
+- [RocketMQ 快速入门](RocketMQ_快速入门.md)
+- [RocketMQ 基本原理](RocketMQ_原理.md)
+- [RocketMQ 面试](RocketMQ_面试.md) 💯
 
 ## 📚 资料
 

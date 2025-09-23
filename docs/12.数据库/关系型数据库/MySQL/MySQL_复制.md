@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 复制
 date: 2023-09-21 21:25:58
 categories:

@@ -1,5 +1,5 @@
 ---
-icon: logos:Elasticsearch
+icon: logos:elasticsearch
 title: Elasticsearch Mapping
 date: 2022-02-22 21:01:01
 categories:

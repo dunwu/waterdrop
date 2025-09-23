@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 管道
 date: 2023-09-11 22:22:31
 categories:

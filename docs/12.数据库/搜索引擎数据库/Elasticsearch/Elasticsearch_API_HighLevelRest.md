@@ -1,5 +1,5 @@
 ---
-icon: logos:Elasticsearch
+icon: logos:elasticsearch
 title: ElasticSearch API 之 HighLevelRestClient
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110759679.webp
 date: 2022-03-01 18:55:46

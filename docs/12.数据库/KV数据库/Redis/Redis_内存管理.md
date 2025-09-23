@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 过期删除和内存淘汰
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202309171630222.png
 date: 2023-08-23 15:14:13

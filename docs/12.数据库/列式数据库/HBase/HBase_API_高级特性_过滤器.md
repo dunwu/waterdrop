@@ -1,5 +1,5 @@
 ---
-icon: logos:HBase
+icon: logos:hbase
 title: HBase Java API 高级特性之过滤器
 date: 2023-03-16 09:45:10
 categories:

@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 复制
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20230914071554.png
 date: 2020-06-24 10:45:38

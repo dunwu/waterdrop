@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 锁
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202310162345947.png
 date: 2020-09-07 07:54:19

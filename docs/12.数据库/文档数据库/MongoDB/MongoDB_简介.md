@@ -1,5 +1,5 @@
 ---
-icon: logos:MongoDB
+icon: logos:mongodb
 title: MongoDB 简介
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062317588.webp
 date: 2020-09-07 07:54:19

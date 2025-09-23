@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 架构
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202410022029759.png
 date: 2020-07-16 11:14:07

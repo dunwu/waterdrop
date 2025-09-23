@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 事件
 date: 2023-09-11 22:22:32
 categories:

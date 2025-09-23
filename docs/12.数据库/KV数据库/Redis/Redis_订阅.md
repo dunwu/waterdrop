@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 发布订阅
 date: 2023-09-11 22:22:30
 categories:

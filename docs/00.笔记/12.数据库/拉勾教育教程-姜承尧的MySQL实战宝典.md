@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: 《姜承尧的 MySQL 实战宝典》笔记
 date: 2025-03-17 07:17:11
 categories:

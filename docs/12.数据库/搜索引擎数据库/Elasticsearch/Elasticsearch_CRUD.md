@@ -1,5 +1,5 @@
 ---
-icon: logos:Elasticsearch
+icon: logos:elasticsearch
 title: Elasticsearch CRUD
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062319755.webp
 date: 2020-06-16 07:10:44

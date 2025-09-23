@@ -1,5 +1,5 @@
 ---
-icon: logos:Elasticsearch
+icon: logos:elasticsearch
 title: Elasticsearch 面试
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
 date: 2020-06-16 07:10:44

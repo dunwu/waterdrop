@@ -1,5 +1,5 @@
 ---
-icon: logos:MongoDB
+icon: logos:mongodb
 title: MongoDB 分片
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062347036.avif
 date: 2020-09-20 23:12:17

@@ -1,5 +1,5 @@
 ---
-icon: logos:Elasticsearch
+icon: logos:elasticsearch
 title: Elasticsearch 文本分析
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110802917.png
 date: 2022-02-22 21:01:01

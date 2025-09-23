@@ -1,5 +1,5 @@
 ---
-icon: logos:Redis
+icon: logos:redis
 title: Redis 教程
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202411231010326.png
 date: 2020-02-10 14:27:39

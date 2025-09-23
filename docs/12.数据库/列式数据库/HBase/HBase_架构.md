@@ -1,5 +1,5 @@
 ---
-icon: logos:HBase
+icon: logos:hbase
 title: HBase 架构
 date: 2020-07-24 06:52:07
 categories:

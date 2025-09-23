@@ -1,5 +1,5 @@
 ---
-icon: logos:MongoDB
+icon: logos:mongodb
 title: 《MongoDB 权威指南》笔记二
 date: 2024-09-29 07:45:34
 categories:

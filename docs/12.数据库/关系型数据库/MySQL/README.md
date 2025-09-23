@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL
 cover: https://raw.githubusercontent.com/dunwu/images/master/202509141351123.webp
 date: 2020-02-10 14:27:39

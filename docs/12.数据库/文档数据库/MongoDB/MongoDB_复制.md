@@ -1,5 +1,5 @@
 ---
-icon: logos:MongoDB
+icon: logos:mongodb
 title: MongoDB 复制
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20200920204024.svg
 date: 2020-09-20 23:12:17

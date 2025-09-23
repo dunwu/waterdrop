@@ -29,12 +29,12 @@ dir:
 - [服务容错](服务容错.md)
 - [分布式协同面试](分布式协同面试.md) 💯
 - **ZooKeeper**
-  - [ZooKeeper 原理](ZooKeeper/ZooKeeper原理.md)
-  - [ZooKeeper Java Api](ZooKeeper/ZooKeeperJavaApi.md)
-  - [ZooKeeper 命令](ZooKeeper/ZooKeeper命令.md)
-  - [ZooKeeper 运维](ZooKeeper/ZooKeeper运维.md)
-  - [ZooKeeper Acl](ZooKeeper/ZooKeeperAcl.md)
-  - [ZooKeeper 面试](ZooKeeper/ZooKeeper面试.md) 💯
+  - [ZooKeeper 原理](ZooKeeper/ZooKeeper_原理.md)
+  - [ZooKeeper Java Api](ZooKeeper/ZooKeeper_API.md)
+  - [ZooKeeper 命令](ZooKeeper/ZooKeeper_命令.md)
+  - [ZooKeeper 运维](ZooKeeper/ZooKeeper_运维.md)
+  - [ZooKeeper Acl](ZooKeeper/ZooKeeper_ACL.md)
+  - [ZooKeeper 面试](ZooKeeper/ZooKeeper_面试.md) 💯
 
 ## 🚪 传送
 

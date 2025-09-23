@@ -1,5 +1,5 @@
 ---
-icon: logos:HBase
+icon: logos:hbase
 title: HBase 运维
 date: 2019-05-07 20:19:25
 categories:

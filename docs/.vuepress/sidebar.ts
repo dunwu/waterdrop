@@ -94,7 +94,7 @@ export default sidebar({
         },
         {
           text: 'HBase',
-          icon: 'logos:HBase',
+          icon: 'logos:hbase',
           prefix: '12.数据库/列式数据库/HBase/',
           collapsible: true,
           children: 'structure'

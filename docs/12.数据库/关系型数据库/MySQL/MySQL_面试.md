@@ -1,5 +1,5 @@
 ---
-icon: logos:MySQL
+icon: logos:mysql
 title: MySQL 面试
 cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
 date: 2020-09-12 10:43:53
