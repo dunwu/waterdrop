@@ -1,4 +1,5 @@
 ---
+icon: logos:git-icon
 title: 如何优雅的玩转 Git
 date: 2019-03-09 00:25:13
 order: 01
@@ -132,13 +133,13 @@ Git Flow 工作流程
 
 #### 2.2. `feature` 分支
 
-这个分支主要是用来开发一个新的功能，一旦开发完成，我们合并回 develop 分支进入下一个 release。feature 分支开发结束后，必须合并回 develop 分支, 合并完分支后一般会删点这个 feature 分支，但是我们也可以保留。
+这个分支主要是用来开发一个新的功能，一旦开发完成，我们合并回 develop 分支进入下一个 release。feature 分支开发结束后，必须合并回 develop 分支，合并完分支后一般会删点这个 feature 分支，但是我们也可以保留。
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419114042.png)
 
 #### 2.3. **`release` 分支**
 
-release 分支基于 develop 分支创建，创建后，我们可以在这个 release 分支上进行测试，修复 Bug 等工作。同时，其它开发人员可以基于它开发新的 feature (记住：一旦创建了 release 分支之后不要从 develop 分支上合并新的改动到 release 分支)。
+release 分支基于 develop 分支创建，创建后，我们可以在这个 release 分支上进行测试，修复 Bug 等工作。同时，其它开发人员可以基于它开发新的 feature （记住：一旦创建了 release 分支之后不要从 develop 分支上合并新的改动到 release 分支）。
 
 发布 release 分支时，合并 release 到 master 和 develop， 同时在 master 分支上打个 Tag 记住 release 版本号，然后可以删除 release 分支了。
 
@@ -202,8 +203,8 @@ Commit message 的作用还不仅仅是理解历史信息，它的主要作用�
 
 它主要有以下组成部分：
 
-- 标题行：必填, 描述主要修改类型和内容
-- 主题内容：描述为什么修改, 做了什么样的修改, 以及开发的思路等等
+- 标题行：必填，描述主要修改类型和内容
+- 主题内容：描述为什么修改，做了什么样的修改，以及开发的思路等等
 - 页脚注释：放 Breaking Changes 或 Closed Issues
 
 常用的修改项
@@ -213,13 +214,13 @@ Commit message 的作用还不仅仅是理解历史信息，它的主要作用�
 - `fix`：修改问题
 - `refactor`：代码重构
 - `docs`：文档修改
-- `style`：代码格式修改, 注意不是 css 修改
+- `style`：代码格式修改，注意不是 css 修改
 - `test`：测试用例修改
-- `chore`：其他修改, 比如构建流程, 依赖管理.
-- `scope`：commit 影响的范围, 比如：route, component, utils, build...
+- `chore`：其他修改，比如构建流程，依赖管理。
+- `scope`：commit 影响的范围，比如：route, component, utils, build...
 - `subject`：commit 的概述
-- `body`：commit 具体修改内容, 可以分为多行
-- `footer`：一些备注, 通常是 BREAKING CHANGE 或修复的 bug 的链接
+- `body`：commit 具体修改内容，可以分为多行
+- `footer`：一些备注，通常是 BREAKING CHANGE 或修复的 bug 的链接
 
 ### Git Commit Template
 
@@ -560,7 +561,7 @@ npm i -D husky
   - [firstaidgit.io](http://firstaidgit.io/) 一个可搜索的最常被问到的 Git 的问题
   - [git-extra-commands](https://github.com/unixorn/git-extra-commands) - 一堆有用的额外的 Git 脚本
   - [git-extras](https://github.com/tj/git-extras) - GIT 工具集 -- repo summary, repl, changelog population, author commit percentages and more
-  - [git-fire](https://github.com/qw3rtman/git-fire) - git-fire 是一个 Git 插件，用于帮助在紧急情况下添加所有当前文件, 做提交(committing), 和推(push)到一个新分支(阻止合并冲突)。
+  - [git-fire](https://github.com/qw3rtman/git-fire) - git-fire 是一个 Git 插件，用于帮助在紧急情况下添加所有当前文件，做提交 (committing), 和推 (push) 到一个新分支（阻止合并冲突）。
   - [git-tips](https://github.com/git-tips/tips) - Git 小提示
   - [git-town](https://github.com/Originate/git-town) - 通用，高级 Git 工作流支持！
 - **GUI 客户端**
@@ -569,6 +570,6 @@ npm i -D husky
   - [GitUp](https://github.com/git-up/GitUp) - 一个新的 Git 客户端，在处理 Git 的复杂性上有自己的特点
   - [gitx-dev](https://rowanj.github.io/gitx/) - 图形化的 Git 客户端 OS X
   - [Source Tree](https://www.sourcetreeapp.com/) - 免费的图形化 Git 客户端 Windows & OS X
-  - [Tower](http://www.git-tower.com/) - 图形化 Git 客户端 OS X(付费)
+  - [Tower](http://www.git-tower.com/) - 图形化 Git 客户端 OS X（付费）
 - **git cheat sheet**
   - [github-git-cheat-sheet](https://services.github.com/on-demand/downloads/github-git-cheat-sheet.pdf)

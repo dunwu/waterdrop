@@ -6,7 +6,7 @@ categories:
   - DevOps
 tags:
   - DevOps
-permalink: /pages/ddd5c1ca/
+permalink: /pages/cdda78f5/
 ---
 
 # DevOps 简介

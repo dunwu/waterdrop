@@ -12,7 +12,7 @@ index: false
 
 # 面试
 
-## JavaCore 面试
+## JavaCore
 
 - [Java 基础面试一](../01.Java/JavaCore/面试/Java_面试_基础（一）.md) 💯
 - [Java 基础面试二](../01.Java/JavaCore/面试/Java_面试_基础（二）.md) 💯
@@ -26,7 +26,7 @@ index: false
 - [Java 虚拟机面试一](../01.Java/JavaCore/面试/Java_面试_虚拟机（一）.md) 💯
 - [Java 虚拟机面试二](../01.Java/JavaCore/面试/Java_面试_虚拟机（二）.md) 💯
 
-## Java 框架面试
+## Java 框架
 
 - [Spring 面试](../01.Java/框架/Spring/Spring面试.md) 💯
 - [SpringBoot 面试](../01.Java/框架/Spring/SpringBoot面试.md) 💯
@@ -34,7 +34,7 @@ index: false
 - [MyBatis 面试](../01.Java/框架/ORM/MyBatis面试.md) 💯
 - [Netty 面试](../01.Java/框架/IO/Netty面试.md) 💯
 
-## 数据库面试
+## 数据库
 
 - [MySQL 面试](../12.数据库/关系型数据库/MySQL/MySQL_面试.md) 💯
 - [MySQL 面试之索引篇](../12.数据库/关系型数据库/MySQL/MySQL_面试_索引.md) 💯
@@ -46,7 +46,7 @@ index: false
 - [MongoDB 面试](../12.数据库/文档数据库/MongoDB/MongoDB_面试.md) 💯
 - [HBase 面试](../12.数据库/列式数据库/HBase/HBase_面试.md) 💯
 
-## 分布式面试
+## 分布式
 
 - [分布式理论面试](../15.分布式/分布式理论/分布式理论面试.md) 💯
 - [分布式协同面试](../15.分布式/分布式协同/分布式协同面试.md) 💯
@@ -60,6 +60,23 @@ index: false
 - [Kafka 面试](../15.分布式/分布式通信/MQ/Kafka/Kafka_面试.md) 💯
 - [RocketMQ 面试](../15.分布式/分布式通信/MQ/RocketMQ/RocketMQ_面试.md) 💯
 - [分布式存储面试](../15.分布式/分布式存储/分布式存储面试.md) 💯
+
+## 设计
+
+- [设计面试](../03.设计/设计面试.md) 💯
+- [设计模式面试](../03.设计/设计模式/设计模式面试.md) 💯
+
+## 计算机基础
+
+- [计算机网络面试](../13.网络/计算机网络面试.md) 💯
+- [操作系统面试](../14.操作系统/操作系统面试.md) 💯
+
+## DevOps
+
+- [DevOps 面试](../04.DevOps/DevOps_面试.md) 💯
+- [Docker 面试](../04.DevOps/工具/Docker/Docker_面试.md) 💯
+- [Kubernetes 面试](../04.DevOps/工具/Kubernetes/K8S_面试.md) 💯
+- [Nginx 面试](../04.DevOps/工具/Nginx/Nginx_面试.md) 💯
 
 ## 📚 资料
 

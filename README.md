@@ -683,7 +683,7 @@
   - [如何优雅的玩转 Git](docs/04.DevOps/工具/Git/如何优雅的玩转Git.md)
   - [Git 帮助手册](docs/04.DevOps/工具/Git/Git帮助手册.md)
 - 其他
-  - [正则表达式极简教程](docs/04.DevOps/工具/其他/正则md)
+  - [正则表达式极简教程](docs/04.DevOps/工具/其他/正则.md)
 
 ## 工作
 

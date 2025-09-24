@@ -267,7 +267,7 @@ public class PipedStreamDemo {
 
 **ObjectInputStream 和 ObjectOutputStream 是对象输入输出流，一般用于对象序列化。**
 
-这里不展开叙述，想了解详细内容和示例可以参考：[Java 序列化](03.Java 序列化。md)
+这里不展开叙述，想了解详细内容和示例可以参考：[Java 序列化](Java_IO_序列化.md)
 
 #### 数据操作流
 

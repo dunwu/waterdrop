@@ -35,6 +35,21 @@ index: false
 - [Kafka 运维](Kafka_运维.md)
 - [Kafka 面试](Kafka_面试.md) 💯
 
+## 📚 资料
+
+- **官方**
+  - [Kafka 官网](http://kafka.apache.org/)
+  - [Kafka Github](https://github.com/apache/kafka)
+  - [Kafka 官方文档](https://kafka.apache.org/documentation/)
+- **书籍**
+  - [《Kafka 权威指南》](https://book.douban.com/subject/27665114/)
+- **教程**
+  - [Kafka 中文文档](https://github.com/apachecn/kafka-doc-zh)
+  - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/100029201)
+- **文章**
+  - [Thorough Introduction to Apache Kafka](https://hackernoon.com/thorough-introduction-to-apache-kafka-6fbf2989bbc1)
+  - [Kafka(03) Kafka 介绍](http://www.heartthinkdo.com/?p=2006#233)
+
 ## 🚪 传送
 
 ◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾

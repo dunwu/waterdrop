@@ -1,5 +1,6 @@
 ---
-title: README
+icon: logos:git-icon
+title: Git
 date: 2022-04-27 19:47:18
 categories:
   - DevOps
@@ -13,9 +14,9 @@ hidden: true
 index: false
 ---
 
-# Git 教程
+# Git
 
-![git脑图](https://raw.githubusercontent.com/dunwu/images/master/cs/web/git/git-summary.png)
+![git 脑图](https://raw.githubusercontent.com/dunwu/images/master/cs/web/git/git-summary.png)
 
 ## 📖 内容
 
@@ -27,6 +28,7 @@ index: false
 - **官方资源**
   - [Git 官网](https://git-scm.com/)
   - [Git Github](https://github.com/git/git)
+  - [Github 官方教程](https://guides.github.com/)
 - **模板**
   - [gitignore 模板](https://github.com/github/gitignore) - .gitignore 文件模板
   - [gitattributes 模板](https://github.com/alexkaratarakis/gitattributes) - .gitattributes 文件模板
@@ -44,6 +46,7 @@ index: false
   - [Git 奇技淫巧](https://github.com/521xueweihan/git-tips)
   - [Git 风格指南](https://github.com/aseaday/git-style-guide)
   - [Git 在团队中的最佳实践--如何正确使用 Git Flow](http://www.cnblogs.com/cnblogsfans/p/5075073.html)
+  - [Commit message 和 Change log 编写指南](http://www.ruanyifeng.com/blog/2016/01/commit_message_change_log.html)
 - **Git 工具**
   - [guis](https://git-scm.com/downloads/guis) - Git 官网展示的客户端工具列表。
   - [gogs](https://github.com/gogits/gogs) - 极易搭建的自助 Git 服务。
@@ -51,7 +54,7 @@ index: false
   - [firstaidgit.io](http://firstaidgit.io/) 一个可搜索的最常被问到的 Git 的问题
   - [git-extra-commands](https://github.com/unixorn/git-extra-commands) - 一堆有用的额外的 Git 脚本
   - [git-extras](https://github.com/tj/git-extras) - GIT 工具集 -- repo summary, repl, changelog population, author commit percentages and more
-  - [git-fire](https://github.com/qw3rtman/git-fire) - git-fire 是一个 Git 插件，用于帮助在紧急情况下添加所有当前文件, 做提交(committing), 和推(push)到一个新分支(阻止合并冲突)。
+  - [git-fire](https://github.com/qw3rtman/git-fire) - git-fire 是一个 Git 插件，用于帮助在紧急情况下添加所有当前文件，做提交 (committing), 和推 (push) 到一个新分支（阻止合并冲突）。
   - [git-tips](https://github.com/git-tips/tips) - Git 小提示
   - [git-town](https://github.com/Originate/git-town) - 通用，高级 Git 工作流支持！
 - **GUI 客户端**
@@ -60,7 +63,7 @@ index: false
   - [GitUp](https://github.com/git-up/GitUp) - 一个新的 Git 客户端，在处理 Git 的复杂性上有自己的特点
   - [gitx-dev](https://rowanj.github.io/gitx/) - 图形化的 Git 客户端 OS X
   - [Source Tree](https://www.sourcetreeapp.com/) - 免费的图形化 Git 客户端 Windows & OS X
-  - [Tower](http://www.git-tower.com/) - 图形化 Git 客户端 OS X(付费)
+  - [Tower](http://www.git-tower.com/) - 图形化 Git 客户端 OS X（付费）
 - **git cheat sheet**
   - [github-git-cheat-sheet](https://services.github.com/on-demand/downloads/github-git-cheat-sheet.pdf)
 

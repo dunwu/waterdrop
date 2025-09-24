@@ -21,45 +21,62 @@ permalink: /pages/d8357cc5/
 
 ## Kafka 简介
 
-### 【简单】Kafka 是什么？
+### 【简单】Kafka 是什么？🌟
 
-**Apache Kafka 是一款开源的消息引擎系统，也是一个分布式流计算平台，此外，还可以作为数据存储**。
+**Kafka 是一个开源分布式事件流平台**。最初由 LinkedIn 开发，现在是 Apache 顶级项目。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070719480.gif)
+**Kafka 的优势**
 
-### 【简单】Kafka 有哪些应用场景？
+- 支持多个 Producer 并发写消息
+- 支持多个 Consumer 并发读消息
+- 持久化
+- 易扩展
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070719480.gif)
+
+### 【简单】Kafka 有哪些应用场景？🌟
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202505111027731.webp)
 
 - **消息队列**：用作高吞吐量的消息系统，将消息从一个系统传递到另一个系统
-- **日志收集**：集中收集日志数据，然后通过 Kafka 传递到实时监控系统或存储系统
-- **流计算**：处理实时数据流，将数据传递给实时计算系统，如 Apache Storm 或 Apache Flink
+- **日志采集分析**：集中收集日志数据，然后通过 Kafka 传递到实时监控系统或存储系统
+- **流计算**：处理实时数据流，将数据传递给实时计算系统，如 Apache Storm 或 Apache Flink，这些实时计算可用于推荐、系统监控
 - **指标收集和监控**：收集来自不同服务的监控指标，统一存储和处理
 - **事件溯源**：记录事件发生的历史，以便稍后进行数据回溯或重新处理
 
-### 【简单】Kafka 有哪些核心术语？
+### 【简单】Kafka 有哪些核心术语？🌟
 
 Kafka 的核心术语如下：
 
-- **消息** - Record。Kafka 是消息引擎嘛，这里的消息就是指 Kafka 处理的主要对象。
-- **主题** - Topic。主题是承载消息的逻辑容器，在实际使用中多用来区分具体的业务。
-- **分区** - Partition。一个有序不变的消息序列。每个主题下可以有多个分区。
-- **消息位移** - Offset。表示分区中每条消息的位置信息，是一个单调递增且不变的值。
-- **副本** - Replica。Kafka 中同一条消息能够被拷贝到多个地方以提供数据冗余，这些地方就是所谓的副本。副本还分为领导者副本和追随者副本，各自有不同的角色划分。副本是在分区层级下的，即每个分区可配置多个副本实现高可用。
-- **生产者** - Producer。向主题发布新消息的应用程序。
-- **消费者** - Consumer。从主题订阅新消息的应用程序。
-- **消费者位移** - Consumer Offset。表征消费者消费进度，每个消费者都有自己的消费者位移。
-- **消费者组** - Consumer Group。多个消费者实例共同组成的一个组，同时消费多个分区以实现高吞吐。
-- **分区再均衡** - Rebalance。消费者组内某个消费者实例挂掉后，其他消费者实例自动重新分配订阅主题分区的过程。Rebalance 是 Kafka 消费者端实现高可用的重要手段。
+- **消息（Message）**：Kafka 的基本数据单元。
+- **主题（Topic）**：消息的逻辑分类容器，按业务划分。
+- **分区（Partition）**：主题的物理分片，每个分区是**有序不可变**的消息序列。**这是实现高并发和扩展性的核心**。
+- **消息偏移量（Offset）**：消息在分区中的唯一、递增的 ID。
+- **副本（Replica）**：分区的备份，提供故障转移。
+  - **领导者副本**：处理所有读写请求。
+  - **追随者副本**：异步复制领导者数据，作为备份。
+- **生产者（Producer）**：向主题的特定分区发布消息。
+- **消费者（Consumer）**：从分区订阅并消费消息。
+- **消费者组（Consumer Group）**：由多个消费者组成，**一个分区只能被组内一个消费者消费**，从而实现横向扩展和负载均衡。
 
-## Kafka 存储
+- **消费者偏移量（Consumer Offset）**：消费者组对每个分区的消费进度记录。
+- **分区再均衡（Rebalance）**：当消费者组内成员发生变更时，自动重新分配分区所有权的流程，**是保证消费端高可用的核心机制**。
 
-### 【中等】Kafka 是如何存储数据的？
+## 存储
+
+### 【中等】Kafka 是如何存储数据的？🌟🌟
 
 ::: tip 关键点
 
 - **逻辑存储**：Topic -> Partition -> Record
-- **物理存储**：Log（对应 Partition） -> LogSegment（`<offset>.log`、.`<offset>.index`、`<offset>.timeindex`、`<offset>.txnindex`）
+- **物理存储**：Log（对应 Partition） -> LogSegment
+  - Segment 文件分类
+    - 索引文件
+      - 偏移量索引文件（ `<offset>.index` ）
+      - 时间戳索引文件（ `<offset>.timeindex` ）
+      - 已终止事务的索引文件（`<offset>.txnindex`）
+    - 日志数据文件（`<offset>.log`）
+  - 默认，每个 Segment 大小不超过 1G，且只包含 7 天的数据
 
 :::
 
@@ -86,7 +103,7 @@ Partiton 命名规则为 Topic 名称 + 有序序号，第一个 Partiton 序号
 
 `Log` 是 Kafka 用于表示日志文件的组件。每个 Partiton 对应一个 `Log` 对象，在物理磁盘上则对应一个目录。如：创建一个双分区的主题 `test`，那么，Kafka 会在磁盘上创建两个子目录：`test-0` 和 `test-1`；而在服务器端，这就对应两个 `Log` 对象。
 
-因为在一个大文件中查找和删除消息是非常耗时且容易出错的。所以，Kafka 将每个 Partition 切割成若干个片段，即日志段（Log Segment）。**默认每个 Segment 大小不超过 1G，且只包含 7 天的数据**。如果 Segment 的消息量达到 1G，那么该 Segment 会关闭，同时打开一个新的 Segment 进行写入。
+因为在一个大文件中查找和删除消息是非常耗时且容易出错的。所以，Kafka 将每个 Partition 切割成若干个片段，即日志段（Log Segment）。**默认，每个 Segment 大小不超过 1G，且只包含 7 天的数据**。如果 Segment 的消息量达到 1G，那么该 Segment 会关闭，同时打开一个新的 Segment 进行写入。
 
 Broker 会为 Partition 里的每个 Segment 打开一个文件句柄（包括不活跃的 Segment），因此打开的文件句柄数通常会比较多，这个需要适度调整系统的进程文件句柄参数。**正在写入的分片称为活跃片段（active segment），活跃片段永远不会被删除**。
 
@@ -96,11 +113,28 @@ Segment 文件命名规则：Partition 全局的第一个 segment 从 0 开始�
 
 Segment 文件可以分为两类：
 
-- 索引文件
-  - 偏移量索引文件（ `.index` ）
-  - 时间戳索引文件（ `.timeindex` ）
-  - 已终止事务的索引文件（`.txnindex`）：如果没有使用 Kafka 事务，则不会创建该文件
-- 日志数据文件（`.log`）
+- **索引文件**
+  - **偏移量索引文件（ `<offset>.index` ）**
+  - **时间戳索引文件（ `<offset>.timeindex` ）**
+  - **已终止事务的索引文件（`<offset>.txnindex`）**：如果没有使用 Kafka 事务，则不会创建该文件
+- **日志数据文件（`<offset>.log`）**
+
+### 【中等】Kafka 如何持久化？
+
+::: tip 关键点
+
+Kafka 持久化关键机制：**顺序 I/O + 零拷贝 + PageCache**
+
+:::
+
+Kafka 持久化有以下核心机制：
+
+- **顺序 I/O**：**Kafka 数据以日志形式存储于磁盘**。采用**追加写入，不可修改**，以此避免在磁盘上随机写入性能不高的问题。
+- **零拷贝**：数据从磁盘直接发送到网卡，**绕过应用程序**，极大提升网络传输效率，降低CPU开销。
+- **页缓存**：直接利用**操作系统内存**缓存数据，使读写速度接近内存速度。
+- **日志清理**：通过**保留策略**（基于时间或大小）自动清理旧数据，防止磁盘耗尽。
+- **分段存储**：日志被切分为多个**日志段文件**，便于管理和清理。
+- **多索引**：为日志段建立“位移->物理位置”的**部分索引**，实现 **快速定位 + 顺序扫描** 的高效读取。
 
 ### 【困难】Kafka 如何检索数据？
 
@@ -132,13 +166,13 @@ Segment 文件可以分为两类：
 - **干净段**：这部分消息之前已经被清理过，每个键只存在一个值。
 - **污浊段**：在上一次清理后写入的新消息。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621135557.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621135557.png)
 
 如果 Kafka 启用了清理功能（通过 `log.cleaner.enabled` 配置），每个 Broker 启动清理管理线程 + N 个清理线程（按分区分配）
 
 对于一个段，清理前后的效果如下：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621140117.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621140117.png)
 
 Apache Kafka 清理数据主要通过 **日志保留策略（Log Retention）** 和 **压缩策略（Compaction）** 实现，以下是核心要点概括：
 
@@ -175,7 +209,7 @@ Apache Kafka 清理数据主要通过 **日志保留策略（Log Retention）** 
 - **压缩与保留策略冲突**：若同时设置`cleanup.policy=compact,delete`，压缩优先于时间/大小删除。
 - **消费者偏移量影响**：删除旧数据可能导致消费者无法回溯（需调整`offsets.retention.minutes`）。
 
-## 生产者和消费者
+## 生产和消费
 
 ### 【中等】Kafka 发送消息的工作流程是怎样的？
 
@@ -204,14 +238,14 @@ Kafka 生产者用一个 `ProducerRecord` 对象来抽象一条要发送的消�
 - 如果**成功**，则返回一个 `RecordMetaData` 对象，它包含了主题、分区、偏移量；
 - 如果**失败**，则返回一个错误。生产者在收到错误后，可以进行重试，重试次数可以在配置中指定。失败一定次数后，就返回错误消息。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200528224323.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200528224323.png)
 
 生产者向 Broker 发送消息时是怎么确定向哪一个 Broker 发送消息？
 
 - 生产者会向任意 broker 发送一个元数据请求（`MetadataRequest`），获取到每一个分区对应的 Leader 信息，并缓存到本地。
 - 生产者在发送消息时，会指定 Partition 或者通过 key 得到到一个 Partition，然后根据 Partition 从缓存中获取相应的 Leader 信息。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113043.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113043.png)
 
 ### 【简单】Kafka 为什么要支持消费者群组？
 
@@ -229,7 +263,7 @@ Kafka 生产者用一个 `ProducerRecord` 对象来抽象一条要发送的消�
 
 **一条消息只有被提交，才会被消费者获取到**。如下图，只能消费 Message0、Message1、Message2：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113917.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113917.png)
 
 #### 消费者群组
 
@@ -272,27 +306,37 @@ Kafka 消费者通过 `pull` 模式来获取消息，但是获取消息时并不
 
 ## 集群
 
-### 【中等】什么是分区？为什么要分区？
+### 【中等】什么是 Kafka 分区？Kafka 分区有什么用？🌟🌟
 
 ::: tip 关键点
 
-**分区的作用就是提供负载均衡的能力**，以实现系统的高伸缩性（Scalability）。
+**分区是Kafka 高性能（吞吐量）、高可用和易扩展的基石。它通过数据分片实现了并行处理，是Kafka性能的关键。**
+
+:::
+
+::: info 什么是 Kafka 分区？
 
 :::
 
 Kafka 的数据结构采用三级结构，即：主题（Topic）、分区（Partition）、消息（Record）。
 
-在 Kafka 中，任意一个 Topic 维护了一组 Partition 日志，如下所示：
+分区是将一个主题（Topic）在物理上分割成的多个**有序、不可变的消息序列**。每个分区都是一个独立的日志文件。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/distributed/mq/kafka/kafka-log-anatomy.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/distributed/mq/kafka/kafka-log-anatomy.png)
 
-每个 Partition 都是一个单调递增的、不可变的日志记录，以不断追加的方式写入数据。Partition 中的每条记录会被分配一个单调递增的 id 号，称为偏移量（Offset），用于唯一标识 Partition 内的每条记录。
+::: info Kafka 分区有什么用？
 
-为什么 Kafka 的数据结构采用三级结构？
+:::
 
-**分区的作用就是提供负载均衡的能力**，以实现系统的高伸缩性（Scalability）。
-
-不同的分区能够被放置到不同节点的机器上，而数据的读写操作也都是针对分区这个粒度而进行的，这样每个节点的机器都能独立地执行各自分区的读写请求处理。并且，我们还可以通过添加新的机器节点来增加整体系统的吞吐量。
+- **高性能**：**提升并发和吞吐能力（最核心）**
+  - **写并行**：生产者可同时向多个分区写入数据。
+  - **读并行**：消费者组内不同消费者可**同时消费不同分区**。
+  - **要点**：一个分区只能被组内一个消费者消费。因此，**分区数决定了Topic的最大并行消费能力**。
+- **易扩展**：分区可以分散在集群的不同服务器上，通过增加机器和分区数即可轻松扩展系统容量和性能。
+- **高可用**：Kafka 副本机制以分区为单元。每个分区的多个副本分散在不同机器上，Leader 副本故障时能快速切换，保证服务不中断。
+- **消息有序**
+  - Kafka **仅保证同一分区内消息的顺序性**。
+  - 通过为消息指定**Key**，可将需顺序处理的消息（如同一用户的操作）发送到同一分区，从而保持其顺序。
 
 ### 【中等】Kafka 的分区策略是怎样的？
 
@@ -834,7 +878,7 @@ Controller 在集群中的主要作用包括：
 - 高`acks`值会增加网络和存储压力
 - 新版 Kafka 优化了高可靠性配置的性能表现
 
-### 【困难】如何保证 Kafka 消息不丢失？
+### 【困难】如何保证 Kafka 消息不丢失？🌟🌟🌟
 
 如何保证消息的可靠性传输，或者说，如何保证消息不丢失？这对于任何 MQ 都是核心问题。
 
@@ -931,7 +975,7 @@ Kafka 有三种发送方式：同步、异步、异步回调。同步方式能�
 
 消费者唯一要做的是确保哪些消息是已经读取过的，哪些是没有读取过的（通过提交偏移量给 Broker 来确认）。如果消费者提交了偏移量却未能处理完消息，那么就有可能造成消息丢失，这也是消费者丢失消息的主要原因。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200727140159.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200727140159.png)
 
 消费者的可靠性配置：
 
@@ -957,7 +1001,7 @@ Kafka 有三种发送方式：同步、异步、异步回调。同步方式能�
   - 写 Redis：set 操作天然具有幂等性
   - 复杂的逻辑处理，则可以在消息中加入全局 ID
 
-### 【困难】如何保证 Kafka 消息不重复？
+### 【困难】如何保证 Kafka 消息不重复？🌟🌟🌟
 
 在 MQTT 协议中，给出了三种传递消息时能够提供的服务质量标准，这三种服务质量从低到高依次是：
 
@@ -984,7 +1028,7 @@ Kafka 有三种发送方式：同步、异步、异步回调。同步方式能�
   - 设计天然幂等操作（如订单状态更新："SET status=paid"）。
   - _优势_：高性能；_挑战_：需深度理解业务。
 
-### 【困难】如何保证 Kafka 消息有序？
+### 【困难】如何保证 Kafka 消息有序？🌟🌟🌟
 
 **对消息有序有要求的场景**
 
@@ -1033,7 +1077,7 @@ Kafka 提供了**有限度的顺序性保证**，具体来说：
   - min.insync.replicas：确保最小同步副本数，以提高消息的可靠性和顺序性保障。
   - acks 设置：生产者的 acks 设置为 'all'（或 -1），确保所有副本已接收到消息再进行确认，保障消息顺序和持久性。
 
-### 【困难】如何应对 Kafka 消息积压？
+### 【困难】如何应对 Kafka 消息积压？🌟🌟🌟
 
 - **紧急处理**
   - 增加消费者实例（不超过分区数）
@@ -1212,22 +1256,130 @@ Kafka 通过`幂等生产`+`事务`+`精准 offset 控制`，在分布式环境�
 - **Kafka Streams**：利用状态存储和检查点机制实现流处理 Exactly Once
 - **消费者组**：`enable.auto.commit=false`时需手动提交 offset 以精准控制消费
 
+## Stream
+
+### 【困难】Kafka 与 Flink 的集成是如何实现的？如何优化 Flink 与 Kafka 之间的数据流动？
+
+实现 **高吞吐、低延迟、强一致性** 的流式数据处理管道。
+
+**基础集成步骤**
+
+- **添加依赖**：引入 `flink-connector-kafka`（匹配 Kafka 版本）。
+- **配置 Source**：通过 `FlinkKafkaConsumer` 订阅 Kafka Topic。
+- **配置 Sink**：通过 `FlinkKafkaProducer` 写入结果到 Kafka。
+- **设计作业**：在 Flink 中实现数据处理逻辑（过滤/转换/聚合）。
+
+**性能优化方向**
+
+| **优化项**   | **关键措施**                                                                |
+| ------------ | --------------------------------------------------------------------------- |
+| **参数调优** | - 调整 `batch.size`/`linger.ms`（生产者）<br>- 设置合理并行度（Flink 任务） |
+| **资源分配** | - 平衡 Flink TaskManager 的 CPU/内存<br>- 确保 Kafka Broker 带宽充足        |
+| **容错机制** | - 启用 Flink Checkpointing（精确一次语义）<br>- 配置 Kafka 幂等性/事务      |
+| **数据压缩** | 选用高效压缩算法（如 `lz4`/`snappy`），减少网络传输压力                     |
+
+**关键代码示例**
+
+```java
+// Kafka Source
+Properties props = new Properties();
+props.setProperty("bootstrap.servers", "kafka:9092");
+props.setProperty("group.id", "flink-group");
+
+FlinkKafkaConsumer<String> source = new FlinkKafkaConsumer<>(
+    "input-topic",
+    new SimpleStringSchema(),
+    props
+);
+
+// Kafka Sink
+FlinkKafkaProducer<String> sink = new FlinkKafkaProducer<>(
+    "output-topic",
+    new SimpleStringSchema(),
+    props
+);
+
+// 作业流程
+env.addSource(source)
+   .map(...)  // 数据处理
+   .addSink(sink);
+```
+
+**高级特性**
+
+- **动态发现分区**：`setStartFromLatest()`/`setStartFromEarliest()`。
+- **水位线生成**：结合 `assignTimestampsAndWatermarks` 处理事件时间。
+- **Exactly-Once 保障**：启用 Kafka 事务（需配置 `transaction.timeout.ms`）。
+
+### 【困难】Kafka 的 Stream 和 Table 是如何相互转换的？它们在 Kafka Streams 中的应用场景是什么？
+
+通过 **流表转换 + 状态管理**，实现实时计算与状态维护的统一处理。
+
+**核心概念对比**
+
+| **抽象类型** | **特点**                           | **适用场景**                             |
+| ------------ | ---------------------------------- | ---------------------------------------- |
+| **Stream**   | 无界、有序的键值记录流（事件日志） | 实时分析、事件监控（如点击流、交易记录） |
+| **Table**    | 有状态的键值快照（当前数据视图）   | 状态维护（如用户配置、库存数量）         |
+
+**相互转换操作**
+
+**(1) Stream → Table**
+
+通过 **聚合操作** 将动态流转换为状态表：
+
+```java
+KStream<String, Long> stream = builder.stream("input-topic");
+
+// 按 Key 分组并累加值
+KTable<String, Long> table = stream
+    .groupByKey()
+    .aggregate(
+        () -> 0L,  // 初始值
+        (key, newValue, agg) -> agg + newValue,  // 累加逻辑
+        Materialized.as("count-store")  // 状态存储
+    );
+```
+
+**(2) Table → Stream**
+
+通过 **toStream()** 将表变更作为流输出：
+
+```java
+KTable<String, Long> table = builder.table("input-topic");
+KStream<String, Long> stream = table.toStream();  // 输出表的更新事件
+```
+
+**典型应用场景**
+
+- **电商实时统计**
+  - **Stream**：处理用户订单事件（如 `order-created`）。
+  - **Table**：维护用户总订单数（`user_id → total_orders`）。
+- **视频播放分析**
+  - **Stream**：接收视频点击事件（`video_id, timestamp`）。
+  - **Table**：存储当前视频播放量（`video_id → play_count`）。
+
+**关键设计思想**
+
+- **流表二元性**：
+  - Stream 是 Table 的变更日志（Changelog）。
+  - Table 是 Stream 的物化视图（Materialized View）。
+- **状态管理**：Table 依赖 **RocksDB 状态存储**，支持容错与高效查询。
+
 ## 架构
 
-### 【简单】Kafka 的基本架构包括哪些组件？各组件的作用是什么？
+### 【简单】Kafka 有哪些核心组件？
 
-Kafka 通过组件分工+副本机制保障高可用，结合批量/压缩/手动提交等优化手段实现高性能。新版本推荐使用 KRaft 模式简化架构。
+Kafka 有以下核心组件：
 
-**核心组件**
+| 组件          | 核心功能                                                                  |
+| ------------- | ------------------------------------------------------------------------- |
+| **Producer**  | 发布数据到 Topic，支持轮询/键值/自定义分区策略，采用批量压缩提升吞吐      |
+| **Consumer**  | 通过消费组实现负载均衡，单分区仅限组内一个消费者，通过 offset 确保顺序    |
+| **Broker**    | 集群节点，管理分区副本，故障时自动切换 Leader，保障高可用                 |
+| **Zookeeper** | 协调集群元数据与 Leader 选举（注：新版本逐步用 KRaft 协议替代 Zookeeper） |
 
-| 组件          | 核心功能                                                                        |
-| ------------- | ------------------------------------------------------------------------------- |
-| **Producer**  | 发布数据到 Topic，支持轮询/Key 哈希/自定义分区策略                              |
-| **Consumer**  | 通过消费组实现负载均衡，同一分区仅限单个消费者消费                              |
-| **Broker**    | 存储管理消息，通过分区副本实现高可用，支持故障自动转移                          |
-| **Zookeeper** | 管理集群元数据、Leader 选举（注：新版本 Kafka 逐步用 KRaft 协议替代 Zookeeper） |
-
-**工作机制优化**
+### 【中等】Kafka 各组件如何进行优化？
 
 - **Producer 优化**
   - 批量发送（`linger.ms`+`batch.size`）
@@ -1484,59 +1636,6 @@ Kafka 通过参数化限速和自适应背压实现多层级流量控制，需�
 - **生产者限流**：控制 `producer` 速率（如 `max.in.flight.requests`）。
 - **消费者限流**：调整 `fetch.max.bytes` 或使用背压机制，匹配消费能力。
 
-### 【困难】Kafka 与 Flink 的集成是如何实现的？如何优化 Flink 与 Kafka 之间的数据流动？
-
-实现 **高吞吐、低延迟、强一致性** 的流式数据处理管道。
-
-**基础集成步骤**
-
-- **添加依赖**：引入 `flink-connector-kafka`（匹配 Kafka 版本）。
-- **配置 Source**：通过 `FlinkKafkaConsumer` 订阅 Kafka Topic。
-- **配置 Sink**：通过 `FlinkKafkaProducer` 写入结果到 Kafka。
-- **设计作业**：在 Flink 中实现数据处理逻辑（过滤/转换/聚合）。
-
-**性能优化方向**
-
-| **优化项**   | **关键措施**                                                                |
-| ------------ | --------------------------------------------------------------------------- |
-| **参数调优** | - 调整 `batch.size`/`linger.ms`（生产者）<br>- 设置合理并行度（Flink 任务） |
-| **资源分配** | - 平衡 Flink TaskManager 的 CPU/内存<br>- 确保 Kafka Broker 带宽充足        |
-| **容错机制** | - 启用 Flink Checkpointing（精确一次语义）<br>- 配置 Kafka 幂等性/事务      |
-| **数据压缩** | 选用高效压缩算法（如 `lz4`/`snappy`），减少网络传输压力                     |
-
-**关键代码示例**
-
-```java
-// Kafka Source
-Properties props = new Properties();
-props.setProperty("bootstrap.servers", "kafka:9092");
-props.setProperty("group.id", "flink-group");
-
-FlinkKafkaConsumer<String> source = new FlinkKafkaConsumer<>(
-    "input-topic",
-    new SimpleStringSchema(),
-    props
-);
-
-// Kafka Sink
-FlinkKafkaProducer<String> sink = new FlinkKafkaProducer<>(
-    "output-topic",
-    new SimpleStringSchema(),
-    props
-);
-
-// 作业流程
-env.addSource(source)
-   .map(...)  // 数据处理
-   .addSink(sink);
-```
-
-**高级特性**
-
-- **动态发现分区**：`setStartFromLatest()`/`setStartFromEarliest()`。
-- **水位线生成**：结合 `assignTimestampsAndWatermarks` 处理事件时间。
-- **Exactly-Once 保障**：启用 Kafka 事务（需配置 `transaction.timeout.ms`）。
-
 ### 【困难】在 Kafka 中，如何优化磁盘 I/O 性能？有哪些策略可以减少 I/O 开销？
 
 **存储架构优化**
@@ -1613,61 +1712,6 @@ compression.type=lz4
 - **命名规范**：Topic 名称包含租户标识（如 `{tenant}_{data_type}`）。
 - **监控**：结合 Kafka Metrics 或 Prometheus 监控配额使用情况，避免资源争抢。
 - **安全**：启用 SSL/SASL 认证，防止租户越权访问。
-
-### 【困难】Kafka 的 Stream 和 Table 是如何相互转换的？它们在 Kafka Streams 中的应用场景是什么？
-
-通过 **流表转换 + 状态管理**，实现实时计算与状态维护的统一处理。
-
-**核心概念对比**
-
-| **抽象类型** | **特点**                           | **适用场景**                             |
-| ------------ | ---------------------------------- | ---------------------------------------- |
-| **Stream**   | 无界、有序的键值记录流（事件日志） | 实时分析、事件监控（如点击流、交易记录） |
-| **Table**    | 有状态的键值快照（当前数据视图）   | 状态维护（如用户配置、库存数量）         |
-
-**相互转换操作**
-
-**(1) Stream → Table**
-
-通过 **聚合操作** 将动态流转换为状态表：
-
-```java
-KStream<String, Long> stream = builder.stream("input-topic");
-
-// 按 Key 分组并累加值
-KTable<String, Long> table = stream
-    .groupByKey()
-    .aggregate(
-        () -> 0L,  // 初始值
-        (key, newValue, agg) -> agg + newValue,  // 累加逻辑
-        Materialized.as("count-store")  // 状态存储
-    );
-```
-
-**(2) Table → Stream**
-
-通过 **toStream()** 将表变更作为流输出：
-
-```java
-KTable<String, Long> table = builder.table("input-topic");
-KStream<String, Long> stream = table.toStream();  // 输出表的更新事件
-```
-
-**典型应用场景**
-
-- **电商实时统计**
-  - **Stream**：处理用户订单事件（如 `order-created`）。
-  - **Table**：维护用户总订单数（`user_id → total_orders`）。
-- **视频播放分析**
-  - **Stream**：接收视频点击事件（`video_id, timestamp`）。
-  - **Table**：存储当前视频播放量（`video_id → play_count`）。
-
-**关键设计思想**
-
-- **流表二元性**：
-  - Stream 是 Table 的变更日志（Changelog）。
-  - Table 是 Stream 的物化视图（Materialized View）。
-- **状态管理**：Table 依赖 **RocksDB 状态存储**，支持容错与高效查询。
 
 ### 【困难】Kafka 的内部状态是如何管理的？如何通过状态管理优化性能？
 
