@@ -122,9 +122,9 @@ org.apache.zookeeper.KeeperException$NoAuthException: KeeperErrorCode = NoAuth f
 限定只有特定的 ip 才能访问。
 
 ```bash
-[zk: localhost:2181(CONNECTED) 46] create /hive "hive" ip:192.168.0.108:cdrwa
-[zk: localhost:2181(CONNECTED) 47] get /hive
-Authentication is not valid : /hive  # 当前主机已经不能访问
+[zk: localhost:2181(CONNECTED) 46] create /Hive "hive" ip:192.168.0.108:cdrwa
+[zk: localhost:2181(CONNECTED) 47] get /Hive
+Authentication is not valid : /Hive  # 当前主机已经不能访问
 ```
 
 这里可以看到当前主机已经不能访问，想要能够再次访问，可以使用对应 IP 的客户端，或使用下面介绍的 `super` 模式。
@@ -140,11 +140,11 @@ Authentication is not valid : /hive  # 当前主机已经不能访问
 修改完成后需要使用 `zkServer.sh restart` 重启服务，此时再次访问限制 IP 的节点：
 
 ```bash
-[zk: localhost:2181(CONNECTED) 0] get /hive  #访问受限
-Authentication is not valid : /hive
+[zk: localhost:2181(CONNECTED) 0] get /Hive  #访问受限
+Authentication is not valid : /Hive
 [zk: localhost:2181(CONNECTED) 1] addauth digest heibai:heibai  # 登录 (添加认证信息)
-[zk: localhost:2181(CONNECTED) 2] get /hive  #成功访问
-hive
+[zk: localhost:2181(CONNECTED) 2] get /Hive  #成功访问
+Hive
 cZxid = 0x158
 ctime = Sat May 25 09:11:29 CST 2019
 mZxid = 0x158

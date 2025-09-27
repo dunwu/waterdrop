@@ -1,5 +1,5 @@
 ---
-icon: mdi:microsoft-azure-devops
+icon: streamline-ultimate-color:medical-app-laptop-1
 title: DevOps
 date: 2022-04-27 20:26:27
 categories:

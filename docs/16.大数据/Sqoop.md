@@ -119,9 +119,9 @@ sqoop import \
 
 ```shell
 # 查看导入后的目录
-hadoop fs -ls  -R /sqoop
+Hadoop fs -ls  -R /sqoop
 # 查看导入内容
-hadoop fs -text  /sqoop/part-m-00000
+Hadoop fs -text  /sqoop/part-m-00000
 ```
 
 查看 HDFS 导入目录，可以看到表中数据被分为 3 部分进行存储，这是由指定的并行度决定的。
@@ -163,28 +163,28 @@ sqoop import \
   --table help_keyword \        # 待导入的表
   --delete-target-dir \         # 如果临时目录存在删除
   --target-dir /sqoop_hive  \   # 临时目录位置
-  --hive-database sqoop_test \  # 导入到 Hive 的 sqoop_test 数据库，数据库需要预先创建。不指定则默认为 default 库
-  --hive-import \               # 导入到 Hive
-  --hive-overwrite \            # 如果 Hive 表中有数据则覆盖，这会清除表中原有的数据，然后再写入
+  --Hive-database sqoop_test \  # 导入到 Hive 的 sqoop_test 数据库，数据库需要预先创建。不指定则默认为 default 库
+  --Hive-import \               # 导入到 Hive
+  --Hive-overwrite \            # 如果 Hive 表中有数据则覆盖，这会清除表中原有的数据，然后再写入
   -m 3                          # 并行度
 ```
 
 导入到 Hive 中的 `sqoop_test` 数据库需要预先创建，不指定则默认使用 Hive 中的 `default` 库。
 
 ```shell
- # 查看 hive 中的所有数据库
- hive>  SHOW DATABASES;
+ # 查看 Hive 中的所有数据库
+ Hive>  SHOW DATABASES;
  # 创建 sqoop_test 数据库
- hive>  CREATE DATABASE sqoop_test;
+ Hive>  CREATE DATABASE sqoop_test;
 ```
 
 ##### 导入验证
 
 ```shell
 # 查看 sqoop_test 数据库的所有表
- hive>  SHOW  TABLES  IN  sqoop_test;
+ Hive>  SHOW  TABLES  IN  sqoop_test;
 # 查看表中数据
- hive> SELECT * FROM sqoop_test.help_keyword;
+ Hive> SELECT * FROM sqoop_test.help_keyword;
 ```
 
 [![img](https://camo.githubusercontent.com/00cf19bbcf1278b0bd28640a5f59862ebdb55e0173e2228fce850cfbcc05e485/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f686976655f7461626c65732e706e67)](https://camo.githubusercontent.com/00cf19bbcf1278b0bd28640a5f59862ebdb55e0173e2228fce850cfbcc05e485/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f686976655f7461626c65732e706e67)
@@ -196,9 +196,9 @@ sqoop import \
 如果执行报错 `java.io.IOException: java.lang.ClassNotFoundException: org.apache.hadoop.hive.conf.HiveConf`，则需将 Hive 安装目录下 `lib` 下的 `hive-exec-**.jar` 放到 sqoop 的 `lib` 。
 
 ```shell
-[root@hadoop001 lib]# ll hive-exec-*
--rw-r--r--. 1 1106 4001 19632031 11 月 13 21:45 hive-exec-1.1.0-cdh5.15.2.jar
-[root@hadoop001 lib]# cp hive-exec-1.1.0-cdh5.15.2.jar  ${SQOOP_HOME}/lib
+[root@hadoop001 lib]# ll Hive-exec-*
+-rw-r--r--. 1 1106 4001 19632031 11 月 13 21:45 Hive-exec-1.1.0-cdh5.15.2.jar
+[root@hadoop001 lib]# cp Hive-exec-1.1.0-cdh5.15.2.jar  ${SQOOP_HOME}/lib
 ```
 
 #### Hive 导出数据到 MySQL
@@ -209,9 +209,9 @@ sqoop import \
 
 ```shell
 # 进入对应的数据库
-hive> use sqoop_test;
+Hive> use sqoop_test;
 # 查看表信息
-hive> desc formatted help_keyword;
+Hive> desc formatted help_keyword;
 ```
 
 `Location` 属性为其存储位置：
@@ -230,8 +230,8 @@ sqoop export  \
     --username root \
     --password root \
     --table help_keyword_from_hive \
-    --export-dir /user/hive/warehouse/sqoop_test.db/help_keyword  \
-    -input-fields-terminated-by '\001' \             # 需要注意的是 hive 中默认的分隔符为 \001
+    --export-dir /user/Hive/warehouse/sqoop_test.db/help_keyword  \
+    -input-fields-terminated-by '\001' \             # 需要注意的是 Hive 中默认的分隔符为 \001
     --m 3
 ```
 
@@ -309,9 +309,9 @@ sqoop import-all-tables -Dorg.apache.sqoop.splitter.allow_text_splitter=true \
   --connect jdbc:mysql://hadoop001:3306/数据库名 \
   --username root \
   --password root \
-  --hive-database sqoop_test \         # 导出到 Hive 对应的库
-  --hive-import \
-  --hive-overwrite \
+  --Hive-database sqoop_test \         # 导出到 Hive 对应的库
+  --Hive-import \
+  --Hive-overwrite \
   -m 3
 ```
 
@@ -329,11 +329,11 @@ sqoop import \
   --query 'select * from help_keyword where  $CONDITIONS and  help_keyword_id < 50' \
   --delete-target-dir \
   --target-dir /sqoop_hive  \
-  --hive-database sqoop_test \           # 指定导入目标数据库 不指定则默认使用 Hive 中的 default 库
-  --hive-table filter_help_keyword \     # 指定导入目标表
+  --Hive-database sqoop_test \           # 指定导入目标数据库 不指定则默认使用 Hive 中的 default 库
+  --Hive-table filter_help_keyword \     # 指定导入目标表
   --split-by help_keyword_id \           # 指定用于 split 的列
-  --hive-import \                        # 导入到 Hive
-  --hive-overwrite \                     、
+  --Hive-import \                        # 导入到 Hive
+  --Hive-overwrite \                     、
   -m 3
 ```
 
@@ -352,11 +352,11 @@ sqoop import \
     --password root \
     --table help_keyword \
     --target-dir /sqoop_hive  \
-    --hive-database sqoop_test \
+    --Hive-database sqoop_test \
     --incremental  append  \             # 指明模式
     --check-column  help_keyword_id \    # 指明用于增量导入的参考列
     --last-value 300  \                  # 指定参考列上次导入的最大值
-    --hive-import \
+    --Hive-import \
     -m 3
 ```
 

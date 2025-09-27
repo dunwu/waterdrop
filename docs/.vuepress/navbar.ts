@@ -4,17 +4,17 @@ export default navbar([
   // '/',
   {
     text: '笔记',
-    icon: 'mdi:notes',
+    icon: 'streamline-ultimate-color:notes-book',
     link: '/00.笔记/'
   },
   {
     text: 'Java',
-    icon: 'ri:java-line',
+    icon: 'devicon:java',
     prefix: '/01.Java/',
     children: [
       {
         text: 'JavaCore',
-        icon: 'mdi:numeric-1-box-multiple-outline',
+        icon: 'devicon:java',
         prefix: 'JavaCore/',
         link: 'JavaCore/',
         children: ['基础特性/', '高级特性/', '容器/', 'IO/', '并发/', 'JVM/', '面试/']
@@ -28,12 +28,12 @@ export default navbar([
   },
   {
     text: '编程',
-    icon: 'mdi:microsoft-visual-studio-code',
+    icon: 'streamline-ultimate-color:app-window-code',
     link: '/02.编程/'
   },
   {
     text: '设计',
-    icon: 'mdi:design',
+    icon: 'streamline-ultimate-color:module-puzzle',
     prefix: '/03.设计/',
     children: [
       {
@@ -54,17 +54,17 @@ export default navbar([
   },
   {
     text: 'DevOps',
-    icon: 'mdi:microsoft-azure-devops',
+    icon: 'streamline-ultimate-color:medical-app-laptop-1',
     link: '/04.DevOps/'
   },
   {
     text: '算法',
-    icon: 'carbon:data-structured',
+    icon: 'streamline-ultimate-color:board-game-jenga',
     link: '/11.算法/'
   },
   {
     text: '数据库',
-    icon: 'mdi:database',
+    icon: 'streamline-plump-color:database',
     link: '/12.数据库/',
     children: [
       { text: '数据库综合', link: '/12.数据库/数据库综合/' },
@@ -105,12 +105,12 @@ export default navbar([
   },
   {
     text: '网络',
-    icon: 'mdi:network',
+    icon: 'streamline-ultimate-color:network',
     link: '/13.网络/'
   },
   {
     text: '分布式',
-    icon: 'mdi:resistor-nodes',
+    icon: 'streamline-stickies-color:server-network',
     prefix: '/15.分布式/',
     children: [
       { text: '分布式理论', link: '分布式理论/' },
@@ -128,7 +128,7 @@ export default navbar([
   },
   {
     text: '大数据',
-    icon: 'devicon-plain:hadoop',
+    icon: 'streamline-ultimate-color:app-window-pie-chart',
     children: [
       { text: 'Hadoop', icon: 'devicon:hadoop', link: '/16.大数据/hadoop/' },
       { text: 'Hive', icon: 'simple-icons:apachehive', link: '/16.大数据/hive/' },
@@ -139,7 +139,7 @@ export default navbar([
   },
   {
     text: '面试',
-    icon: 'fluent-color:chat-bubbles-question-16',
+    icon: 'streamline-ultimate-color:award-ribbon-star-1',
     link: '/99.面试/'
   }
 ])

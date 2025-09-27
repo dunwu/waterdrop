@@ -101,7 +101,7 @@ get path [watch]
 【示例】
 
 ```bash
-[zk: localhost:2181(CONNECTED) 31] get /hadoop
+[zk: localhost:2181(CONNECTED) 31] get /Hadoop
 123456   #节点数据
 cZxid = 0x14b
 ctime = Fri May 24 17:03:06 CST 2019
@@ -150,7 +150,7 @@ stat path [watch]
 【示例】
 
 ```bash
-[zk: localhost:2181(CONNECTED) 32] stat /hadoop
+[zk: localhost:2181(CONNECTED) 32] stat /Hadoop
 cZxid = 0x14b
 ctime = Fri May 24 17:03:06 CST 2019
 mZxid = 0x14b
@@ -187,8 +187,8 @@ create [-s] [-e] path data acl
 【示例】创建持久节点
 
 ```bash
-[zk: localhost:2181(CONNECTED) 4] create /hadoop 123456
-Created /hadoop
+[zk: localhost:2181(CONNECTED) 4] create /Hadoop 123456
+Created /Hadoop
 ```
 
 【示例】创建有序节点，此时创建的节点名为指定节点名 + 自增序号：
@@ -228,7 +228,7 @@ set path data [version]
 【示例】
 
 ```bash
-[zk: localhost:2181(CONNECTED) 33] set /hadoop 345
+[zk: localhost:2181(CONNECTED) 33] set /Hadoop 345
 cZxid = 0x14b
 ctime = Fri May 24 17:03:06 CST 2019
 mZxid = 0x14c
@@ -245,8 +245,8 @@ numChildren = 0
 也可以基于版本号进行更改，此时类似于乐观锁机制，当你传入的数据版本号 (dataVersion) 和当前节点的数据版本号不符合时，zookeeper 会拒绝本次修改：
 
 ```bash
-[zk: localhost:2181(CONNECTED) 34] set /hadoop 678 0
-version No is not valid : /hadoop    #无效的版本号
+[zk: localhost:2181(CONNECTED) 34] set /Hadoop 678 0
+version No is not valid : /Hadoop    #无效的版本号
 ```
 
 ### `delete` 命令
@@ -267,9 +267,9 @@ delete path [version]
 【示例】
 
 ```bash
-[zk: localhost:2181(CONNECTED) 36] delete /hadoop 0
-version No is not valid : /hadoop   #无效的版本号
-[zk: localhost:2181(CONNECTED) 37] delete /hadoop 1
+[zk: localhost:2181(CONNECTED) 36] delete /Hadoop 0
+version No is not valid : /Hadoop   #无效的版本号
+[zk: localhost:2181(CONNECTED) 37] delete /Hadoop 1
 [zk: localhost:2181(CONNECTED) 38]
 ```
 
@@ -297,10 +297,10 @@ version No is not valid : /hadoop   #无效的版本号
 使用 `get path -w` 注册的监听器能够在节点内容发生改变的时候，向客户端发出通知。需要注意的是 zookeeper 的触发器是一次性的 (One-time trigger)，即触发一次后就会立即失效。
 
 ```bash
-[zk: localhost:2181(CONNECTED) 4] get /hadoop -w
-[zk: localhost:2181(CONNECTED) 5] set /hadoop 45678
+[zk: localhost:2181(CONNECTED) 4] get /Hadoop -w
+[zk: localhost:2181(CONNECTED) 5] set /Hadoop 45678
 WATCHER::
-WatchedEvent state:SyncConnected type:NodeDataChanged path:/hadoop  #节点值改变
+WatchedEvent state:SyncConnected type:NodeDataChanged path:/Hadoop  #节点值改变
 ```
 
 > get path [watch] 在当前版本已废弃
@@ -311,9 +311,9 @@ WatchedEvent state:SyncConnected type:NodeDataChanged path:/hadoop  #节点值�
 
 ```bash
 [zk: localhost:2181(CONNECTED) 7] stat path -w
-[zk: localhost:2181(CONNECTED) 8] set /hadoop 112233
+[zk: localhost:2181(CONNECTED) 8] set /Hadoop 112233
 WATCHER::
-WatchedEvent state:SyncConnected type:NodeDataChanged path:/hadoop  #节点值改变
+WatchedEvent state:SyncConnected type:NodeDataChanged path:/Hadoop  #节点值改变
 ```
 
 > stat path [watch] 在当前版本已废弃
@@ -323,11 +323,11 @@ WatchedEvent state:SyncConnected type:NodeDataChanged path:/hadoop  #节点值�
 使用 `ls path -w` 或 `ls2 path -w` 注册的监听器能够监听该节点下所有**子节点**的增加和删除操作。
 
 ```bash
-[zk: localhost:2181(CONNECTED) 9] ls /hadoop -w
+[zk: localhost:2181(CONNECTED) 9] ls /Hadoop -w
 []
-[zk: localhost:2181(CONNECTED) 10] create  /hadoop/yarn "aaa"
+[zk: localhost:2181(CONNECTED) 10] create  /Hadoop/yarn "aaa"
 WATCHER::
-WatchedEvent state:SyncConnected type:NodeChildrenChanged path:/hadoop
+WatchedEvent state:SyncConnected type:NodeChildrenChanged path:/Hadoop
 ```
 
 > ls path [watch] 和 ls2 path [watch] 在当前版本已废弃
