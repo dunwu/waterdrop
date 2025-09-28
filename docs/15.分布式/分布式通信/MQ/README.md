@@ -1,4 +1,5 @@
 ---
+icon: mdi:mq
 title: 消息队列
 cover: https://raw.githubusercontent.com/dunwu/images/master/202509132339376.png
 date: 2022-02-17 22:34:30
@@ -43,7 +44,7 @@ index: false
 
 - [RocketMQ 快速入门](RocketMQ/RocketMQ_快速入门.md)
 - [RocketMQ 基本原理](RocketMQ/RocketMQ_原理.md)
-- [RocketMQ Faq](RocketMQ/RocketMQ_面试.md) 💯
+- [RocketMQ 面试](RocketMQ/RocketMQ_面试.md) 💯
 
 ## 技术对比
 
