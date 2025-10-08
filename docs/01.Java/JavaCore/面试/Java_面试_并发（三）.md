@@ -330,12 +330,12 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 
 **根据任务类型设置线程数指导**
 
-| 场景       | 推荐设置       | 关键考虑                     |
-| :--------- | :------------- | :--------------------------- |
-| CPU 密集型 | 核心数+1       | 避免上下文切换               |
-| I/O 密集型 | 核心数、* 2~5   | IO 等待时间比例              |
-| 混合型     | 核心数、* 1.5~3 | 根据 CPU/IO 时间比例动态调整 |
-| 未知场景   | 动态调整+监控  | 逐步优化                     |
+| 场景       | 推荐设置         | 关键考虑                     |
+| :--------- | :--------------- | :--------------------------- |
+| CPU 密集型 | 核心数+1         | 避免上下文切换               |
+| I/O 密集型 | 核心数、\* 2~5   | IO 等待时间比例              |
+| 混合型     | 核心数、\* 1.5~3 | 根据 CPU/IO 时间比例动态调整 |
+| 未知场景   | 动态调整+监控    | 逐步优化                     |
 
 **通用计算公式**
 
@@ -389,7 +389,7 @@ ThreadPoolExecutor executor = new ThreadPoolExecutor(
 | 队列类型                  | 数据结构         | 是否有界 | 锁机制               | 特点                                                 | 适用场景                     | 不适用场景         |
 | :------------------------ | :--------------- | :------- | :------------------- | :--------------------------------------------------- | :--------------------------- | :----------------- |
 | **ArrayBlockingQueue**    | 数组             | 有界     | ReentrantLock        | 固定容量，内存连续，支持公平锁                       | 已知并发量的稳定系统         | 任务量波动大的场景 |
-| **LinkedBlockingQueue**   | 链表             | 可选   | 双锁分离（put/take） | 默认无界 (Integer.MAX_VALUE)，吞吐量高，节点动态分配 | 任务量不可预测的中等吞吐系统 | 严格内存控制的系统 |
+| **LinkedBlockingQueue**   | 链表             | 可选     | 双锁分离（put/take） | 默认无界 (Integer.MAX_VALUE)，吞吐量高，节点动态分配 | 任务量不可预测的中等吞吐系统 | 严格内存控制的系统 |
 | **SynchronousQueue**      | 无存储           | 无容量   | 无锁 (CAS)           | 直接传递任务，吞吐量最高，公平/非公平模式可选        | 高并发短任务处理             | 存在长任务的场景   |
 | **PriorityBlockingQueue** | 堆               | 无界     | ReentrantLock        | 按优先级排序，自动扩容，元素需实现 Comparable        | 需要任务优先级调度的系统     | 对内存敏感的系统   |
 | **DelayQueue**            | 堆+PriorityQueue | 无界     | ReentrantLock        | 按延迟时间排序，元素需实现 Delayed 接口              | 定时任务/缓存过期处理        | 普通任务队列       |
@@ -661,14 +661,11 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 ## Java 并发同步工具
 
-### 【中等】CountDownLatch 的工作原理是什么？
+### 【中等】CountDownLatch 的工作原理是什么？🌟🌟🌟
 
-CountDownLatch 通过计数器实现线程间的“等待-通知”机制，适用于分阶段任务同步，但不可重复使用。
+`CountDownLatch` 通过计数器实现线程间的“等待-通知”机制，适用于分阶段任务同步，但不可重复使用。**`CountDownLatch` 允许一个或多个线程等待，直到其他线程完成一组操作后再继续执行**。
 
-**基本作用**
-
-- 允许一个或多个线程等待，直到其他线程完成一组操作后再继续执行。
-- 典型场景：主线程等待多个子线程完成任务后再汇总结果。
+典型场景：主线程等待多个子线程完成任务后再汇总结果。
 
 **核心机制**
 
@@ -676,12 +673,12 @@ CountDownLatch 通过计数器实现线程间的“等待-通知”机制，适�
 - **计数递减**：子线程完成任务后调用 `countDown()`，计数器减 1（线程不会阻塞）。
 - **等待阻塞**：主线程调用 `await()` 会阻塞，直到计数器归零（或超时）。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/CountDownLatch.png)
-
 **关键特性**
 
 - **一次性**：计数器归零后无法重置，需重新创建实例。
 - **非中断递减**：`countDown()` 不受线程中断影响，但 `await()` 可被中断。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/202510061730441.png)
 
 **代码示例**
 
@@ -699,7 +696,7 @@ latch.await();
 System.out.println("All tasks done!");
 ```
 
-### 【中等】CyclicBarrier 的工作原理是什么？
+### 【中等】CyclicBarrier 的工作原理是什么？🌟🌟
 
 `CyclicBarrier` 通过“线程互相等待”实现协同，适合需要**多轮同步**的场景，且具备更高的灵活性。
 
@@ -708,7 +705,7 @@ System.out.println("All tasks done!");
 - 让**一组线程互相等待**，直到所有线程都到达某个屏障点（Barrier）后，再一起继续执行。
 - 适用于**分阶段并行任务**（如多线程计算后合并结果）。
 
-**关键机制**
+**核心机制**
 
 | **机制**       | **说明**                                                                                           |
 | -------------- | -------------------------------------------------------------------------------------------------- |
@@ -717,7 +714,7 @@ System.out.println("All tasks done!");
 | **屏障突破**   | 当所有线程到达屏障点后：<br> 1. 执行回调任务（若设置）；<br> 2. 所有线程被唤醒，继续执行后续逻辑。 |
 | **重置能力**   | 屏障被突破后，**自动重置**，可重复使用（区别于 `CountDownLatch`）。                                |
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/CyclicBarrier.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202510061732492.png)
 
 **主要特性**
 
@@ -760,9 +757,11 @@ for (int i = 0; i < 3; i++) {
 - **模拟压力测试**：让所有测试线程同时开始请求。
 - **游戏同步**：多个玩家加载资源完成后同时开始游戏。
 
-### 【中等】Semaphore 的工作原理是什么？
+### 【中等】Semaphore 的工作原理是什么？🌟
 
 **`Semaphore` 译为信号量，是一种同步机制，用于控制多线程对共享资源的访问**。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/202510061732434.png)
 
 Semaphore 通过**许可证机制**灵活控制并发度，既可用于严格互斥（许可证=1 时类似锁），也可用于资源池管理。与 `CyclicBarrier`/`CountDownLatch` 不同，它关注的是**资源的访问权限**而非线程间的同步。
 
@@ -838,6 +837,31 @@ Thread-4 占用资源
 - **连接池管理**：限制同时使用的数据库连接数。
 - **流量控制**：限制每秒处理的请求数。
 - **生产者-消费者模型**：通过信号量控制缓冲区大小。
+
+### 【困难】对比一下 CountDownLatch、 CyclicBarrier、Semaphore？🌟
+
+在 Java 并发编程中，`CountDownLatch`、`CyclicBarrier` 和 `Semaphore` 均用于线程协作，但设计目标、可重用性与适用场景差异明显。核心对比如下：
+
+| 特性             | CountDownLatch                 | CyclicBarrier              | Semaphore                                  |
+| ---------------- | ------------------------------ | -------------------------- | ------------------------------------------ |
+| **可重用性**     | 一次性，不可重置               | 可重复使用                 | 可重复使用                                 |
+| **核心用途**     | 主线程等待 N 个子线程完成任务  | 多线程在屏障点同步         | 控制并发访问资源的线程数                   |
+| **计数器方向**   | 递减（`countDown()`）          | 递减（`await()`）          | 获取 / 释放许可（`acquire()`/`release()`） |
+| **是否支持回调** | 否                             | 是（屏障达成触发）         | 否                                         |
+| **典型场景**     | 多任务并行后汇总、压测并发起点 | 多阶段并行计算、回合制同步 | 限流、数据库连接池、信号量                 |
+| **底层机制**     | AQS                            | ReentrantLock + Condition  | AQS                                        |
+
+**原理简述**
+
+- `CountDownLatch` 内部维护计数器，`countDown()` 递减，`await()` 阻塞至计数器为 0 再释放所有等待线程。
+- `CyclicBarrier` 基于锁与条件变量，`await()` 使线程阻塞，当所有线程到达屏障点时统一唤醒，并可触发回调，随后自动重置，支持循环使用。
+- `Semaphore` 基于 AQS，用 “许可” 控制并发访问，`acquire()` 获取许可，无许可则阻塞；`release()` 释放许可并唤醒等待线程，可设置公平或非公平模式。
+
+**选择建议**
+
+- **主线程等待子任务全部完成** → `CountDownLatch`
+- **多阶段并发任务需在阶段间同步** → `CyclicBarrier`
+- **控制资源的最大并发访问数** → `Semaphore`
 
 ## Java 并发分工工具
 
