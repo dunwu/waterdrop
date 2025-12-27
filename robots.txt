@@ -1,0 +1,5 @@
+
+User-agent:*
+Disallow:
+
+Sitemap: https://dunwu.github.io/waterdrop/waterdrop/sitemap.xml
