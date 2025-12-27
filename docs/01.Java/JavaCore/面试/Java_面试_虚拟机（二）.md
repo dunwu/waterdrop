@@ -262,7 +262,7 @@ Java 中的垃圾回收（GC）算法主要分为以下几类，每种算法针�
 
 ### 【中等】Java 中常见的垃圾收集器有哪些？
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-overview.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-overview.jpg)
 
 以下是 Java 主要垃圾收集器的详细对比表格，涵盖算法、特点、适用场景和关键参数：
 

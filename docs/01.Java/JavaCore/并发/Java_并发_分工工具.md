@@ -21,6 +21,239 @@ permalink: /pages/8b685389/
 
 **对于简单的并行任务，你可以通过“线程池 + Future”的方案来解决；如果任务之间有聚合关系，无论是 AND 聚合还是 OR 聚合，都可以通过 CompletableFuture 来解决；而批量的并行任务，则可以通过 CompletionService 来解决。**
 
+## ForkJoinPool
+
+ForkJoinPool 是 Java 7 引入的一种线程池，专为**分治任务（Divide-and-Conquer）** 设计，核心思想是将大任务拆分为多个小任务（Fork），并行执行后合并结果（Join）。它在处理可分解的复杂任务时效率显著，尤其适合计算密集型场景。
+
+**ForkJoinPool 通过工作窃取机制高效处理分治任务，适合递归并行计算，核心是本地队列+LIFO 处理+FIFO 窃取。**
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200703141326.png)
+
+### ForkJoinPool 特性
+
+**关键特性**
+
+- **工作窃取算法**：空闲线程从繁忙线程的任务队列中 "窃取" 任务执行，减少线程竞争，提高 CPU 利用率。
+- **分治递归**：适合处理可递归拆分的计算密集型任务
+- **并行处理**：默认并行度为 CPU 核心数，可自定义；提供公共池（`commonPool`）供全局使用，减少资源消耗。
+- **任务拆分**：大任务自动拆分为小任务，直到达到阈值
+
+**与普通线程池对比**
+
+| **特性**     | **ForkJoinPool**          | **ThreadPoolExecutor** |
+| ------------ | ------------------------- | ---------------------- |
+| **任务类型** | 分治任务（递归拆分）      | 独立任务               |
+| **任务调度** | 任务窃取（本地队列+窃取） | 全局队列（可能竞争）   |
+| **适用场景** | CPU 密集型并行计算        | IO 密集型或短任务      |
+
+### ForkJoinPool 原理
+
+- **双端队列**：每个工作线程（`ForkJoinWorkerThread`）维护自己的任务队列
+- **任务调度**：
+  - **拆分（fork）**：调用 `fork()` 将子任务加入当前线程队列。
+  - **合并（join）**：调用 `join()` 等待任务完成，必要时帮助执行任务。
+  - **窃取（stealing）**：若线程无任务，从其他线程队列**尾部窃取任务**（FIFO，减少竞争）。
+
+### ForkJoinPool 用法
+
+- **定义任务**：`ForkJoinTask` 是所有 `ForkJoin` 任务的父类。
+  - 继承 `RecursiveTask<T>`（有返回值）或 `RecursiveAction`（无返回值）。
+  - 重写 `compute()` 方法：若任务小于阈值则直接计算，否则分解为子任务。
+- **任务调度**：`ForkJoinPool` 是线程池的核心实现类。
+  - 用 `fork()` 异步提交子任务到线程池。
+  - 用 `join()` 阻塞等待子任务结果并合并。
+  - 通过 `invoke()`（同步执行）或`submit()`（异步执行）提交根任务。
+
+### ForkJoinPool 示例
+
+::: tabs
+
+@tab 计算斐波那契数列
+
+```java
+public static void main(String[] args) {
+    long number = 10;
+    ForkJoinPool pool = new ForkJoinPool();
+    FibonacciTask task = new FibonacciTask(number);
+    long result = pool.invoke(task);
+    System.out.println("斐波那契数列第 " + number + " 项：" + result);
+}
+
+public static class FibonacciTask extends RecursiveTask<Long> {
+    private final long N;
+
+    public FibonacciTask(long n) {
+        this.N = n;
+    }
+
+    @Override
+    protected Long compute() {
+        if (N <= 1) {
+            return N;
+        }
+
+        // Fork：分解任务
+        FibonacciTask f1 = new FibonacciTask(N - 1);
+        FibonacciTask f2 = new FibonacciTask(N - 2);
+
+        // 异步执行第一个任务
+        f1.fork();
+
+        // 同步执行第二个任务并获取结果
+        long result2 = f2.compute();
+
+        // Join：合并结果
+        long result1 = f1.join();
+
+        return result1 + result2;
+    }
+}
+```
+
+@tab 数组求和
+
+```java
+public static void main(String[] args) {
+    // 创建一个随机数组
+    int[] array = new int[10000];
+    for (int i = 0; i < array.length; i++) {
+        array[i] = i + 1;
+    }
+
+    // 使用 ForkJoinPool 计算
+    ForkJoinPool pool = new ForkJoinPool();
+    ArraySum task = new ArraySum(array);
+    int result = pool.invoke(task);
+    System.out.println("数组总和：" + result);
+
+    // 验证结果
+    int expected = Arrays.stream(array).sum();
+    System.out.println("验证结果：" + expected);
+    System.out.println("结果是否正确：" + (result == expected));
+}
+
+public static class ArraySum extends RecursiveTask<Integer> {
+    private static final int THRESHOLD = 1000; // 阈值，小于此值时直接计算
+    private final int[] array;
+    private final int start;
+    private final int end;
+
+    public ArraySum(int[] array) {
+        this(array, 0, array.length);
+    }
+
+    private ArraySum(int[] array, int start, int end) {
+        this.array = array;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected Integer compute() {
+        int length = end - start;
+
+        // 如果任务足够小，直接计算
+        if (length <= THRESHOLD) {
+            int sum = 0;
+            for (int i = start; i < end; i++) {
+                sum += array[i];
+            }
+            return sum;
+        }
+
+        // 否则分解任务
+        int mid = start + (end - start) / 2;
+
+        ArraySum leftTask = new ArraySum(array, start, mid);
+        ArraySum rightTask = new ArraySum(array, mid, end);
+
+        // 执行子任务
+        leftTask.fork();
+        int rightResult = rightTask.compute();
+        int leftResult = leftTask.join();
+
+        // 合并结果
+        return leftResult + rightResult;
+    }
+}
+```
+
+@tab 模拟 MapReduce 统计单词数量
+
+```java
+static void main(String[] args) {
+    String[] fc = { "hello world",
+        "hello me",
+        "hello fork",
+        "hello join",
+        "fork join in world" };
+    //创建 ForkJoin 线程池
+    ForkJoinPool fjp = new ForkJoinPool(3);
+    //创建任务
+    MR mr = new MR(fc, 0, fc.length);
+    //启动任务
+    Map<String, Long> result = fjp.invoke(mr);
+    //输出结果
+    result.forEach((k, v) -> System.out.println(k + ":" + v));
+}
+
+//MR 模拟类
+static class MR extends RecursiveTask<Map<String, Long>> {
+
+    private String[] fc;
+    private int start, end;
+
+    //构造函数
+    MR(String[] fc, int fr, int to) {
+        this.fc = fc;
+        this.start = fr;
+        this.end = to;
+    }
+
+    @Override
+    protected Map<String, Long> compute() {
+        if (end - start == 1) {
+            return calc(fc[start]);
+        } else {
+            int mid = (start + end) / 2;
+            MR mr1 = new MR(fc, start, mid);
+            mr1.fork();
+            MR mr2 = new MR(fc, mid, end);
+            //计算子任务，并返回合并的结果
+            return merge(mr2.compute(),
+                mr1.join());
+        }
+    }
+
+    //合并结果
+    private Map<String, Long> merge(Map<String, Long> r1, Map<String, Long> r2) {
+        Map<String, Long> result = new HashMap<>();
+        result.putAll(r1);
+        //合并结果
+        r2.forEach((k, v) -> {
+            Long c = result.get(k);
+            if (c != null) { result.put(k, c + v); } else { result.put(k, v); }
+        });
+        return result;
+    }
+
+    //统计单词数量
+    private Map<String, Long> calc(String line) {
+        Map<String, Long> result = new HashMap<>();
+        //分割单词
+        String[] words = line.split("\\s+");
+        //统计单词数量
+        for (String w : words) {
+            Long v = result.get(w);
+            if (v != null) { result.put(w, v + 1); } else { result.put(w, 1L); }
+        }
+        return result;
+    }
+}
+```
+
+:::
+
 ## FutureTask
 
 FutureTask 有两个构造函数：
@@ -163,24 +396,340 @@ public class FutureTaskDemo3 {
 
 JDK8 提供了 CompletableFuture 来支持异步编程。
 
-CompletableFuture 提供了四个静态方法来创建一个异步操作。
+### CompletableFuture 特性
+
+- **链式调用**：通过`thenApply()`、`thenAccept()`、`thenCompose()`等方法实现任务流水线
+- **组合操作**：提供`allOf()`（等待所有任务完成）、`anyOf()`（等待任一任务完成）等方法，支持复杂任务依赖管理
+- **异常处理**：通过`exceptionally()`、`handle()`等方法统一处理异步任务中的异常，无需 try-catch 嵌套
+- **线程池灵活配置**：默认使用`ForkJoinPool.commonPool()`，也可指定自定义线程池，控制任务执行线程
+
+### CompletableFuture 原理
+
+CompletableFuture 通过**状态机**管理任务生命周期，**回调列表**实现链式依赖，**线程池**调度异步执行，最终实现高效的非阻塞异步编程。
+
+其核心是将任务、依赖关系、线程调度解耦，通过 CAS 和 `volatile` 保证线程安全，同时避免回调嵌套问题。
+
+#### 状态管理
+
+- 内部维护任务状态（`enum` 类型）：`NEW`（初始）、`COMPLETING`（完成中）、`NORMAL`（正常完成）、`EXCEPTIONAL`（异常完成）、`CANCELLED`（取消）等。
+- 通过 `volatile` 变量 `result` 存储计算结果或异常，确保线程间可见性。
+- 状态转换通过 CAS 操作保证原子性，例如任务完成时从 `NEW` 转为 `NORMAL` 并设置结果。
+
+#### 回调链触发机制
+
+- **回调注册**：`thenApply`/`thenAccept` 等方法会创建新的 `CompletableFuture`（依赖原任务），并将回调函数（如 `Function`/`Consumer`）注册到原任务的回调列表中。
+- **触发时机**：当原任务完成（状态变为 `NORMAL` 或 `EXCEPTIONAL`），会遍历回调列表，在**当前线程**或**指定线程池**中执行回调：
+  - 若原任务由线程池线程完成，回调默认由该线程继续执行（避免线程切换开销）。
+  - 若通过 `thenApplyAsync` 等带 `Async` 的方法，回调会提交到新的线程池执行。
+- **链式传递**：回调执行结果会作为新 `CompletableFuture` 的结果，继续触发后续回调，形成流水线。
+
+#### 任务执行与线程调度
+
+- **异步任务提交**：`supplyAsync`/`runAsync` 会将任务包装为 `AsyncSupply`/`AsyncRun`（实现 `Runnable`），提交到指定线程池（默认 `ForkJoinPool.commonPool()`）。
+- **线程池执行**：线程池工作线程执行任务，完成后调用 `complete()` 或 `completeExceptionally()` 更新状态并触发回调。
+
+#### 多任务协同（`allOf`/`anyOf`）
+
+- **`allOf`**：内部维护计数器，记录未完成的依赖任务数。每个依赖任务完成时计数器减 1，当计数器为 0 时，`allOf` 返回的 `CompletableFuture` 完成。
+- **`anyOf`**：监听所有依赖任务，当第一个任务完成（正常或异常），`anyOf` 返回的 `CompletableFuture` 立即以该结果完成。
+
+### CompletableFuture 用法
+
+#### 创建 CompletableFuture
+
+常见的创建 `CompletableFuture` 对象的方法如下：
+
+- 通过 `new` 关键字
+- 静态工厂方法：`runAsync()`、`supplyAsync()`
+  - `runAsync(Runnable)`：无返回值的异步任务
+  - `supplyAsync(Supplier<T>)`：有返回值的异步任务
+
+::: tabs
+
+@tab new CompletableFuture 示例
 
 ```java
-// 使用默认线程池
-public static CompletableFuture<Void> runAsync(Runnable runnable) { // 省略 }
-public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier) { // 省略 }
-
-// 使用自定义线程池
-public static CompletableFuture<Void> runAsync(Runnable runnable, Executor executor) { // 省略 }
-public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor) { // 省略 }
+CompletableFuture<RpcResponse<Object>> resultFuture = new CompletableFuture<>();
 ```
 
-上面的 4 个静态方法中，有 2 个 `runAsync` 方法，2 个 `supplyAsync` 方法，它们的区别是：
+@tab CompletableFuture 静态工厂方法示例
 
-- `runAsync` 方法没有返回值。
-- `supplyAsync` 方法有返回值。
+```java
+// 无返回值的异步任务
+CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> {
+    System.out.println("异步执行");
+});
+
+// 有返回值的异步任务
+CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> {
+    return "计算结果";
+});
+
+// 指定自定义线程池
+ExecutorService executor = Executors.newFixedThreadPool(4);
+CompletableFuture<String> future3 = CompletableFuture.supplyAsync(() -> {
+    return "使用自定义线程池";
+}, executor);
+```
+
+:::
 
 默认情况下 `CompletableFuture` 会使用公共的 `ForkJoinPool` 线程池，这个线程池默认创建的线程数是 CPU 的核数（也可以通过 JVM option: `-Djava.util.concurrent.ForkJoinPool.common.parallelism` 来设置 `ForkJoinPool` 线程池的线程数）。如果所有 `CompletableFuture` 共享一个线程池，那么一旦有任务执行一些很慢的 I/O 操作，就会导致线程池中所有线程都阻塞在 I/O 操作上，从而造成线程饥饿，进而影响整个系统的性能。所以，强烈建议你要**根据不同的业务类型创建不同的线程池，以避免互相干扰**。
+
+#### CompletableFuture 结果转换
+
+| 方法              | 作用描述           |
+| :---------------- | :----------------- |
+| `thenApply`       | 同步转换结果       |
+| `thenApplyAsync`  | 异步转换结果       |
+| `thenAccept`      | 同步消费结果       |
+| `thenAcceptAsync` | 异步消费结果       |
+| `thenRun`         | 同步执行无参数操作 |
+| `thenRunAsync`    | 异步执行无参数操作 |
+
+CompletableFuture 结果转换用法
+
+```java
+CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> "hello")
+    .thenApply(s -> s + " world")        // 同步转换
+    .thenApply(String::toUpperCase)      // 继续转换
+    .thenApply(s -> s + "!");
+
+System.out.println(future.get()); // 输出：HELLO WORLD!
+```
+
+#### CompletableFuture 组合
+
+| 方法             | 作用描述                 |
+| :--------------- | :----------------------- |
+| `thenCompose`    | 链式组合（扁平化）       |
+| `thenCombine`    | 合并两个独立任务结果     |
+| `thenAcceptBoth` | 合并两个结果并消费       |
+| `runAfterBoth`   | 两个任务都完成后执行操作 |
+
+CompletableFuture 组合用法
+
+```java
+// thenCompose - 链式组合
+CompletableFuture<String> future = getUserInfo(userId).thenCompose(user -> getOrderHistory(user));
+
+// thenCombine - 合并两个独立任务结果
+CompletableFuture<String> future1 = CompletableFuture.supplyAsync(() -> "Hello");
+CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> "World");
+CompletableFuture<String> combined = future1.thenCombine(future2, (s1, s2) -> s1 + " " + s2);
+```
+
+#### CompletableFuture 多任务组合
+
+| 方法    | 作用描述           |
+| :------ | :----------------- |
+| `allOf` | 所有任务完成后执行 |
+| `anyOf` | 任意任务完成后执行 |
+
+CompletableFuture 多任务组合用法
+
+```java
+CompletableFuture<String> task1 = CompletableFuture.supplyAsync(() -> "结果 1");
+CompletableFuture<String> task2 = CompletableFuture.supplyAsync(() -> "结果 2");
+CompletableFuture<String> task3 = CompletableFuture.supplyAsync(() -> "结果 3");
+
+// 所有任务完成后执行
+CompletableFuture<Void> all = CompletableFuture.allOf(task1, task2, task3);
+
+// 任意一个任务完成后执行
+CompletableFuture<Object> any = CompletableFuture.anyOf(task1, task2, task3);
+```
+
+#### CompletableFuture 结果处理
+
+| 方法            | 作用描述                 |
+| :-------------- | :----------------------- |
+| `whenComplete`  | 完成时回调（含异常）     |
+| `handle`        | 处理结果和异常，返回新值 |
+| `exceptionally` | 异常恢复处理             |
+
+CompletableFuture 结果处理用法
+
+```java
+CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+        if (true) throw new RuntimeException("出错啦");
+        return "成功";
+    })
+    .exceptionally(ex -> "异常处理：" + ex.getMessage())  // 异常恢复
+    .handle((result, ex) -> {                           // 结果和异常统一处理
+        if (ex != null) {
+            return "处理异常：" + ex.getMessage();
+        }
+        return "结果：" + result;
+    });
+```
+
+#### CompletableFuture 完成控制
+
+| 方法                    | 作用描述           |
+| :---------------------- | :----------------- |
+| `complete`              | 手动完成并设置结果 |
+| `completeExceptionally` | 手动异常完成       |
+| `cancel`                | 取消任务           |
+
+CompletableFuture 完成控制用法
+
+::: tabs
+
+@tab 快速失败
+
+```java
+CompletableFuture<String> future = new CompletableFuture<>();
+// 条件不满足立即取消
+if (someCondition) {
+    future.complete("成功");
+} else {
+    future.cancel(false);
+}
+```
+
+@tab 超时失败
+
+```java
+CompletableFuture<String> task = CompletableFuture.supplyAsync(() -> {
+    try { Thread.sleep(5000); return "成功"; } 
+    catch (InterruptedException e) { return "失败"; }
+});
+
+// 简单超时机制
+CompletableFuture.runAsync(() -> {
+    try { Thread.sleep(2000); task.cancel(true); } 
+    catch (InterruptedException e) {}
+});
+
+System.out.println(task.isCancelled()); // 2 秒后输出：true
+```
+
+:::
+
+#### CompletableFuture 获取结果
+
+| 方法                       | 作用描述                   |
+| :------------------------- | :------------------------- |
+| `get`                      | 同步阻塞获取结果           |
+| `join`                     | 同步获取结果（不检查异常） |
+| `getNow`                   | 立即获取，未完成返回默认值 |
+| `isDone`                   | 任务是否完成               |
+| `isCompletedExceptionally` | 是否异常完成               |
+| `isCancelled`              | 是否已取消                 |
+
+CompletableFuture 获取结果用法
+
+::: tabs
+
+@tab get 和 join 相同点
+
+```java
+CompletableFuture<String> future = new CompletableFuture<>();
+// 条件不满足立即取消
+if (someCondition) {
+    future.complete("成功");
+} else {
+    future.cancel(false);
+}
+```
+
+@tab get 和 join 不同点
+
+```java
+CompletableFuture<String> task = CompletableFuture.supplyAsync(() -> {
+    try { Thread.sleep(5000); return "成功"; } 
+    catch (InterruptedException e) { return "失败"; }
+});
+
+// 简单超时机制
+CompletableFuture.runAsync(() -> {
+    try { Thread.sleep(2000); task.cancel(true); } 
+    catch (InterruptedException e) {}
+});
+
+System.out.println(task.isCancelled()); // 2 秒后输出：true
+```
+
+:::
+
+### CompletableFuture 示例
+
+::: tabs
+
+@tab 并行调用多个服务
+
+```java
+// 模拟多个微服务调用
+CompletableFuture<String> userService = CompletableFuture.supplyAsync(() -> "用户信息");
+CompletableFuture<String> orderService = CompletableFuture.supplyAsync(() -> "订单信息");
+CompletableFuture<String> productService = CompletableFuture.supplyAsync(() -> "商品信息");
+
+// 并行执行，等待所有完成
+CompletableFuture<Void> all = CompletableFuture.allOf(userService, orderService, productService);
+all.thenRun(() -> {
+    String user = userService.join();
+    String order = orderService.join();
+    String product = productService.join();
+    System.out.println("聚合结果：" + user + ", " + order + ", " + product);
+}).join();
+// 【输出】聚合结果：用户信息，订单信息，商品信息
+```
+
+@tab 并行批处理
+
+```java
+List<Integer> data = Arrays.asList(1, 2, 3, 4, 5);
+
+// 并行处理每个数据
+List<CompletableFuture<String>> futures =
+    data.stream()
+        .map(item -> CompletableFuture.supplyAsync(() -> {
+            // 模拟数据处理
+            // System.out.println(Thread.currentThread().getName() + " 处理：" + item);
+            return "处理结果：" + item;
+        }))
+        .collect(Collectors.toList());
+
+// 等待所有处理完成
+CompletableFuture<Void> allDone = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+List<String> results = allDone.thenApply(v ->
+    futures.stream()
+           .map(CompletableFuture::join)
+           .collect(Collectors.toList())
+).join();
+
+System.out.println("批量处理结果：" + results);
+// 【输出】批量处理结果：[处理结果：1, 处理结果：2, 处理结果：3, 处理结果：4, 处理结果：5]
+```
+
+@tab 链式调用，模拟下单流程
+
+```java
+String res = CompletableFuture.supplyAsync(() -> {
+    System.out.println("1. 创建订单");
+    return "订单 ID:1";
+}).thenApplyAsync(orderId -> {
+    System.out.println("2. 扣减库存 " + orderId);
+    return orderId + " 库存已扣";
+}).thenApplyAsync(result -> {
+    System.out.println("3. 生成物流单 " + result);
+    return result + " 物流单已生成";
+}).thenApplyAsync(result -> {
+    System.out.println("4. 发送通知 " + result);
+    return result + " 通知已发送";
+}).join();
+System.out.println("最终结果：" + res);
+// 【输出】
+// 1. 创建订单
+// 2. 扣减库存 订单 ID:1
+// 3. 生成物流单 订单 ID:1 库存已扣
+// 4. 发送通知 订单 ID:1 库存已扣 物流单已生成
+// 最终结果：订单 ID:1 库存已扣 物流单已生成 通知已发送
+```
+
+:::
 
 ## CompletionStage
 
@@ -330,100 +879,10 @@ Future<V> poll(long timeout, TimeUnit unit) throws InterruptedException;
 
 CompletionService 的实现类 ExecutorCompletionService，需要你自己创建线程池，虽看上去有些啰嗦，但好处是你可以让多个 ExecutorCompletionService 的线程池隔离，这种隔离性能避免几个特别耗时的任务拖垮整个应用的风险。
 
-## ForkJoinPool
-
-Fork/Join 是一个并行计算的框架，主要就是用来支持分治任务模型的，这个计算框架里的** Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并**。Fork/Join 计算框架主要包含两部分，一部分是**分治任务的线程池 ForkJoinPool**，另一部分是**分治任务 ForkJoinTask**。这两部分的关系类似于 ThreadPoolExecutor 和 Runnable 的关系，都可以理解为提交任务到线程池，只不过分治任务有自己独特类型 ForkJoinTask。
-
-ForkJoinTask 是一个抽象类，它的方法有很多，最核心的是 fork() 方法和 join() 方法，其中 fork() 方法会异步地执行一个子任务，而 join() 方法则会阻塞当前线程来等待子任务的执行结果。ForkJoinTask 有两个子类——RecursiveAction 和 RecursiveTask，通过名字你就应该能知道，它们都是用递归的方式来处理分治任务的。这两个子类都定义了抽象方法 compute()，不过区别是 RecursiveAction 定义的 compute() 没有返回值，而 RecursiveTask 定义的 compute() 方法是有返回值的。这两个子类也是抽象类，在使用的时候，需要你定义子类去扩展。
-
-Fork/Join 并行计算的核心组件是 ForkJoinPool，所以下面我们就来简单介绍一下 ForkJoinPool 的工作原理。
-
-ForkJoinPool 本质上也是一个生产者 - 消费者的实现，但是更加智能，你可以参考下面的 ForkJoinPool 工作原理图来理解其原理。ThreadPoolExecutor 内部只有一个任务队列，而 ForkJoinPool 内部有多个任务队列，当我们通过 ForkJoinPool 的 invoke() 或者 submit() 方法提交任务时，ForkJoinPool 根据一定的路由规则把任务提交到一个任务队列中，如果任务在执行过程中会创建出子任务，那么子任务会提交到工作线程对应的任务队列中。
-
-如果工作线程对应的任务队列空了，是不是就没活儿干了呢？不是的，ForkJoinPool 支持一种叫做“**任务窃取**”的机制，如果工作线程空闲了，那它可以“窃取”其他工作任务队列里的任务，例如下图中，线程 T2 对应的任务队列已经空了，它可以“窃取”线程 T1 对应的任务队列的任务。如此一来，所有的工作线程都不会闲下来了。
-
-ForkJoinPool 中的任务队列采用的是双端队列，工作线程正常获取任务和“窃取任务”分别是从任务队列不同的端消费，这样能避免很多不必要的数据竞争。我们这里介绍的仅仅是简化后的原理，ForkJoinPool 的实现远比我们这里介绍的复杂，如果你感兴趣，建议去看它的源码。
-
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200703141326.png)
-
-【示例】模拟 MapReduce 统计单词数量
-
-```java
-
-static void main(String[] args) {
-    String[] fc = { "hello world",
-        "hello me",
-        "hello fork",
-        "hello join",
-        "fork join in world" };
-    //创建 ForkJoin 线程池
-    ForkJoinPool fjp = new ForkJoinPool(3);
-    //创建任务
-    MR mr = new MR(fc, 0, fc.length);
-    //启动任务
-    Map<String, Long> result = fjp.invoke(mr);
-    //输出结果
-    result.forEach((k, v) -> System.out.println(k + ":" + v));
-}
-
-//MR 模拟类
-static class MR extends RecursiveTask<Map<String, Long>> {
-
-    private String[] fc;
-    private int start, end;
-
-    //构造函数
-    MR(String[] fc, int fr, int to) {
-        this.fc = fc;
-        this.start = fr;
-        this.end = to;
-    }
-
-    @Override
-    protected Map<String, Long> compute() {
-        if (end - start == 1) {
-            return calc(fc[start]);
-        } else {
-            int mid = (start + end) / 2;
-            MR mr1 = new MR(fc, start, mid);
-            mr1.fork();
-            MR mr2 = new MR(fc, mid, end);
-            //计算子任务，并返回合并的结果
-            return merge(mr2.compute(),
-                mr1.join());
-        }
-    }
-
-    //合并结果
-    private Map<String, Long> merge(Map<String, Long> r1, Map<String, Long> r2) {
-        Map<String, Long> result = new HashMap<>();
-        result.putAll(r1);
-        //合并结果
-        r2.forEach((k, v) -> {
-            Long c = result.get(k);
-            if (c != null) { result.put(k, c + v); } else { result.put(k, v); }
-        });
-        return result;
-    }
-
-    //统计单词数量
-    private Map<String, Long> calc(String line) {
-        Map<String, Long> result = new HashMap<>();
-        //分割单词
-        String[] words = line.split("\\s+");
-        //统计单词数量
-        for (String w : words) {
-            Long v = result.get(w);
-            if (v != null) { result.put(w, v + 1); } else { result.put(w, 1L); }
-        }
-        return result;
-    }
-}
-```
-
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
 - [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/)
 - [极客时间教程 - Java 并发编程实战](https://time.geekbang.org/column/intro/100023901)
 - [CompletableFuture 使用详解](https://www.jianshu.com/p/6bac52527ca4)
+- [CompletableFuture 原理与实践-外卖商家端 API 的异步化](https://tech.meituan.com/2022/05/12/principles-and-practices-of-completablefuture.html)

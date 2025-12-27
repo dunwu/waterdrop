@@ -20,7 +20,7 @@ permalink: /pages/640f919f/
 
 ### 【简单】Java 中有哪些集合类？
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/java-container-structure.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/java-container-structure.png)
 
 Java 容器类主要位于 `java.util` 包，分为 **Collection** 和 **Map** 两大类：
 
