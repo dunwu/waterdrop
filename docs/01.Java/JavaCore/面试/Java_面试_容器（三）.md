@@ -274,7 +274,7 @@ public int indexOf(Object o) {
 
 `toArray(T[] array)` 方法的参数是一个泛型数组，如果 `toArray` 方法中没有传递任何参数的话返回的是 `Object`类 型数组。
 
-```
+```java
 String [] s= new String[]{
     "dog", "lazy", "a", "over", "jumps", "fox", "brown", "quick", "A"
 };
@@ -286,221 +286,155 @@ s=list.toArray(new String[0]);
 
 由于 JVM 优化，`new String[0]`作为`Collection.toArray()`方法的参数现在使用更好，`new String[0]`就是起一个模板的作用，指定了返回数组的类型，0 是为了节省空间，因为它只是为了说明返回的类型。详见：https://shipilev.net/blog/2016/arrays-wisdom-ancients/
 
-## 数组转集合
+## 使用 Arrays.asList 有什么注意点？
 
 《阿里巴巴 Java 开发手册》的描述如下：
 
 > **使用工具类 `Arrays.asList()` 把数组转换成集合时，不能使用其修改集合相关的方法， 它的 `add/remove/clear` 方法会抛出 `UnsupportedOperationException` 异常。**
 
-我在之前的一个项目中就遇到一个类似的坑。
+::: info 不能直接使用 Arrays.asList 来转换基本类型数组
 
-`Arrays.asList()`在平时开发中还是比较常见的，我们可以使用它将一个数组转换为一个 `List` 集合。
-
-```
-String[] myArray = {"Apple", "Banana", "Orange"};
-List<String> myList = Arrays.asList(myArray);
-//上面两个语句等价于下面一条语句
-List<String> myList = Arrays.asList("Apple","Banana", "Orange");
-```
-
-JDK 源码对于这个方法的说明：
-
-```
-/**
-  *返回由指定数组支持的固定大小的列表。此方法作为基于数组和基于集合的 API 之间的桥梁，
-  * 与 Collection.toArray() 结合使用。返回的 List 是可序列化并实现 RandomAccess 接口。
-  */
-public static <T> List<T> asList(T... a) {
-    return new ArrayList<>(a);
-}
-```
-
-下面我们来总结一下使用注意事项。
-
-**问题一、不能直接使用 Arrays.asList 来转换基本类型数组**
+:::
 
 ```java
-int[] arr = { 1, 2, 3 };
-List list = Arrays.asList(arr);
-log.info("list:{} size:{} class:{}", list, list.size(), list.get(0).getClass());
+// ❌ 错误：基本类型数组会被视为单个元素
+int[] intArray = {1, 2, 3};
+List<int[]> wrongList = Arrays.asList(intArray);  // List<int[]> 不是 List<Integer>
+System.out.println(wrongList.size());  // 输出 1（整个数组作为一个元素）
+
+// ✅ 正确：使用包装类型或流
+Integer[] integerArray = {1, 2, 3};
+List<Integer> correctList = Arrays.asList(integerArray);  // 正常：3个元素
+
+// ✅ Java 8+ 替代方案
+List<Integer> streamList = Arrays.stream(intArray)
+                                  .boxed()
+                                  .collect(Collectors.toList());
 ```
 
-在上面的示例中，通过 `Arrays.asList` 将 `int[]` 数组初始化为 `List` 后。这个`List` 包含的其实是一个 `int` 数组，整个 `List` 的元素个数是 1，元素类型是整数数组。
+::: info 使用集合的修改方法：add()、remove()、clear()会抛出异常
 
-其原因是，只能是把 int 装箱为 Integer，不可能把 int 数组装箱为 Integer 数组。我们知 道，Arrays.asList 方法传入的是一个泛型 T 类型可变参数，最终 int 数组整体作为了一个 对象成为了泛型类型 T
+:::
+
+Arrays.asList 返回的 List 并不是我们期望的 java.util.ArrayList，而是 Arrays 的内部类。
+
+这个内部类继承自 AbstractList 类，但没有覆写父类的 add、remove、clear 方法，而父类中的这几个方法默认会抛出 UnsupportedOperationException。
 
 ```java
-public static <T> List<T> asList(T... a) {
-	return new ArrayList<>(a);
-}
+// ❌ 不是真正的 ArrayList
+List<String> list = Arrays.asList("A", "B", "C");
+list.add("D");  // 抛出 UnsupportedOperationException
+list.remove(0); // 同样抛出异常
 ```
 
-直接遍历这样的 List 必然会出现 Bug。
+正确做法是：
 
-**问题二、使用集合的修改方法：`add()`、`remove()`、`clear()`会抛出异常。**
-
-Arrays.asList 返回的 List 并不是我们期望的 java.util.ArrayList，而是 Arrays 的内部类。这个内部类继承自 AbstractList 类，但没有覆写父类的 add、remove、clear 方法，而父类中的这几个方法默认会抛出 UnsupportedOperationException。
+【示例】使用 `new ArrayList<>(Arrays.asList(...))`
 
 ```java
-String[] arr = { "1", "2", "3" };
-List list = Arrays.asList(arr);
-list.add(4);//运行时报错：UnsupportedOperationException
-list.remove(1);//运行时报错：UnsupportedOperationException
-list.clear();//运行时报错：UnsupportedOperationException
+// ✅ 正确模式：创建真正的可变列表
+List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C"));
+list.add("D");  // 正常执行
 ```
 
-下图是 `java.util.Arrays$ArrayList` 的简易源码，我们可以看到这个类重写的方法有哪些。
+【示例】使用 Java8 的 Stream
 
 ```
-  private static class ArrayList<E> extends AbstractList<E>
-        implements RandomAccess, java.io.Serializable
-    {
-        ...
-
-        @Override
-        public E get(int index) {
-          ...
-        }
-
-        @Override
-        public E set(int index, E element) {
-          ...
-        }
-
-        @Override
-        public int indexOf(Object o) {
-          ...
-        }
-
-        @Override
-        public boolean contains(Object o) {
-           ...
-        }
-
-        @Override
-        public void forEach(Consumer<? super E> action) {
-          ...
-        }
-
-        @Override
-        public void replaceAll(UnaryOperator<E> operator) {
-          ...
-        }
-
-        @Override
-        public void sort(Comparator<? super E> c) {
-          ...
-        }
-    }
-```
-
-我们再看一下`java.util.AbstractList`的 `add/remove/clear` 方法就知道为什么会抛出 `UnsupportedOperationException` 了。
-
-```
-public E remove(int index) {
-    throw new UnsupportedOperationException();
-}
-public boolean add(E e) {
-    add(size(), e);
-    return true;
-}
-public void add(int index, E element) {
-    throw new UnsupportedOperationException();
-}
-
-public void clear() {
-    removeRange(0, size());
-}
-protected void removeRange(int fromIndex, int toIndex) {
-    ListIterator<E> it = listIterator(fromIndex);
-    for (int i=0, n=toIndex-fromIndex; i<n; i++) {
-        it.next();
-        it.remove();
-    }
-}
-```
-
-**那我们如何正确的将数组转换为 `ArrayList` ?**
-
-1、手动实现工具类
-
-```
-//JDK1.5+
-static <T> List<T> arrayToList(final T[] array) {
-  final List<T> l = new ArrayList<T>(array.length);
-
-  for (final T s : array) {
-    l.add(s);
-  }
-  return l;
-}
-
-Integer [] myArray = { 1, 2, 3 };
-System.out.println(arrayToList(myArray).getClass());//class java.util.ArrayList
-```
-
-2、最简便的方法
-
-```
-List list = new ArrayList<>(Arrays.asList("a", "b", "c"))
-```
-
-3、使用 Java8 的 `Stream`（推荐）
-
-```
+// ✅ 正确模式（Java8+）：Stream
 Integer [] myArray = { 1, 2, 3 };
 List myList = Arrays.stream(myArray).collect(Collectors.toList());
-//基本类型也可以实现转换（依赖 boxed 的装箱操作）
+// 基本类型也可以实现转换（依赖 boxed 的装箱操作）
 int [] myArray2 = { 1, 2, 3 };
 List myList = Arrays.stream(myArray2).boxed().collect(Collectors.toList());
 ```
 
-4、使用 Guava
-
-对于不可变集合，你可以使用 [`ImmutableList`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java) 类及其 [`of()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java#L101) 与 [`copyOf()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java#L225) 工厂方法：（参数不能为空）
-
-```
-List<String> il = ImmutableList.of("string", "elements");  // from varargs
-List<String> il = ImmutableList.copyOf(aStringArray);      // from array
-```
+【示例】使用 Lists.newArrayList
 
 对于可变集合，你可以使用 [`Lists`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Lists.java) 类及其 [`newArrayList()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Lists.java#L87) 工厂方法：
 
-```
+```java
 List<String> l1 = Lists.newArrayList(anotherListOrCollection);    // from collection
 List<String> l2 = Lists.newArrayList(aStringArray);               // from array
 List<String> l3 = Lists.newArrayList("or", "string", "elements"); // from varargs
 ```
 
-5、使用 Apache Commons Collections
+【示例】使用 Java9 的 `List.of()`方法
 
-```
-List<String> list = new ArrayList<String>();
-CollectionUtils.addAll(list, str);
-```
-
-6、 使用 Java9 的 `List.of()`方法
-
-```
+```java
 Integer[] array = {1, 2, 3};
 List<Integer> list = List.of(array);
 ```
 
-## 使用 List.subList 进行切片操作居然会导致 OOM
+【示例】使用 Guava
 
-List.subList 返回的子 List 不是一个普通的 ArrayList。这个子 List 可以认为是原始 List 的视图，会和原始 List 相互影响。如果不注意，很可能会因此产生 OOM 问题。
-
-如下代码所示，定义一个名为 data 的静态 List 来存放 Integer 的 List，[也就是说 data 的成员本身是包含了多个数字的 List。循环 1000 次，每次都从一个具有 10 万个 Integer 的 List 中，使用 subList 方法获得一个只包含一个数字的子 List，并把这个子 List 加入 data 变量：
+对于不可变集合，你可以使用 [`ImmutableList`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java) 类及其 [`of()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java#L101) 与 [`copyOf()`](https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/ImmutableList.java#L225) 工厂方法：（参数不能为空）
 
 ```java
-private static List<List<Integer>> data = new ArrayList<>();
-
-private static void oom() {
-    for (int i = 0; i < 1000; i++) {
-        List<Integer> rawList = IntStream.rangeClosed(1, 100000).boxed().collect(Collectors.toList());
-        data.add(rawList.subList(0, 1));
-    }
-}
+List<String> il = ImmutableList.of("string", "elements");  // from varargs
+List<String> il = ImmutableList.copyOf(aStringArray);      // from array
 ```
 
-出现 OOM 的原因是，循环中的 1000 个具有 10 万个元素的 List 始终得不到回收，因为它始终被 subList 方法返回的 List 强引用。
+【示例】使用 Apache Commons Collections
+
+```java
+List<String> list = new ArrayList<String>();
+CollectionUtils.addAll(list, str);
+```
+
+## 使用 List.subList 有什么注意点？
+
+::: info List.subList 使用陷阱
+
+:::
+
+`List.subList` 返回的子 List 不是一个普通的 ArrayList，即**不是副本，是视图**。
+
+子 List 和原 List 共享底层数据，会和原始 List 相互影响。如果不注意，很可能会因此产生 OOM 问题。
+
+```java
+List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C", "D"));
+List<String> sub = list.subList(1, 3);  // [B, C]
+// ❌ 常见误解：创建了独立副本
+// ✅ 实际：sub 是 list 的"视图窗口"，共享底层数据
+```
+
+【示例】结构修改异常（ConcurrentModificationException）
+
+```java
+List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C"));
+List<String> sub = list.subList(0, 2);
+
+list.add("D");  // 🔴 修改原列表结构
+System.out.println(sub.get(0));  // 立即抛出 ConcurrentModificationException
+```
+
+【示例】作用范围陷阱
+
+```java
+List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C", "D"));
+List<String> sub = list.subList(1, 3);  // sub: [B, C]
+
+sub.add("X");
+// sub: [B, C, X]
+// list: [A, B, C, X, D]
+
+sub.remove(0);
+// sub: [C, X]
+// list: [A, C, X, D]
+```
+
+::: info List.subList 正确使用模式
+
+:::
+
+```java
+// 需要长期持有或独立修改
+List<String> independentCopy = new ArrayList<>(list.subList(100, 200));
+
+// 或使用流（Java 8+）
+List<String> streamCopy = list.stream()
+                               .skip(100)
+                               .limit(100)
+                               .collect(Collectors.toList());
+```
+

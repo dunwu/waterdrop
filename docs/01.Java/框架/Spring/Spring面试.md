@@ -47,7 +47,7 @@ Spring Boot 是基于 Spring 框架，支持各种自动化默认配置，节省
 - 由于依赖注入和控制反转，JDBC 得以简化。
 - 它是开源免费的。
 
-### 【中等】Spring 有哪些模块？🌟
+### 【中等】Spring 有哪些模块？⭐
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/spring-framework.png)
 
@@ -77,7 +77,7 @@ Spring 的核心模块主要包括以下部分：
 
 这些核心模块共同构成了 Spring 框架的基础，为开发者提供了全面的解决方案，简化了 Java 应用程序的开发。
 
-### 【中等】Spring 是如何启动的？🌟🌟
+### 【中等】Spring 是如何启动的？⭐⭐
 
 Spring 启动主要分为三阶段：
 
@@ -94,7 +94,7 @@ Spring 启动主要分为三阶段：
 
 Spring 启动流程可以概括为：**容器读取配置，生成 Bean 定义，然后根据定义通过反射创建 Bean 实例，并递归地完成依赖注入和初始化的过程**。
 
-### 【中等】Spring 框架中都用到了哪些设计模式？🌟🌟
+### 【中等】Spring 框架中都用到了哪些设计模式？⭐⭐
 
 | 设计模式         | Spring 中的应用场景                      | 目的                         |
 | :--------------- | :--------------------------------------- | :--------------------------- |
@@ -164,7 +164,7 @@ public class StudentConfig {
 }
 ```
 
-### 【中等】Spring Bean 支持哪些作用域？🌟🌟
+### 【中等】Spring Bean 支持哪些作用域？⭐⭐
 
 | 作用域          | 说明                       | 适用场景                           | 配置                           |
 | :-------------- | :------------------------- | :--------------------------------- | :----------------------------- |
@@ -174,7 +174,7 @@ public class StudentConfig {
 | **session**     | 每个 HTTP Session 一个实例 | 存储用户会话信息：购物车、用户身份 | `@SessionScope`                |
 | **application** | 每个 Web 应用一个实例      | 存储全局应用级数据                 | `@ApplicationScope`            |
 
-### 【困难】Spring Bean 的生命周期是怎样的？🌟🌟🌟
+### 【困难】Spring Bean 的生命周期是怎样的？⭐⭐⭐
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20211201102734.png)
 
@@ -209,7 +209,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 
 ## IoC
 
-### 【简单】什么是 IoC？什么是依赖注入？什么是 Spring IoC？🌟🌟🌟
+### 【简单】什么是 IoC？什么是依赖注入？什么是 Spring IoC？⭐⭐⭐
 
 **控制反转（IoC）**是一种**设计思想**：将对象的**创建控制权**从程序内部“反转”给**外部容器**，目的是**解耦**。
 
@@ -233,7 +233,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 | 方法注入        | `@Autowired public void user(User user) { ... }`   |
 | 接口回调注入    | `class MyBean implements BeanFactoryAware { ... }` |
 
-### 【简单】BeanFactory 和 ApplicationContext 有什么区别？🌟
+### 【简单】BeanFactory 和 ApplicationContext 有什么区别？⭐
 
 在 Spring 中，有两种 IoC 容器：`BeanFactory` 和 `ApplicationContext`。
 
@@ -242,13 +242,13 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 
 实际开发中，更推荐使用 `ApplicationContext` 作为 IoC 容器，因为它的功能远多于 `BeanFactory`。
 
-### 【简单】BeanFactory 和 FactoryBean 有什么区别？🌟
+### 【简单】BeanFactory 和 FactoryBean 有什么区别？⭐
 
 **`BeanFactory` 是 Spring 基础 IoC 容器**。
 
 **`FactoryBean` 是创建 Bean 的一种方式**，帮助实现复杂的初始化逻辑。
 
-### 【困难】Spring 如何解决循环依赖？🌟🌟🌟
+### 【困难】Spring 如何解决循环依赖？⭐⭐⭐
 
 **Spring 采用三级缓存来解决循环依赖**，其关键是：**提前暴露未完全创建完毕的 Bean**。
 
@@ -266,7 +266,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 2. **填充属性时循环引用**：为 A 注入 B 时，触发创建 B。B 在注入 A 时，能从**三级缓存**的工厂中获取到 A 的早期引用。
 3. **升级缓存 & 完成注入**：将获取到的早期引用 A 放入**二级缓存**，并注入给 B，从而让 B 和 A 都能顺利完成创建。
 
-### 【困难】Spring 解决循环依赖为什么一定要用三级缓存？🌟🌟
+### 【困难】Spring 解决循环依赖为什么一定要用三级缓存？⭐⭐
 
 选择**三级缓存**而非二级缓存，主要出于** AOP 代理**的考虑，而非单纯解决循环依赖。
 
@@ -277,7 +277,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 
 ## AOP
 
-### 【简单】什么是 AOP？🌟🌟🌟
+### 【简单】什么是 AOP？⭐⭐⭐
 
 **AOP（面向切面编程）**是一种编程思想，**将与核心业务无关的公共功能（如日志、事务）从业务代码中剥离出来，集中管理和复用**，作为 OOP（面向对象编程）的有效补充。
 
@@ -299,7 +299,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/core/spring-aop.png)
 
-### 【中等】Spring AOP 有哪些实现方式？🌟🌟🌟
+### 【中等】Spring AOP 有哪些实现方式？⭐⭐⭐
 
 Spring AOP 基于**动态代理**，主要分为两种实现方式：
 
@@ -442,7 +442,7 @@ Spring 事务定义的属性有：
 - **是否只读**
 - **事务超时**
 
-### 【中等】Spring 事务支持哪些传播行为？🌟
+### 【中等】Spring 事务支持哪些传播行为？⭐
 
 | 传播行为              | 值                          | 当前有事务                   | 当前无事务       |
 | :-------------------- | :-------------------------- | :--------------------------- | :--------------- |
@@ -456,7 +456,7 @@ Spring 事务定义的属性有：
 
 ## MVC
 
-### 【困难】Spring MVC 是如何工作的？🌟🌟🌟
+### 【困难】Spring MVC 是如何工作的？⭐⭐⭐
 
 **Spring MVC 的核心是 `DispatcherServlet`，它充当了前端控制器（Front Controller）的模式，是所有请求的统一入口，负责协调各个组件完成请求处理**。
 

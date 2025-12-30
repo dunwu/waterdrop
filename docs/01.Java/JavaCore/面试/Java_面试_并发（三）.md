@@ -32,7 +32,7 @@ permalink: /pages/f7892a67/
 - **提高响应速度**。当任务到达时，任务可以不需要等到线程创建就能立即执行。
 - **提高线程的可管理性**。线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。
 
-### 【简单】Java 创建线程池有哪些方式？🌟🌟🌟
+### 【简单】Java 创建线程池有哪些方式？⭐⭐⭐
 
 Java 提供了多种创建线程池的方法，主要通过 `java.util.concurrent.Executors` 工厂类和直接使用 `ThreadPoolExecutor` 构造函数来实现。
 
@@ -76,7 +76,7 @@ ForkJoinPool forkJoinPool = new ForkJoinPool(int parallelism);
 - 适用于分治算法和并行任务
 - 使用工作窃取 (work-stealing) 算法
 
-### 【中等】Java 线程池有哪些核心参数？各有什么作用？🌟🌟🌟
+### 【中等】Java 线程池有哪些核心参数？各有什么作用？⭐⭐⭐
 
 `ThreadPoolExecutor` 有四个构造方法，前三个都是基于第四个实现。第四个构造方法定义如下：
 
@@ -114,7 +114,7 @@ public ThreadPoolExecutor(int corePoolSize,// 线程池的核心线程数量
 
 合理配置这些参数可以优化线程池的性能和稳定性，避免 OOM 或任务丢失。
 
-### 【中等】Java 线程池的工作原理是什么？🌟🌟
+### 【中等】Java 线程池的工作原理是什么？⭐⭐
 
 线程池的工作流程遵循 **任务提交 → 线程分配 → 队列管理 → 拒绝处理** 机制：
 
@@ -326,7 +326,7 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 
 在标准情况下，**核心线程（core threads）即使处于空闲状态也不会被线程池回收**。这是线程池的默认行为，目的是保持一定数量的常驻线程，以便快速响应新任务。通过设置 `allowCoreThreadTimeOut(true)` 可以改变这一行为。
 
-### 【中等】如何合理地设置 Java 线程池的线程数？🌟
+### 【中等】如何合理地设置 Java 线程池的线程数？⭐
 
 **根据任务类型设置线程数指导**
 
@@ -384,7 +384,7 @@ ThreadPoolExecutor executor = new ThreadPoolExecutor(
 );
 ```
 
-### 【中等】Java 线程池支持哪些阻塞队列，如何选择？🌟🌟
+### 【中等】Java 线程池支持哪些阻塞队列，如何选择？⭐⭐
 
 | 队列类型                  | 数据结构         | 是否有界 | 锁机制               | 特点                                                 | 适用场景                     | 不适用场景         |
 | :------------------------ | :--------------- | :------- | :------------------- | :--------------------------------------------------- | :--------------------------- | :----------------- |
@@ -425,7 +425,7 @@ ThreadPoolExecutor executor = new ThreadPoolExecutor(
 - **实时交易**：SynchronousQueue + CachedThreadPool
 - **定时任务**：DelayQueue（单线程消费）
 
-### 【中等】Java 线程池支持哪些拒绝策略？如何选择？🌟🌟
+### 【中等】Java 线程池支持哪些拒绝策略？如何选择？⭐⭐
 
 Java 线程池支持以下拒绝策略：
 
@@ -465,7 +465,7 @@ Java 线程池支持以下拒绝策略：
 - 通过 `TaskRejectedException` 提供更详细的拒绝信息
 - 与 `@Async` 注解配合时自动应用策略
 
-### 【中等】Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？🌟
+### 【中等】Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？⭐
 
 在 Java 线程池中，当任务抛出异常时，默认情况下异常会被线程池"吞掉"，不会直接抛出给调用者。
 
@@ -543,7 +543,7 @@ executor.execute(() -> {
 });
 ```
 
-### 【中等】Java 线程池中 shutdown 与 shutdownNow 的区别是什么？🌟
+### 【中等】Java 线程池中 shutdown 与 shutdownNow 的区别是什么？⭐
 
 **`shutdown` 不会立即终止线程池**，而是要等所有任务缓存队列中的任务都执行完后才终止，但再也不会接受新的任务。
 
@@ -557,7 +557,7 @@ executor.execute(() -> {
 - 中断所有工作线程，无论是否是空闲的；
 - 取出阻塞队列中没有被执行的任务并返回。
 
-### 【困难】Java 线程池参数在运行过程中能修改吗？如何修改？🌟
+### 【困难】Java 线程池参数在运行过程中能修改吗？如何修改？⭐
 
 - **可动态修改参数**：核心线程数、最大线程数、空闲时间、拒绝策略
 - **不可动态修改**：队列实现类、线程工厂
@@ -661,7 +661,7 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 ## Java 并发同步工具
 
-### 【中等】CountDownLatch 的工作原理是什么？🌟🌟🌟
+### 【中等】CountDownLatch 的工作原理是什么？⭐⭐⭐
 
 `CountDownLatch` 通过计数器实现线程间的“等待-通知”机制，适用于分阶段任务同步，但不可重复使用。**`CountDownLatch` 允许一个或多个线程等待，直到其他线程完成一组操作后再继续执行**。
 
@@ -696,7 +696,7 @@ latch.await();
 System.out.println("All tasks done!");
 ```
 
-### 【中等】CyclicBarrier 的工作原理是什么？🌟🌟
+### 【中等】CyclicBarrier 的工作原理是什么？⭐⭐
 
 `CyclicBarrier` 通过“线程互相等待”实现协同，适合需要**多轮同步**的场景，且具备更高的灵活性。
 
@@ -757,7 +757,7 @@ for (int i = 0; i < 3; i++) {
 - **模拟压力测试**：让所有测试线程同时开始请求。
 - **游戏同步**：多个玩家加载资源完成后同时开始游戏。
 
-### 【中等】Semaphore 的工作原理是什么？🌟
+### 【中等】Semaphore 的工作原理是什么？⭐
 
 **`Semaphore` 译为信号量，是一种同步机制，用于控制多线程对共享资源的访问**。
 
@@ -829,7 +829,7 @@ Thread-4 占用资源
 - **流量控制**：限制每秒处理的请求数。
 - **生产者-消费者模型**：通过信号量控制缓冲区大小。
 
-### 【困难】对比一下 CountDownLatch、 CyclicBarrier、Semaphore？🌟
+### 【困难】对比一下 CountDownLatch、 CyclicBarrier、Semaphore？⭐
 
 在 Java 并发编程中，`CountDownLatch`、`CyclicBarrier` 和 `Semaphore` 均用于线程协作，但设计目标、可重用性与适用场景差异明显。核心对比如下：
 
@@ -856,7 +856,7 @@ Thread-4 占用资源
 
 ## Java 并发分工工具
 
-### 【中等】ForkJoinPool 的工作原理是什么？🌟🌟
+### 【中等】ForkJoinPool 的工作原理是什么？⭐⭐
 
 **ForkJoinPool 通过工作窃取机制高效处理分治任务，适合递归并行计算，核心是本地队列+LIFO 处理+FIFO 窃取。**
 
@@ -903,7 +903,7 @@ Thread-4 占用资源
   - **合并（join）**：调用 `join()` 等待任务完成，必要时帮助执行任务。
   - **窃取（stealing）**：若线程无任务，从其他线程队列**尾部窃取任务**（FIFO，减少竞争）。
 
-### 【中等】CompleteFuture 的工作原理是什么？🌟
+### 【中等】CompleteFuture 的工作原理是什么？⭐
 
 **CompletableFuture 通过回调链和 Completion 阶段机制实现灵活的异步编程，支持任务编排、结果转换和异常传播，底层采用无锁设计优化性能。**
 

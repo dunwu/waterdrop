@@ -18,6 +18,21 @@ permalink: /pages/25887789/
 
 ## Map
 
+### 【简单】什么是 Hash 碰撞？如何解决 Hash 碰撞？⭐
+
+**Hash 碰撞**是指：不同 key 经哈希函数计算后，得到相同结果。
+
+Hash 碰撞解决方案：
+
+- **开放寻址法**：碰撞时，按规则（如线性探测）寻找下一个空位存放。
+- **链式地址法**：每个哈希桶存放链表，冲突元素追加到链表。
+
+关键优化：
+
+- **优秀哈希函数**：均匀分布，减少碰撞
+- **动态扩容**：元素过多时，动态扩容
+- **链表转树**：链表过长时转为红黑树（如Java HashMap）
+
 ### 【中等】HashMap 和 Hashtable 有什么区别？
 
 `HashMap` 更高效且灵活，`Hashtable` 线程安全但过时，推荐用 `ConcurrentHashMap` 替代。
@@ -133,21 +148,27 @@ public class HashSet<E> {
 - `LinkedHashMap`可通过`accessOrder`参数实现 LRU 缓存。
 - `TreeMap`支持丰富的导航方法（如`ceilingKey()`、`floorKey()`）。
 
-### 【困难】HashMap 底层实现原理是什么？🌟🌟🌟
+### 【困难】HashMap 底层实现原理是什么？⭐⭐⭐
 
 HashMap 通过哈希函数定位桶，用链表和红黑树解决冲突，动态扩容平衡性能，但非线程安全。
 
 **数据结构**
 
-HashMap 的数据结构是：**数组 + 链表（JDK 8 以前）** ；**数组 + 链表 + 红黑树（JDK 8+）**
+HashMap 的数据结构是：**JDK 8 以前，数组 + 链表** ；**JDK 8 及以后，数组 + 链表 或 数组 + 红黑树**
 
 - **数组（桶）**：`Node<K,V>[] table`，初始长度默认为 `16`。
 - **链表**：相同哈希值的元素组成链表，以解决哈希冲突（拉链地址法）。
-- **红黑树**：当链表长度 ≥ 8 且数组长度 ≥ 64 时，链表转为红黑树（提升查询效率至 `O(log n)`）。
+- **红黑树**：当链表长度 ≥ 8 且数组长度 ≥ 64 时，链表转为红黑树（提升查询效率至 `O(log n)`）；当容量 < 6，由红黑树退化为链表。
 
 **哈希计算**
 
-- **计算哈希值**：高位与低位异或，使哈希分布更均匀。
+- **计算桶索引**：
+
+  ```java
+  index = (table.length - 1) & hash;  // 等价于 hash % table.length，但更高效
+  ```
+
+- **扰动函数**：高位与低位异或，使哈希分布更均匀。
 
   ```java
   // JDK 8 的哈希扰动函数（减少碰撞）
@@ -155,12 +176,6 @@ HashMap 的数据结构是：**数组 + 链表（JDK 8 以前）** ；**数组 +
       int h;
       return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
   }
-  ```
-
-- **计算桶索引**：
-
-  ```java
-  index = (table.length - 1) & hash;  // 等价于 hash % table.length
   ```
 
 **解决哈希冲突**
@@ -174,7 +189,7 @@ HashMap 的数据结构是：**数组 + 链表（JDK 8 以前）** ；**数组 +
 - **扩容操作**：
   - 新建 2 倍大小的数组（`newCap = oldCap << 1`）。
   - 重新计算键的索引位置（`newIndex = (newCap - 1) & hash`）。
-  - **JDK 8 优化**：不需要每个节点重新哈希计算，**通过高位判断新索引位置**（`原索引` 或 `原索引 + oldCap`）。
+  - **JDK 8 优化**：根据 hash & oldCap 是否为 1 来判断是否需要重计算 hash，不需要每个节点重新哈希计算。
 
 **关键参数**
 
@@ -220,7 +235,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent) {
 }
 ```
 
-### 【困难】JDK 1.8 对 HashMap 做了哪些改动？🌟🌟🌟
+### 【困难】JDK 1.8 对 HashMap 做了哪些改动？⭐⭐⭐
 
 - **底层结构优化**：
   - JDK 1.7，仅使用 **数组 + 链表** 的结构。当发生哈希冲突时，新元素会插入到链表的头部（头插法）。
@@ -234,6 +249,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent) {
   - JDK 1.7：扩容时，需重新计算每个键值对在新数组中的位置，然后使用头插法将它们转移到新数组中；
   - JDK 1.8：由于扩容时，容量总是原来的 2 倍，只需要根据最高位的值，即可判断元素的位置是否需要迁移。这样避免了重新计算全部 key 的哈希值。
 - **哈希扰动因子**：
+
 ### 【困难】HashMap 为什么线程不安全？
 
 HashMap 在多线程环境下会出现：
@@ -298,19 +314,43 @@ if ((p = tab[i = (n - 1) & hash]) == null) {
 | 死循环（JDK 7） | 升级到 JDK 8+（改用尾插法）              |
 | 脏读            | 用 `Collections.synchronizedMap()` 包装  |
 
-### 【中等】WeakHashMap 有什么用？
+### 【中等】WeakHashMap 有什么用？⭐
 
-`WeakHashMap` 通过弱引用键实现自动清理，适合管理临时性、生命周期与键对象绑定的数据，但需注意值对象的引用管理和线程安全问题。
+**当 key 对象仅被 WeakHashMap 引用时，会被 GC 自动回收**。
 
 **基于弱引用的键（Key）管理**
 
-- **键是弱引用**：当 `WeakHashMap` 的键（Key）不再被其他强引用指向时，该键值对会被垃圾回收器自动回收，避免内存泄漏。
+- **键是弱引用**：WeakHashMap 的 key 是 WeakReference（弱引用），当 key 对象不再被其他强引用指向时，会被 GC 自动回收，避免内存泄漏。
 - **适用场景**：适合存储与对象生命周期相关的临时数据（如缓存），当键对象外部不再使用时，自动清理对应条目。
+
+```java
+// WeakHashMap 的 key 是 WeakReference（弱引用）
+private static class Entry<K,V> extends WeakReference<Object> {
+    V value;
+    int hash;
+    Entry<K,V> next;
+}
+```
 
 **自动清理无引用键值对**
 
 - **依赖垃圾回收机制**：当键对象仅被 `WeakHashMap` 弱引用时，GC 会回收该键，并移除对应的键值对（通过内部 `ReferenceQueue` 机制触发清理）。
 - **无需手动移除**：与普通 `HashMap` 不同，无需显式调用 `remove()` 方法避免内存泄漏。
+
+```java
+public class WeakHashMap<K,V> {
+    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+
+    // 垃圾回收器将无其他引用的键放入队列
+    // WeakHashMap 在操作时（put/get/size）会检查并清理
+    private void expungeStaleEntries() {
+        Reference<?> ref;
+        while ((ref = queue.poll()) != null) {
+            // 清理对应条目：移除Entry，value置null帮助GC
+        }
+    }
+}
+```
 
 **典型应用场景**
 
@@ -353,7 +393,7 @@ System.gc(); // 仅示例，实际中不推荐显式调用 GC
 | **版本与演进**   | JDK1.0 遗留类，已过时                                  | JDK1.5 引入，持续优化（如 JDK8 改用 CAS）               |
 | **适用场景**     | 旧代码兼容（不推荐新项目使用）                         | **高并发首选**（缓存、计数器等场景）                    |
 
-### 【困难】ConcurrentHashMap 的底层实现原理是什么？🌟🌟🌟
+### 【困难】ConcurrentHashMap 的底层实现原理是什么？⭐⭐⭐
 
 `ConcurrentHashMap` 是 Java 并发编程中最常用的线程安全 `Map`，其底层实现经历了 **JDK7（分段锁）** 和 **JDK8+（CAS + `synchronized` 优化）** 两个重要阶段。以下是核心实现原理：
 
@@ -434,7 +474,7 @@ ConcurrentHashMap
 1. 计算 `key` 的哈希，定位到桶。
 2. 遍历链表或红黑树（依赖 `volatile` 保证可见性）。
 
-**（3）扩容（多线程协同）**
+**（3）渐进式扩容（多线程协同）**
 
 1. 当元素数量超过阈值（`sizeCtl`），触发扩容。
 2. 其他线程检测到扩容时，可协助迁移数据（`transfer` 方法）。
@@ -462,7 +502,7 @@ ConcurrentHashMap
 
 **适用场景**：高并发读写（如缓存、计数器），是 `Hashtable` 和 `Collections.synchronizedMap()` 的现代替代方案。
 
-### 【中等】ConcurrentHashMap 为什么 key 和 value 不能为 null？
+### 【中等】ConcurrentHashMap 为什么 key 和 value 不能为 null？⭐
 
 `ConcurrentHashMap` 在设计上明确禁止 `null` 作为 **key** 或 **value**，而普通的 `HashMap` 是允许的。
 
@@ -544,7 +584,7 @@ if (!map.containsKey("key")) {
 | `ConcurrentHashMap`           | ❌ 否               | ❌ 否                 | 并发安全，避免歧义            |
 | `Collections.synchronizedMap` | 取决于底层 Map      | 取决于底层 Map        | 包装类，行为与被包装 Map 一致 |
 
-### 【中等】ConcurrentHashMap 能保证复合操作的原子性吗？🌟
+### 【中等】ConcurrentHashMap 能保证复合操作的原子性吗？⭐
 
 **ConcurrentHashMap 不能保证复合操作的原子性**，尽管它本身提供了高并发性能和线程安全的单个操作。
 

@@ -18,7 +18,7 @@ permalink: /pages/4003a407/
 
 ## MyBatis 简介
 
-### 【简单】MyBatis 和 Hibernate 有什么差异？🌟
+### 【简单】MyBatis 和 Hibernate 有什么差异？⭐
 
 一句话概括：**Hibernate 是全自动的 ORM 框架（能自动生成 SQL），而 MyBatis 是半自动的 ORM 框架（需手动写 SQL 但更灵活）**。
 
@@ -60,7 +60,7 @@ MyBatis Plus 主要提供了以下能力：
 
 ## MyBatis 应用
 
-### 【简单】MyBatis 中 `#{}` 和 `${}` 的区别是什么？🌟🌟🌟
+### 【简单】MyBatis 中 `#{}` 和 `${}` 的区别是什么？⭐⭐⭐
 
 **MyBatis 中 `#{}` 和 `${}` 的区别对比**
 
@@ -153,7 +153,7 @@ SELECT * FROM user WHERE name = 'Alice' OR '1'='1';  -- 注入攻击示例
 
 ## MyBatis 架构
 
-### 【中等】MyBatis 有哪些核心组件？🌟🌟🌟
+### 【中等】MyBatis 有哪些核心组件？⭐⭐⭐
 
 MyBatis 有以下核心组件：
 
@@ -233,11 +233,11 @@ try (SqlSession session = factory.openSession()) {  // 自动关闭
 UserMapper mapper = session.getMapper(UserMapper.class);
 ```
 
-### 【中等】能详细说说 MyBatis 的执行流程吗？🌟🌟
+### 【中等】能详细说说 MyBatis 的执行流程吗？⭐⭐
 
 ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210512173437.png)
 
-### 【困难】MyBatis 的架构是如何设计的？🌟🌟
+### 【困难】MyBatis 的架构是如何设计的？⭐⭐
 
 MyBatis 的架构设计通过 **分层解耦** 和 **动态代理** 实现了 SQL 与 Java 代码的分离，其核心在于：
 
@@ -283,7 +283,7 @@ MyBatis 的架构分为四层，各层职责明确，通过接口解耦：
   - **职责**：调用 JDBC 执行 SQL，触发插件拦截链。
 - **结果集处理 (ResultSetHandler)**：将 `ResultSet` 转换为 Java 对象（根据 `ResultMap` 或自动映射）。
 
-### 【中等】MyBatis 的缓存机制是如何设计的？🌟🌟
+### 【中等】MyBatis 的缓存机制是如何设计的？⭐⭐
 
 MyBatis 设计了两级缓存。
 
@@ -307,7 +307,7 @@ MyBatis 设计了两级缓存。
 
 建议：在微服务架构中，通常**不建议使用 MyBatis 的二级缓存**。更推荐使用更专业的缓存解决方案，如 **Redis** 或 **Memcached**，它们能更好地保证数据一致性和扩展性。一级缓存由于其局部性，影响不大，可以正常使用。
 
-### 【中等】MyBatis 的插件机制是如何设计的？🌟
+### 【中等】MyBatis 的插件机制是如何设计的？⭐
 
 **MyBatis 插件本质上是一种非侵入式的 AOP 实现**，用于在 MyBatis 执行流程中插入自定义逻辑（如分页、性能监控、SQL 修改）。
 

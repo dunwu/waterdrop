@@ -131,37 +131,72 @@ Comparator<Person> reverseAge =
     Comparator.comparingInt(Person::getAge).reversed();
 ```
 
+### 【中等】什么是 ConcurrentModificationException？⭐⭐
+
+::: info 什么是 ConcurrentModificationException？
+
+:::
+
+`ConcurrentModificationException` 是在 Java 中使用**迭代器**遍历集合时，如果检测到集合被**意外修改**而抛出的运行时异常。
+
+`ConcurrentModificationException` 底层机制：
+
+迭代器内部维护了一个计数器 **`expectedModCount`**（期望修改次数），与集合的 **`modCount`**（实际修改次数）比较。每次修改集合时 `modCount++`，迭代器每次操作检查两者是否一致，不一致立即抛出异常。
+
+::: info 什么时候发生 ConcurrentModificationException？
+
+:::
+
+迭代器创建后，集合被**非迭代器方式**修改结构（增删），就会抛出 `ConcurrentModificationException`。
+
+```java
+List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C"));
+
+// 错误示例 1：遍历时直接修改集合
+for (String item : list) {  // 底层使用迭代器
+    if ("B".equals(item)) {
+        list.remove(item); // 抛出 ConcurrentModificationException
+    }
+}
+
+// 错误示例 2：迭代器创建后通过其他方式修改
+Iterator<String> it = list.iterator();
+list.add("D");  // 结构被修改
+it.next();      // 此处抛出异常
+```
+
+::: info 如何避免 ConcurrentModificationException？
+
+:::
+
+- 单线程优先使用 `removeIf()` 或 `Iterator.remove()`
+- 多线程必须使用并发集合或显式同步
+
+【示例】使用迭代器删除元素（标准方式）
+
+```java
+List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C", "D"));
+
+Iterator<String> iterator = list.iterator();
+while (iterator.hasNext()) {
+    String item = iterator.next();
+    if ("B".equals(item) || "C".equals(item)) {
+        iterator.remove(); // ✅ 通过迭代器安全删除
+    }
+}
+// list = ["A", "D"]
+```
+
+【示例】Java 8+ 的 removeIf（最简洁）
+
+```java
+List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C", "D"));
+// 单行完成过滤
+list.removeIf(item -> item.startsWith("B") || item.equals("C")); // ✅
+// list = ["A", "D"]
+```
+
 ## List
-
-### 【简单】ArrayList 和 Array（数组）的区别？
-
-**ArrayList vs. 数组**
-
-| **对比点**     | **数组 (Array)**                                   | **ArrayList**                                                                                  |
-| -------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| **长度可变性** | 固定长度，创建后无法调整大小                       | 动态扩容（默认扩容 1.5 倍）                                                                      |
-| **存储类型**   | 支持基本类型（`int[]`）和对象类型                  | 仅支持引用类型（基本类型需装箱，如 `Integer`）                                                 |
-| **内存占用**   | 更紧凑（无额外对象开销）                           | 有额外内存开销（记录大小、扩容预留空间等）                                                     |
-| **访问方式**   | 通过索引直接访问（`arr[0]`）                       | 通过 `get(index)`/`set(index)` 方法访问                                                        |
-| **操作效率**   | - 查询：O(1)（极快）<br>- 增删：O(n)（需移动元素） | - 查询：O(1)（底层是数组）<br>- 增删：<br> - 尾部操作：O(1)<br> - 中间操作：O(n)（需移动元素） |
-| **功能方法**   | 功能简单（依赖 `Arrays` 工具类）                   | 提供丰富方法（`add()`、`remove()`、`contains()` 等）                                           |
-| **线程安全**   | 非线程安全                                         | 非线程安全（需用 `Collections.synchronizedList` 包装）                                         |
-| **泛型支持**   | 不支持泛型（类型检查在运行时）                     | 支持泛型（编译时类型安全）                                                                     |
-
-**小结**：
-
-- **动态性**：`ArrayList` 自动扩容，数组长度固定。
-- **类型支持**：数组可直接存基本类型，`ArrayList` 需包装类。
-- **性能**：
-  - 数组的随机访问稍快（少一次方法调用）。
-  - `ArrayList` 的尾部插入高效，但中间插入/删除需移动元素。
-- **功能**：`ArrayList` 提供更多便捷方法（如迭代、搜索）。
-- **内存**：数组更节省内存，`ArrayList` 有额外结构开销。
-
-**应用**：
-
-- **选数组**：需极致性能、固定长度或存储基本类型时（如数学计算）。
-- **选 ArrayList**：需要动态大小、便捷操作或泛型安全时（大多数业务场景）。
 
 ### 【简单】ArrayList 可以添加 null 值吗？
 
@@ -187,6 +222,66 @@ Comparator<Person> reverseAge =
 
 - 明确是否需要 `null`，避免滥用导致代码健壮性问题。
 - 必要时用 `Optional` 或默认值替代 `null`。
+
+### 【简单】ArrayList 如何扩容？⭐⭐⭐
+
+ArrayList 默认初始大小为 10，当元素数达到容量时，触发扩容，每次扩容 1.5 倍。
+
+扩容关键代码：
+
+```java
+private void grow(int minCapacity) { // minCapacity = 当前size + 1
+    int oldCapacity = elementData.length;
+
+    // 关键：新容量 = 旧容量 + 旧容量的一半（1.5倍扩容）
+    int newCapacity = oldCapacity + (oldCapacity >> 1);
+
+    // 特殊情况处理
+    if (newCapacity - minCapacity < 0)  // 新容量仍不够
+        newCapacity = minCapacity;       // 直接使用所需容量
+    if (newCapacity - MAX_ARRAY_SIZE > 0)  // 超过最大限制
+        newCapacity = hugeCapacity(minCapacity);
+
+    // 核心：创建新数组并拷贝数据
+    elementData = Arrays.copyOf(elementData, newCapacity);
+}
+```
+
+因此，为了避免频繁扩容，推荐根据实际情况预分配容量。
+
+```java
+ArrayList<String> list = new ArrayList<>(10000);
+```
+
+### 【简单】ArrayList 和数组有什么区别？
+
+**ArrayList vs. 数组**
+
+| **对比点**     | **数组 (Array)**                                   | **ArrayList**                                                                                  |
+| -------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **长度可变性** | 固定长度，创建后无法调整大小                       | 动态扩容（默认扩容 1.5 倍）                                                                    |
+| **存储类型**   | 支持基本类型（`int[]`）和对象类型                  | 仅支持引用类型（基本类型需装箱，如 `Integer`）                                                 |
+| **内存占用**   | 更紧凑（无额外对象开销）                           | 有额外内存开销（记录大小、扩容预留空间等）                                                     |
+| **访问方式**   | 通过索引直接访问（`arr[0]`）                       | 通过 `get(index)`/`set(index)` 方法访问                                                        |
+| **操作效率**   | - 查询：O(1)（极快）<br>- 增删：O(n)（需移动元素） | - 查询：O(1)（底层是数组）<br>- 增删：<br> - 尾部操作：O(1)<br> - 中间操作：O(n)（需移动元素） |
+| **功能方法**   | 功能简单（依赖 `Arrays` 工具类）                   | 提供丰富方法（`add()`、`remove()`、`contains()` 等）                                           |
+| **线程安全**   | 非线程安全                                         | 非线程安全（需用 `Collections.synchronizedList` 包装）                                         |
+| **泛型支持**   | 不支持泛型（类型检查在运行时）                     | 支持泛型（编译时类型安全）                                                                     |
+
+**小结**：
+
+- **动态性**：`ArrayList` 自动扩容，数组长度固定。
+- **类型支持**：数组可直接存基本类型，`ArrayList` 需包装类。
+- **性能**：
+  - 数组的随机访问稍快（少一次方法调用）。
+  - `ArrayList` 的尾部插入高效，但中间插入/删除需移动元素。
+- **功能**：`ArrayList` 提供更多便捷方法（如迭代、搜索）。
+- **内存**：数组更节省内存，`ArrayList` 有额外结构开销。
+
+**应用**：
+
+- **选数组**：需极致性能、固定长度或存储基本类型时（如数学计算）。
+- **选 ArrayList**：需要动态大小、便捷操作或泛型安全时（大多数业务场景）。
 
 ### 【简单】ArrayList 和 LinkedList 有什么区别？
 
@@ -220,19 +315,32 @@ List` 需遍历链表。
 > - 默认情况下，`Collections.synchronizedList` 包装的 `ArrayList` 比 `LinkedList` 线程安全开销更低。
 > - Java 8+ 的 `Stream` 操作在 `ArrayList` 上效率更高。
 
+### 【中等】CopyOnWriteArrayList 的原理是什么？⭐⭐
+
+`CopyOnWriteArrayList` 核心思想是 "写时复制"（Copy-On-Write，CoW），**适用于【读多写少】的高并发场景**。
+
+`CopyOnWriteArrayList` 内部维护一个 `volatile` Object 数组（`Object[] array`），存储所有元素，`volatile` 保证了并发可见性
+
+- 读操作：由于读取数据是 volatile，保证了并发可见性，所以无需加锁
+- 写操作（add/set/remove）：核心步骤如下
+  1. 加锁（`ReentrantLock`）
+  2. `Arrays.copyOf` 复制新数组（长度 ±1）
+  3. 在新数组上修改
+  4. 替换原数组引用
+
 ## Set
 
 ### 【简单】HashSet、LinkedHashSet 和 TreeSet 有什么区别？
 
-| 特性             | HashSet              | LinkedHashSet           | TreeSet                          |
-| ---------------- | -------------------- | ----------------------- | -------------------------------- |
-| **底层实现**     | 哈希表 (HashMap)     | 哈希表 + 链表           | 红黑树                           |
-| **排序保证**     | 无顺序               | 插入顺序                | 自然顺序/自定义排序              |
-| **时间复杂度**   | 添加/删除/查找：O(1) | 添加/删除/查找：O(1)    | 添加/删除/查找：O(log n)         |
-| **允许 null 元素** | 允许 1 个 null          | 允许 1 个 null             | 不允许（除非自定义 Comparator 允许） |
-| **线程安全**     | 非线程安全           | 非线程安全              | 非线程安全                       |
-| **性能特点**     | 最快的基础操作       | 比 HashSet 稍慢但保持顺序 | 最慢但自动排序                   |
-| **使用场景**     | 只需唯一性不关心顺序 | 需要保持插入顺序        | 需要排序的集合                   |
+| 特性               | HashSet              | LinkedHashSet             | TreeSet                              |
+| ------------------ | -------------------- | ------------------------- | ------------------------------------ |
+| **底层实现**       | 哈希表 (HashMap)     | 哈希表 + 链表             | 红黑树                               |
+| **排序保证**       | 无顺序               | 插入顺序                  | 自然顺序/自定义排序                  |
+| **时间复杂度**     | 添加/删除/查找：O(1) | 添加/删除/查找：O(1)      | 添加/删除/查找：O(log n)             |
+| **允许 null 元素** | 允许 1 个 null       | 允许 1 个 null            | 不允许（除非自定义 Comparator 允许） |
+| **线程安全**       | 非线程安全           | 非线程安全                | 非线程安全                           |
+| **性能特点**       | 最快的基础操作       | 比 HashSet 稍慢但保持顺序 | 最慢但自动排序                       |
+| **使用场景**       | 只需唯一性不关心顺序 | 需要保持插入顺序          | 需要排序的集合                       |
 
 **顺序特性**
 
@@ -302,13 +410,13 @@ Set<String> customTreeSet = new TreeSet<>(Comparator.reverseOrder());
 ::: info Queue vs. Deque
 :::
 
-| 特性         | Queue （队列）                               | Deque （双端队列）              |
-| ------------ | ------------------------------------------ | ----------------------------- |
-| **进出原则** | 先进先出 (FIFO)                            | 两端都可进出 (FIFO + LIFO)    |
+| 特性         | Queue （队列）                               | Deque （双端队列）            |
+| ------------ | -------------------------------------------- | ----------------------------- |
+| **进出原则** | 先进先出 (FIFO)                              | 两端都可进出 (FIFO + LIFO)    |
 | **主要操作** | 队尾入队 (add/offer)，队首出队 (remove/poll) | 支持队首/队尾的入队和出队操作 |
-| **继承关系** | 基础接口                                   | 继承自 Queue 接口             |
-| **代表子类** | LinkedList, PriorityQueue                  | ArrayDeque, LinkedList        |
-| **特殊功能** | -                                          | 支持栈操作 (push/pop/peek)     |
+| **继承关系** | 基础接口                                     | 继承自 Queue 接口             |
+| **代表子类** | LinkedList, PriorityQueue                    | ArrayDeque, LinkedList        |
+| **特殊功能** | -                                            | 支持栈操作 (push/pop/peek)    |
 
 **基本操作对比**
 
