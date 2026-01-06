@@ -26,7 +26,7 @@ permalink: /pages/37e2c2f3/
 
 并发和并行是最容易让新手费解的概念，那么如何理解二者呢？其最关键的差异在于：是否是**同时**发生：
 
-- **并发是指具备处理多个任务的能力，但不一定要同时**。
+- **并发指多个任务在同一时间段内交替执行**，以提高系统效率和资源利用率。
 - **并行是指具备同时处理多个任务的能力**。
 
 下面是我见过最生动的说明，摘自 [并发与并行的区别是什么？——知乎的高票答案](https://www.zhihu.com/question/33515481/answer/58849148)
@@ -41,8 +41,8 @@ permalink: /pages/37e2c2f3/
 > - 什么是异步？
 > - 同步和异步有什么区别？
 
-- **同步**：顺序执行，必须等待当前任务完成才能继续，会阻塞后续操作。
-- **异步**：不等待当前任务完成，直接执行后续操作，任务完成后通过回调/通知返回结果。
+- **同步**指任务必须按顺序依次执行，等待当前任务完成才能继续；
+- **异步**指任务可以独立执行，无需等待当前任务完成即可处理其他任务。
 
 比喻：
 
@@ -56,15 +56,15 @@ permalink: /pages/37e2c2f3/
 
 阻塞和非阻塞关注的是程序在等待调用结果（消息，返回值）时的状态：
 
-- **阻塞**：是指调用结果返回之前，当前线程会被挂起。调用线程只有在得到结果之后才会返回。
-- **非阻塞**：是指在不能立刻得到结果之前，该调用不会阻塞当前线程。
+- **阻塞**指任务执行时必须等待某操作完成才能继续；
+- **非阻塞**指任务执行时无需等待，可立即返回并执行其他操作。
 
 比喻：
 
 - 阻塞：排队等奶茶，不拿到不走；
 - 非阻塞：点完奶茶去逛街，店员短信通知后再取。
 
-### 【中等】进程、线程、协程、管程有什么区别？⭐
+### 【中等】进程、线程、协程、管程有什么区别？
 
 进程、线程、协程、管程对比：
 
@@ -92,7 +92,10 @@ permalink: /pages/37e2c2f3/
 
 JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这就是为什么几个线程可以访问同一个对象。线程共享堆并拥有自己的堆栈空间。这是一个线程如何调用一个方法以及它的局部变量是如何保持线程安全的。但是堆不是线程安全的并且为了线程安全必须进行同步。
 
-### 【中等】Java 线程和操作系统的线程有什么区别？
+### 【中等】Java 线程和操作系统的线程有什么区别？⭐
+
+- **早期**：JVM 使用**用户线程（绿色线程）**，多个 Java 线程映射到一个 OS 线程（M:1）。
+- **现代主流（HotSpot JVM）**：采用** 1:1 映射**，每个 Java 线程直接对应一个 OS 内核线程。
 
 以下是 Java 线程与操作系统线程的区别对比表：
 
@@ -107,12 +110,22 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 | **栈内存占用**    | 默认 1MB（可调），虚拟线程仅 KB 级                  | Linux 默认 8MB（不可跨线程共享）               |
 | **典型应用场景**  | 通用并发编程，高并发推荐虚拟线程                    | 直接系统编程，需精细控制线程行为的场景         |
 
-**补充说明**：
+### 【中等】Java 传统线程和虚拟线程有什么区别？⭐
 
-- **现代 JVM**：HotSpot 等主流 JVM 默认将 **Java 线程与 OS 线程 1:1 绑定**，但 **虚拟线程（Project Loom）实现 M:N 映射**，显著提升并发能力。
-- **性能关键点**：
-   - Java 线程的阻塞操作（如 I/O）会阻塞 OS 线程，而虚拟线程通过挂起避免资源浪费。
-   - OS 线程数量过多会导致内存和调度开销激增，Java 线程池或虚拟线程可缓解。
+**虚拟线程（Project Loom）实现与 OS 线程 M:N 映射**，显著提升并发能力。
+
+**Java 虚拟线程用更少的资源支持更高的并发**。
+
+传统线程和虚拟线程对比：
+
+| 维度         | 传统线程（OS 线程） | 虚拟线程            |
+| :----------- | :------------------ | :------------------ |
+| **并发数量** | 数千个              | 数百万个            |
+| **内存开销** | 每个约 1MB          | 每个约 1KB          |
+| **创建成本** | 高（内核操作）      | 极低（用户态）      |
+| **阻塞代价** | 整个 OS 线程阻塞    | 仅虚拟线程挂起      |
+| **调度方**   | 操作系统内核        | JVM（用户态调度器） |
+| **编程模型** | Thread API          | 相同的 Thread API   |
 
 ### 【中等】单核 CPU 支持 Java 多线程吗？⭐
 
@@ -133,12 +146,12 @@ Java 使用的线程调度是抢占式的。也就是说，JVM 本身不负责�
 
 **并发更快的情况**
 
-- **I/O 密集型**：网络/磁盘操作时，CPU 可切换做其他事
 - **多核 CPU**：真正并行执行计算任务
+- **I/O 密集型**：网络/磁盘操作时，CPU 可切换做其他事
 
 **串行更快的情况**
 
-- **单核 CPU 计算**：线程切换反而增加开销
+- **单核 CPU**：线程切换反而增加开销
 - **高竞争场景**：锁争用导致线程空等
 - **简单任务**：并发管理开销超过收益
 
@@ -215,12 +228,12 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 
 **通用原则**：最小化共享资源，优先用线程安全类，控制锁粒度，避免死锁，事后工具验证。
 
-- **共享可变数据**：多线程读写普通变量 / 非安全集合（如 ArrayList）→ 用原子类（AtomicXXX）、线程安全容器（ConcurrentHashMap）或锁（synchronized/Lock）。
-- **线程时序协作**：需按顺序执行或等待资源（如 A 初始化后 B 读取）→ 用 wait/notify、Condition，或工具类（CountDownLatch）、阻塞队列。
+- **共享可变数据**：多线程读写普通变量 / 非安全集合（如 `ArrayList`）→ 用原子类（AtomicXXX）、线程安全容器（`ConcurrentHashMap`）或锁（`synchronized` / `Lock`）。
+- **线程时序协作**：需按顺序执行或等待资源（如 A 初始化后 B 读取）→ 用 `wait` / `notify`、`Condition`，或工具类（`CountDownLatch`）、阻塞队列。
 - **单例 / 静态容器**：懒汉单例、静态变量并发访问→ 单例用双重检查锁 + volatile / 枚举，静态容器用并发安全容器。
 - **数据库 / 外部资源**：多线程操作同数据（如扣库存）→ 数据库用悲观 / 乐观锁，分布式场景用 Redis 锁，业务层保证 “查 - 改” 原子性。
-- **线程池与 ThreadLocal**：任务共享资源、ThreadLocal 未清理→ 任务内同步，ThreadLocal 在 finally 中 remove。
-- **原子操作拆分**：多步操作（如 if (count<10) count++）→ 用原子类 compareAndSet 或锁包裹整体操作。
+- **线程池与 ThreadLocal**：任务共享资源、`ThreadLocal` 未清理→ 任务内同步，ThreadLocal 在 finally 中 remove。
+- **原子操作拆分**：`if-check-and-then` 操作（如 `if (count<10) count++`）→ 用原子类 compareAndSet 或锁包裹整体操作。
 
 ### 【困难】什么是死锁？如何发现死锁？如何避免死锁？⭐⭐
 
@@ -306,7 +319,7 @@ public class DeadlockDetector {
 ::: info 什么是活锁？
 :::
 
-活锁是一个递归的情况，两个或更多的线程会不断重复一个特定的代码逻辑。预期的逻辑通常为其他线程提供机会继续支持'this'线程。
+**活锁**是指多个线程/进程在执行时，虽然都在运行（不阻塞），但通过相互谦让或重复响应对方的状态变化，导致**谁都无法向前推进**的状态。
 
 想象这样一个例子：两个人在狭窄的走廊里相遇，二者都很礼貌，试图移到旁边让对方先通过。但是他们最终在没有取得任何进展的情况下左右摇摆，因为他们都在同一时间向相同的方向移动。
 
@@ -408,290 +421,6 @@ Java 的 `java.util.concurrent` 包（简称 J.U.C）中提供了大量并发工
 
 J.U.C 包中的工具类是基于 `synchronized`、`volatile`、`CAS`、`ThreadLocal` 这样的并发核心机制打造的。所以，要想深入理解 J.U.C 工具类的特性、为什么具有这样那样的特性，就必须先理解这些核心机制。
 
-## Java 线程
-
-### 【中等】Java 线程生命周期有哪些状态？状态之间如何切换？
-
-`java.lang.Thread.State` 中定义了 **6** 种不同的线程状态，在给定的一个时刻，线程只能处于其中的一个状态。
-
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290809602.png)
-
-以下是各状态的说明，以及状态间的联系：
-
-- **开始（NEW）** - 尚未调用 `start` 方法的线程处于此状态。此状态意味着：**创建的线程尚未启动**。
-- **可运行（RUNNABLE）** - 已经调用了 `start` 方法的线程处于此状态。此状态意味着，**线程已经准备好了**，一旦被线程调度器分配了 CPU 时间片，就可以运行线程。
-  - 在操作系统层面，线程有 READY 和 RUNNING 状态；而在 JVM 层面，只能看到 RUNNABLE 状态，所以 Java 系统一般将这两个状态统称为 RUNNABLE（运行中） 状态 。
-- **阻塞（BLOCKED）** - 此状态意味着：**线程处于被阻塞状态**。表示线程在等待 `synchronized` 的隐式锁（Monitor lock）。`synchronized` 修饰的方法、代码块同一时刻只允许一个线程执行，其他线程只能等待，即处于阻塞状态。当占用 `synchronized` 隐式锁的线程释放锁，并且等待的线程获得 `synchronized` 隐式锁时，就又会从 `BLOCKED` 转换到 `RUNNABLE` 状态。
-- **等待（WAITING）** - 此状态意味着：**线程无限期等待，直到被其他线程显式地唤醒**。 阻塞和等待的区别在于，阻塞是被动的，它是在等待获取 `synchronized` 的隐式锁。而等待是主动的，通过调用 `Object.wait` 等方法进入。
-  - 进入：`Object.wait()`；退出：`Object.notify` / `Object.notifyAll`
-  - 进入：`Thread.join()`；退出：被调用的线程执行完毕
-  - 进入：`LockSupport.park()`；退出：`LockSupport.unpark`
-- **定时等待（TIMED_WAITING）** - 等待指定时间的状态。一个线程处于定时等待状态，是由于执行了以下方法中的任意方法：
-  - 进入：`Thread.sleep(long)`；退出：时间结束
-  - 进入：`Object.wait(long)`；退出：时间结束 / `Object.notify` / `Object.notifyAll`
-  - 进入：`Thread.join(long)`；退出：时间结束 / 被调用的线程执行完毕
-  - 进入：`LockSupport.parkNanos(long)`；退出：`LockSupport.unpark`
-  - 进入：`LockSupport.parkUntil(long)`；退出：`LockSupport.unpark`
-- **终止 (TERMINATED)** - 线程 `run()` 方法执行结束，或者因异常退出了 `run()` 方法，则该线程结束生命周期。死亡的线程不可再次复生。
-
-> 👉 扩展阅读：
->
-> - [Java Thread Methods and Thread States](https://www.w3resource.com/java-tutorial/java-threadclass-methods-and-threadstates.php)
-> - [Java 线程的 5 种状态及切换（透彻讲解）](https://blog.csdn.net/pange1991/article/details/53860651)
-> - [Java 线程运行怎么有第六种状态？ - Dawell 的回答](https://www.zhihu.com/question/56494969/answer/154053599)
-
-### 【中等】Java 中，创建线程有几种方式？
-
-一般来说，创建线程有很多种方式，例如：
-
-- 实现 `Runnable` 接口（推荐）
-- 继承 `Thread` 类（不推荐，因为不灵活，Java 不支持多继承）
-- 实现 `Callable` 接口 + `FutureTask`，支持返回值
-- 通过线程池（生产环境推荐）
-- 使用 `CompletableFuture`
-- ...
-
-虽然，看似有多种多样的创建线程方式。但是，**从本质上来说，Java 就只有一种方式可以创建线程，那就是通过 `new Thread().start() ` 创建。不管是哪种方式，最终还是依赖于 `new Thread().start()`**。
-
-> 👉 扩展阅读：[大家都说 Java 有三种创建线程的方式！并发编程中的惊天骗局！](https://mp.weixin.qq.com/s/NspUsyhEmKnJ-4OprRFp9g)。
-
-### 【简单】可以直接调用 `Thread.run()` 方法么？
-
-可以直接调用 `Thread.run()` 方法，但是它的行为和普通方法一样，不会启动新线程去执行。**调用 `start()` 方法方可启动线程并使线程进入就绪状态，直接执行 `run()` 方法的话不会以多线程的方式执行。**
-
-- **`run()` 方法是线程的执行体**。
-- **`start()` 方法负责启动线程，然后 JVM 会让这个线程去执行 `run()` 方法**。
-
-### 【简单】一个线程两次调用 `Thread.start()` 方法会怎样？
-
-Java 的线程是不允许启动两次的，**第二次调用 `Thread.start()` 会抛出 `IllegalThreadStateException`**。
-
-### 【简单】`Thread.sleep()`、`Thread.yield()`、`Thread.join()`、`Object.wait()` 有什么区别？
-
-| 方法                        | 所属类   | 作用                                                     | 是否释放锁  | 使用场景                                   |
-| --------------------------- | -------- | -------------------------------------------------------- | ----------- | ------------------------------------------ |
-| **`Thread.sleep(long ms)`** | `Thread` | **让当前线程暂停执行指定时间**（不释放 CPU 资源）        | ❌ 不释放锁 | 模拟耗时操作、定时任务                     |
-| **`Thread.yield()`**        | `Thread` | **提示调度器让出 CPU，但可能立即重新竞争**（不保证让出） | ❌ 不释放锁 | 优化线程调度，减少竞争（极少使用）         |
-| **`Thread.join()`**         | `Thread` | **等待目标线程执行完毕**（阻塞当前线程）                 | ❌ 不释放锁 | 线程顺序执行，如主线程等待子线程结束       |
-| **`Object.wait()`**         | `Object` | **释放锁并进入等待，直到 `notify()`/`notifyAll()` 唤醒** | ✅ 释放锁   | 线程间通信（需在 `synchronized` 块中使用） |
-
-**锁的释放**
-
-- `wait()` 会释放锁，其他方法不会。
-- `sleep()` 和 `yield()` 仅影响线程调度，不涉及锁。
-
-**唤醒机制**
-
-- `wait()` 需依赖 `notify()`/`notifyAll()` 或超时唤醒。
-- `sleep()` 和 `join()` 超时后自动恢复。
-- `yield()` 立刻重新参与竞争。
-
-**用途**
-
-- `sleep()`：固定时间暂停（如定时任务）。
-- `yield()`：礼貌让出 CPU（实际开发很少用）。
-- `join()`：线程依赖（如主线程等待子线程）。
-- `wait()`：线程间协作（生产者-消费者模型）。
-
-> 👉 扩展阅读：[Java 并发编程：线程间协作的两种方式：wait、notify、notifyAll 和 Condition](http://www.cnblogs.com/dolphin0520/p/3920385.html)
-
-### 【中等】为什么 `Thread.sleep()`、`Thread.yield()` 设计为静态方法？
-
-`Thread.sleep()`、`Thread.yield()` 针对的是 **Running** 状态的线程，也就是说在非 **Running** 状态的线程上执行这两个方法没有意义。这就是为什么这两个方法被设计为静态的。它们只针对正在 **Running** 状态的线程工作，避免程序员错误的认为可以在其他非 **Running** 状态线程上调用。
-
-> 👉 扩展阅读：[Java 线程中 yield 与 join 方法的区别](http://www.importnew.com/14958.html)
-> 👉 扩展阅读：[sleep()，wait()，yield() 和 join() 方法的区别](https://blog.csdn.net/xiangwanpeng/article/details/54972952)
-
-### 【中等】为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？
-
-**因为锁是对象的，`wait()`/`notify()` 是锁的行为，所以必须定义在 `Object` 中**。
-
-- **锁基于对象**：Java 的锁（`synchronized`）是 **对象级别** 的，每个对象关联一个监视器（Monitor），`wait()`/`notify()` 是监视器的核心操作，必须属于 `Object`。
-
-- **任何对象都可作为锁**：不仅 `Thread` 能作为锁，**所有对象** 都能作为锁，因此这些方法需定义在 `Object` 以保证通用性。
-
-- **等待队列绑定对象**：调用 `wait()` 的线程会进入 **该对象的等待队列**，`notify()` 唤醒的也是同一对象队列中的线程，与对象强绑定。
-
-- **与 `Thread` 类职责分离**：`Thread` 类管理线程生命周期（如 `sleep()`、`join()`），而 `wait()`/`notify()` 是 **线程间协作机制**，属于锁（对象）的行为。
-
-- **设计一致性与历史原因**：遵循 **Monitor 模式**（操作系统同步原语），保持 `Thread` 简洁，避免功能混淆（如 `wait()` 和 `sleep()` 的误用）。
-
-### 【中等】为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？
-
-当一个线程需要调用对象的 `wait()` 方法的时候，这个线程必须拥有该对象的锁，接着它就会释放这个对象锁并进入等待状态直到其他线程调用这个对象上的 `notify()` 方法。同样的，当一个线程需要调用对象的 `notify()` 方法时，它会释放这个对象的锁，以便其他在等待的线程就可以得到这个对象锁。
-
-由于所有的这些方法都需要线程持有对象的锁，这样就只能通过 `synchronized` 来实现，所以他们只能在 `synchronized` 方法/块中被调用。
-
-### 【中等】如何正确停止 Java 线程？
-
-**对于 Java 而言，最正确的停止线程的方式是：通过 `Thread.interrupt` 和 `Thread.isInterrupted` 配合来控制线程终止**。
-
-- `Thread.interrupt()`：设置线程的中断标志位（不会直接停止线程）。
-- `Thread.isInterrupted()`：检查中断状态。
-
-【示例】正确停止线程的方式——`Thread.interrupt`
-
-```java
-public class ThreadStopDemo {
-
-    public static void main(String[] args) throws Exception {
-        Thread thread = new Thread(new MyTask(), "MyTask");
-        thread.start();
-        TimeUnit.MILLISECONDS.sleep(10);
-        thread.interrupt();
-    }
-
-    private static class MyTask implements Runnable {
-
-        private long count = 0L;
-
-        @Override
-        public void run() {
-            System.out.println(Thread.currentThread().getName() + " 线程启动");
-            // 通过 Thread.interrupted 和 interrupt 配合来控制线程终止
-            while (!Thread.currentThread().isInterrupted() && count < 10000) {
-                System.out.println("count = " + count++);
-            }
-            System.out.println(Thread.currentThread().getName() + " 线程终止");
-        }
-
-    }
-
-}
-// 输出（count 未到 10000，线程就主动结束）：
-// MyTask 线程启动
-// count = 0
-// count = 1
-// ...
-// count = 840
-// count = 841
-// count = 842
-// MyTask 线程终止
-```
-
-### 【中等】可以使用 `Thread.stop`，`Thread.suspend` 和 `Thread.resume` 停止线程吗？为什么？
-
-`Thread.stop`，`Thread.suspend` 和 `Thread.resume` 方法已经被 Java 标记为 `@Deprecated`。为什么废弃呢？
-
-- **`Thread.stop` 会直接把线程停止，这样就没有给线程足够的时间来处理想要在停止前保存数据的逻辑，任务戛然而止，会导致出现数据完整性等问题**。
-- 而对于`Thread.suspend` 和 `Thread.resume` 而言，它们的问题在于：**如果线程调用 `Thread.suspend`，它并不会释放锁，就开始进入休眠，但此时有可能仍持有锁，这样就容易导致死锁问题**。因为这把锁在线程被 `Thread.resume` 之前，是不会被释放的。假设线程 A 调用了 `Thread.suspend` 方法让线程 B 挂起，线程 B 进入休眠，而线程 B 又刚好持有一把锁，此时假设线程 A 想访问线程 B 持有的锁，但由于线程 B 并没有释放锁就进入休眠了，所以对于线程 A 而言，此时拿不到锁，也会陷入阻塞，那么线程 A 和线程 B 就都无法继续向下执行。
-
-【示例】`Thread.stop` 终止线程，导致线程任务戛然而止
-
-```java
-public class ThreadStopErrorDemo {
-
-    public static void main(String[] args) {
-        MyTask thread = new MyTask();
-        thread.start();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // 终止线程
-        thread.stop();
-        // 确保线程终止后，才执行下面的代码
-        while (thread.isAlive()) { }
-        // 输出两个计数器的最终状态
-        thread.print();
-    }
-
-    /**
-     * 持有两个计数器，run 方法中每次执行都会使计数器自增
-     */
-    private static class MyTask extends Thread {
-
-        private int i = 0;
-
-        private int j = 0;
-
-        @Override
-        public void run() {
-            synchronized (this) {
-                ++i;
-                try {
-                    // 模拟耗时操作
-                    TimeUnit.SECONDS.sleep(5);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                ++j;
-            }
-        }
-
-        public void print() {
-            System.out.println("i=" + i + " j=" + j);
-        }
-
-    }
-
-}
-```
-
-### 【中等】使用 `volatile` 标记方式停止线程正确吗？
-
-使用 `volatile` 标记方式仅适用于简单场景（无阻塞、无锁竞争）。**推荐 `Thread.interrupt` 和 `Thread.isInterrupted` 方式停止线程**：更通用，可处理阻塞操作，是 Java 线程停止的标准方式。
-
-**`volatile` 标记停止线程适用场景（正确使用）**
-
-- ✅ **非阻塞循环**
-  - 线程在 `while (!stopped)` 循环中运行，且 **无阻塞操作**（如 `sleep()`、`wait()`、I/O）。
-  - `volatile` 保证标志位 (`stopped`) 的修改对所有线程 **立即可见**。
-- ✅ **短周期任务**：适用于 **纯计算型任务** 或 **高频检查标志位** 的场景。
-
-**`volatile` 标记停止线程不适用场景（可能失效）**
-
-- ❌ **线程被阻塞**（如 `sleep()`、`wait()`、I/O）：阻塞期间无法检测 `volatile` 标志位，必须等阻塞结束才能退出。
-- ❌ **依赖外部资源**（如锁竞争、网络请求）：即使 `stopped=true`，线程可能因锁或 I/O 阻塞无法立即退出。
-
-当我们使用 `volatile` 变量来控制线程的停止，通常是通过设置一个 `volatile` 标志位来告诉线程停止执行。例如：
-
-```java
-public class MyTask extends Thread {
-    private volatile boolean canceled = false;
-
-    public void run() {
-        while (!canceled) {
-            // 执行任务
-        }
-    }
-
-    public void stopTask() {
-        canceled = true;
-    }
-}
-```
-
-在上述例子中，`canceled` 是一个 `volatile` 变量，用来控制线程的停止。虽然这种方式在某些情况下可以工作，但它并不是一个可靠的停止线程的方式，因为**在多线程环境中，其他线程修改 `canceled` 的值时，可能会出现竞态条件，导致线程无法正确停止**。
-
-### 【中等】Java 线程之间如何进行通信？
-
-在 Java 中，线程间通信（Inter-Thread Communication, ITC）是指多个线程之间协调工作、共享数据或传递消息的机制。常见的线程通信方式包括以下几种：
-
-| 通信方式                | 核心机制                  | 适用场景         | 特点           |
-| ----------------------- | ------------------------- | ---------------- | -------------- |
-| **共享变量**            | `volatile`/`synchronized` | 简单状态标记     | 需处理竞态条件 |
-| **`wait()`/`notify()`** | 对象监视器                | 生产者-消费者    | 需手动同步     |
-| **`BlockingQueue`**     | 内置锁和条件队列          | 生产者-消费者    | 无需手动同步   |
-| **`CountDownLatch`**    | 计数器                    | 主线程等待子线程 | 一次性         |
-| **`CyclicBarrier`**     | 屏障                      | 多线程同步       | 可重复使用     |
-| **`Semaphore`**         | 许可证                    | 限流/资源池      | 控制并发数     |
-| **管道流**              | 字节流                    | 线程间数据传输   | 效率较低       |
-
-**推荐选择**：
-
-- 需要高效数据交换 → **`BlockingQueue`**
-- 线程协作 → **`wait()`/`notify()` 或 `CountDownLatch`**
-- 资源控制 → **`Semaphore`**
-- 避免重复造轮子，优先使用 JUC（`java.util.concurrent`）工具类！
-
-### 【简单】高优先级的 Java 线程一定先执行吗？
-
-Java 中的线程优先级的范围是 `[1,10]`，一般来说，高优先级的线程在运行时会具有优先权。可以通过 `thread.setPriority(Thread.MAX_PRIORITY)` 的方式设置，默认优先级为 `5`。
-
-即使设置了线程的优先级，也**无法保证高优先级的线程一定先执行**。这是因为 **Java 线程优先级依赖于操作系统的支持**，然而，不同的操作系统支持的线程优先级并不相同，不能很好的和 Java 中线程优先级一一对应。因此，Java 线程优先级控制并不可靠。
-
 ## Java 内存模型
 
 ### 【中等】什么是 Java 内存模型？
@@ -730,7 +459,7 @@ Java 源代码会经历 **编译器优化重排 —> 指令并行重排 —> 内
 
 > 👉 扩展阅读：[全面理解 Java 内存模型](https://blog.csdn.net/suifeng3051/article/details/52611310)
 
-### 【困难】什么是 Happens-Before 规则？有什么用？
+### 【困难】什么是 Happens-Before 规则？有什么用？⭐
 
 JMM 为程序中所有的操作定义了一个偏序关系，称之为 **`先行发生原则（Happens-Before）`**。**Happens-Before 是 JMM 的核心规则，用于约束指令重排序和保证多线程可见性。**
 
@@ -804,7 +533,7 @@ void read() {
 }
 ```
 
-### 【中等】`volatile` 有什么作用？
+### 【中等】`volatile` 有什么作用？⭐⭐⭐
 
 `volatile` 是轻量级的线程同步工具。**`volatile` 可以保证可见性和有序性，但不保证原子性**。适用于状态标志、DCL 单例等场景。
 
@@ -964,7 +693,7 @@ public void increase() {
 }
 ```
 
-### 【中等】`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？
+### 【中等】`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？⭐⭐
 
 **`volatile` 无法替代 `synchronized` ，因为 `volatile` 无法保证操作的原子性**。
 
@@ -988,7 +717,7 @@ public void increase() {
   - 包含 **偏向锁→轻量级锁→重量级锁** 的升级过程
   - 保证 **代码块/方法** 的排他性访问
 
-### 【中等】`synchronized` 有什么作用？
+### 【中等】`synchronized` 有什么作用？⭐⭐⭐
 
 `synchronized` 是 Java 最基础的线程同步机制，通过 **原子性、可见性、有序性** 保障线程安全，适用于需要 **强一致性** 的场景，但需合理控制锁粒度以避免性能问题。
 
@@ -1000,7 +729,7 @@ public void increase() {
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409090719904.png)
 
-### 【中等】`synchronized` 的实现原理是什么？
+### 【中等】`synchronized` 的实现原理是什么？⭐⭐⭐
 
 `synchronized` 的底层实现涉及 **Java 对象头、Monitor（监视器）、锁升级机制** 等。
 
@@ -1030,7 +759,7 @@ Mark Word 记录了对象和锁有关的信息。Mark Word 在 64 位 JVM 中的
 - **`_EntryList`**：等待获取锁的线程队列（阻塞状态）
 - **`_WaitSet`**：调用 `wait()` 后进入等待状态的线程队列
 
-### 【困难】JDK6 对`synchronized` 进行了哪些优化？
+### 【困难】JDK6 对`synchronized` 进行了哪些优化？⭐⭐⭐
 
 **JDK 6 以后，`synchronized` 做了大量的优化，其性能已经与 `Lock` 、`ReadWriteLock` 基本上持平**。
 
@@ -1183,3 +912,283 @@ private volatile boolean running = true;
 // 错误！final 不能保证对象内部线程安全
 final List<String> unsafeList = new ArrayList<>();
 ```
+
+## Java 线程
+
+### 【中等】Java 线程生命周期有哪些状态？状态之间如何切换？⭐⭐⭐
+
+`java.lang.Thread.State` 中定义了 **6** 种不同的线程状态，在给定的一个时刻，线程只能处于其中的一个状态。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290809602.png)
+
+以下是各状态的说明，以及状态间的联系：
+
+- **开始（NEW）** - 尚未调用 `start` 方法的线程处于此状态。此状态意味着：**创建的线程尚未启动**。
+- **可运行（RUNNABLE）** - 已经调用了 `start` 方法的线程处于此状态。此状态意味着，**线程已经准备好了**，一旦被线程调度器分配了 CPU 时间片，就可以运行线程。
+  - 在操作系统层面，线程有 READY 和 RUNNING 状态；而在 JVM 层面，只能看到 RUNNABLE 状态，所以 Java 系统一般将这两个状态统称为 RUNNABLE（运行中） 状态 。
+- **阻塞（BLOCKED）** - 此状态意味着：**线程处于被阻塞状态**。表示线程在等待 `synchronized` 的隐式锁（Monitor lock）。`synchronized` 修饰的方法、代码块同一时刻只允许一个线程执行，其他线程只能等待，即处于阻塞状态。当占用 `synchronized` 隐式锁的线程释放锁，并且等待的线程获得 `synchronized` 隐式锁时，就又会从 `BLOCKED` 转换到 `RUNNABLE` 状态。
+- **等待（WAITING）** - 此状态意味着：**线程无限期等待，直到被其他线程显式地唤醒**。 阻塞和等待的区别在于，阻塞是被动的，它是在等待获取 `synchronized` 的隐式锁。而等待是主动的，通过调用 `Object.wait` 等方法进入。
+  - 进入：`Object.wait()`；退出：`Object.notify` / `Object.notifyAll`
+  - 进入：`Thread.join()`；退出：被调用的线程执行完毕
+  - 进入：`LockSupport.park()`；退出：`LockSupport.unpark`
+- **定时等待（TIMED_WAITING）** - 等待指定时间的状态。一个线程处于定时等待状态，是由于执行了以下方法中的任意方法：
+  - 进入：`Thread.sleep(long)`；退出：时间结束
+  - 进入：`Object.wait(long)`；退出：时间结束 / `Object.notify` / `Object.notifyAll`
+  - 进入：`Thread.join(long)`；退出：时间结束 / 被调用的线程执行完毕
+  - 进入：`LockSupport.parkNanos(long)`；退出：`LockSupport.unpark`
+  - 进入：`LockSupport.parkUntil(long)`；退出：`LockSupport.unpark`
+- **终止 (TERMINATED)** - 线程 `run()` 方法执行结束，或者因异常退出了 `run()` 方法，则该线程结束生命周期。死亡的线程不可再次复生。
+
+> 👉 扩展阅读：
+>
+> - [Java Thread Methods and Thread States](https://www.w3resource.com/java-tutorial/java-threadclass-methods-and-threadstates.php)
+> - [Java 线程的 5 种状态及切换（透彻讲解）](https://blog.csdn.net/pange1991/article/details/53860651)
+> - [Java 线程运行怎么有第六种状态？ - Dawell 的回答](https://www.zhihu.com/question/56494969/answer/154053599)
+
+### 【中等】Java 中，创建线程有几种方式？⭐⭐
+
+一般来说，创建线程有很多种方式，例如：
+
+- 实现 `Runnable` 接口（推荐）
+- 继承 `Thread` 类（不推荐，因为不灵活，Java 不支持多继承）
+- 实现 `Callable` 接口 + `FutureTask`，支持返回值
+- 通过线程池（生产环境推荐）
+- 使用 `CompletableFuture`
+- ...
+
+虽然，看似有多种多样的创建线程方式。但是，**从本质上来说，Java 就只有一种方式可以创建线程，那就是通过 `new Thread().start() ` 创建。不管是哪种方式，最终还是依赖于 `new Thread().start()`**。
+
+> 👉 扩展阅读：[大家都说 Java 有三种创建线程的方式！并发编程中的惊天骗局！](https://mp.weixin.qq.com/s/NspUsyhEmKnJ-4OprRFp9g)。
+
+### 【简单】可以直接调用 `Thread.run()` 方法么？
+
+可以直接调用 `Thread.run()` 方法，但是它的行为和普通方法一样，不会启动新线程去执行。**调用 `start()` 方法方可启动线程并使线程进入就绪状态，直接执行 `run()` 方法的话不会以多线程的方式执行。**
+
+- **`run()` 方法是线程的执行体**。
+- **`start()` 方法负责启动线程，然后 JVM 会让这个线程去执行 `run()` 方法**。
+
+### 【中等】如何正确停止 Java 线程？⭐
+
+**对于 Java 而言，最正确的停止线程的方式是：通过 `Thread.interrupt` 和 `Thread.isInterrupted` 配合来控制线程终止**。
+
+- `Thread.interrupt()`：设置线程的中断标志位（不会直接停止线程）。
+- `Thread.isInterrupted()`：检查中断状态。
+
+【示例】正确停止线程的方式——`Thread.interrupt`
+
+```java
+public class ThreadStopDemo {
+
+    public static void main(String[] args) throws Exception {
+        Thread thread = new Thread(new MyTask(), "MyTask");
+        thread.start();
+        TimeUnit.MILLISECONDS.sleep(10);
+        thread.interrupt();
+    }
+
+    private static class MyTask implements Runnable {
+
+        private long count = 0L;
+
+        @Override
+        public void run() {
+            System.out.println(Thread.currentThread().getName() + " 线程启动");
+            // 通过 Thread.interrupted 和 interrupt 配合来控制线程终止
+            while (!Thread.currentThread().isInterrupted() && count < 10000) {
+                System.out.println("count = " + count++);
+            }
+            System.out.println(Thread.currentThread().getName() + " 线程终止");
+        }
+
+    }
+
+}
+// 输出（count 未到 10000，线程就主动结束）：
+// MyTask 线程启动
+// count = 0
+// count = 1
+// ...
+// count = 840
+// count = 841
+// count = 842
+// MyTask 线程终止
+```
+
+### 【中等】可以使用 `Thread.stop`，`Thread.suspend` 和 `Thread.resume` 停止线程吗？为什么？⭐
+
+`Thread.stop`，`Thread.suspend` 和 `Thread.resume` 方法已经被 Java 标记为 `@Deprecated`。为什么废弃呢？
+
+- **`Thread.stop` 会直接把线程停止，这样就没有给线程足够的时间来处理想要在停止前保存数据的逻辑，任务戛然而止，会导致出现数据完整性等问题**。
+- 而对于`Thread.suspend` 和 `Thread.resume` 而言，它们的问题在于：**如果线程调用 `Thread.suspend`，它并不会释放锁，就开始进入休眠，但此时有可能仍持有锁，这样就容易导致死锁问题**。因为这把锁在线程被 `Thread.resume` 之前，是不会被释放的。假设线程 A 调用了 `Thread.suspend` 方法让线程 B 挂起，线程 B 进入休眠，而线程 B 又刚好持有一把锁，此时假设线程 A 想访问线程 B 持有的锁，但由于线程 B 并没有释放锁就进入休眠了，所以对于线程 A 而言，此时拿不到锁，也会陷入阻塞，那么线程 A 和线程 B 就都无法继续向下执行。
+
+【示例】`Thread.stop` 终止线程，导致线程任务戛然而止
+
+```java
+public class ThreadStopErrorDemo {
+
+    public static void main(String[] args) {
+        MyTask thread = new MyTask();
+        thread.start();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // 终止线程
+        thread.stop();
+        // 确保线程终止后，才执行下面的代码
+        while (thread.isAlive()) { }
+        // 输出两个计数器的最终状态
+        thread.print();
+    }
+
+    /**
+     * 持有两个计数器，run 方法中每次执行都会使计数器自增
+     */
+    private static class MyTask extends Thread {
+
+        private int i = 0;
+
+        private int j = 0;
+
+        @Override
+        public void run() {
+            synchronized (this) {
+                ++i;
+                try {
+                    // 模拟耗时操作
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ++j;
+            }
+        }
+
+        public void print() {
+            System.out.println("i=" + i + " j=" + j);
+        }
+
+    }
+
+}
+```
+
+### 【简单】一个线程两次调用 `Thread.start()` 方法会怎样？
+
+Java 的线程是不允许启动两次的，**第二次调用 `Thread.start()` 会抛出 `IllegalThreadStateException`**。
+
+### 【简单】`Thread.sleep()`、`Thread.yield()`、`Thread.join()`、`Object.wait()` 有什么区别？⭐
+
+| 方法                        | 所属类   | 作用                                                     | 是否释放锁  | 使用场景                                   |
+| --------------------------- | -------- | -------------------------------------------------------- | ----------- | ------------------------------------------ |
+| **`Thread.sleep(long ms)`** | `Thread` | **让当前线程暂停执行指定时间**（不释放 CPU 资源）        | ❌ 不释放锁 | 模拟耗时操作、定时任务                     |
+| **`Thread.yield()`**        | `Thread` | **提示调度器让出 CPU，但可能立即重新竞争**（不保证让出） | ❌ 不释放锁 | 优化线程调度，减少竞争（极少使用）         |
+| **`Thread.join()`**         | `Thread` | **等待目标线程执行完毕**（阻塞当前线程）                 | ❌ 不释放锁 | 线程顺序执行，如主线程等待子线程结束       |
+| **`Object.wait()`**         | `Object` | **释放锁并进入等待，直到 `notify()`/`notifyAll()` 唤醒** | ✅ 释放锁   | 线程间通信（需在 `synchronized` 块中使用） |
+
+**锁的释放**
+
+- `wait()` 会释放锁，其他方法不会。
+- `sleep()` 和 `yield()` 仅影响线程调度，不涉及锁。
+
+**唤醒机制**
+
+- `wait()` 需依赖 `notify()`/`notifyAll()` 或超时唤醒。
+- `sleep()` 和 `join()` 超时后自动恢复。
+- `yield()` 立刻重新参与竞争。
+
+**用途**
+
+- `sleep()`：固定时间暂停（如定时任务）。
+- `yield()`：礼貌让出 CPU（实际开发很少用）。
+- `join()`：线程依赖（如主线程等待子线程）。
+- `wait()`：线程间协作（生产者-消费者模型）。
+
+> 👉 扩展阅读：[Java 并发编程：线程间协作的两种方式：wait、notify、notifyAll 和 Condition](http://www.cnblogs.com/dolphin0520/p/3920385.html)
+
+### 【中等】为什么 `Thread.sleep()`、`Thread.yield()` 设计为静态方法？⭐
+
+`Thread.sleep()`、`Thread.yield()` 针对的是 **Running** 状态的线程，也就是说在非 **Running** 状态的线程上执行这两个方法没有意义。这就是为什么这两个方法被设计为静态的。它们只针对正在 **Running** 状态的线程工作，避免程序员错误的认为可以在其他非 **Running** 状态线程上调用。
+
+> 👉 扩展阅读：[Java 线程中 yield 与 join 方法的区别](http://www.importnew.com/14958.html)
+> 👉 扩展阅读：[sleep()，wait()，yield() 和 join() 方法的区别](https://blog.csdn.net/xiangwanpeng/article/details/54972952)
+
+### 【中等】为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？⭐
+
+**因为锁是对象的，`wait()`/`notify()` 是锁的行为，所以必须定义在 `Object` 中**。
+
+- **锁基于对象**：Java 的锁（`synchronized`）是 **对象级别** 的，每个对象关联一个监视器（Monitor），`wait()`/`notify()` 是监视器的核心操作，必须属于 `Object`。
+- **任何对象都可作为锁**：不仅 `Thread` 能作为锁，**所有对象** 都能作为锁，因此这些方法需定义在 `Object` 以保证通用性。
+- **等待队列绑定对象**：调用 `wait()` 的线程会进入 **该对象的等待队列**，`notify()` 唤醒的也是同一对象队列中的线程，与对象强绑定。
+- **与 `Thread` 类职责分离**：`Thread` 类管理线程生命周期（如 `sleep()`、`join()`），而 `wait()`/`notify()` 是 **线程间协作机制**，属于锁（对象）的行为。
+- **设计一致性与历史原因**：遵循 **Monitor 模式**（操作系统同步原语），保持 `Thread` 简洁，避免功能混淆（如 `wait()` 和 `sleep()` 的误用）。
+
+### 【中等】为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？⭐
+
+当一个线程需要调用对象的 `wait()` 方法的时候，这个线程必须拥有该对象的锁，接着它就会释放这个对象锁并进入等待状态直到其他线程调用这个对象上的 `notify()` 方法。同样的，当一个线程需要调用对象的 `notify()` 方法时，它会释放这个对象的锁，以便其他在等待的线程就可以得到这个对象锁。
+
+由于所有的这些方法都需要线程持有对象的锁，这样就只能通过 `synchronized` 来实现，所以他们只能在 `synchronized` 方法/块中被调用。
+
+### 【中等】使用 `volatile` 标记方式停止线程正确吗？
+
+使用 `volatile` 标记方式仅适用于简单场景（无阻塞、无锁竞争）。**推荐 `Thread.interrupt` 和 `Thread.isInterrupted` 方式停止线程**：更通用，可处理阻塞操作，是 Java 线程停止的标准方式。
+
+**`volatile` 标记停止线程适用场景（正确使用）**
+
+- ✅ **非阻塞循环**
+  - 线程在 `while (!stopped)` 循环中运行，且 **无阻塞操作**（如 `sleep()`、`wait()`、I/O）。
+  - `volatile` 保证标志位 (`stopped`) 的修改对所有线程 **立即可见**。
+- ✅ **短周期任务**：适用于 **纯计算型任务** 或 **高频检查标志位** 的场景。
+
+**`volatile` 标记停止线程不适用场景（可能失效）**
+
+- ❌ **线程被阻塞**（如 `sleep()`、`wait()`、I/O）：阻塞期间无法检测 `volatile` 标志位，必须等阻塞结束才能退出。
+- ❌ **依赖外部资源**（如锁竞争、网络请求）：即使 `stopped=true`，线程可能因锁或 I/O 阻塞无法立即退出。
+
+当我们使用 `volatile` 变量来控制线程的停止，通常是通过设置一个 `volatile` 标志位来告诉线程停止执行。例如：
+
+```java
+public class MyTask extends Thread {
+    private volatile boolean canceled = false;
+
+    public void run() {
+        while (!canceled) {
+            // 执行任务
+        }
+    }
+
+    public void stopTask() {
+        canceled = true;
+    }
+}
+```
+
+在上述例子中，`canceled` 是一个 `volatile` 变量，用来控制线程的停止。虽然这种方式在某些情况下可以工作，但它并不是一个可靠的停止线程的方式，因为**在多线程环境中，其他线程修改 `canceled` 的值时，可能会出现竞态条件，导致线程无法正确停止**。
+
+### 【中等】Java 线程之间如何进行通信？
+
+在 Java 中，线程间通信（Inter-Thread Communication, ITC）是指多个线程之间协调工作、共享数据或传递消息的机制。常见的线程通信方式包括以下几种：
+
+| 通信方式                | 核心机制                  | 适用场景         | 特点           |
+| ----------------------- | ------------------------- | ---------------- | -------------- |
+| **共享变量**            | `volatile`/`synchronized` | 简单状态标记     | 需处理竞态条件 |
+| **`wait()`/`notify()`** | 对象监视器                | 生产者-消费者    | 需手动同步     |
+| **`BlockingQueue`**     | 内置锁和条件队列          | 生产者-消费者    | 无需手动同步   |
+| **`CountDownLatch`**    | 计数器                    | 主线程等待子线程 | 一次性         |
+| **`CyclicBarrier`**     | 屏障                      | 多线程同步       | 可重复使用     |
+| **`Semaphore`**         | 许可证                    | 限流/资源池      | 控制并发数     |
+| **管道流**              | 字节流                    | 线程间数据传输   | 效率较低       |
+
+**推荐选择**：
+
+- 需要高效数据交换 → **`BlockingQueue`**
+- 线程协作 → **`wait()`/`notify()` 或 `CountDownLatch`**
+- 资源控制 → **`Semaphore`**
+- 避免重复造轮子，优先使用 JUC（`java.util.concurrent`）工具类！
+
+### 【简单】高优先级的 Java 线程一定先执行吗？
+
+Java 中的线程优先级的范围是 `[1,10]`，一般来说，高优先级的线程在运行时会具有优先权。可以通过 `thread.setPriority(Thread.MAX_PRIORITY)` 的方式设置，默认优先级为 `5`。
+
+即使设置了线程的优先级，也**无法保证高优先级的线程一定先执行**。这是因为 **Java 线程优先级依赖于操作系统的支持**，然而，不同的操作系统支持的线程优先级并不相同，不能很好的和 Java 中线程优先级一一对应。因此，Java 线程优先级控制并不可靠。

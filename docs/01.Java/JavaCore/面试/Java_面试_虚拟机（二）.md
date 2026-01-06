@@ -18,7 +18,7 @@ permalink: /pages/667f5956/
 
 ## 垃圾收集
 
-### 【困难】如何判断 Java 对象是否可以被回收？
+### 【困难】如何判断 Java 对象是否可以被回收？⭐⭐⭐
 
 判断 Java 对象是否可以被回收有两种方法：
 
@@ -92,7 +92,7 @@ public class ReferenceCountingGC {
 
 **不要使用 finalize()**！在 Java 9 后，`finalize()` 直接被标记为 `@Deprecated`。推荐用 `try-with-resources` 或显式调用 `close()` 管理资源。
 
-### 【中等】Java 对象有哪些引用类型？
+### 【中等】Java 对象有哪些引用类型？⭐⭐
 
 在 Java 中，对象的引用类型决定了它们如何被垃圾回收（GC）处理，主要分为 **4 种引用类型**，按强度从高到低排列如下：
 
@@ -171,7 +171,7 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 
 通过合理选择引用类型，可以优化内存管理并避免内存泄漏问题。
 
-### 【中等】Java 中有哪些垃圾回收算法？
+### 【中等】Java 中有哪些垃圾回收算法？⭐⭐⭐
 
 Java 中的垃圾回收（GC）算法主要分为以下几类，每种算法针对不同的场景和内存区域（如年轻代、老年代）进行优化。
 
@@ -260,7 +260,7 @@ Java 中的垃圾回收（GC）算法主要分为以下几类，每种算法针�
 
 现代 JVM 趋向于使用**分代+分区+并发**的复合算法（如 G1），在吞吐量和延迟之间取得平衡。
 
-### 【中等】Java 中常见的垃圾收集器有哪些？
+### 【中等】Java 中常见的垃圾收集器有哪些？⭐⭐⭐
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-overview.jpg)
 
@@ -298,7 +298,7 @@ Java 中的垃圾回收（GC）算法主要分为以下几类，每种算法针�
 
 通过此表格可快速定位适合业务需求的 GC 组合。
 
-### 【困难】为什么 Java 8 移除了永久代（PermGen）并引入了元空间（Metaspace）？
+### 【困难】为什么 Java 8 移除了永久代（PermGen）并引入了元空间（Metaspace）？⭐⭐
 
 Java 8 用元空间替代永久代，解决了 PermGen 固定大小易导致内存溢出和垃圾回收效率低的问题。元空间使用本地内存，具备更灵活的内存分配能力，提升了垃圾收集和内存管理的效率。
 
@@ -323,7 +323,7 @@ Java 8 用元空间替代永久代，解决了 PermGen 固定大小易导致内�
 | **垃圾回收** | 依赖 Full GC                      | 独立回收，条件更宽松                    |
 | **OOM 错误** | `OutOfMemoryError: PermGen space` | `OutOfMemoryError: Metaspace`           |
 
-### 【困难】Java 中的 Young GC、Old GC、Full GC 和 Mixed GC 的区别是什么？
+### 【困难】Java 中的 Young GC、Old GC、Full GC 和 Mixed GC 的区别是什么？⭐⭐
 
 #### Young GC
 
@@ -431,7 +431,7 @@ Java 8 用元空间替代永久代，解决了 PermGen 固定大小易导致内�
 - 执行方式：混合回收年轻代和部分老年代区域，主要目的是减少老年代中的垃圾积压。
 - 特点：结合了 YGC 的快速回收和 OGC 的深度回收，尽量减少停顿时间，适用于大内存应用。
 
-### 【困难】Java 的 CMS 垃圾回收流程是怎样的？
+### 【困难】Java 的 CMS 垃圾回收流程是怎样的？⭐⭐
 
 CMS 是一种以**低延迟**为目标的垃圾回收器，主要用于老年代回收，其核心流程分为四个阶段，其中两个阶段会触发 **STW（Stop-The-World）**，其余阶段与用户线程并发执行。
 
@@ -454,7 +454,7 @@ CMS 收集器运行步骤如下：
   - 优化：调整 `-XX:CMSInitiatingOccupancyFraction`（默认 68%，建议 70-80%）。
 - **浮动垃圾**：需预留空间（通过 `-XX:+UseCMSInitiatingOccupancyOnly` 避免动态调整阈值）。
 
-### 【困难】Java 的 G1 垃圾回收流程是怎样的？
+### 【困难】Java 的 G1 垃圾回收流程是怎样的？⭐⭐
 
 G1 通过分区和增量回收实现低延迟，兼顾吞吐量与内存碎片控制，是 JDK 9 后的默认垃圾回收器。
 

@@ -97,6 +97,11 @@ permalink: /pages/96684ccf/
 
 ### 【中等】悲观锁和乐观锁有什么区别？
 
+**悲观锁假定会冲突，提前加锁阻塞；乐观锁假定不冲突，提交时检测版本，冲突则重试。**
+
+- **悲观锁**：先加锁再操作，适合写多读少的高并发场景，保证安全但性能较低，如金融交易。
+- **乐观锁**：通过版本号或 CAS 机制实现，提交时检查数据是否被修改，适合读多写少的场景，如电商库存。
+
 以下是悲观锁与乐观锁的详细对比：
 
 | **对比维度**   | **悲观锁**                                                         | **乐观锁**                                              |
@@ -112,14 +117,14 @@ permalink: /pages/96684ccf/
 | **典型应用**   | - 银行转账<br>- 订单支付<br>- 数据库行级锁                         | - 库存扣减<br>- 计数器<br>- 点赞系统                    |
 | **优缺点**     | ✅ 强一致性<br>❌ 吞吐量低、死锁风险                               | ✅ 高并发性能好<br>❌ 实现复杂、可能 ABA 问题           |
 
-**选择建议**：
-
-- **悲观锁**适合"宁可排队等，不能出错"的场景（如金融交易）。
-- **乐观锁**适合"宁可重试，不要阻塞"的场景（如电商库存）。
-
 ### 【中等】公平锁和非公平锁有什么区别？
 
-**Java 中公平锁和非公平锁的对比**：
+**公平锁按请求顺序分配，非公平锁允许插队，可能让先到的线程等待。**
+
+- **公平锁**：线程获取锁的顺序严格遵循请求的先后顺序，保证公平性但可能降低吞吐量。
+- **非公平锁**：允许后请求的线程“插队”抢先获取锁，虽可能造成饥饿但通常能提高系统整体性能。
+
+公平锁和非公平锁的详细对比：
 
 | **对比维度**         | **公平锁 (Fair Lock)**                               | **非公平锁 (Nonfair Lock)**                |
 | -------------------- | ---------------------------------------------------- | ------------------------------------------ |
@@ -153,9 +158,145 @@ permalink: /pages/96684ccf/
 - **性能差异**：非公平锁在高并发下吞吐量可提升 **10%~30%**，但可能增加延迟方差。
 - **synchronized 的公平性**：Java 的 `synchronized` **不支持公平锁**，仅 `ReentrantLock` 可配置。
 
-### 【中等】synchronized 和 ReentrantLock 有什么区别？
+### 【困难】AQS 的实现原理是什么？⭐⭐⭐
 
-使用差异：
+AQS（**AbstractQueuedSynchronizer**）是 Java 并发包（`java.util.concurrent.locks`）的核心框架，用于构建锁（如 `ReentrantLock`）和同步器（如 `CountDownLatch`、`Semaphore`）。
+
+**AQS 用一个 volatile int 状态值 + 一个双向链表队列（CLH），通过 CAS 自旋实现线程的排队与唤醒，是 Java 并发锁的“骨架引擎”。**
+
+::: info AQS 要点
+
+:::
+
+AQS 原理可归纳为：**2 种模式，3 大核心，4 步操作**
+
+**2 种模式**
+
+- **独占模式（Exclusive）**：同一时刻只有一个线程能获取资源（如 `ReentrantLock`）。
+- **共享模式（Shared）**：多个线程可同时获取资源（如 `Semaphore`, `CountDownLatch`）。
+
+**3 大核心**
+
+1. **状态（State）**：一个 `volatile` 整型变量，用于表示同步状态。`state` 在不同的同步组件中意义不同。
+   - **锁的意义**：0 代表无锁，>0 代表有锁（可重入时累加）。例如在 `ReentrantLock` 里，`state` 为 0 表示锁未被持有，大于 0 表示锁已被持有，且重入次数就是 `state` 的值。
+   - **信号量/CountDownLatch 等意义**：state 表示可用资源数或倒数计数。
+2. **同步队列（CLH 变体）**：一个**双链表**，存放等待获取资源的线程。`Node` 包含以下重要属性：
+   - **`thread`**：指向等待获取同步状态的线程。
+   - **`prev` 和 `next`**：分别指向前一个节点和后一个节点，从而形成双向链表。
+   - **`waitStatus`**：表示节点的等待状态，常见的状态有：
+     - `CANCELLED`（1）：表示该节点对应的线程已取消等待。
+     - `SIGNAL`（-1）：表示该节点的后继节点需要被唤醒。
+     - `CONDITION`（-2）：表示该节点处于条件队列中。
+     - `PROPAGATE`（-3）：用于共享模式下，表明状态需要向后传播。
+   - 每个线程被封装为一个 **Node 节点**。
+   - 队列头节点（head）是当前持有资源的线程（独占模式）或已唤醒的节点。
+3. **CAS 操作**：所有对 `state` 和队列头的修改，都通过 **`Unsafe.compareAndSwap`** 原子完成，保证线程安全。
+
+**4 步关键操作**
+
+可以把一个线程获取锁到释放锁的过程，想象成**“尝试加锁 → 排队等候 → 被唤醒 → 解锁”**的流程。
+
+```
+线程请求资源
+    │
+    ▼
+   state=0? ──Y──> CAS 获取资源（成功）
+    │                     │
+    N                     ▼
+    │                执行、占有资源
+    ▼                     │
+加入 CLH 队列尾部 ◄─── 失败     │
+    │                     ▼
+自旋/检查/挂起       释放资源 (state=0)
+（等待被前驱唤醒）         │
+    │                     ▼
+    └──────────►  唤醒后继节点
+```
+
+::: info AQS 独占模式工作流程
+
+:::
+
+**独占模式**：同一时刻仅允许一个线程获取同步状态，例如 `ReentrantLock`。
+
+1. **tryAcquire**：线程尝试直接获取锁（CAS 修改 state）。
+   - **成功**：拿到锁，设置自己为独占线程。
+   - **失败**：进入第 2 步。
+2. **addWaiter**：将当前线程包装成 Node 节点，**用 CAS 快速插入**到同步队列尾部。
+3. **acquireQueued**：在队列中进入“**自旋-检测-挂起**”循环。
+   - 检查自己是不是第二个节点（即 head 的下一个），如果是则再次尝试获取锁（tryAcquire）。
+   - 如果获取失败，则根据前驱节点的状态，决定是否将自己挂起（`LockSupport.park`）。
+4. **release & unparkSuccessor**：持有锁的线程释放锁时。
+   - `tryRelease`：修改 state。
+   - 唤醒（`LockSupport.unpark`）队列中下一个等待的节点（后继节点），让它重新尝试获取锁。
+
+::: info AQS 共享模式工作流程
+
+:::
+
+**共享模式**：同一时刻允许多个线程获取同步状态，例如 `CountDownLatch` 和 `Semaphore`。
+
+- **获取锁**：
+  - 线程调用 `acquireShared(int)` → `tryAcquireShared(int)`（子类实现）。
+  - 如果成功（返回 `≥0`），获取锁；否则进入队列等待。
+- **释放锁**：
+  - 线程调用 `releaseShared(int)` → `tryReleaseShared(int)`（子类实现）。
+  - 如果成功，唤醒后续等待的线程（可能多个）。
+
+::: info AQS 关键方法
+
+:::
+
+AQS 的关键方法采用模板方法设计模式串联起来：
+
+- **独占模式**
+  - **`tryAcquire(int arg)`**：尝试以独占模式获取同步状态，此方法需由子类实现。
+  - **`acquire(int arg)`**：以独占模式获取同步状态，若获取失败则将线程加入队列并阻塞。
+  - **`tryRelease(int arg)`**：尝试以独占模式释放同步状态，需子类实现。
+  - **`release(int arg)`**：以独占模式释放同步状态，若释放成功则唤醒队列中的后继节点。
+- **共享模式**
+  - **`tryAcquireShared(int arg)`**：尝试以共享模式获取同步状态，需子类实现。
+  - **`acquireShared(int arg)`**：以共享模式获取同步状态，若获取失败则将线程加入队列并阻塞。
+  - **`tryReleaseShared(int arg)`**：尝试以共享模式释放同步状态，需子类实现。
+  - **`releaseShared(int arg)`**：以共享模式释放同步状态，若释放成功则唤醒队列中的后继节点。
+
+::: tip 扩展
+
+[从 ReentrantLock 的实现看 AQS 的原理及应用](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)
+
+:::
+
+### 【中等】synchronized 和 ReentrantLock 有什么区别？⭐⭐⭐
+
+- `ReentrantLock` **更强大**：支持公平锁、可中断、超时、多条件变量。`ReentrantLock` **必须手动释放锁**，否则会导致死锁！
+- `synchronized` **更简单**：自动管理锁，适合基础同步需求。
+- **性能差异**：JDK 6 后，synchronized 经过一系列优化，两者性能接近，但 `ReentrantLock` 在高竞争场景仍略有优势。
+
+:::info synchronized 和 ReentrantLock 详细对比
+
+:::
+
+以下是 **`synchronized`** 和 **`ReentrantLock`** 的详细对比表格，涵盖 **锁机制、功能、性能、使用场景** 等核心维度：
+
+---
+
+| **对比维度**       | **`synchronized`**                                                | **`ReentrantLock`**                                                 |
+| ------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **锁类型**         | JVM 内置关键字（隐式锁）                                          | JDK 提供的类（显式锁）                                              |
+| **加锁解锁方式**   | 自动加锁/释放锁（进入同步代码块加锁，退出时释放）                 | 需手动调用 `lock()` 和 `unlock()`（必须配合 `try-finally` 使用）    |
+| **是否可重入**     | 支持（同一线程可重复获取）                                        | 支持（同一线程可重复获取）                                          |
+| **是否支持公平**   | 仅支持非公平锁                                                    | 可配置公平锁或非公平锁（构造函数传参 `true/false`）                 |
+| **是否可中断**     | 不支持中断                                                        | 支持 `lockInterruptibly()`，可响应中断                              |
+| **是否支持超时**   | 不支持超时                                                        | 支持 `tryLock(timeout, unit)`，可设置超时时间                       |
+| **是否支持多条件** | 通过 `wait()`/`notify()` 实现，单一等待队列                       | 支持多个 `Condition`，可精确控制线程唤醒（如 `await()`/`signal()`） |
+| **性能**           | JDK 6+ 优化后（偏向锁→轻量级锁→重量级锁）性能接近 `ReentrantLock` | 在高竞争场景下性能略优（减少上下文切换）                            |
+| **死锁检测**       | 无内置死锁检测                                                    | 可通过 `tryLock` 避免死锁                                           |
+| **适用场景**       | 简单同步场景（如单方法同步）                                      | 复杂同步需求（如公平锁、可中断锁、超时锁）                          |
+| **底层实现**       | JVM 通过 `monitorenter`/`monitorexit` 字节码实现                  | 基于 `AbstractQueuedSynchronizer (AQS)` 实现                        |
+
+:::info synchronized 和 ReentrantLock 的使用差异
+
+:::
 
 ::: code-tabs#synchronized 和 ReentrantLock 使用差异
 
@@ -198,47 +339,9 @@ public void test () throw Exception {
 
 :::
 
-以下是 **`synchronized`** 和 **`ReentrantLock`** 的详细对比表格，涵盖 **锁机制、功能、性能、使用场景** 等核心维度：
+:::info synchronized 和 ReentrantLock 的适用场景
 
----
-
-| **对比维度**       | **`synchronized`**                                                | **`ReentrantLock`**                                                 |
-| ------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
-| **锁类型**         | JVM 内置关键字（隐式锁）                                          | JDK 提供的类（显式锁）                                              |
-| **加锁解锁方式**   | 自动加锁/释放锁（进入同步代码块加锁，退出时释放）                 | 需手动调用 `lock()` 和 `unlock()`（必须配合 `try-finally` 使用）    |
-| **是否可重入**     | 支持（同一线程可重复获取）                                        | 支持（同一线程可重复获取）                                          |
-| **是否支持公平**   | 仅支持非公平锁                                                    | 可配置公平锁或非公平锁（构造函数传参 `true/false`）                 |
-| **是否可中断**     | 不支持中断                                                        | 支持 `lockInterruptibly()`，可响应中断                              |
-| **是否支持超时**   | 不支持超时                                                        | 支持 `tryLock(timeout, unit)`，可设置超时时间                       |
-| **是否支持多条件** | 通过 `wait()`/`notify()` 实现，单一等待队列                       | 支持多个 `Condition`，可精确控制线程唤醒（如 `await()`/`signal()`） |
-| **性能**           | JDK 6+ 优化后（偏向锁→轻量级锁→重量级锁）性能接近 `ReentrantLock` | 在高竞争场景下性能略优（减少上下文切换）                            |
-| **死锁检测**       | 无内置死锁检测                                                    | 可通过 `tryLock` 避免死锁                                           |
-| **适用场景**       | 简单同步场景（如单方法同步）                                      | 复杂同步需求（如公平锁、可中断锁、超时锁）                          |
-| **底层实现**       | JVM 通过 `monitorenter`/`monitorexit` 字节码实现                  | 基于 `AbstractQueuedSynchronizer (AQS)` 实现                        |
-
-**关键区别总结**
-
-- **灵活性**
-
-  - `ReentrantLock` 更强大：支持公平锁、可中断、超时、多条件变量。
-  - `synchronized` 更简单：自动管理锁，适合基础同步需求。
-
-- **性能差异**：JDK 6 后两者性能接近，但 `ReentrantLock` 在高竞争场景仍略有优势。
-
-- **使用选择建议**
-
-  - **选择 `synchronized`**：
-    - 需要简单的代码块同步。
-    - 不需要高级功能（如超时、公平锁）。
-  - **选择 `ReentrantLock`**：
-    - 需要精细控制（如公平性、可中断）。
-    - 需要避免死锁（`tryLock`）。
-
-- **注意**
-  - `ReentrantLock` **必须手动释放锁**，否则会导致死锁！
-  - `synchronized` 是 Java 并发的基础，而 `ReentrantLock` 是它的增强扩展。
-
-**适用场景**
+:::
 
 - **`synchronized` 适用场景**：单例模式的双重检查锁、简单的线程安全计数器。
 - **`ReentrantLock` 适用场景**：
@@ -246,142 +349,93 @@ public void test () throw Exception {
   - 需要超时控制的资源争用（如避免死锁）。
   - 复杂的多条件线程协调（如生产者-消费者模型）。
 
-### 【困难】ReentrantLock 的实现原理是什么？
+**使用选择建议**
 
-**ReentrantLock 基于 AQS（AbstractQueuedSynchronizer）实现**：
+- **选择 `synchronized`**：
+  - 需要简单的代码块同步。
+  - 不需要高级功能（如超时、公平锁）。
+- **选择 `ReentrantLock`**：
+  - 需要精细控制（如公平性、可中断）。
+  - 需要避免死锁（`tryLock`）。
+
+### 【困难】ReentrantLock 的实现原理是什么？⭐⭐⭐
+
+本质上，**ReentrantLock 是 AQS 在独占模式下的一个经典实现**。
+
+**ReentrantLock 以 AQS 的 state 和同步队列为基础，通过 NonfairSync / FairSync 实现（非）公平策略，并内置可重入计数和条件队列机制的互斥锁实现**。
 
 - **核心依赖**：`ReentrantLock` 通过内部类 `Sync`（继承 `AQS`）实现锁机制。
 - **AQS 作用**：提供线程阻塞/唤醒的队列管理（CLH 变体）和状态（`state`）的原子操作。
 
-**锁状态（state）管理**
+:::info 两种模式
 
-- **`state` 字段**：
-  - `=0`：锁未被占用。
-  - `>0`：锁被占用，数值表示重入次数（可重入性）。
-- **修改方式**：通过 `CAS`（Compare-And-Swap）保证原子性。
+:::
 
-**获取锁（公平 / 非公平）**
+ReentrantLock 内部有两个主要的静态内部类，决定了其抢占行为：
 
-- **公平锁**（`FairSync`）：严格按照 FIFO 顺序获取锁（先检查队列是否有等待线程）。
-  - 先检查是否有前驱节点（队列中有无等待线程），有则排队。
-  - 无则尝试 CAS 获取锁。
-- **非公平锁**（`NonfairSync`，默认）：新线程直接尝试 CAS 抢锁（可能插队），失败才进入队列。
-  - 直接尝试 CAS 修改 `state`（抢锁）。
-  - 失败后调用 `AQS.acquire()` 进入队列等待。
+1. **`NonfairSync`（非公平锁，默认）**：**允许插队**
+   - 新线程来了直接尝试 CAS 抢锁（插队），抢不到才排队。
+   - **优点**：吞吐量高。
+   - **缺点**：可能导致饥饿问题。
+2. **`FairSync`（公平锁）**：**先到先得**
+   - 新线程来了先检查同步队列是否为空，有排队者则直接去队尾排队。
+   - **优点**：公平，无饥饿问题。
+   - **缺点**：上下文切换多，吞吐量相对低。
 
-**释放锁**
+二者核心区别就在 `lock()` 方法中，尝试获取锁前**是否检查同步队列中有等待者**（`hasQueuedPredecessors()`）。
 
-1. 减少 `state` 值（重入次数减 1）。
-2. 若 `state=0`，唤醒队列中的下一个线程（通过 `LockSupport.unpark()`）。
+:::info 三大核心
 
-**可重入性**
-
-- 记录当前持有锁的线程（`exclusiveOwnerThread`）。
-- 同一线程重复获取锁时，`state` 递增（无需重新排队）。
-
-**关键方法**
-
-- **`tryLock()`**：非阻塞尝试获取锁（直接 CAS）。
-- **`lockInterruptibly()`**：支持中断的锁获取。
-- **`Condition`**：基于 `AQS` 实现多个等待队列（如 `await()`/`signal()`）。
-
-**性能优化**
-
-- **非公平锁**：减少线程切换，提高吞吐量（但可能饥饿）。
-- **自旋优化**：短暂自旋尝试获取锁，避免立即入队。
-
-**总结**
-
-`ReentrantLock` 的核心是通过 **AQS 队列 + CAS 操作** 实现：
-
-- **锁竞争**：通过 `state` 和 CLH 队列管理线程阻塞/唤醒。
-- **灵活性**：支持公平性、可中断、超时等高级功能。
-- **可重入**：记录持有线程和重入次数。
-
-适用于需要精细控制锁行为的场景（如公平性、条件变量）。
-
-### 【困难】AQS 的实现原理是什么？
-
-AQS（**AbstractQueuedSynchronizer**）是 Java 并发包（`java.util.concurrent.locks`）的核心框架，用于构建锁（如 `ReentrantLock`）和同步器（如 `CountDownLatch`、`Semaphore`）。它的核心思想是 **CLH 队列 + CAS + 状态管理**，提供了一种高效、灵活的同步机制。
-
-**关键属性**
-
-- **状态变量（state）**：一个 `volatile` 整型变量，用于表示同步状态。不同的同步组件对 `state` 有不同的解读，例如在 `ReentrantLock` 里，`state` 为 0 表示锁未被持有，大于 0 表示锁已被持有，且重入次数就是 `state` 的值。
-- **等待队列（head 和 tail）**：指向 FIFO 队列的头尾节点。队列中的每个节点都代表一个等待获取同步状态的线程。每个 `Node` 包含以下重要属性：
-  - **`thread`**：指向等待获取同步状态的线程。
-  - **`prev` 和 `next`**：分别指向前一个节点和后一个节点，从而形成双向链表。
-  - **`waitStatus`**：表示节点的等待状态，常见的状态有：
-    - `CANCELLED`（1）：表示该节点对应的线程已取消等待。
-    - `SIGNAL`（-1）：表示该节点的后继节点需要被唤醒。
-    - `CONDITION`（-2）：表示该节点处于条件队列中。
-    - `PROPAGATE`（-3）：用于共享模式下，表明状态需要向后传播。
-
-**同步模式**
-
-AQS 支持两种同步模式：
-
-- **独占模式**：同一时刻仅允许一个线程获取同步状态，例如 `ReentrantLock`。
-  - **获取锁**：
-    - 线程调用 `acquire(int)` → `tryAcquire(int)`（子类实现）。
-    - 如果成功（`state` 修改成功），则获取锁。
-    - 如果失败，线程被封装成 `Node` 加入 **CLH 队列**，并进入 `park()` 等待。
-  - **释放锁**：
-    - 线程调用 `release(int)` → `tryRelease(int)`（子类实现）。
-    - 如果成功，唤醒队列中的下一个线程（`unparkSuccessor`）。
-- **共享模式**：同一时刻允许多个线程获取同步状态，例如 `CountDownLatch` 和 `Semaphore`。
-  - **获取锁**：
-    - 线程调用 `acquireShared(int)` → `tryAcquireShared(int)`（子类实现）。
-    - 如果成功（返回 `≥0`），获取锁；否则进入队列等待。
-  - **释放锁**：
-    - 线程调用 `releaseShared(int)` → `tryReleaseShared(int)`（子类实现）。
-    - 如果成功，唤醒后续等待的线程（可能多个）。
-
-**关键方法**
-
-- **独占模式**
-  - **`tryAcquire(int arg)`**：尝试以独占模式获取同步状态，此方法需由子类实现。
-  - **`acquire(int arg)`**：以独占模式获取同步状态，若获取失败则将线程加入队列并阻塞。
-  - **`tryRelease(int arg)`**：尝试以独占模式释放同步状态，需子类实现。
-  - **`release(int arg)`**：以独占模式释放同步状态，若释放成功则唤醒队列中的后继节点。
-- **共享模式**
-  - **`tryAcquireShared(int arg)`**：尝试以共享模式获取同步状态，需子类实现。
-  - **`acquireShared(int arg)`**：以共享模式获取同步状态，若获取失败则将线程加入队列并阻塞。
-  - **`tryReleaseShared(int arg)`**：尝试以共享模式释放同步状态，需子类实现。
-  - **`releaseShared(int arg)`**：以共享模式释放同步状态，若释放成功则唤醒队列中的后继节点。
-
-::: info AQS 核心机制
-
-**CAS（Compare-And-Swap）**
-
-使用 `Unsafe` 类的 `compareAndSwapXXX` 方法保证 `state` 和队列操作的原子性。
-
-例如：
+:::
 
 ```java
-protected final boolean compareAndSetState(int expect, int update) {
-    return unsafe.compareAndSwapInt(this, stateOffset, expect, update);
-}
+ReentrantLock
+    │
+    ├── Sync (extends AQS)
+    │    ├── state （锁计数器）
+    │    ├── exclusiveOwnerThread （当前持有线程）
+    │    └── CLH Queue （等待锁的线程队列）
+    │
+    ├── NonfairSync （默认，插队抢锁）
+    ├── FairSync （先来后到）
+    │
+    └── ConditionObject
+         └── Condition Queue （等待特定条件的线程队列）
 ```
 
-**自旋 + `park()` 等待**
+1. **AQS 同步器（Sync）**：继承自 AQS。
+   - **状态 (`state`)**：`volatile int`，表示锁被持有的次数。`0`=空闲，`N`=被同一个线程重入了 `N` 次。
+   - **同步队列**：存储等待线程的 CLH 变体队列。
+   - **独占线程**：记录当前持有锁的线程 (`exclusiveOwnerThread`)。
+2. **可重入机制**：
+   - **加锁**：若当前线程是持有者，则 `state` 加 1（无需 CAS）。
+   - **解锁**：`state` 减 1，减到 0 时才完全释放，唤醒后继节点。
+3. **条件变量 (`ConditionObject`)**：
+   - 每个 `Condition` 对象内部维护一个 **独立的等待队列**。
+   - `await()` 将当前线程从**锁的同步队列**移到**条件等待队列**，并释放锁。
+   - `signal()` 将条件等待队列的头节点移到**锁的同步队列**中，重新等待获取锁。
 
-- 线程在入队前会自旋尝试获取锁（减少上下文切换）。
-- 如果仍然失败，则调用 `LockSupport.park()` 挂起线程。
-
-**公平性控制**
-
-- **公平锁**：严格按照 CLH 队列顺序获取锁（`hasQueuedPredecessors()` 检查是否有前驱节点）。
-- **非公平锁**：新线程可以插队（`tryAcquire` 直接尝试获取锁，不检查队列）。
-
-:::
-
-::: tip 扩展
-
-[从 ReentrantLock 的实现看 AQS 的原理及应用](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)
+:::info 关键步骤
 
 :::
 
-### 【困难】ReentrantReadWriteLock 的实现原理是什么？
+**🔒 加锁四步曲**
+
+1. **快速抢票**：新线程直接 CAS 尝试将 `state` 从 0 改为 1（插队）。
+2. **抢到则坐**：成功则设置自己为独占线程，进入临界区。
+3. **没抢则排**：失败则调用 AQS 的 `acquire(1)`，进入同步队列队尾。
+4. **队列中等**：在队列中进入“自旋-检查-挂起”循环，等待被前驱节点唤醒。
+
+**🔓 解锁两步曲**（`unlock()` 本质是两个关键操作）
+
+1. **尝试释放**：调用 `tryRelease(1)`，将 `state` 减 1。如果 `state` 减到 0，则清空独占线程标记。
+2. **唤醒后继**：如果锁完全释放（`state == 0`），则唤醒同步队列中下一个符合条件的等待线程。
+
+### 【困难】ReentrantReadWriteLock 的实现原理是什么？⭐⭐
+
+::: info ReentrantReadWriteLock 的特性
+
+:::
 
 **ReentrantReadWriteLock 是为【读多写少】的并发场景设计的锁实现**。
 
@@ -393,45 +447,69 @@ ReentrantReadWriteLock 有以下特性：
 - **支持公平锁**，默认为非公平锁。
 - **支持锁降级**：**持有写锁可以获取读锁；反之不允许**。
 
-**ReentrantReadWriteLock 基于 AQS 实现的读写锁**，其**核心设计思想是将一个 32 位的 int 状态变量拆分为两部分**：
+::: info ReentrantReadWriteLock 的核心设计
 
-- **高 16 位**：表示读锁的持有数量（包括重入次数）
-- **低 16 位**：表示写锁的重入次数
+:::
 
+**ReentrantReadWriteLock 基于 AQS 实现的读写锁**。
+
+`ReentrantReadWriteLock` 的**核心设计思想**是**将一个 32 位的 int 状态变量拆分为两部分**：`state = (readCount << 16) | writeCount`
+
+虽然提供了两个锁对象（`readLock`, `writeLock`），但底层共享同一个 AQS 同步器。
+
+| 视角           | 读锁 (`ReadLock`)      | 写锁 (`WriteLock`)         |
+| :------------- | :--------------------- | :------------------------- |
+| **行为**       | 共享锁                 | 独占锁                     |
+| **占用 state** | 高 16 位               | 低 16 位                   |
+| **互斥规则**   | 与**写锁**互斥         | 与**所有锁**（读、写）互斥 |
+| **重入计数**   | 所有读线程的总重入次数 | 单个写线程的重入次数       |
+| **条件变量**   | **不支持** `Condition` | **支持** `Condition`       |
+
+::: info ReentrantReadWriteLock 写锁实现（WriteLock）
+
+:::
+
+**ReentrantReadWriteLock 写锁基于 AQS 的独占模式实现**。
+
+写锁获取步骤：
+
+1. 线程申请写锁（`writeLock.lock()`）
+2. 检查有没有读锁或写锁（`state != 0`）
+3. 没有，**CAS 设置 state 的低 16 为 1**（获得写锁）
+4. 有，当前线程是否已持有写锁（可重入）
+   - 是：CAS 将 state 的低 16 加 1（获得写锁）
+   - 否：排队等待（进入 AQS 同步队列挂起）
+
+实现方法：
+
+```java
+protected final boolean tryAcquire(int acquires) {
+    // 检查是否有读锁或其他线程持有写锁
+    if (c != 0 && w == 0) return false;
+    // 检查重入或 CAS 设置状态
+    // ...
+}
 ```
-状态变量结构：
-+-------------------------------+-------------------------------+
-|         读锁状态 (16 位）        |         写锁状态 (16 位）        |
-+-------------------------------+-------------------------------+
-```
 
-**写锁实现（WriteLock）**
+::: info ReentrantReadWriteLock 读锁实现（ReadLock）
 
-- 排他锁，使用 AQS 的独占模式
-- 获取条件：
-  - 读锁计数为 0（没有读锁）
-  - 写锁计数为 0 或当前线程已持有写锁（可重入）
-- 实现方法：
-  ```java
-  protected final boolean tryAcquire(int acquires) {
-      // 检查是否有读锁或其他线程持有写锁
-      if (c != 0 && w == 0) return false;
-      // 检查重入或 CAS 设置状态
-      // ...
-  }
-  ```
+:::
 
-**读锁实现（ReadLock）**
+**ReentrantReadWriteLock 读锁基于 AQS 的共享模式实现**。
 
-- 共享锁，使用 AQS 的共享模式
-- 获取条件：
-  - 没有线程持有写锁，或写锁被当前线程持有（锁降级）
-- 实现特点：
-  - 使用 ThreadLocal 记录每个线程的重入次数
-  - 第一个获取读锁的线程会记录自己（firstReader）
-  - 后续线程使用 cachedHoldCounter 优化性能
+1. 线程申请读锁（`readLock.lock()`）
+2. 检查有没有写锁（`(state & 0xFFFF) != 0`）
+3. 没有，CAS 将 state 的高 16 加 1（获得读锁）
+4. 有，排队等待（进入 AQS 同步队列挂起）
 
-**锁降级实现**
+::: info ReentrantReadWriteLock 锁降级实现
+
+:::
+
+1. **线程持有写锁**
+2. **直接申请读锁**：因为线程有写锁，因此一定成功（高 16 位加 1）
+3. **释放写锁**
+4. 锁状态从 **“独占写”** 降级为 **“共享读”**。
 
 ```java
 // 锁降级示例代码
@@ -445,56 +523,88 @@ try {
 // 此时仍持有读锁，其他线程可以获取读锁但不能获取写锁
 ```
 
-**关键数据结构**
-
-**HoldCounter**
-
-```java
-static final class HoldCounter {
-    int count;          // 重入次数
-    final long tid = Thread.currentThread().getId(); // 线程 ID
-}
-```
-
-**ThreadLocalHoldCounter**
-
-```0java
-static final class ThreadLocalHoldCounter
-    extends ThreadLocal<HoldCounter> {
-    public HoldCounter initialValue() {
-        return new HoldCounter();
-    }
-}
-```
-
 **性能优化技巧**
 
 - **firstReader 优化**：记录第一个获取读锁的线程，避免 ThreadLocal 查找
 - **cachedHoldCounter**：缓存最近一个获取读锁的线程计数器
 - **读锁计数存储**：使用 ThreadLocal 保存每个线程的重入次数，避免竞争
 
-### 【困难】StampedLock 的实现原理是什么？
+### 【困难】StampedLock 的实现原理是什么？⭐
 
 `StampedLock`是 JDK8 引入的高性能锁，**适合读多写少且追求极致吞吐的场景**，但需谨慎处理乐观读失败和死锁风险。
 
-StampedLock 通过**版本号+状态位拆分**实现无锁读，牺牲重入性和公平性换取更高吞吐，适合短期读操作的并发场景。
+StampedLock 是 **通过一个 64 位 long 值同时编码版本号、读计数和写标记，并利用戳记（Stamp）实现乐观读、锁升级等高级并发控制，在牺牲部分易用性和重入性的前提下，提供极高读性能的同步器**。
 
-**StampedLock 支持三种锁模式**：
+::: info StampedLock 三种模式
 
-- **写锁（独占锁）**：类似`ReentrantLock`，同一时刻只有一个线程能获取。阻塞其他所有读锁和写锁请求。
-- **悲观读锁（共享锁）**：允许多线程并发读，但会阻塞写锁请求（类似`ReentrantReadWriteLock`的读锁）。
-- **乐观读（无锁优化）**：不阻塞写操作，仅通过`tryOptimisticRead()`获取一个"邮戳"（版本号），读完后需校验邮戳是否有效（未被写操作修改）。
+:::
 
-**特性**
+StampedLock 的状态存储在一个 `long` 型（64 位）变量中，分为三个逻辑部分：
 
-- **更高的并发度**：乐观读允许读操作与写操作并发执行（无阻塞）。
-- **不可重入**：锁不可重入，嵌套获取可能导致死锁。
-- **支持锁升级/降级**：
-  - **锁降级**：写锁→悲观读锁（类似`ReentrantReadWriteLock`）。
-  - **锁升级**：乐观读→悲观读锁或写锁（需校验邮戳后尝试转换）。
-- **不支持 `Condition`**：不能像`ReentrantLock`那样使用`await()`/`signal()`。
+| 模式       | 占用位       | 作用                                                                                |
+| :--------- | :----------- | :---------------------------------------------------------------------------------- |
+| **读锁**   | 低 7 位      | 读线程计数（实际是`readerCount+1`）                                                 |
+| **写锁**   | 第 8 位      | 独占标记，0 未占用，1 已占用                                                        |
+| **版本号** | 未使用的高位 | 加锁返回有效戳，解锁需验证戳；<br/>戳无效 = 状态变更（有写操作），戳有效 = 数据一致 |
 
-**StampedLock vs. ReentrantReadWriteLock**
+状态流转：
+
+```
+初始状态：state = (version: 0, readCount: 0, write: 0)
+
+[操作与状态变化示例]
+1. 写锁获取 (`writeLock()`)
+   -> state 低 8 位置 1，同时整个 long 值改变 (version++)
+   -> 返回 stamp W1
+
+2. 乐观读 (`tryOptimisticRead()`)
+   -> 不修改 state！仅记录当前 state 值作为 stamp O1
+   -> 校验时：比较当前 state 是否等于 O1
+
+3. 读锁获取 (`readLock()`)
+   -> 高 56 位读计数+1 （如果写锁未被占用）d
+   -> 返回 stamp R1
+
+4. 锁升级 (`tryConvertToWriteLock(R1)`)
+   -> 原子操作：读计数-1，同时写标记置 1
+   -> 成功返回新 stamp W2，失败返回 0
+```
+
+::: info StampedLock 乐观锁
+
+:::
+
+StampedLock 乐观锁是一种 **“读时复制+版本校验”** 的乐观并发控制。
+
+乐观锁在读远多于写且写操作不频繁的场景下，性能极高（完全无锁）。
+
+StampedLock 乐观锁流程
+
+1. 调用 `tryOptimisticRead()` 获取一个**戳记（Stamp）**，此时**完全不阻塞**。
+2. 读取共享数据到局部变量。
+3. 调用 `validate(stamp)` 校验：**自获取戳记以来，是否有写锁被获取过？**
+   - **无变化**：数据有效，直接使用。
+   - **有变化**：升级为**悲观读锁**，重新读取数据。
+
+::: info StampedLock 锁升级
+
+:::
+
+**读锁 → 写锁升级**：`tryConvertToWriteLock(stamp)`
+
+- **前提**：当前线程已持有读锁（`stamp` 是有效的读锁戳记）。
+- **过程**：原子地尝试释放读计数，获取写锁标记。
+- **结果**：成功返回新写戳记，失败返回 0。
+- **注意**：**可能死锁**！如果当前还有其他读锁持有者，升级会失败（因为读写互斥）。
+
+**乐观读 → 写锁升级**：
+
+- 乐观读戳记本身不代表持有锁，升级失败是常态。
+- 通常先获取悲观读锁，再进行升级尝试。
+
+::: info StampedLock vs. ReentrantReadWriteLock
+
+:::
 
 | 特性         | `StampedLock`        | `ReentrantReadWriteLock` |
 | ------------ | -------------------- | ------------------------ |
@@ -504,56 +614,9 @@ StampedLock 通过**版本号+状态位拆分**实现无锁读，牺牲重入性
 | **公平性**   | 仅非公平             | 支持公平/非公平          |
 | **条件变量** | 不支持               | 支持                     |
 
-**状态设计**
+::: info StampedLock 使用示例
 
-- **64 位长整型状态变量**（`state`）拆分为三部分：
-  - **写锁标记**（最低位）：`WBIT`（写锁占用标志）
-  - **版本号**（中间 7 位）：乐观读的邮戳版本
-  - **读锁计数**（剩余 56 位）：记录悲观读锁的持有数量
-
-```
-State 结构：
-[读锁计数 (56 位） | 版本号 (7 位） | 写锁标记 (1 位）]
-```
-
-**关键操作实现**
-
-**写锁获取**
-
-- **CAS 设置 WBIT 位**：若成功则获取写锁，失败则进入队列等待
-- **版本号+1**：每次写锁释放时递增版本号（保证乐观读的可见性）
-
-**悲观读锁获取**
-
-- **检查无写锁**（WBIT=0）时通过 CAS 增加读计数
-- **写锁占用时**：进入等待队列（类似 AQS 的 CLH 队列）
-
-**乐观读实现**
-
-1. 调用`tryOptimisticRead()`获取当前版本号（不修改状态）
-2. 读取共享数据
-3. 调用`validate(stamp)`检查版本号是否变化（无写操作则有效）
-
-**锁转换机制**
-
-**tryConvertToXLock()**：核心转换方法（避免释放再获取的开销）
-
-- 乐观读→悲观读：验证邮戳后直接获取读锁
-- 读锁→写锁：当读计数=1 且当前线程唯一持有读锁时可转换
-
-**性能优化手段**
-
-- **无锁乐观读**：完全不阻塞写操作（通过版本号校验）
-- **延迟唤醒**：读锁释放时不立即唤醒等待线程（减少竞争）
-- **自旋优化**：短时冲突时先自旋再入队（类似 AQS）
-
-**与 AQS 的差异**
-
-- **非 AQS 实现**：独立的状态机设计（更轻量）
-- **无公平性**：所有锁均为非公平模式
-- **无条件队列**：不支持`Condition`功能
-
-**典型使用示例**
+:::
 
 ```java
 StampedLock lock = new StampedLock();
@@ -582,40 +645,19 @@ try {
 
 ## Java 无锁
 
-### 【中等】什么是 CAS？CAS 的实现原理是什么？
+### 【中等】什么是 CAS？CAS 的实现原理是什么？⭐⭐⭐
 
 ::: info 什么是 CAS？
 
 :::
 
-**CAS（Compare-And-Swap，比较并交换）** 是一种 **无锁（Lock-Free）** 的并发编程技术，基于 **比较-交换** 实现原子操作。它是现代并发编程的基石，被广泛应用于 Java 的 `Atomic` 类、`ReentrantLock`、`ConcurrentHashMap` 等并发工具中。
+CAS 是 **Compare-And-Swap（比较并交换）** 的缩写，是实现并发编程的**无锁原子操作**核心。
 
-CAS 底层实现依赖 CPU 指令（如 `CMPXCHG`），通过 `Unsafe` 类调用本地方法。
+CAS 核心规则是：先比较内存中某个值是否等于预期值，若相等则将其更新为新值；若不等则不操作，整个过程原子性完成。
 
-CAS 的核心应用有：原子类、自旋锁、无锁数据结构（如 `ConcurrentHashMap`）。
-
-**CAS 的核心思想**：
-
-- **比较**：检查某个内存位置的值是否等于预期值（Expected Value）。
-- **交换**：如果相等，则更新为新值（New Value），否则不做任何操作。
-- **原子性**：整个操作由 **CPU 指令** 保证不可分割，不会出现线程安全问题。
-
-::: info CAS 的实现原理是什么？
-
-:::
-
-**（1）底层 CPU 指令支持**
-
-**在 Java 中，通过 `Unsafe` 类调用本地方法（Native Method）实现 CAS**。更底层的实现依赖于 **硬件指令**（如 x86 的 `CMPXCHG`、ARM 的 `LL/SC`），确保操作是原子的。
+CAS 操作伪代码
 
 ```java
-public final native boolean compareAndSwapInt(Object o, long offset, int expected, int newValue);
-```
-
-**（2）CAS 操作流程**
-
-```java
-// 伪代码
 boolean CAS(Variable var, int expected, int newValue) {
     if (var.value == expected) {  // 比较当前值是否等于预期值
         var.value = newValue;     // 如果相等，更新为新值
@@ -625,7 +667,7 @@ boolean CAS(Variable var, int expected, int newValue) {
 }
 ```
 
-**实际执行流程**：
+说明：
 
 1. 读取内存值 `V`。
 2. 比较 `V` 和预期值 `A`：
@@ -633,31 +675,29 @@ boolean CAS(Variable var, int expected, int newValue) {
    - 如果 `V != A`，说明值已被修改，放弃更新。
 3. 返回操作是否成功。
 
-**（3）Java 中的 CAS 实现（以 AtomicInteger 为例）**
+::: info CAS 特性
+
+:::
+
+- **无锁**：无需加 synchronized/Lock，减少线程阻塞 / 唤醒开销，性能更高；
+- **原子性**：CPU 指令级保证，比手动加锁更可靠；
+- **ABA 问题**：V 先从 A 变 B 再变回 A，CAS 会误判为未修改（解决：加版本号，如 `AtomicStampedReference`）。
+
+::: info CAS 的实现原理是什么？
+
+:::
+
+**Java 层面，通过 `Unsafe` 类调用 native 方法（如 `compareAndSwapInt()`）实现 CAS**。
 
 ```java
-AtomicInteger count = new AtomicInteger(0);
-
-// CAS 操作：如果当前值是 0，则设置为 1
-boolean success = count.compareAndSet(0, 1);  // 内部调用 Unsafe.compareAndSwapInt
+public final native boolean compareAndSwapInt(Object o, long offset, int expected, int newValue);
 ```
 
-**底层实现**：
+更底层（CPU 层面），CAS 实现依赖于 CPU 提供的原子指令（如 x86 的 `cmpxchg` 指令）。
 
-```java
-public final boolean compareAndSet(int expect, int update) {
-    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);
-}
-```
+::: info CAS 典型应用
 
-其中：
-
-- `this`：目标对象（如 `AtomicInteger` 实例）。
-- `valueOffset`：字段在对象内存中的偏移量（通过 `Unsafe.objectFieldOffset` 获取）。
-- `expect`：预期值。
-- `update`：新值。
-
-**CAS 的典型应用**
+:::
 
 **（1）原子类**
 
@@ -687,35 +727,7 @@ while (!CAS(lock, 0, 1)) {  // 尝试获取锁
 - `ConcurrentHashMap`（JDK 8 使用 CAS + `synchronized` 替代分段锁）。
 - `CopyOnWriteArrayList`（CAS 保证写入原子性）。
 
-**CAS 的优缺点**
-
-**优点**
-
-| 优点       | 说明                         |
-| ---------- | ---------------------------- |
-| **无锁**   | 避免线程阻塞，减少上下文切换 |
-| **高性能** | 在低竞争场景下比锁更高效     |
-| **可扩展** | 适合高并发读多写少场景       |
-
-**缺点**
-
-| 缺点           | 说明                               |
-| -------------- | ---------------------------------- |
-| **ABA 问题**   | 值从 `A→B→A`，CAS 无法感知中间变化 |
-| **自旋开销**   | 高竞争时 CPU 空转                  |
-| **单变量限制** | 只能保证一个变量的原子性           |
-| **公平性问题** | 无法保证先来先服务                 |
-
-**CAS vs 锁**
-
-| 对比项       | CAS              | 锁（如 synchronized）              |
-| ------------ | ---------------- | ---------------------------------- |
-| **实现方式** | 无锁（CPU 指令） | 阻塞（JVM 管理）                   |
-| **性能**     | 低竞争时更优     | 高竞争时更稳定                     |
-| **适用场景** | 简单原子操作     | 复杂临界区保护                     |
-| **公平性**   | 非公平           | 可公平（如 `ReentrantLock(true)`） |
-
-### 【中等】CAS 算法存在哪些问题？
+### 【中等】CAS 算法存在哪些问题？⭐⭐⭐
 
 CAS（Compare-And-Swap）是一种无锁并发编程技术，广泛用于 Java 的 `Atomic` 类、AQS、`ConcurrentHashMap` 等并发工具中。但它也存在一些问题和限制：
 
@@ -778,6 +790,67 @@ CAS（Compare-And-Swap）是一种无锁并发编程技术，广泛用于 Java �
 
 CAS 在无锁编程中非常高效，但需结合场景权衡利弊。在高竞争环境下，可能需要改用锁或其他并发策略。
 
+### 【中等】Java 中支持哪些原子类？⭐
+
+Java 原子类底层基于 **CAS 指令（CPU 级原子操作）+ 自旋重试** 实现无锁原子操作。部分高性能原子类（如 LongAdder）采用**分段累加**优化高并发性能。
+
+原子类相当于一种泛化的 volatile 变量，能够支持原子的、有条件的读/改/写操作。
+
+::: info 原子类分类
+
+:::
+
+| 分类               | 核心类                                                                         | 作用                                                                            |
+| :----------------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| **基本类型原子类** | AtomicInteger、AtomicLong、AtomicBoolean                                       | 对 `int` / `long` / `boolean` 做原子增删改查，替代加锁                          |
+| **引用类型原子类** | AtomicReference、AtomicStampedReference、AtomicMarkableReference               | 对引用类型做原子操作，解决 CAS 的 ABA 问题                                      |
+| **数组类型原子类** | AtomicIntegerArray、AtomicLongArray、AtomicReferenceArray                      | 对数组元素做原子操作（数组本身不原子，元素原子）                                |
+| **字段更新器**     | AtomicIntegerFieldUpdater、AtomicLongFieldUpdater、AtomicReferenceFieldUpdater | 对字段做原子更新，无需改字段类型                                                |
+| **累加器**         | LongAdder、DoubleAdder、LongAccumulator、DoubleAccumulator                     | 高并发下替代 AtomicLong/Double，分段累加提性能<br/>适合统计，但不保证实时精确值 |
+
+::: info 核心原子类
+
+:::
+
+**（1）基础类**
+
+|       类        |                   核心特性                    |      典型场景      |
+| :-------------: | :-------------------------------------------: | :----------------: |
+|  AtomicInteger  | 支持 getAndIncrement（i++）、compareAndSet 等 | 计数器、序列号生成 |
+|  AtomicBoolean  |    原子更新布尔值，底层用 int 存储（0/1）     | 状态标记（如开关） |
+| AtomicReference |               原子更新对象引用                |  原子替换对象实例  |
+
+**（2）解决 ABA 问题**
+
+|           类            |                核心特性                |              记忆点               |
+| :---------------------: | :------------------------------------: | :-------------------------------: |
+| AtomicStampedReference  |  加版本号（戳），CAS 时校验值 + 版本   |     彻底解决 ABA（版本唯一）      |
+| AtomicMarkableReference | 加标记位（boolean），CAS 校验值 + 标记 | 简化版 ABA 解决（仅标记是否修改） |
+
+**（3）高性能累加器**
+
+|       类        |                         核心特性                          |             记忆点              |
+| :-------------: | :-------------------------------------------------------: | :-----------------------------: |
+|    LongAdder    | 分段累加（base+cells 数组），低竞争用 base，高竞争分 cell | 高并发计数性能≈10 倍 AtomicLong |
+| LongAccumulator |   自定义累加规则（如乘法、最大值），比 LongAdder 更灵活   |      支持非加减的原子计算       |
+
+**（4）灵活类**
+
+|            类             |               核心特性                |            记忆点            |
+| :-----------------------: | :-----------------------------------: | :--------------------------: |
+| AtomicIntegerFieldUpdater | 需通过静态方法创建，字段必须 volatile | 不改原有类结构，原子更新字段 |
+|   AtomicReferenceArray    |     索引操作原子，数组长度不可变      |       原子更新数组元素       |
+
+::: info 原子类选型
+
+:::
+
+- **低并发计数（如普通计数器）**→ 基本类型原子类（AtomicInteger 等）
+- **高并发计数（如接口 QPS 统计）**→ 累加器（LongAdder 等）
+- **操作引用对象 + 防 ABA** → 引用类型原子类（AtomicStampedReference 等）
+- **操作对象的普通字段** → 字段更新器（AtomicIntegerFieldUpdater 等）
+- **操作数组元素** → 数组类型原子类（AtomicIntegerArray 等）
+
 ### 【中等】什么是 ThreadLocal？
 
 ::: info 什么是 ThreadLocal？
@@ -811,7 +884,7 @@ CAS 在无锁编程中非常高效，但需结合场景权衡利弊。在高竞�
       ThreadLocal.withInitial(() -> dataSource.getConnection());
   ```
 
-**避免参数透传**
+**（2）避免参数透传**
 
 **问题**：多层方法调用需要透传某个上下文参数（如 `traceId`）。
 
@@ -863,46 +936,53 @@ ThreadLocal<User> userHolder = ThreadLocal.withInitial(() -> new User());
 
 `ThreadLocal` 不能自动继承，需手动处理（可用 `InheritableThreadLocal`）。
 
-### 【中等】`ThreadLocal` 的原理是什么？
+### 【中等】`ThreadLocal` 的原理是什么？⭐⭐⭐
 
-**内部结构**
+ThreadLocal 是**线程本地变量**，核心作用是为每个线程创建独立的变量副本，实现线程间数据隔离。
 
-`ThreadLocal` 主要依赖于两个类：`ThreadLocal` 自身和 `ThreadLocalMap`。
+::: info 核心结构
 
-- **`Thread` 类**：每个 `Thread` 对象内部都有一个类型为 `ThreadLocalMap` 的成员变量 `threadLocals`，用于存储该线程的所有 `ThreadLocal` 变量及其对应的值。
-- **`ThreadLocalMap`**：它是 `ThreadLocal` 的一个静态内部类，类似于 `HashMap`，但它使用弱引用的 `ThreadLocal` 对象作为键，值则是用户设置的对象。
+:::
 
-**存储机制**
+|      角色      |              作用（记忆点）              |                  核心关系                   |
+| :------------: | :--------------------------------------: | :-----------------------------------------: |
+|  ThreadLocal   |   对外暴露的操作入口（get/set/remove）   |        作为 Key，关联线程的变量副本         |
+|     Thread     | 线程对象，内置 `ThreadLocalMap` 成员变量 |       每个线程有专属的 ThreadLocalMap       |
+| ThreadLocalMap |     线程内部的哈希表（类似 HashMap）     | Key=ThreadLocal（弱引用），Value = 变量副本 |
 
-- 当调用 `ThreadLocal` 的 `set` 方法时，它会首先获取当前线程的 `ThreadLocalMap`。
-- 如果 `ThreadLocalMap` 存在，则以当前 `ThreadLocal` 对象为键，将值存储到 `ThreadLocalMap` 中。
-- 如果 `ThreadLocalMap` 不存在，则创建一个新的 `ThreadLocalMap`，并将当前 `ThreadLocal` 对象和值作为第一个元素存入其中。
+::: info 核心机制
 
-**获取机制**
+:::
 
-- 当调用 `ThreadLocal` 的 `get` 方法时，它会先获取当前线程的 `ThreadLocalMap`。
-- 如果 `ThreadLocalMap` 存在，则以当前 `ThreadLocal` 对象为键去查找对应的值。
-- 如果 `ThreadLocalMap` 不存在或者没有找到对应的值，则调用 `initialValue` 方法（可以通过继承 `ThreadLocal` 类并重写该方法来设置初始值）来获取初始值，并将其存储到 `ThreadLocalMap` 中。
+1. 弱引用解决内存泄漏（关键）
+   - ThreadLocalMap 的 Key 是 ThreadLocal 的**弱引用**。
+   - 当 ThreadLocal 无强引用时，GC 会回收 Key。
+   - 仅回收 Key 仍会残留 Value（强引用），需手动调用 `remove()` 清空，避免内存泄漏；
+2. 线程隔离本质：变量副本存在 Thread 自身的 Map 中，而非 ThreadLocal 里，ThreadLocal 仅作为 “索引”；
+3. 初始化机制：重写 `initialValue()` 可指定初始值，也可通过 `setInitialValue()` 手动初始化。
 
-**弱引用机制**
+::: info 应用场景
 
-`ThreadLocalMap` 的键是对 `ThreadLocal` 对象的弱引用。这意味着当外部对 `ThreadLocal` 对象的强引用被释放后，`ThreadLocal` 对象会在下次垃圾回收时被回收。这样可以避免内存泄漏，因为如果使用强引用，即使外部不再使用 `ThreadLocal` 对象，它也不会被回收，从而导致 `ThreadLocalMap` 中的条目一直存在。
+:::
 
-### 【中等】如何解决 `ThreadLocal` 内存泄漏问题？
+|     场景     | 核心用法                                                       |
+| :----------: | :------------------------------------------------------------- |
+| **资源隔离** | 数据库连接、Session、用户上下文（如登录态），避免线程共享冲突  |
+| **性能优化** | 替代方法传参，减少多线程下锁的使用（如 SimpleDateFormat 隔离） |
+| **链路追踪** | 存储线程专属的追踪 ID（TraceID），全链路日志关联               |
 
-**ThreadLocal 的内存泄漏问题源于其特殊的 "弱引用 Key + 强引用 Value" 存储结构**，主要发生在以下两种场景：
+### 【中等】如何解决 `ThreadLocal` 内存泄漏问题？⭐⭐
 
-**(1) Key 被回收，Value 残留（主要泄漏场景）**
+**ThreadLocal 的内存泄漏问题源于其特殊的 "弱引用 Key + 强引用 Value" 存储结构**。
 
-- `ThreadLocal` 实例（Key）是**弱引用**，会被 GC 回收
-- 对应的 Value 是**强引用**，会持续占用内存
-- 导致 `ThreadLocalMap` 中出现 `key=null` 但 `value≠null` 的无效 Entry
+| 泄漏原因 | 核心逻辑                                                                                                                 |
+| :------- | :----------------------------------------------------------------------------------------------------------------------- |
+| 核心矛盾 | ThreadLocalMap 的 Key 是弱引用（GC 回收），Value 是强引用（绑定线程），导致 Key 回收后 Value 成 “僵尸值”，随线程长期存活 |
+| 高危场景 | 线程池（线程复用）+ 未手动清理 → 僵尸值累积，内存持续泄漏                                                                |
 
-**(2) 线程长期存活时的累积泄漏**
+::: info ThreadLocal 内存泄露场景
 
-- 线程池复用线程（如 Tomcat worker 线程）
-- 每次任务执行后未调用 `remove()`
-- 导致多个无效 Entry 堆积在 `ThreadLocalMap` 中
+:::
 
 ::: code-tabs#内存泄漏的具体场景
 
@@ -921,102 +1001,67 @@ pool.execute(() -> {
 
 **后果**：线程被重复使用时，之前的 `BigObject` 实例无法被回收
 
-@tab 静态 ThreadLocal 长期持有
+@tab `remove()` 未放 finally 块
+
+异常时 `remove()` 不执行
 
 ```java
-static final ThreadLocal<User> userHolder = new ThreadLocal<>();
-
-void processRequest() {
-    userHolder.set(new User()); // 每次请求新 User 对象
-    // 业务逻辑。..
-    // 忘记调用 userHolder.remove()
+ThreadLocal<String> tl = new ThreadLocal<>();
+tl.set("数据");
+if （业务异常） {
+    throw new Exception(); // 跳过 remove()
 }
+tl.remove();
 ```
-
-**后果**：Web 应用中，线程处理多个请求后，内存中堆积多个废弃 `User` 对象
-
-@tab 使用非 static 的 ThreadLocal
-
-```java
-class Service {
-    ThreadLocal<Config> configHolder = new ThreadLocal<>(); // 非 static
-
-    void serve() {
-        configHolder.set(loadConfig());
-        // ...
-    }
-}
-```
-
-**后果**：每次创建 Service 实例都会产生新的 ThreadLocal，增加内存泄漏风险
 
 :::
 
-**解决方案与最佳实践**
+::: info ThreadLocal 内存泄露解决方案
 
-**(1) 强制清理方案**
+:::
 
-| 方案            | 实现方式           | 适用场景   |
-| --------------- | ------------------ | ---------- |
-| **try-finally** | 确保 remove() 执行 | 通用场景   |
-| **拦截器清理**  | AOP/@Around        | Web 应用   |
-| **线程池钩子**  | `afterExecute`     | 线程池任务 |
+**（1）最核心：用完必在 finally 调用 `remove()`（治标治本）**
 
-**代码示例**：
+在业务代码结束处（finally 块）调用 `threadLocal.remove()`，清空当前线程的 Value；
 
 ```java
-// 方案 1：try-finally（推荐）
+ThreadLocal<String> tl = new ThreadLocal<>();
 try {
-    threadLocal.set(data);
-    // 业务逻辑。..
+    tl.set("业务数据");
+    // 业务逻辑执行
 } finally {
-    threadLocal.remove();
-}
-
-// 方案 2：Spring 拦截器
-@Override
-public void afterCompletion(HttpServletRequest request,
-                          HttpServletResponse response,
-                          Object handler, Exception ex) {
-    threadLocal.remove();
+    tl.remove(); // 无论是否异常，必清理
 }
 ```
 
-**(2) 设计优化方案**
+**（2）兜底：依赖 Key 的弱引用特性（被动防护）**
 
-1. **使用 static final 修饰**
+`ThreadLocalMap` 会在 `set()`/`get()`/`remove()` 时，自动清理 “Key 为 null” 的 Entry（僵尸值）。
 
-   ```java
-   private static final ThreadLocal<User> holder = new ThreadLocal<>();
-   ```
+弱引用是 JDK 层面的兜底，但若长期不操作 `Map`（如线程池空闲），仍会泄漏，需配合主动 `remove`。
 
-   - 避免重复创建 ThreadLocal 实例
+**（3）高危场景：线程池使用必规范（重点避坑）**
 
-2. **初始化默认值**
+线程池线程复用，若前一个任务未清理 `ThreadLocal`，后一个任务会读取到脏数据 + 内存泄漏；
 
-   ```java
-   ThreadLocal.withInitial(() -> new LightweightObject());
-   ```
+线程池任务中，ThreadLocal 必须在 finally 中 remove，或使用线程池的任务包装器统一清理。
 
-   - 避免持有大对象
+**（4）辅助：规范初始化（减少泄漏风险）**
 
-3. **改用 InheritableThreadLocal**（需谨慎）
+规范初始化可减少无效 set 操作，降低僵尸值产生概率。
 
-   - 适用于需要父子线程传递数据的场景
+- **方式 1**：重写 `initialValue()` 初始化，避免多次 set 导致旧值残留；
+- **方式 2**：使用 `ThreadLocal.withInitial()`（Java 8+），初始化逻辑更清晰，减少空值操作；
 
-**ThreadLocalMap 的自动清理机制**
+::: info ThreadLocal 使用避坑
 
-虽然 ThreadLocalMap 有部分自清理能力，但**不可依赖**：
+:::
 
-- **set() 触发清理**：探测式清理（expungeStaleEntry）
-- **get() 触发清理**：启发式清理（cleanSomeSlots）
-- **remove() 触发清理**：完全清理指定 Entry
-
-**重要结论**：
-
-- 自动清理不彻底（只清理部分无效 Entry）
-- 高并发场景可能清理不及时
-- **必须显式调用 remove()**
+|            常见误区            |                     正确做法                     |
+| :----------------------------: | :----------------------------------------------: |
+|        依赖 GC 自动回收        |  GC 仅回收 Key，无法回收 Value，必须手动 remove  |
+| 线程池只初始化一次 ThreadLocal |     每次任务执行完都要 remove，而非仅初始化      |
+| 认为 ThreadLocal 静态化会泄漏  | 静态化本身不泄漏，泄漏根源是未 remove + 线程复用 |
 
 ### 【中等】InheritableThreadLocal 的实现原理是什么？
 
@@ -1080,59 +1125,3 @@ new Thread(() -> {
 
 - **不支持动态更新**：子线程启动后父线程的修改不可见
 - **无回调机制**：无法像`ThreadLocal`的`initialValue()`那样自定义子线程初始值
-
-### 【中等】Java 中支持哪些原子类？
-
-原子性是确保并发安全三大特性之一。为了兼顾原子性以及锁带来的性能问题，Java 引入了 CAS （主要体现在 `Unsafe` 类）来实现非阻塞同步（也叫乐观锁），CAS 底层基于 CPU 指令（硬件支持）支持，具有原子性。并基于 CAS ，提供了一套原子工具类。
-
-原子类**比锁的粒度更细，更轻量级**，并且对于在多处理器系统上实现高性能的并发代码来说是非常关键的。原子变量将发生竞争的范围缩小到单个变量上。
-
-原子类相当于一种泛化的 `volatile` 变量，能够**支持原子的、有条件的读/改/写操**作。
-
-原子类可以分为 5 个类别，这 5 个类别提供的方法基本上是相似的：
-
-- **基本数据类型**：基本数据类型原子类针对 Java 基本类型提供原子操作。
-  - `AtomicBoolean` - 布尔类型原子类
-  - `AtomicInteger` - 整型原子类
-  - `AtomicLong` - 长整型原子类
-- **引用数据类型**：Java 数据类型分为 **基本数据类型** 和 **引用数据类型** 两大类（不了解 Java 数据类型划分可以参考： [Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/cba76603/) ）。如果想针对引用类型做原子操作怎么办？Java 也提供了相关的原子类：
-  - `AtomicReference` - 引用类型原子类
-  - `AtomicMarkableReference` - 带有标记位的引用类型原子类
-  - `AtomicStampedReference` - 带有版本号的引用类型原子类
-- **数组数据类型**：**数组类型的原子类为数组元素提供了 `volatile` 类型的访问语义**，这是普通数组所不具备的特性——**`volatile` 类型的数组仅在数组引用上具有 `volatile` 语义**。
-  - `AtomicIntegerArray` - 整形数组原子类
-  - `AtomicLongArray` - 长整型数组原子类
-  - `AtomicReferenceArray` - 引用类型数组原子类
-- **属性更新器类型**：**属性更新器支持基于反射机制的更新字段值的原子操作**。
-  - `AtomicIntegerFieldUpdater` - 整型字段的原子更新器
-  - `AtomicLongFieldUpdater` - 长整型字段的原子更新器
-  - `AtomicReferenceFieldUpdater` - 原子更新引用类型里的字段
-- **累加器**：相比原子化的基本数据类型，速度更快，但是不支持 `compareAndSet()` 方法。
-  - `DoubleAdder` - 浮点型原子累加器
-  - `LongAdder` - 长整型原子累加器。
-  - `DoubleAccumulator` - 更复杂的浮点型原子累加器
-  - `LongAccumulator` - 更复杂的长整型原子累加器
-
-**原子类底层实现**
-
-所有原子类都基于 **Unsafe + CAS** 实现：
-
-```java
-public final int getAndIncrement() {
-    return unsafe.getAndAddInt(this, valueOffset, 1);
-}
-```
-
-- `Unsafe`：直接操作内存（CAS 原子指令）
-- `valueOffset`：字段内存偏移量
-
-**适用场景**
-
-- **读多写少**：`AtomicXXX`
-- **高并发写**：`LongAdder`
-- **无锁数据结构**：`AtomicReference` + CAS
-
-**注意事项**
-
-- 原子类 **不适用于复合操作**（如 `check-then-act`，仍需锁）
-- `LongAdder` 适合统计，但 **不保证实时精确值**（调用 `sum()` 时才合并）。`LongAdder` 在操作后的返回值只是一个近似准确的数值，但是 `LongAdder` 最终返回的是一个准确的数值，所以在一些对实时性要求比较高的场景下，`LongAdder` 并不能取代 `AtomicInteger` 或 `AtomicLong`。
