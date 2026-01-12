@@ -365,7 +365,7 @@ Java 8 用元空间替代永久代，解决了 PermGen 固定大小易导致内�
 **Full GC，全堆垃圾回收**
 
 - 作用范围：对整个堆内存（包括年轻代和老年代）进行回收。
-- 触发条件：当老年代空间不足且无法通过老年代垃圾回收释放足够空间，或其他情况导致系统内存压力较大时触发（如 System.gc () 调用）。
+- 触发条件：当老年代空间不足且无法通过老年代垃圾回收释放足够空间，或其他情况导致系统内存压力较大时触发（如 `System.gc()` 调用）。
 - 执行方式：回收所有代（年轻代、老年代）中的垃圾，并且可能会伴随着元空间的回收。
 - 特点：回收时间最长，会触发整个 JVM 的停顿（Stop - The - World），对性能有较大影响，通常不希望频繁发生。
 
@@ -378,14 +378,14 @@ Java 8 用元空间替代永久代，解决了 PermGen 固定大小易导致内�
 
 **Full GC 触发条件**
 
-| **触发条件**             | **具体原因**                                                                 | **关联参数/备注**                                                            |
-| ------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **老年代空间不足**       | 老年代无法通过垃圾回收释放足够空间，无法容纳新晋升的对象                     | `-Xmx`（老年代最大值）、`-XX:CMSInitiatingOccupancyFraction`（CMS 触发阈值） |
-| **永久代/元空间不足**    | Java 7 及之前：永久代（PermGen）耗尽<br>Java 8+：元空间（Metaspace）超过阈值 | `-XX:MetaspaceSize`、`-XX:MaxMetaspaceSize`（Java 8+）                       |
-| **显式调用 System.gc()** | 代码调用 `System.gc()` 或通过 `jmap -dump` 等工具触发（不保证立即执行）      | `-XX:+DisableExplicitGC`（禁用显式 GC）                                      |
-| **空间分配担保失败**     | 年轻代晋升时，老年代剩余空间不足（`Promotion Failed`）                       | `-XX:HandlePromotionFailure`（JDK 6u24 后默认启用）                          |
-| **晋升老年代失败**       | 大对象或长期存活对象直接进入老年代，但老年代空间不足                         | `-XX:PretenureSizeThreshold`（大对象直接晋升阈值）                           |
-| **平均晋升大小预测失败** | Young GC 前，统计发现历史平均晋升大小 > 老年代当前剩余空间                   | 依赖 JVM 自适应策略（如 `-XX:+UseAdaptiveSizePolicy`）                       |
+| **触发条件**             | **具体原因**                                                 | **关联参数/备注**                                            |
+| ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **老年代空间不足**       | 老年代无法通过垃圾回收释放足够空间，无法容纳新晋升的对象     | `-Xmx`、`-XX:CMSInitiatingOccupancyFraction`（CMS 触发阈值） |
+| **永久代/元空间不足**    | Java 7 及之前：永久代（PermGen）耗尽<br>Java 8+：元空间（Metaspace）超过阈值 | `-XX:MetaspaceSize`、`-XX:MaxMetaspaceSize`（Java 8+）       |
+| **显式调用 System.gc()** | 代码调用 `System.gc()` 或通过 `jmap -dump` 等工具触发（不保证立即执行） | `-XX:+DisableExplicitGC`（禁用显式 GC）                      |
+| **空间分配担保失败**     | 年轻代晋升时，老年代剩余空间不足（`Promotion Failed`）       | `-XX:HandlePromotionFailure`（JDK 6u24 后默认启用）          |
+| **晋升老年代失败**       | 大对象或长期存活对象直接进入老年代，但老年代空间不足         | `-XX:PretenureSizeThreshold`（大对象直接晋升阈值）           |
+| **平均晋升大小预测失败** | Young GC 前，统计发现历史平均晋升大小 > 老年代当前剩余空间   | 依赖 JVM 自适应策略（如 `-XX:+UseAdaptiveSizePolicy`）       |
 
 **减少 Full GC 的优化策略**
 
@@ -562,3 +562,250 @@ java -XX:+UseConcMarkSweepGC \
      -XX:+UseCMSCompactAtFullCollection \
      -Xmx4g -Xms4g YourApplication
 ```
+
+## 调优
+
+### 【简单】JDK 内置了哪些工具？⭐⭐
+
+以下是较常用的 JDK 命令行工具：
+
+| 名称     | 描述                                                                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `jps`    | 查看 Java 进程。显示系统内的所有 JVM 进程。                                                                                           |
+| `jstat`  | JVM 统计监控工具。监控虚拟机运行时状态信息，它可以显示出 JVM 进程中的类装载、内存、GC、JIT 编译等运行数据。                           |
+| `jmap`   | 生成内存快照（Heap Dump）。用于打印 JVM 进程对象直方图、类加载统计。并且可以生成堆转储快照（一般称为 heapdump 或 dump 文件）。        |
+| `jstack` | 线程堆栈分析（排查死锁、线程阻塞）。用于打印 JVM 进程的线程和锁的情况。并且可以生成线程快照（一般称为 threaddump 或 javacore 文件）。 |
+| `jhat`   | 用来分析 jmap 生成的 dump 文件。                                                                                                      |
+| `jinfo`  | 查看/修改 JVM 运行参数。用于实时查看和调整 JVM 进程参数。                                                                             |
+
+扩展命令行工具：
+
+- **Arthas**：**Arthas 是阿里开源的 Java 诊断工具**，无需重启应用，实时**监控方法调用、查看类加载、分析性能瓶颈、热修复代码**，快速定位线上问题（如 CPU 飙高、内存泄漏、方法阻塞等）。
+
+以下是较常见的 JVM GUI 工具：
+
+| **工具名称**                           | **主要功能**                                                        | **适用场景**                 | **优点**                                 | **缺点**                             |
+| :------------------------------------- | :------------------------------------------------------------------ | :--------------------------- | :--------------------------------------- | :----------------------------------- |
+| **VisualVM**                           | - 监控内存、CPU、线程、GC - 堆转储分析 - 插件扩展（如 MBeans 监控） | 开发调试、性能分析           | 免费、轻量、JDK 自带                     | 功能较基础，对大堆支持有限           |
+| **JConsole**                           | - 监控堆、类、线程、MBean - 简单的 GC 分析                          | 快速监控 JVM 状态            | JDK 自带，使用简单                       | 功能较少，无法深入分析               |
+| **Eclipse MAT** (Memory Analyzer Tool) | - 分析堆转储（`heapdump`） - 检测内存泄漏、大对象                   | 内存泄漏排查、OOM 分析       | 强大的内存分析能力，可视化展示对象引用链 | 需要手动导出堆转储，对超大堆分析较慢 |
+| **JProfiler**                          | - CPU 分析、内存分析、线程分析 - 实时监控、方法级调用追踪           | 企业级性能调优、生产环境监控 | 功能全面，支持多种分析模式               | 商业软件（付费），学习成本较高       |
+| **Java Mission Control** (JMC)         | - 实时监控 JVM - 飞行记录（Flight Recorder） - 低开销性能分析       | 生产环境监控、性能诊断       | JDK 商业版自带，低开销                   | 部分功能需商业授权（Oracle JDK）     |
+
+### 【中等】常用的 JVM 配置参数有哪些？⭐⭐⭐
+
+**内存相关参数**
+
+| **参数**                 | **作用**                                | **适用场景**                                 |
+| :----------------------- | :-------------------------------------- | :------------------------------------------- |
+| `-Xss`                   | 设置每个线程的栈大小                    |                                              |
+| `-Xms`                   | 初始堆大小                              | 避免堆动态扩展带来的性能波动                 |
+| `-Xmx`                   | 最大堆大小                              | 防止 OOM，需留 20% 系统内存余量              |
+| `-Xmn`                   | 新生代大小（建议占堆 1/3~1/2）          | 优化 GC 频率和停顿时间                       |
+| `-XX:PermSize`           | 永久代空间的初始值                      | Java 7 及以前用于设置方法区大小，Java 8 废弃 |
+| `-XX:MaxPermSize`        | 永久代空间的最大值                      | Java 7 及以前用于设置方法区大小，Java 8 废弃 |
+| `-XX:MetaspaceSize`      | 元空间初始大小（JDK8+）                 | 避免频繁 Full GC 扩容                        |
+| `-XX:MaxMetaspaceSize`   | 元空间最大大小（默认无限制）            | 防止元空间占用过多内存                       |
+| `-XX:+UseCompressedOops` | 启用压缩指针（64 位系统默认开启）       | 减少内存占用（堆 < 32GB 时有效）             |
+| `-XX:NewRatio`           | 新生代与年老代的比例（默认为 2）        |                                              |
+| `-XX:SurvivorRatio`      | Eden 区与 Survivor 区比例（默认 8:1:1） | 调整新生代对象晋升速度                       |
+
+**GC 相关参数**
+
+| **参数**                          | **作用**                              | **示例/默认值**                     | **适用场景**             |
+| :-------------------------------- | :------------------------------------ | :---------------------------------- | :----------------------- |
+| `-XX:+UseG1GC`                    | 启用 G1 垃圾收集器（JDK9+ 默认）      | `-XX:+UseG1GC`                      | 大堆（>4GB）低延迟场景   |
+| `-XX:MaxGCPauseMillis`            | G1 最大停顿时间目标（毫秒）           | `-XX:MaxGCPauseMillis=200`          | 控制 GC 延迟             |
+| `-XX:ParallelGCThreads`           | 并行 GC 线程数（默认=CPU 核数）       | `-XX:ParallelGCThreads=4`           | 多核服务器优化 GC 效率   |
+| `-XX:+UseConcMarkSweepGC`         | 启用 CMS 收集器（已废弃，JDK14 移除） | 不推荐使用                          | 老年代低延迟（历史项目） |
+| `-XX:+PrintGCDetails`             | 打印详细 GC 日志                      | 配合 `-Xloggc:/path/gc.log`         | 调试 GC 问题             |
+| `-XX:+HeapDumpOnOutOfMemoryError` | OOM 时自动生成堆转储文件              | `-XX:HeapDumpPath=/path/dump.hprof` | 内存泄漏分析             |
+
+### 【中等】如何在 Java 中进行内存泄漏分析？⭐⭐⭐
+
+- 内存泄漏的本质是**对象被意外持有无法回收**，通过引用链分析找到“谁在引用它”。
+- 生产环境优先配置 `-XX:+HeapDumpOnOutOfMemoryError` 防患未然。
+
+#### 确认内存泄漏现象
+
+- 堆内存持续增长（通过 `jstat -gcutil <pid>` 观察 `Old Gen` 或 `Metaspace` 使用率）。
+- Full GC 频繁但无法回收内存（`jstat` 显示 `Full GC` 次数增加）。
+- 最终触发 `OutOfMemoryError: Java heap space`。
+
+#### 获取内存快照
+
+**方法 1：主动触发堆转储（Heap Dump）**
+
+```bash
+# 使用 jmap 导出堆转储文件（需进程权限）
+jmap -dump:format=b,file=heap.hprof <pid>
+
+# 或配置 JVM 参数自动生成（OOM 时触发）
+-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/heap.hprof
+```
+
+**方法 2：通过工具生成**
+
+- **VisualVM**：右键进程 → "Heap Dump"。
+- **JConsole**："MBeans" → "com.sun.management" → "HotSpotDiagnostic" → "dumpHeap"。
+
+#### 分析堆转储文件
+
+**工具选择**
+
+| **工具**        | **特点**                                                 |
+| --------------- | -------------------------------------------------------- |
+| **Eclipse MAT** | 功能强大，支持对象引用链分析、泄漏嫌疑报告（推荐首选）。 |
+| **VisualVM**    | 基础分析，适合快速查看大对象分布。                       |
+| **JProfiler**   | 商业工具，可视化交互好，支持实时监控。                   |
+
+**MAT 关键操作步骤**
+
+1. **打开堆转储文件**：`File` → `Open Heap Dump`。
+2. **查看泄漏报告**：
+
+- 首页会提示 `Leak Suspects`（泄漏嫌疑对象）。
+- 示例报告：`"java.lang.Thread" instances retained by thread stack`（线程未释放）。
+
+3. **分析对象引用链**：
+
+- 右键对象 → `Path to GC Roots` → `exclude weak/soft references`（排除弱引用）。
+- 查找意外被持有的对象（如静态集合、未关闭的资源）。
+
+4. **统计对象占比**：`Histogram` 视图按类/包名分组，排序 `Retained Heap`（对象总占用内存）。
+
+#### 常见内存泄漏场景与修复
+
+| **泄漏类型**     | **典型原因**                             | **修复方案**                            |
+| ---------------- | ---------------------------------------- | --------------------------------------- |
+| **静态集合**     | 静态 `Map`/`List` 持续添加对象未清除。   | 使用弱引用（`WeakHashMap`）或定期清理。 |
+| **未关闭资源**   | 数据库连接、文件流未调用 `close()`。     | 用 `try-with-resources` 自动关闭。      |
+| **线程未终止**   | 线程池或 `Thread` 未销毁（如定时任务）。 | 调用 `shutdown()` 或设为守护线程。      |
+| **缓存未清理**   | 本地缓存（如 Guava Cache）无过期策略。   | 设置大小限制或过期时间。                |
+| **监听器未注销** | 事件监听器未移除（如 Spring Bean）。     | 在销毁时手动注销监听器。                |
+
+#### 实时诊断工具（无需堆转储）
+
+**Arthas（阿里开源）**
+
+```bash
+# 监控对象增长
+watch java.util.HashMap size '{params,returnObj}' -n 5
+
+# 查看类实例数量
+sc -d *MyClass | grep classLoaderHash
+jad --source-only com.example.LeakClass > LeakClass.java
+
+# 生成火焰图分析 CPU/内存
+profiler start -d 30 -f /tmp/flamegraph.html
+```
+
+**JVisualVM**：安装 **VisualGC** 插件，实时观察各内存区域变化。
+
+### 【中等】如何对 Java 的垃圾回收进行调优？⭐⭐
+
+GC 调优的核心思路：**尽可能使对象在年轻代被回收，减少对象进入老年代**。
+
+#### 调优核心目标
+
+- **降低延迟（Latency）**：减少 GC 停顿时间（STW），提升响应速度。
+- **提高吞吐量（Throughput）**：最大化应用处理业务的时间占比（GC 时间占比最小化）。
+- **控制内存占用（Footprint）**：合理分配堆内存，避免浪费或频繁扩容。
+
+#### 调优原则
+
+- **数据驱动**：基于监控而非猜测调整参数。
+- **渐进式修改**：每次只改一个参数，观察效果。
+- **权衡取舍**：低延迟可能牺牲吞吐量，需根据业务需求选择。
+
+通过以上步骤，可系统性地优化 Java GC 性能，解决停顿时间长、吞吐不足等问题。
+
+#### 调优步骤
+
+**监控与基线分析**
+
+- **工具**：
+  - `jstat -gcutil <pid>`：实时监控 GC 各区域使用率。
+  - `GC 日志`：通过 `-Xlog:gc*` 或 `-XX:+PrintGCDetails` 记录详细 GC 行为。
+  - **VisualVM**/**Grafana + Prometheus**：可视化内存和 GC 趋势。
+- **关键指标**：Young GC / Full GC 频率、平均停顿时间、吞吐量（`1 - GC 时间/总时间`）。
+
+**选择垃圾收集器**
+
+| **收集器**      | **适用场景**                 | **关键参数**                                 |
+| --------------- | ---------------------------- | -------------------------------------------- |
+| **G1 GC**       | 平衡延迟与吞吐（JDK8+ 默认） | `-XX:MaxGCPauseMillis=200`（目标停顿时间）   |
+| **ZGC**         | 超低延迟（JDK11+，大堆）     | `-XX:+UseZGC -Xmx>8G`                        |
+| **Parallel GC** | 高吞吐量（批处理任务）       | `-XX:+UseParallelGC -XX:ParallelGCThreads=8` |
+
+**堆内存分配优化**
+
+- **总堆大小**（`-Xms`/`-Xmx`）：
+  - 建议设为物理内存的 50%~70%（预留空间给 OS 和其他进程）。
+  - 容器化环境需启用 `-XX:+UseContainerSupport`。
+- **新生代与老年代比例**：G1 无需手动设置（自动调整），Parallel GC 可设 `-Xmn`（如堆的 1/3）。
+
+**关键参数调优**
+
+- **G1 专用参数**：
+
+  ```bash
+  -XX:InitiatingHeapOccupancyPercent=45  # 老年代占用阈值触发 Mixed GC
+  -XX:G1NewSizePercent=20               # 新生代最小占比
+  -XX:G1MaxNewSizePercent=50            # 新生代最大占比
+  ```
+
+- **通用参数**：
+
+  ```bash
+  -XX:MetaspaceSize=512M                # 避免元空间动态扩容
+  -XX:+HeapDumpOnOutOfMemoryError       # OOM 时自动转储内存
+  ```
+
+**避免常见陷阱**
+
+- **Full GC 频繁**：
+  - 检查老年代对象晋升过快（调整 `-XX:MaxTenuringThreshold`）。
+  - 避免大对象直接进入老年代（如 `-XX:G1HeapRegionSize` 适配对象大小）。
+- **MetaSpace OOM**：
+  - 增加 `-XX:MaxMetaspaceSize`（如 `1G`），并检查动态类生成（反射/CGLIB）。
+
+**验证与迭代**
+
+- **压测对比**：使用相同负载对比调优前后的 GC 日志。
+- **持续监控**：生产环境通过 APM（如 SkyWalking）观察长周期效果。
+
+**调优示例**
+
+**场景：Web 服务（低延迟优先）**
+
+```bash
+# G1 GC 配置示例
+-Xms4G -Xmx4G
+-XX:+UseG1GC
+-XX:MaxGCPauseMillis=150
+-XX:InitiatingHeapOccupancyPercent=40
+-XX:G1HeapRegionSize=4M
+-Xlog:gc*,gc+heap=debug:file=gc.log:time,uptime
+```
+
+**场景：大数据计算（高吞吐优先）**
+
+```bash
+# Parallel GC 配置示例
+-Xms8G -Xmx8G
+-XX:+UseParallelGC
+-XX:ParallelGCThreads=4
+-XX:MaxGCPauseMillis=500
+-XX:+UseAdaptiveSizePolicy  # 自动调整新生代/老年代比例
+```
+
+#### 高级工具
+
+- **JFR（Java Flight Recorder）**：
+
+  ```bash
+  -XX:StartFlightRecording=duration=60s,settings=profile,jfr=memory=on
+  ```
+
+- **Arthas**：实时诊断内存泄漏（如 `heapdump` 命令）。

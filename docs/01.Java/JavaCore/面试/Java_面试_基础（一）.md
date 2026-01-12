@@ -511,6 +511,12 @@ System.out.println(a == b); // false
 
 ### 【简单】如何解决浮点数运算的精度丢失问题？
 
+**首选 BigDecimal **表示需要保证精度的场景，如：金融数值。
+
+- 构造必用字符串 / 整数，禁用 double；
+- 运算用`add/subtract/multiply/divide`方法；
+- 除法必须指定精度和舍入模式（避免除不尽报错）。
+
 `BigDecimal` 直接使用字符串初始化（如 `new BigDecimal("0.1")`）可完全避免二进制浮点误差。通常情况下，大部分需要浮点数精确运算结果的业务场景（比如涉及到钱的场景）可以通过 `BigDecimal` 来处理。
 
 ```java
@@ -526,6 +532,8 @@ System.out.println(y); /* 0.1 */
 System.out.println(Objects.equals(x, y)); /* true */
 ```
 
+简单场景，可用**放大整数运算**：将小数放大为整数，如使用 long 表示金钱，单位为分
+
 ### 【简单】超过 long 整型的数据应该如何表示？
 
 基本数值类型都有一个表达范围，如果超过这个范围就会有数值溢出的风险。
@@ -538,7 +546,7 @@ System.out.println(l + 1); // -9223372036854775808
 System.out.println(l + 1 == Long.MIN_VALUE); // true
 ```
 
-`BigInteger` 内部使用 `int[]` 数组来存储任意大小的整形数据。
+**`BigInteger` 内部使用 `int[]` 数组来存储任意大小的整形数据**。
 
 相对于常规整数类型的运算来说，`BigInteger` 运算的效率会相对较低。
 

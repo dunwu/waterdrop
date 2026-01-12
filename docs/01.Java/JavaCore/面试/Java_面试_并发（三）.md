@@ -897,7 +897,7 @@ Thread-4 占用资源
 
 ## Java 并发分工工具
 
-### 【中等】ForkJoinPool 的工作原理是什么？⭐⭐
+### 【困难】ForkJoinPool 的工作原理是什么？⭐⭐
 
 ForkJoinPool 是专为**分治任务**设计的线程池，核心作用是将大任务拆分为小任务并行执行，再合并结果。
 
@@ -949,7 +949,24 @@ ForkJoinPool 基于 “分治 + 工作窃取” 算法，让空闲线程偷取�
 | **任务调度** | 任务窃取（本地队列+窃取） | 全局队列（可能竞争）   |
 | **适用场景** | CPU 密集型并行计算        | IO 密集型或短任务      |
 
-### 【中等】CompleteFuture 的工作原理是什么？⭐
+### 【中等】CompleteFuture 有哪些用法？
+
+CompletableFuture 是 Java 8+ 提供的**异步任务编排工具**。
+
+| 用法类型            | 核心方法（记忆关键词）                                       | 作用说明                                      | 示例代码                                                     |
+| :------------------ | :----------------------------------------------------------- | :-------------------------------------------- | :----------------------------------------------------------- |
+| **创建异步任务**    | `runAsync`（无返回值）<br/>`supplyAsync`（有返回值）         | 提交异步任务，指定线程池（默认 ForkJoinPool） | `// 有返回值异步任务<br>CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> "Hello", executor);` |
+| **结果转换**        | `thenApply`（同步）<br/>`thenApplyAsync`（异步）             | 对任务结果做转换，返回新结果                  | `cf.thenApply(s -> s + " World");`                           |
+| **结果消费**        | `thenAccept`（同步）<br/>`thenAcceptAsync`（异步）           | 消费任务结果（无返回值）                      | `cf.thenAccept(s -> System.out.println(s));`                 |
+| **任务衔接**        | `thenRun`（同步）<br/>`thenRunAsync`（异步）                 | 任务完成后执行无参操作（不依赖结果）          | `cf.thenRun(() -> System.out.println("任务完成"));`          |
+| **多任务合并**      | `allOf`（全部完成）<br/>`anyOf`（任一完成）                  | 等待任务完成                                  | `CompletableFuture.allOf(cf1, cf2).join();`<br/>`Object result = CompletableFuture.anyOf(cf1, cf2).get();` |
+| **结果组合**        | `thenCombinethenCombineAsync`                                | 合并两个任务的结果，生成新结果                | `cf1.thenCombine(cf2, (r1, r2) -> r1 + r2);`                 |
+| **异常处理**        | `exceptionally`                                              | 任务异常时返回默认值                          | `cf.exceptionally(e -> "默认值");`                           |
+| **异常 / 完成处理** | `whenComplete`                                               | 无论成功 / 失败，都执行回调（可获取异常）     | `cf.whenComplete((res, e) -> { if(e!=null) e.printStackTrace(); });` |
+| **超时控制**        | `completeOnTimeoutorTimeout`                                 | 超时后返回默认值 / 抛出超时异常               | `// 3秒超时返回默认值<br>cf.completeOnTimeout("超时默认值", 3, TimeUnit.SECONDS);` |
+| **结果获取**        | `get`（阻塞）<br/>`join`（阻塞，不抛检查异常）<br/>`getNow`（立即获取，无结果返回默认值） | 获取任务结果，按需选择阻塞 / 非阻塞           | `String res = cf.join(); // 推荐，无需捕获异常`              |
+
+### 【困难】CompleteFuture 的工作原理是什么？⭐
 
 CompletableFuture 基于「状态机 + 回调链表」实现的异步编程框架。
 
@@ -1096,9 +1113,114 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 
 HashedWheelTimer 是 Netty 中时间轮算法的实现类。
 
-## 案例
+## Java 并发应用
 
-### 生产者消费者模式
+### 【中等】Java 中如何控制多线程的执行顺序？
+
+Java 控制多线程执行顺序，核心是通过「阻塞等待」「同步控制」「任务编排」三类机制，打破线程调度的随机性，让线程按指定顺序（如 A→B→C）执行，本质是控制线程的执行时机和先后依赖。
+
+| 方法类型                                             | 核心 API（记忆关键词）                                       | 实现原理                                                     | 适用场景                                                   |
+| :--------------------------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- | :--------------------------------------------------------- |
+| join () 等待（最基础）                               | Thread.join()                                                | 让当前线程阻塞，等待目标线程执行完成后再继续                 | 简单顺序（如 A 执行完再执行 B）、少量线程                  |
+| 锁 + 信号量（手动控制）                              | synchronized + 标志位CountDownLatch（倒计时门闩）            | ① 标志位：线程循环检查前置条件；② CountDownLatch：等待计数器归 0 | 多线程分批次执行（如先执行所有初始化线程，再执行业务线程） |
+| 线程池按序执行                                       | Executors.newSingleThreadExecutor()                          | 单线程池串行执行提交的任务，底层基于队列 FIFO                | 任务需严格按提交顺序执行，无需并行                         |
+| CompletableFuture 编排（推荐）                       | thenRun/thenAccept/thenApply                                 | 异步任务链式编排，前一个任务完成自动执行下一个               | 复杂顺序（如 A→B 并行 C→D）、异步场景                      |
+| 同步工具（CountDownLatch、CyclicBarrier、Semaphore） | CountDownLatch.await()/countDown()<br/>CyclicBarrier.await()<br/>Semaphore.acquire()/release() | 底层直接或间接基于 AQS 实现                                  | 多线程先准备再统一执行（如多线程加载数据后，统一处理）     |
+
+::: code-tabs#控制多线程的执行顺序
+
+@tab join () 控制顺序
+
+`join()` 是线程级 别的阻塞，目标线程执行完才会释放当前线程。
+
+```java
+// 定义3个线程
+Thread t1 = new Thread(() -> System.out.println("线程A执行"), "A");
+Thread t2 = new Thread(() -> System.out.println("线程B执行"), "B");
+Thread t3 = new Thread(() -> System.out.println("线程C执行"), "C");
+
+// 控制顺序：A→B→C
+t1.start();
+t1.join(); // 主线程等待t1完成
+t2.start();
+t2.join(); // 主线程等待t2完成
+t3.start();
+```
+
+@tab CountDownLatch 分批次执行
+
+计数器归 0 前，`await()` 线程阻塞，适合 “先完成前置任务，再执行主任务”。
+
+```java
+// 倒计时门闩：计数器为2，需2个初始化线程完成
+CountDownLatch latch = new CountDownLatch(2);
+
+// 初始化线程1
+Thread init1 = new Thread(() -> {
+    System.out.println("初始化1完成");
+    latch.countDown(); // 计数器-1
+});
+// 初始化线程2
+Thread init2 = new Thread(() -> {
+    System.out.println("初始化2完成");
+    latch.countDown(); // 计数器-1
+});
+// 业务线程（需等初始化完成）
+Thread business = new Thread(() -> {
+    try {
+        latch.await(); // 阻塞直到计数器=0
+        System.out.println("业务线程执行");
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    }
+});
+
+// 启动顺序不影响，业务线程会等初始化完成
+init1.start();
+init2.start();
+business.start();
+```
+
+@tab CompletableFuture 链式编排
+
+链式调用天然支持顺序，`thenRunAsync` 保证前序任务完成后执行，适合复杂编排。
+
+```java
+// 自定义线程池（避免默认池）
+ExecutorService executor = Executors.newFixedThreadPool(3);
+
+// 顺序：A完成→B和C并行→D完成
+CompletableFuture<Void> cf = CompletableFuture
+    .runAsync(() -> System.out.println("任务A执行"), executor) // 第一步：A
+    .thenRunAsync(() -> System.out.println("任务B执行"), executor) // 第二步：A完成后执行B
+    .thenRunAsync(() -> { // 第三步：B完成后，并行执行C
+        CompletableFuture.runAsync(() -> System.out.println("任务C执行"), executor).join();
+    }, executor)
+    .thenRunAsync(() -> System.out.println("任务D执行"), executor); // 第四步：C完成后执行D
+
+cf.join(); // 等待所有任务完成
+executor.shutdown();
+```
+
+@tab 单线程池按提交顺序执行
+
+无需手动控制，池内队列保证 FIFO，适合简单串行场景。
+
+```java
+// 单线程池：任务按提交顺序串行执行
+ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
+
+// 提交顺序=执行顺序：A→B→C
+singleExecutor.submit(() -> System.out.println("任务A执行"));
+singleExecutor.submit(() -> System.out.println("任务B执行"));
+singleExecutor.submit(() -> System.out.println("任务C执行"));
+
+singleExecutor.shutdown();
+```
+
+:::
+
+### 【中等】Java 中如何实现生产者消费者模式？
 
 **经典问题**
 
