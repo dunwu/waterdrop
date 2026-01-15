@@ -114,13 +114,20 @@ export default navbar([
     prefix: '/15.分布式/',
     children: [
       { text: '分布式理论', link: '分布式理论/' },
-      { text: '分布式协同', link: '分布式协同/' },
+      {
+        text: '分布式协同',
+        prefix: '分布式协同/',
+        link: '分布式协同/',
+        children: [{ text: 'ZooKeeper', link: 'ZooKeeper/' }]
+      },
       { text: '分布式调度', link: '分布式调度/' },
       {
         text: '分布式通信',
+        prefix: '分布式通信/',
+        link: '分布式通信/',
         children: [
-          { text: 'RPC', icon: 'file-icons:powerpc', link: '分布式通信/RPC' },
-          { text: 'MQ', icon: 'mdi:mq', link: '分布式通信/MQ' }
+          { text: 'RPC', icon: 'file-icons:powerpc', link: 'RPC/' },
+          { text: 'MQ', icon: 'mdi:mq', link: 'MQ/' }
         ]
       },
       { text: '分布式存储', link: '分布式存储/' }
