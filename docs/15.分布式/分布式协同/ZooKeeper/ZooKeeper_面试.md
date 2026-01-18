@@ -17,7 +17,7 @@ permalink: /pages/eeaed507/
 
 ## ZooKeeper 简介
 
-### 【基础】什么是 ZooKeeper？
+### 【简单】什么是 ZooKeeper？
 
 :::details 要点
 
@@ -33,7 +33,7 @@ Zookeeper 具有以下特性：
 
 :::
 
-### 【基础】ZooKeeper 中有哪些应用场景？
+### 【简单】ZooKeeper 中有哪些应用场景？
 
 :::details 要点
 
@@ -135,7 +135,7 @@ ZooKeeper 可以处理两种类型的队列：
 
 ## ZooKeeper 存储
 
-### 【基础】ZooKeeper 如何存储数据？
+### 【简单】ZooKeeper 如何存储数据？
 
 :::details 要点
 
@@ -151,7 +151,7 @@ znode 通过路径被引用。**znode 节点路径必须是绝对路径**。
 
 :::
 
-### 【基础】ZooKeeper 有几种节点类型？
+### 【简单】ZooKeeper 有几种节点类型？
 
 :::details 要点
 
@@ -163,7 +163,7 @@ znode 其实有 `PERSISTENT`、`PERSISTENT_SEQUENTIAL`、`EPHEMERAL` 和 `EPHEME
 
 ## ZooKeeper 架构
 
-### 【中级】ZooKeeper 的设计目标是什么？
+### 【中等】ZooKeeper 的设计目标是什么？
 
 :::details 要点
 
@@ -191,7 +191,7 @@ ZooKeeper 将数据存全量储在内存中以保持高性能，并通过服务�
 
 :::
 
-### 【中级】ZooKeeper 集群有几种角色？
+### 【中等】ZooKeeper 集群有几种角色？
 
 :::details 要点
 
@@ -205,7 +205,7 @@ Zookeeper 集群是一个基于主从复制的高可用集群，集群中每个�
 
 :::
 
-### 【中级】ZooKeeper 的权限控制如何设计的？
+### 【中等】ZooKeeper 的权限控制如何设计的？
 
 :::details 要点
 
@@ -229,7 +229,7 @@ ZooKeeper 定义了如下五种权限：
 
 :::
 
-### 【高级】ZooKeeper 的架构有什么缺点？
+### 【困难】ZooKeeper 的架构有什么缺点？
 
 :::details 要点
 
@@ -273,7 +273,7 @@ ZooKeeper 定义了如下五种权限：
 
 ## ZooKeeper 工作流
 
-### 【中级】ZooKeeper 读操作工作流程是怎样的？
+### 【中等】ZooKeeper 读操作工作流程是怎样的？
 
 :::details 要点
 
@@ -285,7 +285,7 @@ ZooKeeper 定义了如下五种权限：
 
 :::
 
-### 【中级】ZooKeeper 写操作工作流程是怎样的？
+### 【中等】ZooKeeper 写操作工作流程是怎样的？
 
 :::details 要点
 
@@ -318,7 +318,7 @@ ZooKeeper 定义了如下五种权限：
 
 :::
 
-### 【中级】ZooKeeper 事务机制是怎样的？
+### 【中等】ZooKeeper 事务机制是怎样的？
 
 :::details 要点
 
@@ -340,7 +340,7 @@ ZooKeeper 定义了如下五种权限：
 
 :::
 
-### 【中级】ZooKeeper 监听机制是怎样的？
+### 【中等】ZooKeeper 监听机制是怎样的？
 
 :::details 要点
 
@@ -389,7 +389,7 @@ Zookeeper 中的所有数据其实都是由一个名为 `DataTree` 的数据结�
 
 :::
 
-### 【中级】ZooKeeper 会话机制是怎样的？
+### 【中等】ZooKeeper 会话机制是怎样的？
 
 :::details 要点
 
@@ -416,7 +416,7 @@ Zookeeper 的会话管理主要是通过 `SessionTracker` 来负责，其采用�
 
 ## Zab 协议
 
-### 【中级】什么是 Zab 协议？
+### 【中等】什么是 Zab 协议？
 
 :::details 要点
 
@@ -431,7 +431,7 @@ ZAB 协议定义了两个可以**无限循环**的流程：
 
 :::
 
-### 【高级】Zab 协议中故障恢复的流程是怎样的？
+### 【困难】Zab 协议中故障恢复的流程是怎样的？
 
 :::details 要点
 
@@ -499,7 +499,7 @@ ZAB 协议的选举 Leader 机制简单来说，就是：**基于过半选举机
 
 :::
 
-### 【高级】Zab 协议中原子广播的流程是怎样的？
+### 【困难】Zab 协议中原子广播的流程是怎样的？
 
 :::details 要点
 
@@ -519,7 +519,7 @@ ZAB 协议的原子广播要求：
 
 :::
 
-### 【中级】Zab 和 Paxos 有什么区别？
+### 【中等】Zab 和 Paxos 有什么区别？
 
 :::details 要点
 

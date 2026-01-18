@@ -31,17 +31,13 @@ permalink: /pages/01da9521/
 
 假如生产者产生了 2 条消息：M1、M2，要保证这两条消息的顺序，应该怎样做？你脑中想到的可能是这样：
 
-<div align="center">
-<img src="http://upload-images.jianshu.io/upload_images/3101171-bb5ec534363e2fb4" />
-</div>
+![](http://upload-images.jianshu.io/upload_images/3101171-bb5ec534363e2fb4)
 
 假定 M1 发送到 S1，M2 发送到 S2，如果要保证 M1 先于 M2 被消费，那么需要 M1 到达消费端被消费后，通知 S2，然后 S2 再将 M2 发送到消费端。
 
 这个模型存在的问题是，如果 M1 和 M2 分别发送到两台 Server 上，就不能保证 M1 先达到 MQ 集群，也不能保证 M1 被先消费。换个角度看，如果 M2 先于 M1 达到 MQ 集群，甚至 M2 被消费后，M1 才达到消费端，这时消息也就乱序了，说明以上模型是不能保证消息的顺序的。
 
-<div align="center">
-<img src="http://upload-images.jianshu.io/upload_images/3101171-5a6313fe906a678b" />
-</div>
+![](http://upload-images.jianshu.io/upload_images/3101171-5a6313fe906a678b)
 
 #### 第二种模型
 
@@ -51,9 +47,7 @@ permalink: /pages/01da9521/
 
 这个模型也仅仅是理论上可以保证消息的顺序，在实际场景中可能会遇到下面的问题：
 
-<div align="center">
-<img src="http://upload-images.jianshu.io/upload_images/3101171-d430f5a3ec6c48ad" />
-</div>
+![](http://upload-images.jianshu.io/upload_images/3101171-d430f5a3ec6c48ad)
 
 只要将消息从一台服务器发往另一台服务器，就会存在网络延迟问题。如上图所示，如果发送 M1 耗时大于发送 M2 的耗时，那么 M2 就仍将被先消费，仍然不能保证消息的顺序。即使 M1 和 M2 同时到达消费端，由于不清楚消费端 1 和消费端 2 的负载情况，仍然有可能出现 M2 先于 M1 被消费的情况。
 
@@ -61,9 +55,7 @@ permalink: /pages/01da9521/
 
 这可能产生另外的问题：如果 M1 被发送到消费端后，消费端 1 没有响应，那是继续发送 M2 呢，还是重新发送 M1？一般为了保证消息一定被消费，肯定会选择重发 M1 到另外一个消费端 2，就如下图所示。
 
-<div align="center">
-<img src="http://upload-images.jianshu.io/upload_images/3101171-3c0e822d37a85e1e" />
-</div>
+![](http://upload-images.jianshu.io/upload_images/3101171-3c0e822d37a85e1e)
 
 这样的模型就严格保证消息的顺序，细心的你仍然会发现问题，消费端 1 没有响应 Server 时有两种情况，一种是 M1 确实没有到达(数据在网络传送中丢失)，另外一种消费端已经消费 M1 且已经发送响应消息，只是 MQ Server 端没有收到。如果是第二种情况，重发 M1，就会造成 M1 被重复消费。也就引入了我们要说的第二个问题，消息重复问题，这个后文会详细讲解。
 

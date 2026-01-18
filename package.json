@@ -3,16 +3,29 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "vuepress build docs",
-    "start": "vuepress dev docs --clean-cache",
-    "dev": "vuepress dev docs",
-    "update": "npx vp-update"
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 vuepress-vite build docs",
+    "start": "vuepress-vite dev docs --clean-cache",
+    "dev": "vuepress-vite dev docs",
+    "update": "pnpm dlx vp-update"
   },
   "devDependencies": {
-    "@vuepress/client": "2.0.0-beta.67",
-    "vue": "^3.3.4",
-    "vuepress": "2.0.0-beta.67",
-    "vuepress-plugin-search-pro": "^2.0.0-beta.237",
-    "vuepress-theme-hope": "2.0.0-beta.236"
+    "@vuepress/bundler-vite": "2.0.0-rc.26",
+    "sass-embedded": "^1.97.1",
+    "vue": "^3.5.26",
+    "vuepress": "2.0.0-rc.26",
+    "vuepress-theme-hope": "2.0.0-rc.102"
+  },
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "packageManager": "pnpm@10.5.2",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "dependencies": {
+    "cross-env": "^10.1.0",
+    "vuepress-plugin-search-pro": "2.0.0-rc.59"
   }
 }

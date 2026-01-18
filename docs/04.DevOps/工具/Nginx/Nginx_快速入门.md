@@ -35,7 +35,7 @@ permalink: /pages/50030028/
 
 ## Nginx 入门
 
-> 详细安装方法请参考：[Nginx 运维](docs/nginx-install.md)
+> 详细安装方法请参考：[Nginx 运维](Nginx_运维.md)
 
 nginx 的使用比较简单，就是几条命令。
 

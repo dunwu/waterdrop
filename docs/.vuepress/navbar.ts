@@ -19,7 +19,7 @@ export default navbar([
         link: 'JavaCore/',
         children: ['基础特性/', '高级特性/', '容器/', 'IO/', '并发/', 'JVM/', '面试/']
       },
-      { text: 'JavaEE', icon: 'mdi:numeric-2-box-multiple-outline', link: 'JavaEE/' },
+      { text: 'JavaWeb', icon: 'mdi:numeric-2-box-multiple-outline', link: 'JavaWeb/' },
       { text: '软件', icon: 'mdi:numeric-3-box-multiple-outline', link: '软件/' },
       { text: '工具', icon: 'mdi:numeric-4-box-multiple-outline', link: '工具/' },
       { text: '框架', icon: 'mdi:numeric-5-box-multiple-outline', link: '框架/' },
@@ -114,21 +114,17 @@ export default navbar([
     prefix: '/15.分布式/',
     children: [
       { text: '分布式理论', link: '分布式理论/' },
-      {
-        text: '分布式协同',
-        prefix: '分布式协同/',
-        link: '分布式协同/',
-        children: [{ text: 'ZooKeeper', link: 'ZooKeeper/' }]
-      },
+      { text: '分布式协同', link: '分布式协同/' },
       { text: '分布式调度', link: '分布式调度/' },
+      { text: '分布式治理', link: '分布式治理/' },
       {
         text: '分布式通信',
-        prefix: '分布式通信/',
-        link: '分布式通信/',
-        children: [
-          { text: 'RPC', icon: 'file-icons:powerpc', link: 'RPC/' },
-          { text: 'MQ', icon: 'mdi:mq', link: 'MQ/' }
-        ]
+        link: '分布式通信/'
+        // prefix: '分布式通信/',
+        // children: [
+        //   { text: 'RPC', icon: 'file-icons:powerpc', link: 'RPC/' },
+        //   { text: 'MQ', icon: 'mdi:mq', link: 'MQ/' }
+        // ]
       },
       { text: '分布式存储', link: '分布式存储/' }
     ]

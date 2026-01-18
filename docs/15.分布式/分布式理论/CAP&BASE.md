@@ -74,7 +74,7 @@ CAP 就是取 Consistency、Availability、Partition Tolerance 的首字母而�
 
 选择 **AP 模式**，偏向于保证服务的高可用性。用户访问系统的时候，都能得到响应数据，不会出现响应错误；但是，当出现分区故障时，相同的读操作，访问不同的节点，得到响应数据可能不一样。
 
-<img src="https://raw.githubusercontent.com/dunwu/images/master/snap/20211102191819.png" style="width: 500px" />
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20211102191819.png)
 
 ### CP 模式
 
@@ -82,7 +82,7 @@ CAP 就是取 Consistency、Availability、Partition Tolerance 的首字母而�
 
 选择 **CP 模式**，一旦因为消息丢失、延迟过高发生了网络分区，就会影响用户的体验和业务的可用性。因为为了防止数据不一致，系统将拒绝新数据的写入。
 
-<img src="https://raw.githubusercontent.com/dunwu/images/master/snap/20211102191820.png" style="width: 500px" />
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20211102191820.png)
 
 ### CAP 定理的应用
 
@@ -129,7 +129,7 @@ BASE 定理的**核心思想**是：即使无法做到强一致性，但每个�
 
 ACID 要求强一致性，通常运用在传统的数据库系统上。而 BASE 要求最终一致性，通过**牺牲强一致性来达到可用性**，通常运用在大型分布式系统中。
 
-<img src="https://raw.githubusercontent.com/dunwu/images/master/snap/20211102192406.png" style="width: 640px" />
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20211102192406.png)
 
 在实际的分布式场景中，不同业务单元和组件对一致性的要求是不同的，因此 ACID 和 BASE 往往会结合在一起使用。
 

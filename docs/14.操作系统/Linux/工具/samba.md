@@ -447,7 +447,7 @@ $ reboot
 ### window 下对 samba 的清理操作
 
 1. windows 清除访问 samba 局域网密码缓存
-   - 在 dos 窗口中输入 `control userpasswords2` 或者 `control keymgr.dll`，然后【高级】/【密码管理】，删掉保存的该机器密码。
+   - 在 dos 窗口中输入 `control userpasswords2` 或者 `control keymgr.dll`，然后【困难】/【密码管理】，删掉保存的该机器密码。
 2. windows 清除连接的 linux 的 samba 服务缓存
    1. 打开 win 的命令行。
    2. 输入 net use，就会打印出当前缓存的连接上列表。

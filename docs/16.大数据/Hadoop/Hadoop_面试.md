@@ -154,7 +154,7 @@ MapReduce 有以下特性：
 
 ## 架构
 
-### 【高级】HDFS 的架构是怎样设计的？
+### 【困难】HDFS 的架构是怎样设计的？
 
 :::details 要点
 
@@ -212,7 +212,7 @@ NameNode 负责维护文件系统的命名空间，任何对文件系统命名�
 
 :::
 
-### 【中级】HDFS 使用 NameNode 的好处 ？
+### 【中等】HDFS 使用 NameNode 的好处 ？
 
 :::details 要点
 
@@ -228,7 +228,7 @@ HDFS 使用 NameNode 的好处主要体现在以下几个方面：
 
 :::
 
-### 【中级】HDFS 使用 Block 的好处 ？
+### 【中等】HDFS 使用 Block 的好处 ？
 
 :::details 要点
 
@@ -242,7 +242,7 @@ HDFS 采用文件分块（Block）进行存储管理，主要是基于以下几�
 
 :::
 
-### 【中级】NameNode 与 SecondaryNameNode 的区别与联系 ？
+### 【中等】NameNode 与 SecondaryNameNode 的区别与联系 ？
 
 :::details 要点
 
@@ -260,7 +260,7 @@ NameNode 和 SecondaryNameNode 的**联系**：
 
 :::
 
-### 【中级】什么是 FsImage 和 EditLog？
+### 【中等】什么是 FsImage 和 EditLog？
 
 :::details 要点
 
@@ -286,7 +286,7 @@ HDFS 中，`FsImage`和`EditLog`是两个关键的文件，用于存储和管理
 
 :::
 
-### 【中级】YARN 有哪些核心组件？
+### 【中等】YARN 有哪些核心组件？
 
 :::details 要点
 
@@ -307,7 +307,7 @@ YARN 有以下核心组件：
 
 :::
 
-### 【中级】MapReduce 有哪些核心组件？
+### 【中等】MapReduce 有哪些核心组件？
 
 :::details 要点
 
@@ -335,7 +335,7 @@ MapReduce 有以下核心组件：
 
 ## 工作流
 
-### 【中级】HDFS 的写数据流程是怎样的？
+### 【中等】HDFS 的写数据流程是怎样的？
 
 :::details 要点
 
@@ -368,7 +368,7 @@ HDFS 写数据的源码流程：
 
 :::
 
-### 【中级】HDFS 的读数据流程是怎样的？
+### 【中等】HDFS 的读数据流程是怎样的？
 
 :::details 要点
 
@@ -395,7 +395,7 @@ HDFS 读数据的源码流程：
 
 :::
 
-### 【中级】MapReduce 是如何工作的？
+### 【中等】MapReduce 是如何工作的？
 
 :::details 要点
 
@@ -415,7 +415,7 @@ MapReduce 编程模型中 `splitting` 和 `shuffing` 操作都是由框架实现
 
 :::
 
-### 【中级】YARN 是如何工作的？
+### 【中等】YARN 是如何工作的？
 
 :::details 要点
 
@@ -443,7 +443,7 @@ MapReduce 编程模型中 `splitting` 和 `shuffing` 操作都是由框架实现
 
 所有分布式系统都需要支持复制。
 
-### 【中级】HDFS 的副本机制是怎样的？
+### 【中等】HDFS 的副本机制是怎样的？
 
 :::details 要点
 
@@ -491,7 +491,7 @@ HDFS 默认的副本数为 3，此时 HDFS 的副本分布策略是：
 
 :::
 
-### 【中级】HDFS 如何保证数据一致性？
+### 【中等】HDFS 如何保证数据一致性？
 
 :::details 要点
 
@@ -511,7 +511,7 @@ HDFS 的数据一致性主要依赖以下机制来保证：
 
 ## 容错
 
-### 【中级】HDFS 有哪些故障类型？如何检测故障？
+### 【中等】HDFS 有哪些故障类型？如何检测故障？
 
 :::details 要点
 
@@ -532,7 +532,7 @@ HDFS 常见故障及检测方法：
 
 :::
 
-### 【中级】HDFS 读写故障如何处理？
+### 【中等】HDFS 读写故障如何处理？
 
 :::details 要点
 
@@ -552,7 +552,7 @@ HDFS 常见故障及检测方法：
 
 :::
 
-### 【中级】DataNode 故障如何处理？
+### 【中等】DataNode 故障如何处理？
 
 :::details 要点
 
@@ -566,7 +566,7 @@ NameNode 会立即查找该 DataNode 上存储的数据块有哪些，以及这�
 
 :::
 
-### 【中级】NameNode 故障如何处理？
+### 【中等】NameNode 故障如何处理？
 
 :::details 要点
 
@@ -609,7 +609,7 @@ QJM 共享存储系统
 
 :::
 
-### 【中级】HDFS 安全模式有什么作用？
+### 【中等】HDFS 安全模式有什么作用？
 
 :::details 要点
 
@@ -619,7 +619,7 @@ QJM 共享存储系统
 
 ## HA
 
-### 【高级】HDFS 如何实现高可用？
+### 【困难】HDFS 如何实现高可用？
 
 :::details 要点
 
@@ -643,7 +643,7 @@ HDFS 高可用架构主要由以下组件所构成：
 
 :::
 
-### 【高级】NameNode 如何实现主备切换？
+### 【困难】NameNode 如何实现主备切换？
 
 :::details 要点
 
@@ -670,7 +670,7 @@ NameNode 在选举成功后，会在 zk 上创建了一个 `/hadoop-ha/${dfs.nam
 
 :::
 
-### 【高级】如何应对 HDFS 脑裂问题？
+### 【困难】如何应对 HDFS 脑裂问题？
 
 :::details 要点
 
@@ -702,7 +702,7 @@ Controller 给 Broker 发送的请求中，都会携带 controller epoch 信息�
 
 :::
 
-### 【高级】YARN 如何实现高可用？
+### 【困难】YARN 如何实现高可用？
 
 :::details 要点
 

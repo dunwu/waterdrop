@@ -11,7 +11,7 @@ permalink: /pages/f2e9ac63/
 hidden: true
 index: false
 dir:
-  order: 4
+  order: 05
   link: true
 ---
 
@@ -52,4 +52,4 @@ dir:
 
 ## 🚪 传送
 
-◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾

@@ -16,7 +16,7 @@ permalink: /pages/cd02d15c/
 
 ## Hive 简介
 
-### 【基础】什么是 Hive？
+### 【简单】什么是 Hive？
 
 :::details 要点
 
@@ -34,7 +34,7 @@ Hive 可以将结构化的数据文件映射成表，并提供类 SQL 查询功�
 
 :::
 
-### 【基础】什么是 HMS？
+### 【简单】什么是 HMS？
 
 :::details 要点
 
@@ -46,7 +46,7 @@ Hive Metastore （HMS） 是关系数据库中 Hive 表和分区元数据的中�
 
 ## Hive 存储
 
-### 【基础】Hive 支持哪些数据类型？
+### 【简单】Hive 支持哪些数据类型？
 
 :::details 要点
 
@@ -77,7 +77,7 @@ Hive 表中的列支持以下基本数据类型：
 
 :::
 
-### 【基础】Hive 支持哪些存储格式？
+### 【简单】Hive 支持哪些存储格式？
 
 :::details 要点
 
@@ -116,7 +116,7 @@ CREATE TABLE page_view(viewTime INT, userid BIGINT)
 
 :::
 
-### 【基础】Hive 中的内部表和外部表有什么区别？
+### 【简单】Hive 中的内部表和外部表有什么区别？
 
 :::details 要点
 
@@ -130,7 +130,7 @@ CREATE TABLE page_view(viewTime INT, userid BIGINT)
 
 :::
 
-### 【基础】什么是分区表？
+### 【简单】什么是分区表？
 
 :::details 要点
 
@@ -176,7 +176,7 @@ LOAD DATA LOCAL INPATH "/usr/file/emp30.txt" OVERWRITE INTO TABLE emp_partition 
 
 :::
 
-### 【基础】什么是分桶表？
+### 【简单】什么是分桶表？
 
 :::details 要点
 
@@ -239,7 +239,7 @@ bucket（桶） 本质上就是表目录下的具体文件：
 
 :::
 
-### 【基础】分区和分桶可以一起使用吗？
+### 【简单】分区和分桶可以一起使用吗？
 
 :::details 要点
 
@@ -273,7 +273,7 @@ SELECT * FROM page_view WHERE dt='2009-02-25';
 
 ## Hive 索引
 
-### 【中级】Hive 的索引是如何工作的？
+### 【中等】Hive 的索引是如何工作的？
 
 :::details 要点
 
@@ -336,7 +336,7 @@ ALTER INDEX index_name ON table_name [PARTITION partition_spec] REBUILD;
 
 :::
 
-### 【中级】Hive 索引有什么缺陷？
+### 【中等】Hive 索引有什么缺陷？
 
 :::details 要点
 
@@ -353,7 +353,7 @@ ALTER INDEX index_name ON table_name [PARTITION partition_spec] REBUILD;
 
 ## Hive 架构
 
-### 【高级】Hive SQL 如何执行的？
+### 【困难】Hive SQL 如何执行的？
 
 :::details 要点
 

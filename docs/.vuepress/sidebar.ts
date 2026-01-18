@@ -77,14 +77,8 @@ export default sidebar({
       text: '分布式',
       icon: 'streamline-stickies-color:server-network',
       prefix: '15.分布式/',
-      collapsible: true,
-      children: [
-        { text: '分布式理论', link: '分布式理论', collapsible: true, children: 'structure' },
-        { text: '分布式协同', link: '分布式协同', collapsible: true, children: 'structure' },
-        { text: '分布式调度', link: '分布式调度', collapsible: true, children: 'structure' },
-        { text: '分布式通信', link: '分布式通信', collapsible: true, children: 'structure' },
-        { text: '分布式存储', link: '分布式存储', collapsible: true, children: 'structure' }
-      ]
+      children: 'structure',
+      collapsible: true
     },
     {
       text: '大数据',

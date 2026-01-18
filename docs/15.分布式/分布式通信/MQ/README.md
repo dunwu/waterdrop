@@ -1,5 +1,4 @@
 ---
-icon: mdi:mq
 title: 消息队列
 cover: https://raw.githubusercontent.com/dunwu/images/master/202509132339376.png
 date: 2022-02-17 22:34:30
@@ -14,6 +13,9 @@ tags:
 permalink: /pages/8a1e3989/
 hidden: true
 index: false
+dir:
+  order: 01
+  link: true
 ---
 
 # 消息队列
@@ -104,4 +106,4 @@ index: false
 
 ## 🚪 传送
 
-◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾

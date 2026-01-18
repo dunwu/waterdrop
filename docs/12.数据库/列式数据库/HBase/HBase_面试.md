@@ -19,7 +19,7 @@ permalink: /pages/6a3851d6/
 
 ## HBase 简介
 
-### 【基础】什么是 HBase？
+### 【简单】什么是 HBase？
 
 :::details 要点
 
@@ -55,7 +55,7 @@ HBase 的其他特性
 
 :::
 
-### 【基础】为什么需要 HBase？
+### 【简单】为什么需要 HBase？
 
 :::details 要点
 
@@ -71,7 +71,7 @@ Hadoop 的缺陷在于：它只能执行批处理，并且只能以顺序方式�
 
 :::
 
-### 【基础】HBase 有哪些应用场景？
+### 【简单】HBase 有哪些应用场景？
 
 :::details 要点
 
@@ -102,7 +102,7 @@ HBase 的典型应用场景
 
 :::
 
-### 【基础】HBase vs. RDBMS？
+### 【简单】HBase vs. RDBMS？
 
 :::details 要点
 
@@ -121,7 +121,7 @@ HBase 和 RDBMS 的不同之处如下：
 
 :::
 
-### 【基础】HBase vs. HDFS？
+### 【简单】HBase vs. HDFS？
 
 :::details 要点
 
@@ -138,7 +138,7 @@ HBase 和 HDFS 的不同之处如下：
 
 :::
 
-### 【基础】行式数据库 vs. 列式数据库？
+### 【简单】行式数据库 vs. 列式数据库？
 
 :::details 要点
 
@@ -169,7 +169,7 @@ HBase 和 HDFS 的不同之处如下：
 
 ## HBase 存储
 
-### 【基础】HBase 表有什么特性？
+### 【简单】HBase 表有什么特性？
 
 :::details 要点
 
@@ -183,7 +183,7 @@ Hbase 的表具有以下特点：
 
 :::
 
-### 【基础】HBase 的逻辑存储模型是怎样的？
+### 【简单】HBase 的逻辑存储模型是怎样的？
 
 :::details 要点
 
@@ -225,7 +225,7 @@ HBase 数据模型和关系型数据库有所不同。其数据模型的关键�
 
 :::
 
-### 【基础】HBase 的物理存储模型是怎样的？
+### 【简单】HBase 的物理存储模型是怎样的？
 
 :::details 要点
 
@@ -245,7 +245,7 @@ HBase Table 中的所有行按照 `Row Key` 的字典序排列。HBase Tables �
 
 ## HBase 架构
 
-### 【中级】HBase 读数据流程是怎样的？
+### 【中等】HBase 读数据流程是怎样的？
 
 :::details 要点
 
@@ -269,7 +269,7 @@ HBase Table 中的所有行按照 `Row Key` 的字典序排列。HBase Tables �
 
 :::
 
-### 【中级】HBase 写数据流程是怎样的？
+### 【中等】HBase 写数据流程是怎样的？
 
 :::details 要点
 
@@ -285,7 +285,7 @@ HBase Table 中的所有行按照 `Row Key` 的字典序排列。HBase Tables �
 
 :::
 
-### 【中级】HBase 有哪些核心组件？
+### 【中等】HBase 有哪些核心组件？
 
 :::details 要点
 
