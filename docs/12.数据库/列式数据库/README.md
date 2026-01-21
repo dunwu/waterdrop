@@ -10,6 +10,9 @@ tags:
 permalink: /pages/2d01c30e/
 hidden: true
 index: false
+dir:
+  order: 07
+  link: true
 ---
 
 # 列式数据库

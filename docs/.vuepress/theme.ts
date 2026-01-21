@@ -73,6 +73,12 @@ export default hopeTheme({
     }
   },
 
+  markdown: {
+    math: {
+      type: "katex", // 支持数学公式 Tex
+    },
+  },
+
   // page meta
   metaLocales: {
     editLink: '在 GitHub 上编辑此页'

@@ -290,7 +290,7 @@ end
 
 1. 粘性 session
 2. 应用服务器间的 session 复制共享
-3. 基于缓存的 session 共享 ✅
+3. 基于缓存的 session 共享 ✔️
 
 基于缓存的 session 共享实现
 

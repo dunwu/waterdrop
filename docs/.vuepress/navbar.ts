@@ -75,14 +75,14 @@ export default navbar([
         children: [{ text: 'MySQL', icon: 'logos:mysql', link: '/12.数据库/关系型数据库/MySQL/' }]
       },
       {
-        text: '文档数据库',
-        link: '/12.数据库/文档数据库/',
-        children: [{ text: 'MongoDB', icon: 'logos:mongodb', link: '/12.数据库/文档数据库/MongoDB/' }]
-      },
-      {
         text: 'KV数据库',
         link: '/12.数据库/KV数据库/',
         children: [{ text: 'Redis', icon: 'logos:redis', link: '/12.数据库/KV数据库/Redis/' }]
+      },
+      {
+        text: '文档数据库',
+        link: '/12.数据库/文档数据库/',
+        children: [{ text: 'MongoDB', icon: 'logos:mongodb', link: '/12.数据库/文档数据库/MongoDB/' }]
       },
       {
         text: '列式数据库',

@@ -181,7 +181,7 @@ Iterator<String> iterator = list.iterator();
 while (iterator.hasNext()) {
     String item = iterator.next();
     if ("B".equals(item) || "C".equals(item)) {
-        iterator.remove(); // ✅ 通过迭代器安全删除
+        iterator.remove(); // ✔️ 通过迭代器安全删除
     }
 }
 // list = ["A", "D"]
@@ -192,7 +192,7 @@ while (iterator.hasNext()) {
 ```java
 List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C", "D"));
 // 单行完成过滤
-list.removeIf(item -> item.startsWith("B") || item.equals("C")); // ✅
+list.removeIf(item -> item.startsWith("B") || item.equals("C")); // ✔️
 // list = ["A", "D"]
 ```
 
@@ -295,7 +295,7 @@ ArrayList<String> list = new ArrayList<>(10000);
 | **插入/删除性能** | - 尾部操作：⚡ **O(1)**<br>- 中间/头部操作：🐢 **O(n)**（需移动元素） | - 头尾操作：⚡ **O(1)**<br>- 中间操作：🐢 **O(n)**（需遍历定位） |
 | **适用场景**      | - 频繁随机访问<br>- 数据量稳定或尾部操作多                            | - 频繁头尾插入/删除<br>- 数据动态性强                            |
 | **额外功能**      | 仅基础列表操作                                                        | 实现了 `Deque` 接口（可作队列/栈使用）                           |
-| **空间局部性**    | ✅ 更好（CPU 缓存友好）                                               | ❌ 较差（节点分散存储）                                          |
+| **空间局部性**    | ✔️ 更好（CPU 缓存友好）                                               | ❌ 较差（节点分散存储）                                          |
 
 **对比小结**：
 List` 需遍历链表。
@@ -638,11 +638,11 @@ PriorityQueue 是自动排序的堆结构队列，默认小顶堆，适用优先
 
 **选择 `ArrayBlockingQueue` 的情况**：
 
-- ✅ **队列大小固定**，防止内存耗尽（如任务队列有严格上限）。
-- ✅ **低/中并发**，且对内存占用敏感。
+- ✔️ **队列大小固定**，防止内存耗尽（如任务队列有严格上限）。
+- ✔️ **低/中并发**，且对内存占用敏感。
 
 **选择 `LinkedBlockingQueue` 的情况**：
 
-- ✅ **高并发**（生产者-消费者模型）。
-- ✅ **队列大小不固定**（默认几乎无界，但可手动指定容量）。
-- ✅ **需要更高的吞吐量**（双锁机制减少竞争）。
+- ✔️ **高并发**（生产者-消费者模型）。
+- ✔️ **队列大小不固定**（默认几乎无界，但可手动指定容量）。
+- ✔️ **需要更高的吞吐量**（双锁机制减少竞争）。

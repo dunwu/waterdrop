@@ -10,6 +10,9 @@ tags:
 permalink: /pages/bf863c80/
 hidden: true
 index: false
+dir:
+  order: 06
+  link: true
 ---
 
 # 搜索引擎数据库

@@ -10,6 +10,9 @@ tags:
 permalink: /pages/ba6c6f2b/
 hidden: true
 index: false
+dir:
+  order: 01
+  link: true
 ---
 
 # 数据库综合

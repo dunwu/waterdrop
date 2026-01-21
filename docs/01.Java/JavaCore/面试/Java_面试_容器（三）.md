@@ -302,11 +302,11 @@ int[] intArray = {1, 2, 3};
 List<int[]> wrongList = Arrays.asList(intArray);  // List<int[]> 不是 List<Integer>
 System.out.println(wrongList.size());  // 输出 1（整个数组作为一个元素）
 
-// ✅ 正确：使用包装类型或流
+// ✔️ 正确：使用包装类型或流
 Integer[] integerArray = {1, 2, 3};
 List<Integer> correctList = Arrays.asList(integerArray);  // 正常：3个元素
 
-// ✅ Java 8+ 替代方案
+// ✔️ Java 8+ 替代方案
 List<Integer> streamList = Arrays.stream(intArray)
                                   .boxed()
                                   .collect(Collectors.toList());
@@ -332,7 +332,7 @@ list.remove(0); // 同样抛出异常
 【示例】使用 `new ArrayList<>(Arrays.asList(...))`
 
 ```java
-// ✅ 正确模式：创建真正的可变列表
+// ✔️ 正确模式：创建真正的可变列表
 List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C"));
 list.add("D");  // 正常执行
 ```
@@ -340,7 +340,7 @@ list.add("D");  // 正常执行
 【示例】使用 Java8 的 Stream
 
 ```
-// ✅ 正确模式（Java8+）：Stream
+// ✔️ 正确模式（Java8+）：Stream
 Integer [] myArray = { 1, 2, 3 };
 List myList = Arrays.stream(myArray).collect(Collectors.toList());
 // 基本类型也可以实现转换（依赖 boxed 的装箱操作）
@@ -395,7 +395,7 @@ CollectionUtils.addAll(list, str);
 List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C", "D"));
 List<String> sub = list.subList(1, 3);  // [B, C]
 // ❌ 常见误解：创建了独立副本
-// ✅ 实际：sub 是 list 的"视图窗口"，共享底层数据
+// ✔️ 实际：sub 是 list 的"视图窗口"，共享底层数据
 ```
 
 【示例】结构修改异常（ConcurrentModificationException）

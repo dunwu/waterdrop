@@ -49,15 +49,7 @@ export default sidebar({
       icon: 'streamline-plump-color:database',
       prefix: '12.数据库/',
       collapsible: true,
-      children: [
-        { text: '数据库综合', prefix: '数据库综合', collapsible: true, children: 'structure' },
-        { text: '数据库中间件', prefix: '数据库中间件', collapsible: true, children: 'structure' },
-        { text: '关系型数据库', prefix: '关系型数据库', collapsible: true, children: 'structure' },
-        { text: '文档数据库', prefix: '文档数据库', collapsible: true, children: 'structure' },
-        { text: 'KV数据库', prefix: 'KV数据库', collapsible: true, children: 'structure' },
-        { text: '列式数据库', prefix: '列式数据库', collapsible: true, children: 'structure' },
-        { text: '搜索引擎数据库', prefix: '搜索引擎数据库', collapsible: true, children: 'structure' }
-      ]
+      children: 'structure'
     },
     {
       text: '网络',

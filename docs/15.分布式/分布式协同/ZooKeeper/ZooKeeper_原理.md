@@ -166,7 +166,7 @@ ZooKeeper 定义了如下五种权限：
 > 注意
 >
 > - Leader 不需要得到 Observer 的 ACK，即 Observer 无投票权。
-> - Leader 不需要得到所有 Follower 的 ACK，只要收到过半的 ACK 即可，同时 Leader 本身对自己有一个 ACK。上图中有 4 个 Follower，只需其中两个返回 ACK 即可，因为 $$(2+1) / (4+1) > 1/2$$ 。
+> - Leader 不需要得到所有 Follower 的 ACK，只要收到过半的 ACK 即可，同时 Leader 本身对自己有一个 ACK。上图中有 4 个 Follower，只需其中两个返回 ACK 即可，因为 $(2+1) / (4+1) > 1/2$ 。
 > - Observer 虽然无投票权，但仍须同步 Leader 的数据从而在处理读请求时可以返回尽可能新的数据。
 
 #### 写 Follower/Observer

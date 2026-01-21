@@ -747,7 +747,7 @@ Java 9 引入 **AOT（Ahead of Time Compilation，提前编译）** 。AOT 模�
 | **启动速度** | ⭐⭐⭐极快（无编译开销）      | ⭐较慢（首次解释执行，热点编译有延迟） |
 | **内存占用** | ⭐⭐⭐低（无需 JIT 编译缓存） | ⭐⭐较高（需缓存编译后的机器码）       |
 | **峰值性能** | ⭐⭐（静态优化）              | ⭐⭐⭐（动态优化）                     |
-| **动态支持** | ❌受限                        | ✅完整支持                             |
+| **动态支持** | ❌受限                        | ✔️完整支持                             |
 | **适合场景** | 云原生 / 微服务               | 高吞吐 / 动态框架                      |
 
 提到 AOT 就不得不提 [GraalVM](https://www.graalvm.org/) 了！GraalVM 是一种高性能的 JDK（完整的 JDK 发行版本），它可以运行 Java 和其他 JVM 语言，以及 JavaScript、Python 等非 JVM 语言。 GraalVM 不仅能提供 AOT 编译，还能提供 JIT 编译。感兴趣的同学，可以去看看 [GraalVM 的官方文档](https://www.graalvm.org/latest/docs/)。如果觉得官方文档看着比较难理解的话，也可以找一些文章来看看，比如：
