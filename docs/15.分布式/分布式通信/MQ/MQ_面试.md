@@ -34,7 +34,7 @@ permalink: /pages/fcbb3c4e/
 
 ### 【简单】MQ 有哪些应用场景？⭐⭐
 
-::: tip 关键点
+::: important 要点
 
 MQ 的典型应用场景
 

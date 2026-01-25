@@ -80,16 +80,6 @@ export default navbar([
         children: [{ text: 'Redis', icon: 'logos:redis', link: '/12.数据库/KV数据库/Redis/' }]
       },
       {
-        text: '文档数据库',
-        link: '/12.数据库/文档数据库/',
-        children: [{ text: 'MongoDB', icon: 'logos:mongodb', link: '/12.数据库/文档数据库/MongoDB/' }]
-      },
-      {
-        text: '列式数据库',
-        link: '/12.数据库/列式数据库/',
-        children: [{ text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/列式数据库/HBase/' }]
-      },
-      {
         text: '搜索引擎数据库',
         link: '/12.数据库/搜索引擎数据库/',
         children: [
@@ -100,6 +90,16 @@ export default navbar([
             link: '/12.数据库/搜索引擎数据库/Elastic/'
           }
         ]
+      },
+      {
+        text: '文档数据库',
+        link: '/12.数据库/文档数据库/',
+        children: [{ text: 'MongoDB', icon: 'logos:mongodb', link: '/12.数据库/文档数据库/MongoDB/' }]
+      },
+      {
+        text: '列式数据库',
+        link: '/12.数据库/列式数据库/',
+        children: [{ text: 'HBase', icon: 'logos:hbase', link: '/12.数据库/列式数据库/HBase/' }]
       }
     ]
   },

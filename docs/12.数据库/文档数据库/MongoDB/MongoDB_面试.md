@@ -21,7 +21,7 @@ permalink: /pages/cae9f346/
 
 ## MongoDB 简介
 
-::: info 扩展阅读
+::: tip 扩展
 
 - [MongoDB 官方文档之 MongoDB 简介](https://www.mongodb.com/zh-cn/docs/manual/introduction/)
 - [MongoDB 简史](https://www.infoq.cn/article/3d4suwkc2fvikykemnvw)
@@ -31,7 +31,7 @@ permalink: /pages/cae9f346/
 
 ### 【简单】MongoDB 是什么？
 
-::: tip 关键点
+::: important 要点
 
 文档数据库、C++、CRUD、聚合、文本搜索、地理空间搜索
 
@@ -51,7 +51,7 @@ MongoDB 提供了丰富的功能：
 
 ### 【简单】MongoDB 有什么特性？
 
-::: tip 关键点
+::: important 要点
 
 面向文档、无模式、丰富的数据类型、丰富的查询方式、支持聚合、支持事务、支持压缩、分布式
 
@@ -92,14 +92,14 @@ MongoDB vs.RDBM：
 
 ### 【简单】MongoDB 有哪些里程碑版本？
 
-::: info 扩展阅读
+::: tip 扩展
 
 - [MongoDB 简史](https://www.infoq.cn/article/3d4suwkc2fvikykemnvw)
 - [MongoDB 发展历史及各主要版本新特性概述](https://blog.csdn.net/JiekeXu/article/details/143670868)
 
 :::
 
-::: tip 关键点
+::: important 要点
 
 - **1.0**：2009 年，MongoDB 发布第一版
 - **3.0**：2015 年，支持 **WiredTiger** 存储引擎
@@ -121,7 +121,7 @@ MongoDB 是由 **10gen** 开发的 NoSQL 数据库，该公司由 Dwight Merrima
 
 ### 【简单】BSON 是什么？与 JSON 有何区别？
 
-::: tip 关键点
+::: important 要点
 
 二进制 JSON
 
@@ -130,7 +130,230 @@ MongoDB 是由 **10gen** 开发的 NoSQL 数据库，该公司由 Dwight Merrima
 BSON 的英文全称是 **Binary JSON**，即**二进制 JSON**。主要用于在 MongoDB 中存储文档和进行网络传输。
 
 - 最大 16MB
-- 必须有唯一 _id 作为主键
+- 必须有唯一 \_id 作为主键
+
+## MongoDB 存储
+
+### 【简单】MongoDB 的逻辑存储是怎样设计的？⭐⭐⭐
+
+MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/docs/manual/core/document/#std-label-bson-document-format)。BSON 是 [JSON](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-JSON) 文档的二进制表示形式，尽管它包含的数据类型比 JSON 多。最大 BSON 文档大小为 16 MB。
+
+每个 MongoDB 文档都需要一个唯一的 [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) 字段作为 [主键](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-primary-key)。如果插入的文档省略了 `_id` 字段，则 MongoDB 驱动程序会自动为 `_id` 字段生成 [ObjectId](https://www.mongodb.com/zh-cn/docs/manual/reference/bson-types/#std-label-objectid)。
+
+这些 [MongoDB 文档](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-document) 收集在 [集合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-collection) 中。[数据库](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-database) 存储一个或多个文档集合。
+
+为了方便理解 MongoDB 概念，下面将 MongoDB 概念和 RDBM 概念进行对比：
+
+| RDBM 概念          | MongoDB 概念                                                                        |
+| :----------------- | :---------------------------------------------------------------------------------- |
+| database（数据库） | database（数据库）                                                                  |
+| table（表）        | collection（集合）                                                                  |
+| row（行）          | document（文档）                                                                    |
+| column（列）       | field（字段）                                                                       |
+| index（索引）      | index（索引）                                                                       |
+| primary key        | [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) |
+
+::: info 文档
+
+:::
+
+文档是 MongoDB 中的**基本数据单元**。**文档是一组有序键值对（即 BSON）**。MongoDB 的文档不需要设置相同的字段，并且相同的字段不需要相同的数据类型，这与关系型数据库有很大的区别，也是 MongoDB 非常突出的特点。
+
+![MongoDB Document](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024526.png)
+
+需要注意的是：
+
+- **文档中的键/值对是有序的**。
+
+- 文档的键是字符串。除了少数例外情况，**键可以使用任意 UTF-8 字符**。
+
+- 文档中的值不仅可以是在双引号里面的字符串，还可以是其他几种数据类型（甚至可以是整个嵌入的文档）。
+
+- **MongoDB 区分类型和大小写**。例如，下面这两对文档是不同的：
+
+  ```json
+  {"count" : 5}
+  {"count" : "5"}
+
+  {"count" : 5}
+  {"Count" : 5}
+  ```
+
+- MongoDB 的文档不能有重复的键。例如，下面这个文档是不合法的
+
+  ```json
+  {"greeting" : "Hello, world!", "greeting" : "Hello, MongoDB!"
+  ```
+
+文档键命名规范：
+
+- 键不能含有 `\0` （空字符）。这个字符用来表示键的结尾。
+- `.` 和 `$` 有特别的意义，只有在特定环境下才能使用。
+- 以下划线 `_` 开头的键是保留的（不是严格要求的）。
+
+::: info 集合
+
+:::
+
+集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System) 中的表（Table）。集合存在于数据库中，集合没有固定的结构，这意味着你在对集合可以插入不同格式和类型的数据，但通常情况下我们插入集合的数据都会有一定的关联性。
+
+![MongoDB Collection](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024137.png)
+
+集合不需要事先创建，当第一个文档插入或者第一个索引创建时，如果该集合不存在，则会创建一个新的集合。使用 `.` 字符分隔不同命名空间的子集合是一种组织集合的惯例。例如，有一个具有博客功能的应用程序，可能包含名为 `blog.posts` 和名为 `blog.authors` 的集合。
+
+合法的集合名：
+
+- 集合名称不能是空字符串（""）。
+- 集合名称不能含有 `\0`（空字符），因为这个字符用于表示一个集合名称的结束。
+- 集合名称不能以 `system.` 开头，该前缀是为内部集合保留的。例如，`system.users` 集合中保存着数据库的用户，`system.namespaces` 集合中保存着有关数据库所有集合的信息。
+- 用户创建的集合名称中不应包含保留字符 `$`。许多驱动程序确实支持在集合名称中使用 `$`，这是因为某些由系统生成的集合会包含它，但除非你要访问的是这些集合之一，否则不应在名称中使用 `$` 字符。
+
+::: info 数据库
+
+:::
+
+数据库用于存储所有集合，而集合又用于存储所有文档。一个 MongoDB 中可以创建多个数据库，每一个数据库都有自己的集合和权限。MongoDB 的单个实例可以容纳多个独立的数据库，每一个都有自己的集合和权限，不同的数据库也放置在不同的文件中。
+
+MongoDB 的默认数据库为"db"，该数据库存储在 data 目录中。
+
+**"show dbs"** 命令可以显示所有数据的列表。
+
+```shell
+$ ./mongo
+MongoDBshell version: 3.0.6
+connecting to: test
+> show dbs
+local  0.078GB
+test   0.078GB
+```
+
+执行 **"db"** 命令可以显示当前数据库对象或集合。
+
+```shell
+$ ./mongo
+MongoDBshell version: 3.0.6
+connecting to: test
+> db
+test
+```
+
+运行"use"命令，可以连接到一个指定的数据库。
+
+```shell
+> use local
+switched to db local
+> db
+local
+```
+
+数据库按照名称进行标识的。数据库名称可以是任意 UTF-8 字符串，但有以下限制：
+
+- 数据库名称不能是空字符串（""）。
+- 数据库名称不能包含 `/`、`\`、`.`、`"`、`*`、`<`、`>`、`:`、`|`、`?`、`$`、单一的空格以及 `\0`（空字符），基本上只能使用 ASCII 字母和数字。
+- 数据库名称区分大小写。
+- 数据库名称的长度限制为 64 字节。
+
+有一些数据库名是保留的，可以直接访问这些有特殊作用的数据库。
+
+- **admin**：admin 数据库会在身份验证和授权时被使用。此外，某些管理操作需要访问此数据库。
+- **local**：这个数据永远不会被复制，可以用来存储限于本地单台服务器的任意集合
+- **config**：当 Mongo 用于分片设置时，config 数据库在内部使用，用于保存分片的相关信息。
+
+::: info 元数据
+
+:::
+
+数据库的信息是存储在集合中。它们使用了系统的命名空间：`dbname.system.*`
+
+在 MongoDB 数据库中命名空间 `<dbname>.system.*` 是包含多种系统信息的特殊集合 (Collection)，如下：
+
+| 集合命名空间               | 描述                                      |
+| :------------------------- | :---------------------------------------- |
+| `dbname.system.namespaces` | 列出所有名字空间。                        |
+| `dbname.system.indexes`    | 列出所有索引。                            |
+| `dbname.system.profile`    | 包含数据库概要 (profile) 信息。           |
+| `dbname.system.users`      | 列出所有可访问数据库的用户。              |
+| `dbname.local.sources`     | 包含复制对端（slave）的服务器信息和状态。 |
+
+对于修改系统集合中的对象有如下限制。
+
+在 `system.indexes` 插入数据，可以创建索引。但除此之外该表信息是不可变的（特殊的 drop index 命令将自动更新相关信息）。`system.users` 是可修改的。`system.profile` 是可删除的。
+
+### 【中等】MongoDB 支持哪些存储引擎？⭐⭐
+
+::: important 要点
+
+- **MMAPV1**：MongoDB 早期版本的默认存储引擎为 MMAPV1，已废弃
+- **WiredTiger**：MongoDB 3.2 后，默认的存储引擎为 [WiredTiger 存储引擎](https://www.mongodb.com/docs/manual/core/wiredtiger/)，支持 ACID 事务
+- **In-Memory**：数据存储在内存中
+
+:::
+
+存储引擎（Storage Engine）是数据库的核心组件，负责管理数据在内存和磁盘中的存储方式。
+
+与 MySQL 一样，MongoDB 采用的也是 **插件式的存储引擎架构** ，支持不同类型的存储引擎，不同的存储引擎解决不同场景的问题。在创建数据库或集合时，可以指定存储引擎。
+
+> 插件式的存储引擎架构可以实现 Server 层和存储引擎层的解耦，可以支持多种存储引擎，如 MySQL 既可以支持 B-Tree 结构的 InnoDB 存储引擎，还可以支持 LSM 结构的 RocksDB 存储引擎。
+
+在存储引擎刚出来的时候，默认是使用 MMAPV1 存储引擎，MongoDB4.x 版本不再支持 MMAPv1 存储引擎。
+
+现在主要有下面这两种存储引擎：
+
+- **WiredTiger 存储引擎**：自 MongoDB 3.2 以后，默认的存储引擎为 [WiredTiger 存储引擎](https://www.mongodb.com/docs/manual/core/wiredtiger/) 。非常适合大多数工作负载，建议用于新部署。WiredTiger 提供文档级并发模型、检查点和数据压缩（后文会介绍到）等功能。
+- **In-Memory 存储引擎**：[In-Memory 存储引擎](https://www.mongodb.com/docs/manual/core/inmemory/) 在 MongoDB Enterprise 中可用。它不是将文档存储在磁盘上，而是将它们保留在内存中以获得更可预测的数据延迟。
+
+此外，MongoDB 3.0 提供了 **可插拔的存储引擎 API** ，允许第三方为 MongoDB 开发存储引擎，这点和 MySQL 也比较类似。
+
+### 【中等】MongoDB 支持哪些压缩算法？
+
+::: important 要点
+
+MongoDB 支持的压缩算法：**[Snappy](https://github.com/google/snappy)**、**[zlib](https://github.com/madler/zlib)**、**[zstd](https://github.com/facebook/zstd)**
+
+:::
+
+借助 WiredTiger 存储引擎（ MongoDB 3.2 后的默认存储引擎），MongoDB 支持对所有集合和索引进行压缩。压缩以额外的 CPU 为代价最大限度地减少存储使用。
+
+默认情况下，WiredTiger 使用 [Snappy](https://github.com/google/snappy) 压缩算法（谷歌开源，旨在实现非常高的速度和合理的压缩，压缩比 3 ～ 5 倍）对所有集合使用块压缩，对所有索引使用前缀压缩。
+
+除了 Snappy 之外，对于集合还有下面这些压缩算法：
+
+- [zlib](https://github.com/madler/zlib)：高度压缩算法，压缩比 5 ～ 7 倍
+- [zstd](https://github.com/facebook/zstd)：Facebook 开源的一种快速无损压缩算法，针对 zlib 级别的实时压缩场景和更好的压缩比，提供更高的压缩率和更低的 CPU 使用率，MongoDB 4.2 开始可用。
+
+WiredTiger 日志也会被压缩，默认使用的也是 Snappy 压缩算法。如果日志记录小于或等于 128 字节，WiredTiger 不会压缩该记录。
+
+### 【中等】WiredTiger 数据结构采用 LSM Tree 还是 B+ Tree？⭐⭐
+
+::: important 要点
+
+WiredTiger 采用 B+ 树，因为其很适合以页为单位存储于磁盘空间。
+
+:::
+
+目前绝大部分流行的数据库存储引擎都是基于 B/B+ Tree 或者 LSM(Log Structured Merge) Tree 来实现的。对于 NoSQL 数据库来说，绝大部分（比如 HBase、Cassandra、RocksDB）都是基于 LSM 树，MongoDB 不太一样。
+
+上面也说了，自 MongoDB 3.2 以后，默认的存储引擎为 WiredTiger 存储引擎。在 WiredTiger 引擎官网上，我们发现 WiredTiger 使用的是 B+ 树作为其存储结构：
+
+```
+WiredTiger maintains a table's data in memory using a data structure called a B-Tree ( B+ Tree to be specific), referring to the nodes of a B-Tree as pages. Internal pages carry only keys. The leaf pages store both keys and values.
+```
+
+此外，WiredTiger 还支持 [LSM(Log Structured Merge)](https://source.wiredtiger.com/3.1.0/lsm.html) 树作为存储结构，MongoDB 在使用 WiredTiger 作为存储引擎时，默认使用的是 B+ 树。
+
+如果想要了解 MongoDB 使用 B+ 树的原因，可以看看这篇文章：[【驳斥八股文系列】别瞎分析了，MongoDB 使用的是 B+ 树，不是你们以为的 B 树](https://zhuanlan.zhihu.com/p/519658576)。
+
+使用 B+ 树时，WiredTiger 以 **page** 为基本单位往磁盘读写数据。B+ 树的每个节点为一个 page，共有三种类型的 page：
+
+- **root page（根节点）**：B+ 树的根节点。
+- **internal page（内部节点）**：不实际存储数据的中间索引节点。
+- **leaf page（叶子节点）**：真正存储数据的叶子节点，包含一个页头（page header）、块头（block header）和真正的数据（key/value），其中页头定义了页的类型、页中实际载荷数据的大小、页中记录条数等信息；块头定义了此页的 checksum、块在磁盘上的寻址位置等信息。
+
+其整体结构如下图所示：
+
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041050392.png)
+
+如果想要深入研究学习 WiredTiger 存储引擎，推荐阅读 MongoDB 中文社区的 [WiredTiger 存储引擎系列](https://mongoing.com/archives/category/wiredtiger 存储引擎系列)。
 
 ## MongoDB CRUD
 
@@ -139,21 +362,21 @@ BSON 的英文全称是 **Binary JSON**，即**二进制 JSON**。主要用于�
 - `skip()` + `limit()`：在大数据集中性能较差（需扫描跳过所有前置文档）
 - 基于游标的分页（使用 `_id` 或时间戳）：记录上一页最后一条记录的 `_id`，下次查询直接定位
 
-### 【简单】什么是主键  `_id`？
+### 【简单】什么是主键 `_id`？⭐
 
 `_id` 是**每个文档的唯一标识符**，默认由系统自动生成，也可以自定义。
 
 自动生成规则
 
-- MongoDB 默认使用 ObjectId 作为 _id 的值
+- MongoDB 默认使用 ObjectId 作为 \_id 的值
 - ObjectId 是一个 12 字节的 BSON 类型数据
-- _id 构成
+- \_id 构成
   - 时间戳：文档创建时的 Unix 时间戳（秒级）
   - 机器标识：生成 ObjectId 的服务器唯一标识
-  - 进程ID：MongoDB 进程的标识
+  - 进程 ID：MongoDB 进程的标识
   - 计数器：同一秒内的自增序列（确保同一进程内不重复）
 
-### 【简单】如何实现数据的增删改查操作？
+### 【简单】如何实现数据的增删改查操作？⭐
 
 - 插入
   - `db.collection.insertOne()`
@@ -171,7 +394,7 @@ BSON 的英文全称是 **Binary JSON**，即**二进制 JSON**。主要用于�
   - `db.collection.insertMany()`
   - `db.collection.bulkWrite()`
 
-### 【简单】如何使用 find() 方法查询文档？
+### 【简单】如何使用 find() 方法查询文档？⭐
 
 语法：`db.collection.find(query, projection)`
 
@@ -186,9 +409,9 @@ GridFS 是一种用于存储和检索大文件（超过 16MB BSON 文档限制�
 - 元数据存储：文件信息（如文件名、大小、MD5）保存在 `fs.files` 集合
 - 自动管理：通过 MongoDB 驱动程序或命令行工具透明地操作文件
 
-### 【简单】如何实现全文检索？
+### 【简单】如何实现全文检索？⭐⭐
 
-::: tip 关键点
+::: important 要点
 
 创建文本索引 + 使用 `$text` 操作符进行搜索
 
@@ -198,9 +421,9 @@ GridFS 是一种用于存储和检索大文件（超过 16MB BSON 文档限制�
 
 ```javascript
 db.articles.createIndex({
-  title: "text",
-  content: "text",
-  tags: "text"
+  title: 'text',
+  content: 'text',
+  tags: 'text'
 })
 ```
 
@@ -210,59 +433,63 @@ db.articles.createIndex({
 
 ```javascript
 db.articles.find({
-  $text: { 
-    $search: "mongodb tutorial" 
+  $text: {
+    $search: 'mongodb tutorial'
   }
 })
 ```
 
 ### 【简单】MongoDB 支持哪些数据类型？
 
-::: tip 关键点
+::: important 要点
 
-- 基本类型：String、Integer、Boolean、Double、Decimal、Null
-- 时间类型：Date、Timestamp
-- 组合类型：Array、Embedded Document
-- 特殊类型：ObjectId、Binary、Regular、Script、GeoJSON
+- **基本类型**：String、Integer、Boolean、Double、Decimal、Null
+- **时间类型**：Date、Timestamp
+- **组合类型**：Array、Embedded Document
+- **特殊类型**：ObjectId、Binary、Regular、Script、GeoJSON
 
 :::
 
-#### 基本类型
+::: info 基本类型
+:::
 
-- String：UTF-8 字符串
-- Integer：整数（32 位或 64 位，取决于服务器架构）
-- Boolean：true 或 false
-- Double：双精度浮点数
-- Decimal：高精度浮点数（适用于金融数据，避免精度丢失）
-- Null：表示空值或缺失字段
+- **String**：UTF-8 字符串
+- **Integer**：整数（32 位或 64 位，取决于服务器架构）
+- **Boolean**：true 或 false
+- **Double**：双精度浮点数
+- **Decimal**：高精度浮点数（适用于金融数据，避免精度丢失）
+- **Null**：表示空值或缺失字段
 
-#### 时间类型
+::: info 时间类型
+:::
 
-- Date：存储日期和时间（Unix 时间戳格式，毫秒精度）
-- Timestamp：内部使用的时间戳（不同于 Date 类型）。示例：`Timestamp(1000, 1)`
+- **Date**：存储日期和时间（Unix 时间戳格式，毫秒精度）
+- **Timestamp**：内部使用的时间戳（不同于 Date 类型）。示例：`Timestamp(1000, 1)`
 
-#### 组合类型
+::: info 组合类型
+:::
 
-- Array：有序的值列表，可包含不同类型。示例：`["apple", 42, true]`
-- Embedded Document：嵌套的 BSON 文档（子文档）。示例：`{ address: { city: "Beijing", zip: "100000" } }`
+- **Array**：有序的值列表，可包含不同类型。示例：`["apple", 42, true]`
+- **Embedded Document**：嵌套的 BSON 文档（子文档）。示例：`{ address: { city: "Beijing", zip: "100000" } }`
 
-#### 特殊类型
+::: info 特殊类型
+:::
 
-- ObjectId：文档的唯一标识（默认 _id 字段类型）。示例：ObjectId("507f1f77bcf86cd799439011")
-- Binary Data：存储二进制数据（如图片、文件）
-- Regular Expression：正则表达式。示例：`{ pattern: /^test/i }`
-- JavaScript Code：存储 JavaScript 代码（不推荐在服务端执行）。示例：`{ code: function() { return x + y; } }`
-- GeoJSON：支持地理坐标查询（点、线、多边形等）。示例：`{ location: { type: "Point", coordinates: [116.4, 39.9] } }`
+- **ObjectId**：文档的唯一标识（默认 \_id 字段类型）。示例：ObjectId("507f1f77bcf86cd799439011")
+- **Binary Data**：存储二进制数据（如图片、文件）
+- **Regular Expression**：正则表达式。示例：`{ pattern: /^test/i }`
+- **JavaScript Code**：存储 JavaScript 代码（不推荐在服务端执行）。示例：`{ code: function() { return x + y; } }`
+- **GeoJSON**：支持地理坐标查询（点、线、多边形等）。示例：`{ location: { type: "Point", coordinates: [116.4, 39.9] } }`
 
 ## MongoDB 聚合
 
-::: info 扩展阅读
+::: tip 扩展
 
 [MongoDB 官方文档之聚合](https://www.mongodb.com/zh-cn/docs/manual/aggregation/)
 
 :::
 
-### 【简单】MongoDB 支持哪些聚合方式？
+### 【简单】MongoDB 支持哪些聚合方式？⭐⭐
 
 聚合操作处理多个文档并返回计算结果。可以使用聚合操作来：
 
@@ -279,12 +506,12 @@ db.articles.find({
   - `$sort`：排序
   - `$limit/$skip`：限制/跳过结果
   - `$unwind`：展开数组
-  - `$lookup`：关联查询(类似SQL的JOIN)
+  - `$lookup`：关联查询（类似 SQL 的 JOIN)
   - `$facet`：多分支聚合
 - [单一目的聚合方法](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-single-purpose-agg-methods)，这些方法很简单，但缺乏聚合管道的功能。
   - `count()`：计数
   - `distinct()`：去重
-  - `estimatedDocumentCount()`：快速计数(不精确)
+  - `estimatedDocumentCount()`：快速计数（不精确）
 - [Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/)，从 MongoDB 5.0 开始，[Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/#std-label-Map-Reduce) 已被弃用。聚合管道提供的性能和可用性比 Map-Reduce 更优越。
 - **聚合表达式**
   - 数学表达式：`$add`, `$subtract`, `$multiply`, `$divide`
@@ -293,7 +520,7 @@ db.articles.find({
   - 逻辑表达式：`$and`, `$or`, `$not`, `$cond`
   - 数组表达式：`$arrayElemAt`, `$size`, `$slice`
 
-### 【中等】什么是聚合管道？
+### 【中等】什么是聚合管道？⭐⭐
 
 聚合管道由一个或多个处理文档的 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 组成：
 
@@ -362,7 +589,7 @@ db.orders.aggregate([
 - 按披萨 `name` 对剩余文档进行分组。
 - 使用 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 计算每种披萨 `name` 的总订单 `quantity`。总数存储在聚合管道返回的 `totalQuantity` 字段中。
 
-### 【简单】RDBM 聚合 vs. MongoDB 聚合？
+### 【简单】RDBM 聚合 vs. MongoDB 聚合？⭐⭐
 
 MongoDB pipeline 提供了许多等价于 SQL 中常见聚合语句的操作。 下表概述了常见的 SQL 聚合语句或函数和 MongoDB 聚合操作的映射表：
 
@@ -397,234 +624,9 @@ Map-Reduce 是一种数据处理范式，用于将大量数据汇总为有用的
 
 MongoDB 中的所有 Map-Reduce 函数都是 JavaScript，并在 mongod 进程中运行。 Map-Reduce 操作将单个 collection 的 document 作为输入，并且可以在开始 map 阶段之前执行任意排序和限制。 mapReduce 可以将 Map-Reduce 操作的结果作为 document 返回，也可以将结果写入 collection。
 
-## MongoDB 存储
-
-### 【简单】MongoDB 的逻辑存储是什么？
-
-::: tip 关键点
-
-```
-database -> collection -> document -> field
-index
-_id
-```
-
-:::
-
-MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/docs/manual/core/document/#std-label-bson-document-format)。BSON 是 [JSON](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-JSON) 文档的二进制表示形式，尽管它包含的数据类型比 JSON 多。最大 BSON 文档大小为 16 MB。
-
-每个 MongoDB 文档都需要一个唯一的 [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) 字段作为 [主键](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-primary-key)。如果插入的文档省略了 `_id` 字段，则 MongoDB 驱动程序会自动为 `_id` 字段生成 [ObjectId](https://www.mongodb.com/zh-cn/docs/manual/reference/bson-types/#std-label-objectid)。
-
-这些 [MongoDB 文档](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-document) 收集在 [集合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-collection) 中。[数据库](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-database) 存储一个或多个文档集合。
-
-为了方便理解 MongoDB 概念，下面将 MongoDB 概念和 RDBM 概念进行对比：
-
-| RDBM 概念          | MongoDB 概念                                                                        |
-| :----------------- | :---------------------------------------------------------------------------------- |
-| database（数据库） | database（数据库）                                                                  |
-| table（表）        | collection（集合）                                                                  |
-| row（行）          | document（文档）                                                                    |
-| column（列）       | field（字段）                                                                       |
-| index（索引）      | index（索引）                                                                       |
-| primary key        | [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) |
-
-#### 文档
-
-文档是 MongoDB 中的**基本数据单元**。**文档是一组有序键值对（即 BSON）**。MongoDB 的文档不需要设置相同的字段，并且相同的字段不需要相同的数据类型，这与关系型数据库有很大的区别，也是 MongoDB 非常突出的特点。
-
-![MongoDB Document](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024526.png)
-
-需要注意的是：
-
-- **文档中的键/值对是有序的**。
-
-- 文档的键是字符串。除了少数例外情况，**键可以使用任意 UTF-8 字符**。
-
-- 文档中的值不仅可以是在双引号里面的字符串，还可以是其他几种数据类型（甚至可以是整个嵌入的文档）。
-
-- **MongoDB 区分类型和大小写**。例如，下面这两对文档是不同的：
-
-  ```json
-  {"count" : 5}
-  {"count" : "5"}
-
-  {"count" : 5}
-  {"Count" : 5}
-  ```
-
-- MongoDB 的文档不能有重复的键。例如，下面这个文档是不合法的
-
-  ```json
-  {"greeting" : "Hello, world!", "greeting" : "Hello, MongoDB!"
-  ```
-
-文档键命名规范：
-
-- 键不能含有 `\0` （空字符）。这个字符用来表示键的结尾。
-- `.` 和 `$` 有特别的意义，只有在特定环境下才能使用。
-- 以下划线 `_` 开头的键是保留的（不是严格要求的）。
-
-#### 集合
-
-集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System) 中的表（Table）。集合存在于数据库中，集合没有固定的结构，这意味着你在对集合可以插入不同格式和类型的数据，但通常情况下我们插入集合的数据都会有一定的关联性。
-
-![MongoDB Collection](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024137.png)
-
-集合不需要事先创建，当第一个文档插入或者第一个索引创建时，如果该集合不存在，则会创建一个新的集合。使用 `.` 字符分隔不同命名空间的子集合是一种组织集合的惯例。例如，有一个具有博客功能的应用程序，可能包含名为 `blog.posts` 和名为 `blog.authors` 的集合。
-
-合法的集合名：
-
-- 集合名称不能是空字符串（""）。
-- 集合名称不能含有 `\0`（空字符），因为这个字符用于表示一个集合名称的结束。
-- 集合名称不能以 `system.` 开头，该前缀是为内部集合保留的。例如，`system.users` 集合中保存着数据库的用户，`system.namespaces` 集合中保存着有关数据库所有集合的信息。
-- 用户创建的集合名称中不应包含保留字符 `$`。许多驱动程序确实支持在集合名称中使用 `$`，这是因为某些由系统生成的集合会包含它，但除非你要访问的是这些集合之一，否则不应在名称中使用 `$` 字符。
-
-#### 数据库
-
-数据库用于存储所有集合，而集合又用于存储所有文档。一个 MongoDB 中可以创建多个数据库，每一个数据库都有自己的集合和权限。MongoDB 的单个实例可以容纳多个独立的数据库，每一个都有自己的集合和权限，不同的数据库也放置在不同的文件中。
-
-MongoDB 的默认数据库为"db"，该数据库存储在 data 目录中。
-
-**"show dbs"** 命令可以显示所有数据的列表。
-
-```shell
-$ ./mongo
-MongoDBshell version: 3.0.6
-connecting to: test
-> show dbs
-local  0.078GB
-test   0.078GB
-```
-
-执行 **"db"** 命令可以显示当前数据库对象或集合。
-
-```shell
-$ ./mongo
-MongoDBshell version: 3.0.6
-connecting to: test
-> db
-test
-```
-
-运行"use"命令，可以连接到一个指定的数据库。
-
-```shell
-> use local
-switched to db local
-> db
-local
-```
-
-数据库按照名称进行标识的。数据库名称可以是任意 UTF-8 字符串，但有以下限制：
-
-- 数据库名称不能是空字符串（""）。
-- 数据库名称不能包含 `/`、`\`、`.`、`"`、`*`、`<`、`>`、`:`、`|`、`?`、`$`、单一的空格以及 `\0`（空字符），基本上只能使用 ASCII 字母和数字。
-- 数据库名称区分大小写。
-- 数据库名称的长度限制为 64 字节。
-
-有一些数据库名是保留的，可以直接访问这些有特殊作用的数据库。
-
-- **admin**：admin 数据库会在身份验证和授权时被使用。此外，某些管理操作需要访问此数据库。
-- **local**：这个数据永远不会被复制，可以用来存储限于本地单台服务器的任意集合
-- **config**：当 Mongo 用于分片设置时，config 数据库在内部使用，用于保存分片的相关信息。
-
-#### 元数据
-
-数据库的信息是存储在集合中。它们使用了系统的命名空间：`dbname.system.*`
-
-在 MongoDB 数据库中命名空间 `<dbname>.system.*` 是包含多种系统信息的特殊集合 (Collection)，如下：
-
-| 集合命名空间               | 描述                                      |
-| :------------------------- | :---------------------------------------- |
-| `dbname.system.namespaces` | 列出所有名字空间。                        |
-| `dbname.system.indexes`    | 列出所有索引。                            |
-| `dbname.system.profile`    | 包含数据库概要 (profile) 信息。           |
-| `dbname.system.users`      | 列出所有可访问数据库的用户。              |
-| `dbname.local.sources`     | 包含复制对端（slave）的服务器信息和状态。 |
-
-对于修改系统集合中的对象有如下限制。
-
-在 `system.indexes` 插入数据，可以创建索引。但除此之外该表信息是不可变的（特殊的 drop index 命令将自动更新相关信息）。`system.users` 是可修改的。`system.profile` 是可删除的。
-
-### 【中等】MongoDB 支持哪些存储引擎？
-
-::: tip 关键点
-
-- **MMAPV1**：MongoDB 早起版本的默认存储引擎为 MMAPV1，已废弃
-- **WiredTiger**：MongoDB 3.2 后，默认的存储引擎为 [WiredTiger 存储引擎](https://www.mongodb.com/docs/manual/core/wiredtiger/)，支持 ACID 事务
-- **In-Memory**
-
-:::
-
-存储引擎（Storage Engine）是数据库的核心组件，负责管理数据在内存和磁盘中的存储方式。
-
-与 MySQL 一样，MongoDB 采用的也是 **插件式的存储引擎架构** ，支持不同类型的存储引擎，不同的存储引擎解决不同场景的问题。在创建数据库或集合时，可以指定存储引擎。
-
-> 插件式的存储引擎架构可以实现 Server 层和存储引擎层的解耦，可以支持多种存储引擎，如 MySQL 既可以支持 B-Tree 结构的 InnoDB 存储引擎，还可以支持 LSM 结构的 RocksDB 存储引擎。
-
-在存储引擎刚出来的时候，默认是使用 MMAPV1 存储引擎，MongoDB4.x 版本不再支持 MMAPv1 存储引擎。
-
-现在主要有下面这两种存储引擎：
-
-- **WiredTiger 存储引擎**：自 MongoDB 3.2 以后，默认的存储引擎为 [WiredTiger 存储引擎](https://www.mongodb.com/docs/manual/core/wiredtiger/) 。非常适合大多数工作负载，建议用于新部署。WiredTiger 提供文档级并发模型、检查点和数据压缩（后文会介绍到）等功能。
-- **In-Memory 存储引擎**：[In-Memory 存储引擎](https://www.mongodb.com/docs/manual/core/inmemory/) 在 MongoDB Enterprise 中可用。它不是将文档存储在磁盘上，而是将它们保留在内存中以获得更可预测的数据延迟。
-
-此外，MongoDB 3.0 提供了 **可插拔的存储引擎 API** ，允许第三方为 MongoDB 开发存储引擎，这点和 MySQL 也比较类似。
-
-### 【中等】MongoDB 支持哪些压缩算法？
-
-::: tip 关键点
-
-snappy、zlib、zstd
-
-:::
-
-借助 WiredTiger 存储引擎（ MongoDB 3.2 后的默认存储引擎），MongoDB 支持对所有集合和索引进行压缩。压缩以额外的 CPU 为代价最大限度地减少存储使用。
-
-默认情况下，WiredTiger 使用 [Snappy](https://github.com/google/snappy) 压缩算法（谷歌开源，旨在实现非常高的速度和合理的压缩，压缩比 3 ～ 5 倍）对所有集合使用块压缩，对所有索引使用前缀压缩。
-
-除了 Snappy 之外，对于集合还有下面这些压缩算法：
-
-- [zlib](https://github.com/madler/zlib)：高度压缩算法，压缩比 5 ～ 7 倍
-- [Zstandard](https://github.com/facebook/zstd)（简称 zstd）：Facebook 开源的一种快速无损压缩算法，针对 zlib 级别的实时压缩场景和更好的压缩比，提供更高的压缩率和更低的 CPU 使用率，MongoDB 4.2 开始可用。
-
-WiredTiger 日志也会被压缩，默认使用的也是 Snappy 压缩算法。如果日志记录小于或等于 128 字节，WiredTiger 不会压缩该记录。
-
-### 【中等】WiredTiger 基于 LSM Tree 还是 B+ Tree？
-
-::: tip 关键点
-
-WiredTiger 采用 B+ 树，因为其很适合以页为单位存储于磁盘空间。
-
-:::
-
-目前绝大部分流行的数据库存储引擎都是基于 B/B+ Tree 或者 LSM(Log Structured Merge) Tree 来实现的。对于 NoSQL 数据库来说，绝大部分（比如 HBase、Cassandra、RocksDB）都是基于 LSM 树，MongoDB 不太一样。
-
-上面也说了，自 MongoDB 3.2 以后，默认的存储引擎为 WiredTiger 存储引擎。在 WiredTiger 引擎官网上，我们发现 WiredTiger 使用的是 B+ 树作为其存储结构：
-
-```
-WiredTiger maintains a table's data in memory using a data structure called a B-Tree ( B+ Tree to be specific), referring to the nodes of a B-Tree as pages. Internal pages carry only keys. The leaf pages store both keys and values.
-```
-
-此外，WiredTiger 还支持 [LSM(Log Structured Merge)](https://source.wiredtiger.com/3.1.0/lsm.html) 树作为存储结构，MongoDB 在使用 WiredTiger 作为存储引擎时，默认使用的是 B+ 树。
-
-如果想要了解 MongoDB 使用 B+ 树的原因，可以看看这篇文章：[【驳斥八股文系列】别瞎分析了，MongoDB 使用的是 B+ 树，不是你们以为的 B 树](https://zhuanlan.zhihu.com/p/519658576)。
-
-使用 B+ 树时，WiredTiger 以 **page** 为基本单位往磁盘读写数据。B+ 树的每个节点为一个 page，共有三种类型的 page：
-
-- **root page（根节点）**：B+ 树的根节点。
-- **internal page（内部节点）**：不实际存储数据的中间索引节点。
-- **leaf page（叶子节点）**：真正存储数据的叶子节点，包含一个页头（page header）、块头（block header）和真正的数据（key/value），其中页头定义了页的类型、页中实际载荷数据的大小、页中记录条数等信息；块头定义了此页的 checksum、块在磁盘上的寻址位置等信息。
-
-其整体结构如下图所示：
-
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041050392.png)
-
-如果想要深入研究学习 WiredTiger 存储引擎，推荐阅读 MongoDB 中文社区的 [WiredTiger 存储引擎系列](https://mongoing.com/archives/category/wiredtiger 存储引擎系列)。
-
 ## MongoDB 索引
 
-::: info 扩展阅读
+::: tip 扩展
 
 - [MongoDB 官方文档之索引](https://www.mongodb.com/zh-cn/docs/manual/indexes/)
 - [你真的会用索引么？[Mongo]](https://zhuanlan.zhihu.com/p/77971681)
@@ -641,17 +643,19 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 ![MongoDB 索引](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921210621.svg)
 
-### 【简单】MongoDB 支持哪些类型的索引？
+### 【简单】MongoDB 支持哪些类型的索引？⭐⭐⭐
 
-::: tip 关键点
+::: important 要点
 
-单字段索引、复合索引、多键索引、文本索引、地理空间索引
+**MongoDB 支持索引类型：单字段索引、复合索引、多键索引、文本索引、地理空间索引**
 
 :::
 
 MongoDB 支持多种类型的索引，适用于不同的场景。
 
-#### 单字段索引
+::: info 单字段索引
+
+:::
 
 单个字段索引收集集合内每个文档中单个字段的数据，并对其排序。
 
@@ -661,7 +665,9 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 > 要了解详情，请参阅 [单字段索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-single/#std-label-indexes-single-field)。
 
-#### 复合索引
+::: info 复合索引
+
+:::
 
 复合索引从集合中每个文档的两个或多个字段收集数据并对其排序。数据先按索引中的第一个字段分组，再按每个后续字段分组。
 
@@ -671,7 +677,9 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 > 要了解详情，请参阅 [复合索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-compound/#std-label-index-type-compound)。
 
-#### 多键索引
+::: info 多键索引
+
+:::
 
 多键索引收集数组中存储的数据并进行排序。
 
@@ -683,13 +691,17 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 > 要了解详情，请参阅 [多键索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-multikey/#std-label-index-type-multikey)。
 
-#### 文本索引
+::: info 文本索引
+
+:::
 
 文本索引支持对包含字符串内容的字段进行文本搜索查询。
 
 > 要了解详情，请参阅 [自管理部署上的文本索引。](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-text/#std-label-index-type-text)
 
-#### 地理空间索引
+::: info 地理空间索引
+
+:::
 
 地理空间索引可提高对地理空间坐标数据进行查询的性能。
 
@@ -700,15 +712,17 @@ MongoDB 提供两种类型的地理空间索引：
 
 > 要了解详情，请参阅 [地理空间索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-geospatial/#std-label-geospatial-index)。
 
-#### 哈希索引
+::: info 哈希索引
+
+:::
 
 哈希索引支持 [哈希分片](https://www.mongodb.com/zh-cn/docs/manual/core/hashed-sharding/#std-label-sharding-hashed-sharding)。哈希索引对字段值的哈希值进行索引。
 
 > 要了解详情，请参阅 [哈希索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-hashed/#std-label-index-type-hashed)。
 
-### 【简单】复合索引中字段的顺序有影响吗？
+### 【简单】复合索引中字段的顺序有影响吗？⭐⭐⭐
 
-::: tip 关键点
+::: important 要点
 
 MongoDB 复合索引类似 MySQL，遵循最左匹配原则
 
@@ -748,7 +762,7 @@ db.s2.find().sort({"score": -1, "userid": 1}).explain()
 
 ### 【中等】什么是覆盖索引查询？
 
-::: tip 关键点
+::: important 要点
 
 索引覆盖查询所需的所有字段，可以避免回表
 
@@ -791,7 +805,7 @@ db.users.find({gender:"M"},{user_name:1,_id:0})
 
 ## MongoDB 事务
 
-::: info 扩展阅读
+::: tip 扩展
 
 - [MongoDB 官方文档之事务](https://www.mongodb.com/zh-cn/docs/manual/core/transactions/)
 - [技术干货| MongoDB 事务原理](https://mongoing.com/archives/82187)
@@ -799,7 +813,7 @@ db.users.find({gender:"M"},{user_name:1,_id:0})
 
 :::
 
-### 【简单】MongoDB 中如何使用事务?
+### 【简单】MongoDB 中如何使用事务？⭐
 
 MongoDB 从 4.0 版本开始支持多文档事务。
 
@@ -827,7 +841,7 @@ try {
     System.out.println("事务已提交。");
 
 } catch (Exception e) {
-    System.err.println("事务执行失败，正在回滚: " + e.getMessage());
+    System.err.println("事务执行失败，正在回滚：" + e.getMessage());
     // 4. 如果发生任何异常，中止事务
     session.abortTransaction();
 } finally {
@@ -836,7 +850,7 @@ try {
 }
 ```
 
-### 【中等】MongoDB 事务支持哪些操作？
+### 【中等】MongoDB 事务支持哪些操作？⭐⭐⭐
 
 可以跨多个操作、集合、数据库、文档和分片使用分布式事务。
 
@@ -845,7 +859,9 @@ try {
 - 可以在事务中创建集合和索引。
 - 事务中使用的集合可以位于不同的数据库中。
 
-#### 在事务中创建集合和索引
+::: info 在事务中创建集合和索引
+
+:::
 
 如果事务不是跨分片写入事务，则可以在 [分布式事务](https://www.mongodb.com/zh-cn/docs/manual/core/transactions/#std-label-transactions) 中执行以下操作：
 
@@ -864,7 +880,9 @@ try {
 - 不存在的集合。集合作为操作的一部分创建。
 - 先前在同一事务中创建的新空集合。
 
-#### 计数操作
+::: info 计数操作
+
+:::
 
 要在事务内执行计数操作，请使用 [`$count`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/count/#mongodb-pipeline-pipe.-count) 聚合阶段或 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group)（带有 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 表达式）聚合阶段。
 
@@ -872,7 +890,9 @@ MongoDB 驱动程序提供集合级 API `countDocuments(filter, options)` 作为
 
 [`mongosh`](https://www.mongodb.com/zh-cn/docs/mongodb-shell/#mongodb-binary-bin.mongosh) 提供 [`db.collection.countDocuments()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.countDocuments/#mongodb-method-db.collection.countDocuments) 辅助方法，该方法使用 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 和 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 表达式进行计数。
 
-#### 去重操作
+::: info 去重操作
+
+:::
 
 如要在事务中执行不同的操作：
 
@@ -909,11 +929,15 @@ MongoDB 驱动程序提供集合级 API `countDocuments(filter, options)` 作为
 
   迭代游标以访问结果文档。
 
-#### 信息操作
+::: info 信息操作
+
+:::
 
 事务中允许使用诸如 [`hello`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/hello/#mongodb-dbcommand-dbcmd.hello)、[`buildInfo`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/buildInfo/#mongodb-dbcommand-dbcmd.buildInfo)、[`connectionStatus`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/connectionStatus/#mongodb-dbcommand-dbcmd.connectionStatus)（及其辅助方法）之类的信息命令，但它们不能是事务中的第一项操作。
 
-#### 事务操作限制
+::: info 事务操作限制
+
+:::
 
 事务中不允许执行以下操作：
 
@@ -925,7 +949,7 @@ MongoDB 驱动程序提供集合级 API `countDocuments(filter, options)` 作为
 
 ## MongoDB 集群
 
-### 【中等】MongoDB 的副本机制是怎样的？
+### 【中等】MongoDB 的副本机制是怎样的？⭐⭐⭐
 
 MongoDB 的复制集群又称为副本集群，是一组维护相同数据集合的 mongod 进程。
 
@@ -968,11 +992,10 @@ MongoDB 的分片集群由如下三个部分组成（下图来源于 [官方文�
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042043821.png)
 
-**Config Servers**：配置服务器，本质上是一个 MongoDB 的副本集，负责存储集群的各种元数据和配置，如分片地址、Chunks 等
+- **Config Servers**：配置服务器，本质上是一个 MongoDB 的副本集，负责存储集群的各种元数据和配置，如分片地址、Chunks 等
+- **Mongos**：路由服务，不存具体数据，从 Config 获取集群配置讲请求转发到特定的分片，并且整合分片结果返回给客户端。
 
-**Mongos**：路由服务，不存具体数据，从 Config 获取集群配置讲请求转发到特定的分片，并且整合分片结果返回给客户端。
-
-**Shard**：每个分片是整体数据的一部分子集，从 MongoDB3.6 版本开始，每个 Shard 必须部署为副本集（replica set）架构
+- **Shard**：每个分片是整体数据的一部分子集，从 MongoDB3.6 版本开始，每个 Shard 必须部署为副本集（replica set）架构
 
 ### 【简单】为什么要用分片集群？
 
@@ -998,7 +1021,7 @@ MongoDB 的分片集群由如下三个部分组成（下图来源于 [官方文�
 
 综上，在选择片键时要考虑以上 4 个条件，尽可能满足更多的条件，才能降低 MoveChunks 对性能的影响，从而获得最优的性能体验。
 
-### 【中等】分片策略有哪些？
+### 【中等】分片策略有哪些？⭐⭐⭐
 
 MongoDB 支持两种分片算法来满足不同的查询需求（摘自 [MongoDB 分片集群介绍 - 阿里云文档](https://help.aliyun.com/document_detail/64561.html?spm=a2c4g.11186623.0.0.3121565eQhUGGB#h2--shard-key-3)）：
 
@@ -1024,7 +1047,7 @@ MongoDB 计算单个字段的哈希值作为索引值，并以哈希值的范围
 
 除了上述两种分片策略，您还可以配置 **复合片键** ，例如由一个低基数的键和一个单调递增的键组成。
 
-### 【中等】分片数据如何存储？
+### 【中等】分片数据如何存储？⭐⭐⭐
 
 **Chunk（块）** 是 MongoDB 分片集群的一个核心概念，其本质上就是由一组 Document 组成的逻辑数据单元。每个 Chunk 包含一定范围片键的数据，互不相交且并集为全部数据，即离散数学中**划分**的概念。
 
