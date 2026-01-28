@@ -255,10 +255,7 @@ PUT /my_index
 
 静态配置里，有重要的部分是配置分析器（config analyzers）。
 
-- **`index.analysis`**
-
-  ：分析器最外层的配置项，内部主要分为 char_filter、tokenizer、filter 和 analyzer。
-
+- **`index.analysis`** ：分析器最外层的配置项，内部主要分为 char_filter、tokenizer、filter 和 analyzer。
   - **_`char_filter`_**：定义新的字符过滤器件。
   - **_`tokenizer`_**：定义新的分词器。
   - **_`filter`_**：定义新的 token filter，如同义词 filter。

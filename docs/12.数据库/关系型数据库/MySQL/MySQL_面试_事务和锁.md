@@ -198,9 +198,9 @@ MVCC 的实现原理，主要基于隐式字段、UndoLog、ReadView 来实现�
 
 InnoDB 存储引擎中，数据表的每行记录，除了用户显示定义的字段以外，还有几个数据库隐式定义的字段：
 
-- `row_id` - **隐藏的自增 ID**。如果数据表没有指定主键，InnoDB 会自动基于 `row_id` 产生一个聚簇索引。
-- `trx_id` - **最近修改的事务 ID**。事务对某条聚簇索引记录进行改动时，就会把该事务的事务 id 记录在 trx_id 隐藏列里；
-- `roll_pointer` - **回滚指针**，指向这条记录的上一个版本。
+- `row_id`：**隐藏的自增 ID**。如果数据表没有指定主键，InnoDB 会自动基于 `row_id` 产生一个聚簇索引。
+- `trx_id`：**最近修改的事务 ID**。事务对某条聚簇索引记录进行改动时，就会把该事务的事务 id 记录在 trx_id 隐藏列里；
+- `roll_pointer`：**回滚指针**，指向这条记录的上一个版本。
 
 ::: info UndoLog
 :::
@@ -216,10 +216,10 @@ MVCC 的多版本指的是多个版本的快照，快照存储在 UndoLog 中。
 
 ReadView 有四个重要的字段：
 
-- `m_ids` - 指的是在创建 ReadView 时，当前数据库中“活跃事务”的事务 ID 列表。注意：这是一个列表，**“活跃事务”指的就是，启动了但还没提交的事务**。
-- `min_trx_id` - 指的是在创建 ReadView 时，当前数据库中“活跃事务”中事务 id 最小的事务，也就是 `m_ids` 的最小值。
-- `max_trx_id` - 这个并不是 m_ids 的最大值，而是指创建 ReadView 时当前数据库中应该给下一个事务分配的 ID 值，也就是全局事务中最大的事务 ID 值 + 1；
-- `creator_trx_id` - 指的是创建该 ReadView 的事务的事务 ID。
+- `m_ids`：指的是在创建 ReadView 时，当前数据库中“活跃事务”的事务 ID 列表。注意：这是一个列表，**“活跃事务”指的就是，启动了但还没提交的事务**。
+- `min_trx_id`：指的是在创建 ReadView 时，当前数据库中“活跃事务”中事务 id 最小的事务，也就是 `m_ids` 的最小值。
+- `max_trx_id`：这个并不是 m_ids 的最大值，而是指创建 ReadView 时当前数据库中应该给下一个事务分配的 ID 值，也就是全局事务中最大的事务 ID 值 + 1；
+- `creator_trx_id`：指的是创建该 ReadView 的事务的事务 ID。
 
 在创建 ReadView 后，我们可以将记录中的 trx_id 划分为三种情况：
 
@@ -233,10 +233,10 @@ ReadView 有四个重要的字段：
 
 一个事务去访问记录的时候，除了自己的更新记录总是可见之外，还有这几种情况：
 
-- `trx_id == creator_trx_id` - 表示 `trx_id` 版本记录由 ReadView 所代表的当前事务产生，当然可以访问。
-- `trx_id < min_trx_id` - 表示 `trx_id` 版本记录是在创建 ReadView 之前已提交的事务生成的，当前事务可以访问。
-- `trx_id >= max_trx_id` - 表示 `trx_id` 版本记录是在创建 ReadView 之后才启动的事务生成的，当前事务不可以访问。
-- `min_trx_id <= trx_id < max_trx_id` - 需要判断 `trx_id` 是否在 `m_ids` 列表中
+- `trx_id == creator_trx_id`：表示 `trx_id` 版本记录由 ReadView 所代表的当前事务产生，当然可以访问。
+- `trx_id < min_trx_id`：表示 `trx_id` 版本记录是在创建 ReadView 之前已提交的事务生成的，当前事务可以访问。
+- `trx_id >= max_trx_id`：表示 `trx_id` 版本记录是在创建 ReadView 之后才启动的事务生成的，当前事务不可以访问。
+- `min_trx_id <= trx_id < max_trx_id`：需要判断 `trx_id` 是否在 `m_ids` 列表中
   - 如果 `trx_id` 在 `m_ids` 列表中，表示生成 `trx_id` 版本记录的事务依然活跃（未提交事务），当前事务不可以访问。
   - 如果 `trx_id` 不在 `m_ids` 列表中，表示生成 `trx_id` 版本记录的事务已提交，当前事务可以访问。
 

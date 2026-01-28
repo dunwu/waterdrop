@@ -151,7 +151,7 @@ ES 核心概念 vs. DB 核心概念：
 | 字符（field）                    | 列（column）       |
 | 映射（mapping）                  | 表结构（schema）   |
 
-## Elasticsearch Mapping
+## Elasticsearch 建模
 
 ::: tip 扩展
 
@@ -177,7 +177,7 @@ Elasticsearch 支持丰富的数据类型，常见的有：
 
 :::
 
-### 【简单】ES 如何识别字段的数据类型？
+### 【简单】ES 如何识别字段的数据类型？⭐⭐
 
 在 Elasticsearch 中，`Mapping`（映射），用来定义一个文档以及其所包含的字段如何被存储和索引，可以在映射中事先定义字段的数据类型、字段的权重、分词器等属性，就如同在关系型数据库中创建数据表时会设置字段的类型。简言之，**Mapping 定义了索引中的文档有哪些字段及其类型、这些字段是如何存储和索引的，就好像数据库的表定义一样。**
 
@@ -258,6 +258,16 @@ PUT data/_doc/1
 { "count": 5 }
 ```
 
+### 【简单】ES 索引别名有什么用？
+
+Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允许同时对多个索引执行操作，或者通过隐藏底层索引结构的复杂性来简化索引管理。
+
+::: tip 扩展
+
+[Elasticsearch 官方文档之别名](https://www.elastic.co/guide/en/elasticsearch/reference/current/aliases.html)
+
+:::
+
 ## Elasticsearch CRUD
 
 ::: tip 扩展
@@ -273,7 +283,7 @@ Elasticsearch 的基本 CRUD 方式如下：
 - **添加索引**
   - `PUT <index>/_create/<id>`：指定 id，如果 id 已存在，报错
   - `POST <index>/_doc`：自动生成 `_id`
-- **删除索引**：`DELETE /<index>？pretty`
+- **删除索引**：`DELETE /<index>?pretty`
 - **更新索引**：`POST <index>/_update/<id>`
 - **查询索引**：`GET <index>/_doc/<id>`
 - **批量更新**：`bulk` API 支持 `index/create/update/delete`
@@ -298,16 +308,6 @@ Elasticsearch 的基本 CRUD 方式如下：
 - [Elasticsearch 官方文档之组合查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)
 - [Elasticsearch 官方文档之推荐查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
 - [Elasticsearch 官方文档之查询和过滤上下文](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html)
-
-:::
-
-### 【简单】ES 索引别名有什么用？
-
-Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允许同时对多个索引执行操作，或者通过隐藏底层索引结构的复杂性来简化索引管理。
-
-::: tip 扩展
-
-https://www.elastic.co/guide/en/elasticsearch/reference/current/aliases.html
 
 :::
 
@@ -465,7 +465,7 @@ Elasticsearch 中存储的数据可以粗略分为：
 - **Tokenization（分词化）**：分词化将文本分解成更小的块，称为分词。在大多数情况下，这些分词是单独的 term（词项）。
 - **Normalization（标准化）**：经过分词后的文本只能进行词项匹配，但是无法进行同义词匹配。为解决这个问题，可以将文本进行标准化处理。例如：将 `foxes` 标准化为 `fox`。
 
-### 【简单】ES 中的分析器是什么？⭐⭐⭐
+### 【中等】ES 中的分析器是什么？⭐⭐⭐
 
 文本分析由 [**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 执行，分析器是一组控制整个过程的规则。无论是索引还是搜索，都需要使用分析器。
 
@@ -715,6 +715,12 @@ Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索�
   - `.pay` 文件，记录了 payload 信息和 term 在 doc 中的偏移信息；
   - `.pos` 文件，记录了 term 在 doc 中的位置信息。
 
+### 【中等】ES 如何处理删除操作？
+
+ES 处理删除请求时，不会立即从磁盘物理删除文件。
+
+ES 会将文件标记为删除，然后在后台通过段合并操作时，再彻底删除文件。
+
 ## Elasticsearch 集群
 
 ### 【中等】ES 如何保证高可用？⭐⭐⭐
@@ -814,10 +820,10 @@ Elasticsearch 中有两种类型的分片：
 
 常见的路由方式如下：
 
-| **算法**     | **描述**                                                     |
-| :----------- | :----------------------------------------------------------- |
-| **随机算法** | 写数据时，随机写入到一个节点中；读数据时，由于不知道查询数据存在于哪个节点，所以需要遍历所有节点。 |
-| **哈希取模** | 对 key 值进行哈希计算，然后根据节点数取模，以确定节点。      |
+| **算法**     | **描述**                                                                                                                                         |
+| :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **随机算法** | 写数据时，随机写入到一个节点中；读数据时，由于不知道查询数据存在于哪个节点，所以需要遍历所有节点。                                               |
+| **哈希取模** | 对 key 值进行哈希计算，然后根据节点数取模，以确定节点。                                                                                          |
 | **路由表**   | 由中心节点统一维护数据的路由表，以保证唯一性；但是，中心化产生了新的问题：单点故障、数据越大，路由表越大、单点容易称为性能瓶颈、数据迁移复杂等。 |
 
 ES 的数据路由算法是根据文档 ID 和 routing key 来确定 Shard ID 的过程。**默认的情况下 routing key 为文档 ID**，路由算法一般情况下的计算公式如下：
@@ -955,7 +961,7 @@ ES 存储数据的流程可以从三个角度来阐述：
 
 **乐观锁机制**：可以通过版本号使用乐观锁并发控制，以确保新版本不会被旧版本覆盖，由应用层来处理具体的冲突；
 
-另外对于写操作，一致性级别支持 quorum/one/all，默认为 quorum，即只有当大多数分片可用时才允许写操作。但即使大多数可用，也可能存在因为网络等原因导致写入副本失败，这样该副本被认为故障，分片将会在一个不同的节点上重建。
+另外对于写操作，可以设置 consistency（一致性级别），支持 quorum/one/all，默认为 quorum，即只有当大多数分片可用时才允许写操作。但即使大多数可用，也可能存在因为网络等原因导致写入副本失败，这样该副本被认为故障，分片将会在一个不同的节点上重建。
 
 对于读操作，可以设置 replication 为 sync（默认），这使得操作在主分片和副本分片都完成后才会返回；如果设置 replication 为 async 时，也可以通过设置搜索请求参数、\_preference 为 primary 来查询主分片，确保文档是最新版本。
 
@@ -1006,7 +1012,7 @@ https://cloud.tencent.com/developer/article/1922613
 - **字段**
   - 一个索引中的字段数默认最大为 **1000**，但是不建议超过 **100**
   - text 和 keyword 必须理清楚，keyword 是不会进行分词。
-  - 对于 `keyword` 类型，默认只索引前 **256** 个字符。超过此长度的字符串将不会被索引（即无法被term查询、聚合）。可以通过 `ignore_above` 参数调整。
+  - 对于 `keyword` 类型，默认只索引前 **256** 个字符。超过此长度的字符串将不会被索引（即无法被 term 查询、聚合）。可以通过 `ignore_above` 参数调整。
 - **Settings 设置**
   - 分片数设置后，不可修改
   - 副本数默认 1 个

@@ -101,9 +101,11 @@ MongoDB vs.RDBM：
 
 ::: important 要点
 
-- **1.0**：2009 年，MongoDB 发布第一版
-- **3.0**：2015 年，支持 **WiredTiger** 存储引擎
-- **4.0**：2019 年，支持 ACID 事务
+核心特性版本：
+
+- **1.0（2009 年）**：MongoDB 发布第一版
+- **3.0（2015 年）**：支持 **WiredTiger** 存储引擎
+- **4.0（2019 年）**：支持 ACID 事务
 
 :::
 
@@ -111,26 +113,290 @@ MongoDB 是由 **10gen** 开发的 NoSQL 数据库，该公司由 Dwight Merrima
 
 里程碑版本：
 
-- **1.0**：2009 年，MongoDB 发布第一版。
-- **1.6**：2010 年，引入分片机制（Sharding），支持水平扩展。
-- **2.2**：2012 年，引入了聚合管道（Pipeline）。
-- **2.4**：2013 年，引入了全文搜索。
-- **3.0**：2015 年，全面支持 **WiredTiger** 存储引擎，并支持可插拔存储引擎。
-- **4.0**：2019 年，支持 ACID 事务。
-- **4.2**：2020 年，支持分布式事务。
+- **1.0（2009 年）**：MongoDB 发布第一版。
+- **1.6（2010 年）**：引入分片机制（Sharding），支持水平扩展。
+- **2.2（2012 年）**：引入了聚合管道（Pipeline）。
+- **2.4（2013 年）**：引入了全文搜索。
+- **3.0（2015 年）**：全面支持 **WiredTiger** 存储引擎，并支持可插拔存储引擎。
+- **4.0（2019 年）**：支持 ACID 事务。
+- **4.2（2020 年）**：支持分布式事务。
 
 ### 【简单】BSON 是什么？与 JSON 有何区别？
 
-::: important 要点
-
-二进制 JSON
-
-:::
-
-BSON 的英文全称是 **Binary JSON**，即**二进制 JSON**。主要用于在 MongoDB 中存储文档和进行网络传输。
+BSON 的英文全称是 **Binary JSON**，是 [JSON](https://www.mongodb.com/zh-cn/docs/v8.0/reference/glossary/#std-term-JSON) 文档的二进制表示形式，但它包含的数据类型比 JSON 多。主要用于在 MongoDB 中存储文档和进行网络传输。
 
 - 最大 16MB
 - 必须有唯一 \_id 作为主键
+
+## MongoDB 建模
+
+### 【简单】什么是主键 `_id`？⭐
+
+`_id` 是**每个文档的唯一标识符**，默认由系统自动生成，也可以自定义。
+
+自动生成规则
+
+- MongoDB 默认使用 ObjectId 作为 \_id 的值
+- ObjectId 是一个 12 字节的 BSON 类型数据
+- \_id 构成
+  - 时间戳：文档创建时的 Unix 时间戳（秒级）
+  - 机器标识：生成 ObjectId 的服务器唯一标识
+  - 进程 ID：MongoDB 进程的标识
+  - 计数器：同一秒内的自增序列（确保同一进程内不重复）
+
+### 【简单】MongoDB 支持哪些数据类型？⭐⭐
+
+::: important 要点
+
+- **基本类型**：String、Integer、Boolean、Double、Decimal、Null
+- **时间类型**：Date、Timestamp
+- **组合类型**：Array、Embedded Document
+- **特殊类型**：ObjectId、Binary、Regular、Script、GeoJSON
+
+:::
+
+::: info 基本类型
+:::
+
+- **String**：UTF-8 字符串
+- **Integer**：整数（32 位或 64 位，取决于服务器架构）
+- **Boolean**：true 或 false
+- **Double**：双精度浮点数
+- **Decimal**：高精度浮点数（适用于金融数据，避免精度丢失）
+- **Null**：表示空值或缺失字段
+
+::: info 时间类型
+:::
+
+- **Date**：存储日期和时间（Unix 时间戳格式，毫秒精度）
+- **Timestamp**：内部使用的时间戳（不同于 Date 类型）。示例：`Timestamp(1000, 1)`
+
+::: info 组合类型
+:::
+
+- **Array**：有序的值列表，可包含不同类型。示例：`["apple", 42, true]`
+- **Embedded Document**：嵌套的 BSON 文档（子文档）。示例：`{ address: { city: "Beijing", zip: "100000" } }`
+
+::: info 特殊类型
+:::
+
+- **ObjectId**：文档的唯一标识（默认 \_id 字段类型）。示例：ObjectId("507f1f77bcf86cd799439011")
+- **Binary Data**：存储二进制数据（如图片、文件）
+- **Regular Expression**：正则表达式。示例：`{ pattern: /^test/i }`
+- **JavaScript Code**：存储 JavaScript 代码（不推荐在服务端执行）。示例：`{ code: function() { return x + y; } }`
+- **GeoJSON**：支持地理坐标查询（点、线、多边形等）。示例：`{ location: { type: "Point", coordinates: [116.4, 39.9] } }`
+
+## MongoDB CRUD
+
+### 【简单】如何进行分页查询？⭐
+
+- `skip()` + `limit()`：在大数据集中性能较差（需扫描跳过所有前置文档）
+- 基于游标的分页（使用 `_id` 或时间戳）：记录上一页最后一条记录的 `_id`，下次查询直接定位
+
+### 【简单】如何实现数据的增删改查操作？⭐
+
+- 插入
+  - `db.collection.insertOne()`
+  - `db.collection.insertMany()`
+- 更新
+  - `db.collection.updateOne()`
+  - `db.collection.updateMany()`
+  - `db.collection.replaceOne()`
+- 删除
+  - `db.collection.deleteOne()`
+  - `db.collection.deleteMany()`
+- 查询
+  - `db.collection.find()`
+- 批量
+  - `db.collection.bulkWrite()`
+
+### 【简单】如何使用 find() 方法查询文档？⭐
+
+语法：`db.collection.find(query, projection)`
+
+- **`query`**：查询条件（可选，默认为空对象 {}，查询所有文档）
+- **`projection`**：指定返回的字段（可选，默认为返回全部字段）
+
+### 【简单】如何使用 GridFS 存储大文件？
+
+GridFS 是一种用于存储和检索大文件（超过 16MB BSON 文档限制）的规范，它将文件分块存储为多个文档
+
+- 文件拆分：将大文件分割为多个 256KB 的块（默认），存储到 `fs.chunks` 集合
+- 元数据存储：文件信息（如文件名、大小、MD5）保存在 `fs.files` 集合
+- 自动管理：通过 MongoDB 驱动程序或命令行工具透明地操作文件
+
+### 【简单】如何实现全文检索？
+
+::: important 要点
+
+创建文本索引 + 使用 `$text` 操作符进行搜索
+
+:::
+
+**创建文本索引**
+
+```javascript
+db.articles.createIndex({
+  title: 'text',
+  content: 'text',
+  tags: 'text'
+})
+```
+
+**全文搜索**
+
+使用 `$text` 操作符进行搜索，支持关键词匹配和排序
+
+```javascript
+db.articles.find({
+  $text: {
+    $search: 'mongodb tutorial'
+  }
+})
+```
+
+## MongoDB 聚合
+
+::: tip 扩展
+
+[MongoDB 官方文档之聚合](https://www.mongodb.com/zh-cn/docs/manual/aggregation/)
+
+:::
+
+### 【简单】MongoDB 支持哪些聚合方式？⭐⭐
+
+聚合操作处理多个文档并返回计算结果。可以使用聚合操作来：
+
+- 将多个文档中的值组合在一起。
+- 对分组数据执行操作，返回单一结果。
+- 分析一段时间内的数据变化。
+
+若要执行聚合操作，可以使用：
+
+- [聚合管道](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-aggregation-pipeline-intro)，这是执行聚合的首选方法。
+  - `$match`：过滤文档
+  - `$group`：分组聚合
+  - `$project`：指定返回字段
+  - `$sort`：排序
+  - `$limit/$skip`：限制/跳过结果
+  - `$unwind`：展开数组
+  - `$lookup`：关联查询（类似 SQL 的 JOIN)
+  - `$facet`：多分支聚合
+- [单一目的聚合方法](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-single-purpose-agg-methods)，这些方法很简单，但缺乏聚合管道的功能。
+  - `count()`：计数
+  - `distinct()`：去重
+  - `estimatedDocumentCount()`：快速计数（不精确）
+- [Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/)，从 MongoDB 5.0 开始，[Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/#std-label-Map-Reduce) 已被弃用。聚合管道提供的性能和可用性比 Map-Reduce 更优越。
+- **表达式**
+  - 数学表达式：`$add`, `$subtract`, `$multiply`, `$divide`
+  - 日期表达式：`$year`, `$month`, `$dayOfMonth`
+  - 字符串表达式：`$concat`, `$substr`, `$toLower`
+  - 逻辑表达式：`$and`, `$or`, `$not`, `$cond`
+  - 数组表达式：`$arrayElemAt`, `$size`, `$slice`
+
+### 【中等】什么是聚合管道？⭐⭐
+
+聚合管道由一个或多个处理文档的 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 组成：
+
+- 每个阶段对输入文档执行一个操作。例如，某个阶段可以过滤文档、对文档进行分组并计算值。
+- 从一个阶段输出的文档将传递到下一阶段。
+- 一个聚合管道可以返回针对文档组的结果。例如，返回总值、平均值、最大值和最小值。
+
+如使用 [通过聚合管道更新](https://www.mongodb.com/zh-cn/docs/manual/tutorial/update-documents-with-aggregation-pipeline/#std-label-updates-agg-pipeline) 中显示的阶段，则可以通过聚合管道更新文档。
+
+> 注意：使用 [`db.collection.aggregate()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.aggregate/#mongodb-method-db.collection.aggregate) 方法运行的聚合管道不会修改集合中的文档，除非管道包含 [`$merge`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge) 或 [`$out`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out) 阶段。
+
+![MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921092725.png)
+
+[阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 的其他要点：
+
+- 阶段不必为每个输入文档输出一个文档。例如，某些阶段可能会产生新文档或过滤掉现有文档。
+- 同一个阶段可以在管道中多次出现，但以下阶段例外：[`$out`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out)、[`$merge`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge) 和 [`$geoNear`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/geoNear/#mongodb-pipeline-pipe.-geoNear)。
+- 要在阶段中计算平均值和执行其他计算，请使用指定 [聚合操作符](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/#std-label-aggregation-expressions) 的 [聚合表达式](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/#std-label-aggregation-expression-operators)。
+
+MongoDB 聚合管道提供了许多等价于 SQL 中常见聚合语句的操作。 下表概述了常见的 SQL 聚合语句或函数和 MongoDB 聚合操作的映射表：
+
+| RDBM 操作               | MongoDB 聚合操作                                                                                                                                                                                          |
+| :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WHERE`                 | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
+| `GROUP BY`              | [`$group`](https://docs.mongodb.com/manual/reference/operator/aggregation/group/#pipe._S_group)                                                                                                           |
+| `HAVING`                | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
+| `SELECT`                | [`$project`](https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project)                                                                                                     |
+| `ORDER BY`              | [`$sort`](https://docs.mongodb.com/manual/reference/operator/aggregation/sort/#pipe._S_sort)                                                                                                              |
+| `LIMIT`                 | [`$limit`](https://docs.mongodb.com/manual/reference/operator/aggregation/limit/#pipe._S_limit)                                                                                                           |
+| `SUM()`                 | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)                                                                                                                  |
+| `COUNT()`               | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)[`$sortByCount`](https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/#pipe._S_sortByCount) |
+| `JOIN`                  | [`$lookup`](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/#pipe._S_lookup)                                                                                                        |
+| `SELECT INTO NEW_TABLE` | [`$out`](https://docs.mongodb.com/manual/reference/operator/aggregation/out/#pipe._S_out)                                                                                                                 |
+| `MERGE INTO TABLE`      | [`$merge`](https://docs.mongodb.com/manual/reference/operator/aggregation/merge/#pipe._S_merge) (Available starting in MongoDB 4.2)                                                                       |
+| `UNION ALL`             | [`$unionWith`](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/#pipe._S_unionWith) (Available starting in MongoDB 4.4)                                                           |
+
+下面通过一个示例来展示，如何通过 MongoDB 聚合计算总订单数量：
+
+以下聚合管道示例包含两个 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference)，并返回按披萨名称分组后，各款中号披萨的总订单数量：
+
+```javascript
+db.orders.aggregate([
+  // Stage 1: 根据 size 过滤订单
+  {
+    $match: { size: 'medium' }
+  },
+  // Stage 2: 按名称对剩余文档进行分组，并计算总数量
+  {
+    $group: { _id: '$name', totalQuantity: { $sum: '$quantity' } }
+  }
+])[
+  // 输出
+  ({ _id: 'Cheese', totalQuantity: 50 },
+  { _id: 'Vegan', totalQuantity: 10 },
+  { _id: 'Pepperoni', totalQuantity: 20 })
+]
+```
+
+[`$match`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/match/#mongodb-pipeline-pipe.-match) 阶段：
+
+- 从披萨订单文档过滤出 `size` 为 `medium` 的披萨。
+- 将剩余文档传递到 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 阶段。
+
+[`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 阶段：
+
+- 按披萨 `name` 对剩余文档进行分组。
+- 使用 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 计算每种披萨 `name` 的总订单 `quantity`。总数存储在聚合管道返回的 `totalQuantity` 字段中。
+
+### 【简单】RDBM 聚合 vs. MongoDB 聚合？⭐⭐
+
+MongoDB pipeline 提供了许多等价于 SQL 中常见聚合语句的操作。 下表概述了常见的 SQL 聚合语句或函数和 MongoDB 聚合操作的映射表：
+
+| RDBM 操作               | MongoDB 聚合操作                                                                                                                                                                                          |
+| :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WHERE`                 | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
+| `GROUP BY`              | [`$group`](https://docs.mongodb.com/manual/reference/operator/aggregation/group/#pipe._S_group)                                                                                                           |
+| `HAVING`                | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
+| `SELECT`                | [`$project`](https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project)                                                                                                     |
+| `ORDER BY`              | [`$sort`](https://docs.mongodb.com/manual/reference/operator/aggregation/sort/#pipe._S_sort)                                                                                                              |
+| `LIMIT`                 | [`$limit`](https://docs.mongodb.com/manual/reference/operator/aggregation/limit/#pipe._S_limit)                                                                                                           |
+| `SUM()`                 | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)                                                                                                                  |
+| `COUNT()`               | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)[`$sortByCount`](https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/#pipe._S_sortByCount) |
+| `JOIN`                  | [`$lookup`](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/#pipe._S_lookup)                                                                                                        |
+| `SELECT INTO NEW_TABLE` | [`$out`](https://docs.mongodb.com/manual/reference/operator/aggregation/out/#pipe._S_out)                                                                                                                 |
+| `MERGE INTO TABLE`      | [`$merge`](https://docs.mongodb.com/manual/reference/operator/aggregation/merge/#pipe._S_merge) (Available starting in MongoDB 4.2)                                                                       |
+| `UNION ALL`             | [`$unionWith`](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/#pipe._S_unionWith) (Available starting in MongoDB 4.4)                                                           |
+
+RDBM 聚合 vs. MongoDB 聚合：
+
+![SQL 聚合 vs. MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921200556.png)
+
+### 【中等】MongoDB Map-Reduce 有什么用？
+
+> 从 MongoDB 5.0 开始，[Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/#std-label-Map-Reduce) 已被弃用。聚合管道提供的性能和可用性比 Map-Reduce 更优越。
+
+Map-Reduce 是一种数据处理范式，用于将大量数据汇总为有用的聚合结果。为了执行 Map-Reduce 操作，MongoDB 提供了 [`mapReduce`](https://docs.mongodb.com/manual/reference/command/mapReduce/#dbcmd.mapReduce) 数据库命令。
+
+![Map-Reduce](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921155546.svg)
+
+在上面的操作中，MongoDB 将 map 阶段应用于每个输入 document（即 collection 中与查询条件匹配的 document）。 map 函数分发出多个键 - 值对。对于具有多个值的那些键，MongoDB 应用 reduce 阶段，该阶段收集并汇总聚合的数据。然后，MongoDB 将结果存储在 collection 中。可选地，reduce 函数的输出可以通过 finalize 函数来进一步汇总聚合结果。
+
+MongoDB 中的所有 Map-Reduce 函数都是 JavaScript，并在 mongod 进程中运行。 Map-Reduce 操作将单个 collection 的 document 作为输入，并且可以在开始 map 阶段之前执行任意排序和限制。 mapReduce 可以将 Map-Reduce 操作的结果作为 document 返回，也可以将结果写入 collection。
 
 ## MongoDB 存储
 
@@ -144,13 +410,13 @@ MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/doc
 
 为了方便理解 MongoDB 概念，下面将 MongoDB 概念和 RDBM 概念进行对比：
 
-| RDBM 概念          | MongoDB 概念                                                                        |
-| :----------------- | :---------------------------------------------------------------------------------- |
-| database（数据库） | database（数据库）                                                                  |
-| table（表）        | collection（集合）                                                                  |
-| row（行）          | document（文档）                                                                    |
-| column（列）       | field（字段）                                                                       |
-| index（索引）      | index（索引）                                                                       |
+| RDBM 概念          | MongoDB 概念                                                 |
+| :----------------- | :----------------------------------------------------------- |
+| database（数据库） | database（数据库）                                           |
+| table（表）        | collection（集合）                                           |
+| row（行）          | document（文档）                                             |
+| column（列）       | field（字段）                                                |
+| index（索引）      | index（索引）                                                |
 | primary key        | [`_id`](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-_id) |
 
 ::: info 文档
@@ -174,7 +440,7 @@ MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/doc
   ```json
   {"count" : 5}
   {"count" : "5"}
-
+  
   {"count" : 5}
   {"Count" : 5}
   ```
@@ -354,275 +620,6 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041050392.png)
 
 如果想要深入研究学习 WiredTiger 存储引擎，推荐阅读 MongoDB 中文社区的 [WiredTiger 存储引擎系列](https://mongoing.com/archives/category/wiredtiger 存储引擎系列)。
-
-## MongoDB CRUD
-
-### 【简单】如何进行分页查询？
-
-- `skip()` + `limit()`：在大数据集中性能较差（需扫描跳过所有前置文档）
-- 基于游标的分页（使用 `_id` 或时间戳）：记录上一页最后一条记录的 `_id`，下次查询直接定位
-
-### 【简单】什么是主键 `_id`？⭐
-
-`_id` 是**每个文档的唯一标识符**，默认由系统自动生成，也可以自定义。
-
-自动生成规则
-
-- MongoDB 默认使用 ObjectId 作为 \_id 的值
-- ObjectId 是一个 12 字节的 BSON 类型数据
-- \_id 构成
-  - 时间戳：文档创建时的 Unix 时间戳（秒级）
-  - 机器标识：生成 ObjectId 的服务器唯一标识
-  - 进程 ID：MongoDB 进程的标识
-  - 计数器：同一秒内的自增序列（确保同一进程内不重复）
-
-### 【简单】如何实现数据的增删改查操作？⭐
-
-- 插入
-  - `db.collection.insertOne()`
-  - `db.collection.insertMany()`
-- 更新
-  - `db.collection.updateOne()`
-  - `db.collection.updateMany()`
-  - `db.collection.replaceOne()`
-- 删除
-  - `db.collection.deleteOne()`
-  - `db.collection.deleteMany()`
-- 查询
-  - `db.collection.find()`
-- 批量
-  - `db.collection.insertMany()`
-  - `db.collection.bulkWrite()`
-
-### 【简单】如何使用 find() 方法查询文档？⭐
-
-语法：`db.collection.find(query, projection)`
-
-- query：查询条件（可选，默认为空对象 {}，查询所有文档）
-- projection：指定返回的字段（可选，默认为返回全部字段）
-
-### 【简单】如何使用 GridFS 存储大文件？
-
-GridFS 是一种用于存储和检索大文件（超过 16MB BSON 文档限制）的规范，它将文件分块存储为多个文档
-
-- 文件拆分：将大文件分割为多个 256KB 的块（默认），存储到 `fs.chunks` 集合
-- 元数据存储：文件信息（如文件名、大小、MD5）保存在 `fs.files` 集合
-- 自动管理：通过 MongoDB 驱动程序或命令行工具透明地操作文件
-
-### 【简单】如何实现全文检索？⭐⭐
-
-::: important 要点
-
-创建文本索引 + 使用 `$text` 操作符进行搜索
-
-:::
-
-**创建文本索引**
-
-```javascript
-db.articles.createIndex({
-  title: 'text',
-  content: 'text',
-  tags: 'text'
-})
-```
-
-**全文搜索**
-
-使用 `$text` 操作符进行搜索，支持关键词匹配和排序
-
-```javascript
-db.articles.find({
-  $text: {
-    $search: 'mongodb tutorial'
-  }
-})
-```
-
-### 【简单】MongoDB 支持哪些数据类型？
-
-::: important 要点
-
-- **基本类型**：String、Integer、Boolean、Double、Decimal、Null
-- **时间类型**：Date、Timestamp
-- **组合类型**：Array、Embedded Document
-- **特殊类型**：ObjectId、Binary、Regular、Script、GeoJSON
-
-:::
-
-::: info 基本类型
-:::
-
-- **String**：UTF-8 字符串
-- **Integer**：整数（32 位或 64 位，取决于服务器架构）
-- **Boolean**：true 或 false
-- **Double**：双精度浮点数
-- **Decimal**：高精度浮点数（适用于金融数据，避免精度丢失）
-- **Null**：表示空值或缺失字段
-
-::: info 时间类型
-:::
-
-- **Date**：存储日期和时间（Unix 时间戳格式，毫秒精度）
-- **Timestamp**：内部使用的时间戳（不同于 Date 类型）。示例：`Timestamp(1000, 1)`
-
-::: info 组合类型
-:::
-
-- **Array**：有序的值列表，可包含不同类型。示例：`["apple", 42, true]`
-- **Embedded Document**：嵌套的 BSON 文档（子文档）。示例：`{ address: { city: "Beijing", zip: "100000" } }`
-
-::: info 特殊类型
-:::
-
-- **ObjectId**：文档的唯一标识（默认 \_id 字段类型）。示例：ObjectId("507f1f77bcf86cd799439011")
-- **Binary Data**：存储二进制数据（如图片、文件）
-- **Regular Expression**：正则表达式。示例：`{ pattern: /^test/i }`
-- **JavaScript Code**：存储 JavaScript 代码（不推荐在服务端执行）。示例：`{ code: function() { return x + y; } }`
-- **GeoJSON**：支持地理坐标查询（点、线、多边形等）。示例：`{ location: { type: "Point", coordinates: [116.4, 39.9] } }`
-
-## MongoDB 聚合
-
-::: tip 扩展
-
-[MongoDB 官方文档之聚合](https://www.mongodb.com/zh-cn/docs/manual/aggregation/)
-
-:::
-
-### 【简单】MongoDB 支持哪些聚合方式？⭐⭐
-
-聚合操作处理多个文档并返回计算结果。可以使用聚合操作来：
-
-- 将多个文档中的值组合在一起。
-- 对分组数据执行操作，返回单一结果。
-- 分析一段时间内的数据变化。
-
-若要执行聚合操作，可以使用：
-
-- [聚合管道](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-aggregation-pipeline-intro)，这是执行聚合的首选方法。
-  - `$match`：过滤文档
-  - `$group`：分组聚合
-  - `$project`：重塑文档结构
-  - `$sort`：排序
-  - `$limit/$skip`：限制/跳过结果
-  - `$unwind`：展开数组
-  - `$lookup`：关联查询（类似 SQL 的 JOIN)
-  - `$facet`：多分支聚合
-- [单一目的聚合方法](https://www.mongodb.com/zh-cn/docs/manual/aggregation/#std-label-single-purpose-agg-methods)，这些方法很简单，但缺乏聚合管道的功能。
-  - `count()`：计数
-  - `distinct()`：去重
-  - `estimatedDocumentCount()`：快速计数（不精确）
-- [Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/)，从 MongoDB 5.0 开始，[Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/#std-label-Map-Reduce) 已被弃用。聚合管道提供的性能和可用性比 Map-Reduce 更优越。
-- **聚合表达式**
-  - 数学表达式：`$add`, `$subtract`, `$multiply`, `$divide`
-  - 日期表达式：`$year`, `$month`, `$dayOfMonth`
-  - 字符串表达式：`$concat`, `$substr`, `$toLower`
-  - 逻辑表达式：`$and`, `$or`, `$not`, `$cond`
-  - 数组表达式：`$arrayElemAt`, `$size`, `$slice`
-
-### 【中等】什么是聚合管道？⭐⭐
-
-聚合管道由一个或多个处理文档的 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 组成：
-
-- 每个阶段对输入文档执行一个操作。例如，某个阶段可以过滤文档、对文档进行分组并计算值。
-- 从一个阶段输出的文档将传递到下一阶段。
-- 一个聚合管道可以返回针对文档组的结果。例如，返回总值、平均值、最大值和最小值。
-
-如使用 [通过聚合管道更新](https://www.mongodb.com/zh-cn/docs/manual/tutorial/update-documents-with-aggregation-pipeline/#std-label-updates-agg-pipeline) 中显示的阶段，则可以通过聚合管道更新文档。
-
-> 注意：使用 [`db.collection.aggregate()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.aggregate/#mongodb-method-db.collection.aggregate) 方法运行的聚合管道不会修改集合中的文档，除非管道包含 [`$merge`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge) 或 [`$out`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out) 阶段。
-
-![MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921092725.png)
-
-[阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 的其他要点：
-
-- 阶段不必为每个输入文档输出一个文档。例如，某些阶段可能会产生新文档或过滤掉现有文档。
-- 同一个阶段可以在管道中多次出现，但以下阶段例外：[`$out`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out)、[`$merge`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge) 和 [`$geoNear`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/geoNear/#mongodb-pipeline-pipe.-geoNear)。
-- 要在阶段中计算平均值和执行其他计算，请使用指定 [聚合操作符](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/#std-label-aggregation-expressions) 的 [聚合表达式](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/#std-label-aggregation-expression-operators)。
-
-MongoDB 聚合管道提供了许多等价于 SQL 中常见聚合语句的操作。 下表概述了常见的 SQL 聚合语句或函数和 MongoDB 聚合操作的映射表：
-
-| RDBM 操作               | MongoDB 聚合操作                                                                                                                                                                                          |
-| :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WHERE`                 | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
-| `GROUP BY`              | [`$group`](https://docs.mongodb.com/manual/reference/operator/aggregation/group/#pipe._S_group)                                                                                                           |
-| `HAVING`                | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
-| `SELECT`                | [`$project`](https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project)                                                                                                     |
-| `ORDER BY`              | [`$sort`](https://docs.mongodb.com/manual/reference/operator/aggregation/sort/#pipe._S_sort)                                                                                                              |
-| `LIMIT`                 | [`$limit`](https://docs.mongodb.com/manual/reference/operator/aggregation/limit/#pipe._S_limit)                                                                                                           |
-| `SUM()`                 | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)                                                                                                                  |
-| `COUNT()`               | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)[`$sortByCount`](https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/#pipe._S_sortByCount) |
-| `JOIN`                  | [`$lookup`](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/#pipe._S_lookup)                                                                                                        |
-| `SELECT INTO NEW_TABLE` | [`$out`](https://docs.mongodb.com/manual/reference/operator/aggregation/out/#pipe._S_out)                                                                                                                 |
-| `MERGE INTO TABLE`      | [`$merge`](https://docs.mongodb.com/manual/reference/operator/aggregation/merge/#pipe._S_merge) (Available starting in MongoDB 4.2)                                                                       |
-| `UNION ALL`             | [`$unionWith`](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/#pipe._S_unionWith) (Available starting in MongoDB 4.4)                                                           |
-
-下面通过一个示例来展示，如何通过 MongoDB 聚合计算总订单数量：
-
-以下聚合管道示例包含两个 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference)，并返回按披萨名称分组后，各款中号披萨的总订单数量：
-
-```javascript
-db.orders.aggregate([
-  // Stage 1: 根据 size 过滤订单
-  {
-    $match: { size: 'medium' }
-  },
-  // Stage 2: 按名称对剩余文档进行分组，并计算总数量
-  {
-    $group: { _id: '$name', totalQuantity: { $sum: '$quantity' } }
-  }
-])[
-  // 输出
-  ({ _id: 'Cheese', totalQuantity: 50 },
-  { _id: 'Vegan', totalQuantity: 10 },
-  { _id: 'Pepperoni', totalQuantity: 20 })
-]
-```
-
-[`$match`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/match/#mongodb-pipeline-pipe.-match) 阶段：
-
-- 从披萨订单文档过滤出 `size` 为 `medium` 的披萨。
-- 将剩余文档传递到 [`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 阶段。
-
-[`$group`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 阶段：
-
-- 按披萨 `name` 对剩余文档进行分组。
-- 使用 [`$sum`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/sum/#mongodb-group-grp.-sum) 计算每种披萨 `name` 的总订单 `quantity`。总数存储在聚合管道返回的 `totalQuantity` 字段中。
-
-### 【简单】RDBM 聚合 vs. MongoDB 聚合？⭐⭐
-
-MongoDB pipeline 提供了许多等价于 SQL 中常见聚合语句的操作。 下表概述了常见的 SQL 聚合语句或函数和 MongoDB 聚合操作的映射表：
-
-| RDBM 操作               | MongoDB 聚合操作                                                                                                                                                                                          |
-| :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WHERE`                 | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
-| `GROUP BY`              | [`$group`](https://docs.mongodb.com/manual/reference/operator/aggregation/group/#pipe._S_group)                                                                                                           |
-| `HAVING`                | [`$match`](https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match)                                                                                                           |
-| `SELECT`                | [`$project`](https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project)                                                                                                     |
-| `ORDER BY`              | [`$sort`](https://docs.mongodb.com/manual/reference/operator/aggregation/sort/#pipe._S_sort)                                                                                                              |
-| `LIMIT`                 | [`$limit`](https://docs.mongodb.com/manual/reference/operator/aggregation/limit/#pipe._S_limit)                                                                                                           |
-| `SUM()`                 | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)                                                                                                                  |
-| `COUNT()`               | [`$sum`](https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum)[`$sortByCount`](https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/#pipe._S_sortByCount) |
-| `JOIN`                  | [`$lookup`](https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/#pipe._S_lookup)                                                                                                        |
-| `SELECT INTO NEW_TABLE` | [`$out`](https://docs.mongodb.com/manual/reference/operator/aggregation/out/#pipe._S_out)                                                                                                                 |
-| `MERGE INTO TABLE`      | [`$merge`](https://docs.mongodb.com/manual/reference/operator/aggregation/merge/#pipe._S_merge) (Available starting in MongoDB 4.2)                                                                       |
-| `UNION ALL`             | [`$unionWith`](https://docs.mongodb.com/manual/reference/operator/aggregation/unionWith/#pipe._S_unionWith) (Available starting in MongoDB 4.4)                                                           |
-
-RDBM 聚合 vs. MongoDB 聚合：
-
-![SQL 聚合 vs. MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921200556.png)
-
-### 【中等】MongoDB Map-Reduce 有什么用？
-
-> 从 MongoDB 5.0 开始，[Map-Reduce](https://www.mongodb.com/zh-cn/docs/manual/core/Map-Reduce/#std-label-Map-Reduce) 已被弃用。聚合管道提供的性能和可用性比 Map-Reduce 更优越。
-
-Map-Reduce 是一种数据处理范式，用于将大量数据汇总为有用的聚合结果。为了执行 Map-Reduce 操作，MongoDB 提供了 [`mapReduce`](https://docs.mongodb.com/manual/reference/command/mapReduce/#dbcmd.mapReduce) 数据库命令。
-
-![Map-Reduce](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921155546.svg)
-
-在上面的操作中，MongoDB 将 map 阶段应用于每个输入 document（即 collection 中与查询条件匹配的 document）。 map 函数分发出多个键 - 值对。对于具有多个值的那些键，MongoDB 应用 reduce 阶段，该阶段收集并汇总聚合的数据。然后，MongoDB 将结果存储在 collection 中。可选地，reduce 函数的输出可以通过 finalize 函数来进一步汇总聚合结果。
-
-MongoDB 中的所有 Map-Reduce 函数都是 JavaScript，并在 mongod 进程中运行。 Map-Reduce 操作将单个 collection 的 document 作为输入，并且可以在开始 map 阶段之前执行任意排序和限制。 mapReduce 可以将 Map-Reduce 操作的结果作为 document 返回，也可以将结果写入 collection。
 
 ## MongoDB 索引
 

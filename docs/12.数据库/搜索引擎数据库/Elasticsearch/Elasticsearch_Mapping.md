@@ -197,7 +197,7 @@ PUT books/it/1
 
 ### 动态模板
 
-**动态模板（[dynamic templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html)）**是用于给 `mapping` 动态添加字段的自定义规则。
+[**动态模板（dynamic templates）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html) 是用于给 `mapping` 动态添加字段的自定义规则。
 
 动态模板可以设置匹配条件，只有匹配的情况下才使用动态模板：
 
@@ -266,14 +266,12 @@ Elasticsearch 提供了非常丰富的数据类型，官方将其分为以下几
   - [`nested`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html)：保留其子字段之间关系的 JSON 对象。
   - [`join`](https://www.elastic.co/guide/en/elasticsearch/reference/current/parent-join.html)：为同一索引中的文档定义父/子关系。
 - **结构化数据类型**
-
   - [Range](https://www.elastic.co/guide/en/elasticsearch/reference/current/range.html)：范围类型，例如：`long_range`、`double_range`、`date_range` 和 `ip_range`。
   - [`ip`](https://www.elastic.co/guide/en/elasticsearch/reference/current/ip.html)：IPv4 和 IPv6 地址。
   - [`version`](https://www.elastic.co/guide/en/elasticsearch/reference/current/version.html)：版本号。支持 [Semantic Versioning](https://semver.org/) 优先规则。
   - [`murmur3`](https://www.elastic.co/guide/en/elasticsearch/plugins/8.2/mapper-murmur3.html)：计算并存储 hash 值。
 
 - **聚合数据类型**
-
   - [`aggregate_metric_double`](https://www.elastic.co/guide/en/elasticsearch/reference/current/aggregate-metric-double.html)：预先聚合的指标值
   - [`histogram`](https://www.elastic.co/guide/en/elasticsearch/reference/current/histogram.html)：直方图式的预聚合数值。
 
@@ -288,7 +286,6 @@ Elasticsearch 提供了非常丰富的数据类型，官方将其分为以下几
   - [`rank_feature`](https://www.elastic.co/guide/en/elasticsearch/reference/current/rank-feature.html)：记录一个数字特征，为了在查询时提高命中率。
   - [`rank_features`](https://www.elastic.co/guide/en/elasticsearch/reference/current/rank-features.html)：记录多个数字特征，为了在查询时提高命中率。
 - **空间数据类型**
-
   - [`geo_point`](https://www.elastic.co/guide/en/elasticsearch/reference/current/geo-point.html)：地理经纬度
   - [`geo_shape`](https://www.elastic.co/guide/en/elasticsearch/reference/current/geo-shape.html)：复杂的形状，例如多边形
   - [`point`](https://www.elastic.co/guide/en/elasticsearch/reference/current/point.html)：任意笛卡尔点
