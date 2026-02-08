@@ -18,7 +18,7 @@ Apache Flume 是一个分布式，高可用的数据收集系统。它可以从�
 
 ## Flume 架构
 
-![Agent component diagram](https://flume.apache.org/releases/content/1.11.0/_images/UserGuide_image00.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082100555.png)
 
 外部数据源以特定格式向 Flume 发送 `events` （事件），当 `source` 接收到 `events` 时，它将其存储到一个或多个 `channel`，`channel` 会一直保存 `events` 直到它被 `sink` 所消费。`sink` 的主要功能从 `channel` 中读取 `events`，并将其存入外部存储系统或转发到下一个 `source`，成功后再从 `channel` 中移除 `events`。
 
@@ -48,19 +48,19 @@ Flume 支持多种架构模式，分别介绍如下
 
 ### multi-agent flow
 
-![Two agents communicating over Avro RPC](https://flume.apache.org/releases/content/1.11.0/_images/UserGuide_image03.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082100555.png)
 
 Flume 支持跨越多个 Agent 的数据传递，这要求前一个 Agent 的 Sink 和下一个 Agent 的 Source 都必须是 `Avro` 类型，Sink 指向 Source 所在主机名 （或 IP 地址） 和端口（详细配置见下文案例三）。
 
 ### Consolidation
 
-![A fan-in flow using Avro RPC to consolidate events in one place](https://flume.apache.org/releases/content/1.11.0/_images/UserGuide_image02.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082101366.png)
 
 日志收集中常常存在大量的客户端（比如分布式 web 服务），Flume 支持使用多个 Agent 分别收集日志，然后通过一个或者多个 Agent 聚合后再存储到文件系统中。
 
 ### Multiplexing the flow
 
-![A fan-out flow using a (multiplexing) channel selector](https://flume.apache.org/releases/content/1.11.0/_images/UserGuide_image01.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082101790.png)
 
 Flume 支持从一个 Source 向多个 Channel，也就是向多个 Sink 传递事件，这个操作称之为 `Fan Out`（扇出）。默认情况下 `Fan Out` 是向所有的 Channel 复制 `Event`，即所有 Channel 收到的数据都是相同的。同时 Flume 也支持在 `Source` 上自定义一个复用选择器 (multiplexing selector) 来实现自定义的路由规则。
 
@@ -114,10 +114,10 @@ Flume 配置通常需要以下两个步骤：
 
 ```shell
 #指定 agent 的 sources,sinks,channels
-a1.sources = s1  
-a1.sinks = k1  
-a1.channels = c1  
-   
+a1.sources = s1
+a1.sinks = k1
+a1.channels = c1
+
 #配置 sources 属性
 a1.sources.s1.type = exec
 a1.sources.s1.command = tail -F /tmp/log.txt
@@ -125,13 +125,13 @@ a1.sources.s1.shell = /bin/bash -c
 
 #将 sources 与 channels 进行绑定
 a1.sources.s1.channels = c1
-   
-#配置 sink 
+
+#配置 sink
 a1.sinks.k1.type = logger
 
-#将 sinks 与 channels 进行绑定  
-a1.sinks.k1.channel = c1  
-   
+#将 sinks 与 channels 进行绑定
+a1.sinks.k1.channel = c1
+
 #配置 channel 类型
 a1.channels.c1.type = memory
 ```
@@ -150,11 +150,11 @@ flume-ng agent \
 
 向文件中追加数据：
 
-[![img](https://camo.githubusercontent.com/794055bb44cd4142afdb34675eb08cf073a17173312d8df03ad8258a912bdc34/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d312e706e67)](https://camo.githubusercontent.com/794055bb44cd4142afdb34675eb08cf073a17173312d8df03ad8258a912bdc34/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d312e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082117127.png)
 
 控制台的显示：
 
-[![img](https://camo.githubusercontent.com/46bd80666a18249b3401cc778525ae664849a6b51a3d45c433adbf1c9bb5f7eb/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d322e706e67)](https://camo.githubusercontent.com/46bd80666a18249b3401cc778525ae664849a6b51a3d45c433adbf1c9bb5f7eb/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d322e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082117949.png)
 
 ### 案例二
 
@@ -166,29 +166,29 @@ flume-ng agent \
 
 ```shell
 #指定 agent 的 sources,sinks,channels
-a1.sources = s1  
-a1.sinks = k1  
-a1.channels = c1  
-   
+a1.sources = s1
+a1.sinks = k1
+a1.channels = c1
+
 #配置 sources 属性
-a1.sources.s1.type =spooldir  
+a1.sources.s1.type =spooldir
 a1.sources.s1.spoolDir =/tmp/logs
 a1.sources.s1.basenameHeader = true
-a1.sources.s1.basenameHeaderKey = fileName 
-#将 sources 与 channels 进行绑定  
-a1.sources.s1.channels =c1 
+a1.sources.s1.basenameHeaderKey = fileName
+#将 sources 与 channels 进行绑定
+a1.sources.s1.channels =c1
 
-   
-#配置 sink 
+
+#配置 sink
 a1.sinks.k1.type = hdfs
 a1.sinks.k1.hdfs.path = /flume/events/%y-%m-%d/%H/
 a1.sinks.k1.hdfs.filePrefix = %{fileName}
 #生成的文件类型，默认是 Sequencefile，可用 DataStream，则为普通文本
-a1.sinks.k1.hdfs.fileType = DataStream  
+a1.sinks.k1.hdfs.fileType = DataStream
 a1.sinks.k1.hdfs.useLocalTimeStamp = true
-#将 sinks 与 channels 进行绑定  
+#将 sinks 与 channels 进行绑定
 a1.sinks.k1.channel = c1
-   
+
 #配置 channel 类型
 a1.channels.c1.type = memory
 ```
@@ -210,7 +210,7 @@ flume-ng agent \
 # cp log.txt logs/
 ```
 
-[![img](https://camo.githubusercontent.com/254c73acc86f6e95c78769a0fabfa454607f124314fa34472a9f754765d441cb/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d332e706e67)](https://camo.githubusercontent.com/254c73acc86f6e95c78769a0fabfa454607f124314fa34472a9f754765d441cb/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d332e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082118872.png)
 
 查看上传到 HDFS 上的文件内容与本地是否一致：
 
@@ -218,7 +218,7 @@ flume-ng agent \
 # hdfs dfs -cat /flume/events/19-04-09/13/log.txt.1554788567801
 ```
 
-[![img](https://camo.githubusercontent.com/74240f5a53dbe0708725cdc065960d79a937aa64240b5d19c375b13fac11e6a5/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d342e706e67)](https://camo.githubusercontent.com/74240f5a53dbe0708725cdc065960d79a937aa64240b5d19c375b13fac11e6a5/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d342e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082118886.png)
 
 ### 案例三
 
@@ -307,17 +307,17 @@ flume-ng agent \
 
 这里建议按以上顺序启动，原因是 `avro.source` 会先与端口进行绑定，这样 `avro sink` 连接时才不会报无法连接的异常。但是即使不按顺序启动也是没关系的，`sink` 会一直重试，直至建立好连接。
 
-[![img](https://camo.githubusercontent.com/05731fcc095f6f4d19ec46e8bcdd24b695ab5e331eb98ff30c053de3fb3f03b2/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d72657472792e706e67)](https://camo.githubusercontent.com/05731fcc095f6f4d19ec46e8bcdd24b695ab5e331eb98ff30c053de3fb3f03b2/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d72657472792e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082119255.png)
 
 #### 测试
 
 向文件 `tmp/log.txt` 中追加内容：
 
-[![img](https://camo.githubusercontent.com/9e06f24ab35b86302054e9d23e177240c2d194ebded8113a089f2cb2e2bbba50/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d382e706e67)](https://camo.githubusercontent.com/9e06f24ab35b86302054e9d23e177240c2d194ebded8113a089f2cb2e2bbba50/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d382e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082119270.png)
 
 可以看到已经从 8888 端口监听到内容，并成功输出到控制台：
 
-[![img](https://camo.githubusercontent.com/a15934195f40ba109ee621c0cac0371278836088ded74240bfd5f4debea3ad62/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d392e706e67)](https://camo.githubusercontent.com/a15934195f40ba109ee621c0cac0371278836088ded74240bfd5f4debea3ad62/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f666c756d652d6578616d706c652d392e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082120031.png)
 
 ## 参考资料
 

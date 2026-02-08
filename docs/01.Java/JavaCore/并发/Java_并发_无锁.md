@@ -1004,7 +1004,7 @@ server.tomcat.max-threads=1
 
 当访问 id = 1 时，符合预期
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200731111854.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200731111854.png)
 
 当访问 id = 2 时，before 的应答不是 null，而是 1，不符合预期。
 

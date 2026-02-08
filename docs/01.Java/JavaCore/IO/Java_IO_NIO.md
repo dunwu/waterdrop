@@ -363,11 +363,11 @@ BIO 与 NIO 最重要的区别是数据打包和传输的方式。**BIO 面向�
 
 BIO 模式：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630212345.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630212345.png)
 
 NIO 模式：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630212248.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630212248.png)
 
 ## 参考资料
 

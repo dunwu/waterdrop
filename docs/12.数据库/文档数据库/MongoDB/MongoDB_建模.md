@@ -419,7 +419,7 @@ review collection 存储所有的评论
 
 ## 树形结构模型
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200911194846.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200911194846.svg)
 
 ### 具有父节点的树形结构模型
 
@@ -573,7 +573,7 @@ db.categories.insertMany([
 
 ### 具有嵌套集的树形结构模型
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200911204252.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200911204252.svg)
 
 ```javascript
 db.categories.insertMany([
@@ -602,7 +602,7 @@ db.categories.find({
 
 解决方案是：列转行
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200919225901.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200919225901.png)
 
 ### 管理文档不同版本
 

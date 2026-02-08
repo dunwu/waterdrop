@@ -13,7 +13,7 @@ permalink: /pages/3d690f52/
 
 # Nosql 技术选型
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209020702.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209020702.png)
 
 ## Nosql 简介
 
@@ -68,8 +68,6 @@ permalink: /pages/3d690f52/
 
 - BigTable
 
-  ![img](https://user-gold-cdn.xitu.io/2018/8/10/165234a1e9147edf?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
   BigTable 是一种压缩的、高性能的、高可扩展性的，基于 Google 文件系统（Google File System，GFS）的数据存储系统，用于存储大规模结构化数据，适用于云端计算。
 
 ### 列式数据库特性
@@ -86,7 +84,7 @@ permalink: /pages/3d690f52/
 
 读取多条数据的同一列效率高，因为这些列都是存储在一起的，一次磁盘操作可以数据的指定列全部读取到内存中。 下图通过一条查询的执行过程说明列式存储（以及数据压缩）的优点
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209005611.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209005611.png)
 
 ```
 执行步骤如下：
@@ -127,19 +125,19 @@ KV 存储非常适合存储**不涉及过多数据关系业务关系的数据**�
 
 - Redis
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209010410.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209010410.png)
 
   Redis 是一个使用 ANSI C 编写的开源、支持网络、基于内存、可选持久性的键值对存储数据库。从 2015 年 6 月开始，Redis 的开发由 Redis Labs 赞助，而 2013 年 5 月至 2015 年 6 月期间，其开发由 Pivotal 赞助。在 2013 年 5 月之前，其开发由 VMware 赞助。根据月度排行网站 DB-Engines.com 的数据显示，Redis 是最流行的键值对存储数据库。
 
 - Cassandra
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209010451.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209010451.png)
 
   Apache Cassandra（社区内一般简称为 C\*）是一套开源分布式 NoSQL 数据库系统。它最初由 Facebook 开发，用于储存收件箱等简单格式数据，集 Google BigTable 的数据模型与 Amazon Dynamo 的完全分布式架构于一身。Facebook 于 2008 将 Cassandra 开源，此后，由于 Cassandra 良好的可扩展性和性能，被 Apple, Comcast,Instagram, Spotify, eBay, Rackspace, Netflix 等知名网站所采用，成为了一种流行的分布式结构化数据存储方案。
 
 - LevelDB
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209011140.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209011140.png)
 
   LevelDB 是一个由 Google 公司所研发的键／值对（Key/Value Pair）嵌入式数据库管理系统编程库， 以开源的 BSD 许可证发布。
 
@@ -176,13 +174,13 @@ KV 存储非常适合存储**不涉及过多数据关系业务关系的数据**�
 
 - MongoDB
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209012320.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209012320.png)
 
   **MongoDB **是一种面向文档的数据库管理系统，由 C++ 撰写而成，以此来解决应用程序开发社区中的大量现实问题。2007 年 10 月，MongoDB 由 10gen 团队所发展。2009 年 2 月首度推出。
 
 - CouchDB
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209012418.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209012418.png)
 
   Apache CouchDB 是一个开源数据库，专注于易用性和成为"**完全拥抱 web 的数据库**"。它是一个使用 JSON 作为存储格式，JavaScript 作为查询语言，MapReduce 和 HTTP 作为 API 的 NoSQL 数据库。其中一个显著的功能就是多主复制。CouchDB 的第一个版本发布在 2005 年，在 2008 年成为了 Apache 的项目。
 
@@ -234,21 +232,17 @@ MongonDB 还是支持多文档事务的 Consistency（一致性）和 Durability
 
 现在有如下文档集合：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209014530.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209014530.png)
 
 正排索引得到索引如下：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209014723.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209014723.png)
 
 可见，正排索引适用于根据文档名称查询文档内容
 
-简单的倒排索引如下：
-
-![img](https://user-gold-cdn.xitu.io/2018/8/10/165234a2750634bc?imageslim)
-
 带有单词频率信息的倒排索引如下：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209014842.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209014842.png)
 
 可见，倒排索引适用于根据关键词来查询文档内容
 
@@ -256,13 +250,11 @@ MongonDB 还是支持多文档事务的 Consistency（一致性）和 Durability
 
 - Elasticsearch
 
-  ![img](https://user-gold-cdn.xitu.io/2018/8/10/165234a27ea53fae?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
-
   Elasticsearch 是一个基于 Lucene 的搜索引擎。它提供了一个分布式，多租户 -能够全文搜索与发动机 HTTP Web 界面和无架构 JSON 文件。Elasticsearch 是用 Java 开发的，并根据 Apache License 的条款作为开源发布。根据 DB-Engines 排名，Elasticsearch 是最受欢迎的企业搜索引擎，后面是基于 Lucene 的 Apache Solr。
 
 - Solr
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209014947.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209014947.png)
 
   Solr 是 Apache Lucene 项目的开源企业搜索平台。其主要功能包括全文检索、命中标示、分面搜索、动态聚类、数据库集成，以及富文本（如 Word、PDF）的处理。Solr 是高度可扩展的，并提供了分布式搜索和索引复制
 
@@ -296,7 +288,7 @@ MongonDB 还是支持多文档事务的 Consistency（一致性）和 Durability
 
 ## 图数据库
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209015751.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209015751.png)
 
 **图形数据库应用图论存储实体之间的关系信息**。最常见例子就是社会网络中人与人之间的关系。关系型数据库用于存储“关系型”数据的效果并不好，其查询复杂、缓慢、超出预期，而图形数据库的独特设计恰恰弥补了这个缺陷，解决关系型数据库存储和处理复杂关系型数据功能较弱的问题。
 
@@ -304,19 +296,19 @@ MongonDB 还是支持多文档事务的 Consistency（一致性）和 Durability
 
 - Neo4j
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209015817.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209015817.png)
 
   Neo4j 是由 Neo4j，Inc。开发的图形数据库管理系统。由其开发人员描述为具有原生图存储和处理的符合 ACID 的事务数据库，根据 DB-Engines 排名， Neo4j 是最流行的图形数据库。
 
 - ArangoDB
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209015858.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209015858.png)
 
   ArangoDB 是由 triAGENS GmbH 开发的原生多模型数据库系统。数据库系统支持三个重要的数据模型（键/值，文档，图形），其中包含一个数据库核心和统一查询语言 AQL（ArangoDB 查询语言）。查询语言是声明性的，允许在单个查询中组合不同的数据访问模式。ArangoDB 是一个 NoSQL 数据库系统，但 AQL 在很多方面与 SQL 类似。
 
 - Titan
 
-  ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209015923.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200209015923.png)
 
   Titan 是一个可扩展的图形数据库，针对存储和查询包含分布在多机群集中的数百亿个顶点和边缘的图形进行了优化。Titan 是一个事务性数据库，可以支持数千个并发用户实时执行复杂的图形遍历。
 
@@ -326,13 +318,9 @@ MongonDB 还是支持多文档事务的 Consistency（一致性）和 Durability
 
 Neo4j 使用数据结构中图（graph）的概念来进行建模。 Neo4j 中两个最基本的概念是节点和边。节点表示实体，边则表示实体之间的关系。节点和边都可以有自己的属性。不同实体通过各种不同的关系关联起来，形成复杂的对象图。
 
-针对关系数据，2 种 2 数据库的存储结构不同：
-
-![2 种存储结构](https://user-gold-cdn.xitu.io/2018/8/10/165234a2b2cebaf8?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+针对关系数据，2 种数据库的存储结构不同：
 
 Neo4j 中，存储节点时使用了”index-free adjacency”，即每个节点都有指向其邻居节点的指针，可以让我们在 O(1) 的时间内找到邻居节点。另外，按照官方的说法，在 Neo4j 中边是最重要的，是”first-class entities”，所以单独存储，这有利于在图遍历的时候提高速度，也可以很方便地以任何方向进行遍历
-
-![img](https://user-gold-cdn.xitu.io/2018/8/10/165234a2b3a0f7b7?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
 如下优点：
 

@@ -66,7 +66,7 @@ MapReduce 的特点
 
 MapReduce 编程模型：MapReduce 程序被分为 Map（映射）阶段和 Reduce（化简）阶段。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601162305.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601162305.png)
 
 1. **input** : 读取文本文件；
 2. **splitting** : 将文件按照行进行拆分，此时得到的 `K1` 行数，`V1` 表示对应行的文本内容；
@@ -98,7 +98,7 @@ MapReduce 有以下核心组件：
   - 确认作业的输出规范，例如检查输出路径是否已经存在。
   - 提供 RecordWriter 实现。[RecordWriter](https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/RecordWriter.html) 将输出 `<key， value>` 对到文件系统。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601163846.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601163846.png)
 
 ## 参考资料
 

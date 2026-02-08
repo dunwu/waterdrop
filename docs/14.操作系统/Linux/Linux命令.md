@@ -597,6 +597,4 @@ mkdir empty && rsync -r --delete empty/ some-dir && rmdir some-dir
 
 ## 授权条款
 
-![img](http://creativecommons.org/licenses/by-sa/4.0/)
-
 本文使用授权协议 [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/)。

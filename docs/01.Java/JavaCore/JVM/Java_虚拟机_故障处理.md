@@ -24,11 +24,11 @@ Java 应用出现线上故障，如何进行诊断？
 
 一般来说，服务器故障诊断的整体思路如下：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200309181645.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200309181645.png)
 
 应用故障诊断思路：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200309181831.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200309181831.png)
 
 ## CPU 问题
 
@@ -204,7 +204,7 @@ dm-1              0.00     0.00    0.00    0.00     0.00     0.00    16.95     0
 ### TCP 队列溢出
 
 tcp 队列溢出是个相对底层的错误，它可能会造成超时、rst 等更表层的错误。因此错误也更隐蔽，所以我们单独说一说。
-![img](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083827.jpg)
+![](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083827.jpg)
 
 如上图所示，这里有两个队列：syns queue(半连接队列）、accept queue（全连接队列）。三次握手，在 server 收到 client 的 syn 后，把消息放到 syns queue，回复 syn+ack 给 client，server 收到 client 的 ack，如果这时 accept queue 没满，那就从 syns queue 拿出暂存的信息放入 accept queue 中，否则按 tcp_abort_on_overflow 指示的执行。
 
@@ -213,11 +213,11 @@ tcp_abort_on_overflow 0 表示如果三次握手第三步的时候 accept queue 
 那么在实际开发中，我们怎么能快速定位到 tcp 队列溢出呢？
 
 **netstat 命令，执行 netstat -s | egrep "listen|LISTEN"**
-![img](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-83828.jpg)
+![](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-83828.jpg)
 如上图所示，overflowed 表示全连接队列溢出的次数，sockets dropped 表示半连接队列溢出的次数。
 
 **ss 命令，执行 ss -lnt**
-![img](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083828.jpg)
+![](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083828.jpg)
 上面看到 Send-Q 表示第三列的 listen 端口上的全连接队列最大为 5，第一列 Recv-Q 为全连接队列当前使用了多少。
 
 接着我们看看怎么设置全连接、半连接队列大小吧：
@@ -255,10 +255,10 @@ RST 包表示连接重置，用于关闭一些无用的连接，通常表示异�
 之前说过 RST 报文多会导致程序报错，在一个已关闭的连接上读操作会报`connection reset`，而在一个已关闭的连接上写操作则会报`connection reset by peer`。通常我们可能还会看到`broken pipe`错误，这是管道层面的错误，表示对已关闭的管道进行读写，往往是在收到 RST，报出`connection reset`错后继续读写数据报的错，这个在 glibc 源码注释中也有介绍。
 
 我们在诊断故障时候怎么确定有 RST 包的存在呢？当然是使用 tcpdump 命令进行抓包，并使用 wireshark 进行简单分析了。`tcpdump -i en0 tcp -w xxx.cap`，en0 表示监听的网卡。
-![img](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083829.jpg)
+![](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083829.jpg)
 
 接下来我们通过 wireshark 打开抓到的包，可能就能看到如下图所示，红色的就表示 RST 包了。
-![img](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083830.jpg)
+![](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083830.jpg)
 
 ### TIME_WAIT 和 CLOSE_WAIT
 
@@ -267,7 +267,7 @@ TIME_WAIT 和 CLOSE_WAIT 是啥意思相信大家都知道。
 
 用 ss 命令会更快`ss -ant | awk '{++S[$1]} END {for(a in S) print a, S[a]}'`
 
-![img](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083830.png)
+![](https://fredal-blog.oss-cn-hangzhou.aliyuncs.com/2019-11-04-083830.png)
 
 #### TIME_WAIT
 

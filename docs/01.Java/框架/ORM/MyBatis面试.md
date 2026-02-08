@@ -169,7 +169,7 @@ SqlSessionFactoryBuilder → SqlSessionFactory → SqlSession → Mapper Proxy
        （方法级）               （应用级）       （请求级）     （方法级）
 ```
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210510113446.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210510113446.png)
 
 #### SqlSessionFactoryBuilder
 
@@ -235,7 +235,7 @@ UserMapper mapper = session.getMapper(UserMapper.class);
 
 ### 【中等】能详细说说 MyBatis 的执行流程吗？⭐⭐
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210512173437.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210512173437.png)
 
 ### 【困难】MyBatis 的架构是如何设计的？⭐⭐
 
@@ -249,7 +249,7 @@ MyBatis 的架构设计通过 **分层解耦** 和 **动态代理** 实现了 SQ
 
 MyBatis 的架构设计以 **SQL 与 Java 对象的灵活映射** 为核心，采用分层模块化设计，平衡了灵活性与易用性。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210512114852.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210512114852.png)
 
 MyBatis 的架构分为四层，各层职责明确，通过接口解耦：
 

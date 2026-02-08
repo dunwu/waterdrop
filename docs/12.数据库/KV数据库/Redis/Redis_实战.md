@@ -243,7 +243,7 @@ noslave-lazy-flush no
 
 使用 `HASH` 类型存储文章信息。其中：key 是文章 ID；field 是文章的属性 key；value 是属性对应值。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225143038.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225143038.jpg)
 
 操作：
 
@@ -255,7 +255,7 @@ noslave-lazy-flush no
 
 使用 `ZSET` 类型分别存储按照时间排序和按照评分排序的文章 ID 集合。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225145742.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225145742.jpg)
 
 操作：
 
@@ -265,7 +265,7 @@ noslave-lazy-flush no
 
 （3）为了防止重复投票，使用 `SET` 类型记录每篇文章 ID 对应的投票集合。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225150105.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225150105.jpg)
 
 操作：
 
@@ -274,7 +274,7 @@ noslave-lazy-flush no
 
 （4）假设 user:115423 给 article:100408 投票，分别需要高更新评分排序集合以及投票集合。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225150138.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225150138.jpg)
 
 当需要对一篇文章投票时，程序需要用 ZSCORE 命令检查记录文章发布时间的有序集合，判断文章的发布时间是否超过投票有效期（比如：一星期）。
 
@@ -390,7 +390,7 @@ noslave-lazy-flush no
 
 取出群组里的文章：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225214210.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200225214210.jpg)
 
 - 通过对存储群组文章的集合和存储文章评分的有序集合执行 `ZINTERSTORE` 命令，可以得到按照文章评分排序的群组文章。
 - 通过对存储群组文章的集合和存储文章发布时间的有序集合执行 `ZINTERSTORE` 命令，可以得到按照文章发布时间排序的群组文章。

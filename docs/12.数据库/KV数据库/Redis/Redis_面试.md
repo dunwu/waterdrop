@@ -684,7 +684,7 @@ OK
 
 重新分区的实现原理如下图所示：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-cluster-trib.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-cluster-trib.png)
 
 ::: info 重定向
 :::

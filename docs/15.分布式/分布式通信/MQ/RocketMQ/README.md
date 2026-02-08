@@ -22,7 +22,6 @@ index: false
 ## 📖 内容
 
 - [RocketMQ 快速入门](RocketMQ_快速入门.md)
-- [RocketMQ 基本原理](RocketMQ_原理.md)
 - [RocketMQ 面试](RocketMQ_面试.md) 💯
 
 ## 📚 资料

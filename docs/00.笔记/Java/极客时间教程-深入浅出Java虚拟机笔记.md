@@ -39,11 +39,11 @@ permalink: /pages/76e8b6af/
 
 ## 大厂面试题：你不得不掌握的 JVM 内存管理
 
-![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjWAPqAuAARqnz6cigo666.png)
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjWAPqAuAARqnz6cigo666.png)
 
-![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjaANruFAAQKxZvgfSs652.png)
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjaANruFAAQKxZvgfSs652.png)
 
-![img](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjaAIlgaAAJKReuKXII670.png)
+![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjaAIlgaAAJKReuKXII670.png)
 
 ## 大厂面试题：从覆盖 JDK 的类开始掌握类的加载机制
 

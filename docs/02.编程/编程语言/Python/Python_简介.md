@@ -146,8 +146,6 @@ PyCharm 是由 JetBrains 打造的一款 Python IDE，支持 macOS、 Windows、
 
 我认为，[PyCharm](https://www.jetbrains.com/pycharm/) 是最好用的 Python IDE，功能丰富，UI 很酷，缺点是正版比较贵。
 
-![](https://www.jetbrains.com/pycharm/img/screenshots/code-completion_animation.gif)
-
 ### VSCode
 
 [VSCode](https://github.com/microsoft/vscode)（全称：Visual Studio Code）是一款由微软开发且跨平台的免费源代码编辑器，VSCode 开发环境非常简单易用。

@@ -44,7 +44,7 @@ Jmeter 的工作原理是仿真用户向服务器发送请求，并收集服务�
 
 Jmeter 的工作流如下图所示：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/technology/test/jmeter-workflow.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/technology/test/jmeter-workflow.png)
 
 ### 主要元素
 
@@ -64,7 +64,7 @@ Jmeter 的主要元素如下：
 - **`预处理器元素(Pre-Processor Elements)`** - 预处理器元素在采样器发出请求之前执行，如果预处理器附加到采样器元素，那么它将在该采样器元素运行之前执行。预处理器元素用于在运行之前准备环境及参数。
 - **`后处理器元素(Post-Processor Elements)`** - 后处理器元素是在发送采样器请求之后执行的元素，常用于处理响应数据。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/technology/test/jmeter-elements.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/technology/test/jmeter-elements.png)
 
 > 📌 提示：
 >

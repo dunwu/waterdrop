@@ -49,7 +49,7 @@ Executor 框架核心 API 如下：
 - `ScheduledThreadPoolExecutor` - `ScheduledExecutorService` 接口的实现，一个可定时调度任务的线程池。
 - `Executors` - 可以通过调用 `Executors` 的静态工厂方法来创建线程池并返回一个 `ExecutorService` 对象。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/exexctor-uml.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/exexctor-uml.png)
 
 ### Executor
 

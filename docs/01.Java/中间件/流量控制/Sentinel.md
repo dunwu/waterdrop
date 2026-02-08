@@ -20,7 +20,7 @@ permalink: /pages/d3fd54bd/
 
 Sentinel 是面向分布式、多语言异构化服务架构的流量治理组件，主要以流量为切入点，从流量控制、流量路由、熔断降级、系统自适应保护等多个维度来帮助用户保障微服务的稳定性。
 
-![img](https://sentinelguard.io/img/sentinel-flow-index-overview-cn.jpg)
+![](https://sentinelguard.io/img/sentinel-flow-index-overview-cn.jpg)
 
 Sentinel 中有两个基本概念：
 

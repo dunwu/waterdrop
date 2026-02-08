@@ -18,7 +18,7 @@ permalink: /pages/7c31e675/
 
 > EhCache 是一个纯 Java 的进程内缓存框架，具有快速、精干等特点，是 Hibernate 中默认的 CacheProvider。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/technology/cache/ehcache-architecture.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/technology/cache/ehcache-architecture.png)
 
 ## 一、简介
 

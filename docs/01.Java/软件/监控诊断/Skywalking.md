@@ -23,7 +23,7 @@ SkyWalking 是观察性分析平台和应用性能管理系统。
 
 提供分布式追踪、服务网格遥测分析、度量聚合和可视化一体化解决方案。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200211152235.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200211152235.png)
 
 ### SkyWalking 特性
 

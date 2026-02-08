@@ -36,13 +36,13 @@ Flink 旨在任意规模上运行有状态流式应用。因此，应用程序�
 
 有状态的 Flink 程序针对本地状态访问进行了优化。任务的状态始终保留在内存中，如果状态大小超过可用内存，则会保存在能高效访问的磁盘数据结构中。任务通过访问本地（通常在内存中）状态来进行所有的计算，从而产生非常低的处理延迟。Flink 通过定期和异步地对本地状态进行持久化存储来保证故障场景下精确一次的状态一致性。
 
-![img](https://flink.apache.org/img/local-state.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081707039.png)
 
 ## Flink 集群剖析
 
 Flink 运行时由两种类型的进程组成：一个 **`JobManager`** 和一个或者多个 **`TaskManager`**。
 
-![The processes involved in executing a Flink dataflow](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/processes.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081709964.svg)
 
 _Client_ 不是运行时和程序执行的一部分，而是用于准备数据流并将其发送给 `JobManager`。之后，客户端可以断开连接（_分离模式_），或保持连接来接收进程报告（_附加模式_）。客户端可以作为触发执行 Java/Scala 程序的一部分运行，也可以在命令行进程 `./bin/flink run ...` 中运行。
 
@@ -80,7 +80,7 @@ _TaskManager_（也称为 _worker_）执行作业流的 task，并且缓存和�
 
 下图中样例数据流用 5 个 subtask 执行，因此有 5 个并行线程。
 
-![Operator chaining into Tasks](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/tasks_chains.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081709025.svg)
 
 ## Task Slots 和资源
 
@@ -90,14 +90,14 @@ _TaskManager_（也称为 _worker_）执行作业流的 task，并且缓存和�
 
 通过调整 task slot 的数量，用户可以定义 subtask 如何互相隔离。每个 TaskManager 有一个 slot，这意味着每个 task 组都在单独的 JVM 中运行（例如，可以在单独的容器中启动）。具有多个 slot 意味着更多 subtask 共享同一 JVM。同一 JVM 中的 task 共享 TCP 连接（通过多路复用）和心跳信息。它们还可以共享数据集和数据结构，从而减少了每个 task 的开销。
 
-![A TaskManager with Task Slots and Tasks](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/tasks_slots.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081710497.svg)
 
 默认情况下，Flink 允许 subtask 共享 slot，即便它们是不同的 task 的 subtask，只要是来自于同一作业即可。结果就是一个 slot 可以持有整个作业管道。允许 *slot 共享*有两个主要优点：
 
 - Flink 集群所需的 task slot 和作业中使用的最大并行度恰好一样。无需计算程序总共包含多少个 task（具有不同并行度）。
 - 容易获得更好的资源利用。如果没有 slot 共享，非密集 subtask（_source/map()_）将阻塞和密集型 subtask（_window_） 一样多的资源。通过 slot 共享，我们示例中的基本并行度从 2 增加到 6，可以充分利用分配的资源，同时确保繁重的 subtask 在 TaskManager 之间公平分配。
 
-![TaskManagers with shared Task Slots](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/slot_sharing.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081710298.svg)
 
 ## Flink 应用程序执行
 
@@ -142,7 +142,7 @@ JobManager 高可用是指，在任何时候都有一个 **JobManager Leader**�
 
 如下是一个使用三个 JobManager 实例的例子：
 
-![img](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/jobmanager_ha_overview.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081707755.png)
 
 Flink 的 [高可用服务](https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/ha/overview/#high-availability-services) 封装了所需的服务，使一切可以正常工作：
 

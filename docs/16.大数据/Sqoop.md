@@ -21,7 +21,7 @@ Sqoop 是一个常用的数据迁移工具，主要用于在不同存储系统�
 - 导入数据：从 MySQL，Oracle 等关系型数据库中导入数据到 HDFS、Hive、HBase 等分布式文件存储系统中；
 - 导出数据：从 分布式文件系统中导出数据到关系数据库中。
 
-![Image](https://cdn-media-1.freecodecamp.org/images/rEfjXBnXyMjmyvtcIub-cxby3LS31vpFCFyt)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081844424.webp)
 
 目前 Sqoop 主要分为 Sqoop1 和 Sqoop2 两个版本，其中，版本号为 1.4.x 属于 Sqoop1，而版本号为 1.99.x 的属于 Sqoop2。这两个版本开发时的定位方向不同，体系结构具有很大的差异，因此它们之间互不兼容。
 
@@ -44,13 +44,13 @@ Sqoop 社区提供了多种连接器，可以在很多数据存储之间进行�
 
 在导入数据之前，Sqoop 使用 JDBC 检查导入的数据表，检索出表中的所有列以及列的 SQL 数据类型，并将这些 SQL 类型映射为 Java 数据类型。在转换后的 MapReduce 应用中使用这些对应的 Java 类型来保存字段的值，Sqoop 的代码生成器使用这些信息来创建对应表的类，用于保存从表中抽取的记录。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/bigdata/Sqoop/sqoop-import.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/bigdata/Sqoop/sqoop-import.png)
 
 ### 导出原理
 
 在导出数据之前，Sqoop 会根据数据库连接字符串来选择一个导出方法，对于大部分系统来说，Sqoop 会选择 JDBC。Sqoop 会根据目标表的定义生成一个 Java 类，这个生成的类能够从文本中解析出记录数据，并能够向表中插入类型合适的值，然后启动一个 MapReduce 作业，从 HDFS 中读取源数据文件，使用生成的类解析出记录，并且执行选定的导出方法。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/bigdata/Sqoop/sqoop-export.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/bigdata/Sqoop/sqoop-export.png)
 
 ## Sqoop 应用
 
@@ -75,7 +75,7 @@ sqoop list-databases \
 --password root
 ```
 
-[![img](https://camo.githubusercontent.com/a908521864b3f952eeea127801a3614e0cb29169e6667c19fa930d5bacd0ed88/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f702d6c6973742d6461746162617365732e706e67)](https://camo.githubusercontent.com/a908521864b3f952eeea127801a3614e0cb29169e6667c19fa930d5bacd0ed88/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f702d6c6973742d6461746162617365732e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082053497.png)
 
 #### 查询指定数据库中所有数据表
 
@@ -113,7 +113,7 @@ sqoop import \
 - 添加 `-- autoreset-to-one-mapper` 参数，代表只启动一个 `map task`，即不并行执行；
 - 若仍希望并行执行，则可以使用 `--split-by <column-name>` 指明拆分数据的参考列。
 
-[![img](https://camo.githubusercontent.com/c2e23d7fe456107c3351a2da5d2ff651e851e8d36c134339f07297df0a96319a/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f702d6d61702d7461736b2e706e67)](https://camo.githubusercontent.com/c2e23d7fe456107c3351a2da5d2ff651e851e8d36c134339f07297df0a96319a/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f702d6d61702d7461736b2e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082053212.png)
 
 ##### 导入验证
 
@@ -126,7 +126,7 @@ Hadoop fs -text  /sqoop/part-m-00000
 
 查看 HDFS 导入目录，可以看到表中数据被分为 3 部分进行存储，这是由指定的并行度决定的。
 
-[![img](https://camo.githubusercontent.com/9e788568906a827b27cdcd07c1ee14d2410030a74af0233a06fe00b15a2c54d9/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f686466735f6c732e706e67)](https://camo.githubusercontent.com/9e788568906a827b27cdcd07c1ee14d2410030a74af0233a06fe00b15a2c54d9/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f686466735f6c732e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082055173.png)
 
 #### HDFS 数据导出到 MySQL
 
@@ -187,11 +187,11 @@ sqoop import \
  Hive> SELECT * FROM sqoop_test.help_keyword;
 ```
 
-[![img](https://camo.githubusercontent.com/00cf19bbcf1278b0bd28640a5f59862ebdb55e0173e2228fce850cfbcc05e485/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f686976655f7461626c65732e706e67)](https://camo.githubusercontent.com/00cf19bbcf1278b0bd28640a5f59862ebdb55e0173e2228fce850cfbcc05e485/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f686976655f7461626c65732e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082056692.png)
 
 ##### 可能出现的问题
 
-[![img](https://camo.githubusercontent.com/27ca396ed586d5d9be1ba106f26dd672401785ac585e1c24adc63069343a6fe6/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f686976655f6572726f722e706e67)](https://camo.githubusercontent.com/27ca396ed586d5d9be1ba106f26dd672401785ac585e1c24adc63069343a6fe6/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f686976655f6572726f722e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082056314.png)
 
 如果执行报错 `java.io.IOException: java.lang.ClassNotFoundException: org.apache.hadoop.hive.conf.HiveConf`，则需将 Hive 安装目录下 `lib` 下的 `hive-exec-**.jar` 放到 sqoop 的 `lib` 。
 
@@ -216,11 +216,11 @@ Hive> desc formatted help_keyword;
 
 `Location` 属性为其存储位置：
 
-![img](https://camo.githubusercontent.com/ed9d22fb7fcdc3f71d067010820d1c7de41a243bf3cf8be572020923ecdf0802/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f702d686976652d6c6f636174696f6e2e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082057536.png)
 
 这里可以查看一下这个目录，文件结构如下：
 
-![img](https://camo.githubusercontent.com/27f1234dafcee45782a5f711e85a3161592a1ca787d587b4a7e14089b4bf7e72/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f702d686976652d686466732e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082057388.png)
 
 ##### 执行导出命令
 
@@ -277,7 +277,7 @@ hbase> desc 'help_keyword_hbase'
 
 使用 `scan` 查看表数据：
 
-[![img](https://camo.githubusercontent.com/7fdd034cab4722d9e194d16a91ce0c23db4b9589d0c4d7c241b56034686b490a/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f68626173652e706e67)](https://camo.githubusercontent.com/7fdd034cab4722d9e194d16a91ce0c23db4b9589d0c4d7c241b56034686b490a/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f73716f6f705f68626173652e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082058212.png)
 
 ### 全库导出
 

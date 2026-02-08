@@ -38,7 +38,7 @@ public class HelloWorld {
 
 ## 基本数据类型
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java基本数据类型.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java基本数据类型.svg)
 
 > 👉 扩展阅读：[深入理解 Java 基本数据类型](https://dunwu.github.io/waterdrop/pages/cba76603/)
 
@@ -75,13 +75,13 @@ Java 支持的变量类型有：
 
 ## 数组
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java数组.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java数组.svg)
 
 > 👉 扩展阅读：[深入理解 Java 数组](https://dunwu.github.io/waterdrop/pages/ae0740ef/)
 
 ## 枚举
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java枚举.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java枚举.svg)
 
 > 👉 扩展阅读：[深入理解 Java 枚举](https://dunwu.github.io/waterdrop/pages/2f0a1ca4/)
 
@@ -89,58 +89,58 @@ Java 支持的变量类型有：
 
 Java 中支持的操作符类型如下：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java操作符.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java操作符.svg)
 
 > 👉 扩展阅读：[Java 操作符](http://www.runoob.com/java/java-operators.html)
 
 ## 方法
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20220125072221.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220125072221.png)
 
 > 👉 扩展阅读：[深入理解 Java 方法](https://dunwu.github.io/waterdrop/pages/e70c4bf9/)
 
 ## 控制语句
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java控制语句.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java控制语句.svg)
 
 > 👉 扩展阅读：[Java 控制语句](https://dunwu.github.io/waterdrop/pages/36fd1ce8/)
 
 ## 异常
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java异常框架.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java异常框架.svg)
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java异常.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java异常.svg)
 
 > 👉 扩展阅读：[深入理解 Java 异常](https://dunwu.github.io/waterdrop/pages/07ac0613/)
 
 ## 泛型
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java泛型.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java泛型.svg)
 
 > 👉 扩展阅读：[深入理解 Java 泛型](https://dunwu.github.io/waterdrop/pages/ddc68bb5/)
 
 ## 反射
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java反射.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java反射.svg)
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java代理.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java代理.svg)
 
 > 👉 扩展阅读：[深入理解 Java 反射和动态代理](https://dunwu.github.io/waterdrop/pages/6ef470ed/)
 
 ## 注解
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/注解简介.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/注解简介.svg)
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/元注解.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/元注解.svg)
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/内置注解.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/内置注解.svg)
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/自定义注解.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/自定义注解.svg)
 
 > 👉 扩展阅读：[深入理解 Java 注解](https://dunwu.github.io/waterdrop/pages/56a4a49d/)
 
 ## 序列化
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java序列化.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/Java序列化.svg)
 
 > 👉 扩展阅读：[Java 序列化](https://dunwu.github.io/waterdrop/pages/ce9efc62/)

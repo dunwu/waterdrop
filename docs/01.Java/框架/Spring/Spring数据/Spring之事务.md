@@ -1111,7 +1111,7 @@ ErrorCode 定义（sql-error-codes.xml 文件）
 
 ## Spring 事务最佳实践
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200805171418.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200805171418.png)
 
 ### Spring 事务未生效
 

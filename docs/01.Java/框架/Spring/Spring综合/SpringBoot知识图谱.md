@@ -36,8 +36,6 @@ permalink: /pages/1116337f/
 
 原材料已经准备好（把 BeanDefinition 看着原料），开始做菜吧，等等，你还需要一份菜谱，`BeanDefinitionRegistry`和`BeanFactory`就是这份菜谱，BeanDefinitionRegistry 抽象出 bean 的注册逻辑，而 BeanFactory 则抽象出了 bean 的管理逻辑，而各个 BeanFactory 的实现类就具体承担了 bean 的注册以及管理工作。它们之间的关系就如下图：
 
-![img](https://user-gold-cdn.xitu.io/2018/9/9/165bd49d06649b0b?imageView2/0/w/1280/h/960/format/webp/ignore-error/1) _BeanFactory、BeanDefinitionRegistry 关系图（来自：Spring 揭秘）_
-
 `DefaultListableBeanFactory`作为一个比较通用的 BeanFactory 实现，它同时也实现了 BeanDefinitionRegistry 接口，因此它就承担了 Bean 的注册管理工作。从图中也可以看出，BeanFactory 接口中主要包含 getBean、containBean、getType、getAliases 等管理 bean 的方法，而 BeanDefinitionRegistry 接口则包含 registerBeanDefinition、removeBeanDefinition、getBeanDefinition 等注册管理 BeanDefinition 的方法。
 
 下面通过一段简单的代码来模拟 BeanFactory 底层是如何工作的：

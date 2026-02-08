@@ -22,13 +22,13 @@ shardingsphere-jdbc 定位为轻量级 Java 框架，在 Java 的 JDBC 层提供
 - 支持任何第三方的数据库连接池，如：DBCP, C3P0, BoneCP, Druid, HikariCP 等。
 - 支持任意实现 JDBC 规范的数据库，目前支持 MySQL，Oracle，SQLServer，PostgreSQL 以及任何遵循 SQL92 标准的数据库。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151213.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151213.png)
 
 ### ShardingSphere 组件
 
 ShardingSphere 是一套开源的分布式数据库中间件解决方案组成的生态圈，它由 Sharding-JDBC、Sharding-Proxy 和 Sharding-Sidecar（计划中）这 3 款相互独立的产品组成。 他们均提供标准化的数据分片、分布式事务和数据库治理功能，可适用于如 Java 同构、异构语言、云原生等各种多样化的应用场景。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151613.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151613.png)
 
 #### ShardingSphere-JDBC
 
@@ -38,7 +38,7 @@ ShardingSphere 是一套开源的分布式数据库中间件解决方案组成�
 - 支持任何第三方的数据库连接池，如：DBCP, C3P0, BoneCP, Druid, HikariCP 等。
 - 支持任意实现 JDBC 规范的数据库，目前支持 MySQL，Oracle，SQLServer，PostgreSQL 以及任何遵循 SQL92 标准的数据库。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151213.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151213.png)
 
 #### Sharding-Proxy
 
@@ -47,7 +47,7 @@ ShardingSphere 是一套开源的分布式数据库中间件解决方案组成�
 - 向应用程序完全透明，可直接当做 MySQL/PostgreSQL 使用。
 - 适用于任何兼容 MySQL/PostgreSQL 协议的的客户端。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151434.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151434.png)
 
 #### Sharding-Sidecar（TODO）
 
@@ -55,7 +55,7 @@ ShardingSphere 是一套开源的分布式数据库中间件解决方案组成�
 
 Database Mesh 的关注重点在于如何将分布式的数据访问应用与数据库有机串联起来，它更加关注的是交互，是将杂乱无章的应用与数据库之间的交互进行有效地梳理。 使用 Database Mesh，访问数据库的应用和数据库终将形成一个巨大的网格体系，应用和数据库只需在网格体系中对号入座即可，它们都是被啮合层所治理的对象。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151557.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151557.png)
 
 | _Sharding-JDBC_ | _Sharding-Proxy_ | _Sharding-Sidecar_ |        |
 | :-------------- | :--------------- | :----------------- | ------ |
@@ -72,7 +72,7 @@ ShardingSphere-JDBC 采用无中心化架构，适用于 Java 开发的高性能
 
 Apache ShardingSphere 是多接入端共同组成的生态圈。 通过混合使用 ShardingSphere-JDBC 和 ShardingSphere-Proxy，并采用同一注册中心统一配置分片策略，能够灵活的搭建适用于各种场景的应用系统，使得架构师更加自由地调整适合与当前业务的最佳系统架构。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151658.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008151658.png)
 
 ### 功能列表
 
@@ -160,7 +160,7 @@ DataSource dataSource = ShardingSphereDataSourceFactory.createDataSource(dataSou
 
 ShardingSphere 的 3 个产品的数据分片主要流程是完全一致的。 核心由 `SQL 解析 => 执行器优化 => SQL 路由 => SQL 改写 => SQL 执行 => 结果归并`的流程组成。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008153551.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201008153551.png)
 
 - QL 解析：分为词法解析和语法解析。 先通过词法解析器将 SQL 拆分为一个个不可再分的单词。再使用语法解析器对 SQL 进行理解，并最终提炼出解析上下文。 解析上下文包括表、选择项、排序项、分组项、聚合函数、分页信息、查询条件以及可能需要修改的占位符的标记。
 - 执行器优化：合并和优化分片条件，如 OR 等。

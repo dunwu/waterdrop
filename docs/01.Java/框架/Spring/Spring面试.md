@@ -49,7 +49,7 @@ Spring Boot 是基于 Spring 框架，支持各种自动化默认配置，节省
 
 ### 【中等】Spring 有哪些模块？⭐
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/spring-framework.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/spring-framework.png)
 
 Spring 的核心模块主要包括以下部分：
 
@@ -260,7 +260,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 
 解决步骤：
 
-![](https://img2024.cnblogs.com/blog/786311/202506/786311-20250620213520068-1302403901.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081811988.png)
 
 1. **实例化 & 暴露工厂**：实例化 Bean A 后，立即将其工厂放入**三级缓存**，**提前暴露引用**。
 2. **填充属性时循环引用**：为 A 注入 B 时，触发创建 B。B 在注入 A 时，能从**三级缓存**的工厂中获取到 A 的早期引用。
@@ -297,7 +297,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 - **切点（Pointcut）**：**“在哪做”**。通过表达式匹配需要切入的具体方法。
 - **连接点（JoinPoint）**：**“可以做的点”**。程序执行中的节点（如方法调用），是切点的具体实例。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/core/spring-aop.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/core/spring-aop.png)
 
 ### 【中等】Spring AOP 有哪些实现方式？⭐⭐⭐
 
@@ -428,7 +428,7 @@ public class EmpAccount {
 
 ### 【中等】Spring DAO 有哪些异常？
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/data-access/spring-data-access-exception.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/data-access/spring-data-access-exception.png)
 
 ### 【中等】什么是 Spring 的事务管理？
 
@@ -460,7 +460,7 @@ Spring 事务定义的属性有：
 
 **Spring MVC 的核心是 `DispatcherServlet`，它充当了前端控制器（Front Controller）的模式，是所有请求的统一入口，负责协调各个组件完成请求处理**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/web/spring-dispatcher-servlet.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/web/spring-dispatcher-servlet.png)
 
 **请求流程**
 

@@ -553,7 +553,6 @@
 ##### [RocketMQ](docs/15.分布式/分布式通信/MQ/RocketMQ)
 
 - [RocketMQ 快速入门](docs/15.分布式/分布式通信/MQ/RocketMQ/RocketMQ_快速入门.md)
-- [RocketMQ 基本原理](docs/15.分布式/分布式通信/MQ/RocketMQ/RocketMQ_原理.md)
 - [RocketMQ 面试](docs/15.分布式/分布式通信/MQ/RocketMQ/RocketMQ_面试.md) 💯
 
 ### [分布式存储](docs/15.分布式/分布式存储)

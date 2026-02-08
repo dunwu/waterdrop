@@ -112,7 +112,7 @@ MOVED <slot> <ip>:<port>
 
 重新分区的实现原理如下图所示：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-cluster-trib.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-cluster-trib.png)
 
 ### ASK 错误
 
@@ -125,7 +125,7 @@ MOVED <slot> <ip>:<port>
 
 判断 ASK 错误的过程如下图所示：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-ask.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-ask.png)
 
 ## Redis Cluster 复制
 

@@ -62,7 +62,7 @@ JUnit 5 在运行时需要 Java 8（或更高版本）。
 
 组件间依赖关系：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javalib/test/junit/junit5-components.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javalib/test/junit/junit5-components.png)
 
 ## JUnit5 注解
 

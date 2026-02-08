@@ -94,14 +94,13 @@ Apache RocketMQ 消息默认存储在本地磁盘文件中，存储文件的根�
 :::
 
 1.  **写入流程**：
-
     - 消息**顺序写入** Commit Log 后即返回成功。
     - 索引的构建（写入 Consume Queue）是**异步完成**的，不影响主写入性能。
     - 无论 Commit Log 还是 Commit Queue，文件都是按固定大小分段管理的（如每个文件 1G 大小）。
 
 2.  **读取/消费流程**：
-    - 消费者根据消费偏移量，先从** Consume Queue **找到索引。
-    - 再根据索引中的物理地址，到** Commit Log **中读取实际消息内容。
+    - 消费者根据消费偏移量，先从 **Consume Queue** 找到索引。
+    - 再根据索引中的物理地址，到 **Commit Log** 中读取实际消息内容。
 
 ### 【中等】RocketMQ 如何持久化？⭐⭐
 
@@ -132,8 +131,8 @@ RocketMQ 持久化有以下核心机制：
 **性能优势**
 
 - **极高写入性能**：将磁盘随机 I/O 转换为顺序内存写入，避免频繁系统调用。
-- **极高读取性能**：将磁盘随机 I/O 转换为内存访问，利用 Page Cache 实现**“零拷贝”** 读取。
-- **高效GC**：主动调用 `force()` 刷盘，避免传统 `DirectByteBuffer` 的 Full GC 问题。
+- **极高读取性能**：将磁盘随机 I/O 转换为内存访问，利用 Page Cache 实现“**零拷贝**” 读取。
+- **高效 GC**：主动调用 `force()` 刷盘，避免传统 `DirectByteBuffer` 的 Full GC 问题。
 
 **潜在问题**
 
@@ -143,7 +142,7 @@ RocketMQ 持久化有以下核心机制：
 
 ## RocketMQ 生产消费
 
-### 【中等】RocketMQ 发送消息的工作流程是怎样的？⭐⭐
+### 【中等】RocketMQ 如何发送消息？⭐⭐
 
 ::: important 要点
 
@@ -243,7 +242,7 @@ producer.send(message, new SendCallback() {
 producer.sendOneway(message);
 ```
 
-### 【中等】RocketMQ 消费消息的工作流程是怎样的？⭐⭐
+### 【中等】RocketMQ 如何消费消息 ？⭐⭐
 
 ::: info RocketMQ 消费消息流程
 
@@ -255,7 +254,7 @@ producer.sendOneway(message);
 2.  **拉取与处理**
     - 每个消费者**只从分配给自己的 Message Queue 中拉取消息**。
     - 拉取到的消息提交到消费线程池，由业务监听器 (`MessageListener`) 处理。
-3.  **确认与记录（ACK & Offset）**：
+3.  **确认与记录（ACK & Offset）**
     - **成功 ACK**：向 Broker 返回 **ACK**。Consumer 会**定期**将 Offset 持久化到 Broker，确保重启后能从断点继续消费。
     - **失败重试**：处理失败的消息会进入**自动重试**流程，超过最大重试次数（默认 16 次）后，放入死信队列。
 
@@ -269,7 +268,7 @@ producer.sendOneway(message);
   - **广播模式**：组内共享，一条消息**被所有消费者**消费（用于全员通知）。
 - **结果保证**：默认提供 **`at least once`** 语义，消息可能不丢但可能重复，要求业务逻辑实现**幂等性**。
 
-### 【简单】RocketMQ 支持哪几种消费方式？⭐
+### 【简单】RocketMQ 有几种消费消息方式？⭐
 
 ::: important 要点
 
@@ -303,6 +302,15 @@ MessageBatch messageBatch = MessageBatch.generateFromList(messages);
 
 ## RocketMQ 集群
 
+### 【简单】RocketMQ 集群有几种部署方式？
+
+| 部署方式                           | 特点                         |
+| :--------------------------------- | :--------------------------- |
+| **单 Master 部署**                 | 简单                         |
+| **多 Master 部署**                 | 性能最高，可能有消息丢失     |
+| **多 Master 多 Slave（异步复制）** | 主从异步复制，可能有消息丢失 |
+| **多 Master 多 Slave（同步复制）** | 主从同步复制，可靠性最高     |
+
 ### 【中等】RocketMQ 如何实现主从复制？⭐⭐
 
 **RocketMQ 采用主从架构，基于主从复制实现高可用**。
@@ -320,42 +328,124 @@ RocketMQ 以 **Commit Log** 为复制单位，而非主题或队列。
 
 **数据流向**：
 
-- Producer → Master Commit Log → (复制) → Slave Commit Log。
+- Producer → Master Commit Log → （复制） → Slave Commit Log。
 - Consume Queue（消费索引）在 Master 和 Slave 上**各自独立生成**。
 
 **RocketMQ 复制模式**
 
-| 模式         | 配置参数                    | 工作原理                                                | 优点               | 缺点                                        |
-| :----------- | :-------------------------- | :------------------------------------------------------ | :----------------- | :------------------------------------------ |
-| **异步复制** | `brokerRole = ASYNC_MASTER` | Master 写入内存后立即返回成功，**异步**同步数据到 Slave | **性能高**，延迟低 | **可能丢消息**（Master 宕机且数据未同步时） |
-| **同步双写** | `brokerRole = SYNC_MASTER`  | Master 写入内存后，**等待 Slave 写入成功**后才返回      | **数据可靠性高**   | **性能较低**，延迟增加                      |
+| 模式     | 配置参数                    | 工作原理                                                | 优点               | 缺点                                        |
+| :------- | :-------------------------- | :------------------------------------------------------ | :----------------- | :------------------------------------------ |
+| **异步** | `brokerRole = ASYNC_MASTER` | Master 写入内存后立即返回成功，**异步**同步数据到 Slave | **性能高**，延迟低 | **可能丢消息**（Master 宕机且数据未同步时） |
+| **同步** | `brokerRole = SYNC_MASTER`  | Master 写入内存后，**等待 Slave 写入成功**后才返回      | **数据可靠性高**   | **性能较低**，延迟增加                      |
 
-### 【中等】RocketMQ 如何实现故障转移？⭐⭐
+### 【中等】RocketMQ 如何实现高可用？⭐⭐⭐
 
-当 Master 节点宕机（如进程崩溃、服务器断电），RocketMQ 通过 **“路由剔除 + Slave 补位”** 实现故障转移，分两种场景：
+RocketMQ 高可用可以分为三个维度：
 
-- **自动切换（需开启 DLeger 或 Broker 高可用模式）**
-- **手动 / 半自动切换（传统主从模式）**
+- 路由层：NameServer 多活
+- 存储层：Broker 主从复制 + 自动切换
+- 客户端层：自动重试 + 故障规避
 
-::: info 自动切换（需开启 DLeger 或 Broker 高可用模式）
-
-:::
-
-（推荐，支持自动选主）
-
-- 将多个 Broker 节点（如 3 个）组成 DLeger 集群，节点间通过 Raft 协议选举 Leader（相当于原 Master），其余为 Follower（相当于原 Slave）。
-- 当 Leader 宕机，Follower 节点会基于 Raft 协议 **自动选举新 Leader**（通常 10s 内完成），新 Leader 接管写服务，客户端通过 NameServer 获取最新路由（指向新 Leader），实现无感知切换。
-- 优势：无需人工干预，故障转移自动化，数据一致性由 Raft 协议保障（仅丢失 Leader 未同步到 Follower 的数据，可通过同步复制优化）。
-
-::: info 手动 / 半自动切换（传统主从模式）
+::: info 高可用流程
 
 :::
 
-若未开启 DLeger，Master 宕机后需人工干预，流程如下：
+- **启动 NameServer**：NameServer 起来后监听端口，等待 Broker、Producer、Consumer 连上来，相当于一个路由控制中心。
 
-- **NameServer 剔除故障 Master**：Broker 会向 NameServer 发送心跳（默认 30s 一次），若 NameServer 超过 120s 未收到 Master 心跳，会将其从路由表中剔除，标记为 “不可用”。
-- **Slave 升级为 Master**：人工修改 Slave 配置（将 `brokerId` 从 1 改为 0，0 表示 Master），重启 Slave 节点，新 Master 向 NameServer 注册路由。
-- **客户端路由更新**：Producer/Consumer 定时（默认 30s）从 NameServer 拉取最新路由，自动将消息发送 / 消费切换到新 Master，完成故障转移。
+- **启动 Broker**：跟所有的 NameServer 保持长连接，定时发送心跳包。心跳包中包含当前 Broker 信息 (IP+端口等）以及存储所有 Topic 信息。注册成功后，NameServer 集群中就有 Topic 跟 Broker 的映射关系。
+
+- **创建 Topic**：创建 Topic 时需要指定该 Topic 要存储在哪些 Broker 上，也可以在发送消息时自动创建 Topic。
+
+- **Producer 发送消息**：启动时先跟 NameServer 集群中的其中一台建立长连接，并从 NameServer 中获取当前发送的 Topic 存在哪些
+  Broker 上，轮询从队列列表中选择一个队列，然后与队列所在的 Broker 建立长连接从而向 Broker 发消息。
+
+- **Consumer 消费消息**：跟其中一台 NameServer 建立长连接，获取当前订阅 Topic 存在哪些 Broker 上，然后直接跟 Broker 建立连接通道，开始消费消息
+
+:::info NameServer 高可用
+
+:::
+
+**多活架构**
+
+- 部署方式：至少 2 个，推荐 3-4 个 NameServer
+
+- 工作模式：每个实例独立，存储全量路由信息
+
+- 客户端连接：随机选择或配置多个地址
+
+- 故障影响：单个宕机无影响（客户端自动切换）
+
+**心跳检测**
+
+- Broker **每 30 秒**向所有 NameServer 发送心跳
+
+- NameServer **120 秒**无心跳则标记 Broker 不可用，调整 Topic 跟 Broker 的对应关系
+
+- 客户端 **每 30 秒**从 NameServer 拉取最新路由
+
+:::info Broker 高可用
+
+:::
+
+**复制模式**
+
+| 复制模式     | 原理                                | 高可用表现             | 适用场景       |
+| :----------- | :---------------------------------- | :--------------------- | :------------- |
+| **异步复制** | Master 写入即返回，后台同步到 Slave | 切换快，可能丢少量数据 | 大多数业务场景 |
+| **同步双写** | Master 等 Slave 确认后才返回        | 数据零丢失，切换稍慢   | 金融、交易场景 |
+
+:::info 客户端高可用
+
+:::
+
+::: tabs#单例模式
+
+@tab 生产者容错
+
+失败重试 + 故障规避
+
+```java
+DefaultMQProducer producer = new DefaultMQProducer("Group");
+// 关键配置
+producer.setNamesrvAddr("ns1:9876;ns2:9876");  // 多 NameServer
+producer.setRetryTimesWhenSendFailed(3);       // 发送失败重试
+producer.setSendLatencyFaultEnable(true);      // 故障延迟规避
+producer.setSendMsgTimeout(5000);              // 发送超时
+
+// 发送时自动故障转移
+SendResult result = producer.send(msg);
+// 内部：尝试其他 Broker → 重试 → 最终失败才抛出异常
+```
+
+@tab 消费者容错
+
+消费重试 16 次（默认），全部失败，则消息进入死信队列。
+
+```java
+DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("Group");
+consumer.setNamesrvAddr("ns1:9876;ns2:9876");
+
+// 消费失败处理
+consumer.registerMessageListener(new MessageListenerConcurrently() {
+    @Override
+    public ConsumeConcurrentlyStatus consumeMessage(
+        List<MessageExt> msgs,
+        ConsumeConcurrentlyContext context) {
+        try {
+            // 业务处理
+            return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+        } catch (Exception e) {
+            // 失败消息进入重试队列
+            return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+        }
+    }
+});
+
+// 广播模式容错（每个客户端独立消费）
+// 集群模式容错（组内消费者自动平衡）
+```
+
+:::
 
 ### 【中等】RocketMQ 如何实现负载均衡？⭐⭐⭐
 
@@ -374,29 +464,32 @@ RocketMQ 的消费负载均衡机制保障了系统的可扩展性和高可用�
 
 ### 【中等】RocketMQ 的 NameServer 有什么作用？⭐⭐
 
-RocketMQ 的 NameServer 是轻量级服务注册与发现组件。
-
-NameServer 提供路由信息，保存所有 Broker 的地址与路由信息，供客户端（Producer、Consumer）通信查询。
+NameServer 是 RocketMQ 的路由注册中心，**负责管理所有 Broker 的路由信息，为生产者和消费者提供服务发现功能**。
 
 **主要功能**：
 
-- 维护 Broker 集群元数据（地址、状态等）。
-- 支持服务注册与发现（Broker 注册自身信息，客户端通过它获取路由信息以完成消息收发）。
+- **集群部署，互不通讯**：每个 NameServer 实例独立，不互相交换数据
+- **全量路由信息**：每个 NameServer 都保存**完整的集群路由信息**
+- **无主设计**：所有实例平等，无单点故障
 
-**服务发现流程**：
-
-- Broker 启动时持续向所有 NameServer 注册自身信息。
-- Producer、Consumer 初始化时从 NameServer 集群获取最新路由信息，且定期刷新。
-- Broker 状态变化（上线 / 下线等）时，会及时通知所有 NameServer，NameServer 同步更新内部路由信息。
-
-::: info NameServer 设计
+::: info NameServer 服务发现
 
 :::
 
-- **分布式一致性**：NameServer 间无直接通信，依赖客户端定期刷新路由信息，通过多节点提升可用性与容错性。
-- **高可用性**：部署多个 NameServer，Broker、Producer、Consumer 初始化时配置所有节点地址，保障单节点故障时系统正常运行。
-- **动态扩展**：新 Broker 注册到 NameServer，客户端定期更新路由信息即可感知，实现系统动态扩展。
-- **架构优势**：相比 Kafka 的 Zookeeper，NameServer 更轻量专一，且无状态，可随时增减，无需处理状态同步问题。
+- Broker 启动，每 30 秒向所有 NameServer 注册路由信息
+
+- Broker 向所有 NameServer 发送心跳，心跳包含：Broker 信息 + 负责的所有 Topic 列表
+
+- NameServer 更新 Broker 最后心跳时间
+
+::: info NameServer 多活架构
+
+:::
+
+NameServer 通过多活架构，来保证可用性：
+
+- NameServer 若宕机，Broker 继续向其他 NameServer 发送心跳
+- Producer/Consumer 连接其他 NameServer 获取路由
 
 ### 【中等】为什么 RocketMQ 不用 ZooKeeper，而是自己开发 NameServer？⭐⭐
 
@@ -467,11 +560,11 @@ RocketMQ 的消息保障机制（重试、重投）必然会导致消息可能�
 
 保证 RocketMQ 消息不重复的主要方法：
 
-| 方法             | 核心思想                                                                       | 实现方式举例                                                                                                                                                                          | 优点                                       | 适用场景                                           |
-| :--------------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------- | :------------------------------------------------- |
-| **消费端幂等性** | **核心方法**<br>处理逻辑本身具备幂等性，即同一消息处理多次的结果与处理一次相同 | 数据库唯一约束插入（如订单ID）<br>乐观锁更新状态（如`update table set status = 'paid' where id = 1 and status = 'unpaid'`）<br>读写操作天然幂等（如`select`、`update set value = 1`） | **最优雅、高效**<br>不依赖存储，性能损耗小 | **首选方案**，适用于绝大多数业务，如交易、状态更新 |
-| **消息状态记录** | **兜底方案**<br>消费前检查全局状态，判断消息是否已被处理过                     | 创建**去重表**，以消息唯一键（如`MessageId`）作为主键，消费前尝试插入，插入成功才处理<br>使用Redis等缓存，以消息ID为Key记录消费状态                                                   | **简单、直接**，可靠性高                   | 幂等性难以实现的复杂业务；与DB操作强关的场景       |
-| **优化重试机制** | **辅助手段**<br>减少不必要的重复消费触发源头                                   | 设置合理的**最大重试次数**（非无限重试）<br>避免消费者进程频繁异常重启，以减少消息被退回Broker重试的次数                                                                              | 从源头降低重复概率                         | 作为前两种方法的辅助优化                           |
+| 方法             | 核心思想                                                                       | 实现方式举例                                                                                                                                                                           | 优点                                       | 适用场景                                           |
+| :--------------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- | :------------------------------------------------- |
+| **消费端幂等性** | **核心方法**<br>处理逻辑本身具备幂等性，即同一消息处理多次的结果与处理一次相同 | 数据库唯一约束插入（如订单 ID）<br>乐观锁更新状态（如`update table set status = 'paid' where id = 1 and status = 'unpaid'`）<br>读写操作天然幂等（如`select`、`update set value = 1`） | **最优雅、高效**<br>不依赖存储，性能损耗小 | **首选方案**，适用于绝大多数业务，如交易、状态更新 |
+| **消息状态记录** | **兜底方案**<br>消费前检查全局状态，判断消息是否已被处理过                     | 创建**去重表**，以消息唯一键（如`MessageId`）作为主键，消费前尝试插入，插入成功才处理<br>使用 Redis 等缓存，以消息 ID 为 Key 记录消费状态                                              | **简单、直接**，可靠性高                   | 幂等性难以实现的复杂业务；与 DB 操作强关的场景     |
+| **优化重试机制** | **辅助手段**<br>减少不必要的重复消费触发源头                                   | 设置合理的**最大重试次数**（非无限重试）<br>避免消费者进程频繁异常重启，以减少消息被退回 Broker 重试的次数                                                                             | 从源头降低重复概率                         | 作为前两种方法的辅助优化                           |
 
 ### 【困难】如何保证 RocketMQ 消息有序？⭐⭐⭐
 
@@ -501,7 +594,7 @@ RocketMQ 可以保证消息在同一队列中有序，但无法保证全局所�
   - 消费逻辑需**幂等**，避免因异常重试阻塞后续消息。
 - **性能与设计**：
   - 不同业务使用不同 Topic 隔离。
-  - 警惕“热点”订单，可通过更细粒度的标识（如订单ID+明细ID）打散消息。
+  - 警惕“热点”订单，可通过更细粒度的标识（如订单 ID+明细 ID）打散消息。
 
 ### 【困难】如何处理 RocketMQ 消息积压？⭐⭐
 
@@ -778,7 +871,7 @@ producer.send(msg);
 DefaultMQProducer producer = new DefaultMQProducer("group_name");
 // 关键配置：启用轨迹
 producer.setUseTracing(true);
-// producer.setTraceTopic("Your_Trace_Topic"); // 可选：自定义轨迹Topic
+// producer.setTraceTopic("Your_Trace_Topic"); // 可选：自定义轨迹 Topic
 ```
 
 **消费者端**
@@ -809,18 +902,16 @@ consumer.setUseTracing(true);
 **RocketMQ 不提供内置幂等性**，需由业务系统自行实现。
 
 - **幂等键设计**：
-
   - 使用**业务唯一标识**（如 `orderId`），而非 `messageId`
-  - 推荐格式：`业务类型:业务ID`（如 `order_pay:123`）
+  - 推荐格式：`业务类型：业务 ID`（如 `order_pay:123`）
 
 - **处理流程**：
-
   - 先检查幂等键 → 再执行业务逻辑
   - 业务操作与幂等记录写入必须在同一事务中
 
 - **选型建议**：
   - **核心业务**：首选数据库唯一键方案
-  - **高并发场景**：可选用Redis方案
+  - **高并发场景**：可选用 Redis 方案
   - **状态业务**：状态机方案作为补充保障
 
 ### 【困难】事务消息是如何工作的？⭐⭐⭐
@@ -853,7 +944,7 @@ MQ 事务方案本质是利用 MQ 功能实现的本地消息表。事务消息�
 :::
 
 - **本地消息表**：**业务与消息耦合**，通过**数据库+自研任务**保证可靠性。
-- **RocketMQ 事务消息**：**业务与消息解耦**，通过**MQ 框架机制**保证可靠性。
+- **RocketMQ 事务消息**：**业务与消息解耦**，通过** MQ 框架机制**保证可靠性。
 
 **本地消息表 vs. 事务消息**
 

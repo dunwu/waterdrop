@@ -96,7 +96,7 @@ BeanFactory beanFactory = new FileSystemXmlApplicationContext("fileSystemConfig.
 
 下图显示了 Spring IoC 容器的工作步骤
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200723102456.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200723102456.png)
 
 使用 IoC 容器可分为三步骤：
 

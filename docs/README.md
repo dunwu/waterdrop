@@ -594,7 +594,6 @@ footer: CC-BY-SA-4.0 Licensed | Copyright © 2015-Now 钝悟
 ##### [RocketMQ](15.分布式/分布式通信/MQ/RocketMQ)
 
 - [RocketMQ 快速入门](15.分布式/分布式通信/MQ/RocketMQ/RocketMQ_快速入门.md)
-- [RocketMQ 基本原理](15.分布式/分布式通信/MQ/RocketMQ/RocketMQ_原理.md)
 - [RocketMQ 面试](15.分布式/分布式通信/MQ/RocketMQ/RocketMQ_面试.md) 💯
 
 ### [分布式存储](15.分布式/分布式存储)

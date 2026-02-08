@@ -47,7 +47,6 @@ dir:
 #### [RocketMQ](MQ/RocketMQ)
 
 - [RocketMQ 快速入门](MQ/RocketMQ/RocketMQ_快速入门.md)
-- [RocketMQ 基本原理](MQ/RocketMQ/RocketMQ_原理.md)
 - [RocketMQ 面试](MQ/RocketMQ/RocketMQ_面试.md) 💯
 
 ## 🚪 传送

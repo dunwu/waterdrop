@@ -83,7 +83,7 @@ Servlet 执行以下主要任务：
 
 ### Servlet 生命周期
 
-![img](http://www.runoob.com/wp-content/uploads/2014/07/Servlet-LifeCycle.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/07/Servlet-LifeCycle.jpg)
 
 Servlet 生命周期如下：
 

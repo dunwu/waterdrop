@@ -40,7 +40,7 @@ Hive 可以将结构化的数据文件映射成表，并提供类 SQL 查询功�
 
 Hive Metastore （HMS） 是关系数据库中 Hive 表和分区元数据的中央存储库，它使用元存储服务 API 为客户端（包括 Hive、Impala 和 Spark）提供对此信息的访问。它已成为利用各种开源软件（如 Apache Spark 和 Presto）的数据湖的构建块。事实上，整个工具生态系统，无论是开源的还是其他的，都是围绕 Hive Metastore 构建的，下图说明了其中一些。
 
-[![Apache Software Foundation](https://hive.apache.org/images/HMS.jpg)](https://cwiki.apache.org/confluence/display/hive/design)
+![Apache Software Foundation](https://raw.githubusercontent.com/dunwu/images/master/202602081634212.jpg)
 
 :::
 
@@ -188,7 +188,7 @@ LOAD DATA LOCAL INPATH "/usr/file/emp30.txt" OVERWRITE INTO TABLE emp_partition 
 
 当调用 HashMap 的 put() 方法存储数据时，程序会先对 key 值调用 hashCode() 方法计算出 hashcode，然后对数组长度取模计算出 index，最后将数据存储在数组 index 位置的链表上，链表达到一定阈值后会转换为红黑树 (JDK1.8+)。下图为 HashMap 的数据结构图：
 
-[![img](https://camo.githubusercontent.com/fcfe76ad0ab86ee4cc640c6ac0d180775eddc18caaa381c1235d746fbb956169/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f486173684d61702d486173685461626c652e706e67)](https://camo.githubusercontent.com/fcfe76ad0ab86ee4cc640c6ac0d180775eddc18caaa381c1235d746fbb956169/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f486173684d61702d486173685461626c652e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081633220.png)
 
 > 图片引用自：[HashMap vs. Hashtable](http://www.itcuties.com/java/hashmap-hashtable/)
 
@@ -229,13 +229,13 @@ INSERT INTO TABLE emp_bucket SELECT *  FROM emp;  --这里的 emp 表就是一�
 
 可以从执行日志看到 CTAS 触发 MapReduce 操作，且 Reducer 数量和建表时候指定 bucket 数量一致：
 
-[![img](https://camo.githubusercontent.com/668d80c787133f868e172856b92983364719ea86f645b019d0b7cb19f8c0b838/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f686976652d6861646f6f702d6d6170726564756365722e706e67)](https://camo.githubusercontent.com/668d80c787133f868e172856b92983364719ea86f645b019d0b7cb19f8c0b838/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f686976652d6861646f6f702d6d6170726564756365722e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081632838.png)
 
 查看分桶文件
 
 bucket（桶） 本质上就是表目录下的具体文件：
 
-[![img](https://camo.githubusercontent.com/9500f855c80ae87e1294a71f4dd3c4d31602fb5a87009682474e31c293432a43/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f686976652d6861646f6f702d6275636b65742e706e67)](https://camo.githubusercontent.com/9500f855c80ae87e1294a71f4dd3c4d31602fb5a87009682474e31c293432a43/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f686976652d6861646f6f702d6275636b65742e706e67)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081632602.png)
 
 :::
 
@@ -372,4 +372,4 @@ Hive 在执行一条 HQL 的时候，会经过以下步骤：
 
 ## 参考资料
 
-- [Hive 简介及核心概念](https://github.com/heibaiying/BigData-Notes/blob/master/notes/Hive 简介及核心概念。md)
+- [Hive 简介及核心概念](https://github.com/heibaiying/BigData-Notes/blob/master/notes/Hive%E7%AE%80%E4%BB%8B%E5%8F%8A%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5.md)

@@ -45,7 +45,7 @@ push 模式的优缺点：
 
 **一条消息只有被提交，才会被消费者获取到**。如下图，只能消费 Message0、Message1、Message2：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113917.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113917.png)
 
 ### 消费者群组
 
@@ -437,11 +437,11 @@ try {
 
 （1）**如果提交的偏移量小于客户端处理的最后一个消息的偏移量，那么处于两个偏移量之间的消息就会被重复处理**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210412200354.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210412200354.png)
 
 （2）**如果提交的偏移量大于客户端处理的最后一个消息的偏移量，那么处于两个偏移量之间的消息将会丢失**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210412200405.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210412200405.png)
 
 由此可知，处理偏移量，会对客户端处理数据产生影响。
 

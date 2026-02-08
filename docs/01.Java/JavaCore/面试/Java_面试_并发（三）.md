@@ -1234,8 +1234,6 @@ singleExecutor.shutdown();
 
 生产者消费者模式是一个经典的并发设计模式。在这个模型中，有一个共享缓冲区；有两个线程，一个负责向缓冲区推数据，另一个负责向缓冲区拉数据。要让两个线程更好的配合，就需要一个阻塞队列作为媒介来进行调度，由此便诞生了生产者消费者模式。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Java%20%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%2078%20%e8%ae%b2-%e5%ae%8c/assets/CgotOV3OJ3iAGcaiAAFrcv5xk9U160.png)
-
 （2）Java 中如何实现生产者消费者模式
 
 在 Java 中，实现生产者消费者模式有 3 种具有代表性的方式：

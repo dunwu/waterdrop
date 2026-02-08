@@ -38,7 +38,7 @@ permalink: /pages/73ef7196/
 
 Nginx 是一个高性能、开源的 **Web 服务器**软件。但它更核心的现代角色是作为**反向代理服务器**和**负载均衡器**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/web/nginx/nginx.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/web/nginx/nginx.jpg)
 
 **核心特点**：采用**事件驱动**的异步架构，能以极少的资源处理海量并发连接，以**高性能、高稳定性和低内存占用**著称。
 
@@ -54,7 +54,7 @@ Nginx 是一个高性能、开源的 **Web 服务器**软件。但它更核心�
 
 反向代理（Reverse Proxy）方式是指以代理服务器来接受 internet 上的连接请求，然后将请求转发给内部网络上的服务器，并将从服务器上得到的结果返回给 internet 上请求连接的客户端，此时代理服务器对外就表现为一个反向代理服务器。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/web/nginx/reverse-proxy.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/web/nginx/reverse-proxy.png)
 
 ## 【中等】如何用 Nginx 做限流，有几种限流算法，分别如何实现？
 

@@ -111,7 +111,7 @@ MySQL 索引可以从以下四个维度来分类：
 
 **“哈希表”使用哈希函数组织数据，以支持快速插入和搜索的数据结构**。哈希表的本质是一个数组，其思路是：使用哈希函数将 Key 转换为数组下标，利用数组的随机访问特性，使得我们能在 `O(1)` 的时间代价内完成检索。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20220320201844.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220320201844.png)
 
 有两种不同类型的哈希表：**哈希集合** 和 **哈希映射**。
 
@@ -167,7 +167,7 @@ B+ 树索引适用于**全键值查找**、**键值范围查找**和**键前缀�
 - 第一，所有的关键字（可以理解为数据）都存储在叶子节点，非叶子节点并不存储真正的数据，所有记录节点都是按键值大小顺序存放在同一层叶子节点上。
 - 其次，所有的叶子节点由指针连接。如下图为简化了的 B+Tree。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200304235424.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200304235424.jpg)
 
 #### 聚簇索引和非聚簇索引
 

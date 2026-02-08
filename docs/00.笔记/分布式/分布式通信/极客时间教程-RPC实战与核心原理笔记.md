@@ -222,7 +222,7 @@ RPC 框架必须要有服务注册和发现机制，这样，集群中的节点�
 
 搭建一个 ZooKeeper 集群作为注册中心集群，服务注册的时候只需要服务节点向 ZooKeeper 节点写入注册信息即可，利用 ZooKeeper 的 Watcher 机制完成服务订阅与服务下发功能
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200610180056.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200610180056.png)
 
 通常我们可以使用 ZooKeeper、etcd 或者分布式缓存（如 Hazelcast）来解决事件通知问题，但当集群达到一定规模之后，依赖的 ZooKeeper 集群、etcd 集群可能就不稳定了，无法满足我们的需求。
 
@@ -240,7 +240,7 @@ ZooKeeper 的一大特点就是强一致性，ZooKeeper 集群的每个节点的
 
 而 RPC 框架的服务发现，在服务节点刚上线时，服务调用方是可以容忍在一段时间之后（比如几秒钟之后）发现这个新上线的节点的。毕竟服务节点刚上线之后的几秒内，甚至更长的一段时间内没有接收到请求流量，对整个服务集群是没有什么影响的，所以我们可以牺牲掉 CP（强制一致性），而选择 AP（最终一致），来换取整个注册中心集群的性能和稳定性。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717162006.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717162006.png)
 
 ## 健康检测：这个节点都挂了，为啥还要疯狂发请求？
 
@@ -360,7 +360,7 @@ RPC 框架是不会知道哪些业务异常能够去进行异常重试的，我�
 
 综上，一个可靠的 RPC 容错处理机制如下：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717163921.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717163921.png)
 
 ## 优雅关闭：如何避免服务停机带来的业务损失？
 
@@ -454,7 +454,7 @@ Hook 逻辑。用户可以在 Hook 里面模拟调用逻辑，从而使 JVM 指�
 
 ## 业务分组：如何隔离流量？
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200718204407.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200718204407.png)
 
 在 RPC 里面我们可以通过分组的方式人为地给不同的调用方划分出不同的小集群，从而实现调用方流量隔离的效果，保障我们的核心业务不受非核心业务的干扰。但我们在考虑问题的时候，不能顾此失彼，不能因为新加一个的功能而影响到原有系统的稳定性。
 

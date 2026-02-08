@@ -61,8 +61,6 @@ permalink: /pages/eee00d6e/
 
 ## MySQL 简史
 
-![](https://www.datasciencecentral.com/wp-content/uploads/2021/10/growth_mysql-1.png)
-
 - **1.0** - 1995 年，MySQL 1.0 发布，仅供内部使用。
 - **3.23** - 1999 年，MySQL AB 公司成立。同年，发布 MySQL 3.23，该版本集成了 Berkeley DB 存储引擎。
 - **4.0** - 2002 年，集成 InnoDB 存储引擎。

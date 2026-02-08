@@ -19,7 +19,7 @@ permalink: /pages/688894f6/
 
 本节选择性介绍 git 中比较常用的命令行场景。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/web/git/git-cheat-sheet.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/web/git/git-cheat-sheet.png)
 
 ## 安装
 

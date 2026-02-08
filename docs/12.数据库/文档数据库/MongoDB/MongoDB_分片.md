@@ -52,7 +52,7 @@ MongoDB [分片集群](https://www.mongodb.com/zh-cn/docs/manual/reference/gloss
 
 下图描述了分片集群内各组件之间的交互：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920210057.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920210057.svg)
 
 MongoDB 在 [集合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-collection) 级别对数据进行分片，从而将集合数据分布到集群中的分片上。
 
@@ -64,7 +64,7 @@ MongoDB 在 [集合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossar
 
 在创建新数据库时，[`mongos`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongos/#mongodb-binary-bin.mongos) 通过选择集群中数据量最少的分片来选择主分片。[`mongos`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongos/#mongodb-binary-bin.mongos) 使用 [`listDatabases`](https://www.mongodb.com/zh-cn/docs/manual/reference/command/listDatabases/#mongodb-dbcommand-dbcmd.listDatabases) 命令返回的 `totalSize` 字段作为选择标准的一部分。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920212159.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920212159.svg)
 
 ### 配置服务器
 
@@ -84,7 +84,7 @@ MongoDB [`mongos`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/m
 
 `mongos` 通过缓存来自 [配置服务器](https://www.mongodb.com/zh-cn/docs/manual/core/sharded-cluster-config-servers/#std-label-sharded-cluster-config-server) 的元数据来跟踪哪个分片上有哪些数据。`mongos` 使用该元数据将操作从应用程序和客户端路由到 [`mongod`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongod/#mongodb-binary-bin.mongod) 实例。`mongos` 没有*持久*状态，且会使用最少的系统资源。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920212157.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920212157.svg)
 
 #### 路由和结果进程
 
@@ -160,7 +160,7 @@ MongoDB 支持两种分片策略：Hash 分片和范围分片。
 
 > 注意：使用哈希索引解析查询时，MongoDB 会自动计算哈希值，应用程序不需要计算哈希。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920213343.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920213343.svg)
 
 虽然分片键的范围可能“相近”，但它们的哈希值却不太可能位于同一 [数据段](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-chunk)。基于哈希值的数据分配可促进更均匀的数据分布，尤其是在分片键 [单调](https://www.mongodb.com/zh-cn/docs/manual/core/sharding-choose-a-shard-key/#std-label-shard-key-monotonic) 变化的数据集中。
 
@@ -170,7 +170,7 @@ MongoDB 支持两种分片策略：Hash 分片和范围分片。
 
 范围分片涉及根据分片键值将数据划分为多个范围。然后，根据分片键值为每个 [数据段](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-chunk) 分配一个范围。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920213345.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920213345.svg)
 
 具有“相近”数值的一系列分片键更有可能位于同一个 [数据段](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-chunk) 上。这允许进行 [有针对性的操作](https://www.mongodb.com/zh-cn/docs/manual/core/sharded-cluster-query-router/#std-label-sharding-mongos-targeted)，因为 [`mongos`](https://www.mongodb.com/zh-cn/docs/manual/reference/program/mongos/#mongodb-binary-bin.mongos) 只能将操作路由到包含所需数据的分片。
 
@@ -196,7 +196,7 @@ MongoDB 负载均衡器是一个后台进程，用于监控每个分片集合的
 
 每个区域涵盖 [分片键](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-shard-key) 值的一个或多个范围。某一区域所覆盖的每个范围始终包括其下边界，而不包括其上边界。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920214854.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920214854.svg)
 
 为要覆盖的区域定义范围时，必须使用 [分片键](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-shard-key) 中包含的字段。如果使用的是 [复合](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-compound-index) 分片键，此范围则须包含分片键的前缀。在选择分片键时，应考虑将来可能使用区域的情况。
 

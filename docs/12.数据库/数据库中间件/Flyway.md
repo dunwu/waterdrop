@@ -24,16 +24,6 @@ permalink: /pages/9464b967/
 
 ### 为什么要使用数据迁移
 
-为了说明数据迁移的作用，我们来举一个示例：
-
-（1）假设，有一个叫做 Shiny 的项目，它的架构是一个叫做 Shiny Soft 的 App 连接叫做 Shiny DB 的数据库。
-
-（2）对于大多数项目而言，最简单的持续集成场景如下所示：
-
-![img](https://flywaydb.org/assets/balsamiq/Environments.png)
-
-这意味着，我们不仅仅要处理一份环境中的修改，由此会引入一些版本冲突问题：
-
 在代码侧（即应用软件）的版本问题比较容易解决：
 
 - 有方便的版本控制工具
@@ -61,13 +51,13 @@ permalink: /pages/9464b967/
 
 最简单的场景是指定 Flyway 迁移到一个空的数据库。
 
-![img](http://upload-images.jianshu.io/upload_images/3101171-bb6e9f39e56ebbda.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082152721.webp)
 
 Flyway 会尝试查找它的 schema 历史表，如果数据库是空的，Flyway 就不再查找，而是直接创建数据库。
 
 现再你就有了一个仅包含一张空表的数据库，默认情况下，这张表叫 **flyway_schema_history**。
 
-![img](http://upload-images.jianshu.io/upload_images/3101171-410eb31c6313b389.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082152800.webp)
 
 这张表将被用于追踪数据库的状态。
 
@@ -75,17 +65,17 @@ Flyway 会尝试查找它的 schema 历史表，如果数据库是空的，Flywa
 
 这些 **migrations** 将根据他们的版本号进行排序。
 
-![img](http://upload-images.jianshu.io/upload_images/3101171-d36ee07ada4efbcd.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082153205.webp)
 
 任意 migration 应用后，schema 历史表将更新。当元数据和初始状态替换后，可以称之为：迁移到新版本。
 
 Flyway 一旦扫描了文件系统或应用 classpath 下的 migrations，这些 migrations 会检查 schema 历史表。如果它们的版本号低于或等于当前的版本，将被忽略。保留下来的 migrations 是等待的 migrations，有效但没有应用。
 
-![img](http://upload-images.jianshu.io/upload_images/3101171-99a88fea7a31a070.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082153822.webp)
 
 migrations 将根据版本号排序并按序执行。
 
-![img](http://upload-images.jianshu.io/upload_images/3101171-b444fef6e5c13b71.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602082153255.webp)
 
 ## 快速上手
 
@@ -398,7 +388,7 @@ migrations 最常用的编写形式就是 SQL。
 
 为了被 Flyway 自动识别，SQL migrations 的文件命名必须遵循规定的模式：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/database/flyway/sql-migrations.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/flyway/sql-migrations.png)
 
 - **Prefix** - `V` 代表 versioned migrations (可配置), `U` 代表 undo migrations (可配置)、 `R` 代表 repeatable migrations (可配置)
 - **Version** - 版本号通过`.`(点)或`_`(下划线)分隔 (repeatable migrations 不需要)
@@ -417,7 +407,7 @@ migrations 最常用的编写形式就是 SQL。
 
 为了被 Flyway 自动识别，JAVA migrations 的文件命名必须遵循规定的模式：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/database/flyway/java-migrations.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/flyway/java-migrations.png)
 
 - **Prefix** - `V` 代表 versioned migrations (可配置), `U` 代表 undo migrations (可配置)、 `R` 代表 repeatable migrations (可配置)
 - **Version** - 版本号通过`.`(点)或`_`(下划线)分隔 (repeatable migrations 不需要)

@@ -69,7 +69,7 @@ JSP 容器与 Web 服务器协同合作，为 JSP 的正常运行提供必要的
 
 下图显示了 JSP 容器和 JSP 文件在 Web 应用中所处的位置。
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/jsp-arch.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/jsp-arch.jpg)
 
 #### 工作步骤
 
@@ -102,7 +102,7 @@ JSP 生命周期就是从创建到销毁的整个过程，类似于 servlet 生�
 
 很明显，JSP 生命周期的四个主要阶段和 servlet 生命周期非常相似，下面给出图示：
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/jsp_life_cycle.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/jsp_life_cycle.jpg)
 
 #### JSP 编译
 
@@ -197,7 +197,7 @@ public void jspDestroy() {
 
 将以上代码保存在 hello.jsp 中，然后将它放置在 C:\apache-tomcat-7.0.2\webapps\ROOT 目录下，打开浏览器并在地址栏中输入 `http://localhost:8080/hello.jsp` 。运行后得到以下结果：
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/jsp_hello_world.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/jsp_hello_world.jpg)
 
 #### 中文编码问题
 
@@ -436,7 +436,7 @@ pageEncoding="UTF-8"%> <%! int fontSize; %>
 
 运行后得到以下结果：
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/7B4B85CF-FE4B-43CB-AAFF-F8594AD4342C.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/7B4B85CF-FE4B-43CB-AAFF-F8594AD4342C.jpg)
 
 将上例改用 while 循环来写：
 
@@ -462,7 +462,7 @@ pageEncoding="UTF-8"%> <%! int fontSize; %>
 
 浏览器访问，输出结果为（fontSize 初始化为 0，所以多输出了一行）：
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/4F744CC9-E484-45BA-AF18-27AFCF4AD45C.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/4F744CC9-E484-45BA-AF18-27AFCF4AD45C.jpg)
 
 JSP 运算符
 
@@ -802,7 +802,7 @@ $ javac TestBean.java
 
 下面是一个 Eclipse 中目录结构图：
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/6AC33FBA-0B76-4BFD-A690-E856E9E01900.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/6AC33FBA-0B76-4BFD-A690-E856E9E01900.jpg)
 
 下面是一个很简单的例子，它的功能是装载一个 Bean，然后设置/读取它的 message 属性。
 
@@ -832,7 +832,7 @@ pageEncoding="UTF-8"%>
 
 浏览器访问，执行以上文件，输出如下所示：
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/D7AD87A8-3392-4D4E-8731-18806B0644CD.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/D7AD87A8-3392-4D4E-8731-18806B0644CD.jpg)
 
 ### `<jsp:forward>`
 
@@ -941,7 +941,7 @@ pageEncoding="UTF-8"%>
 
 浏览器访问以下页面，输出结果如下所示：
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/7D8C47F0-0DDE-4F1D-8BE1-B2C9C955683E.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/7D8C47F0-0DDE-4F1D-8BE1-B2C9C955683E.jpg)
 
 ### `<jsp:text>`
 
@@ -1274,7 +1274,7 @@ Example"; %>
 
 运行结果如下：
 
-![img](http://www.runoob.com/wp-content/uploads/2014/01/jsp-expression-language.jpg)
+![](http://www.runoob.com/wp-content/uploads/2014/01/jsp-expression-language.jpg)
 
 header 对象返回单一值，而 headerValues 则返回一个字符串数组。
 

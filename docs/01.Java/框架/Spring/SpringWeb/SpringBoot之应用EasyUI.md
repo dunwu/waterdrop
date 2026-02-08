@@ -26,7 +26,7 @@ permalink: /pages/eeebabae/
 > - EasyUI：按需加载，并没有引入所有的 EasyUI 特性
 > - 数据库：为了测试方便，使用 H2
 
-![img](http://www.jeasyui.cn/images/easyui.png)
+![](http://www.jeasyui.cn/images/easyui.png)
 
 ## 简介
 

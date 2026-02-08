@@ -28,7 +28,7 @@ permalink: /pages/b5bcba51/
 
 `DispatcherServlet` 的工作流程大致如下图所示：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/web/spring-dispatcher-servlet.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/spring/web/spring-dispatcher-servlet.png)
 
 1. **接收 Http 请求**：当客户端发送 HTTP 请求时，`DispatcherServlet` 接收该请求并将其传递给 Spring MVC 框架。
 2. **选择 `Handler`**：`DispatcherServlet` 会根据请求的 URL 找到对应的处理器映射器 `HandlerMapping`，该映射器会根据配置文件中的 URL 映射规则找到合适的处理器 `Handler`。

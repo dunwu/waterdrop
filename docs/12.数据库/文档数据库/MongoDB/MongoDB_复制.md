@@ -112,7 +112,7 @@ MongoDB 本身是一个分布式数据库，自然也需要具备复制的能力
 
 当主节点在超过配置的 [`electionTimeoutMillis`](https://www.mongodb.com/zh-cn/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.settings.electionTimeoutMillis) 时间段（默认 10 秒）内未与副本集中的其他节点通信时，一个符合条件的从节点将发起选举，并提名自己成为新的主节点。集群将尝试完成新主节点的选举并恢复其正常运转。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920175429.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920175429.svg)
 
 在成功完成选举之前，副本集无法处理写操作。如果将读取查询配置为当主节点离线时 [在从节点上运行](https://www.mongodb.com/zh-cn/docs/manual/core/read-preference/#std-label-replica-set-read-preference)，那么副本集可以继续为读取查询提供服务。
 
@@ -130,7 +130,7 @@ MongoDB 提供 [镜像读](https://www.mongodb.com/zh-cn/docs/manual/replication
 
 默认情况下，客户端从主节点读取数据；但是，客户端可以指定 [读取偏好](https://www.mongodb.com/zh-cn/docs/manual/core/read-preference/) 以向从节点发送读取操作。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920204024.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920204024.svg)
 
 [异步复制](https://www.mongodb.com/zh-cn/docs/manual/replication/#std-label-asynchronous-replication) 到从节点意味着在从节点读取到的数据可能不会反映主节点上数据的状态。
 

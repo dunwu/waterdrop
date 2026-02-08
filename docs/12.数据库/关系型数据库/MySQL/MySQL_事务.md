@@ -594,7 +594,7 @@ MySQLQueryInterruptedException: Query execution was interrupted
 
 又因为锁的竞争是不公平的，当多个事务同时对一条记录进行更新时，极端情况下，一个更新操作进去排队系统后，可能会一直拿不到锁，最后因超时被系统打断踢出。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630112600.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630112600.png)
 
 如上图中的操作，虽然都是在一个事务中，但锁的申请在不同时间，只有当其他操作都执行完，才会释放所有锁。因为扣除库存是更新操作，属于行锁，这将会影响到其他操作该数据的事务，所以我们应该尽量避免长时间地持有该锁，尽快释放该锁。又因为先新建订单和先扣除库存都不会影响业务，所以我们可以将扣除库存操作放到最后，也就是使用执行顺序 1，以此尽量减小锁的持有时间。
 

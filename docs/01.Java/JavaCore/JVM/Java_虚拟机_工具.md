@@ -437,8 +437,6 @@ $ jps | grep myapp
 
 （2）找出该进程内最耗费 CPU 的线程，可以使用 `ps -Lfp pid` 或者 `ps -mp pid -o THREAD, tid, time` 或者 `top -Hp pid`
 
-![img](http://static.oschina.net/uploads/space/2014/0128/170402_A57i_111708.png)
-
 TIME 列就是各个 Java 线程耗费的 CPU 时间，CPU 时间最长的是线程 ID 为 21742 的线程，用
 
 ```shell
@@ -552,7 +550,7 @@ Java 应用开启 JMX 后，可以使用 `jconsole` 或 `jvisualvm` 进行监控
 - `VM 摘要` - 显示有关 Java VM 的信息。
 - `MBean` - 显示有关 MBean 的信息。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730151422.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730151422.png)
 
 ### VisualVM
 
@@ -564,23 +562,23 @@ Java 应用开启 JMX 后，可以使用 `jconsole` 或 `jvisualvm` 进行监控
 
 jvisualvm 概述页面可以查看当前 Java 进程的基本信息，如：JDK 版本、Java 进程、JVM 参数等。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150147.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150147.png)
 
 #### jvisualvm 监控页面
 
 在 jvisualvm 监控页面，可以看到 Java 进程的 CPU、内存、类加载、线程的实时变化。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150254.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150254.png)
 
 #### jvisualvm 线程页面
 
 jvisualvm 线程页面展示了当前的线程状态。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150416.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150416.png)
 
 jvisualvm 还可以生成线程 Dump 文件，帮助进一步分析线程栈信息。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150830.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150830.png)
 
 #### jvisualvm 抽样器页面
 
@@ -614,24 +612,24 @@ Failed to create the Java Virtual Machine
 
 #### MAT 分析
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200308092746.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200308092746.png)
 
 点击 Leak Suspects 可以进入内存泄漏页面。
 
 （1）首先，可以查看饼图了解内存的整体消耗情况
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200308150556.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200308150556.png)
 
 （2）缩小范围，寻找问题疑似点
 
-![img](https://img-blog.csdn.net/20160223202154818)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081735984.png)
 
 可以点击进入详情页面，在详情页面 Shortest Paths To the Accumulation Point 表示 GC root 到内存消耗聚集点的最短路径，如果某个内存消耗聚集点有路径到达 GC root，则该内存消耗聚集点不会被当做垃圾被回收。
 
 为了找到内存泄露，我获取了两个堆转储文件，两个文件获取时间间隔是一天（因为内存只是小幅度增长，短时间很难发现问题）。对比两个文件的对象，通过对比后的结果可以很方便定位内存泄露。
 
 MAT 同时打开两个堆转储文件，分别打开 Histogram，如下图。在下图中方框 1 按钮用于对比两个 Histogram，对比后在方框 2 处选择 Group By package，然后对比各对象的变化。不难发现 heap3.hprof 比 heap6.hprof 少了 64 个 eventInfo 对象，如果对代码比较熟悉的话想必这样一个结果是能够给程序员一定的启示的。而我也是根据这个启示差找到了最终内存泄露的位置。
-![img](https://img-blog.csdn.net/20160223203226362)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081736158.png)
 
 ### JProfile
 
@@ -645,7 +643,7 @@ MAT 同时打开两个堆转储文件，分别打开 Histogram，如下图。在
 
 Arthas 支持 JDK 6+，支持 Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 `Tab` 自动补全功能，进一步方便进行问题的定位和诊断。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730145030.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730145030.png)
 
 #### Arthas 基础命令
 
@@ -701,7 +699,7 @@ Arthas 支持 JDK 6+，支持 Linux/Mac/Windows，采用命令行交互模式，
 
 ## thread dump 文件
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730112431.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730112431.png)
 
 一个 Thread Dump 文件大致可以分为五个部分。
 
@@ -1030,9 +1028,7 @@ JNI global references: 830
 
 Moniter 是 Java 中用以实现线程之间的互斥与协作的主要手段，它可以看成是对象或者 class 的锁，每个对象都有，也仅有一个 Monitor。
 
-![img](https://www.javatang.com/wp-content/uploads/2017/10/java-monitor.png)
-
-从上图可以看出，每个 Monitor 在某个时刻只能被一个线程拥有，该线程就是 "Active Thread"，而其他线程都是 "Waiting Thread"，分别在两个队列 "Entry Set"和"Waint Set"里面等待。其中在 "Entry Set" 中等待的线程状态是 `waiting for monitor entry`，在 "Wait Set" 中等待的线程状态是 `in Object.wait()`。
+每个 Monitor 在某个时刻只能被一个线程拥有，该线程就是 "Active Thread"，而其他线程都是 "Waiting Thread"，分别在两个队列 "Entry Set"和"Waint Set"里面等待。其中在 "Entry Set" 中等待的线程状态是 `waiting for monitor entry`，在 "Wait Set" 中等待的线程状态是 `in Object.wait()`。
 
 （1）"Entry Set"里面的线程。
 

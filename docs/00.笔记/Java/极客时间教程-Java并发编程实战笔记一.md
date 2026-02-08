@@ -701,7 +701,9 @@ Java 中线程共有六种状态：
 
 ### 方法是如何被执行的
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270751420.png)“CPU 去哪里找到调用方法的参数和返回地址？
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270751420.png)
+
+CPU 去哪里找到调用方法的参数和返回地址？
 
 **通过 CPU 的堆栈寄存器**。CPU 支持一种栈结构，先入后出。因为这个栈是和方法调用相关的，因此经常被称为**调用栈**。
 

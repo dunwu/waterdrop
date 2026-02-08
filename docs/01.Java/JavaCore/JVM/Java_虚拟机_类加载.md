@@ -246,7 +246,7 @@ JVM 加载 `class` 文件到内存有两种方式：
 
 ### 类加载器分类
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200617115936.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200617115936.png)
 
 #### Bootstrap ClassLoader
 

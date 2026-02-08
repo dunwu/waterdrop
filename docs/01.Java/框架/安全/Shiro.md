@@ -62,7 +62,7 @@ permalink: /pages/48a9ed51/
 
 `SecurityManager` 是 Shiro 框架核心中的核心，它相当于 Shiro 的总指挥，负责调度所有行为，包括：认证、授权、获取安全数据（调用 `Realm`）、会话管理等。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/standalone/security/shiro/ShiroArchitecture.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/standalone/security/shiro/ShiroArchitecture.png)
 
 `SecurityManager` 聚合了以下组件：
 
@@ -127,7 +127,7 @@ currentUser.logout();
 
 ### 认证流程
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200317092427.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200317092427.png)
 
 1. 应用程序代码调用 `Subject.login` 方法，传入构造的 `AuthenticationToken` 实例，该实例代表最终用户的 `Principals` 和 `Credentials`。
 
@@ -281,7 +281,7 @@ public void updateAccount(Account userAccount) {
 
 ### 授权流程
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200317092618.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200317092618.png)
 
 1. 应用程序或框架代码调用任何 `Subject` 的 `hasRole*`，`checkRole*`，`isPermitted*` 或 `checkPermission*` 方法，并传入所需的权限或角色。
 

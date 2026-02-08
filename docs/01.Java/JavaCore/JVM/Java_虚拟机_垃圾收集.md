@@ -45,10 +45,7 @@ public class ReferenceCountingGC {
 
 通过 **GC Roots** 作为起始点进行搜索，JVM 将能够到达到的对象视为**存活**，不可达的对象视为**死亡**。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-root.png" />
-<p>可达性分析算法</p>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-root.png)
 
 **可作为 GC Roots 的对象**包括下面几种：
 
@@ -187,9 +184,7 @@ obj = null;
 
 ### 标记 - 清除（Mark-Sweep）
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-mark-sweep.jpg" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-mark-sweep.jpg)
 
 将需要回收的对象进行标记，然后清理掉被标记的对象。
 
@@ -200,9 +195,7 @@ obj = null;
 
 ### 标记 - 整理（Mark-Compact）
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-mark-compact.jpg" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-mark-compact.jpg)
 
 让所有存活的对象都向一端移动，然后直接清理掉端边界以外的内存。
 
@@ -210,9 +203,7 @@ obj = null;
 
 ### 标记 - 复制（Copying）
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-copying.jpg" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-copying.jpg)
 
 将内存划分为大小相等的两块，每次只使用其中一块，当这一块内存用完了就将还存活的对象复制到另一块上面，然后再把使用过的内存空间进行一次清理。
 
@@ -229,9 +220,7 @@ obj = null;
 - 年轻代使用：**复制** 算法
 - 老年代使用：**标记 - 清理** 或者 **标记 - 整理** 算法
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-hotspot-heap-structure.png" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-hotspot-heap-structure.png)
 
 #### 新生代
 
@@ -268,9 +257,7 @@ Java 虚拟机会记录 `Survivor` 区中的对象一共被来回复制了几次
 
 ## 垃圾收集器
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-overview.jpg" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-overview.jpg)
 
 以上是 HotSpot 虚拟机中的 7 个垃圾收集器，连线表示垃圾收集器可以配合使用。
 
@@ -284,10 +271,7 @@ Java 虚拟机会记录 `Survivor` 区中的对象一共被来回复制了几次
 
 **串行收集器采用单线程 stop-the-world 的方式进行收集**。当内存不足时，串行 GC 设置停顿标识，待所有线程都进入安全点（Safepoint）时，应用线程暂停，串行 GC 开始工作，**采用单线程方式回收空间并整理内存**。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-serial.jpg" />
-<p>Serial / Serial Old 收集器运行示意图</p>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-serial.jpg)
 
 单线程意味着复杂度更低、占用内存更少，垃圾回收效率高；但同时也意味着不能有效利用多核优势。事实上，串行收集器特别适合堆内存不高、单核甚至双核 CPU 的场合。
 
@@ -329,10 +313,7 @@ Serial Old 是 Serial 收集器的老年代版本，也是给 Client 模式下�
 
 **在注重吞吐量以及 CPU 资源敏感的场合，都可以优先考虑 Parallel Scavenge 收集器 + Parallel Old 收集器。**
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-parallel.jpg" />
-<p>Parallel / Parallel Old 收集器运行示意图</p>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-parallel.jpg)
 
 #### Parallel Scavenge 收集器
 
@@ -376,23 +357,21 @@ CMS 收集器运行步骤如下：
 
 在整个过程中耗时最长的并发标记和并发清除过程中，收集器线程都可以与用户线程一起工作，不需要进行停顿。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-cms.jpg" />
-<p>CMS 收集器运行示意图</p>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-cms.jpg)
 
 ##### CMS 回收年轻代详细步骤
 
 **（1）堆空间被分割为三块空间**
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081724119.PNG)
+
 年轻代分割成一个 Eden 区和两个 Survivor 区。年老代一个连续的空间。就地完成对象收集。除非有 FullGC 否则不会压缩。
 
 **（2）CMS 年轻代垃圾收集如何工作**
 
 年轻代被标为浅绿色，年老代被标记为蓝色。如果你的应用已经运行了一段时间，CMS 的堆看起来应该是这个样子。对象分散在年老代区域里。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide2.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081725568.PNG)
 
 使用 CMS，年老代对象就地释放。它们不会被来回移动。这个空间不会被压缩除非发生 FullGC。
 
@@ -400,12 +379,12 @@ CMS 收集器运行步骤如下：
 
 从 Eden 和 Survivor 区复制活跃对象到另一个 Survivor 区。所有达到他们的年龄阈值的对象会晋升到年老代。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide3.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081725559.PNG)
 **（4）年轻代回收之后**
 
 一次年轻代垃圾收集之后，Eden 区和其中一个 Survivor 区被清空。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide4.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081725941.PNG)
 最近晋升的对象以深蓝色显示在上图中，绿色的对象是年轻代幸免的还没有晋升到老年代对象。
 
 ##### CMS 回收年老代详细步骤
@@ -414,7 +393,7 @@ CMS 收集器运行步骤如下：
 
 发生两次 stop the world 事件：初始标记和重新标记。当年老代达到特定的占用比例时，CMS 开始执行。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide5.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081726287.PNG)
 
 - 初始标记是一个短暂暂停的、可达对象被标记的阶段。
 - 并发标记寻找活跃对象在应用连续执行时。
@@ -424,14 +403,16 @@ CMS 收集器运行步骤如下：
 
 在之前阶段没有被标记的对象会被就地释放。不进行压缩操作。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide6.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081726220.PNG)
+
 **注意：**未被标记的对象等于死亡对象
 
 **（3）年老代收集-清除之后**
 
 清除阶段之后，你可以看到大量内存被释放。你还可以注意到没有进行压缩操作。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide7.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081726500.PNG)
+
 最后，CMS 收集器会再次进入重新设置阶段，等待下一次垃圾收集时机的到来。
 
 ##### CMS 特点
@@ -452,10 +433,7 @@ CMS 收集器具有以下缺点：
 
 ParNew 收集器其实是 Serial 收集器的多线程版本。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-par-new.jpg" />
-<p>ParNew 收集器运行示意图</p>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-par-new.jpg)
 
 是 Server 模式下的虚拟机首选年轻代收集器，除了性能原因外，主要是因为除了 Serial 收集器，只有它能与 CMS 收集器配合工作。
 
@@ -477,9 +455,7 @@ G1 最大的特点是引入分区的思路，弱化了分代的概念，合理�
 
 G1 取消了永久代，并把年轻代和老年代划分成多个大小相等的独立区域（Region），年轻代和老年代不再物理隔离。G1 可以直接对年轻代和老年代一起回收。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-g1-heap-allocation.png" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-g1-heap-allocation.png)
 
 通过引入 Region 的概念，从而将原来的一整块内存空间划分成多个的小空间，使得每个小空间可以单独进行垃圾回收。这种划分方法带来了很大的灵活性，使得可预测的停顿时间模型成为可能。通过记录每个 Region 垃圾回收时间以及回收所获得的空间（这两个值是通过过去回收的经验获得），并维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的 Region。
 
@@ -487,10 +463,7 @@ G1 取消了永久代，并把年轻代和老年代划分成多个大小相等�
 
 #### G1 回收机制
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-g1.jpg" />
-<p>G1 收集器运行示意图</p>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/jvm/jvm-gc-g1.jpg)
 
 如果不计算维护 Remembered Set 的操作，G1 收集器的运作大致可划分为以下几个步骤：
 
@@ -510,14 +483,16 @@ G1 取消了永久代，并把年轻代和老年代划分成多个大小相等�
 
 堆空间是一个被分成许多固定大小区域的内存块。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide8.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081730800.PNG)
+
 Java 虚拟机启动时选定区域大小。Java 虚拟机通常会指定 2000 个左右的大小相等、每个大小范围在 1 到 32M 的区域。
 
 **（2）G1 堆空间分配**
 
 实际上，这些区域被映射成 Eden、Survivor、年老代空间的逻辑表述形式。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide9.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081730251.PNG)
+
 图片中的颜色表明了哪个区域被关联上什么角色。活跃对象从一个区域疏散（复制、移动）到另一个区域。区域被设计为并行的方式收集，可以暂停或者不暂停所有的其它用户线程。
 
 明显的区域可以被分配成 Eden、Survivor、Old 区域。另外，有第四种类型的区域叫做*极大区域 (Humongous regions)*。这些区域被设计成保持标准区域大小的 50%或者更大的对象。它们被保存在一个连续的区域集合里。最后，最后一个类型的区域就是堆空间里没有使用的区域。
@@ -528,14 +503,16 @@ Java 虚拟机启动时选定区域大小。Java 虚拟机通常会指定 2000 �
 
 堆空间被分割成大约 2000 个区域。最小 1M，最大 32M，蓝色区域保持年老代对象，绿色区域保持年轻代对象。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide10.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081730610.PNG)
+
 **注意：**区域没有必要像旧的收集器一样是保持连续的。
 
 **（4）G1 的年轻代收集**
 
 活跃对象会被疏散（复制、移动）到一个或多个 survivor 区域。如果达到晋升总阈值，对象会晋升到年老代区域。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide11.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081731624.PNG)
+
 这是一个 stop the world 暂停。为下一次年轻代垃圾回收计算 Eden 和 Survivor 的大小。保留审计信息有助于计算大小。类似目标暂停时间的事情会被考虑在内。
 
 这个方法使重调区域大小变得很容易，按需把它们调大或调小。
@@ -544,7 +521,8 @@ Java 虚拟机启动时选定区域大小。Java 虚拟机通常会指定 2000 �
 
 活跃对象被疏散到 Survivor 或者年老代区域。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide12.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081731782.PNG)
+
 最近晋升的对象显示为深蓝色。Survivor 区域显示为绿色。
 
 关于 G1 的年轻代回收做以下总结：
@@ -561,27 +539,31 @@ Java 虚拟机启动时选定区域大小。Java 虚拟机通常会指定 2000 �
 
 年轻代垃圾收集肩负着活跃对象初始标记的任务。在日志文件中被标为* GC pause (young)(inital-mark)*
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide13.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081731007.PNG)
+
 **（2）并发标记阶段**
 
 如果发现空区域 (“X”标示的），在重新标记阶段它们会被马上清除掉。当然，决定活性的审计信息也在此时被计算。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide14.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081731904.PNG)
+
 **（3）重新标记阶段**
 
 空的区域被清除和回收掉。所有区域的活性在此时计算。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide15.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081732338.PNG)
+
 **（4）复制/清理阶段**
 
 G1 选择活性最低的区域，这些区域能够以最快的速度回收。然后这些区域会在年轻代垃圾回收过程中被回收。在日志中被指示为* [GC pause (mixed)]*。所以年轻代和年老代在同一时间被回收。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide16.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081732946.PNG)
+
 **（5）复制/清理阶段之后**
 
 被选择的区域已经被回收和压缩到图中显示的深蓝色区和深绿色区中。
 
-![img](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/images/slide17.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081732852.PNG)
 
 ### 总结
 

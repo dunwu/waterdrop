@@ -35,13 +35,9 @@ Git 和其它版本控制系统（包括 Subversion 和近似工具）的主要�
 
 这么做最显而易见的缺点是中央服务器的单点故障。如果宕机一小时，那么在这一小时内，谁都无法提交更新，也就无法协同工作。要是中央服务器的磁盘发生故障，碰巧没做备份，或者备份不够及时，就会有丢失数据的风险。最坏的情况是彻底丢失整个项目的所有历史更改记录。
 
-![img](https://git-scm.com/figures/18333fig0102-tn.png)
-
 #### 分布式版本控制系统
 
 **分布式版本控制系统**的客户端并不只提取最新版本的文件快照，而是把代码仓库完整地镜像下来。这么一来，任何一处协同工作用的服务器发生故障，事后都可以用任何一个镜像出来的本地仓库恢复。因为每一次的提取操作，实际上都是一次对代码仓库的完整备份。
-
-![img](https://git-scm.com/figures/18333fig0103-tn.png)
 
 ### 为什么使用 Git
 
@@ -60,7 +56,7 @@ Git 是分布式的。这是 Git 和其它非分布式的版本控制系统（�
 
 当你一个项目到本地或创建一个 git 项目，项目目录下会有一个隐藏的 `.git` 子目录。这个目录是 git 用来跟踪管理版本库的，如果不熟悉其工作机制，千万不要手动修改。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419093855.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419093855.png)
 
 - `hooks` 目录：包含客户端或服务端的钩子脚本（hook scripts）
 - `info` 目录：包含一个全局性排除（global exclude）文件， 用以放置那些不希望被记录在 `.gitignore` 文件中的忽略模式（ignored patterns）。
@@ -100,7 +96,7 @@ Git 中使用这种哈希值的情况很多，你将经常看到这种哈希值�
 - **本地仓库（local）** - 提交更新，找到暂存区域的文件，将快照永久性存储到 Git 本地仓库。
 - **远程仓库（remote）** - 以上几个工作区都是在本地。为了让别人可以看到你的修改，你需要将你的更新推送到远程仓库。同理，如果你想同步别人的修改，你需要从远程仓库拉取更新。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/web/git/git-theory.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/web/git/git-theory.png)
 
 ## 分支管理
 
@@ -108,7 +104,7 @@ Git 中使用这种哈希值的情况很多，你将经常看到这种哈希值�
 
 Git Flow 应该是目前流传最广的 Git 分支管理策略。Git Flow 围绕的核心点是版本发布（release），它适用于迭代版本较长的项目。
 
-> ![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419110634.png)
+> ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419110634.png)
 
 > 详细内容，可以参考这篇文章：[Git 在团队中的最佳实践--如何正确使用 Git Flow](http://www.cnblogs.com/cnblogsfans/p/5075073.html)
 
@@ -124,7 +120,7 @@ Git Flow 工作流程
 
 #### 2.1. 主干分支
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419113532.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419113532.png)
 
 主干分支有两个，它们是伴随着项目生命周期长期存在的分支。
 
@@ -135,7 +131,7 @@ Git Flow 工作流程
 
 这个分支主要是用来开发一个新的功能，一旦开发完成，我们合并回 develop 分支进入下一个 release。feature 分支开发结束后，必须合并回 develop 分支，合并完分支后一般会删点这个 feature 分支，但是我们也可以保留。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419114042.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419114042.png)
 
 #### 2.3. **`release` 分支**
 
@@ -147,7 +143,7 @@ release 分支基于 develop 分支创建，创建后，我们可以在这个 re
 
 当出现线上 bug 时，也意味着 master 存在 Bug。这时，我们需要基于 master 创建一个 hotfix 分支，在此分支上完成 bug 修复。修复后，我们应该将此分支合并回 master 和 develop 分支，同时在 master 上打一个 tag。所以，hotfix 的改动会进入下一个 release。
 
-![img](https://nvie.com/img/hotfix-branches@2x.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081747788.png)
 
 #### 2.5. 如何应用 Git Flow
 
@@ -167,7 +163,7 @@ git 提供了 `git flow` 命令来手动管理，但是比较麻烦，所以还�
 
 在 Github Flow 策略中，所有分支都是基于 master 创建。在 Feature 或 Bugfix 分支中完成工作后，将其合入 master，然后继续迭代。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420194518.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420194518.png)
 
 > 想了解更详细的 Github Flow 介绍，可以参考：[GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html)
 
@@ -179,11 +175,11 @@ Git 每次提交代码，都要写 Commit message（提交说明），否则就�
 
 先来看下图中不好的 Commit message 范例，从提交信息完全看不出来修改了什么。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420152215.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420152215.png)
 
 再来一张较好的 Commit message 范例，每次提交的是什么内容，做了什么一目了然。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420151352.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420151352.png)
 
 ### Commit message 的作用
 
@@ -230,11 +226,11 @@ Intellij 中有集成 [Angular Git Commit 规范](https://docs.google.com/docume
 
 第一步，安装插件
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419145223.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419145223.png)
 
 第二步，提交代码时，按照模板填写 commit message
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419145327.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419145327.png)
 
 ### 生成 Change log
 
@@ -470,7 +466,7 @@ hs_err_pid*
 
 示例，下面是携程 [apollo](https://github.com/ctripcorp/apollo) 的一个 Issue 模板，要求提问者填充 bug 描述、复现步骤、期望、截图、日志等细节。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420114644.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420114644.png)
 
 > 更多模板：[Github issue_templates 模板](https://github.com/stevemao/github-issue-templates)
 
@@ -482,7 +478,7 @@ hs_err_pid*
 
 （2）在 `.gitlab` 目录中添加 `issue_templates` 目录，在其中添加的 md 文件都会被 Gitlab 自动识，并将其作为 issue 的默认模板。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420141838.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420141838.png)
 
 > 更多模板：[Gitlab 官方 issue_templates 模板](https://gitlab.com/gitlab-org/gitlab/-/tree/master/.gitlab/issue_templates)
 

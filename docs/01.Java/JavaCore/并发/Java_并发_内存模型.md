@@ -224,7 +224,7 @@ Load3;
 
 Java 中对内存屏障的使用在一般的代码中不太容易见到，常见的有 `volatile` 和 `synchronized` 关键字修饰的代码块（后面再展开介绍），还可以通过 `Unsafe` 这个类来使用内存屏障。
 
-![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC83LzE1LzE3MzUwODViNjA2M2Q0NGY?x-oss-process=image/format,png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081742034.png)
 
 ## Synchronized 内存语义
 
@@ -529,7 +529,7 @@ public void foo(Object lock) {
 
 Mark Word 记录了对象和锁有关的信息。Mark Word 在 64 位 JVM 中的长度是 64bit，我们可以一起看下 64 位 JVM 的存储结构是怎么样的。如下图所示：
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200629191250.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200629191250.png)
 
 锁升级功能主要依赖于 Mark Word 中的锁标志位和释放偏向锁标志位，`synchronized` 同步锁就是从偏向锁开始的，随着竞争越来越激烈，偏向锁升级到轻量级锁，最终升级到重量级锁。
 
@@ -550,7 +550,7 @@ Java 1.6 引入了偏向锁和轻量级锁，从而让 `synchronized` 拥有了�
 
 偏向锁的思想是偏向于**第一个获取锁对象的线程，这个线程在之后获取该锁就不再需要进行同步操作，甚至连 CAS 操作也不再需要**。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200604105151.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200604105151.png)
 
 #### 轻量级锁
 
@@ -558,7 +558,7 @@ Java 1.6 引入了偏向锁和轻量级锁，从而让 `synchronized` 拥有了�
 
 当尝试获取一个锁对象时，如果锁对象标记为 `0|01`，说明锁对象的锁未锁定（unlocked）状态。此时虚拟机在当前线程的虚拟机栈中创建 Lock Record，然后使用 CAS 操作将对象的 Mark Word 更新为 Lock Record 指针。如果 CAS 操作成功了，那么线程就获取了该对象上的锁，并且对象的 Mark Word 的锁标记变为 00，表示该对象处于轻量级锁状态。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200604105248.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200604105248.png)
 
 #### 锁消除 / 锁粗化
 

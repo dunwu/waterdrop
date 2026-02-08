@@ -39,7 +39,7 @@ Java 中常用的存储容器就是数组和容器，二者有以下区别：
 
 ### 容器框架
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/java-container-structure.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/java-container-structure.png)
 
 Java 容器框架主要分为 `Collection` 和 `Map` 两种。其中，`Collection` 又分为 `List`、`Set` 以及 `Queue`。
 

@@ -34,7 +34,7 @@ permalink: /pages/f7d4ff23/
 
 当流量很大的情况下，某个依赖的阻塞，会导致上游服务请求被阻塞。当这种级联故障愈演愈烈，就可能造成整个线上服务不可用的雪崩效应，如下图。这种情况若持续恶化，如果上游服务本身还被其他服务所依赖，就可能出现多米洛骨牌效应，导致多个服务都无法正常工作。
 
-![img](https://github.com/Netflix/Hystrix/wiki/images/soa-3-640.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/202602081544885.png)
 
 ## 为什么需要服务降级以及常见的几种降级方式
 

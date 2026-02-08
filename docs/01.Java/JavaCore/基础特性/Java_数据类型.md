@@ -15,7 +15,7 @@ permalink: /pages/cba76603/
 
 # 深入理解 Java 基本数据类型
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20220408172602.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220408172602.png)
 
 ## 数据类型分类
 

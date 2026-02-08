@@ -24,7 +24,7 @@ RocketMQ 由阿里巴巴孵化，被捐赠给 Apache，成为 Apache 的顶级�
 
 ## RocketMQ 概念
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/distributed/mq/rocketmq/rmq-model.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/distributed/mq/rocketmq/rmq-model.png)
 
 ### 消息模型（Message Model）
 
@@ -200,7 +200,7 @@ RocketMQ 将这种正常情况下无法被消费的消息称为死信消息（De
 
 ## RocketMQ 组件
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20220712060550.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220712060550.png)
 
 RocketMQ 由四部分组成：NameServer、Broker、Producer、Consumer。其中任意一个组成都可以水平扩展为集群模式，以避免单点故障问题。
 
@@ -245,7 +245,7 @@ Broker 同时支持推拉模型，包含容错机制（2 副本或 3 副本）�
 - **HA Service**：高可用服务，提供 Master Broker 和 Slave Broker 之间的数据同步功能。
 - **Index Service**：根据特定的 Message key 对投递到 Broker 的消息进行索引服务，以提供消息的快速查询。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/distributed/mq/rocketmq/rmq-basic-component.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/distributed/mq/rocketmq/rmq-basic-component.png)
 
 ### Producer（生产者）
 

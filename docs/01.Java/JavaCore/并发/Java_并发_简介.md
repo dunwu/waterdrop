@@ -503,7 +503,7 @@ J.U.C 包中的工具类是基于 `synchronized`、`volatile`、`CAS`、`ThreadL
 - 线程比进程划分更细，所以执行开销更小，并发性更高
 - 进程是一个实体，拥有独立的资源；而同一个进程中的多个线程共享进程的资源。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/processes-vs-threads.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/processes-vs-threads.jpg)
 
 JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这就是为什么几个线程可以访问同一个对象。线程共享堆并拥有自己的堆栈空间。这是一个线程如何调用一个方法以及它的局部变量是如何保持线程安全的。但是堆不是线程安全的并且为了线程安全必须进行同步。
 

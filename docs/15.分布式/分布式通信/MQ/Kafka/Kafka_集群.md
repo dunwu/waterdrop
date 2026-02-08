@@ -166,7 +166,7 @@ broker 会在它所监听的每一个端口上运行一个 Acceptor 线程，这
 
 当请求放进请求队列后，IO 线程负责进行处理。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/10427194506.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/10427194506.png)
 
 生产请求和获取请求都需要发送给 Partition 的 Leader 副本处理。如果 Broker 收到一个针对特定分区的请求，而该分区的 Leader 在另一个 Broker 上，那么发送请求的客户端会收到一个“非分区 Leader”的错误响应。Kafka 客户端要自己负责把生成请求和获取请求发送到正确的 Broker 上。
 
@@ -176,7 +176,7 @@ broker 会在它所监听的每一个端口上运行一个 Acceptor 线程，这
 
 客户端会把这些信息缓存起来，并直接往目标 Broker 上发送生产请求和获取请求。它们需要时不时地通过发送元数据请求来刷新这些信息（刷新的时间间隔通过 `metadata.max.age.ms` 来配置），从而知道元数据是否发生了变化。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621123848.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621123848.png)
 
 ### 生产请求
 
@@ -204,7 +204,7 @@ Leader 处理拉取请求和处理生产请求的方式很相似：
 
 **客户端可以指定 Broker 返回数据量的上限和下限，防止数据量过大造成客户端内存溢出**。同时，**客户端也可以指定返回的最小数据量**，当消息数据量没有达到最小数据量时，请求会一直阻塞直到有足够的数据返回。指定最小的数据量在负载不高的情况下非常有用，通过这种方式**可以减轻网络往返的额外开销**。当然请求也不能永远的阻塞，客户端可以指定最大的阻塞时间，如果到达指定的阻塞时间，即便没有足够的数据也会返回。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621124516.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621124516.png)
 
 不是所有 Leader 的数据都能够被读取。**消费者只能读取已提交的消息**。**只有当消息被写入分区的若干同步副本时，才被认为是已提交的**。为什么是若干个 Broker 呢？这取决于你对“已提交”的定义。你可以选择只要 Leader 成功保存该消息就算是已提交，也可以是令所有 Broker 都成功保存该消息才算是已提交。
 
@@ -212,7 +212,7 @@ Leader 处理拉取请求和处理生产请求的方式很相似：
 
 这也意味着，如果 Broker 间的消息复制因为某些原因变慢了，那么消息到达消费者的时间也会随之变长。延迟时间可以通过 `replica.lag.time.max.ms` 来配置，它指定了副本在复制消息时可被允许的最大延迟时间。
 
-![img](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621124533.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621124533.png)
 
 ### 其他请求
 
