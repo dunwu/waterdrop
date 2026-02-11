@@ -1,7 +1,7 @@
 ---
 icon: logos:elasticsearch
 title: Elasticsearch CRUD
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062319755.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/e27a633b69e5464c90a27a6b78c8df72.webp
 date: 2020-06-16 07:10:44
 categories:
   - 数据库

@@ -22,9 +22,7 @@ permalink: /pages/48a9ed51/
 
 ### Shiro 特性
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/standalone/security/shiro/shiro-features.png">
-</p>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/standalone/security/shiro/shiro-features.png)
 
 核心功能：
 
@@ -46,9 +44,7 @@ permalink: /pages/48a9ed51/
 
 ### Shiro 架构概述
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/standalone/security/shiro/ShiroBasicArchitecture.png">
-</p>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javaweb/standalone/security/shiro/ShiroBasicArchitecture.png)
 
 - **Subject** - **主题**。它代表当前用户，`Subject` 可以是一个人，但也可以是第三方服务、守护进程帐户、时钟守护任务或者其它——当前和软件交互的任何事件。`Subject` 是 Shiro 的入口。
 
@@ -127,7 +123,7 @@ currentUser.logout();
 
 ### 认证流程
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200317092427.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/03/6965446af31e4847b078d369a61d4b69.png)
 
 1. 应用程序代码调用 `Subject.login` 方法，传入构造的 `AuthenticationToken` 实例，该实例代表最终用户的 `Principals` 和 `Credentials`。
 
@@ -281,7 +277,7 @@ public void updateAccount(Account userAccount) {
 
 ### 授权流程
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200317092618.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/03/b1c0493dbae74043b6fc404c2592885c.png)
 
 1. 应用程序或框架代码调用任何 `Subject` 的 `hasRole*`，`checkRole*`，`isPermitted*` 或 `checkPermission*` 方法，并传入所需的权限或角色。
 

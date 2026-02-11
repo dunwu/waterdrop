@@ -27,7 +27,7 @@ ForkJoinPool 是 Java 7 引入的一种线程池，专为**分治任务（Divide
 
 **ForkJoinPool 通过工作窃取机制高效处理分治任务，适合递归并行计算，核心是本地队列+LIFO 处理+FIFO 窃取。**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200703141326.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/338c79b1b1d34e258454af64336b9356.png)
 
 ### ForkJoinPool 特性
 

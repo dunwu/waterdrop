@@ -23,7 +23,7 @@ permalink: /pages/5eea3123/
 
 RabbitMQ 是一个开源的消息队列中间件，基于 AMQP（Advanced Message Queuing Protocol，高级消息队列协议）标准实现。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082127382.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9249144112254111998aea81eb34999f.png)
 
 **RabbitMQ 的核心概念**
 
@@ -40,7 +40,7 @@ RabbitMQ 是一个开源的消息队列中间件，基于 AMQP（Advanced Messag
 
 ### 【简单】RabbitMQ 有哪些核心组件？⭐
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082128930.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/73e008a437134e34b76b8ac46682219a.png)
 
 RabbitMQ 的基本架构主要由以下核心组件组成：
 

@@ -23,7 +23,7 @@ permalink: /pages/05c0e1ae/
 
 因此，在很多缓存框架、缓存库中，其 API 都参考了 JSR 107 规范。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200709174139.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/27d5dc33b622440da7160c592fd69a7e.png)
 
 Java Caching 定义了 5 个核心接口
 

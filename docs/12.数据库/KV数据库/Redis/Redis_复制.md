@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 复制
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20230914071554.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/1aa2be15292d48b882350d5d8357bcba.png
 date: 2020-06-24 10:45:38
 categories:
   - 数据库
@@ -58,7 +58,7 @@ Redis 的复制功能分为同步（sync）和命令传播（command propagate�
 3. 主服务器执行 `BGSAVE` 完毕后，主服务器会将生成的 RDB 文件发送给从服务器。从服务器接收并载入 RDB 文件，更新自己的数据库状态。
 4. 主服务器将记录在缓冲区中的所有写命令发送给从服务器，从服务器执行这些写命令，更新自己的数据库状态。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309172035716.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/c570a38a44bb4425b49d22c593695e69.png)
 
 ### 命令传播
 
@@ -103,7 +103,7 @@ Redis 的复制功能分为同步（sync）和命令传播（command propagate�
 - 如果主从服务器的复制偏移量相同，则说明二者的数据库状态一致；
 - 反之，则说明二者的数据库状态不一致。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309172031325.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/514d790c8fcf48569e915827758cd1d6.png)
 
 #### 复制积压缓冲区
 
@@ -150,7 +150,7 @@ Redis 的复制功能分为同步（sync）和命令传播（command propagate�
 - 假如主从服务器的 **master run id 相同**，并且**指定的偏移量（offset）在内存缓冲区中还有效**，复制就会从上次中断的点开始继续。
 - 如果其中一个条件不满足，就会进行完全重新同步（在 2.8 版本之前就是直接进行完全重新同步）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309172030499.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/19463a3ab05944e88a0b69b83b9dc812.png)
 
 ## 心跳检测
 

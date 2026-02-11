@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 数据结构
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20230901071535.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/8def8f71526944e8be4642b3e66e7a32.png
 date: 2023-08-23 15:14:13
 categories:
   - 数据库
@@ -60,7 +60,7 @@ struct sdshdr {
 
 SDS 遵循 C 字符串以空字符结尾的惯例， 保存空字符的 `1` 字节空间不计算在 SDS 的 `len` 属性里面， 并且为空字符分配额外的 `1` 字节空间， 以及添加空字符到字符串末尾等操作都是由 SDS 函数自动完成的， 所以这个空字符对于 SDS 的使用者来说是完全透明的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100815385.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/70ed299190974403bee6d05fd58edc5b.svg)
 
 ### SDS 特性
 
@@ -159,7 +159,7 @@ typedef struct list {
 - `free` 函数 - 用于释放链表节点所保存的值；
 - `match` 函数 - 用于对比链表节点所保存的值和另一个输入值是否相等。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100817994.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/39a7f710680b455a9edd17ead62af457.svg)
 
 ## 字典
 
@@ -252,7 +252,7 @@ typedef struct dict {
 - `ht` 属性是一个包含两个项的数组， 数组中的每个项都是一个 `dictht` 哈希表， 一般情况下， 字典只使用 `ht[0]` 哈希表， `ht[1]` 哈希表只会在对 `ht[0]` 哈希表进行 rehash 时使用。
 - `rehashidx` 属性记录了 rehash 目前的进度， 如果目前没有在进行 rehash ， 那么它的值为 `-1` 。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100819328.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/079e5000700f4e1a87370213226c6230.svg)
 
 ### 哈希算法
 
@@ -275,7 +275,7 @@ index = hash & dict->ht[x].sizemask;
 
 **Redis 使用链地址法（separate chaining）来解决哈希冲突**： 每个哈希表节点都有一个 `next` 指针， 多个哈希表节点可以用 `next` 指针构成一个单向链表， 被分配到同一个索引上的多个节点可以用这个单向链表连接起来， 这就解决了键冲突的问题。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100822993.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/28415616ad244c97b39105a5f172f7da.svg)
 
 ### rehash
 

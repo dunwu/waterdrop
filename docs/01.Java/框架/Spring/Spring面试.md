@@ -176,7 +176,7 @@ public class StudentConfig {
 
 ### 【困难】Spring Bean 的生命周期是怎样的？⭐⭐⭐
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20211201102734.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/12/843b87f616f1495596adabca5bc2db4b.png)
 
 Spring Bean 容器的生命周期如下：
 
@@ -219,7 +219,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 
 一言以蔽之：遵循 **IoC** 思想，通过 **DI** 技术实现，而 **Spring IoC** 就是最主流的实现容器。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20221005163639.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/10/49a819c968434375b7a40e9edf468081.png)
 
 ### 【简单】依赖注入有哪些实现方式？
 
@@ -260,7 +260,7 @@ Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFac
 
 解决步骤：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081811988.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/321e07e5f17840b3833391e6d95c8140.png)
 
 1. **实例化 & 暴露工厂**：实例化 Bean A 后，立即将其工厂放入**三级缓存**，**提前暴露引用**。
 2. **填充属性时循环引用**：为 A 注入 B 时，触发创建 B。B 在注入 A 时，能从**三级缓存**的工厂中获取到 A 的早期引用。

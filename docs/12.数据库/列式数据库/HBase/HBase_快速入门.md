@@ -38,7 +38,7 @@ Hadoop 的缺陷在于：它只能执行批处理，并且只能以顺序方式�
 
 HBase 是一种类似于 `Google’s Big Table` 的数据模型，它是 Hadoop 生态系统的一部分，它将数据存储在 HDFS 上，客户端可以通过 HBase 实现对 HDFS 上数据的随机访问。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601170449.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/eb0570e6c12d453fa87f32b658c05a15.png)
 
 HBase 的**核心特性**如下：
 

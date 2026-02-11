@@ -18,11 +18,11 @@ permalink: /pages/60cd79de/
 
 > MyBatis 的前身就是 iBatis ，是一个作用在数据持久层的对象关系映射（Object Relational Mapping，简称 ORM）框架。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200716162305.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/777878f7390e40959486bee8f8edf3cc.png)
 
 ## Mybatis 简介
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210510164925.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/05/f7ed06c91c4e4bbb9846150320eb5b38.png)
 
 ### 什么是 MyBatis
 

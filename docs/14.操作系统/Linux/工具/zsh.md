@@ -111,7 +111,7 @@ wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - 
 
 zsh 效果如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082144220.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b33b26270b3e4a78b9dd6a033ab2c5f3.png)
 
 ## 快捷键
 

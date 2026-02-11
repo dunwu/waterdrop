@@ -1,7 +1,7 @@
 ---
 icon: logos:mysql
 title: MySQL 事务
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202310260703504.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/10/a7c2e3d0bcfa44029a944ee465a6399f.png
 date: 2020-06-03 19:32:09
 categories:
   - 数据库
@@ -31,7 +31,7 @@ permalink: /pages/5914c645/
 
 **“事务”指的是满足 ACID 特性的一组操作**。事务内的 SQL 语句，要么全执行成功，要么全执行失败。可以通过 `Commit` 提交一个事务，也可以使用 `Rollback` 进行回滚。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242207831.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/b4a1daeedac948b9861d2bd118318503.png)
 
 ### ACID
 
@@ -161,7 +161,7 @@ SET autocommit = 1;
 
 如下图所示，T<sub>1</sub> 和 T<sub>2</sub> 两个事务对同一个数据进行修改，T<sub>1</sub> 先修改，T<sub>2</sub> 随后修改，T<sub>2</sub> 的修改覆盖了 T<sub>1</sub> 的修改。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242209867.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c23c467952344bbfa5da717fb8cd40e4.png)
 
 ### 脏读
 
@@ -169,7 +169,7 @@ SET autocommit = 1;
 
 如下图所示，T<sub>1</sub> 修改一个数据，T<sub>2</sub> 随后读取这个数据。如果 T<sub>1</sub> 撤销了这次修改，那么 T<sub>2</sub> 读取的数据是脏数据。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242210430.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/97bed91b49804832bdfee9cb821ec38f.png)
 
 ### 不可重复读
 
@@ -177,7 +177,7 @@ SET autocommit = 1;
 
 如下图所示，T<sub>2</sub> 读取一个数据，T<sub>1</sub> 对该数据做了修改。如果 T<sub>2</sub> 再次读取这个数据，此时读取的结果和第一次读取的结果不同。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242211015.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/8f5443289d244a9b9a214d7efeab8255.png)
 
 ### 幻读
 
@@ -185,7 +185,7 @@ SET autocommit = 1;
 
 事务 T<sub>1</sub> 读取某个范围内的记录时，事务 T<sub>2</sub> 在该范围内插入了新的记录，T<sub>1</sub> 再次读取这个范围的数据，此时读取的结果和和第一次读取的结果不同。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242212639.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/67d3e2c1570f428a9ad49e4972ae30c2.png)
 
 ## 事务隔离级别
 
@@ -317,7 +317,7 @@ InnoDB 存储引擎中，数据表的每行记录，除了用户显示定义的�
 
 MVCC 的多版本指的是多个版本的快照，快照存储在 UndoLog 中。该日志通过回滚指针 `roll_pointer` 把一个数据行的所有快照链接起来，构成一个**版本链**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242213050.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c8f2ba25d0654b6bbc4a3a92d5130b82.png)
 
 #### ReadView
 
@@ -336,7 +336,7 @@ ReadView 有四个重要的字段：
 - 已启动但未提交的事务
 - 未启动的事务
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242214504.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/42ecd8e7abe041d4a9103b917a0ad2c0.png)
 
 > ReadView 如何判断版本链中哪个版本可见？
 
@@ -378,7 +378,7 @@ MySQL InnoDB 引擎的默认隔离级别虽然是“可重复读”，但是它�
 
 以上操作，如下图所示。T2 事务在事务过程中，是否可以看到 T1 事务的修改，可以根据 [ReadView](#ReadView) 中描述的规则去判断。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242217983.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c3aee26dbdac457dbccd94f80a22b80f.png)
 
 从图中不难看出：
 
@@ -402,7 +402,7 @@ MySQL InnoDB 引擎的默认隔离级别虽然是“可重复读”，但是它�
 
 以上操作，如下图所示，T2 事务在事务过程中，是否可以看到其他事务的修改，可以根据 [ReadView](#ReadView) 中描述的规则去判断。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242218464.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/68040105435448c3bf2c57e49e2ea33c.png)
 
 从图中不难看出：
 
@@ -488,7 +488,7 @@ COMMIT;
 
 以上示例代码的时序图如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311070630072.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/11/95368377f3204443bef25ad541c356df.png)
 
 【示例】幻读案例二
 
@@ -594,7 +594,7 @@ MySQLQueryInterruptedException: Query execution was interrupted
 
 又因为锁的竞争是不公平的，当多个事务同时对一条记录进行更新时，极端情况下，一个更新操作进去排队系统后，可能会一直拿不到锁，最后因超时被系统打断踢出。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630112600.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/185151e775c9416b9a1dbfa41216581e.png)
 
 如上图中的操作，虽然都是在一个事务中，但锁的申请在不同时间，只有当其他操作都执行完，才会释放所有锁。因为扣除库存是更新操作，属于行锁，这将会影响到其他操作该数据的事务，所以我们应该尽量避免长时间地持有该锁，尽快释放该锁。又因为先新建订单和先扣除库存都不会影响业务，所以我们可以将扣除库存操作放到最后，也就是使用执行顺序 1，以此尽量减小锁的持有时间。
 

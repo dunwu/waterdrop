@@ -1,7 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 简介
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062317588.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/3752ae26956a47ba90682e13ae2ad9c0.webp
 date: 2020-09-07 07:54:19
 categories:
   - 数据库
@@ -112,7 +112,7 @@ MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/doc
 
 文档是 MongoDB 中的**基本数据单元**。**文档是一组有序键值对（即 BSON）**。MongoDB 的文档不需要设置相同的字段，并且相同的字段不需要相同的数据类型，这与关系型数据库有很大的区别，也是 MongoDB 非常突出的特点。
 
-![MongoDB Document](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024526.png)
+![MongoDB Document](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/d27963035cc44309934797be03165c89.png)
 
 需要注意的是：
 
@@ -148,7 +148,7 @@ MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/doc
 
 集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System) 中的表（Table）。集合存在于数据库中，集合没有固定的结构，这意味着你在对集合可以插入不同格式和类型的数据，但通常情况下我们插入集合的数据都会有一定的关联性。
 
-![MongoDB Collection](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024137.png)
+![MongoDB Collection](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c0035fd58205478ea124ceb0c9940c95.png)
 
 集合不需要事先创建，当第一个文档插入或者第一个索引创建时，如果该集合不存在，则会创建一个新的集合。使用 `.` 字符分隔不同命名空间的子集合是一种组织集合的惯例。例如，有一个具有博客功能的应用程序，可能包含名为 `blog.posts` 和名为 `blog.authors` 的集合。
 

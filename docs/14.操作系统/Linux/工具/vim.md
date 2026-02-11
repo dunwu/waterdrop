@@ -234,7 +234,7 @@ Vim 是从 vi 发展出来的一个文本编辑器。代码补完、编译及错
 > - `v2i)` → 会选择 `map (+) ("foo")`
 > - `v2a)` → 会选择 `(map (+) ("foo"))`
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082145455.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/0fdcadc5306a42e0a794fd2aa0eb0a20.webp)
 
 #### 块操作: `<C-v>`
 
@@ -245,7 +245,7 @@ Vim 是从 vi 发展出来的一个文本编辑器。代码补完、编译及错
 - `<C-d>` → 向下移动 (你也可以使用 hjkl 来移动光标，或是使用%，或是别的)
 - `I-- [ESC]` → I 是插入，插入“`--`”，按 ESC 键来为每一行生效。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082145924.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8af7097ff28a460584f7e677c6642560.webp)
 
 在 Windows 下的 vim，你需要使用 `<C-q>` 而不是 `<C-v>` ，`<C-v>` 是拷贝剪贴板。
 
@@ -253,7 +253,7 @@ Vim 是从 vi 发展出来的一个文本编辑器。代码补完、编译及错
 
 在 Insert 模式下，你可以输入一个词的开头，然后按 `<C-p>或是<C-n>，自动补齐功能就出现了……`
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082146480.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9ba49bdf836647f49e45b36c9f520412.webp)
 
 #### 宏录制： `qa` 操作序列 `q`, `@a`, `@@`
 
@@ -282,7 +282,7 @@ Vim 是从 vi 发展出来的一个文本编辑器。代码补完、编译及错
 >
 > - 现在做 `100@@` 会创建新的 100 行，并把数据增加到 103.
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082146594.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/15b0f0b0b64e40f3ab7f032b1916b916.webp)
 
 #### 可视化选择： `v`,`V`,`<C-v>`
 
@@ -292,7 +292,7 @@ Vim 是从 vi 发展出来的一个文本编辑器。代码补完、编译及错
 - `<` 或 `>` → 左右缩进
 - `=` → 自动给缩进 （注：这个功能相当强大，我太喜欢了）
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082146813.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5047d91f09fe465f93d5c2c9ce7a2e7f.webp)
 
 在所有被选择的行后加上点东西：
 
@@ -301,7 +301,7 @@ Vim 是从 vi 发展出来的一个文本编辑器。代码补完、编译及错
 - `$` 到行最后
 - `A`, 输入字符串，按 `ESC。`
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082147392.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e3a8d13a46134e0c9c85ef1b9ebbbdb0.webp)
 
 #### 分屏: `:split` 和 `vsplit`.
 
@@ -312,7 +312,7 @@ Vim 是从 vi 发展出来的一个文本编辑器。代码补完、编译及错
 > - `<C-w>_` (或 `<C-w>|`) : 最大化尺寸 (`<C-w>`| 垂直分屏)
 > - `<C-w>+` (或 `<C-w>-`) : 增加尺寸
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082147503.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d4b25914099b427a9f04418a40a305c9.webp)
 
 ## Vim Cheat Sheet
 

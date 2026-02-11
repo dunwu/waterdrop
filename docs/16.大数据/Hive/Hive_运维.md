@@ -117,11 +117,11 @@ HADOOP_HOME=/usr/app/hadoop-2.6.0-cdh5.15.2
 # hive
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081549176.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a75056bd255b495daa1559e376963b2b.png)
 
 在 Mysql 中也能看到 Hive 创建的库和存放元数据信息的表
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081549410.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d60e789b8f224a66a01d02b33d4dd117.png)
 
 ## HiveServer2/beeline
 
@@ -271,7 +271,7 @@ usage: Hive
 Hive -e 'select * from emp';
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081547321.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1e1ce7f430a64a18911d9ef28a26641d.png)
 
 ### 执行 SQL 脚本
 
@@ -343,7 +343,7 @@ Hive > select ${hivevar:j} from emp;
 
 结果如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081548662.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8944e6354f2f4716af17ca92da59c173.png)
 
 ## Hive 配置
 

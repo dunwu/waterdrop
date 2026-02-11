@@ -60,7 +60,7 @@ ES 的索引有一个或者多个分片，而分片又分为主分片和副本�
 
 ES 的数据持久化流程主要有以下几个过程：**Refresh、写 Translog、Flush、Merge。**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110726542.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/17e5ffbe2dad440d981823db4e9d4be5.png)
 
 #### Refresh
 

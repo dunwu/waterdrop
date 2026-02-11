@@ -36,7 +36,7 @@ permalink: /pages/43b6c7f6/
 - **一次性**：计数器归零后无法重置，需重新创建实例。
 - **非中断递减**：`countDown()` 不受线程中断影响，但 `await()` 可被中断。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202510061730441.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/4050a64b7ad141ecb59cdbda6abf0bcb.png)
 
 `CountDownLatch` 是共享锁的一种实现，它默认构造 AQS 的 `state` 值为 `count`。当线程使用 `countDown()` 方法时，其实使用了`tryReleaseShared`方法以 CAS 的操作来减少 `state`，直至 `state` 为 0 。当调用 `await()` 方法的时候，如果 `state` 不为 0，那就证明任务还没有执行完毕，`await()` 方法就会一直阻塞，也就是说 `await()` 方法之后的语句不会被执行。直到`count` 个线程调用了`countDown()`使 state 值被减为 0，或者调用`await()`的线程被中断，该线程才会从阻塞中被唤醒，`await()` 方法之后的语句得到执行。
 
@@ -126,7 +126,7 @@ public class CountDownLatchDemo {
 | **屏障突破**   | 当所有线程到达屏障点后：<br> 1. 执行回调任务（若设置）；<br> 2. 所有线程被唤醒，继续执行后续逻辑。 |
 | **重置能力**   | 屏障被突破后，**自动重置**，可重复使用（区别于 `CountDownLatch`）。 |
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202510061732492.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/eb0b20ab653b47e09fd3cea6ca186e78.png)
 
 ### CyclicBarrier 核心方法
 
@@ -217,7 +217,7 @@ public class CyclicBarrierDemo {
 
 信号量模型还是很简单的，可以简单概括为：**一个计数器，一个等待队列，三个方法**。在信号量模型里，计数器和等待队列对外是透明的，所以只能通过信号量模型提供的三个方法来访问它们，这三个方法分别是：init()、down() 和 up()。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202510061732434.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/27ee310c93bf4ab48ec62ec57c4e7cfb.png)
 
 - 这三个方法详细的语义具体如下所示。
 
@@ -265,7 +265,7 @@ public void release(int permits) {}
 - `release()` - 释放 1 个 permit。
 - `release(int permits)` - 释放 permits 数量的 permit。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202510061732434.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/27ee310c93bf4ab48ec62ec57c4e7cfb.png)
 
 【示例】Semaphore 使用示例
 

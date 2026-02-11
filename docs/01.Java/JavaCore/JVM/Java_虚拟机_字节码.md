@@ -22,7 +22,7 @@ Java 字节码是 Java 虚拟机执行的一种指令格式。之所以被称之
 
 Java 能做到 “**一次编译，到处运行**”，一是因为 JVM 针对各种操作系统、平台都进行了定制；二是因为无论在什么平台，都可以编译生成固定格式的 Java 字节码文件（`.class`）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408200751147.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/a4f6a2dbf4ad4353995700c382ed16f3.png)
 
 ## 类文件结构
 
@@ -30,13 +30,13 @@ Java 能做到 “**一次编译，到处运行**”，一是因为 JVM 针对�
 
 Class 文件是一组以 8 个字节为基础单位的二进制流，各个数据项目严格按照顺序紧凑地排列在文 件之中，中间没有添加任何分隔符，这使得整个 Class 文件中存储的内容几乎全部是程序运行的必要数 据，没有空隙存在。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230419141404.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/04/25941bcc52e74a5e84b6420f9ca9ecbf.png)
 
 图来自 [字节码增强技术探索](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
 
 字节码看似杂乱无序，实际上是由严格的格式要求组成的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408200748424.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/d5dbfd94883c48cca97e5693b6ae5d82.png)
 
 ### 魔数
 

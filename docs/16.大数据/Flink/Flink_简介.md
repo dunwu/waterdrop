@@ -88,7 +88,7 @@ Flink 应用程序的状态访问都在本地进行，因为这有助于其提�
 
 只有在每一个单独的事件上进行转换操作的应用才不需要状态，换言之，每一个具有一定复杂度的流处理应用都是有状态的。任何运行基本业务逻辑的流处理应用都需要在一定时间内存储所接收的事件或中间结果，以供后续的某个时间点（例如收到下一个事件或者经过一段特定时间）进行访问并进行后续处理。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081704283.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b5cd3f4d1909464ea34e6bcee7eba213.png)
 
 应用状态是 Flink 中的一等公民，Flink 提供了许多状态管理相关的特性支持，其中包括：
 

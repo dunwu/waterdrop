@@ -90,7 +90,7 @@ public String decode(String filepath) throws IOException, NotFoundException {
 
 以下是一个生成的二维码图片示例：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082222081.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1a6f2fba5522499e964cc108a9957740.webp)
 
 ## 参考
 

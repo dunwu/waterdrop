@@ -600,7 +600,7 @@ Spring Data 翻页查询总是返回 Page 对象，Page 对象提供了以下常
 
 ## 核心 API
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230123160810.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/01/a7650885b15846ecad8fe1ee75ffed7f.png)
 
 ## 参考资料
 

@@ -18,7 +18,7 @@ permalink: /pages/d2b4f7d2/
 
 JVM 在执行 Java 程序的过程中会把它所管理的内存划分为若干个不同的数据区域。这些区域都有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而存在，有些区域则依赖用户线程的启动和结束而建立和销毁。如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202505070632861.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/05/9240b05d12a24954aaa2e25d232bc3e4.png)
 
 ### 程序计数器
 
@@ -36,7 +36,7 @@ JVM 在执行 Java 程序的过程中会把它所管理的内存划分为若干�
 
 一个线程中的方法调用链可能会很长，以 Java 程序的角度来看，同一时刻、同一条线程里面，在 调用堆栈的所有方法都同时处于执行状态。而对于执行引擎来讲，在活动线程中，只有位于栈顶的方 法才是在运行的，只有位于栈顶的栈帧才是生效的，其被称为“当前栈帧”（Current Stack Frame），与 这个栈帧所关联的方法被称为“当前方法”（Current Method）。执行引擎所运行的所有字节码指令都只 针对当前栈帧进行操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408130821241.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/9ed9a4d1afa64196863ea4aabffa0b8e.png)
 
 - **局部变量表** - 用于存放方法参数和方法内部定义的局部变量。
 - **操作数栈** - 主要作为方法调用的中转站使用，用于存放方法执行过程中产生的中间计算结果。另外，计算过程中产生的临时变量也会放在操作数栈中。
@@ -68,7 +68,7 @@ JVM 在执行 Java 程序的过程中会把它所管理的内存划分为若干�
 
 **操作数栈（Operand Stack）**也常被称为操作栈，它是一个后入先出（Last In First Out，LIFO） 栈。**操作数栈主要作为方法调用的中转站使用，用于存放方法执行过程中产生的中间计算结果**。另外，计算过程中产生的临时变量也会放在操作数栈中。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408130822600.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/e546003105fd4776968c14b2f9976bb7.png)
 
 当一个方法刚刚开始执行的时候，这个方法的操作数栈是空的，在方法的执行过程中，会有各种字节码指令往操作数栈中写入和提取内容，也就是出栈和入栈操作。譬如在做算术运算的时候是通过将运算涉及的操作数栈压入栈顶后调用运算指令来进行的，又譬如在调用其他方法的时候是通过操作数栈来进行方法参数的传递。
 
@@ -194,11 +194,11 @@ JDK4 中新加入了 NIO，它可以使用 Native 函数库直接分配堆外内
 
 **指针碰撞（Bump The Pointer）** - 如果 Java 堆中**内存是规整的**，所有被使用过的内存都被放在一 边，空闲的内存被放在另一边，中间放着一个指针作为分界点的指示器，那所分配内存就仅仅是把那个指针向空闲空间方向挪动一段与对象大小相等的距离。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408140753480.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/823753f373ad4ea98a5d4c749956b231.png)
 
 **空闲列表（Free List）** - 如果 Java 堆中的**内存是不规整的**，已被使用的内存和空闲的内存相互交错在一起，那就没有办法简单地进行指针碰撞了，虚拟机就必须维护一个列表，记录上哪些内存块是可用的，在分配的时候从列表中找到一块足够大的空间划分给对象实例，并更新列表上的记录。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408140753926.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/9604526516774939a9c9564f34d92efc.png)
 
 选择哪种分配方式由 Java 堆是否规整决定，而 Java 堆是否规整又由所采用的垃圾收集器是否采用**标记-压缩算法**决定。因此，当使用 Serial、ParNew 等带压缩整理过程的收集器时，系统采用的分配算法是指针碰撞，既简单又高效；而当使用 CMS 这种基于清除 （Sweep）算法的收集器时，理论上就只能采用较为复杂的空闲列表来分配内存。
 
@@ -303,19 +303,19 @@ class Student{
 
 （3）class 文件加载、验证、准备以及解析，其中准备阶段会为类的静态变量分配内存，初始化为系统的初始值（这部分我在第 21 讲还会详细介绍）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630094250.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/86cd92c518354736a9b81b59bf9b5382.png)
 
 （4）完成上一个步骤后，将会进行最后一个初始化阶段。在这个阶段中，JVM 首先会执行构造器 `<clinit>` 方法，编译器会在 `.java` 文件被编译成 `.class` 文件时，收集所有类的初始化代码，包括静态变量赋值语句、静态代码块、静态方法，收集在一起成为 `<clinit>()` 方法。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630094329.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/5679266c95774a7c96091bfb0b7500d1.png)
 
 （5）执行方法。启动 main 线程，执行 main 方法，开始执行第一行代码。此时堆内存中会创建一个 student 对象，对象引用 student 就存放在栈中。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630094651.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/296e8c01f3bf40199a511ed39dd040d2.png)
 
 （6）此时再次创建一个 JVMCase 对象，调用 sayHello 非静态方法，sayHello 方法属于对象 JVMCase，此时 sayHello 方法入栈，并通过栈中的 student 引用调用堆中的 Student 对象；之后，调用静态方法 print，print 静态方法属于 JVMCase 类，是从静态方法中获取，之后放入到栈中，也是通过 student 引用调用堆中的 student 对象。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630094714.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/a51b2a1e963a4130a54c3ad8377a6945.png)
 
 ## 内存溢出
 

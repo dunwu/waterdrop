@@ -23,7 +23,7 @@ permalink: /pages/150d4cfd/
 
 Filter 提供了过滤链（Filter Chain）的概念，一个过滤链包括多个 Filter。客户端请求 request 在抵达 Servlet 之前会经过过滤链的所有 Filter，服务器响应 response 从 Servlet 抵达客户端浏览器之前也会经过过滤链的所有 FIlter。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1559054413341.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/05/00cfbefd5a2144a09b38e76100f779d4.png)
 
 ### 过滤器方法
 

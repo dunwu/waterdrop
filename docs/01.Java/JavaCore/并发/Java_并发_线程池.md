@@ -215,7 +215,7 @@ private static final int TERMINATED =  3 << COUNT_BITS;
     - `workerCount` 为 0；
     - 设置 `TIDYING` 状态成功。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409190729946.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/e926fa2451744708b1bcaee5b301c6ad.png)
 
 ### 其他重要方法
 
@@ -321,7 +321,7 @@ public void execute(Runnable command) {
 3. 如果 `workerCount >= corePoolSize && workerCount < maximumPoolSize`，且线程池内的阻塞队列已满，则创建并启动一个线程来执行新提交的任务；
 4. 如果`workerCount >= maximumPoolSize`，并且线程池内的阻塞队列已满，则根据拒绝策略来处理该任务，默认的处理方式是直接抛异常。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409190726019.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/495409421cd54f0289115628bf09ec32.png)
 
 在 `execute` 方法中，多次调用 `addWorker` 方法。`addWorker` 这个方法主要用来创建新的工作线程，如果返回 true 说明创建和启动工作线程成功，否则的话返回的就是 false。
 

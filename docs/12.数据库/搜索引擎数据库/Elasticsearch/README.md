@@ -1,7 +1,7 @@
 ---
 icon: logos:elasticsearch
 title: Elasticsearch
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110800267.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/19d8b5a1586247d68530ed5719b98801.webp
 date: 2022-04-11 16:52:35
 categories:
   - 数据库

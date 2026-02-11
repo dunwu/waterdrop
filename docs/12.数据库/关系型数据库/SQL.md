@@ -1,7 +1,7 @@
 ---
 icon: devicon:azuresqldatabase
 title: SQL
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202410022047122.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/c18ad7637f7b49ca948a8e3745c3c35e.png
 date: 2018-06-15 16:07:17
 categories:
   - 数据库

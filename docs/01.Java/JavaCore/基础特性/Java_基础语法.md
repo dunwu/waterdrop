@@ -95,7 +95,7 @@ Java 中支持的操作符类型如下：
 
 ## 方法
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220125072221.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/01/2dc621e5218e41ab9e8dd3e07e337a80.png)
 
 > 👉 扩展阅读：[深入理解 Java 方法](https://dunwu.github.io/waterdrop/pages/e70c4bf9/)
 

@@ -25,7 +25,7 @@ permalink: /pages/d8357cc5/
 
 **Kafka 是一个开源分布式事件流平台**。最初由 LinkedIn 开发，现在是 Apache 顶级项目。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070719480.gif)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/e27c76e0a2b44cce807b5cf1b4bd1a75.gif)
 
 **Kafka 的核心概念**
 
@@ -55,7 +55,7 @@ Kafka 有以下核心组件：
 
 ### 【简单】Kafka 有哪些应用场景？⭐
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202505111027731.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/05/8388f56d9edc4bfbb6a57dc6a593b008.webp)
 
 - **消息队列**：用作高吞吐量的消息系统，将消息从一个系统传递到另一个系统
 - **日志采集分析**：集中收集日志数据，然后通过 Kafka 传递到实时监控系统或存储系统
@@ -98,7 +98,7 @@ Kafka 的三层消息架构：
 
 在 Kafka 中，任意一个 Topic 维护了一组 Partition 日志，如下所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070720162.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/053ea3816769483ea373ee63d446b917.png)
 
 请注意：这里的主题只是一个逻辑上的抽象概念，实际上，**Kafka 的基本存储单元是 Partition**。Partition 无法在多个 Broker 间进行再细分，也无法在同一个 Broker 的多个磁盘上进行再细分。所以，分区的大小受到单个挂载点可用空间的限制。
 
@@ -116,7 +116,7 @@ Broker 会为 Partition 里的每个 Segment 打开一个文件句柄（包括�
 
 Segment 文件命名规则：Partition 全局的第一个 segment 从 0 开始，后续每个 segment 文件名为上一个 segment 文件最后一条消息的 offset 值。数值最大为 64 位 long 大小，19 位数字字符长度，没有数字用 0 填充。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070721654.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/04f8792fd52d4cd8840046f22f8869ab.png)
 
 Segment 文件可以分为两类：
 
@@ -150,13 +150,13 @@ Kafka 持久化有以下核心机制：
 - **干净段**：这部分消息之前已经被清理过，每个键只存在一个值。
 - **污浊段**：在上一次清理后写入的新消息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621135557.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/2d62fa2e6dea413eb1c427fdd51ecab3.png)
 
 如果 Kafka 启用了清理功能（通过 `log.cleaner.enabled` 配置），每个 Broker 启动清理管理线程 + N 个清理线程（按分区分配）
 
 对于一个段，清理前后的效果如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621140117.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/30430106919943c885b0c56e74111161.png)
 
 Apache Kafka 清理数据主要通过 **日志保留策略（Log Retention）** 和 **压缩策略（Compaction）** 实现，以下是核心要点概括：
 
@@ -214,7 +214,7 @@ Apache Kafka 清理数据主要通过 **日志保留策略（Log Retention）** 
 
 下面是 Kafka 中分段的日志数据文件和偏移量索引文件的对应映射关系图（其中也说明了如何按照起始偏移量来定位到日志数据文件中的具体消息）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070722556.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/845493d743af480b85cb3c81fa9233e0.png)
 
 ### 【中等】Kafka 如何实现日志压缩？
 
@@ -285,14 +285,14 @@ Kafka 生产者用一个 `ProducerRecord` 对象来抽象一条要发送的消�
 - 如果**成功**，则返回一个 `RecordMetaData` 对象，它包含了主题、分区、偏移量；
 - 如果**失败**，则返回一个错误。生产者在收到错误后，可以进行重试，重试次数可以在配置中指定。失败一定次数后，就返回错误消息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200528224323.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/05/b89455640aa248e9bfeb1f4000652fe1.png)
 
 生产者向 Broker 发送消息时是怎么确定向哪一个 Broker 发送消息？
 
 - 生产者会向任意 broker 发送一个元数据请求（`MetadataRequest`），获取到每一个分区对应的 Leader 信息，并缓存到本地。
 - 生产者在发送消息时，会指定 Partition 或者通过 key 得到到一个 Partition，然后根据 Partition 从缓存中获取相应的 Leader 信息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113043.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/3f7ed5e9c2e24c5da6553fd54189516a.png)
 
 ### 【简单】Kafka 为什么要支持消费者群组？⭐⭐⭐
 
@@ -312,7 +312,7 @@ Kafka 生产者用一个 `ProducerRecord` 对象来抽象一条要发送的消�
 
 **一条消息只有被提交，才会被消费者获取到**。如下图，只能消费 Message0、Message1、Message2：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113917.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/7306e918c2ae4fbfb8d8d14b2b625913.png)
 
 ::: info 消费者群组
 
@@ -328,11 +328,11 @@ Kafka 消费者从属于消费者群组，**一个群组里的 Consumer 订阅�
 
 同一时刻，**一条消息只能被同一消费者组中的一个消费者实例消费**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070722981.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/29b36f29666e4111b1482440c5eb23e0.png)
 
 **不同消费者群组之间互不影响**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070723165.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/c47a58d33e82429e857fd7f890f07239.png)
 
 ### 【中等】Kafka 消费消息的工作流程是怎样的？⭐⭐
 
@@ -349,7 +349,7 @@ Kafka 消费者通过 `pull` 模式来获取消息，但是获取消息时并不
 - 消费者通过 `customer.poll(time)` 中设置等待时间
 - Broker 会等待累计一定量数据，然后发送给消费者。这样可以减少网络开销。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070724283.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/f3d0c34e18fb4f168a486ec90cfb580c.png)
 
 `pull` 除了获取消息外，还有其他作用：
 
@@ -379,7 +379,7 @@ Kafka 的数据结构采用三级结构，即：主题（Topic）、分区（Par
 
 Kafka 通过分区实现生产、消费的负载均衡。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202510030938004.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/dd62c39370804af5aacb40e6208c9682.png)
 
 ::: info 生产者分区策略
 
@@ -426,7 +426,7 @@ Kafka 通过分区实现生产、消费的负载均衡。
 
 消费者通过向 Coordinator 定期发送心跳来维持它们和群组的从属关系以及它们对分区的所有权。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070723810.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/6f39e1092bed4282afe8b10fca12c052.png)
 
 （3）**分区策略**：群主从 Coordinator 获取群组成员列表，然后给每一个消费者进行分配分区 Partition。分区策略根据消费者群组预设的负载均衡策略而定：
 
@@ -491,7 +491,7 @@ Kafka 通过分区实现生产、消费的负载均衡。
 
 Kafka 使用 Topic 来组织数据，每个 Topic 被分为若干个 Partition，每个 Partition 有多个副本。每个 Broker 可以保存成百上千个属于不同 Topic 和 Partition 的副本。**Kafka 副本的本质是一个只能追加写入的提交日志**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070726284.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/e617de480b874a119b2828eb6585d51d.png)
 
 Kafka 副本有两种角色：
 
@@ -499,7 +499,7 @@ Kafka 副本有两种角色：
 - **Follower 副本（从）**：Leader 副本以外的副本都是 Follower 副本。**Follower 唯一的任务就是从 Leader 那里复制消息，保持与 Leader 一致的状态**。
 - 如果 Leader 宕机，其中一个 Follower 会被选举为新的 Leader。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070726185.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/c3666e28d96d493e849abbfd22a1b686.png)
 
 为了与 Leader 保持同步，Follower 向 Leader 发起获取数据的请求，这种请求与消费者为了读取消息而发送的请求是一样的。请求消息里包含了 Follower 想要获取消息的偏移量，而这些偏移量总是有序的。
 
@@ -570,7 +570,7 @@ Kafka 中的 Controller 是整个集群的协调者，它是专门负责监控�
 
 **控制器（Controller）**，是 Apache Kafka 的核心组件。它的**主要作用是基于 ZooKeeper 管理和协调整个 Kafka 集群**。控制器其实就是一个 Broker，只不过它除了具有一般 Broker 的功能以外，还负责 Leader 的选举。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070741426.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/3ff8312cefef44b6a95ac3405215f172.png)
 
 Controller 在集群中的主要作用包括：
 
@@ -605,7 +605,7 @@ Controller 在集群中的主要作用包括：
 
 选举控制器的详细流程：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070742505.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/0d86e292214d441986cdc9ea979d4446.png)
 
 1. 第一个在 ZooKeeper 中成功创建 `/controller` 临时节点的 Broker 会被指定为控制器。
 2. 其他 Broker 在控制器节点上创建 Zookeeper watch 对象。
@@ -672,7 +672,7 @@ Zookeeper 仍是 Kafka 2.8 之前版本的"大脑"，承担关键协调职能。
 
 在 Broker 停机、出现网络分区或长时间垃圾回收停顿时，Broker 会与 ZooKeeper 断开连接，此时 Broker 在启动时创建的临时节点会自动被 ZooKeeper 移除。监听 Broker 列表的 Kafka 组件会被告知 Broker 已移除。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070741387.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/134313cedc064cbb934291b9af2226c8.png)
 
 - `admin`：存储管理信息。主要为删除主题事件，分区迁移事件，优先副本选举，信息 (一般为临时节点)
 - `brokers`：存储 Broker 相关信息。broker 节点以及节点上的主题相关信息
@@ -758,7 +758,7 @@ Kafka 弃用 ZooKeeper 主要是为了**简化架构、提升性能、降低运�
 
 一条消息从生产到消费，可以划分三个阶段：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070727544.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/34a58a9972694faaafb421296f7d5bd7.png)
 
 - **生产阶段**：Producer 创建消息，并通过网络发送给 Broker。
 - **存储阶段**：Broker 收到消息并存储，如果是集群，还要同步副本给其他 Broker。
@@ -852,7 +852,7 @@ Kafka 有三种发送方式：同步、异步、异步回调。同步方式能�
 
 消费者唯一要做的是确保哪些消息是已经读取过的，哪些是没有读取过的（通过提交偏移量给 Broker 来确认）。如果消费者提交了偏移量却未能处理完消息，那么就有可能造成消息丢失，这也是消费者丢失消息的主要原因。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200727140159.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/f265b495ad7c411face607063ca699e8.png)
 
 消费者的可靠性配置：
 
@@ -1055,7 +1055,7 @@ Kafka 数据传输是一个从网络到磁盘，再由磁盘到网络的过程�
 
 采用零拷贝技术，Kafka 使用 `sendfile()` 系统方法，将数据从 os buffer 直接复制到网卡 buffer。这个过程中，唯一一次复制数据是从 os buffer 到网卡 buffer。这个复制过程是通过 DMA（Direct Memory Access，直接内存访问） 完成的。使用 DMA 时，CPU 不参与，这使得它非常高效。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070727055.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/9b5da2cfd99e47f4aebadeedb0bad066.webp)
 
 ::: info 其他性能设计
 

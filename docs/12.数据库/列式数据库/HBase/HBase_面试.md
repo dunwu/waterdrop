@@ -27,7 +27,7 @@ permalink: /pages/6a3851d6/
 
 HBase 是一种类似于 `Google’s Big Table` 的数据模型，它是 Hadoop 生态系统的一部分，它将数据存储在 HDFS 上，客户端可以通过 HBase 实现对 HDFS 上数据的随机访问。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601170449.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/eb0570e6c12d453fa87f32b658c05a15.png)
 
 HBase 的**核心特性**如下：
 
@@ -219,7 +219,7 @@ HBase 数据模型和关系型数据库有所不同。其数据模型的关键�
 - 该表具有两个列族，分别是 personal 和 office;
 - 其中列族 personal 拥有 name、city、phone 三个列，列族 office 拥有 tel、addres 两个列。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601172926.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/49d2fa930d82453fa511ea2796a1114a.png)
 
 > _图片引用自 : HBase 是列式存储数据库吗_ *https://www.iteblog.com/archives/2498.html*
 
@@ -235,11 +235,11 @@ HBase Table 中的所有行按照 `Row Key` 的字典序排列。HBase Tables �
 
 每个表一开始只有一个 `Region`，随着数据不断增加，`Region` 会不断增大，当增大到一个阀值的时候，`Region` 就会等分为两个新的 `Region`。当 Table 中的行不断增多，就会有越来越多的 `Region`。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082201901.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/99d2cb0498cc441bbafad5c709f1e5dc.png)
 
 `Region` 是 HBase 中**分布式存储和负载均衡的最小单元**。这意味着不同的 `Region` 可以分布在不同的 `Region Server` 上。但一个 `Region` 是不会拆分到多个 Server 上的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082201143.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/57150baad84f43a18c61a357e769ae85.png)
 
 :::
 
@@ -259,7 +259,7 @@ HBase Table 中的所有行按照 `Row Key` 的字典序排列。HBase Tables �
 
 注：`META` 表是 HBase 中一张特殊的表，它保存了所有 Region 的位置信息，META 表自己的位置信息则存储在 ZooKeeper 上。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601182655.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/3785f5fce6404a6b97aa1340fc26b232.png)
 
 > 更为详细读取数据流程参考：
 >
@@ -306,7 +306,7 @@ HBase 系统遵循 Master/Salve 架构，由三种不同类型的组件组成：
   - Region Server 负责维护 Master 分配给它的 Region ，并处理发送到 Region 上的 IO 请求；
   - Region Server 负责切分在运行过程中变得过大的 Region。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200612151602.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/6cb6d779233049bca32fc818dbef7240.png)
 
 HBase 使用 ZooKeeper 作为分布式协调服务来维护集群中的服务器状态。 Zookeeper 负责维护可用服务列表，并提供服务故障通知等服务：
 

@@ -27,7 +27,7 @@ permalink: /pages/01602c0e/
 
 ## Hive 的体系架构
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200224193019.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/02/f40f7bdbe3a24bfa9c4968c92ad5b7ef.png)
 
 ### command-line shell & thrift/jdbc
 
@@ -80,7 +80,7 @@ Hive 表中的列支持以下基本数据类型：
 
 Hive 中基本数据类型遵循以下的层次结构，按照这个层次结构，子类型到祖先类型允许隐式转换。例如 INT 类型的数据允许隐式转换为 BIGINT 类型。额外注意的是：按照类型层次结构允许将 STRING 类型隐式转换为 DOUBLE 类型。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200224193613.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/02/f7ffc4a5940e47c8b1ce0d0fbcb35404.png)
 
 ### 复杂类型
 

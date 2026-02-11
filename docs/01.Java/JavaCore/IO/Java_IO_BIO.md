@@ -35,7 +35,7 @@ BIO 中操作的流主要有两大类，字节流和字符流，两类根据流�
   - 输入字符流：`Reader`
   - 输出字符流：`Writer`
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200219130627.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/02/e80caaa647cf46f9afc662abadb9238f.png)
 
 ### 字节流
 
@@ -43,7 +43,7 @@ BIO 中操作的流主要有两大类，字节流和字符流，两类根据流�
 
 字节流有两个核心抽象类：`InputStream` 和 `OutputStream`。所有的字节流类都继承自这两个抽象类。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200219133627.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/02/8a631489a9ef4d46a96833b68d929e3e.png)
 
 #### InputStream
 

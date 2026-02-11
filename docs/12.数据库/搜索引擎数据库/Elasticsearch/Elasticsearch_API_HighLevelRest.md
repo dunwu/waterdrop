@@ -1,7 +1,7 @@
 ---
 icon: logos:elasticsearch
 title: ElasticSearch API 之 HighLevelRestClient
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110759679.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/1179194f8ffb4056ad2b1b18aaf12536.webp
 date: 2022-03-01 18:55:46
 categories:
   - 数据库

@@ -29,7 +29,7 @@ permalink: /pages/bf41e73b/
 
 ## "singleton" Bean 作用域
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20221221170833.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/12/763d46a1e80d4f0aae8ed4acafd626c9.png)
 
 ## "prototype" Bean 作用域
 

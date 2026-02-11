@@ -62,7 +62,7 @@ Systemd 的优点是功能强大，使用方便，缺点是体系庞大，非常
 simple, keep stupid"
 的[Unix 哲学](http://www.ruanyifeng.com/blog/2009/06/unix_philosophy.html)。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081800768.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8cea4f448fa84d2a986296fc5984a2c5.png)
 
 （上图为 Systemd 架构图）
 

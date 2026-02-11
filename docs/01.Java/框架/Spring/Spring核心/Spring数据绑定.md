@@ -21,7 +21,7 @@ permalink: /pages/b528229a/
 
 在 Spring 中，数据绑定功能主要由 `DataBinder` 类实现。此外，`BeanWrapper` 也具有类似的功能，但 `DataBinder` 额外支持字段验证、字段格式化和绑定结果分析。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230111150930.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/01/731a79f4024f4915a49bfb86f395227f.png)
 
 ## 快速入门
 
@@ -78,7 +78,7 @@ public class DataBindingDemo {
 
 在 Spring 中，`DataBinder` 类是数据绑定功能的基类。`WebDataBinder` 是 `DataBinder` 的子类，主要用于 Spring Web 数据绑定，此外，还有一些 `WebDataBinder` 的扩展子类，其类族如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230111152225.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/01/5ded07def7fc426cae54cd27b597c3c5.png)
 
 DataBinder 核心属性：
 

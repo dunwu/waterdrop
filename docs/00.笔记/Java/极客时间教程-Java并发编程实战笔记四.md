@@ -62,27 +62,27 @@ Guava 实现令牌桶算法，其关键是**记录并动态计算下一令牌发
 
 假设令牌桶的容量为 b=1，限流速率 r = 1 个请求/秒，如下图所示，如果当前令牌桶中没有令牌，下一个令牌的发放时间是在第 3 秒，而在第 2 秒的时候有一个线程 T1 请求令牌，此时该如何处理呢？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010943737.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/d3d3eedd362b44cca2f4cc66df04110d.png)
 
 对于这个请求令牌的线程而言，很显然需要等待 1 秒，因为 1 秒以后（第 3 秒）它就能拿到令牌了。此时需要注意的是，下一个令牌发放的时间也要增加 1 秒，为什么呢？因为第 3 秒发放的令牌已经被线程 T1 预占了。处理之后如下图所示。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010944198.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/fc45f874ba334522a932f98a577216b1.png)
 
 假设 T1 在预占了第 3 秒的令牌之后，马上又有一个线程 T2 请求令牌，如下图所示。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010945560.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/4e1d438863ad4711b142967ebd590ee8.png)
 
 很显然，由于下一个令牌产生的时间是第 4 秒，所以线程 T2 要等待两秒的时间，才能获取到令牌，同时由于 T2 预占了第 4 秒的令牌，所以下一令牌产生时间还要增加 1 秒，完全处理之后，如下图所示。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010946590.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/873027124abd4a2293bbd9c26f1c1424.png)
 
 上面线程 T1、T2 都是在**下一令牌产生时间之前**请求令牌，如果线程在**下一令牌产生时间之后**请求令牌会如何呢？假设在线程 T1 请求令牌之后的 5 秒，也就是第 7 秒，线程 T3 请求令牌，如下图所示。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010947529.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/68df48fca8fb4adc873ce02f19c090f9.png)
 
 由于在第 5 秒已经产生了一个令牌，所以此时线程 T3 可以直接拿到令牌，而无需等待。在第 7 秒，实际上限流器能够产生 3 个令牌，第 5、6、7 秒各产生一个令牌。由于我们假设令牌桶的容量是 1，所以第 6、7 秒产生的令牌就丢弃了，其实等价地你也可以认为是保留的第 7 秒的令牌，丢弃的第 5、6 秒的令牌，也就是说第 7 秒的令牌被线程 T3 占有了，于是下一令牌的的产生时间应该是第 8 秒，如下图所示。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010947885.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/3ddee97a93584693a66eb98507d5a701.png)
 
 通过上面简要地分析们**只需要记录一个下一令牌产生的时间，并动态更新它，就能够轻松完成限流功能**。我们可以将上面的这个算法代码化，示例代码如下所示，依然假设令牌桶的容量是 1。关键是** reserve() 方法**，这个方法会为请求令牌的线程预分配令牌，同时返回该线程能够获取令牌的时间。其实现逻辑就是上面提到的：如果线程请求令牌的时间在下一令牌产生时间之后，那么该线程立刻就能够获取令牌；反之，如果请求时间在下一令牌产生时间之前，那么该线程是在下一令牌产生的时间获取令牌。由于此时下一令牌已经被该线程预占，所以下一令牌产生的时间需要加上 1 秒。
 
@@ -202,19 +202,19 @@ class SimpleLimiter {
 
 BIO 模型里，所有 read() 操作和 write() 操作都会阻塞当前线程的，如果客户端已经和服务端建立了一个连接，而迟迟不发送数据，那么服务端的 read() 操作会一直阻塞，所以**使用 BIO 模型，一般都会为每个 socket 分配一个独立的线程**，这样就不会因为线程阻塞在一个 socket 上而影响对其他 socket 的读写。BIO 的线程模型如下图所示，每一个 socket 都对应一个独立的线程；为了避免频繁创建、消耗线程，可以采用线程池，但是 socket 和线程之间的对应关系并不会变化。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010957084.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/b72e0f19f6414d5d8526669a207a272d.png)
 
 BIO 这种线程模型适用于 socket 连接不是很多的场景；但是现在的互联网场景，往往需要服务器能够支撑十万甚至百万连接，而创建十万甚至上百万个线程显然并不现实，所以 BIO 线程模型无法解决百万连接的问题。如果仔细观察，你会发现互联网场景中，虽然连接多，但是每个连接上的请求并不频繁，所以线程大部分时间都在等待 I/O 就绪。也就是说线程大部分时间都阻塞在那里，这完全是浪费，如果我们能够解决这个问题，那就不需要这么多线程了。
 
 可以用一个线程来处理多个连接，这样线程的利用率就上来了，同时所需的线程数量也跟着降下来了。这个思路很好，可是使用 BIO 相关的 API 是无法实现的，这是为什么呢？因为 BIO 相关的 socket 读写操作都是阻塞式的，而一旦调用了阻塞式 API，在 I/O 就绪前，调用线程会一直阻塞，也就无法处理其他的 socket 连接了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010959294.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/93f73d78313e4a9486464ba1d7569bba.png)
 
 ### Reactor 模式
 
 下面是 Reactor 模式的类结构图，其中 Handle 指的是 I/O 句柄，在 Java 网络编程里，它本质上就是一个网络连接。Event Handler 很容易理解，就是一个事件处理器，其中 handle_event() 方法处理 I/O 事件，也就是每个 Event Handler 处理一个 I/O Handle；get_handle() 方法可以返回这个 I/O 的 Handle。Synchronous Event Demultiplexer 可以理解为操作系统提供的 I/O 多路复用 API，例如 POSIX 标准里的 select() 以及 Linux 里面的 epoll()。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409011000910.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/5995a45408124e67b4ab45490100c2b6.png)
 
 Reactor 模式的核心自然是 **Reactor 这个类**，其中 register_handler() 和 remove_handler() 这两个方法可以注册和删除一个事件处理器；**handle_events() 方式是核心**，也是 Reactor 模式的发动机，这个方法的核心逻辑如下：首先通过同步事件多路选择器提供的 select() 方法监听网络事件，当有网络事件就绪后，就遍历事件处理器来处理该网络事件。由于网络事件是源源不断的，所以在主程序中启动 Reactor 模式，需要以 `while(true){}` 的方式调用 handle_events() 方法。
 
@@ -239,7 +239,7 @@ while (true) {
 
 一个网络连接对应到一个 Java 线程上，最大的好处就是对于一个网络连接的事件处理是单线程的，这样就**避免了各种并发问题**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409011004870.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/c520d2c3c1704e978946d0f81af1a021.png)
 
 Netty 中还有一个核心概念是** EventLoopGroup**，顾名思义，一个 EventLoopGroup 由一组 EventLoop 组成。实际使用中，一般都会创建两个 EventLoopGroup，一个称为 bossGroup，一个称为 workerGroup。
 
@@ -373,7 +373,7 @@ Java SDK 中 ArrayBlockingQueue 使用**数组**作为底层的数据存储，�
 
 生产者线程向 ArrayBlockingQueue 增加一个元素，每次增加元素 E 之前，都需要创建一个对象 E，如下图所示，ArrayBlockingQueue 内部有 6 个元素，这 6 个元素都是由生产者线程创建的，由于创建这些元素的时间基本上是离散的，所以这些元素的内存地址大概率也不是连续的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409020709300.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/8b95aabd22f541f2a21def7a8d12d9c6.png)
 
 Disruptor 内部的 RingBuffer 也是用数组实现的，但是这个数组中的所有元素在初始化时是一次性全部创建的，所以这些元素的内存地址大概率是连续的，相关的代码如下所示。
 
@@ -388,7 +388,7 @@ for (int i=0; i<bufferSize; i++){
 
 数组中所有元素内存地址连续能提升性能。因为消费者线程在消费的时候，是遵循空间局部性原理的，消费完第 1 个元素，很快就会消费第 2 个元素；当消费第 1 个元素 E1 的时候，CPU 会把内存中 E1 后面的数据也加载进 Cache，如果 E1 和 E2 在内存中的地址是连续的，那么 E2 也就会被加载进 Cache 中，然后当消费第 2 个元素的时候，由于 E2 已经在 Cache 中了，所以就不需要从内存中加载了，这样就能大大提升性能。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409020712580.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/ea8d4d7f8abc4b22bac66e7bc3f32a11.png)
 
 除此之外，在 Disruptor 中，生产者线程通过 publishEvent() 发布 Event 的时候，并不是创建一个新的 Event，而是通过 event.set() 方法修改 Event， 也就是说 RingBuffer 创建的 Event 是可以循环利用的，这样还能避免频繁创建、删除 Event 导致的频繁 GC 问题。
 
@@ -396,7 +396,7 @@ for (int i=0; i<bufferSize; i++){
 
 **伪共享指的是由于共享缓存行导致缓存无效的场景**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409020714249.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/4846dc3bccb04866aa85f3104d9521cb.png)
 
 避免伪共享的方法是：
 
@@ -467,7 +467,7 @@ do {
 
 数据库连接池和线程池一样，都属于池化资源，作用都是避免重量级资源的频繁创建和销毁，对于数据库连接池来说，也就是避免数据库连接频繁创建和销毁。如下图所示，服务端会在运行期持有一定数量的数据库连接，当需要执行 SQL 时，并不是直接创建一个数据库连接，而是从连接池中获取一个；当 SQL 执行完，也并不是将数据库连接真的关掉，而是将其归还到连接池中。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409020725868.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/ad25cd5975c44bc88ad84b3f1e5b787b.png)
 
 执行数据库操作基本上是一系列规范化的步骤：
 
@@ -538,7 +538,7 @@ HiKariCP 觉得用 ArrayList 还是太慢，当通过 `conn.createStatement()` �
 
 假设一个 Connection 依次创建 6 个 Statement，分别是 S1、S2、S3、S4、S5、S6，按照正常的编码习惯，关闭 Statement 的顺序一般是逆序的，关闭的顺序是：S6、S5、S4、S3、S2、S1，而 ArrayList 的 remove(Object o) 方法是顺序遍历查找，逆序删除而顺序查找，这样的查找效率就太慢了。如何优化呢？很简单，优化成逆序查找就可以了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409020729492.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/eb407f6eab4046e39d40cf516c8edfd3.png)
 
 HiKariCP 中的 FastList 相对于 ArrayList 的一个优化点就是将 `remove(Object element)` 方法的**查找顺序变成了逆序查找**。除此之外，FastList 还有另一个优化点，是 `get(int index)` 方法没有对 index 参数进行越界检查，HiKariCP 能保证不会越界，所以不用每次都进行越界检查。
 

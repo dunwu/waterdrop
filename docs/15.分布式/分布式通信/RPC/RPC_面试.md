@@ -38,7 +38,7 @@ RPC 是一种应用间通信的方式，它的通信流程中需要注意以下�
 - **协议**：请求方和响应方要互相识别彼此的信息，需要约定好彼此数据的格式，即协议。大多数的协议至少分成两部分，分别是数据头和消息体。数据头一般用于身份识别，包括协议标识、数据大小、请求类型、序列化类型等信息；消息体主要是请求的业务参数信息和扩展属性等。
 - **动态代理**：为了屏蔽底层通信细节，使用户聚焦自身业务，因此 RPC 框架一般引入了动态代理，通过依赖注入等技术，拦截方法调用，完成远程调用的通信逻辑。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220625094814.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/085e7be8982344bb8bd81404e29456c4.png)
 
 1. 服务消费方（client）调用以本地调用方式调用服务；
 2. client stub 接收到调用后负责将方法、参数等组装成能够进行网络传输的消息体；
@@ -74,13 +74,13 @@ RPC 是一种应用间通信的方式，它的通信流程中需要注意以下�
 
 综上，一个 RPC 协议大概会由下图中的这些参数组成：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619102052.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/ba7ab435b38142cab7d5b15e058221a8.png)
 
 前面所述的协议属于定长协议头，那也就是说往后就不能再往协议头里加新参数了，如果加参数就会导致线上兼容问题。
 
 为了保证能平滑地升级改造前后的协议，我们有必要设计一种支持可扩展的协议。其关键在于让协议头支持可扩展，扩展后协议头的长度就不能定长了。那要实现读取不定长的协议头里面的内容，在这之前肯定需要一个固定的地方读取长度，所以我们需要一个固定的写入协议头的长度。整体协议就变成了三部分内容：固定部分、协议头内容、协议体内容。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619102833.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/c3272dfb216141749fe5ceb8188d1bf0.png)
 
 ## 序列化
 
@@ -91,7 +91,7 @@ RPC 是一种应用间通信的方式，它的通信流程中需要注意以下�
 - **序列化（serialize）**：序列化是将对象转换为二进制数据。
 - **反序列化（deserialize）**：反序列化是将二进制数据转换为对象。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619110947.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/ba8d88ee24c94088b3a389fc55e0bc18.png)
 
 Java 领域，常见的序列化技术如下
 
@@ -162,7 +162,7 @@ RPC 调用在大多数的情况下，是一个高并发调用的场景，考虑�
 
 系统内核处理 IO 操作分为两个阶段——等待数据和拷贝数据。等待数据，就是系统内核在等待网卡接收到数据后，把数据写到内核中；而拷贝数据，就是系统内核在获取到数据后，将数据拷贝到用户进程的空间中。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717154300)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/c72774bd398d418e8eb9df059ef8b4b5.)
 
 应用进程的每一次写操作，都会把数据写到用户空间的缓冲区中，再由 CPU 将数据拷贝到系统内核的缓冲区中，之后再由 DMA 将这份数据拷贝到网卡中，最后由网卡发送出去。这里我们可以看到，一次写操作数据要拷贝两次才能通过网卡发送出去，而用户进程的读操作则是将整个流程反过来，数据同样会拷贝两次才能让应用程序读取到数据。
 
@@ -170,7 +170,7 @@ RPC 调用在大多数的情况下，是一个高并发调用的场景，考虑�
 
 所谓的零拷贝，就是取消用户空间与内核空间之间的数据拷贝操作，应用进程每一次的读写操作，可以通过一种方式，直接将数据写入内核或从内核中读取数据，再通过 DMA 将内核中的数据拷贝到网卡，或将网卡中的数据 copy 到内核。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717154716.jfif)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/73f7580c02844403a8f9f241af82cfd5.jfif)
 
 Netty 的零拷贝偏向于用户空间中对数据操作的优化，这对处理 TCP 传输中的拆包粘包问题有着重要的意义，对应用程序处理请求数据与返回数据也有重要的意义。
 
@@ -216,7 +216,7 @@ RPC 框架必须要有服务注册和发现机制，这样，集群中的节点�
 
 搭建一个 ZooKeeper 集群作为注册中心集群，服务注册的时候只需要服务节点向 ZooKeeper 节点写入注册信息即可，利用 ZooKeeper 的 Watcher 机制完成服务订阅与服务下发功能。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200610180056.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/cbc4710785a845fcb3262d1d1ffdbc0c.png)
 
 通常我们可以使用 ZooKeeper、etcd 或者分布式缓存（如 Hazelcast）来解决事件通知问题，但当集群达到一定规模之后，依赖的 ZooKeeper 集群、etcd 集群可能就不稳定了，无法满足我们的需求。
 
@@ -310,7 +310,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 其实，在 RPC 框架打印的异常信息中，是包括定位异常所需要的异常信息的，比如是哪类异常引起的问题（如序列化问题或网络超时问题），是调用端还是服务端出现的异常，调用端与服务端的 IP 是什么，以及服务接口与服务分组都是什么等等。具体如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200719082205.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/66ccb58c4231455893790f103a4e1750.png)
 
 ## 优雅启停
 
@@ -353,7 +353,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 不管你是选择哪个时间，最终的结果就是，调用方通过服务发现，除了可以拿到IP列表，还可以拿到对应的启动时间。接着，可以利用加权负载均衡算法来分发流量。现在，需要让这个权重变为动态的，并且是随着时间的推移慢慢增加到服务提供方设定的固定值。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220630194822.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/1e792fbdddd745e08bebb0fd819479bc.png)
 
 通过这个小逻辑的改动，我们就可以保证当服务提供方运行时长小于预热时间时，对服务提供方进行降权，减少被负载均衡选择的概率，避免让应用在启动之初就处于高负载状态，从而实现服务提供方在启动后有一个预热的过程。
 
@@ -367,7 +367,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 我们可以在服务提供方应用启动后，接口注册到注册中心前，预留一个 Hook 过程，让用户可以实现可扩展的 Hook 逻辑。用户可以在 Hook 里面模拟调用逻辑，从而使 JVM 指令能够预热起来，并且用户也可以在 Hook 里面事先预加载一些资源，只有等所有的资源都加载完成后，最后才把接口注册到注册中心。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220630194919.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/9398281772014435b06750851da7a756.png)
 
 ## 流量回放
 
@@ -459,11 +459,11 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 
 场景一：搭建一个统一的测试平台，可以让各个业务方在测试平台中通过输入接口、分组名、方法名以及参数值，在线测试自己发布的 RPC 服务。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200719095518.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/b227125391f64c82a5d7f9cb18aae60a.png)
 
 场景二：搭建一个轻量级的服务网关，可以让各个业务方用 HTTP 的方式，通过服务网关调用其它服务。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200719095704.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/51e553c30a5a49a487a3287c388c51ea.png)
 
 为了解决这些场景的问题，可以使用泛化调用。
 

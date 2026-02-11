@@ -200,11 +200,11 @@ Java 使用的线程调度是抢占式的。也就是说，JVM 本身不负责�
 
 在单核时代，所有的线程都是在一颗 CPU 上执行，CPU 缓存与内存的数据一致性容易解决。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409042331169.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/453dca98b738418cbb666bea54047617.png)
 
 多核时代，每颗 CPU 都有自己的缓存，这时 CPU 缓存与内存的数据一致性就没那么容易解决了，当多个线程在不同的 CPU 上执行时，这些线程操作的是不同的 CPU 缓存。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409042332517.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/c980ad7f084146cda33bc6ef5f770df7.png)
 
 **（2）线程切换带来的原子性问题**
 
@@ -218,7 +218,7 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 
 因此，执行 `count += 1` 不是原子操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409042334004.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/5d408a9b8c60432b8db6a6bb815e0e4e.png)
 
 **（3）编译优化带来的有序性问题**
 
@@ -249,7 +249,7 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 - **不可抢占**：线程已获得的资源在未使用完之前不能被其他线程强行剥夺，只有自己使用完毕后才释放资源。
 - **循环等待**：若干线程之间形成一种头尾相接的循环等待资源关系。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409050712813.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/6798886d8aeb40f192444cbd16c7a16d.png)
 
 ::: info 如何发现死锁？
 :::
@@ -323,7 +323,7 @@ public class DeadlockDetector {
 
 想象这样一个例子：两个人在狭窄的走廊里相遇，二者都很礼貌，试图移到旁边让对方先通过。但是他们最终在没有取得任何进展的情况下左右摇摆，因为他们都在同一时间向相同的方向移动。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409050740102.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/fcb8b3cd83314468b8c62039442ff810.png)
 
 如图所示：两个线程想要通过一个 Worker 对象访问共享公共资源的情况，但是当他们看到另一个 Worker（在另一个线程上调用）也是“活动的”时，它们会尝试将该资源交给其他工作者并等待为它完成。如果最初我们让两名工作人员都活跃起来，他们将会面临活锁问题。
 
@@ -408,7 +408,7 @@ public class DeadlockDetector {
 - **同步** - 是指线程之间如何协作。
 - **互斥** - 是指保证同一时刻只允许一个线程访问共享资源。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202504221021138.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/398206020e8a4e02b9b6048b8eab811b.png)
 
 Java 的 `java.util.concurrent` 包（简称 J.U.C）中提供了大量并发工具类，是 Java 并发能力的主要体现（注意，不是全部，有部分并发能力的支持在其他包中）。从功能上，大致可以分为：
 
@@ -441,7 +441,7 @@ J.U.C 包中的工具类是基于 `synchronized`、`volatile`、`CAS`、`ThreadL
 
 为了解决缓存一致性问题，**需要各个处理器访问缓存时都遵循一些协议，在读写时要根据协议来进行操作**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290755550.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/fb22bbdce2e94b4999d82a3750f00589.png)
 
 **指令重排序**
 
@@ -727,7 +727,7 @@ public void increase() {
 - **同步静态方法** - 对于静态同步方法，锁是当前类的 `Class` 对象
 - **同步代码块** - 对于同步方法块，锁是 `synchonized` 括号里配置的对象
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409090719904.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/4175cd3e336f4ac489f3f0e328f907aa.png)
 
 ### 【中等】`synchronized` 的实现原理是什么？⭐⭐⭐
 
@@ -749,7 +749,7 @@ public void increase() {
 
 Mark Word 记录了对象和锁有关的信息。Mark Word 在 64 位 JVM 中的长度是 64bit，我们可以一起看下 64 位 JVM 的存储结构是怎么样的。如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200629191250.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/a2dc15c84410441883de9c6ccf8d57ae.png)
 
 **（2）Monitor（监视器）**
 
@@ -802,7 +802,7 @@ JDK 1.6 后，`synchronized` 采用 **锁升级** 机制优化性能，避免直
 
 Mark Word 记录了对象和锁有关的信息。Mark Word 在 64 位 JVM 中的长度是 64bit，我们可以一起看下 64 位 JVM 的存储结构是怎么样的。如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200629191250.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/a2dc15c84410441883de9c6ccf8d57ae.png)
 
 锁升级功能主要依赖于 Mark Word 中的锁标志位和释放偏向锁标志位，`synchronized` 同步锁就是从偏向锁开始的，随着竞争越来越激烈，偏向锁升级到轻量级锁，最终升级到重量级锁。
 
@@ -919,7 +919,7 @@ final List<String> unsafeList = new ArrayList<>();
 
 `java.lang.Thread.State` 中定义了 **6** 种不同的线程状态，在给定的一个时刻，线程只能处于其中的一个状态。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290809602.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/bbb471da0cb743b088dc9fe58ec57993.png)
 
 以下是各状态的说明，以及状态间的联系：
 

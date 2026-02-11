@@ -297,7 +297,7 @@ DateFormat df = SafeDateFormat.get();
 
 ThreadLocal 的目标是让不同的线程有不同的变量 V，那最直接的方法就是创建一个 Map，它的 Key 是线程，Value 是每个线程拥有的变量 V，ThreadLocal 内部持有这样的一个 Map 就可以了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010704287.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/c3dc79c9f51548ffa34abcf1e5ca2667.png)
 
 ```java
 class MyThreadLocal<T> {
@@ -318,7 +318,7 @@ class MyThreadLocal<T> {
 
 Java 的实现里面也有一个 Map，叫做 ThreadLocalMap，不过持有 ThreadLocalMap 的不是 ThreadLocal，而是 Thread。Thread 这个类内部有一个私有属性 threadLocals，其类型就是 ThreadLocalMap，ThreadLocalMap 的 Key 是 ThreadLocal。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010705524.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/67ca9489f6a7453cb843c4a0f5fac587.png)
 
 Thread 持有 ThreadLocalMap 的示意图
 
@@ -394,7 +394,7 @@ es.execute(()->{
 
 消息队列在互联网大厂中用的非常多，主要用作流量削峰和系统解耦。在这种接入方式中，发送消息和消费结果这两个操作之间是异步的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010706341.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/aa57d6db1b1c441b94e12033ebdc2497.png)
 
 ```java
 class Message{
@@ -429,7 +429,7 @@ Respond handleWebReq(){
 
 一个对象 GuardedObject，内部有一个成员变量——受保护的对象，以及两个成员方法——`get(Predicate<T> p)`和`onChanged(T obj)`方法。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010706780.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/19745db87a924042a37ae305f9f54281.png)
 
 GuardedObject 的内部实现非常简单，是管程的一个经典用法，核心是：get() 方法通过条件变量的 await() 方法实现等待，onChanged() 方法通过条件变量的 signalAll() 方法实现唤醒功能。逻辑还是很简单的，所以这里就不再详细介绍了。
 
@@ -906,7 +906,7 @@ try {
 
 Worker Thread 模式可以类比现实世界里车间的工作模式：车间里的工人，有活儿了，大家一起干，没活儿了就聊聊天等着。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010734563.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/a92e584c92ce450483a426c41d163aba.png)
 
 这个模式，在 Java 中的方案就是线程池。
 
@@ -973,7 +973,7 @@ ExecutorService es = new ThreadPoolExecutor(50, 500, 60L, TimeUnit.SECONDS,
 
 这个出问题的应用，相关的逻辑精简之后，如下图所示，该应用将一个大型的计算任务分成两个阶段，第一个阶段的任务会等待第二阶段的子任务完成。在这个应用里，每一个阶段都使用了线程池，而且两个阶段使用的还是同一个线程池。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010741505.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/eb9cf8c1c7c04d5b8ea2765bfbea2a9e.png)
 
 我们可以用下面的示例代码来模拟该应用，如果你执行下面的这段代码，会发现它永远执行不到最后一行。执行过程中没有任何异常，但是应用已经停止响应了。
 
@@ -1007,7 +1007,7 @@ System.out.println("end");
 
 当应用出现类似问题时，首选的诊断方法是查看线程栈。下图是上面示例代码停止响应后的线程栈，你会发现线程池中的两个线程全部都阻塞在 `l2.await();` 这行代码上了，也就是说，线程池里所有的线程都在等待 L2 阶段的任务执行完，那 L2 阶段的子任务什么时候能够执行完呢？永远都没那一天了，为什么呢？因为线程池里的线程都阻塞了，没有空闲的线程执行 L2 阶段的任务了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010743782.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/248fe8c5fa71497bb542bf87bed591a5.png)
 
 原因找到了，那如何解决就简单了，最简单粗暴的办法就是将线程池的最大线程数调大，如果能够确定任务的数量不是非常多的话，这个办法也是可行的，否则这个办法就行不通了。其实**这种问题通用的解决方案是为不同的任务创建不同的线程池**。对于上面的这个应用，L1 阶段的任务和 L2 阶段的任务如果各自都有自己的线程池，就不会出现这种问题了。
 
@@ -1019,7 +1019,7 @@ System.out.println("end");
 
 **两阶段终止模式**，顾名思义，就是将终止过程分成两个阶段：第一个阶段主要是线程 T1 向线程 T2 **发送终止指令**，而第二阶段则是线程 T2 **响应终止指令**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010920384.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/9fad5cc689134de5bf47724507e9d154.png)
 
 终止指令，其实包括两方面内容：**interrupt() 方法**和**线程终止的标志位**。
 
@@ -1027,7 +1027,7 @@ System.out.println("end");
 
 实际工作中，有些监控系统需要动态地采集一些数据，一般都是监控系统发送采集指令给被监控系统的监控代理，监控代理接收到指令之后，从监控目标收集数据，然后回传给监控系统，详细过程如下图所示。出于对性能的考虑（有些监控项对系统性能影响很大，所以不能一直持续监控），动态采集功能一般都会有终止操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010923997.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/3baf111ebb8c4084b08a3bf6283bb635.png)
 
 下面的示例代码是**监控代理**简化之后的实现，start() 方法会启动一个新的线程 rptThread 来执行监控数据采集和回传的功能，stop() 方法需要优雅地终止线程 rptThread，那 stop() 相关功能该如何实现呢？
 
@@ -1169,7 +1169,7 @@ shutdown() 方法是一种很保守的关闭线程池的方法。线程池执行
 
 生产者-消费者模式的核心是一个**任务队列**，生产者线程生产任务，并将任务添加到任务队列中，而消费者线程从任务队列中获取任务并执行。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010930317.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/71ee08be87a04e4ba21d06c2b6699c22.png)
 
 生产者和消费者没有任何依赖关系，它们彼此之间的通信只能通过任务队列，所以**生产者-消费者模式是一个不错的解耦方案**。
 
@@ -1179,7 +1179,7 @@ shutdown() 方法是一种很保守的关闭线程池的方法。线程池执行
 
 监控系统动态采集的案例，其实最终回传的监控数据还是要存入数据库的（如下图）。但被监控系统往往有很多，如果每一条回传数据都直接 INSERT 到数据库，那么这个方案就是上面提到的第一种方案：每个线程 INSERT 一条数据。很显然，更好的方案是批量执行 SQL，那如何实现呢？这就要用到生产者-消费者模式了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409010933833.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/48fd7011683f41ec9e34462e13136fae.png)
 
 利用生产者-消费者模式实现批量执行 SQL 非常简单：将原来直接 INSERT 数据到数据库的线程作为生产者线程，生产者线程只需将数据添加到任务队列，然后消费者线程负责将任务从任务队列中批量取出并批量执行。
 

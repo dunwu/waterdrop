@@ -903,7 +903,7 @@ public class ThreadLocalDemo {
 - `key` 是 `ThreadLocal` 对象
 - `value` 是传递进来的对象（变量副本）
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409110720703.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/55b36b7961db43a0bedecd97cc01a945.png)
 
 `ThreadLocal` 关键源码如下：
 
@@ -1004,7 +1004,7 @@ server.tomcat.max-threads=1
 
 当访问 id = 1 时，符合预期
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200731111854.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/bef40273f82c4db59a5418f3442da4aa.png)
 
 当访问 id = 2 时，before 的应答不是 null，而是 1，不符合预期。
 

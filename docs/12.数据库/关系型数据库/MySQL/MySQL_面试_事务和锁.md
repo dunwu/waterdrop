@@ -1,7 +1,7 @@
 ---
 icon: logos:mysql
 title: MySQL 面试之事务和锁篇
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2025-03-24 22:42:57
 categories:
   - 数据库
@@ -32,7 +32,7 @@ permalink: /pages/ef946393/
 
 **事务指的是满足 ACID 特性的一组操作**。事务内的 SQL 语句，要么全执行成功，要么全执行失败。可以通过 `Commit` 提交一个事务，也可以使用 `Rollback` 进行回滚。通俗来说，**事务就是要保证一组数据库操作，要么全部成功，要么全部失败**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242207831.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/b4a1daeedac948b9861d2bd118318503.png)
 
 ACID 是数据库事务正确执行的四个基本要素。
 
@@ -74,25 +74,25 @@ ACID 是数据库事务正确执行的四个基本要素。
 
 如下图所示，T<sub>1</sub> 和 T<sub>2</sub> 两个事务对同一个数据进行修改，T<sub>1</sub> 先修改，T<sub>2</sub> 随后修改，T<sub>2</sub> 的修改覆盖了 T<sub>1</sub> 的修改。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242209867.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c23c467952344bbfa5da717fb8cd40e4.png)
 
 **“脏读（dirty read）”是指当前事务可以读取其他事务未提交的数据**。
 
 如下图所示，T<sub>1</sub> 修改一个数据，T<sub>2</sub> 随后读取这个数据。如果 T<sub>1</sub> 撤销了这次修改，那么 T<sub>2</sub> 读取的数据是脏数据。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242210430.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/97bed91b49804832bdfee9cb821ec38f.png)
 
 **“不可重复读（non-repeatable read）”是指一个事务内多次读取同一数据，过程中，该数据被其他事务所修改，导致当前事务多次读取的数据可能不一致**。
 
 如下图所示，T<sub>2</sub> 读取一个数据，T<sub>1</sub> 对该数据做了修改。如果 T<sub>2</sub> 再次读取这个数据，此时读取的结果和第一次读取的结果不同。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242211015.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/8f5443289d244a9b9a214d7efeab8255.png)
 
 **“幻读（phantom read）”是指一个事务内多次读取同一范围的数据，过程中，其他事务在该数据范围新增了数据，导致当前事务未发现新增数据**。
 
 事务 T<sub>1</sub> 读取某个范围内的记录时，事务 T<sub>2</sub> 在该范围内插入了新的记录，T<sub>1</sub> 再次读取这个范围的数据，此时读取的结果和和第一次读取的结果不同。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242212639.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/67d3e2c1570f428a9ad49e4972ae30c2.png)
 
 ### 【中等】有哪些事务隔离级别，分别解决了什么问题？⭐⭐⭐
 
@@ -207,7 +207,7 @@ InnoDB 存储引擎中，数据表的每行记录，除了用户显示定义的�
 
 MVCC 的多版本指的是多个版本的快照，快照存储在 UndoLog 中。该日志通过回滚指针 `roll_pointer` 把一个数据行的所有快照链接起来，构成一个**版本链**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242213050.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c8f2ba25d0654b6bbc4a3a92d5130b82.png)
 
 ::: info ReadView
 :::
@@ -227,7 +227,7 @@ ReadView 有四个重要的字段：
 - 已启动但未提交的事务
 - 未启动的事务
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242214504.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/42ecd8e7abe041d4a9103b917a0ad2c0.png)
 
 > ReadView 如何判断版本链中哪个版本可见？
 
@@ -262,7 +262,7 @@ ReadView 有四个重要的字段：
 
 以上操作，如下图所示。T2 事务在事务过程中，是否可以看到 T1 事务的修改，可以根据 [ReadView](#ReadView) 中描述的规则去判断。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242217983.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c3aee26dbdac457dbccd94f80a22b80f.png)
 
 从图中不难看出：
 
@@ -287,7 +287,7 @@ ReadView 有四个重要的字段：
 
 以上操作，如下图所示，T2 事务在事务过程中，是否可以看到其他事务的修改，可以根据 [ReadView](#ReadView) 中描述的规则去判断。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503242218464.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/68040105435448c3bf2c57e49e2ea33c.png)
 
 从图中不难看出：
 

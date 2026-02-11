@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 基本数据类型
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20230901071808.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/342ad73ca4da4e6a96d7c34c7c288885.png
 date: 2020-06-24 10:45:38
 categories:
   - 数据库
@@ -27,7 +27,7 @@ Redis 支持的高级数据类型：BitMap、HyperLogLog、GEO、Stream
 
 使用 Redis ，不仅要了解其数据类型的特性，还需要根据业务场景，灵活的、高效的使用其数据类型来建模。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309232155082.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/94ab9cd4e4b041519ac47defd9f5c98e.png)
 
 ## String
 
@@ -53,11 +53,11 @@ SDS 和我们认识的 C 字符串不太一样，之所以没有使用 C 语言�
 
 **字符串对象的编码可以是 `int` 、 `raw` 或者 `embstr`** 。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100759580.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/8750a3a81dda49c7aea56f979c922205.svg)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100759674.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/518e3b820a9e44bd8d49f968fa8031db.svg)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100800212.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/36bd460bc17e4494b0a88e434a3a716b.svg)
 
 字符串对象保存各类型值的编码方式：
 
@@ -314,13 +314,13 @@ Hash 是一个键值对（key - value）集合，其中 value 的形式如： `v
 
 `ziplist` 编码的哈希对象使用压缩列表作为底层实现，每当有新的键值对要加入到哈希对象时， 程序会先将保存了键的压缩列表节点推入到压缩列表表尾， 然后再将保存了值的压缩列表节点推入到压缩列表表尾。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100803215.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/1238d3cb785c4e5dae73f7b2c520fde6.svg)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100804441.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/d7a1684aed604ac3b91516247ade2fca.svg)
 
 `hashtable` 编码的哈希对象使用字典作为底层实现， 哈希对象中的每个键值对都使用一个字典键值对来保存。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100805761.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/408473dc4cf04a25bf4857170eca6ad4.svg)
 
 当哈希对象同时满足以下两个条件时， 使用 `ziplist` 编码；否则，使用 `hashtable` 编码。
 
@@ -443,11 +443,11 @@ List 列表是简单的字符串列表，**按照插入顺序排序**，可以�
 
 `ziplist` 编码的列表对象使用压缩列表作为底层实现， 每个压缩列表节点（entry）保存了一个列表元素。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100802398.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/b778d6be3c574c319fd787b166ccae92.svg)
 
 `inkedlist` 编码的列表对象使用双链表作为底层实现。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100802787.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/686dd8d100e74cf3a679cc19d8b0d999.svg)
 
 当列表对象可以同时满足以下两个条件时， 列表对象使用 `ziplist` 编码；否则，使用 `linkedlist` 编码
 
@@ -582,9 +582,7 @@ Redis 中的 Set 类型就是无序且去重的集合。
 
 ### Set 简介
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-datatype-set.png" width="400"/>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-datatype-set.png)
 
 Set 类型是一个无序并唯一的键值集合，它的存储顺序不会按照插入的先后顺序进行存储。
 
@@ -601,11 +599,11 @@ Set 类型和 List 类型的区别如下：
 
 `intset` 编码的集合对象使用整数集合作为底层实现， 集合对象包含的所有元素都被保存在整数集合里面。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100806680.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/0c96252f39004023895b70b18cf7a191.svg)
 
 `hashtable` 编码的集合对象使用字典作为底层实现， 字典的每个键都是一个字符串对象， 每个字符串对象包含了一个集合元素， 而字典的值则全部被设置为 `NULL` 。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100806732.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/314aa590556542acb9b8d65e9882909f.svg)
 
 当集合对象可以同时满足以下两个条件时，集合对象使用 `intset` 编码；否则，使用 `hashtable` 编码：
 
@@ -821,9 +819,7 @@ Zset 类型（有序集合类型）相比于 Set 类型多了一个排序属性 
 
 有序集合保留了集合不能有重复成员的特性（分值可以重复），但不同的是，有序集合中的元素可以排序。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-datatype-zset.png" width="400"/>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/redis/redis-datatype-zset.png)
 
 ### Zset 实现
 
@@ -831,9 +827,9 @@ Zset 类型（有序集合类型）相比于 Set 类型多了一个排序属性 
 
 `ziplist` 编码的有序集合对象使用压缩列表作为底层实现， 每个集合元素使用两个紧挨在一起的压缩列表节点来保存， 第一个节点保存元素的成员（member）， 而第二个元素则保存元素的分值（score）。压缩列表内的集合元素按分值从小到大进行排序， 分值较小的元素被放置在靠近表头的方向， 而分值较大的元素则被放置在靠近表尾的方向。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100808991.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/37233fb05ca2456f8dd1b9ed5fb3beae.svg)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100808319.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/8a5ed1f2c3764b4d9626828ca3dddef0.svg)
 
 `skiplist` 编码的有序集合对象使用 `zset` 结构作为底层实现， 一个 `zset` 结构同时包含一个字典和一个跳跃表
 
@@ -851,11 +847,11 @@ typedef struct zset {
 
 除此之外， `zset` 结构中的 `dict` 字典为有序集合创建了一个从成员到分值的映射， 字典中的每个键值对都保存了一个集合元素： 字典的键保存了元素的成员， 而字典的值则保存了元素的分值。 通过这个字典， 程序可以用 O(1) 复杂度查找给定成员的分值， ZSCORE 命令就是根据这一特性实现的， 而很多其他有序集合命令都在实现的内部用到了这一特性。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100810255.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/ac6d07ff998845b2afee66c463c4f40f.svg)
 
 有序集合每个元素的成员都是一个字符串对象， 而每个元素的分值都是一个 `double` 类型的浮点数。 值得一提的是， 虽然 `zset` 结构同时使用跳跃表和字典来保存有序集合元素， 但这两种数据结构都会通过指针来共享相同元素的成员和分值， 所以同时使用跳跃表和字典来保存集合元素不会产生任何重复成员或者分值， 也不会因此而浪费额外的内存。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410100812776.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/9ffe7a61a7474b00a31dc36205cf6d15.svg)
 
 当有序集合对象可以同时满足以下两个条件时，有序集合对象使用 `ziplist` 编码；否则，使用 `skiplist` 编码。
 
@@ -1111,7 +1107,7 @@ Redis 后续版本又支持四种数据类型，它们的应用场景如下：
 - GEO（3.2 版新增）：存储地理位置信息的场景，比如滴滴叫车；
 - Stream（5.0 版新增）：消息队列，相比于基于 List 类型实现的消息队列，有这两个特有的特性：自动生成全局唯一消息 ID，支持以消费组形式消费数据。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309232144470.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/a2fb0aaa85444ac38c5b03adcb93b923.jpg)
 
 针对 Redis 是否适合做消息队列，关键看你的业务场景：
 

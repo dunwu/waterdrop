@@ -1,7 +1,7 @@
 ---
 icon: logos:mysql
 title: MySQL 面试之索引篇
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2025-03-24 22:42:57
 categories:
   - 数据库
@@ -176,7 +176,7 @@ InnoDB 选择 B+ 树，是其在**磁盘 I/O 效率**、**范围查询**、**稳
 
 - 如果需要进行全表扫描，B+ 树不需要像 B 树那样对整棵树进行复杂的中序遍历。它只需要对叶子节点组成的链表进行**一次简单的顺序遍历**即可，效率非常高。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200304235424.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/03/652346e464664ef28e6bdcded0d8c8f8.jpg)
 
 > B+ 树 vs B 树
 
@@ -262,7 +262,7 @@ InnoDB 选择 B+ 树，是其在**磁盘 I/O 效率**、**范围查询**、**稳
 - 如果语句是 `select * from T where ID=500`，即聚簇索引查询方式，则只需要搜索主键索引树；
 - 如果语句是 `select * from T where k=5`，即非聚簇索引查询方式，则需要先搜索 k 索引树，得到 ID 的值为 500，再到 ID 索引树搜索一次。这个过程称为**回表**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503221604600.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/17c02829c9994728876f6f7ce13f9af7.png)
 
 也就是说，**基于非聚簇索引的查询需要多扫描一棵索引树**。因此，我们在应用中应该尽量使用主键查询。
 

@@ -21,7 +21,7 @@ Sqoop 是一个常用的数据迁移工具，主要用于在不同存储系统�
 - 导入数据：从 MySQL，Oracle 等关系型数据库中导入数据到 HDFS、Hive、HBase 等分布式文件存储系统中；
 - 导出数据：从 分布式文件系统中导出数据到关系数据库中。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081844424.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e7516868861c440d8d8229097ca2c223.webp)
 
 目前 Sqoop 主要分为 Sqoop1 和 Sqoop2 两个版本，其中，版本号为 1.4.x 属于 Sqoop1，而版本号为 1.99.x 的属于 Sqoop2。这两个版本开发时的定位方向不同，体系结构具有很大的差异，因此它们之间互不兼容。
 
@@ -75,7 +75,7 @@ sqoop list-databases \
 --password root
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082053497.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/81b9383b705e4c32a742025e563bdd6c.png)
 
 #### 查询指定数据库中所有数据表
 
@@ -113,7 +113,7 @@ sqoop import \
 - 添加 `-- autoreset-to-one-mapper` 参数，代表只启动一个 `map task`，即不并行执行；
 - 若仍希望并行执行，则可以使用 `--split-by <column-name>` 指明拆分数据的参考列。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082053212.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1b6f41f72ac3494fbf11583421edbbf9.png)
 
 ##### 导入验证
 
@@ -126,7 +126,7 @@ Hadoop fs -text  /sqoop/part-m-00000
 
 查看 HDFS 导入目录，可以看到表中数据被分为 3 部分进行存储，这是由指定的并行度决定的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082055173.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/de8b0616bb384e9dab94f1eab113016d.png)
 
 #### HDFS 数据导出到 MySQL
 
@@ -187,11 +187,11 @@ sqoop import \
  Hive> SELECT * FROM sqoop_test.help_keyword;
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082056692.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8361413b645345b4b5203244a6bcbe3b.png)
 
 ##### 可能出现的问题
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082056314.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/bc9688f6b7004353aad0f05fc65f351b.png)
 
 如果执行报错 `java.io.IOException: java.lang.ClassNotFoundException: org.apache.hadoop.hive.conf.HiveConf`，则需将 Hive 安装目录下 `lib` 下的 `hive-exec-**.jar` 放到 sqoop 的 `lib` 。
 
@@ -216,11 +216,11 @@ Hive> desc formatted help_keyword;
 
 `Location` 属性为其存储位置：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082057536.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/48b8adfcaaca4ff59b0c3f9152e8ef3b.png)
 
 这里可以查看一下这个目录，文件结构如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082057388.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/f5dbe908f2fb4d85b8beb9d777cb0dea.png)
 
 ##### 执行导出命令
 
@@ -277,7 +277,7 @@ hbase> desc 'help_keyword_hbase'
 
 使用 `scan` 查看表数据：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082058212.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/541ddb58acf9436e9f7115fcf26d2a91.png)
 
 ### 全库导出
 

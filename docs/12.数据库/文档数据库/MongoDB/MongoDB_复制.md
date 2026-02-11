@@ -1,7 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 复制
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/20200920204024.svg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/f8d315ecc42145578e2991332d7a3da9.svg
 date: 2020-09-20 23:12:17
 categories:
   - 数据库
@@ -65,7 +65,7 @@ MongoDB 本身是一个分布式数据库，自然也需要具备复制的能力
 
 > 扩展阅读：[副本集主节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/)
 
-![读写请求路由到主节点](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165054.svg)
+![读写请求路由到主节点](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/e64b0153c6624f6fbe0493e03d142f9d.svg)
 
 ### 从节点
 
@@ -75,7 +75,7 @@ MongoDB 本身是一个分布式数据库，自然也需要具备复制的能力
 
 > 扩展阅读：[副本集从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/)
 
-![一主两从集群](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165055.svg)
+![一主两从集群](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/904339337fff4510b21bd67f74d2bc66.svg)
 
 ### 仲裁节点
 
@@ -83,7 +83,7 @@ MongoDB 本身是一个分布式数据库，自然也需要具备复制的能力
 
 > 扩展阅读：[副本集仲裁节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-arbiter/)
 
-![一主一从一仲裁集群](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920165053.svg)
+![一主一从一仲裁集群](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/8d8f49249aca4a7084d6622dddba13ab.svg)
 
 [仲裁节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-arbiter/#std-label-replica-set-arbiter-configuration) 将永远是仲裁节点，而在选举期间，[主节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-primary/#std-label-replica-set-primary) 可能被降级成为 [从节点](https://www.mongodb.com/zh-cn/docs/manual/core/replica-set-secondary/#std-label-replica-set-secondary-members-ref)，从节点可能变为主节点。
 
@@ -112,7 +112,7 @@ MongoDB 本身是一个分布式数据库，自然也需要具备复制的能力
 
 当主节点在超过配置的 [`electionTimeoutMillis`](https://www.mongodb.com/zh-cn/docs/manual/reference/replica-configuration/#mongodb-rsconf-rsconf.settings.electionTimeoutMillis) 时间段（默认 10 秒）内未与副本集中的其他节点通信时，一个符合条件的从节点将发起选举，并提名自己成为新的主节点。集群将尝试完成新主节点的选举并恢复其正常运转。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920175429.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/080af50812f04e0b9792f92c27ce7cc5.svg)
 
 在成功完成选举之前，副本集无法处理写操作。如果将读取查询配置为当主节点离线时 [在从节点上运行](https://www.mongodb.com/zh-cn/docs/manual/core/read-preference/#std-label-replica-set-read-preference)，那么副本集可以继续为读取查询提供服务。
 
@@ -130,7 +130,7 @@ MongoDB 提供 [镜像读](https://www.mongodb.com/zh-cn/docs/manual/replication
 
 默认情况下，客户端从主节点读取数据；但是，客户端可以指定 [读取偏好](https://www.mongodb.com/zh-cn/docs/manual/core/read-preference/) 以向从节点发送读取操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200920204024.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/f8d315ecc42145578e2991332d7a3da9.svg)
 
 [异步复制](https://www.mongodb.com/zh-cn/docs/manual/replication/#std-label-asynchronous-replication) 到从节点意味着在从节点读取到的数据可能不会反映主节点上数据的状态。
 

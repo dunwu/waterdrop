@@ -71,7 +71,7 @@ public interface Resource extends InputStreamSource {
 | 编码资源   | `org.springframework.core.io.support.EncodedResource` |
 | 上下文资源 | `org.springframework.core.io.ContextResource`         |
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20221223155859.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/12/54c9f4144757405e801b390b72f642df.png)
 
 ## 内置的 Resource 实现
 
@@ -102,7 +102,7 @@ public interface ResourceLoader {
 
 Spring 中主要的 ResourceLoader 实现：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20221223164745.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/12/cf1c621ffb6d485f9d77f998abb39a15.png)
 
 Spring 中，所有的 `ApplicationContext` 都实现了 `ResourceLoader` 接口。因此，所有 `ApplicationContext` 都可以通过 `getResource()` 方法获取 `Resource` 实例。
 

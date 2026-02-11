@@ -370,11 +370,11 @@ gantt
 
 ### 居中
 
-<div align="center"><p>居中显示的文本</p></div>
+<p>居中显示的文本</p>
 
 ### 图片尺寸
 
-<div align="center"><img width="100px" src="https://raw.githubusercontent.com/dunwu/images/master/common/dunwu-logo.png" /></div>
+![](https://raw.githubusercontent.com/dunwu/images/master/common/dunwu-logo.png)
 
 ## 编辑器
 

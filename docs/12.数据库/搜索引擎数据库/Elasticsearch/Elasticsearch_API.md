@@ -1,7 +1,7 @@
 ---
 icon: logos:elasticsearch
 title: ElasticSearch API
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110759679.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/1179194f8ffb4056ad2b1b18aaf12536.webp
 date: 2020-06-16 07:10:44
 categories:
   - 数据库
@@ -128,11 +128,11 @@ ElasticSearch Rest API 分为两种：
 
 URI Search 示例：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220530072511.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/05/f4e00ea62f6748f79b2a289fe54c3686.png)
 
 Request Body Search 示例：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220530072654.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/05/0bc884283137488bad839e6a57efc260.png)
 
 ### 索引 API
 

@@ -1,7 +1,7 @@
 ---
 icon: logos:mysql
 title: MySQL 面试
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2020-09-12 10:43:53
 categories:
   - 数据库
@@ -42,7 +42,7 @@ permalink: /pages/2379811c/
 
 根据约束程度从低到高有：第一范式（1NF）、第二范式（2NF）、第三范式（3NF）、巴斯-科德范式（BCNF）等等。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410022024207.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/5001644c5874419d983278ad9bdecc6d.png)
 
 - 1NF 要求**所有属性都不可再分解**。
 - 2NF 要求**不存在部分依赖**。
@@ -482,7 +482,7 @@ MySQL 内置了以下存储引擎：
   - Archive 存储引擎采用 zlib 算法压缩数据，压缩比可达到 1: 10。
 - **CSV**：可以将 CSV 文件作为 MySQL 的表来处理，但这种表不支持索引。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503210712752.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/0a682886e08640e2a99db61fc0eb9ec9.png)
 
 ### 【中等】InnoDB 和 MyISAM 有哪些差异？⭐
 
@@ -517,7 +517,7 @@ InnoDB 的物理文件结构为：
   - 独享表空间存储方式使用`.ibd`文件，并且每个表一个`.ibd`文件
   - 共享表空间存储方式使用`.ibdata`文件，所有表共同使用一个`.ibdata`文件（或多个，可自己配置）
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311070640589.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/11/4dbec2a86c464e16a3ff4d462becd077.png)
 
 MyISAM 的物理文件结构为：
 
@@ -529,7 +529,7 @@ MyISAM 的物理文件结构为：
 
 Buffer Pool（缓冲池）是 MySQL InnoDB 存储引擎的核心组件之一，它是数据库系统中的内存缓存区域，主要**用于缓存表和索引的数据**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311070641009.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/11/44bddc8474ba47638838b80db4f02897.png)
 
 **主要作用**：
 
@@ -666,7 +666,7 @@ Redo Log 由固定大小的文件组成（如 ib_logfile0、ib_logfile1），循
 
 redo log 是 InnoDB 的重做日志，用于崩溃恢复，确保数据正确性。redo log 采用 WAL 机制：先写日志，再写磁盘数据，将随机写入转换为顺序写入。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311070641668.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/11/b2995714d7774039899d5aa0d446891c.png)
 
 **Log Buffer 的刷盘时机**
 
@@ -764,7 +764,7 @@ MySQL 5.7 引入了半同步复制：主库只需等待**至少 N 个从库**（
 
 ### 【中等】SQL 查询语句的执行顺序是怎么样的？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202506050817770.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/06/710bd42c250f49ada0796d8a59d976b0.jpg)
 
 所有的查询语句都是从 FROM 开始执行的，在执行过程中，每个步骤都会为下一个步骤生成一个虚拟表，这个虚拟表将作为下一个执行步骤的输入。
 
@@ -790,7 +790,7 @@ MySQL 5.7 引入了半同步复制：主库只需等待**至少 N 个从库**（
 
 ### 【困难】一条 SQL 查询语句是如何执行的？⭐⭐⭐
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202410022029759.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/702667178a274a67ac92bc333a0ffbfd.png)
 
 MySQL 整个查询执行过程，总的来说分为 6 个步骤：
 
@@ -834,7 +834,7 @@ select city,name,age from t where city='杭州' order by name limit 1000;
 - 对 `sort_buffer` 中的数据按照排序字段进行排序。
 - 返回排序后的结果。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220728090300.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/1d5a380080ae4a8e8a6ab59701ba0c2a.png)
 
 **内存与磁盘排序**：
 
@@ -851,7 +851,7 @@ select city,name,age from t where city='杭州' order by name limit 1000;
   - 排序完成后，根据 `id` 回表查询其他字段（如 `city`、`age`）。
 - **性能影响**：`rowid` 排序减少了 `sort_buffer` 的内存占用，但增加了回表操作，导致更多的磁盘 I/O。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220728090919.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/40b5efca71a04ddfa9a9d659d808f32a.png)
 
 ::: info 全字段排序 VS rowid 排序
 :::

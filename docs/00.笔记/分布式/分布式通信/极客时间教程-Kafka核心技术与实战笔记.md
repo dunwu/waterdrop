@@ -17,7 +17,7 @@ permalink: /pages/10813811/
 
 ## 开篇词 为什么要学习 Kafka？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170734255.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/a41a5d7cd551446d9f3f9172f2ea7e3e.jpeg)
 
 ## 消息引擎系统 ABC
 
@@ -59,7 +59,7 @@ Kafka 术语：
 - **消费者组** - Consumer Group。多个消费者实例共同组成的一个组，同时消费多个分区以实现高吞吐。
 - **分区再均衡** - Rebalance。消费者组内某个消费者实例挂掉后，其他消费者实例自动重新分配订阅主题分区的过程。Rebalance 是 Kafka 消费者端实现高可用的重要手段。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170734395.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/0942072759304e95a55263255c65f074.jpeg)
 
 Kafka 的三层消息架构：
 
@@ -230,7 +230,7 @@ Kafka 压缩、解压流程：**Producer 端压缩、Broker 端保持、Consumer
 - 在吞吐量方面：`LZ4 > Snappy > zstd 和 GZIP`；
 - 在压缩比方面，`zstd > LZ4 > GZIP > Snappy`。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170735260.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/733cabffcfe5487fa77b8d2831b3b09c.png)
 
 ## 无消息丢失配置怎么实现？
 
@@ -360,15 +360,15 @@ CommitFailedException 最常见的场景：当消息处理的总时间超过预�
 
 **消费者程序启动多个线程，每个线程维护专属的 KafkaConsumer 实例，负责完整的消息获取、消息处理流程**。如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170735535.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/29baaca5d66b4e5682c92b197cdd9ebf.jpeg)
 
 **消费者程序使用单或多线程获取消息，同时创建多个消费线程执行消息处理逻辑**。获取消息的线程可以是一个，也可以是多个，每个线程维护专属的 KafkaConsumer 实例，处理消息则交由**特定的线程池**来做，从而实现消息获取与消息处理的真正解耦。具体架构如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170735276.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/f05308fe7023436e8408c04ed8f789a4.jpeg)
 
 方案对比：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170735905.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/0dca57a1241945eab0968f9d7ffa3359.jpeg)
 
 ## Java 消费者是如何管理 TCP 连接的
 
@@ -408,13 +408,13 @@ CommitFailedException 最常见的场景：当消息处理的总时间超过预�
 
 **所谓副本（Replica），本质就是一个只能追加写消息的提交日志**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170736678.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/e1bbf10fc5e94c89bc7e5bb96ba76889.jpeg)
 
 基于领导者的副本机制
 
 在 Kafka 中，副本分成两类：领导者副本（Leader Replica）和追随者副本（Follower Replica）。每个分区在创建时都要选举一个副本，称为领导者副本，其余的副本自动称为追随者副本。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170736956.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/e6fc2490f20e4e388499f658811096dd.jpeg)
 
 ### In-sync Replicas（ISR）
 
@@ -440,17 +440,17 @@ Kafka 所有的请求都是通过 TCP 网络以 Socket 的方式进行通讯的�
 
 **Reactor 模式是事件驱动架构的一种实现方式，特别适合应用于处理多个客户端并发向服务器端发送请求的场景**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170736577.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/dbbec8fafa3f44dc858d9886b205eae9.jpeg)
 
 Kafka 采用了类 Reactor 架构
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170736471.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/613b911849694e9382b3aa2721cd2f5f.jpeg)
 
 Acceptor 线程采用轮询的方式将入站请求公平地发到所有网络线程中，因此，在实际使用过程中，这些线程通常都有相同的几率被分配到待处理请求。
 
 当网络线程拿到请求后，将请求放入到一个共享请求队列中。Broker 端还有个 IO 线程池，负责从该队列中取出请求，执行真正的处理。如果是 PRODUCE 生产请求，则将消息写入到底层的磁盘日志中；如果是 FETCH 请求，则从磁盘或页缓存中读取消息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170736893.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/97e89db3a67e4373a8e0fbd85c3914a0.jpeg)
 
 Purgatory 是用来**缓存延时请求**（Delayed Request）的。**所谓延时请求，就是那些一时未满足条件不能立刻处理的请求**。比如设置了 acks=all 的 PRODUCE 请求，一旦设置了 acks=all，那么该请求就必须等待 ISR 中所有副本都接收了消息后才能返回，此时处理该请求的 IO 线程就必须等待其他 Broker 的写入结果。当请求不能立刻处理时，它就会暂存在 Purgatory 中。稍后一旦满足了完成条件，IO 线程会继续处理该请求，并将 Response 放入对应网络线程的响应队列中。
 
@@ -474,7 +474,7 @@ Rebalance 是通过消费者群组中的称为“群主”消费者客户端进�
 
 （2）消费者通过向被指派为群组协调器（Coordinator）的 Broker 定期发送心跳来维持它们和群组的从属关系以及它们对分区的所有权。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070723810.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/6f39e1092bed4282afe8b10fca12c052.png)
 
 （3）群主从群组协调器获取群组成员列表，然后给每一个消费者进行分配分区 Partition。有两种分配策略：Range 和 RoundRobin。
 
@@ -493,7 +493,7 @@ Rebalance 是通过消费者群组中的称为“群主”消费者客户端进�
 
 下图展示了 Kafka 在 ZooKeeper 中创建的 znode 分布：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170738496.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/09a8c48a033e412d82b418158100939a.jpeg)
 
 控制器的职责：
 
@@ -505,13 +505,13 @@ Rebalance 是通过消费者群组中的称为“群主”消费者客户端进�
 
 控制器保存的数据：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170738150.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/4f04bb1c1d2b4d5e81cdfbd5ab26e64c.jpeg)
 
 控制器故障转移
 
 **故障转移指的是，当运行中的控制器突然宕机或意外终止时，Kafka 能够快速地感知到，并立即启用备用控制器来代替之前失败的控制器**。这个过程就被称为 Failover，该过程是自动完成的，无需你手动干预。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170739678.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/54a418e5deba4c6280e163efc99e72cb.jpeg)
 
 ## 关于高水位和 Leader Epoch 的讨论
 
@@ -529,11 +529,11 @@ Rebalance 是通过消费者群组中的称为“群主”消费者客户端进�
   - **分区的高水位就是其 Leader 副本的高水位**。
 - 帮助 Kafka 完成副本同步。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170739112.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/56751ec192eb4f39a3fe1b50e2f770df.jpeg)
 
 ### 高水位更新机制
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170740521.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/ad4f73180fbe4020bd61a5d6f03ff636.jpeg)
 
 Broker 0 上保存了某分区的 Leader 副本和所有 Follower 副本的 LEO 值，而 Broker 1 上仅仅保存了该分区的某个 Follower 副本。Kafka 把 Broker 0 上保存的这些 Follower 副本又称为**远程副本**（Remote Replica）。Kafka 副本机制在运行过程中，会更新 Broker 1 上 Follower 副本的高水位和 LEO 值，同时也会更新 Broker 0 上 Leader 副本的高水位和 LEO 以及所有远程副本的 LEO，但它不会更新远程副本的高水位值，也就是我在图中标记为灰色的部分。
 
@@ -543,21 +543,21 @@ Broker 0 上保存了某分区的 Leader 副本和所有 Follower 副本的 LEO 
 
 首先是初始状态。下面这张图中的 remote LEO 就是刚才的远程副本的 LEO 值。在初始状态时，所有值都是 0。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170740419.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/2fbf3ca681394afab294372644a1eb51.jpeg)
 
 当生产者给主题分区发送一条消息后，状态变更为：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170741966.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/7ed9cf3f28eb442697e3a3a7c0c0d55d.jpeg)
 
 此时，Leader 副本成功将消息写入了本地磁盘，故 LEO 值被更新为 1。
 
 Follower 再次尝试从 Leader 拉取消息。和之前不同的是，这次有消息可以拉取了，因此状态进一步变更为：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170741603.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/41a36fa614824a0c843c3e0b8c2fe2f1.jpeg)
 
 这时，Follower 副本也成功地更新 LEO 为 1。此时，Leader 和 Follower 副本的 LEO 都是 1，但各自的高水位依然是 0，还没有被更新。**它们需要在下一轮的拉取中被更新**，如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502170741850.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/c852b22e94db4638af708383b84af9b8.jpeg)
 
 在新一轮的拉取请求中，由于位移值是 0 的消息已经拉取成功，因此 Follower 副本这次请求拉取的是位移值=1 的消息。Leader 副本接收到此请求后，更新远程副本 LEO 为 1，然后更新 Leader 高水位为 1。做完这些之后，它会将当前已更新过的高水位值 1 发送给 Follower 副本。Follower 副本接收到以后，也将自己的高水位值更新成 1。至此，一次完整的消息同步周期就结束了。事实上，Kafka 就是利用这样的机制，实现了 Leader 和 Follower 副本之间的同步。
 

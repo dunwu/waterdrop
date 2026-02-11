@@ -1,7 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 聚合
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062323072.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/ba0fb769d64f4a47b790ec2b6b8bc2cc.png
 date: 2020-09-21 21:22:57
 categories:
   - 数据库
@@ -49,7 +49,7 @@ permalink: /pages/687db7da/
 
 > 注意：使用 [`db.collection.aggregate()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.aggregate/#mongodb-method-db.collection.aggregate) 方法运行的聚合管道不会修改集合中的文档，除非管道包含 [`$merge`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge) 或 [`$out`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out) 阶段。
 
-![MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921092725.png)
+![MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/4fcab0841ee84b35aa92b2239117a1eb.png)
 
 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 的其他要点：
 
@@ -398,7 +398,7 @@ MongoDB 支持以下单一目的的聚合操作：
 
 所有这些操作都汇总了单个 collection 中的 document。尽管这些操作提供了对常见聚合过程的简单访问，但是它们相比聚合 pipeline 和 Map-Reduce，缺少灵活性和丰富的功能性。
 
-![单一目的聚合方法](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921155935.svg)
+![单一目的聚合方法](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/8f2137c38448497c8788fe8515f3d62e.svg)
 
 ## RDBM 聚合 vs. MongoDB 聚合
 
@@ -421,7 +421,7 @@ MongoDB pipeline 提供了许多等价于 SQL 中常见聚合语句的操作。 
 
 RDBM 聚合 vs. MongoDB 聚合：
 
-![SQL 聚合 vs. MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921200556.png)
+![SQL 聚合 vs. MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/fa90a9f9eac44e6f93f21b6e03648ccc.png)
 
 【示例】
 
@@ -535,7 +535,7 @@ db.orders.insertMany([
 
 Map-Reduce 是一种数据处理范式，用于将大量数据汇总为有用的聚合结果。为了执行 Map-Reduce 操作，MongoDB 提供了 [`mapReduce`](https://docs.mongodb.com/manual/reference/command/mapReduce/#dbcmd.mapReduce) 数据库命令。
 
-![Map-Reduce](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921155546.svg)
+![Map-Reduce](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/d344c32b56854ebfabb07dd4c5452f02.svg)
 
 在此 Map-Reduce 操作中，MongoDB 将 **map** 阶段应用于每个输入文档（即集合中与查询条件匹配的文档）。map 函数发出键值对。对于具有多个值的键，MongoDB 会应用 **reduce** 阶段，此阶段将收集并压缩聚合数据。然后，MongoDB 将结果存储在一个集合中。（可选）reduce 函数的输出可以通过 _finalize_ 函数来进一步压缩或处理聚合的结果。
 

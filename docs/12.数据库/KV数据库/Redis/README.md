@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 教程
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202411231010326.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/1a422c1e990a4499873ba2f9e73ad0a5.png
 date: 2020-02-10 14:27:39
 categories:
   - 数据库

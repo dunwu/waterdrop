@@ -98,7 +98,7 @@ Jmeter 的主要元素如下：
 
 Unix 类系统运行 `jmeter` ；Windows 系统运行 `jmeter.bat`
 
-![image-20191024104517721](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024104517721.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/9318fd382f664225b618f520ec5b333b.png)
 
 ## 使用
 
@@ -107,7 +107,6 @@ Unix 类系统运行 `jmeter` ；Windows 系统运行 `jmeter.bat`
 > 🔔 注意：
 >
 > - 在运行整个测试计划之前，应保存测试计划。
->
 > - JMeter 的测试计划以 `.jmx` 扩展文件的形式保存。
 
 #### 创建线程组
@@ -116,7 +115,7 @@ Unix 类系统运行 `jmeter` ；Windows 系统运行 `jmeter.bat`
 
 - 设置线程数和循环次数
 
-![image-20191024105545736](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024105545736.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/8a49319fe6424defb420c3f8700df21c.png)
 
 #### 配置原件
 
@@ -124,7 +123,7 @@ Unix 类系统运行 `jmeter` ；Windows 系统运行 `jmeter.bat`
 
 - 填写协议、服务器名称或 IP、端口号
 
-![image-20191024110016264](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024110016264.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/e03d2dc839154660afa372fc6b995344.png)
 
 #### 构造 HTTP 请求
 
@@ -134,35 +133,35 @@ Unix 类系统运行 `jmeter` ；Windows 系统运行 `jmeter.bat`
 - 填写方法、路径
 - 填写参数、消息体数据、文件上传
 
-![image-20191024110953063](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024110953063.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/4b9ea1a9317f460b88da08d4d35fbb78.png)
 
 #### 添加 HTTP 请求头
 
 - 在“线程组”上右键 【添加】=>【配置元件】=>【HTTP 信息头管理器】
 - 由于我的测试例中传输的数据为 json 形式，所以设置键值对 `Content-Type`：`application/json`
 
-![image-20191024111825226](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024111825226.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/3a54227821a14a5082d9d84a5dc77b6b.png)
 
 #### 添加断言
 
 - 在“线程组”上右键 【添加】=>【断言】=>【 响应断言 】
 - 在我的案例中，以 HTTP 应答状态码为 200 来判断请求是否成功
 
-![image-20191024112335130](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024112335130.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/b0bb9328437b4220b5a379e56a872516.png)
 
 #### 添加察看结果树
 
 - 在“线程组”上右键 【添加】=>【监听器】=>【察看结果树】
 - 直接点击运行，就可以查看测试结果
 
-![image-20191024113849270](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024113849270.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/e412625e076e400db34f93bb11da93cf.png)
 
 #### 添加汇总报告
 
 - 在“线程组”上右键 【添加】=>【监听器】=>【汇总报告】
 - 直接点击运行，就可以查看测试结果
 
-![image-20191024114016424](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024114016424.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/56ff174f32e94982ba2edebbf182023f.png)
 
 #### 保存测试计划
 
@@ -180,7 +179,7 @@ jmeter -n -t [jmx file] -l [results file] -e -o [Path to web report folder]
 
 执行测试计划后，在 `-e -o` 参数后指定的 web 报告目录下，可以找到测试报告内容。在浏览器中打开 `index.html` 文件，可以看到如下报告：
 
-![image-20191024120233058](https://raw.githubusercontent.com/dunwu/images/master/snap/jmeter/image-20191024120233058.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/10/e5eed8906d064150aabfa11e2898f774.png)
 
 ## 问题
 
@@ -192,7 +191,7 @@ jmeter -n -t [jmx file] -l [results file] -e -o [Path to web report folder]
 
 配置如下所示：
 
-![image-20191127175820747](https://raw.githubusercontent.com/dunwu/images/master/snap/image-20191127175820747.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/11/6f4249a055d0494b87a69e76c8e6ad36.png)
 
 重要配置说明（其他配置根据实际情况填）：
 

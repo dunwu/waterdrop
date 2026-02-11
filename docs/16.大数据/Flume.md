@@ -18,7 +18,7 @@ Apache Flume 是一个分布式，高可用的数据收集系统。它可以从�
 
 ## Flume 架构
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082100555.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/69b0c9a3fb3646eeae19bd71e24eb5cd.png)
 
 外部数据源以特定格式向 Flume 发送 `events` （事件），当 `source` 接收到 `events` 时，它将其存储到一个或多个 `channel`，`channel` 会一直保存 `events` 直到它被 `sink` 所消费。`sink` 的主要功能从 `channel` 中读取 `events`，并将其存入外部存储系统或转发到下一个 `source`，成功后再从 `channel` 中移除 `events`。
 
@@ -48,19 +48,19 @@ Flume 支持多种架构模式，分别介绍如下
 
 ### multi-agent flow
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082100555.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/69b0c9a3fb3646eeae19bd71e24eb5cd.png)
 
 Flume 支持跨越多个 Agent 的数据传递，这要求前一个 Agent 的 Sink 和下一个 Agent 的 Source 都必须是 `Avro` 类型，Sink 指向 Source 所在主机名 （或 IP 地址） 和端口（详细配置见下文案例三）。
 
 ### Consolidation
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082101366.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/bfc2b79bd04445b2a9e38a55551c918d.png)
 
 日志收集中常常存在大量的客户端（比如分布式 web 服务），Flume 支持使用多个 Agent 分别收集日志，然后通过一个或者多个 Agent 聚合后再存储到文件系统中。
 
 ### Multiplexing the flow
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082101790.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1eebb042830f42129a17ee523c8167a5.png)
 
 Flume 支持从一个 Source 向多个 Channel，也就是向多个 Sink 传递事件，这个操作称之为 `Fan Out`（扇出）。默认情况下 `Fan Out` 是向所有的 Channel 复制 `Event`，即所有 Channel 收到的数据都是相同的。同时 Flume 也支持在 `Source` 上自定义一个复用选择器 (multiplexing selector) 来实现自定义的路由规则。
 
@@ -150,11 +150,11 @@ flume-ng agent \
 
 向文件中追加数据：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082117127.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/94735976001b4575810c247cef3992e8.png)
 
 控制台的显示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082117949.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8ba0c2f1bb654f7da73f9f12103c4d90.png)
 
 ### 案例二
 
@@ -210,7 +210,7 @@ flume-ng agent \
 # cp log.txt logs/
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082118872.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7f68d8ba3dcd4e988c9c807019513a90.png)
 
 查看上传到 HDFS 上的文件内容与本地是否一致：
 
@@ -218,7 +218,7 @@ flume-ng agent \
 # hdfs dfs -cat /flume/events/19-04-09/13/log.txt.1554788567801
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082118886.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/995dfeadd7dc42fea71e4f86fad81814.png)
 
 ### 案例三
 
@@ -307,17 +307,17 @@ flume-ng agent \
 
 这里建议按以上顺序启动，原因是 `avro.source` 会先与端口进行绑定，这样 `avro sink` 连接时才不会报无法连接的异常。但是即使不按顺序启动也是没关系的，`sink` 会一直重试，直至建立好连接。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082119255.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e657b221006c4bd4bb6db934726fe08c.png)
 
 #### 测试
 
 向文件 `tmp/log.txt` 中追加内容：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082119270.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5bf4f67c46d54788899f7e4c69d4f5a2.png)
 
 可以看到已经从 8888 端口监听到内容，并成功输出到控制台：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082120031.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/decefe05277e45baa27466d782d7c346.png)
 
 ## 参考资料
 

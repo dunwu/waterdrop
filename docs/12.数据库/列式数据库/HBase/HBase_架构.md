@@ -24,7 +24,7 @@ permalink: /pages/4ad04653/
 
 ### 概览
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200612151239.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/ca870964a15a4714a3955bc1d3c7d736.png)
 
 HBase 主要处理两种文件：预写日志（WAL）和实际数据文件 HFile。一个基本的流程是客户端首先联系 ZooKeeper 集群查找行键。上述过程是通过 ZooKeeper 获取欧含有 `-ROOT-` 的  region 服务器来完成的。通过含有 `-ROOT-` 的 region 服务器可以查询到含有 `.META.` 表中对应的 region 服务器名，其中包含请求的行键信息。这两种内容都会被缓存下来，并且只查询一次。最终，通过查询 .META. 服务器来获取客户端查询的行键数据所在 region 的服务器名。
 
@@ -38,7 +38,7 @@ HBase Table 中的所有行按照 `Row Key` 的字典序排列。HBase Table 根
 
 `Region` 是 HBase 中**分布式存储和负载均衡的最小单元**。这意味着不同的 `Region` 可以分布在不同的 `Region Server` 上。但一个 `Region` 是不会拆分到多个 Server 上的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601181219.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/fc831b1d13454e70b53e76e578a73852.png)
 
 ### Region Server
 
@@ -90,7 +90,7 @@ Region Server 存取一个子表时，会创建一个 Region 对象，然后对�
 - Region Server 负责维护 Master Server 分配给它的 Region，并处理发送到 Region 上的 IO 请求；
 - 当 Region 过大，Region Server 负责自动分区，并通知 Master Server 记录更新。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200612151602.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/6cb6d779233049bca32fc818dbef7240.png)
 
 ### ZooKeeper
 
@@ -139,7 +139,7 @@ HBase 内部保留名为 hbase:meta 的特殊目录表（catalog table）。它�
 
 注：`META` 表是 HBase 中一张特殊的表，它保存了所有 Region 的位置信息，META 表自己的位置信息则存储在 ZooKeeper 上。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601182655.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/3785f5fce6404a6b97aa1340fc26b232.png)
 
 > 更为详细读取数据流程参考：
 >

@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 面试
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2020-07-13 17:03:42
 categories:
   - 数据库
@@ -50,7 +50,7 @@ Redis 的功能和特性：
 - Redis 有多种**高可用方案**：**主从复制**模式、**哨兵**模式、**集群**模式。
 - Redis 支持很多丰富的特性，如：**事务** 、**Lua 脚本**、**发布订阅**、**过期删除**、**内存淘汰**等等。
 
-![图来自 [Redis Explained](https://architecturenotes.co/p/redis)](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231010326.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/1a422c1e990a4499873ba2f9e73ad0a5.png)
 
 ### 【简单】Redis 有哪些应用场景？
 
@@ -79,7 +79,7 @@ Redis 里程碑版本如下：
 - **Redis 5.0（2017 年）**：新增 **Stream** 数据类型。
 - **Redis 6.0（2020 年）**：在网络模块中引入了**多线程 I/O**。Redis 模型分为网络模块和主处理模块。特别注意：Redis 不再完全是单线程架构。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503270820508.gif)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/9530695aeeed4ad5b10e0058b1315755.gif)
 
 ### 【简单】对比一下 Redis 和 Memcached？
 
@@ -96,7 +96,7 @@ Redis 与 Memcached 的**共性**：
 
 Redis 与 Memcached 的**差异**：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202504010716308.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/ce410bcd988c434995177b86effafdb1.jpg)
 
 核心差异对比：
 
@@ -307,7 +307,7 @@ Redis 有三种持久化方式
 
 [**`BGSAVE`**](https://redis.io/commands/bgsave) 命令会**派生**（fork）一个子进程，由子进程负责创建 RDB 文件，服务器进程继续处理命令请求，所以**该命令“不会阻塞”服务器**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272238061.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/34973284a5354682b0dfd111d68d312d.png)
 
 > 🔔 **【注意】**
 >
@@ -391,7 +391,7 @@ AOF 重写机制是，读取当前数据库中的所有键值对，然后将每�
 - 由于彼此不是在同一个进程中工作，AOF 重写不影响 AOF 写入和同步。当子进程完成创建新 AOF 文件的工作之后，服务器会将重写缓冲区中的所有内容追加到新 AOF 文件的末尾，使得新旧两个 AOF 文件所保存的数据库状态一致。
 - 最后，服务器用新的 AOF 文件替换就的 AOF 文件，以此来完成 AOF 重写操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272248959.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/ed34ce20d3224b588a0eb93e67379ffa.png)
 
 ## Redis 批处理
 
@@ -465,7 +465,7 @@ Redis Pipeline（管道）是一种**客户端技术**，用于将多个 Redis �
 - **传统模式**：客户端发送一条命令 → 等待响应 → 再发送下一条（高延迟）。
 - **Pipeline 模式**：客户端一次性发送多条命令 → 服务器按顺序执行 → 一次性返回所有结果（低延迟）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272224006.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/ae9bd14ebd1b495991a29f9bd3e9d7f9.jpg)
 
 **核心特性**
 
@@ -563,7 +563,7 @@ Redis 的主从复制过程主要分为**建立连接、数据同步、命令传
 
 **Redis 哨兵（Sentinel）**是一个**高可用性（High Availability）解决方案**，用于管理 Redis 主从架构。它是一个**独立的分布式进程**，通过一系列心跳检测和投票机制，**自动完成故障发现（Failure Detection）和故障转移（Failover）**，从而实现服务的无人值守不间断运行。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503282134261.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/8e92a611649b4b2285aaca30b3cbbd10.png)
 
 Redis 哨兵主要有三个功能：监控、故障转移、通知
 
@@ -815,7 +815,7 @@ Redis 解决脑裂的思路： 通过配置限制主节点的写操作条件，�
 
 根据 [Redis 官方 Benchmark](https://redis.io/docs/management/optimization/benchmarks/) 文档的描述，Redis 单机 QPS 能达到 10w+，将近是 Mysql 的 10 倍。
 
-![Redis 官方 Benchmark QPS 图](https://raw.githubusercontent.com/dunwu/images/master/snap/202503270821660.png)
+![Redis 官方 Benchmark QPS 图](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/9df116a7b7e24f62b814c9aedf8b6e5e.png)
 
 Redis 是单线程模型（Redis 6.0 已经支持多线程模型），为什么还能有这么高的并发？
 
@@ -826,7 +826,7 @@ Redis 是单线程模型（Redis 6.0 已经支持多线程模型），为什么�
   - 由于，Redis 读写基于内存，性能很高，所以 CPU 并不是制约 Redis 性能表现的瓶颈所在。更多情况下是受到内存大小和网络 I/O 的限制，所以 Redis 核心网络模型使用单线程并没有什么问题。
 - **高效的数据结构**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272229177.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/9cc33933a1e8445e997c871509c25251.jpg)
 
 图来自 [Why is redis so fast?](https://blog.bytebytego.com/p/why-is-redis-so-fast)
 
@@ -836,7 +836,7 @@ Redis 是单线程模型（Redis 6.0 已经支持多线程模型），为什么�
 
 Redis 单线程模式指的是其核心网络模型为单线程模式。这个模式为 IO 多路复用+单线程读写请求，其中，IO 多路复用使得 Redis 可以同时处理多个客户端连接。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309241133046.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/793365f183bd427d9fd1695f189ee80f.png)
 
 > Redis 真的只有单线程吗？
 
@@ -854,7 +854,7 @@ Redis 并非真的只有单线。
 
 Redis 官方表示，**Redis 6.0 版本引入的多线程 I/O 特性对性能提升至少是一倍以上**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309241148273.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/e06ceb9d55034251ad2b584c24f23417.png)
 
 ### 【中等】什么是 Redis 模块？有什么用？
 

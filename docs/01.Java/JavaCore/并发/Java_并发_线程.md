@@ -727,7 +727,7 @@ public class Piped {
 
 ## 线程生命周期
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290809602.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/bbb471da0cb743b088dc9fe58ec57993.png)
 
 `java.lang.Thread.State` 中定义了 **6** 种不同的线程状态，在给定的一个时刻，线程只能处于其中的一个状态。
 

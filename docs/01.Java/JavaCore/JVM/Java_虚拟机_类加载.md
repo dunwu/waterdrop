@@ -23,11 +23,11 @@ permalink: /pages/b529ddfd/
 
 类加载器并不需要等到某个类被“首次主动使用”时再加载它，JVM 规范允许类加载器在预料某个类将要被使用时就预先加载它，如果在预先加载的过程中遇到了.class 文件缺失或存在错误，类加载器必须在程序首次主动使用该类时才报告错误（LinkageError 错误）如果这个类一直没有被程序主动使用，那么类加载器就不会报告错误。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202505070638969.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/05/8cff7f1df29e46a8a44e11c1131b8374.png)
 
 ## 类的生命周期
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202505070635024.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/05/02055428ea7649998581ed46519c8a9f.png)
 
 Java 类的完整生命周期包括以下几个阶段：
 
@@ -246,7 +246,7 @@ JVM 加载 `class` 文件到内存有两种方式：
 
 ### 类加载器分类
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200617115936.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/4e83752f655e439c80e9f04b746e37e5.png)
 
 #### Bootstrap ClassLoader
 
@@ -357,7 +357,7 @@ null
 
 下图展示的类加载器之间的层次关系，称为类加载器的**双亲委派模型（Parents Delegation Model）**。**该模型要求除了顶层的 Bootstrap ClassLoader 外，其余的类加载器都应有自己的父类加载器**。**这里类加载器之间的父子关系一般通过组合（Composition）关系来实现，而不是通过继承（Inheritance）的关系实现**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202505070634474.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/05/83b042a530424999a75d6d383aade1c0.png)
 
 **（1）工作过程**
 

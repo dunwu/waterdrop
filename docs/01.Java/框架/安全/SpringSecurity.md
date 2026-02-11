@@ -70,7 +70,7 @@ try {
 
 Spring Security 框架中的认证数据模型如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200331115710.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/03/1f224e096c17461ea187a4b38efc1164.png)
 
 - `Authentication` - 认证信息实体。
   - `principal` - 用户标识。如：用户名、账户名等。通常是 `UserDetails` 的实例（后面详细讲解）。

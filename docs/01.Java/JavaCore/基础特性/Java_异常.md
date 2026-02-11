@@ -15,7 +15,7 @@ permalink: /pages/e67da890/
 
 # 深入理解 Java 异常
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1553752019030.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/404fe3f8b5784e55bb446b2636d93c03.png)
 
 ## 异常框架
 
@@ -125,7 +125,7 @@ Exception in thread "main" java.lang.ArithmeticException: / by zero
 
 ## 自定义异常
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1553752795010.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/876a3997d0794582b272f50fb6029ac6.png)
 
 **自定义一个异常类，只需要继承 `Exception` 或 `RuntimeException` 即可。**
 

@@ -1,7 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 索引
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503072209292.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/4b04a9cf5f644cda89601aa433f52c47.webp
 date: 2020-09-21 21:22:57
 categories:
   - 数据库
@@ -35,7 +35,7 @@ permalink: /pages/e62be9c0/
 
 **MongoDB 在 collection 数据级别上定义索引**。
 
-![MongoDB 索引](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921210621.svg)
+![MongoDB 索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/b92b31ce4d7e43298687500238cad1e9.svg)
 
 ### 默认索引
 
@@ -77,7 +77,7 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 下图显示了单个字段 `score` 上的一个索引：
 
-![单字段索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052211281.svg)
+![单字段索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/e98ae88ee9ac49d7845b8b2a0e7aa1bf.svg)
 
 > 要了解详情，请参阅 [单字段索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-single/#std-label-indexes-single-field)。
 
@@ -87,7 +87,7 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 例如，下图显示了一个复合索引，其中文档首先按 `userid` 分组并以升序（按字母顺序）排序。然后，每个 `userid` 的 `scores` 按降序排序：
 
-![复合索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052213721.svg)
+![复合索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/4a1199dd95b7433d997be4a10c60a856.svg)
 
 > 要了解详情，请参阅 [复合索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-compound/#std-label-index-type-compound)。
 
@@ -99,7 +99,7 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 下图显示了 `addr.zip` 字段的多键索引：
 
-![多键索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052214522.svg)
+![多键索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/09857616f765458faa22ce3450311ce7.svg)
 
 > 要了解详情，请参阅 [多键索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-multikey/#std-label-index-type-multikey)。
 

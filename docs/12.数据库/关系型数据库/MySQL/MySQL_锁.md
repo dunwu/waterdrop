@@ -1,7 +1,7 @@
 ---
 icon: logos:mysql
 title: MySQL 锁
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202310162345947.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/10/c01397411a8e4d779555fc2a5b978176.png
 date: 2020-09-07 07:54:19
 categories:
   - 数据库
@@ -22,7 +22,7 @@ permalink: /pages/397b8ebb/
 
 > 不同存储引擎对于锁的支持粒度是不同的，由于 InnoDB 是 MySQL 的默认存储引擎，所以本文以 InnoDB 对于锁的支持进行阐述。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202310162345947.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/10/c01397411a8e4d779555fc2a5b978176.png)
 
 ## 锁的分类
 
@@ -494,17 +494,17 @@ SELECT * FROM test where value = 4 for update;
 INSERT INTO `test` (`id`, `value`) VALUES (5, 5);
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630153139.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/8a838d6967aa4d239e371f32a9d9f91d.png)
 
 **另一个死锁场景**
 
 InnoDB 存储引擎的主键索引为聚簇索引，其它索引为辅助索引。如果使用辅助索引来更新数据库，就需要使用聚簇索引来更新数据库字段。如果两个更新事务使用了不同的辅助索引，或一个使用了辅助索引，一个使用了聚簇索引，就都有可能导致锁资源的循环等待。由于本身两个事务是互斥，也就构成了以上死锁的四个必要条件了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630154606.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/3fb9de0abfed401b89ff393a1854ee8a.png)
 
 出现死锁的步骤：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200630154619.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/48431badd2c9400697f6cebc4d43ca38.png)
 
 综上可知，在更新操作时，我们应该尽量使用主键来更新表字段，这样可以有效避免一些不必要的死锁发生。
 

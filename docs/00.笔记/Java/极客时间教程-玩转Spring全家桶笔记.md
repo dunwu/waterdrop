@@ -2106,7 +2106,7 @@ RestTemplate 配置
 
 ### Dockerfile
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230806142644.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/08/ddbea270b2664562bd51a53b8585a7f9.png)
 
 ### 通过 Maven 构建 Docker 镜像
 
@@ -2193,7 +2193,7 @@ Cloud Native Computing Foundation，缩写 CNCF
 
 ### 90 | 认识 Spring Cloud 的组成部分
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230729155944.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/07/0e6b301742f8408882229cdf959b413d.svg)
 
 Spring Cloud 的主要功能
 

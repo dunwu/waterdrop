@@ -112,7 +112,7 @@ Dubbo 目前支持的主流注册中心实现包括：
 
 CAP 就是取 Consistency、Availability、Partition Tolerance 的首字母而命名。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202405160639643.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/05/c8dfb3ab0ac64f958fc929399aff692c.png)
 
 在分布式系统中，分区容错性是一个既定的事实：因为分布式系统总会出现各种各样的问题，如由于网络原因而导致节点失联；发生机器故障；机器重启或升级等等。因此，**CAP 定理实际上是要在可用性（A）和一致性（C）之间做权衡**。
 

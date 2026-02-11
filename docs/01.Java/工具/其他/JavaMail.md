@@ -53,7 +53,7 @@ JavaMail 包中用于处理电子邮件的核心类是： `Properties` 、 `Sess
 - `MimeBodyPart` 类：代表邮件的一个 MIME 信息。
 - `MimeMultipart` 类：代表一个由多个 MIME 信息组合成的组合 MIME 信息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082217408.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/49951171c17145ec9f18323c3347375d.webp)
 
 ## JavaMail 的核心类
 
@@ -107,7 +107,7 @@ JavaMail 在 Jar 包的 META-INF 目录下，通过以下文件提供了基本�
 - javamail.default.providers
 - javamail.default.address.map
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082217070.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/62b33ff746c54bfab1c53ed0c9e0d8dd.webp)
 
 **例：**
 

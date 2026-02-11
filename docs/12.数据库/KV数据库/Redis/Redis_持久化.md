@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 持久化
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202309150716562.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/39c6b8ea48c744bba4939e826bf77dd2.png
 date: 2020-06-24 10:45:38
 categories:
   - 数据库
@@ -64,7 +64,7 @@ permalink: /pages/7f947a6f/
 
 [**`BGSAVE`**](https://redis.io/commands/bgsave) 命令会**“派生”**（fork）一个子进程，由子进程负责创建 RDB 文件，服务器进程继续处理命令请求，所以**该命令“不会阻塞”服务器**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272238061.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/34973284a5354682b0dfd111d68d312d.png)
 
 ```shell
 >BGSAVE
@@ -147,7 +147,7 @@ redisServer 中的 `saveparams` 数组维护了多个自动间隔保存条件。
 
 对于不同类型（STRING、HASH、LIST、SET、SORTED SET）的键值对，RDB 文件会使用不同的方式来保存它们。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272240429.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/156a6d96025c4cf49b476e3d8bc1bbbe.png)
 
 Redis 本身提供了一个 RDB 文件检查工具 `redis-check-dump`。
 
@@ -230,7 +230,7 @@ AOF 载入过程如下：
 5. 循环执行步骤 3、4，直到所有写命令都被处理完毕为止。
 6. 载入完毕。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272247006.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/f6775ec076254231bc941f54caec74af.png)
 
 ### AOF 的重写
 
@@ -241,7 +241,7 @@ AOF 载入过程如下：
 
 为了解决 AOF 体积膨胀问题，Redis 提供了 AOF 重写功能，来对 AOF 文件进行压缩。**AOF 重写可以产生一个新的 AOF 文件，这个新的 AOF 文件和原来的 AOF 文件所保存的数据库状态一致，但体积更小**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272248857.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/a13ee43d15904d6fb614fc2f1fe28034.png)
 
 AOF 重写并非读取和分析现有 AOF 文件的内容，而是直接从数据库中读取当前的数据库状态。即**从数据库中读取键的当前值，然后用一条命令去记录该键值对**，以此代替之前可能存在冗余的命令。
 
@@ -253,7 +253,7 @@ AOF 重写并非读取和分析现有 AOF 文件的内容，而是直接从数�
 - 由于彼此不是在同一个进程中工作，AOF 重写不影响 AOF 写入和同步。当子进程完成创建新 AOF 文件的工作之后，服务器会将重写缓冲区中的所有内容追加到新 AOF 文件的末尾，使得新旧两个 AOF 文件所保存的数据库状态一致。
 - 最后，服务器用新的 AOF 文件替换就的 AOF 文件，以此来完成 AOF 重写操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272248959.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/ed34ce20d3224b588a0eb93e67379ffa.png)
 
 > `BGREWRITEAOF` 命令的实现采用的是写时复制技术（Copy-On-Write，缩写为 CoW）。
 
@@ -297,7 +297,7 @@ AOF 持久化通过在 `redis.conf` 中的 `appendonly yes` 配置选项来开�
 
 > 当 Redis 启动时， 如果 RDB 和 AOF 功能都开启了，那么程序会优先使用 AOF 文件来恢复数据集，因为 AOF 文件所保存的数据通常是最完整的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081751197.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2eea12a8545d4ba8b30a712074dc0aeb.webp)
 
 ### 如何选择持久化
 

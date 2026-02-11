@@ -22,7 +22,7 @@ HDFS 的设计目标是管理数以千计的服务器、数以万计的磁盘，
 
 HDFS 是在一个大规模分布式服务器集群上，对数据分片后进行并行读写及冗余存储。因为 HDFS 可以部署在一个比较大的服务器集群上，集群中所有服务器的磁盘都可供 HDFS 使用，所以整个 HDFS 的存储空间可以达到 PB 级容量。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192251433.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/4179c2265ff94f93a725957112bb5f19.png)
 
 ## HDFS 命令
 

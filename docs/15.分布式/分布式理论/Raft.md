@@ -14,7 +14,7 @@ permalink: /pages/29586d95/
 
 # 深入剖析共识性算法 Raft
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202405170818218.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/05/70b31b134b514e0c9e065dd0bc8fb757.png)
 
 ## Raft 简介
 
@@ -38,7 +38,7 @@ Paxos 和 Raft 都是分布式共识性算法，这个过程如同投票选举�
 
 **`复制状态机（Replicated State Machines）`** 是指一组服务器上的状态机产生相同状态的副本，并且在一些机器宕掉的情况下也可以继续运行。一致性算法管理着来自客户端指令的复制日志。状态机从日志中处理相同顺序的相同指令，所以产生的结果也是相同的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200131233906.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/01/b35a7a0be4764c26937df03523b68bc6.png)
 
 复制状态机通常都是基于复制日志实现的，如上图。每一个服务器存储一个包含一系列指令的日志，并且按照日志的顺序进行执行。每一个日志都按照相同的顺序包含相同的指令，所以每一个服务器都执行相同的指令序列。因为每个状态机都是确定的，每一次执行操作都产生相同的状态和同样的序列。
 
@@ -78,7 +78,7 @@ Raft 将一致性问题分解成了三个子问题：
 - **`Follower`** - 跟随者，**不会发送任何请求**，只是简单的 **响应来自 Leader 或者 Candidate 的请求**。
 - **`Candidate`** - 参选者，选举新 Leader 时的临时角色。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200131215742.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/01/2c3b424b83e944729ce71ee6dab8baf9.png)
 
 > :bulb: 图示说明：
 >
@@ -88,7 +88,7 @@ Raft 将一致性问题分解成了三个子问题：
 
 ### 任期
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200131220742.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/01/27c2819256024ed0af63abee0bf0580e.png)
 
 Raft 把时间分割成任意长度的 **_`任期（Term）`_**，任期用连续的整数标记。每一段任期从一次**选举**开始。**Raft 保证了在一个给定的任期内，最多只有一个领导者**。
 
@@ -195,7 +195,7 @@ Raft 算法通过：领导者心跳消息、随机选举超时时间、得到大
 - 日志条目中的 Term 号被用来检查是否出现不一致的情况，它实际上是创建这条日志的领导者的任期编号。
 - 日志条目中的日志索引用来表明它在日志中的位置，它是一个单调递增的整数。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202405170814527.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/05/0aee89525cc042369958da4ef9a6df40.png)
 
 Raft 日志同步保证如下两点：
 
@@ -206,7 +206,7 @@ Raft 日志同步保证如下两点：
 
 ### 日志复制流程
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202405170817072.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/05/6560d178194f41f597f775761c320f32.png)
 
 1. Leader 负责处理所有客户端的请求。
 2. Leader 把请求作为日志条目加入到它的日志中，然后并行的向其他服务器发送 `AppendEntries RPC` 请求，要求 Follower 复制日志条目。
@@ -241,7 +241,7 @@ Raft 日志同步保证如下两点：
 
 Leader 和 Follower 可能存在多种日志不一致的可能。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202405170815743.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/05/5999c1ee92fe4628a70062b5e6b9a170.png)
 
 > :bulb: 图示说明：
 >
@@ -287,7 +287,7 @@ Raft 通过比较两份日志中最后一条日志条目的日志索引和 Term 
 
 一个当前 Term 的日志条目被复制到了半数以上的服务器上，Leader 就认为它是可以被提交的。如果这个 Leader 在提交日志条目前就下线了，后续的 Leader 可能会覆盖掉这个日志条目。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202405170816381.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/05/c9820bf6535a4fe1a5a9778bd38d7a69.png)
 
 > 💡 图示说明：
 >
@@ -316,7 +316,7 @@ Raft 通过比较两份日志中最后一条日志条目的日志索引和 Term 
 
 当 Leader 要发送某个日志条目，落后太多的 Follower 的日志条目会被丢弃，Leader 会将快照发给 Follower。或者新上线一台机器时，也会发送快照给它。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200201220628.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/02/d936d27165ca456c8d1811a48411c34f.png)
 
 **生成快照的频率要适中**，频率过高会消耗大量 I/O 带宽；频率过低，一旦需要执行恢复操作，会丢失大量数据，影响可用性。推荐当日志达到某个固定的大小时生成快照。
 

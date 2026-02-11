@@ -1,6 +1,6 @@
 ---
 title: Java 基础面试二
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2024-07-03 07:44:02
 order: 2
 categories:

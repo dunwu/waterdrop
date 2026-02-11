@@ -34,7 +34,7 @@ select city,name,age from t where city='杭州' order by name limit 1000;
 - 对 `sort_buffer` 中的数据按照排序字段进行排序。
 - 返回排序后的结果。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220728090300.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/1d5a380080ae4a8e8a6ab59701ba0c2a.png)
 
 **内存与磁盘排序**：
 
@@ -50,7 +50,7 @@ select city,name,age from t where city='杭州' order by name limit 1000;
   - 排序完成后，根据 `id` 回表查询其他字段（如 `city`、`age`）。
 - **性能影响**：`rowid` 排序减少了 `sort_buffer` 的内存占用，但增加了回表操作，导致更多的磁盘 I/O。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220728090919.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/40b5efca71a04ddfa9a9d659d808f32a.png)
 
 ### 全字段排序 VS rowid 排序
 
@@ -74,7 +74,7 @@ select city,name,age from t where city='杭州' order by name limit 1000;
 
 **内存临时表**：当临时表大小小于 `tmp_table_size` 时，MySQL 使用内存临时表，排序过程使用 `rowid` 排序算法。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503200808843.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/0dcf2767081143a29cc388160cda47b1.png)
 
 **磁盘临时表**：当临时表大小超过 `tmp_table_size` 时，MySQL 会使用磁盘临时表，排序过程使用归并排序算法。
 
@@ -222,7 +222,7 @@ select city,name,age from t where city='杭州' order by name limit 1000;
   - `sync_binlog=1`：每次提交事务都 fsync。
   - `sync_binlog=N`：每 N 个事务提交后 fsync。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220802060429.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/08/037e4977a97147cfb63c8b5680106950.png)
 
 **redo log 的写入机制**
 
@@ -283,7 +283,7 @@ select city,name,age from t where city='杭州' order by name limit 1000;
 - `io_thread` 负责从主库读取 binlog 并写入备库的中转日志（relay log）。
 - `sql_thread` 负责解析并执行中转日志中的命令，保持备库与主库的数据一致。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503200809203.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/99921adfebb648cd9fb4778fb32af848.png)
 
 **binlog 的三种格式**：
 
@@ -407,7 +407,7 @@ select city,name,age from t where city='杭州' order by name limit 1000;
 
 **一主多从架构**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220803070027.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/08/77742c7a235d4658bc98c8ebb8c2b6ff.png)
 
 - 一主多从架构通常用于读写分离，主库负责写操作和部分读操作，从库分担读请求。
 - 当主库发生故障时，需要进行主备切换，从库需要重新指向新的主库，增加了切换的复杂性。

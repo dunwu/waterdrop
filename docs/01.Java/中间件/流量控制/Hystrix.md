@@ -44,15 +44,15 @@ Hystrix 官方已宣布**不再发布新版本**。但是，Hystrix 的断路器
 
 当一切正常时，整体系统如下所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717141615.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/cd5b5f86513f40a588d45eef7af285c9.png)
 
 在高并发场景，这些依赖的稳定性与否对系统的影响非常大，但是依赖有很多不可控问题：如网络连接、资源繁忙、服务宕机等。例如：下图中有一个 QPS 为 50 的依赖 I 出现不可用，但是其他依赖服务是可用的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717141749.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/9f81b92d48194579a31fb838594cc96e.png)
 
 但是，在高并发场景下，当依赖 I 阻塞时，大多数服务器的线程池就出现阻塞(BLOCK)。当这种级联故障愈演愈烈，就可能造成整个线上服务不可用的雪崩效应，如下图：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717141859.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/a32fea268e064eaaa3a7f83997240674.png)
 
 Hystrix 就是为了解决这类问题而应运而生。
 
@@ -70,13 +70,13 @@ Hystrix 具有以下功能：
 
 如果使用 Hystrix 对每个基础依赖服务进行过载保护，则整个系统架构将会类似下图所示，每个依赖项彼此隔离，受到延迟时发生饱和的资源的被限制访问，并包含 fallback 逻辑（用于降级处理），该逻辑决定了在依赖项中发生任何类型的故障时做出对应的处理。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717142842.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/2204808e15a4450dac3a2d7ad31143d3.png)
 
 ## Hystrix 原理
 
 如下图所示，Hystrix 的工作流程大致可以分为 9 个步骤。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717143247.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/fd81ea1cea31439996502e67c9920487.png)
 
 ### （一）构建一个 HystrixCommand 或 HystrixObservableCommand 对象
 
@@ -105,7 +105,7 @@ Hystrix 中共有 4 种方式执行命令，如下所示：
 
 这四种命令中，`exeucte()`、`queue()`、`observe()` 的表示其实是通过 `toObservable()` 实现的，其转换关系如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082219032.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2eb5b858f5fe4cb3b431f3558877699b.webp)
 
 `HystrixCommand` 执行方式
 
@@ -180,7 +180,7 @@ Hystrix 会统计 Command 命令执行执行过程中的**成功数**、**失败
 
 如果 Hystrix 命令对象执行成功，将会返回结果，或者以`Observable`形式包装的结果。根据**步骤 2**的 command 调用方式，返回的`Observable` 会按照如下图说是的转换关系进行返回：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082219073.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e5148be0748e455d9f340124c7e67660.webp)
 
 - `execute()` — 用和 `.queue()` 相同的方式获取 `Future`，然后调用 `Future` 的 `get()` 以获取 `Observable` 的单个值。
 - `queue()` —将 `Observable` 转换为 `BlockingObservable`，以便可以将其转换为 `Future` 并返回。
@@ -189,7 +189,7 @@ Hystrix 会统计 Command 命令执行执行过程中的**成功数**、**失败
 
 ## 断路器工作原理
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082219891.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/735854d76d4146a1bca3b1e3cd2c751d.webp)
 
 1. 断路器时间窗内的请求数 是否超过了**请求数断路器生效阈值**`circuitBreaker.requestVolumeThreshold`,如果超过了阈值，则将会触发断路，断路状态为**开启**
    例如，如果当前阈值设置的是`20`,则当时间窗内统计的请求数共计 19 个，即使 19 个全部失败了，都不会触发断路器。
@@ -236,7 +236,7 @@ Hystrix 对系统指标的统计是基于时间窗模式的：
 
 在系统内，时间窗会随着系统的运行逐渐向前移动，而时间窗的长度和桶的数量是固定不变的，那么随着时间的移动，会出现较久的过期的桶被移除出去，新的桶被添加进来，如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082219972.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d380af22102f4e63b14fe32e8cba4025.webp)
 
 ## 资源隔离技术
 
@@ -268,7 +268,7 @@ User Request
 
 可以直接以超时的方式直接返回，快速失败。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082220573.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/3e4589ee54ef48ba843b3351c7e39936.webp)
 
 线程池隔离的几点好处
 
@@ -357,7 +357,7 @@ new ThreadPoolExecutor.DiscardPolicy() // 提交请求过多时，可以丢弃�
 > **在实践上，应当对像远程方法调用，网络资源请求这种服务时间不太可控的场景下使用线程池隔离模式处理**
 > 如下图所示，是线程池隔离模式的三种场景：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082220255.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8be658a6bec54807bd6151c9eea15df7.webp)
 
 ### 信号量隔离
 
@@ -371,7 +371,7 @@ semaphore
 
 进行原子操作，控制线程的并发量，当并发量达到一定量级时，服务禁止调用。如下图所示：信号量本身不会消耗多余的线程资源，所以就非常轻量。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082220222.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d221d3db609947bd96d199cf91303405.webp)
 
 基于信号量隔离的利弊
 

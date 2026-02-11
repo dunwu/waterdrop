@@ -550,7 +550,7 @@ Java 应用开启 JMX 后，可以使用 `jconsole` 或 `jvisualvm` 进行监控
 - `VM 摘要` - 显示有关 Java VM 的信息。
 - `MBean` - 显示有关 MBean 的信息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730151422.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/7d9b2317d05d43bcb02d849746dcdd0c.png)
 
 ### VisualVM
 
@@ -562,23 +562,23 @@ Java 应用开启 JMX 后，可以使用 `jconsole` 或 `jvisualvm` 进行监控
 
 jvisualvm 概述页面可以查看当前 Java 进程的基本信息，如：JDK 版本、Java 进程、JVM 参数等。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150147.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/109e28344c5e4026895c03686d697215.png)
 
 #### jvisualvm 监控页面
 
 在 jvisualvm 监控页面，可以看到 Java 进程的 CPU、内存、类加载、线程的实时变化。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150254.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/5520eb24015948cd914548b0ead73175.png)
 
 #### jvisualvm 线程页面
 
 jvisualvm 线程页面展示了当前的线程状态。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150416.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/c12582c62f214b98a438ee769cf4ecf6.png)
 
 jvisualvm 还可以生成线程 Dump 文件，帮助进一步分析线程栈信息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730150830.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/4eb45801d98e4973a01ba24fe2672874.png)
 
 #### jvisualvm 抽样器页面
 
@@ -612,24 +612,24 @@ Failed to create the Java Virtual Machine
 
 #### MAT 分析
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200308092746.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/03/a0fc6fddb79c43c6a7e17f051e9456de.png)
 
 点击 Leak Suspects 可以进入内存泄漏页面。
 
 （1）首先，可以查看饼图了解内存的整体消耗情况
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200308150556.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/03/2c7cc56b071447e7835cc018d2a62cc7.png)
 
 （2）缩小范围，寻找问题疑似点
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081735984.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/f1e3456110c548d2afda1b2e875c69a6.png)
 
 可以点击进入详情页面，在详情页面 Shortest Paths To the Accumulation Point 表示 GC root 到内存消耗聚集点的最短路径，如果某个内存消耗聚集点有路径到达 GC root，则该内存消耗聚集点不会被当做垃圾被回收。
 
 为了找到内存泄露，我获取了两个堆转储文件，两个文件获取时间间隔是一天（因为内存只是小幅度增长，短时间很难发现问题）。对比两个文件的对象，通过对比后的结果可以很方便定位内存泄露。
 
 MAT 同时打开两个堆转储文件，分别打开 Histogram，如下图。在下图中方框 1 按钮用于对比两个 Histogram，对比后在方框 2 处选择 Group By package，然后对比各对象的变化。不难发现 heap3.hprof 比 heap6.hprof 少了 64 个 eventInfo 对象，如果对代码比较熟悉的话想必这样一个结果是能够给程序员一定的启示的。而我也是根据这个启示差找到了最终内存泄露的位置。
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081736158.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/efc76c786a294518bfd0356646d5127e.png)
 
 ### JProfile
 
@@ -643,7 +643,7 @@ MAT 同时打开两个堆转储文件，分别打开 Histogram，如下图。在
 
 Arthas 支持 JDK 6+，支持 Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 `Tab` 自动补全功能，进一步方便进行问题的定位和诊断。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730145030.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/b5384a9f170744d9ac5d6d4611c33300.png)
 
 #### Arthas 基础命令
 
@@ -699,7 +699,7 @@ Arthas 支持 JDK 6+，支持 Linux/Mac/Windows，采用命令行交互模式，
 
 ## thread dump 文件
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200730112431.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/f542dab54c8642feb521a548bda237b9.png)
 
 一个 Thread Dump 文件大致可以分为五个部分。
 

@@ -203,11 +203,11 @@ Full GC 回收日志:
 
 YOUNG GC
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220107093538.jfif)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/01/d042ff29fdfa455f838268115af0234b.jfif)
 
 FULL GC
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220107093543.jfif)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/01/f8e6a6081d494317901717136d6cd67e.jfif)
 
 #### CPU 过高
 

@@ -1,6 +1,6 @@
 ---
 title: 深入剖析共识性算法 Paxos
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202310200757219.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/10/eba86cbf98354c65b6de63ff0304ca0c.png
 date: 2020-02-02 22:00:00
 categories:
   - 分布式
@@ -19,7 +19,7 @@ permalink: /pages/a22fc1e4/
 >
 > **Paxos 算法解决了分布式一致性问题**：在一个节点数为 `2N+1` 的分布式集群中，只要半数以上的节点（`N + 1`）还正常工作，整个系统仍可以正常工作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202405170823342.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/05/c881007e302744b2b9e014b9541a8000.png)
 
 ## Paxos 背景
 
@@ -42,7 +42,7 @@ Paxos 算法包含 2 个部分：
 
 Paxos 将分布式系统中的节点分 Proposer、Acceptor、Learner 三种角色。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210528150700.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/05/16a841866ecc4612ace4c507177f7bf4.png)
 
 - **提议者（Proposer）**：发出提案（Proposal），用于投票表决。Proposal 信息包括提案编号 (Proposal ID) 和提议的值 (Value)。在绝大多数场景中，集群中收到客户端请求的节点，才是提议者。这样做的好处是，对业务代码没有入侵性，也就是说，我们不需要在业务代码中实现算法逻辑。
 - **接受者（Acceptor）**：对每个 Proposal 进行投票，若 Proposal 获得多数 Acceptor 的接受，则称该 Proposal 被批准。一般来说，集群中的所有节点都在扮演接受者的角色，参与共识协商，并接受和存储数据。
@@ -85,18 +85,18 @@ Paxos 算法流程中的每条消息描述如下：
 
 下图的示例中，首先客户端 1、2 作为提议者，分别向所有接受者发送包含提案编号的准备请求：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220628231557.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/72d93f095bc3422a9e311b67938e9071.png)
 
 接着，当节点 A、B 收到提案编号为 1 的准备请求，节点 C 收到提案编号为 5 的准备请求后，将进行这样的处理：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220628231908.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/ff46adbf7de945bbbac5c8ca61c49328.png)
 
 - 由于之前没有通过任何提案，所以节点 A、B 将返回一个 “尚无提案” 的响应。也就是说节点 A 和 B 在告诉提议者，我之前没有通过任何提案呢，并承诺以后不再响应提案编号小于等于 1 的准备请求，不会通过编号小于 1 的提案。
 - 节点 C 也是如此，它将返回一个 “尚无提案”的响应，并承诺以后不再响应提案编号小于等于 5 的准备请求，不会通过编号小于 5 的提案。
 
 另外，当节点 A、B 收到提案编号为 5 的准备请求，和节点 C 收到提案编号为 1 的准备请求的时候，将进行这样的处理过程：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220628232029.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/5572085bbfb842ceb6cb5db1501b7ccb.png)
 
 - 当节点 A、B 收到提案编号为 5 的准备请求的时候，因为提案编号 5 大于它们之前响应的准备请求的提案编号 1，而且两个节点都没有通过任何提案，所以它将返回一个 “尚无提案”的响应，并承诺以后不再响应提案编号小于等于 5 的准备请求，不会通过编号小于 5 的提案。
 
@@ -106,7 +106,7 @@ Paxos 算法流程中的每条消息描述如下：
 
 首先客户端 1、2 在收到大多数节点的准备响应之后，会分别发送接受请求：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220628232309.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/1b2534d957354bcd80219a4134a55d8b.png)
 
 - 当客户端 1 收到大多数的接受者（节点 A、B）的准备响应后，根据响应中提案编号最大的提案的值，设置接受请求中的值。因为该值在来自节点 A、B 的准备响应中都为空（也就是图 5 中的“尚无提案”），所以就把自己的提议值 3 作为提案的值，发送接受请求[1, 3]。
 
@@ -114,7 +114,7 @@ Paxos 算法流程中的每条消息描述如下：
 
 当三个节点收到 2 个客户端的接受请求时，会进行这样的处理：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220628232515.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/cc2ebbf8a81a449797c2a962258dbf9a.png)
 
 - 当节点 A、B、C 收到接受请求[1, 3]的时候，由于提案的提案编号 1 小于三个节点承诺能通过的提案的最小提案编号 5，所以提案[1, 3]将被拒绝。
 - 当节点 A、B、C 收到接受请求[5, 7]的时候，由于提案的提案编号 5 不小于三个节点承诺能通过的提案的最小提案编号 5，所以就通过提案[5, 7]，也就是接受了值 7，三个节点就 X 值为 7 达成了共识。

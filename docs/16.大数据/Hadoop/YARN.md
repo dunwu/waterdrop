@@ -18,11 +18,11 @@ permalink: /pages/83e894f7/
 
 **Apache YARN** (Yet Another Resource Negotiator) 是 hadoop 2.0 引入的集群资源管理系统。用户可以将各种服务框架部署在 YARN 上，由 YARN 进行统一地管理和资源分配。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192251433.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/4179c2265ff94f93a725957112bb5f19.png)
 
 ## YARN 架构
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192252145.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/df3fc4d6e8f64e47ac6a84468f098bcd.png)
 
 ### ResourceManager
 
@@ -51,7 +51,7 @@ permalink: /pages/83e894f7/
 
 ## YARN 工作原理
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192253437.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/085a9f5c043c49e1acc6927a50371241.png)
 
 1. `Client` 提交作业到 YARN 上；
 
@@ -61,7 +61,7 @@ permalink: /pages/83e894f7/
 
 4. `Application Master` 通过获取到的 `Container` 资源执行分布式计算。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192255544.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/4f284dea034b4da192f532eb2a6960b1.png)
 
 #### 作业提交
 

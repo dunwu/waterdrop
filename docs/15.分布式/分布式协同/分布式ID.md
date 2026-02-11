@@ -49,7 +49,7 @@ UUID 不保证全局唯一性，我们需要小心 ID 冲突（尽管这种可�
 
 UUID 版本 1 **根据时间和 MAC 地址生成 UUID**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081848993.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/10c8d68cbbcb45f4aeb538ada8f6903f.png)
 
 组成参数说明：
 
@@ -69,13 +69,13 @@ UUID 版本 2 **根据时间和 MAC 地址、DCE Security 生成 UUID**。
 
 UUID 版本 3 **使用命名空间和名称生成 UUID**。**命名空间**本身是一个 UUID，URL 名称用作标识。二者组合后，通过 **MD5** 哈希算法计算生成 UUID。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081849693.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/915fb69f559d4bf2b238e78dedb0537e.png)
 
 ### 版本 5
 
 UUID 版本 5 和 版本 4 近似，都**使用命名空间和名称生成 UUID**。差异在于：**版本 3 采用 MD5 作为哈希算法**；**版本 5 采用 SHA1 作为哈希算法**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081849594.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/adb8a49d0b374e3798e97d4ba269ca16.png)
 
 **版本 3 、版本 5** - 基于哈希命名空间标识符和名称生成 UUID，差异在于：版本 3 采用 MD5 作为哈希算法；版本 5 采用 SHA1 作为哈希算法。
 
@@ -83,7 +83,7 @@ UUID 版本 5 和 版本 4 近似，都**使用命名空间和名称生成 UUID*
 
 版本 4 随机生成 UUID，不包含其他 UUID 中使用的任何信息 （命名空间、MAC 地址、时间）。识别它的唯一方法是版本 4 UUID，字符只是 **4** 位于 UUID 第三部分的第一个位置。其他字符是随机生成的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081849417.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/90754adb223348c2b8aa2f8524085c0e.png)
 
 版本 4 是最常见的 UUID 实现，JDK 中也提供了实现，示例如下：
 

@@ -57,7 +57,7 @@ zk.setData("/config", "draven".getBytes(), 0);
 
 发布与订阅是 Zookeeper 提供的一个最基本的功能，它的使用非常的简单，我们可以在 `getData` 中传入实现 `process` 方法的 `Watcher` 对象，在每次改变节点的状态时，`process` 方法都会被调用，在这个方法中就可以对变更进行响应动态修改一些行为。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082131390.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b9a134918bac48d6a946d53932a7d998.png)
 
 通过 Zookeeper 这个中枢，每一个客户端对节点状态的改变都能够推送给节点的订阅者，在发布订阅模型中，Zookeeper 的每一个节点都可以被理解成一个主题，每一个客户端都可以向这个主题推送详细，同时也可以订阅这个主题中的消息；只是 Zookeeper 引入了文件系统的父子层级的概念将发布订阅功能实现得更加复杂。
 
@@ -77,7 +77,7 @@ public static enum EventType {
 
 在分布式系统中，通常需要一个全局唯一的名字，如生成全局唯一的订单号等，ZooKeeper 可以通过顺序节点的特性来生成全局唯一 ID，从而可以对分布式系统提供命名服务。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240736223.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/3f2e9cb172d84b7fa2003337c1a9cf07.png)
 
 #### 配置管理
 
@@ -91,7 +91,7 @@ public static enum EventType {
 
 （1）访问 `/lock` （这个目录路径由程序自己决定），创建 **带序列号的临时节点（EPHEMERAL）** 。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240738997.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/5b13ae075ef24a6889a6ba07b48283f2.png)
 
 （2）每个节点尝试获取锁时，拿到 `/locks`节点下的所有子节点（`id_0000`,`id_0001`,`id_0002`），**判断自己创建的节点是不是序列号最小的**
 
@@ -99,11 +99,11 @@ public static enum EventType {
   - 释放锁：执行完操作后，把创建的节点给删掉。
 - 如果不是，则监听比自己要小 1 的节点变化。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240738641.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/b53f701f32f04dee99ec563813699a7a.png)
 
 （3）释放锁，即删除自己创建的节点。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240739623.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/e78fde066a674827a7a60d4dc696e818.png)
 
 图中，NodeA 删除自己创建的节点 `id_0000`，NodeB 监听到变化，发现自己的节点已经是最小节点，即可获取到锁。
 
@@ -143,7 +143,7 @@ ZooKeeper 可以处理两种类型的队列：
 
 树中的节点被称为 **`znode`**，其中根节点为 `/`，每个节点上都会保存自己的数据和节点信息。znode 可以用于存储数据，并且有一个与之相关联的 ACL（详情可见 [ACL](#ACL)）。ZooKeeper 的设计目标是实现协调服务，而不是真的作为一个文件存储，因此 znode 存储数据的**大小被限制在 1MB 以内**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240730789.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/90627118e0b54b38a9d1b0a101b2809f.png)
 
 **ZooKeeper 的数据访问具有原子性**。其读写操作都是要么全部成功，要么全部失败。
 
@@ -173,13 +173,13 @@ Zookeeper 致力于为那些高吞吐的大型分布式系统提供一个高性�
 
 Zookeeper 通过树形结构来存储数据，它由一系列被称为 znode 的数据节点组成，类似于常见的文件系统。不过和常见的文件系统不同，Zookeeper 将数据全量存储在内存中，以此来实现高吞吐，减少访问延迟。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082132647.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/3a8aaacfb47844a89b70751a5a137fc5.jpg)
 
 目标二：构建集群
 
 可以由一组 Zookeeper 服务构成 Zookeeper 集群，集群中每台机器都会单独在内存中维护自身的状态，并且每台机器之间都保持着通讯，只要集群中有半数机器能够正常工作，那么整个集群就可以正常提供服务。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082137796.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/ecafef2a3e4c45978d03835eee7a961e.jpg)
 
 目标三：顺序访问
 
@@ -281,7 +281,7 @@ ZooKeeper 定义了如下五种权限：
 
 由于处理读请求不需要服务器之间的交互，**Follower/Observer 越多，整体系统的读请求吞吐量越大**，也即读性能越好。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240730119.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/8bbe50fab903486cb206ea1f5431327e.png)
 
 :::
 
@@ -293,7 +293,7 @@ ZooKeeper 定义了如下五种权限：
 
 #### 写 Leader
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240731595.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/d99ccb9cabe9486eb1dc03a1e9c37640.png)
 
 由上图可见，通过 Leader 进行写操作，主要分为五步：
 
@@ -311,7 +311,7 @@ ZooKeeper 定义了如下五种权限：
 
 #### 写 Follower/Observer
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240731844.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/338cdfef25dc43e192fbd8a5bb2eb10a.png)
 
 - Follower/Observer 均可接受写请求，但不能直接处理，而需要将写请求转发给 Leader 处理。
 - 除了多了一步请求转发，其它流程与直接写 Leader 无任何区别。
@@ -401,7 +401,7 @@ Zookeeper 中的所有数据其实都是由一个名为 `DataTree` 的数据结�
 
 通常来说，会话应该长期存在，而这需要由客户端来保证。客户端可以通过心跳方式（ping）来保持会话不过期。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240732938.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/2362e3dba7794967a892919e1bd8e446.png)
 
 ZooKeeper 的会话具有四个属性：
 
@@ -507,7 +507,7 @@ ZAB 协议的选举 Leader 机制简单来说，就是：**基于过半选举机
 
 那么，ZooKeeper 是如何实现副本机制的呢？答案是：ZAB 协议的原子广播。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412240735474.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/887f931d51a74924816aa7cea443d661.png)
 
 ZAB 协议的原子广播要求：
 

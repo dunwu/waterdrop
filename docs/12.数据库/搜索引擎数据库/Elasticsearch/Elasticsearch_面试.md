@@ -1,7 +1,7 @@
 ---
 icon: logos:elasticsearch
 title: Elasticsearch 面试
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2020-06-16 07:10:44
 categories:
   - 数据库
@@ -36,7 +36,7 @@ permalink: /pages/447cbc4f/
 
 ### 【简单】什么是 ES？
 
-![Elasticsearch](https://raw.githubusercontent.com/dunwu/images/master/snap/202411241734774.png)
+![Elasticsearch](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/f769820186fe432da503bb095aec7817.png)
 
 [**Elasticsearch**](https://github.com/elastic/elasticsearch) 是一个开源的分布式**搜索和分析引擎**。
 
@@ -99,7 +99,7 @@ Elasticsearch 里程碑版本：
 
 Elastic Stack 通常被用来作为日志采集、检索、可视化的解决方案。
 
-![ELK](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231210104.png)
+![ELK](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/ec41500c0b614c4db5245a202c266967.png)
 
 Elastic Stack 也常被称为 ELK，这是 Elastic 公司旗下三款产品 [Elasticsearch](https://www.elastic.co/elasticsearch) 、[Logstash](https://www.elastic.co/products/logstash) 、[Kibana](https://www.elastic.co/kibana) 的首字母组合。
 
@@ -111,7 +111,7 @@ Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](
 
 此外，基于 Elastic Stack，其技术生态还可以和一些主流的分布式中间件进行集成，以应对各种不同的场景。
 
-![Elastic Stack](https://raw.githubusercontent.com/dunwu/images/master/snap/202411231211496.png)
+![Elastic Stack](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/afa56f3c9bcf4f23b6c77dfd65c4eff8.png)
 
 ### 【简单】ES 有哪些基本概念？⭐
 
@@ -471,7 +471,7 @@ Elasticsearch 中存储的数据可以粗略分为：
 
 [**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 由三个组件组成：零个或多个 [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)、有且仅有一个 [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)、零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)。分析的执行顺序为：`character filters -> tokenizer -> token filters`。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012129250.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/bcb1956f433042a0aeab132ad6d39f91.png)
 
 Elasticsearch 内置的分析器：
 
@@ -565,7 +565,7 @@ Elasticsearch 内置了很多分词过滤器，这里列举几个常见的：
 
 Elasticsearch 的逻辑存储被设计为层级结构，自上而下依次为：
 
-![Elasticsearch 逻辑存储](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260812733.png)
+![Elasticsearch 逻辑存储](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/0fa7dbbd361c4dcd816f0c29737b6996.png)
 
 各层级结构的说明如下：
 
@@ -645,7 +645,7 @@ Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分�
 
 Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。简单来说，Lucene 就是一个 jar 包，里面包含了封装好的构建、管理倒排索引的算法代码。
 
-![Elasticsearch 物理存储](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260815446.png)
+![Elasticsearch 物理存储](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/7fa4076e4ae24f63a6b8273c5cc10923.png)
 
 ### 【中等】什么是倒排索引？⭐⭐⭐
 
@@ -670,7 +670,7 @@ Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索�
 
 除了要保存词项与 ID 的关系外，还需要保存这个词项在对应文档出现的位置、偏移量等信息，这是因为很多检索的场景中还需要判断关键词前后的内容是否符合搜索要求。
 
-![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202411260816781.png)
+![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/b3880af0bf2e4b29a35afb04c43ec5c9.png)
 
 有了倒排索引，搜索引擎可以很方便地响应用户的查询。比如用户输入查询 `明月`，搜索系统查找倒排索引，从中读出包含这个单词的文档，这些文档就是提供给用户的搜索结果。
 
@@ -687,7 +687,7 @@ Trie 遵循一个规则：如果两个字符串有共同的前缀，那么它们
 
 Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效。此外，Trie 有 Hash 不具备的**优点**：Trie 支持前缀搜索和排序。Trie 的主要**缺点**是：存储词项需要额外的空间，对于长文本，空间可能会变得很大。
 
-![字典树](https://raw.githubusercontent.com/dunwu/images/master/snap/202411301547515.png)
+![字典树](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/81835bcf7ac2463780b0e22973a2caad.png)
 
 ### 【困难】ES 如何实现倒排索引？⭐⭐⭐
 
@@ -697,7 +697,7 @@ Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效
 
 Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。
 
-![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110718277.png)
+![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/06025626fc6148708b30ba20e7b157f3.png)
 
 倒排索引的组成主要有 3 个部分：
 
@@ -812,7 +812,7 @@ Elasticsearch 中有两种类型的分片：
 
 默认情况下，每个索引都有 1 个主分片（早期版本，默认每个索引有 5 个主分片）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411221525828.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/e9fd078433d445a597b75efcbc3ab044.png)
 
 ### 【中等】ES 如何选择读写数据映射到哪个分片上？⭐⭐⭐
 
@@ -924,19 +924,19 @@ Query 阶段会根据搜索条件遍历每个分片（主分片或者副分片�
 
 :::
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110752784.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/50ff0b019c6f47f6a5a00103adfc3301.png)
 
 ES 存储数据的流程可以从三个角度来阐述：
 
 - 从**集群**的角度来看，数据写入会先路由到主分片，在主分片上写入成功后，会并发写副本分片，最后响应给客户端。
 
-  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012126135.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/7788e062ae544310a999180c4953bc48.png)
 
 - 从**分片**的角度来看，数据到达分片后，需要对内容进行格式校验、分词处理然后再索引数据。
 
 - 从**节点**的角度来看，ES 数据持久化的步骤可归纳为：**Refresh、写 Translog、Flush、Merge。**
 
-  ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012127951.png)
+  ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/9b3ea3bae0d342b7928a7cdc9bc9d8e5.png)
   - 默认，ES 会每秒执行一次 **Refresh** 操作，把 Index Buffer 的数据写入磁盘中，但不会调用 fsync 刷盘。ES 提供近实时搜索的原因是因为数据被 Refresh 后才能被检索出来 。
   - 为了保证数据不丢失，在**写完 Index Buffer 后，ES 还要写 Translog**。Translog 是追加写入的，并且默认是调用 fsync 进行刷盘的。
   - **Flush** 操作会将 Filesystem Cache 中的数据持久化到磁盘中，默认 30 分钟或者在 Translog 写满时（默认 512 MB）触发执行。Flush 将磁盘缓存持久化到磁盘后，会清空 Translog。
@@ -946,9 +946,9 @@ ES 存储数据的流程可以从三个角度来阐述：
 
 在 ES 中，不仅仅是普通搜索，相关性计算（评分）和聚合计算也是先在每个 shard 的本地进行计算，再由 coordinate node 进行汇总。由于分片的本地计算是独立的，只能基于数据子集来进行计算，所以难免出现数据偏差。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012144894.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/0848782a8d894f078e0f7f9583ed6743.png)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012145912.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/3656b57ba1f4491ebc4a2297f03d7bbc.png)
 
 解决这个问题的方式也有多种：
 

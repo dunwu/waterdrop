@@ -47,7 +47,7 @@ Java 内存模型（Java Memory Model），简称 **JMM**。Java 内存模型的
 
 为了解决缓存一致性问题，**需要各个处理器访问缓存时都遵循一些协议，在读写时要根据协议来进行操作**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290755550.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/fb22bbdce2e94b4999d82a3750f00589.png)
 
 ### 指令重排序
 
@@ -131,7 +131,7 @@ JMM 还规定了上述 8 种基本操作，需要满足以下规则：
 - 如果一个变量事先没有被 lock 操作锁定，则不允许对它执行 unlock 操作，也不允许去 unlock 一个被其他线程锁定的变量。
 - 对一个变量执行 unlock 操作之前，必须先把此变量同步到主内存中（执行 store 和 write 操作）
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290758072.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/2cbd12a4220d4374bd1f0f77fcbdcf6b.png)
 
 ### 并发安全特性
 
@@ -224,7 +224,7 @@ Load3;
 
 Java 中对内存屏障的使用在一般的代码中不太容易见到，常见的有 `volatile` 和 `synchronized` 关键字修饰的代码块（后面再展开介绍），还可以通过 `Unsafe` 这个类来使用内存屏障。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081742034.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/91c041f6660542489de6ba2c2a2f5cf8.png)
 
 ## Synchronized 内存语义
 
@@ -248,7 +248,7 @@ Java 中对内存屏障的使用在一般的代码中不太容易见到，常见
 - **同步静态方法** - 对于静态同步方法，锁是当前类的 `Class` 对象
 - **同步代码块** - 对于同步方法块，锁是 `synchonized` 括号里配置的对象
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409090719904.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/4175cd3e336f4ac489f3f0e328f907aa.png)
 
 【示例】`synchronized` 的使用语法
 
@@ -370,7 +370,7 @@ public class ThreadSafeCounter {
 }
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409090720289.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/c46f008fb46042fe84753cfc98110f0f.png)
 
 #### 静态 `synchronized` 方法和非静态 `synchronized` 是否互斥
 
@@ -420,7 +420,7 @@ class Account {
 
 问题就出在 this 这把锁上，this 这把锁可以保护自己的余额 this.balance，却保护不了别人的余额 target.balance，就像你不能用自家的锁来保护别人家的资产，也不能用自己的票来保护别人的座位一样。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409060808648.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/78f1f62d279c455aa862db8f83808b52.png)
 
 应该保证使用的**锁能覆盖所有受保护资源**。
 
@@ -529,7 +529,7 @@ public void foo(Object lock) {
 
 Mark Word 记录了对象和锁有关的信息。Mark Word 在 64 位 JVM 中的长度是 64bit，我们可以一起看下 64 位 JVM 的存储结构是怎么样的。如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200629191250.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/a2dc15c84410441883de9c6ccf8d57ae.png)
 
 锁升级功能主要依赖于 Mark Word 中的锁标志位和释放偏向锁标志位，`synchronized` 同步锁就是从偏向锁开始的，随着竞争越来越激烈，偏向锁升级到轻量级锁，最终升级到重量级锁。
 
@@ -550,7 +550,7 @@ Java 1.6 引入了偏向锁和轻量级锁，从而让 `synchronized` 拥有了�
 
 偏向锁的思想是偏向于**第一个获取锁对象的线程，这个线程在之后获取该锁就不再需要进行同步操作，甚至连 CAS 操作也不再需要**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200604105151.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/84a8cc69adb94e6c891ef70f133ea222.png)
 
 #### 轻量级锁
 
@@ -558,7 +558,7 @@ Java 1.6 引入了偏向锁和轻量级锁，从而让 `synchronized` 拥有了�
 
 当尝试获取一个锁对象时，如果锁对象标记为 `0|01`，说明锁对象的锁未锁定（unlocked）状态。此时虚拟机在当前线程的虚拟机栈中创建 Lock Record，然后使用 CAS 操作将对象的 Mark Word 更新为 Lock Record 指针。如果 CAS 操作成功了，那么线程就获取了该对象上的锁，并且对象的 Mark Word 的锁标记变为 00，表示该对象处于轻量级锁状态。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200604105248.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/97343466833b451480a11f206183c694.png)
 
 #### 锁消除 / 锁粗化
 

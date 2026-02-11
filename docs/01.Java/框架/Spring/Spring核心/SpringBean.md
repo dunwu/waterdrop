@@ -102,7 +102,7 @@ Bean 别名（Alias）的作用：
 
 ## Spring Bean 生命周期
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20211201102734.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/12/843b87f616f1495596adabca5bc2db4b.png)
 
 1. Spring 对 Bean 进行实例化（相当于 new XXX()）
 

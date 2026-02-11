@@ -1,7 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 建模
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503072140127.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/435475f28e2d4fcfbb019d9120105c4b.png
 date: 2020-09-12 10:43:53
 categories:
   - 数据库
@@ -50,7 +50,7 @@ MongoDB 是无模式的，那么文档之间如何关联呢？要关联文档数
 
 嵌入式文档在单一文档结构中存储相关数据。文档可以包含具有相关数据的数组和子文档。这些**非规范化**数据模型允许应用程序在单个数据库操作中检索相关数据。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503072153634.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/74f2525013df4740b4a635d02853d605.svg)
 
 > 扩展阅读：[嵌入式数据模型](https://www.mongodb.com/zh-cn/docs/manual/data-modeling/concepts/embedding-vs-references/#std-label-data-modeling-embedding)
 
@@ -60,7 +60,7 @@ MongoDB 是无模式的，那么文档之间如何关联呢？要关联文档数
 
 应用程序可以通过解析这些引用来访问相关数据。从广义上讲，这些是**规范化**数据模型。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503072157794.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/48e9255df74d4f1baed8eb7521bda05b.svg)
 
 > 扩展阅读：[引用式数据模型](https://www.mongodb.com/zh-cn/docs/manual/data-modeling/concepts/embedding-vs-references/#std-label-data-modeling-referencing)
 
@@ -419,7 +419,7 @@ review collection 存储所有的评论
 
 ## 树形结构模型
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200911194846.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/a6e8974e868e42c5a0bd694ce553e446.svg)
 
 ### 具有父节点的树形结构模型
 
@@ -573,7 +573,7 @@ db.categories.insertMany([
 
 ### 具有嵌套集的树形结构模型
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200911204252.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/39d10ff7913543a0a97e0013011a326a.svg)
 
 ```javascript
 db.categories.insertMany([
@@ -602,7 +602,7 @@ db.categories.find({
 
 解决方案是：列转行
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200919225901.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/6ec571c6a6304f5bb594e71d01bff16f.png)
 
 ### 管理文档不同版本
 

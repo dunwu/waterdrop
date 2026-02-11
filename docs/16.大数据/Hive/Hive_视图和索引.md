@@ -47,7 +47,7 @@ CREATE VIEW [IF NOT EXISTS] [db_name.]view_name   -- 视图名称
   CREATE VIEW  IF NOT EXISTS custom_view AS SELECT empno, empno+deptno , 1+2 FROM emp;
   ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081647604.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e337635b62e745a3ab2ee5eb610941dc.png)
 
 ### 查看视图
 
@@ -93,7 +93,7 @@ table_properties:
 ALTER VIEW custom_view SET TBLPROPERTIES ('create'='heibaiying','date'='2019-05-05');
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081648057.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2d3cabf6c3c84f3288b710e6b80814cc.png)
 
 ## 索引
 
@@ -181,7 +181,7 @@ alter index emp_index on emp rebuild;
 
 Hive 会启动 MapReduce 作业去建立索引，建立好后查看索引表数据如下。三个表字段分别代表：索引列的值、该值对应的 HDFS 文件路径、该值在文件中的偏移量。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081648628.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/3860d09660d84af39909426487eb7f09.png)
 
 ### 自动使用索引
 
@@ -199,7 +199,7 @@ SET hive.optimize.index.filter.compact.minsize=0;
 SHOW INDEX ON emp;
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081649563.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d3fae8a47d094c2da536cb1fe62fb729.png)
 
 ## 索引的缺陷
 

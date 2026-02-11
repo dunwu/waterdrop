@@ -27,7 +27,7 @@ permalink: /pages/2558b1f3/
 
 Elasticsearch 是一款基于 Lucene 的开源分布式搜索引擎。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202411060749487.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/23e25faeaebd4d619cc90c3a506f094b.png)
 
 - 1.0（2014 年 1 月）
 - 5.0（2016 年 10 月）

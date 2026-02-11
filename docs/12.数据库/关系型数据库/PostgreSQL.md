@@ -18,7 +18,7 @@ permalink: /pages/178e40ac/
 >
 > 关键词：Database, RDBM, psql
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20180920181010182614.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/09/27e76b9b5198423fbbc8dbcb4e871e49.png)
 
 ## 安装
 
@@ -28,7 +28,7 @@ permalink: /pages/178e40ac/
 
 官方下载页面要求用户选择相应版本，然后动态的给出安装提示，如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20180920181010174348.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/09/57793f9a6627473aa9dc6ffbf1734137.png)
 
 前 3 步要求用户选择，后 4 步是根据选择动态提示的安装步骤
 

@@ -25,7 +25,7 @@ permalink: /pages/918b4660/
 
 **Figure 1. 包含空内容节点的集群**
 
-![包含空内容节点的集群](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110727127.png)
+![包含空内容节点的集群](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/b7f2218fc3aa4379b7935ba8c254ef8f.png)
 
 图 1：只有一个空节点的集群
 
@@ -98,7 +98,7 @@ PUT /blogs
 
 **Figure 2. 拥有一个索引的单节点集群**
 
-![拥有一个索引的单节点集群](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110727271.png)
+![拥有一个索引的单节点集群](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/36480bf32731402dbf1e951315bb7c5b.png)
 
 如果我们现在查看集群健康，我们将看到如下内容：
 
@@ -141,7 +141,7 @@ PUT /blogs
 
 **Figure 3. 拥有两个节点的集群——所有主分片和副本分片都已被分配**
 
-![拥有两个节点的集群](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110728008.png)
+![拥有两个节点的集群](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/10daf4326c414ecead13ac5afef072ee.png)
 
 当第二个节点加入到集群后，3 个 _副本分片_ 将会分配到这个节点上——每个主分片对应一个副本分片。 这意味着当集群内任何一个节点出现问题时，我们的数据都完好无损。
 
@@ -179,7 +179,7 @@ PUT /blogs
 
 **Figure 4. 拥有三个节点的集群——为了分散负载而对分片进行重新分配**
 
-![拥有三个节点的集群](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110729711.png)
+![拥有三个节点的集群](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/0ef9df142bae44e6a1d929c16b26bc03.png)
 
 `Node 1` 和 `Node 2` 上各有一个分片被迁移到了新的 `Node 3` 节点，现在每个节点上都拥有 2 个分片，而不是之前的 3 个。 这表示每个节点的硬件资源（CPU, RAM, I/O）将被更少的分片所共享，每个分片的性能将会得到提升。
 
@@ -204,7 +204,7 @@ PUT /blogs/_settings
 
 **Figure 5. 将参数 `number_of_replicas` 调大到 2**
 
-![拥有2份副本分片3个节点的集群](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110729856.png)
+![拥有2份副本分片3个节点的集群](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/098a3b5543704b378294ef6e04016d74.png)
 
 > 当然，如果只是在相同节点数目的集群上增加更多的副本分片并不能提高性能，因为每个分片从节点上获得的资源会变少。 你需要增加更多的硬件资源来提升吞吐量。
 >
@@ -216,7 +216,7 @@ PUT /blogs/_settings
 
 **Figure 6. 关闭了一个节点后的集群**
 
-![关闭了一个节点后的集群](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110730968.png)
+![关闭了一个节点后的集群](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/6ab3137609dc4e92b031f1338793aa02.png)
 
 我们关闭的节点是一个主节点。而集群必须拥有一个主节点来保证正常工作，所以发生的第一件事情就是选举一个新的主节点： `Node 2` 。
 
@@ -282,7 +282,7 @@ Elasticsearch 基于 Lucene, 这个 java 库引入了 按段搜索 的概念。 
 
 **Figure 16. 一个 Lucene 索引包含一个提交点和三个段**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110730032.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/05f0c5bb98c640b5aa67b982409af7a9.png)
 
 > 被混淆的概念是，一个 _Lucene 索引_ 我们在 Elasticsearch 称作 _分片_ 。 一个 Elasticsearch _索引_ 是分片的集合。 当 Elasticsearch 在索引中搜索的时候， 他发送查询到每一个属于索引的分片(Lucene 索引)，然后像 [_执行分布式检索_](https://www.elastic.co/guide/cn/elasticsearch/guide/current/distributed-search.html) 提到的那样，合并每个分片的结果到一个全局的结果集。
 
@@ -298,11 +298,11 @@ Elasticsearch 基于 Lucene, 这个 java 库引入了 按段搜索 的概念。 
 
 **Figure 17. 一个在内存缓存中包含新文档的 Lucene 索引**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110731191.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/9a13115aabaf4049baff8c4a6d10fb60.png)
 
 **Figure 18. 在一次提交后，一个新的段被添加到提交点而且缓存被清空。**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110732279.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/525772f2d2124026bde5617a8354c915.png)
 
 当一个查询被触发，所有已知的段按顺序被查询。词项统计会对所有段的结果进行聚合，以保证每个词和每个文档的关联都被准确计算。 这种方式可以用相对较低的成本将新文档添加到索引。
 
@@ -328,13 +328,13 @@ Elasticsearch 基于 Lucene, 这个 java 库引入了 按段搜索 的概念。 
 
 **Figure 19. 在内存缓冲区中包含了新文档的 Lucene 索引**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110732211.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/82b85159ff5c439993ef121004deef8b.png)
 
 Lucene 允许新段被写入和打开—使其包含的文档在未进行一次完整提交时便对搜索可见。 这种方式比进行一次提交代价要小得多，并且在不影响性能的前提下可以被频繁地执行。
 
 **Figure 20. 缓冲区的内容已经被写入一个可被搜索的段中，但还没有进行提交**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110733340.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/71e7b2e4d2b3438a985db4bc52d94e67.png)
 
 ### refresh API
 
@@ -396,7 +396,7 @@ Elasticsearch 增加了一个 _translog_ ，或者叫事务日志，在每一次
 
 **Figure 21. 新的文档被添加到内存缓冲区并且被追加到了事务日志**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110734258.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/0c24990fbe8640b1b39d737d61146136.png)
 
 刷新（refresh）使分片处于 [Figure 22, “刷新（refresh）完成后, 缓存被清空但是事务日志不会”](https://www.elastic.co/guide/cn/elasticsearch/guide/current/translog.html#img-xlog-post-refresh) 描述的状态，分片每秒被刷新（refresh）一次：
 
@@ -406,13 +406,13 @@ Elasticsearch 增加了一个 _translog_ ，或者叫事务日志，在每一次
 
 **Figure 22. 刷新（refresh）完成后, 缓存被清空但是事务日志不会**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110748579.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/d548c0db9b2f4673a31a21d14c20e0bd.png)
 
 这个进程继续工作，更多的文档被添加到内存缓冲区和追加到事务日志（见 [Figure 23, “事务日志不断积累文档”](https://www.elastic.co/guide/cn/elasticsearch/guide/current/translog.html#img-xlog-pre-flush) ）。
 
 **Figure 23. 事务日志不断积累文档**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110748210.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/0f6563a176194b52b0cf81a3b95a7c2a.png)
 
 1. 每隔一段时间—例如 translog 变得越来越大—索引被刷新（flush）；一个新的 translog 被创建，并且一个全量提交被执行（见 [Figure 24, “在刷新（flush）之后，段被全量提交，并且事务日志被清空”](https://www.elastic.co/guide/cn/elasticsearch/guide/current/translog.html#img-xlog-post-flush) ）：
    - 所有在内存缓冲区的文档都被写入一个新的段。
@@ -427,7 +427,7 @@ translog 也被用来提供实时 CRUD 。当你试着通过 ID 查询、更新�
 
 **Figure 24. 在刷新（flush）之后，段被全量提交，并且事务日志被清空**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110749967.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/35faedecbe1e47c8b6b4d2968eb0710f.png)
 
 ### flush API
 
@@ -485,7 +485,7 @@ Elasticsearch 通过在后台进行段合并来解决这个问题。小的段被
 
 **Figure 25. 两个提交了的段和一个未提交的段正在被合并到一个更大的段**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110750835.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/fbe425c46a1d464582db0b1b14b90bb2.png)
 
 [Figure 26, “一旦合并结束，老的段被删除”](https://www.elastic.co/guide/cn/elasticsearch/guide/current/merge-process.html#img-post-merge) 说明合并完成时的活动：
 
@@ -495,7 +495,7 @@ Elasticsearch 通过在后台进行段合并来解决这个问题。小的段被
 
 **Figure 26. 一旦合并结束，老的段被删除**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503110750455.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/8e797963a5c044d1874b4a893fab3fd5.png)
 
 合并大的段需要消耗大量的 I/O 和 CPU 资源，如果任其发展会影响搜索性能。Elasticsearch 在默认情况下会对合并流程进行资源限制，所以搜索仍然 有足够的资源很好地执行。
 

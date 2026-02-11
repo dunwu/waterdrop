@@ -68,11 +68,11 @@ AQS 核心思想是，如果被请求的共享资源空闲，则将当前请求�
 
 CLH 本是一个单向队列，AQS 中的队列采用了 CLH 的变体，是一个虚拟的 FIFO 双向队列（虚拟的双向队列，是指不存在结点实例，仅存在结点之间的关联关系），暂时获取不到锁的线程将被加入到该队列中。AQS 将每条请求共享资源的线程封装成一个 CLH 队列锁的一个结点（Node）来实现锁的分配。在 CLH 队列锁中，一个节点表示一个线程，它保存着线程的引用（thread）、 当前节点在队列中的状态（waitStatus）、前驱节点（prev）、后继节点（next）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409120729373.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/9344f54d09cd4b1daa2bdc6955ce1190.png)
 
 AQS 的核心原理图：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409120729594.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/bb71372467e243a3982038d11d9cc00e.png)
 
 ### AQS 的数据结构
 
@@ -144,7 +144,7 @@ static final class Node {
 
 ### 独占锁的获取和释放
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409120730774.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/f8b4d70e224945f7a25fd9ff4c976d3f.png)
 
 #### 获取独占锁
 
@@ -256,7 +256,7 @@ doAcquireNanos 的实现方式 **相较于获取独占锁方法（ `acquire`）�
 
 ### 共享锁的获取和释放
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409120732865.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/883fe5890caa430a819a538a69cac402.png)
 
 #### 获取共享锁
 

@@ -41,7 +41,7 @@ NoSql 不同时期的释义
 
 ### Oracle 中的 SQL 是如何执行的
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220716105947.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/8cb698a397624dbbb48c3ff741b90dcb.png)
 
 1. **语法检查**：检查 SQL 拼写是否正确，如果不正确，Oracle 会报语法错误。
 2. **语义检查**：检查 SQL 中的访问对象是否存在。比如我们在写 SELECT 语句的时候，列名写错了，系统就会提示错误。语法检查和语义检查的作用是保证 SQL 语句没有错误。
@@ -58,7 +58,7 @@ NoSql 不同时期的释义
 
 MySQL 是典型的 C/S 架构，即 Client/Server 架构，服务器端程序使用的 mysqld。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220716110905.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/48d46f0637784551ae88446b1c23144a.png)
 
 Mysql 可分为三层：
 
@@ -66,7 +66,7 @@ Mysql 可分为三层：
 2. **SQL 层**：对 SQL 语句进行查询处理；
 3. **存储引擎层**：与数据库文件打交道，负责数据的存储和读取。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220716111103.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/2829f7fd9647429fb962b85c93d0748c.png)
 
 SQL 层的结构
 
@@ -450,7 +450,7 @@ Mysql 中，只有 Memory 存储引擎显示支持哈希索引。
 
 **在数据库中，不论读一行，还是读多行，都是将这些行所在的页进行加载。也就是说，数据库管理存储空间的基本单位是页（Page）。**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220720055715.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/cac700cad53c477194b6a76eefc12774.png)
 
 一个表空间包括了一个或多个段，一个段包括了一个或多个区，一个区包括了多个页，而一个页中可以有多行记录：
 
@@ -505,7 +505,7 @@ MySQL 整个查询执行过程，总的来说分为 6 个步骤，分别对应 6
 
 ## 33 丨如何使用性能分析工具定位 SQL 执行慢的原因？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220720093823.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/2a1d5ff534784e099a0ac7a1f5e9ef84.png)
 
 ## 34 丨答疑篇：关于索引以及缓冲池的一些解惑
 
@@ -521,9 +521,7 @@ Mysql 支持两种复制：基于行的复制和基于语句的复制。
 - **I/O 线程** ：负责从主服务器上读取二进制日志文件，并写入从服务器的中继日志中。
 - **SQL 线程** ：负责读取中继日志并重放其中的 SQL 语句。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/master-slave.png" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/master-slave.png)
 
 如何解决主从同步时的数据一致性问题？
 
@@ -637,7 +635,7 @@ SQL 可以帮我们进行数据处理，总的来说可以分成 OLTP 和 OLAP �
 
 ## 46 丨数据集成：如何对各种数据库进行集成和转换？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220720142031.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/259def2471df41ce9da23836cb99306a.png)
 
 ETL 是英文 Extract、Transform 和 Load 的缩写，也就是将数据从不同的数据源进行抽取，然后通过交互转换，最终加载到目的地的过程。
 

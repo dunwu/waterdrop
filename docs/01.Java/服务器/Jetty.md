@@ -253,7 +253,7 @@ mvn jetty:run
 
 ### Jetty 架构简介
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201127154145.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/11/7c32ce2781484bf9b348c6df900bea27.jpg)
 
 Jetty Server 就是由多个 Connector（连接器）、多个 Handler（处理器），以及一个线程池组成。
 
@@ -378,7 +378,7 @@ getEndPoint().fillInterested(_readCallback);
 
 到此你应该了解了 Connector 的工作原理，下面我画张图再来回顾一下 Connector 的工作流程。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201118175805.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/11/e12d006550be4f6daa4a643e2a93a514.jpg)
 
 1. Acceptor 监听连接请求，当有连接请求到达时就接受连接，一个连接对应一个 Channel，Acceptor 将 Channel 交给 ManagedSelector 来处理。
 
@@ -426,7 +426,7 @@ public interface Handler extends LifeCycle, Destroyable
 
 Handler 只是一个接口，完成具体功能的还是它的子类。那么 Handler 有哪些子类呢？它们的继承关系又是怎样的？这些子类是如何实现 Servlet 容器功能的呢？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20201118181025.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/11/fbcb4c4540ed496182ec50672aa7ad9c.png)
 
 在 AbstractHandler 之下有 AbstractHandlerContainer，为什么需要这个类呢？这其实是个过渡，为了实现链式调用，一个 Handler 内部必然要有其他 Handler 的引用，所以这个类的名字里才有 Container，意思就是这样的 Handler 里包含了其他 Handler 的引用。
 
@@ -621,15 +621,15 @@ public interface ExecutionStrategy
 
 - ProduceConsume：任务生产者自己依次生产和执行任务，对应到 NIO 通信模型就是用一个线程来侦测和处理一个 ManagedSelector 上所有的 I/O 事件，后面的 I/O 事件要等待前面的 I/O 事件处理完，效率明显不高。通过图来理解，图中绿色表示生产一个任务，蓝色表示执行这个任务。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082229296.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/57a31dee515148b3a71e37ff8f66eafd.png)
 
 - ProduceExecuteConsume：任务生产者开启新线程来运行任务，这是典型的 I/O 事件侦测和处理用不同的线程来处理，缺点是不能利用 CPU 缓存，并且线程切换成本高。同样我们通过一张图来理解，图中的棕色表示线程切换。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082230804.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/457ba439d89b4f919ab5458b5d892db0.png)
 
 - ExecuteProduceConsume：任务生产者自己运行任务，但是该策略可能会新建一个新线程以继续生产和执行任务。这种策略也被称为“吃掉你杀的猎物”，它来自狩猎伦理，认为一个人不应该杀死他不吃掉的东西，对应线程来说，不应该生成自己不打算运行的任务。它的优点是能利用 CPU 缓存，但是潜在的问题是如果处理 I/O 事件的业务代码执行时间过长，会导致线程大量阻塞和线程饥饿。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082230354.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/f131e8f6a67e453fbd3e416f6b86f7fa.png)
 
 - EatWhatYouKill：这是 Jetty 对 ExecuteProduceConsume 策略的改良，在线程池线程充足的情况下等同于 ExecuteProduceConsume；当系统比较忙线程不够时，切换成 ProduceExecuteConsume 策略。为什么要这么做呢，原因是 ExecuteProduceConsume 是在同一线程执行 I/O 事件的生产和消费，它使用的线程来自 Jetty 全局的线程池，这些线程有可能被业务代码阻塞，如果阻塞得多了，全局线程池中的线程自然就不够用了，最坏的情况是连 I/O 事件的侦测都没有线程可用了，会导致 Connector 拒绝浏览器请求。于是 Jetty 做了一个优化，在低线程情况下，就执行 ProduceExecuteConsume 策略，I/O 侦测用专门的线程处理，I/O 事件的处理扔给线程池处理，其实就是放到线程池的队列里慢慢处理。
 

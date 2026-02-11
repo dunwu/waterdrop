@@ -618,11 +618,11 @@ rebalance：表明让 Redis 自动根据节点数进行均衡哈希槽分配。
 
 --cluster-use-empty-masters：表明
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200712125827.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/52cd1149e71940818062aeabeb4f8007.png)
 
 执行结束后，查看状态：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200712130234.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/52bc8dd467c04857b038c81f971cad91.png)
 
 ## Redis 命令
 

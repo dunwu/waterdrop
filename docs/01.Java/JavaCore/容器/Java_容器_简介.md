@@ -143,9 +143,7 @@ public interface Iterable<T> {
 
 **迭代器模式** - **提供一种方法顺序访问一个聚合对象中各个元素，而又无须暴露该对象的内部表示**。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/oop/design-patterns/iterator-pattern.png" width="500"/>
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/oop/design-patterns/iterator-pattern.png)
 
 示例：迭代器遍历
 
@@ -299,7 +297,7 @@ public class ComparableDemo {
             this.age = age;
             this.name = name;
         }
-        
+
         // getter、setter 略
 
         @Override
@@ -362,7 +360,7 @@ public class ComparatorDemo {
 }
 ```
 
-从上例可以看出，使用 `Comparator` 接口和  `Comparable` 接口的不同点在于：被排序的对象类无需实现 `Comparator` 接口，排序逻辑置于被排序对象类的外部。
+从上例可以看出，使用 `Comparator` 接口和 `Comparable` 接口的不同点在于：被排序的对象类无需实现 `Comparator` 接口，排序逻辑置于被排序对象类的外部。
 
 :::
 

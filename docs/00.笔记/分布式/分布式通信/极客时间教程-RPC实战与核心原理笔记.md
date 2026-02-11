@@ -39,7 +39,7 @@ RPC 的作用体现在两个方面：
 
 ### RPC 通信流程
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619100051.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/c82438fe869d45f0af078cd755ff9eee.png)
 
 RPC 是一个远程调用，因此必然需要通过网络传输数据，且 RPC 常用于业务系统之间的数据交互，需要保证其可靠性，所以 RPC 一般默认采用 **TCP 协议**来传输。
 
@@ -56,7 +56,7 @@ RPC 是一个远程调用，因此必然需要通过网络传输数据，且 RPC
 RPC 框架能够帮助我们解决系统拆分后的通信问题，并且能让我们像调用本地一样去调用
 远程方法。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619101023.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/45ed92a202344e2c98607edb73415998.png)
 
 ## 协议：怎么设计可扩展且向后兼容的协议？
 
@@ -78,7 +78,7 @@ RPC 协议对性能要求高，而公有网络协议往往数据报文较大，�
 
 综上，一个 RPC 协议大概会由下图中的这些参数组成：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619102052.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/ba7ab435b38142cab7d5b15e058221a8.png)
 
 ### 可扩展的协议
 
@@ -87,7 +87,7 @@ RPC 协议对性能要求高，而公有网络协议往往数据报文较大，�
 
 为了保证能平滑地升级改造前后的协议，我们有必要设计一种支持可扩展的协议。其关键在于让协议头支持可扩展，扩展后协议头的长度就不能定长了。那要实现读取不定长的协议头里面的内容，在这之前肯定需要一个固定的地方读取长度，所以我们需要一个固定的写入协议头的长度。整体协议就变成了三部分内容：固定部分、协议头内容、协议体内容。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619102833.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/c3272dfb216141749fe5ceb8188d1bf0.png)
 
 ## 序列化：对象怎么在网络中传输？
 
@@ -95,11 +95,11 @@ RPC 协议对性能要求高，而公有网络协议往往数据报文较大，�
 
 调用方和被调用方的数据原本是对象，无法在网络中传输，必须转换为二进制数据。因此，需要一种方式来实现此过程：将对象转为二进制数据，即**序列化**；同时，需要根据二进制数据逆向转化为对象，即**反序列化**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619101617.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/8b8158b5588a47dd8e63514eeb4c6b66.png)
 
 从 RPC 的实现角度来看，序列化的作用如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619104420.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/5d40088ff9c54167adad38e7ae9a5885.png)
 
 常用序列化方式
 
@@ -141,7 +141,7 @@ IO 多路复用分为 select，poll 和 epoll。
 
 网络 IO 读写流程
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619174154.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/ef59b8dceb7e4aa8bd848e645278fb09.png)
 
 应用进程的每一次写操作，都会把数据写到用户空间的缓冲区中，再由 CPU 将数据拷贝到系统内核的缓冲区中，之后再由 DMA 将这份数据拷贝到网卡中，最后由网卡发送出去。这里我们可以看到，一次写操作数据要拷贝两次才能通过网卡发送出去，而用户进程的读操作则是将整个流程反过来，数据同样会拷贝两次才能让应用程序读取到数据。
 
@@ -149,7 +149,7 @@ IO 多路复用分为 select，poll 和 epoll。
 
 所谓的零拷贝，就是取消用户空间与内核空间之间的数据拷贝操作，应用进程每一次的读写操作，可以通过一种方式，直接将数据写入内核或从内核中读取数据，再通过 DMA 将内核中的数据拷贝到网卡，或将网卡中的数据 copy 到内核。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619174335.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/2b90f5b95c444f2fa0f0ab31d0e7199f.png)
 
 Netty 的零拷贝偏向于用户空间中对数据操作的优化，这对处理 TCP 传输中的拆包粘包问题有着重要的意义，对应用程序处理请求数据与返回数据也有重要的意义。
 
@@ -165,7 +165,7 @@ Netty 还提供 FileRegion 中包装 NIO 的 FileChannel.transferTo() 方法实�
 
 动态代理可以帮用户屏蔽远程调用的细节，实现像调用本地一样地调用远程的体验。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619204255.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/93d4b0f0e72d417682bccab8a37f8f40.png)
 
 JDK 支持的动态代理方式是通过实现 InvocationHandler 接口。这种方式有一定的局限性——它要求被代理的类只能是接口。原因是因为生成的代理类会继承 Proxy 类，但 Java 是不支持多重继承的。此外，它还有性能问题。它生成后的代理类是使用反射来完成方法调用的，而这种方式相对直接用编码调用来说，性能会降低。
 
@@ -195,7 +195,7 @@ RPC 还需要为调用方找到所有的服务提供方，并需要在 RPC 里�
 
 有了集群之后，提供方可能就需要管理好这些服务了，那我们的 RPC 就需要内置一些服务治理的功能，比如服务提供方权重的设置、调用授权等一些常规治理手段。而服务调用方需要额外做哪些事情呢？每次调用前，我们都需要根据服务提供方设置的规则，从集群中选择可用的连接用于发送请求。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220620112739.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/ec9030574ee5477dbe3350c070115fd2.png)
 
 ### RPC 可扩展架构
 
@@ -203,13 +203,13 @@ RPC 还需要为调用方找到所有的服务提供方，并需要在 RPC 里�
 
 可以使用 SPI 技术来实现。注意：由于 JDK SPI 性能不高，并且不支持自动注入，所以，一般会选择其他的 SPI 实现。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220620113147.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/62d78b8a7ba24478953578f825f7888d.png)
 
 有了 SPI 支持插件式加载后，RPC 框架就变成了一个微内核架构。
 
 ## 服务发现：到底是要 CP 还是 AP？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220620144009.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/238cc7b863d04b889ffac1f247c4476f.png)
 
 RPC 框架必须要有服务注册和发现机制，这样，集群中的节点才能知道通信方的请求地址。
 
@@ -222,7 +222,7 @@ RPC 框架必须要有服务注册和发现机制，这样，集群中的节点�
 
 搭建一个 ZooKeeper 集群作为注册中心集群，服务注册的时候只需要服务节点向 ZooKeeper 节点写入注册信息即可，利用 ZooKeeper 的 Watcher 机制完成服务订阅与服务下发功能
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200610180056.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/cbc4710785a845fcb3262d1d1ffdbc0c.png)
 
 通常我们可以使用 ZooKeeper、etcd 或者分布式缓存（如 Hazelcast）来解决事件通知问题，但当集群达到一定规模之后，依赖的 ZooKeeper 集群、etcd 集群可能就不稳定了，无法满足我们的需求。
 
@@ -240,7 +240,7 @@ ZooKeeper 的一大特点就是强一致性，ZooKeeper 集群的每个节点的
 
 而 RPC 框架的服务发现，在服务节点刚上线时，服务调用方是可以容忍在一段时间之后（比如几秒钟之后）发现这个新上线的节点的。毕竟服务节点刚上线之后的几秒内，甚至更长的一段时间内没有接收到请求流量，对整个服务集群是没有什么影响的，所以我们可以牺牲掉 CP（强制一致性），而选择 AP（最终一致），来换取整个注册中心集群的性能和稳定性。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717162006.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/c1d95c5241154205ad3e439d0512143c.png)
 
 ## 健康检测：这个节点都挂了，为啥还要疯狂发请求？
 
@@ -306,7 +306,7 @@ RPC 负载均衡所采用的策略与传统的 Web 服务负载均衡所采用�
 
 RPC 的负载均衡完全由 RPC 框架自身实现，RPC 的服务调用者会与“注册中心”下发的所有服务节点建立长连接，在每次发起 RPC 调用时，服务调用者都会通过配置的负载均衡插件，自主选择一个服务节点，发起 RPC 调用请求。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220622175324.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/d38e2b60c8be4c19ab6c0548d0c549ac.png)
 
 ### 如何设计自适应的负载均衡
 
@@ -320,7 +320,7 @@ RPC 的负载均衡完全由 RPC 框架自身实现，RPC 的服务调用者会�
 健康值 = 指标值1 * 权重1 + 指标值2 * 权重2 + ...
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220622180243.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/deabaffb1204460eb7020a72e7daf09f.png)
 
 服务调用者给每个服务节点都打完分之后，会发送请求，那这时候我们又该如何根据分数去控制给每个服务节点发送多少流量呢？
 
@@ -360,20 +360,20 @@ RPC 框架是不会知道哪些业务异常能够去进行异常重试的，我�
 
 综上，一个可靠的 RPC 容错处理机制如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200717163921.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/a0d59085c46f453ca70d7aa6079d4bc3.png)
 
 ## 优雅关闭：如何避免服务停机带来的业务损失？
 
 > 优雅关闭：如何避免服务停机带来的业务损失？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220623102847.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/558f248b05814a9595652011255fad1d.png)
 
 在服务重启的时候，对于调用方来说，可能会存在以下几种情况：
 
 - **调用方发请求前，目标服务已经下线**。对于调用方来说，跟目标节点的连接会断开，这时候调用方可以立马感知到，并且在其健康列表里面会把这个节点挪掉，自然也就不会被负载均衡选中。
 - **调用方发请求的时候，目标服务正在关闭**。但调用方并不知道它正在关闭，而且两者之间的连接也没断开，所以这个节点还会存在健康列表里面，因此该节点就有一定概率会被负载均衡选中。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220623110010.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/897e7a81c4a44155b5ec4cffea2aeb94.png)
 
 当服务提供方正在关闭，如果这之后还收到了新的业务请求，服务提供方直接返回一个特定的异常给调用方（比如 ShutdownException）。这个异常就是告诉调用方“我已经收到这个请求了，但是我正在关闭，并没有处理这个请求”，然后调用方收到这个异常响应后，RPC 框架把这个节点从健康列表挪出，并把请求自动重试到其他节点，因为这个请求是没有被服务提供方处理过，所以可以安全地重试到其他节点，这样就可以实现对业务无损。
 
@@ -402,7 +402,7 @@ RPC 框架是不会知道哪些业务异常能够去进行异常重试的，我�
 
 最终的结果就是，调用方通过服务发现，除了可以拿到 IP 列表，还可以拿到对应的启动时间。我们需要把这个时间作用在负载均衡上。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220623114858.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/1205a2f30b8640378c3b994325d87890.png)
 
 通过这个小逻辑的改动，我们就可以保证当服务提供方运行时长小于预热时间时，对服务提供方进行降权，减少被负载均衡选择的概率，避免让应用在启动之初就处于高负载状态，从而实现服务提供方在启动后有一个预热的过程。
 
@@ -454,7 +454,7 @@ Hook 逻辑。用户可以在 Hook 里面模拟调用逻辑，从而使 JVM 指�
 
 ## 业务分组：如何隔离流量？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200718204407.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/ceee3cd487354c9aa3e4e99aa04882f5.png)
 
 在 RPC 里面我们可以通过分组的方式人为地给不同的调用方划分出不同的小集群，从而实现调用方流量隔离的效果，保障我们的核心业务不受非核心业务的干扰。但我们在考虑问题的时候，不能顾此失彼，不能因为新加一个的功能而影响到原有系统的稳定性。
 
@@ -484,7 +484,7 @@ RPC 是解决应用间互相通信的框架，而应用之间的远程调用过�
 
 对于 RPC 来说，需要关心的安全问题不会有公网应用那么复杂，我们只要保证让服务调用方能拿到真实的服务提供方 IP 地址集合，且服务提供方可以管控调用自己的应用就够了（比如颁发数字签名）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220623194151.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/2b3bc6f99e644b4d951f2db574d19ed2.png)
 
 ## 分布式环境下如何快速定位问题？
 
@@ -554,7 +554,7 @@ RPC 是解决应用间互相通信的框架，而应用之间的远程调用过�
 
 （1）**测试平台**：各个业务方在测试平台中通过输入接口、分组名、方法名以及参数值，在线测试自己发布的 RPC 服务。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220624110324.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/d3af39e6c6a048ed9dd3cb8f09808a1b.png)
 
 （2）**轻量级的服务网关**：可以让各个业务方用 HTTP 的方式，通过服务网关调用其它服务。服务网关要作为所有 RPC 服务的调用端，是不能依赖所有服务提供方的接口 API 的，也需要调用端在没有服务提供方提供接口的情况下，仍然可以正常地发起 RPC 调用。
 
@@ -562,7 +562,7 @@ RPC 是解决应用间互相通信的框架，而应用之间的远程调用过�
 
 所谓的 RPC 调用，本质上就是调用端向服务端发送一条请求消息，服务端接收并处理，之后向调用端发送一条响应消息，调用端处理完响应消息之后，一次 RPC 调用就完成了。只要调用端将服务端需要知道的信息，如接口名、业务分组名、方法名以及参数信息等封装成请求消息发送给服务端，服务端就能够解析并处理这条请求消息，这样问题就解决了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220624110611.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/5caee901ef004dde854946c5656c0cae.png)
 
 泛化调用接口示例：
 
@@ -583,7 +583,7 @@ class GenericService {
 
 在保持原有 RPC 使用方式不变的情况下，同时引入新的 RPC 框架的思路，是可以让所有的应用最终都能升级到我们想要升级的 RPC 上，但对于开发人员来说，这样切换成本还是有点儿高，整个过程最少需要两次上线才能彻底地把应用里面的旧 RPC 都切换成新 RPC。还有一种方案：要让新的 RPC 能同时支持多种 RPC 调用，当一个调用方切换到新的 RPC 之后，调用方和服务提供方之间就可以用新的协议完成调用；当调用方还是用老的 RPC 进行调用的话，调用方和服务提供方之间就继续沿用老的协议完成调用。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220624112147.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/f9c1d347ea8142639d2cb1857f76d980.png)
 
 ### 如何优雅处理多协议
 
@@ -595,7 +595,7 @@ class GenericService {
 
 当完成了真正的方法调用以后，RPC 返回的也是一个跟协议无关的通用对象，所以在真正往调用方写回数据的时候，我们同样需要完成一个对象转换的逻辑，只不过这时候是把通用对象转成协议相关的对象。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220624112208.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/ce3762dbff484a2d9fdb943b8e500d4d.png)
 
 ## 参考资料
 

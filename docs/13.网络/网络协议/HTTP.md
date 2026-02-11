@@ -24,7 +24,7 @@ permalink: /pages/abc29724/
 
 HTTP 是由 **IETF**(Internet Engineering Task Force，互联网工程工作小组) 和 **W3C**(World Wide Web Consortium，万维网协会) 共同合作制订的，它们发布了一系列的**RFC**(Request For Comments)，其中最著名的是 RFC 2616，它定义了**HTTP /1.1**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200119131949.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/01/a9be6cdfcad547f89d5ff837bb8a82ee.png)
 
 ### HTTP 协议特点
 
@@ -95,21 +95,21 @@ HTTP 使用统一资源标识符（Uniform Resource Identifiers, URI）来传输
 
 一旦建立连接后，数据消息就通过类似 Internet 邮件所使用的格式[RFC5322]和多用途 Internet 邮件扩展（MIME）[RFC2045]来传送。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082150709.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d2ed34c2247240fd99302bcf2f01d27f.png)
 
 以下是使用 wireshark 抓取的一个实际访问百度首页的 HTTP GET 报文：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082150006.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/200ea3761e4c49e293b3ce5b9eb3c23b.png)
 
 可以清楚的看到它的层级结构如下图，经过了层层的包装。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082151080.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/79043eb5a0304ceda67592d7c73b6c87.png)
 
 ### HTTP 请求报文
 
 客户端发送一个 HTTP 请求到服务器的请求消息包括以下格式：请求行（request line）、请求头部（header）、空行和请求数据四个部分组成，下图给出了请求报文的一般格式。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200119132129.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/01/dff214e37d654c479414d0a7d307e2ca.png)
 
 HTTP 请求报文由以下元素组成：
 
@@ -153,7 +153,7 @@ HTTP 请求报文由以下元素组成：
 
 ### HTTP 响应报文
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200119132311.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/01/cb07bb26a851479ebb81508373d2e7bd.png)
 
 HTTP 响应报文包含了下面的元素：
 

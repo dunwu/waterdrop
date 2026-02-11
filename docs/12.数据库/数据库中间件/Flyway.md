@@ -51,13 +51,13 @@ permalink: /pages/9464b967/
 
 最简单的场景是指定 Flyway 迁移到一个空的数据库。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082152721.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9baea6f7af01432ab3d12e54f3e0f90a.webp)
 
 Flyway 会尝试查找它的 schema 历史表，如果数据库是空的，Flyway 就不再查找，而是直接创建数据库。
 
 现再你就有了一个仅包含一张空表的数据库，默认情况下，这张表叫 **flyway_schema_history**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082152800.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/22d3e352485c4241abc15d89608a7094.webp)
 
 这张表将被用于追踪数据库的状态。
 
@@ -65,17 +65,17 @@ Flyway 会尝试查找它的 schema 历史表，如果数据库是空的，Flywa
 
 这些 **migrations** 将根据他们的版本号进行排序。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082153205.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8ee2f02c5ae4471fbbc965ae0999ae2b.webp)
 
 任意 migration 应用后，schema 历史表将更新。当元数据和初始状态替换后，可以称之为：迁移到新版本。
 
 Flyway 一旦扫描了文件系统或应用 classpath 下的 migrations，这些 migrations 会检查 schema 历史表。如果它们的版本号低于或等于当前的版本，将被忽略。保留下来的 migrations 是等待的 migrations，有效但没有应用。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082153822.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e5e96d8528b1485e9f9eddfe15290818.webp)
 
 migrations 将根据版本号排序并按序执行。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082153255.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/da9d8ff9fcc9404491105c0b2b4ce3d8.webp)
 
 ## 快速上手
 

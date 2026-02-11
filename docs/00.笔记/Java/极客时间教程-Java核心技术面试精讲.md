@@ -47,7 +47,7 @@ Exception 又分为**可检查**（checked）异常和**不检查**（unchecked�
 
 【考点分析】
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240656683.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/3cee3bfba34448179b03f33919450756.png)
 
 **理解 Throwable、Exception、Error 的设计和分类**。
 
@@ -248,7 +248,7 @@ ArrayList 是应用更加广泛的**动态数组**实现，它本身不是线程
 
 LinkedList 顾名思义是 Java 提供的**双向链表**，所以它不需要像上面两种那样调整容量，它也不是线程安全的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240657167.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/136bb4a67cab4f5baaea48112065a410.png)
 
 ## 对比 Hashtable、HashMap、TreeMap 有什么不同？
 
@@ -285,7 +285,7 @@ HashMap 源码实现：
 - 分离锁，也就是将内部进行分段（Segment），里面则是 HashEntry 的数组，和 HashMap 类似，哈希相同的条目也是以链表形式存放。
 - HashEntry 内部使用 volatile 的 value 字段来保证可见性，也利用了不可变对象的机制以改进利用 Unsafe 提供的底层能力，比如 volatile access，去直接完成部分操作，以最优化性能，毕竟 Unsafe 中的很多操作都是 JVM intrinsic 优化过的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240701236.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/07cc5a8554b84331abe13957c9b2ddc6.png)
 
 ```java
 public V get(Object key) {
@@ -517,13 +517,13 @@ public static void copyFileByChannel(File source, File dest) throws
 
 当我们使用输入输出流进行读写时，实际上是进行了多次上下文切换，比如应用读取数据时，先在内核态将数据从磁盘读取到内核缓存，再切换到用户态将数据从内核缓存读取到用户缓存。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240702998.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/bc9ed06c2cab4a22896ecc3ce741aff4.png)
 
 基于 NIO transferTo 的实现方式，在 Linux 和 Unix 上，则会使用到零拷贝技术，数据传输并不需要用户态参与，省去了上下文切换的开销和不必要的内存拷贝，进而可能提高应用拷贝性能。注意，transferTo 不仅仅是可以用在文件拷贝中，与其类似的，例如读取磁盘文件，然后进行 Socket 发送，同样可以享受这种机制带来的性能和扩展性提高。
 
 transferTo 的传输过程是：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240702146.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/b16b09e5cd29479ca8709cea08bd2dac.png)
 
 ## 谈谈接口和抽象类有什么区别？
 
@@ -601,7 +601,7 @@ JDK6 以前，由于 synchronized 阻塞度高，导致性能不佳。JDK6 对�
 
 Mark Word 记录了对象和锁有关的信息。Mark Word 在 64 位 JVM 中的长度是 64bit，我们可以一起看下 64 位 JVM 的存储结构是怎么样的。如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200629191250.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/a2dc15c84410441883de9c6ccf8d57ae.png)
 
 锁升级功能主要依赖于 Mark Word 中的锁标志位和释放偏向锁标志位，`synchronized` 同步锁就是从偏向锁开始的，随着竞争越来越激烈，偏向锁升级到轻量级锁，最终升级到重量级锁。
 
@@ -640,7 +640,7 @@ private native void interrupt0();
 
 ### 线程生命周期
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408290809602.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/bbb471da0cb743b088dc9fe58ec57993.png)
 
 `java.lang.Thread.State` 中定义了 **6** 种不同的线程状态，在给定的一个时刻，线程只能处于其中的一个状态。
 
@@ -672,7 +672,7 @@ private native void interrupt0();
 
 死锁是一种特定的程序状态，在实体之间，由于循环依赖导致彼此一直处于等待之中，没有任何个体可以继续前进。死锁不仅仅是在线程之间会发生，存在资源独占的进程之间同样也可能出现死锁。通常来说，我们大多是聚焦在多线程场景中的死锁，指两个或多个线程之间，由于互相持有对方需要的锁，而永久处于阻塞的状态。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409050712813.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/6798886d8aeb40f192444cbd16c7a16d.png)
 
 ### 如何检测死锁
 
@@ -686,7 +686,7 @@ ${JAVA_HOME}\bin\jstack your_pid
 
 然后，分析得到的输出，具体片段如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240702087.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/8ebbc0b9b0634e4eb0073b73a5583c37.png)
 
 最后，结合代码分析线程栈信息。上面这个输出非常明显，找到处于 BLOCKED 状态的线程，按照试图获取（waiting）的锁 ID（请看我标记为相同颜色的数字）查找，很快就定位问题。 jstack 本身也会把类似的简单死锁抽取出来，直接打印出来。
 
@@ -745,7 +745,7 @@ J.U.C 包提供的容器（Queue、List、Set）、Map，从命名上可以大�
 
 下面这张图是 Java 并发类库提供的各种各样的**线程安全**队列实现，注意，图中并未将非线程安全部分包含进来。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240702121.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/6cd6c830873d4303bd935859c9db5060.png)
 
 我们可以从不同的角度进行分类，从基本的数据结构的角度分析，有两个特别的 [Deque](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html) 实现，ConcurrentLinkedDeque 和 LinkedBlockingDeque。Deque 的侧重点是支持对队列头尾都进行插入和删除，所以提供了特定的方法，如：
 
@@ -781,7 +781,7 @@ Executors 目前提供了 5 种不同的线程池创建配置：
 
 Executor 框架的基本组成，请参考下面的类图。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240703740.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/16b1d777a7704a07b5b1adabf49d18dd.png)
 
 - Executor 是一个基础的接口，其初衷是将任务提交和任务执行细节解耦，这一点可以体会其定义的唯一方法。
 
@@ -959,7 +959,7 @@ final boolean acquireQueued(final Node node, int arg) {
 - Ext ClassLoader - 负责加载 `/jre/lib/ext` 路径下的 jar。可以通过 `-Djava.ext.dirs` 参数修改扫描路径。
 - App ClassLoaer- 负责加载 classpath 路径下的内容。可以通过 -Djava.system.class.loader 参数修改扫描路径。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240704663.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/106a18ac60c04b6b842919122e12f2fa.png)
 
 通常类加载机制有三个基本特征：
 
@@ -969,7 +969,7 @@ final boolean acquireQueued(final Node node, int arg) {
 
 在 JDK 9 中，由于 Jigsaw 项目引入了 Java 平台模块化系统（JPMS），Java SE 的源代码被划分为一系列模块。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240704856.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/0b33a67fc0164eae809398da176d105a.png)
 
 类加载器，类文件容器等都发生了非常大的变化：
 
@@ -988,7 +988,7 @@ java --patch-module java.base=your_patch yourApp
 
 结合了 Layer，目前的 JVM 内部结构就变成了下面的层次，内建类加载器都在 BootLayer 中，其他 Layer 内部有自定义的类加载器，不同版本模块可以同时工作在不同的 Layer。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240704234.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/79ca95e2e2924810bc39be9750dbeb0e.png)
 
 ## 有哪些方法可以在运行时动态生成一个 Java 类？
 
@@ -1031,7 +1031,7 @@ static native Class<?> defineClass2(ClassLoader loader, String name, java.nio.By
 - 第五，**运行时常量池**（Run-Time Constant Pool），这是方法区的一部分。如果仔细分析过反编译的类文件结构，你能看到版本号、字段、方法、超类、接口等各种信息，还有一项信息就是常量池。Java 的常量池可以存放各种常量信息，不管是编译期生成的各种字面量，还是需要在运行时决定的符号引用，所以它比一般语言的符号表存储的信息更加宽泛。
 - 第六，**本地方法栈**（Native Method Stack）。它和 Java 虚拟机栈是非常相似的，支持对本地方法的调用，也是每个线程都会创建一个。在 Oracle Hotspot JVM 中，本地方法栈和 Java 虚拟机栈是在同一块儿区域，这完全取决于技术实现的决定，并未在规范中强制。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240705853.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/320ac2d1591247e398905c54334abcfd.png)
 
 OOM 场景：
 
@@ -1060,7 +1060,7 @@ OOM 场景：
 
 堆结构示意图。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240705463.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/642503fd93674890b7648563f12a72f1.png)
 
 ### 年轻代
 
@@ -1070,7 +1070,7 @@ JVM 会随意选取一个 Survivor 区域作为“to”，然后会在 GC 过程
 
 从内存模型而不是垃圾收集的角度，对 Eden 区域继续进行划分，Hotspot JVM 还有一个概念叫做 Thread Local Allocation Buffer（TLAB）。这是 JVM 为每个线程分配的一个私有缓存区域，否则，多线程同时分配内存时，为避免操作同一地址，可能需要使用加锁等机制，进而影响分配速度。TLAB 仍然在堆上，它是分配在 Eden 区域内的。其内部结构比较直观易懂，start、end 就是起始地址，top（指针）则表示已经分配到哪里了。所以我们分配新对象，JVM 就会移动 top，当 top 和 end 相遇时，即表示该缓存已满，JVM 会试图再从 Eden 里分配一块儿。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240705117.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/3298c6093e2245059c160962837453d8.png)
 
 ### 老年代
 
@@ -1149,21 +1149,21 @@ JVM 会随意选取一个 Survivor 区域作为“to”，然后会在 GC 过程
 
 第一，Java 应用不断创建对象，通常都是分配在 Eden 区域，当其空间占用达到一定阈值时，触发 minor GC。仍然被引用的对象（绿色方块）存活下来，被复制到 JVM 选择的 Survivor 区域，而没有被引用的对象（黄色方块）则被回收。注意，我给存活对象标记了“数字 1”，这是为了表明对象的存活时间。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240706966.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/4bb48732229c4ab4b5aa7e05827e4af4.png)
 
 第二， 经过一次 Minor GC，Eden 就会空闲下来，直到再次达到 Minor GC 触发条件，这时候，另外一个 Survivor 区域则会成为 to 区域，Eden 区域的存活对象和 From 区域对象，都会被复制到 to 区域，并且存活的年龄计数会被加 1。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240706215.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/1dc071d638a2419480412be20d3d027b.png)
 
 第三， 类似第二步的过程会发生很多次，直到有对象年龄计数达到阈值，这时候就会发生所谓的晋升（Promotion）过程，如下图所示，超过阈值的对象会被晋升到老年代。这个阈值是可以通过参数指定：
 
 `-XX:MaxTenuringThreshold=<N>`
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240706521.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/f57a3e07b4b54da4849c1e325ec22eb0.png)
 
 后面就是老年代 GC，具体取决于选择的 GC 选项，对应不同的算法。下面是一个简单标记 - 整理算法过程示意图，老年代中的无用对象被清除后， GC 会将对象进行整理，以防止内存碎片化。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240707750.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/b2706611416c4c10825599eb9b28f3f7.png)
 
 通常我们把老年代 GC 叫作 Major GC，将对整个堆进行的清理叫作 Full GC，但是这个也没有那么绝对，因为不同的老年代 GC 算法其实表现差异很大，例如 CMS，“concurrent”就体现在清理工作是与工作线程一起并发运行的。
 
@@ -1185,7 +1185,7 @@ GC 调优，从性能角度来看，通常关注三个方面，内存占用（fo
 
 G1 内存区域如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240707671.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/663c6a9886f445e795916b9f35de340a.png)
 
 region 的大小是一致的，数值是在 1M 到 32M 字节之间的一个 2 的幂值数，JVM 会尽量划分 2048 个左右、同等大小的 region。这个数字既可以手动调整，G1 也会根据堆大小自动进行调整。
 
@@ -1219,7 +1219,7 @@ JMM 为程序中所有的操作定义了一个偏序关系，称之为 **`先行
 
 虽然看起来 Docker 之类容器和虚拟机非常相似，例如，它也有自己的 shell，能独立安装软件包，运行时与其他容器互不干扰。但是，如果深入分析你会发现，Docker 并不是一种完全的**虚拟化**技术，而更是一种轻量级的**隔离**技术。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240707589.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/0bdf5a8b40594a61afdc1e72eb1084ed.png)
 
 基于 namespace，Docker 为每个容器提供了单独的命名空间，对网络、PID、用户、IPC 通信、文件系统挂载点等实现了隔离。对于 CPU、内存、磁盘 IO 等计算资源，则是通过 CGroup 进行管理。
 
@@ -1264,7 +1264,7 @@ JDK 9 中的实验性改进已经被移植到 Oracle JDK 8u131 之中。
 
 【典型回答】+【考点分析】+【知识扩展】
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240708746.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/daed1ac83df741adbfadfdcde6c9f3ee.png)
 
 ## 有人说“Lambda 能让 Java 程序慢 30 倍”，你怎么看？
 
@@ -1333,7 +1333,7 @@ public int lambdaMaxInteger() {
 - 调用 BeanPostProcessor 的后置初始化方法 postProcessAfterInitialization。
 - 创建过程完毕。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240708158.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/3a53e9cc2e014e5ba7787be4082b35de.png)
 
 ### Spring 销毁 Bean
 
@@ -1362,11 +1362,11 @@ Spring Bean 有五个作用域，其中最基础的有下面两种：
 
 从 API 能力范围来看，Netty 完全是 Java NIO 框架的一个大大的超集
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240708363.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/754b161b64af48dfa1537bc8193eea5c.png)
 
 Netty 官方提供的 Server 部分，完整用例请点击 [链接](http://netty.io/4.1/xref/io/netty/example/echo/package-summary.html)。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240708879.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/349baff359a84fa89f3cde4fb130a31e.png)
 
 - [ServerBootstrap](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/bootstrap/ServerBootstrap.java)，服务器端程序的入口，这是 Netty 为简化网络程序配置和关闭等生命周期管理，所引入的 Bootstrapping 机制。我们通常要做的创建 Channel、绑定端口、注册 Handler 等，都可以通过这个统一的入口，以 **Fluent** API 等形式完成，相对简化了 API 使用。与之相对应， [Bootstrap](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/bootstrap/Bootstrap.java) 则是 Client 端的通常入口。
 - [Channel](https://github.com/netty/netty/blob/2c13f71c733c5778cd359c9148f50e63d1878f7f/transport/src/main/java/io/netty/channel/Channel.java)，作为一个基于 NIO 的扩展框架，Channel 和 Selector 等概念仍然是 Netty 的基础组件，但是针对应用开发具体需求，提供了相对易用的抽象。
@@ -1377,7 +1377,7 @@ Netty 官方提供的 Server 部分，完整用例请点击 [链接](http://nett
 
 参考下面的简化示意图，忽略 Inbound/OutBound Handler 的细节，理解这几个基本单元之间的操作流程和对应关系。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240709828.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/bc072bae65e74dafb730e0f128443b12.png)
 
 对比 Java 标准 NIO 的代码，Netty 提供的相对高层次的封装，减少了对 Selector 等细节的操纵，而 EventLoop、Pipeline 等机制则简化了编程模型，开发者不用担心并发等问题，在一定程度上简化了应用代码的开发。
 
@@ -1398,7 +1398,7 @@ UUID
 
 雪花算法 - 如 Twitter 早期开源的 [Snowflake](https://github.com/twitter/snowflake) 的实现，其结构定义可以参考下图：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409240710538.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/0183ff111bb0498d89a8d61aed054075.png)
 
 ## 周末福利 一份 Java 工程师必读书单
 

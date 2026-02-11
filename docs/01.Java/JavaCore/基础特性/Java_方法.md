@@ -475,7 +475,7 @@ public class MethodOverloadDemo {
 
 ## 小结
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1553767582595.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/74813c81ded6430f8fc1e31f0d29749f.png)
 
 ## 参考资料
 

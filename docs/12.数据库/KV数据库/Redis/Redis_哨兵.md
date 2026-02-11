@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 哨兵
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202309190748787.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/1f704468724345bd969b58e56f68a72f.png
 date: 2020-06-24 10:45:38
 categories:
   - 数据库
@@ -32,7 +32,7 @@ Redis 的主从复制模式，虽然提供了一定程度的 **高可用性（Hi
 
 Redis 哨兵模式由一个或多个 Sentinel 实例组成 Sentinel 集群，可以监控任意多个主服务器，以及这些主服务器的所有从服务器；并在被监视的主服务器进入下线状态时，自动将下线主服务器的某个从服务器升级为新的主服务器，然后由新的主服务器代替已下线的主服务器继续处理命令请求。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503282134672.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/07a6cfd0e3bf4a1e8b694e0ee9c2e0a8.png)
 
 Sentinel 的主要功能如下：
 
@@ -69,7 +69,7 @@ Redis-server /path/to/sentinel.conf --sentinel
 
 ### 获取服务器信息
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503282134261.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/8e92a611649b4b2285aaca30b3cbbd10.png)
 
 默认情况下， Sentinel 以“**每十秒一次**”的频率向被监视的主服务器和从服务器**发送 `INFO` 命令**，并通过分析 `INFO` 命令的回复来获取服务器的当前信息。
 
@@ -82,7 +82,7 @@ Redis-server /path/to/sentinel.conf --sentinel
 
 ### 判断下线
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503282135416.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/a8fbb3526acb4bdcaee4abd9cef2633a.png)
 
 #### 主观下线
 
@@ -150,13 +150,13 @@ Sentinel Leader 如何选出新的主服务器：
 
 选出新的主服务器后，Sentinel Leader 会向所有从服务器发送 `SLAVEOF` 命令，让它们去复制新的主服务器。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503282136227.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/50d68df3184243b5a9b530e841019d75.png)
 
 （3）**将旧的主服务器变为从服务器**
 
 Sentinel Leader 将旧的主服务器标记为从服务器。当旧的主服务器重新上线，Sentinel 会向它发送 `SLAVEOF` 命令，让其成为从服务器。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503282136527.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/518e688692494ad4a72d2d6d4ce9ae1a.png)
 
 ## 参考资料
 

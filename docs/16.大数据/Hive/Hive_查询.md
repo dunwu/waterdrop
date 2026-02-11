@@ -210,7 +210,7 @@ Hive 支持内连接，外连接，左外连接，右外连接，笛卡尔连接
 
 需要特别强调：JOIN 语句的关联条件必须用 ON 指定，不能用 WHERE 指定，否则就会先做笛卡尔积，再过滤，这会导致你得不到预期的结果 (下面的演示会有说明)。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200224195733.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/02/f6867ef43c3845a884c8430a187bb363.png)
 
 ### INNER JOIN
 
@@ -247,7 +247,7 @@ ON e.deptno = d.deptno;
 
 执行右连接后，由于 40 号部门下没有任何员工，所以此时员工信息为 NULL。这个查询可以很好的复述上面提到的——JOIN 语句的关联条件必须用 ON 指定，不能用 WHERE 指定。你可以把 ON 改成 WHERE，你会发现无论如何都查不出 40 号部门这条数据，因为笛卡尔运算不会有 (NULL, 40) 这种情况。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081656344.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/62b0b292f9134987ae11135ab9274afa.png)
 
 ### FULL OUTER JOIN
 

@@ -175,7 +175,7 @@ public void execute(Runnable command) {
 3. 如果 `workerCount >= corePoolSize && workerCount < maximumPoolSize`，且线程池内的阻塞队列已满，则创建并启动一个线程来执行新提交的任务；
 4. 如果`workerCount >= maximumPoolSize`，并且线程池内的阻塞队列已满，则根据拒绝策略来处理该任务，默认的处理方式是直接抛异常。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409190726019.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/495409421cd54f0289115628bf09ec32.png)
 
 ::: info 线程池任务状态
 
@@ -216,7 +216,7 @@ private static final int TERMINATED =  3 << COUNT_BITS;
   - `workerCount` 为 0；
   - 设置 `TIDYING` 状态成功。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409190729946.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/e926fa2451744708b1bcaee5b301c6ad.png)
 
 在 `execute` 方法中，多次调用 `addWorker` 方法。`addWorker` 这个方法主要用来创建新的工作线程，如果返回 true 说明创建和启动工作线程成功，否则的话返回的就是 false。
 
@@ -677,7 +677,7 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 **核心流程**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202510061730441.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/4050a64b7ad141ecb59cdbda6abf0bcb.png)
 
 1. 等待方（主线程 / 等待线程）
 
@@ -724,7 +724,7 @@ CyclicBarrier 是基于「锁 + 条件等待」实现的同步工具，核心作
 
 初始化需集齐的线程数 N，线程调用 await () 则计数 + 1，计数达标后触发屏障、重置计数器，所有等待线程放行。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202510061732492.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/eb0b20ab653b47e09fd3cea6ca186e78.png)
 
 **核心机制**
 
@@ -785,7 +785,7 @@ for (int i = 0; i < 3; i++) {
 
 Semaphore 是基于 AQS 实现的限流同步工具，核心作用是**控制同时访问共享资源的线程数量**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202510061732434.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/27ee310c93bf4ab48ec62ec57c4e7cfb.png)
 
 **核心机制**
 
@@ -903,7 +903,7 @@ ForkJoinPool 是专为**分治任务**设计的线程池，核心作用是将大
 
 ForkJoinPool 基于 “分治 + 工作窃取” 算法，让空闲线程偷取繁忙线程的任务，最大化利用多核 CPU，适配递归拆分的 CPU 密集型任务。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200703141326.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/338c79b1b1d34e258454af64336b9356.png)
 
 ::: info ForkJoinPool 特性
 

@@ -19,7 +19,7 @@ permalink: /pages/29fc14bd/
 
 UML 图类型如下图所示：
 
-<div align="center"><img src="https://raw.githubusercontent.com/dunwu/images/master/cs/design/uml/uml-diagrams.png"/></div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/design/uml/uml-diagrams.png)
 
 #### [结构式建模图](UML结构建模图.md)
 
@@ -65,7 +65,7 @@ UML 工具非常多，到底哪种工具好，真的是仁者见仁智者见智�
 >
 > [亿图官网](http://www.edrawsoft.cn/)
 
-<div align="center"><img src="http://www.edrawsoft.cn/images/software/createsoftware.png"/></div>
+![](http://www.edrawsoft.cn/images/software/createsoftware.png)
 
 ### Visio
 
@@ -73,7 +73,7 @@ UML 工具非常多，到底哪种工具好，真的是仁者见仁智者见智�
 >
 > [Visio 官网](https://products.office.com/zh-cn/visio/flowchart-software)
 
-<div align="center"><img src="https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE2jMC4?ver=5361&q=90&h=675&w=830&b=%23FFFFFFFF&aim=true"/></div>
+![](https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE2jMC4?ver=5361&q=90&h=675&w=830&b=%23FFFFFFFF&aim=true)
 
 ### StarUML
 
@@ -81,7 +81,7 @@ UML 工具非常多，到底哪种工具好，真的是仁者见仁智者见智�
 >
 > [StarUML 官网](http://staruml.io/)
 
-<div align="center"><img src="http://staruml.io/image/screenshot_jumbotron.png"/></div>
+![](http://staruml.io/image/screenshot_jumbotron.png)
 
 ### Astah
 
@@ -89,7 +89,7 @@ UML 工具非常多，到底哪种工具好，真的是仁者见仁智者见智�
 >
 > [Astah 官网](http://astah.net/)
 
-<div align="center"><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539757904141&di=7e4f71d0a00ffcd87e0e5aa62f0ed168&imgtype=jpg&src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D3525476819%2C2924170461%26fm%3D214%26gp%3D0.jpg"/></div>
+![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539757904141&di=7e4f71d0a00ffcd87e0e5aa62f0ed168&imgtype=jpg&src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D3525476819%2C2924170461%26fm%3D214%26gp%3D0.jpg)
 
 ### ArgoUML
 
@@ -97,7 +97,7 @@ UML 工具非常多，到底哪种工具好，真的是仁者见仁智者见智�
 >
 > [ArgoUML 官网](https://argouml.en.softonic.com/?ex=CAT-759.2)
 
-<div align="center"><img src="https://gss0.bdstatic.com/-4o3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=f4e8a7c6923df8dcb23087c3ac7819ee/8b13632762d0f70315a83ced05fa513d2697c5ed.jpg"/></div>
+![](https://gss0.bdstatic.com/-4o3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=f4e8a7c6923df8dcb23087c3ac7819ee/8b13632762d0f70315a83ced05fa513d2697c5ed.jpg)
 
 ### ProcessOn
 

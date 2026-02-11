@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 过期删除和内存淘汰
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202309171630222.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/241e7c2423c449c29ec4a7df629f7efc.png
 date: 2023-08-23 15:14:13
 categories:
   - 数据库
@@ -98,7 +98,7 @@ typedef struct redisDb {
 
 下图是一个带有过期字典的示例：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309171537744.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/45eae9af1405467c8916fc46091d9e5b.png)
 
 当执行 `EXPIRE`、`PEXPIRE`、`EXPIREAT`、`PEXPIREAT` 命令，Redis 都会将其转为 `PEXPIREAT` 形式的时间戳，然后维护在 `expires` 字典中。
 
@@ -129,7 +129,7 @@ Redis 同时采用了惰性删除和定期删除策略，以此在合理使用 C
 
 **Redis 惰性删除策略的实现** - 由 `db.c/expireIfNeeded` 函数实现，所有读写命令在执行之前都会调用 `expireIfNeeded` 函数对输入键进行检查：如果输入键已过期，将输入键从数据库中删除；否则，什么也不做。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309171604805.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/7b43e8dc17e64eaca7f845c76982e78e.png)
 
 ### AOF、RDB 和复制对过期键的处理
 

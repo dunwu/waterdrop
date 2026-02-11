@@ -1,7 +1,7 @@
 ---
 icon: logos:redis
 title: Redis 面试之应用篇
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2020-07-13 17:03:42
 categories:
   - 数据库
@@ -32,7 +32,7 @@ permalink: /pages/9145dbc8/
 - Redis 支持五种基本数据类型：String（字符串）、Hash（哈希）、List（列表）、Set（集合）、Zset（有序集合）。
 - 随着 Redis 版本升级，又陆续支持以下数据类型： BitMap（2.2 版新增）、HyperLogLog（2.8 版新增）、GEO（3.2 版新增）、Stream（5.0 版新增）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202506152022430.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/06/0d838364a9944deb97b21f0f61746be0.png)
 
 > **扩展**：[What Redis data structures look like](https://redislabs.com/ebook/part-1-getting-started/chapter-1-getting-to-know-redis/1-2-what-redis-data-structures-look-like/)
 
@@ -124,11 +124,11 @@ permalink: /pages/9145dbc8/
 - **GEO**（3.2 版新增）：存储地理位置信息的场景，比如滴滴叫车；
 - **Stream**（5.0 版新增）：消息队列，相比于基于 List 类型实现的消息队列，有这两个特有的特性：自动生成全局唯一消息 ID，支持以消费组形式消费数据。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309232144470.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/a2fb0aaa85444ac38c5b03adcb93b923.jpg)
 
 ### 【困难】Redis 基础数据类型的底层实现是怎样的？⭐⭐
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202506152022257.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/06/c642059d34204de8b8b13fa7ee11ee14.png)
 
 - **String 类型**：String 类型的底层数据结构是 SDS。SDS 是 Redis 针对字符串类型的优化，具有以下特性：
   - 常数复杂度获取字符串长度
@@ -203,21 +203,21 @@ permalink: /pages/9145dbc8/
 
 但是，即使是有序的链表，也只能使用低效的顺序查找，其时间复杂度为 `O(n)`。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220323113532.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/03/9c2b6521bd3a464794c76ff65cf505db.png)
 
 如何提高链表的查找效率呢？
 
 我们可以对链表加一层索引。具体来说，可以每两个结点提取一个结点到上一级，我们把抽出来的那一级叫作**索引**或**索引层**。索引节点中通过一个 down 指针，指向下一级结点。通过这样的改造，就可以支持类似二分查找的算法。我们把改造之后的数据结构叫作**跳表**（Skip list）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220323155309.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/03/68a613a4ea954a378fd0278c46032069.png)
 
 随着数据的不断增长，一级索引层也变得越来越长。此时，我们可以为一级索引再增加一层索引层：二级索引层。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220323155346.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/03/b016a0850af24079a146046b32724a2f.png)
 
 随着数据的膨胀，当二级索引层也变得很长时，我们可以继续为其添加新的索引层。**这种链表加多级索引的结构，就是跳表**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220323114408.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/03/7f98f0563ced46a5ab261104677036da.png)
 
 **跳表的时间复杂度**
 
@@ -563,7 +563,7 @@ null
 
 **Redis 2.0 引入了发布订阅 (pub/sub) 功能，解决了 List 实现消息队列没有广播机制的问题。**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503272225857.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/fa73a5d083e541c48b8938cb1cc331f8.png)
 
 Redis 发布订阅 (pub/sub) 功能
 
@@ -589,7 +589,7 @@ pub/sub 既能单播又能广播，还支持 channel 的简单正则匹配。不
 
 `Stream` 的结构如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503270823833.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/50d2a8dfb3ed43cfbc28147a6f69764d.png)
 
 这是一个有序的消息链表，每个消息都有一个唯一的 ID 和对应的内容。ID 是一个时间戳和序列号的组合，用来保证消息的唯一性和递增性。内容是一个或多个键值对（类似 Hash 基本数据类型），用来存储消息的数据。
 

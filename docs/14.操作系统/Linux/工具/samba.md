@@ -165,7 +165,7 @@ Windows：
 
 访问：`\\<你的ip>\<你的共享路径>` ：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20180920180928161334.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/09/e6bfd1c9a4904183bd7227e35777dddc.png)
 
 Mac：
 

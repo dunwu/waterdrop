@@ -19,7 +19,7 @@ permalink: /pages/57ef7781/
 
 SpringBoot 为我们做的自动配置，确实方便快捷，但一直搞不明白它的内部启动原理，这次就来一步步解开 SpringBoot 的神秘面纱，让它不再神秘。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082223689.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5e3ba023b4854273a374bdb110f76aae.webp)
 
 ---
 
@@ -206,7 +206,7 @@ static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImp
 
 new PackageImport(metadata).getPackageName()，它其实返回了当前主程序类的 同级以及子级 的包组件。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082224134.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1d03f45688b745e69cd9212f10c60cc6.webp)
 
 以上图为例，DemoApplication 是和 demo 包同级，但是 demo2 这个类是 DemoApplication 的父级，和 example 包同级
 
@@ -214,7 +214,7 @@ new PackageImport(metadata).getPackageName()，它其实返回了当前主程序
 
 #### Import(AutoConfigurationImportSelector.class)注解：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082224291.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/c17be4382032464caaa5b1519a16b4aa.webp)
 
 可以从图中看出 AutoConfigurationImportSelector 继承了 DeferredImportSelector 继承了 ImportSelector
 
@@ -243,13 +243,13 @@ ImportSelector 有一个方法为：selectImports。
 
 可以看到第九行，它其实是去加载 public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";外部文件。这个外部文件，有很多自动配置的类。如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082224938.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b8c335399cdc4f45b1e130db05ca38e6.webp)
 
 image
 
 其中，最关键的要属**@Import(EnableAutoConfigurationImportSelector.class)**，借助**EnableAutoConfigurationImportSelector**，**@EnableAutoConfiguration**可以帮助 SpringBoot 应用将所有符合条件的**@Configuration**配置都加载到当前 SpringBoot 创建并使用的 IoC 容器。就像一只“八爪鱼”一样。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082225737.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9fb6618fce3e4a03bf242a708ae7717d.webp)
 
 ### 自动配置幕后英雄：SpringFactoriesLoader 详解
 
@@ -273,13 +273,13 @@ public abstract class SpringFactoriesLoader {
 
 配合**@EnableAutoConfiguration**使用的话，它更多是提供一种配置查找的功能支持，即根据@EnableAutoConfiguration 的完整类名 org.springframework.boot.autoconfigure.EnableAutoConfiguration 作为查找的 Key,获取对应的一组**@Configuration**类
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082225494.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9bf46cb04ad34899a3dc0eba0100607b.webp)
 
 上图就是从 SpringBoot 的 autoconfigure 依赖包中的 META-INF/spring.factories 配置文件中摘录的一段内容，可以很好地说明问题。
 
 所以，@EnableAutoConfiguration 自动配置的魔法骑士就变成了：**从 classpath 中搜寻所有的 META-INF/spring.factories 配置文件，并将其中 org.springframework.boot.autoconfigure.EnableutoConfiguration 对应的配置项通过反射（Java Refletion）实例化为对应的标注了@Configuration 的 JavaConfig 形式的 IoC 容器配置类，然后汇总为一个并加载到 IoC 容器。**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082225606.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/03128c6f018a4086a1efebaf1e0fac46.webp)
 
 ## 参考资料
 

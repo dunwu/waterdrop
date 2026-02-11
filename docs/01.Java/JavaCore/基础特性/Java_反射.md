@@ -45,7 +45,7 @@ permalink: /pages/e058816d/
 
 ### 类加载过程
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1553611895164.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/e7386dacbce04b4c8840cc6d755884c0.png)
 
 类加载的完整过程如下：
 
@@ -561,7 +561,7 @@ public class ReflectMethodConstructorDemo {
 >
 > **代理模式为其他对象提供一种代理以控制对这个对象的访问。**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081740995.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/913f2977ba914b58b1c37596966f3ff5.webp)
 
 **Subject** 定义了 RealSubject 和 Proxy 的公共接口，这样就在任何使用 RealSubject 的地方都可以使用 Proxy 。
 
@@ -608,7 +608,7 @@ class Proxy extends Subject {
 
 在运行状态中，需要代理的地方，根据 Subject 和 RealSubject，动态地创建一个 Proxy，用完之后，就会销毁，这样就可以避免了 Proxy 角色的 class 在系统中冗杂的问题了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1553614585028.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/c80619b22c024745b60814b553c9713f.png)
 
 Java 动态代理基于经典代理模式，引入了一个 `InvocationHandler`，`InvocationHandler` 负责统一管理所有的方法调用。
 

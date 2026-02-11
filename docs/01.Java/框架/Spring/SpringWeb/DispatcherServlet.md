@@ -236,7 +236,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 根 `WebApplicationContext` 通常包含基础结构 bean，例如需要跨多个 Servlet 实例共享的数据存储和业务服务。这些 bean 是有效继承的，并且可以在特定 `Servlet` 的子 `WebApplicationContext` 中被覆盖（即重新声明），它通常包含指定 `Servlet` 的本地 bean。下图显示了这种关系：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20230213103223.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/02/976a6152156145908d2b198a892dd50d.png)
 
 【示例】配置 `WebApplicationContext` 层次结构：
 

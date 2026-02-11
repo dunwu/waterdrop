@@ -17,7 +17,7 @@ permalink: /pages/3e806bd1/
 
 ## 开篇词
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220703152740.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/b3c5274fa1d94d798c672c9152b1e4e4.png)
 
 从功能上讲，Kafka 源码分为四大模块。
 
@@ -26,7 +26,7 @@ permalink: /pages/3e806bd1/
 - Connect 源码：用于实现 Kafka 与外部系统的高性能数据传输。
 - Streams 源码：用于实现实时的流处理功能。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220703152803.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/2f71521f617f418392552cab6a7c815a.png)
 
 ## 导读
 
@@ -47,7 +47,7 @@ kafka 项目主要目录结构
 
 ### Kafka 日志结构
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220704204019.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/2bb9f2d94eef4d279c2943df630916b3.png)
 
 Kafka 日志对象由多个日志段对象组成，而每个日志段对象会在磁盘上创建一组文件，包括**消息日志文件（.log）**、**位移索引文件（.index）**、**时间戳索引文件（.timeindex）**以及已中止（Aborted）事务的**索引文件（.txnindex）**。当然，如果你没有使用 Kafka 事务，已中止事务的索引文件是不会被创建出来的。
 
@@ -94,7 +94,7 @@ append 方法接收 4 个参数：分别表示
 - `shallowOffsetOfMaxTimestamp`：最大时间戳对应消息的位移
 - `records`：真正要写入的消息集合
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220705062643.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/07a6fc91bf6c4c9bb43dce115cf84429.png)
 
 - 第一步：在源码中，首先调用 `log.sizeInBytes` 方法判断该日志段是否为空，如果是空的话， Kafka 需要记录要写入消息集合的最大时间戳，并将其作为后面新增日志段倒计时的依据。
 - 第二步：代码调用 `ensureOffsetInRange` 方法确保输入参数最大位移值是合法的。那怎么判断是不是合法呢？标准就是看它与日志段起始位移的差值是否在整数范围内，即 `largestOffset - baseOffset` 的值是不是 介于 `[0，Int.MAXVALUE]` 之间。在极个别的情况下，这个差值可能会越界，这时， `append` 方法就会抛出异常，阻止后续的消息写入。一旦你碰到这个问题，你需要做的是升级你的 Kafka 版本，因为这是由已知的 Bug 导致的。
@@ -121,7 +121,7 @@ read 方法代码逻辑：
 
 #### recover 方法
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220705064515.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/e47f0686d2be4f6e917e6fbcb30b22ad.png)
 
 recover 开始时，代码依次调用索引对象的 reset 方法清空所有的索引文件，之后会开始遍历日志段中的所有消息集合或消息批次（RecordBatch）。对于读取到的每个消息集合，日志段必须要确保它们是合法的，这主要体现在两个方面：
 
@@ -136,7 +136,7 @@ recover 开始时，代码依次调用索引对象的 reset 方法清空所有�
 
 日志是日志段的容器，里面定义了很多管理日志段的操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220705195916.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/ed7acc3fee324990bc188b272cc14fe2.png)
 
 ### Log 源码结构
 
@@ -197,7 +197,7 @@ class LocalLog(@volatile private var _dir: File,
 
 Log End Offset（LEO），是表示日志下一条待插入消息的位移值，而这个 Log Start Offset 是跟它相反的，它表示日志当前对外可见的最早一条消息的位移值。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220705201758.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/013f6e74c9a940dc8c1dac7a60c7fea3.png)
 
 图中绿色的位移值 3 是日志的 Log Start Offset，而位移值 15 表示 LEO。另外，位移值 8 是高水位值，它是区分已提交消息和未提交消息的分水岭。
 
@@ -214,7 +214,7 @@ Log 类的其他属性你暂时不用理会，因为它们要么是很明显的�
 
 ### LOG 类初始化逻辑
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220705204919.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/2f89e4fb033c45c1a70596fdc78905fd.png)
 
 ### Log 的常见操作
 
@@ -399,7 +399,7 @@ Log Start Offset 被更新的时机：
 
 写操作流程：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220706104752.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/fbff8487445d420aaa6792c1236a67a8.png)
 
 读操作
 
@@ -420,7 +420,7 @@ read 方法中有 4 个参数：
 - TimeIndex.scala：定义时间戳索引，保存“< 时间戳，位移值 >”对。
 - TransactionIndex.scala：定义事务索引，为已中止事务（Aborted Transcation）保存重要的元数据信息。只有启用 Kafka 事务后，这个索引才有可能出现。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220706142040.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/797c74ceac494e9fb4bb66d342956ab4.png)
 
 ### AbstractIndex 代码结构
 

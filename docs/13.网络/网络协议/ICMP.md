@@ -22,7 +22,7 @@ ICMP 的协议号为**1**。
 
 ICMP 报文就像是 IP 报文的小弟，总顶着 IP 报文的名头出来混。因为 ICMP 报文是在 IP 报文内部的，如图：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082148005.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/75885975149546568f1699161604ac20.png)
 
 ## ICMP 类型
 
@@ -230,7 +230,7 @@ Code
 
 **图：ICMP 知识点思维导图**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082148248.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/dd908712ed8c4d4d8d727322854e2c6c.png)
 
 ## 参考
 

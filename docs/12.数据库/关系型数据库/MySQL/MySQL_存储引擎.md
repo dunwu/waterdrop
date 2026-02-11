@@ -1,7 +1,7 @@
 ---
 icon: logos:mysql
 title: MySQL 存储引擎
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503210715759.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/216d3b9a363c44cba8954de9f8e8ba01.webp
 date: 2020-07-13 10:08:37
 categories:
   - 数据库
@@ -50,7 +50,7 @@ MySQL 内置了以下存储引擎：
   - Archive 存储引擎采用 zlib 算法压缩数据，压缩比可达到 1: 10。
 - **CSV** - 可以将 CSV 文件作为 MySQL 的表来处理，但这种表不支持索引。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503210712752.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/0a682886e08640e2a99db61fc0eb9ec9.png)
 
 ### 如何选择合适的存储引擎
 
@@ -126,7 +126,7 @@ InnoDB 物理文件结构为：
 
 ### InnoDB 存储架构
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311070640589.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/11/4dbec2a86c464e16a3ff4d462becd077.png)
 
 InnoDB 存储架构分为内存结构和磁盘结构。
 
@@ -146,7 +146,7 @@ InnoDB 磁盘结构的核心组件有：
 
 ### InnoDB 表空间
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311070708733.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/11/59526066f5594ff6b225577de6adedb0.png)
 
 #### 行（row）
 
@@ -196,7 +196,7 @@ B+ 树中每一层都是通过双向链表连接起来的，如果是以页为�
 
 #### Buffer Pool
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311070641009.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/11/44bddc8474ba47638838b80db4f02897.png)
 
 Buffer Pool 用于加速数据的访问和修改，通过将热点数据缓存在内存的方法，最大限度地减少磁盘 IO，加速热点数据的读和写。
 
@@ -214,7 +214,7 @@ Buffer Pool 中数据**以页为存储单位**，其实现数据结构是**以�
 
 #### Change Buffer
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202311070641668.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/11/b2995714d7774039899d5aa0d446891c.png)
 
 Change Buffer 用于加速非热点数据中二级索引的写入操作。由于二级索引数据的不连续性，导致修改二级索引时需要进行频繁的磁盘 IO 消耗大量性能，Change Buffer 缓冲对二级索引的修改操作，同时将写操作录入 redo log 中，在缓冲到一定量或系统较空闲时进行 `ibuf merge` 操作将修改写入磁盘中。Change Buffer 在系统表空间中有相应的持久化区域。
 

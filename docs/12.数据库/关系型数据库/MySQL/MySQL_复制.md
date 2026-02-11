@@ -255,9 +255,7 @@ MySQL 读写分离能提高性能的原因在于：
 - 从服务器可以配置 MyISAM 引擎，提升查询性能以及节约系统开销；
 - 增加冗余，提高可用性。
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/master-slave-proxy.png" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/database/mysql/master-slave-proxy.png)
 
 ## 参考资料
 

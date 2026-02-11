@@ -136,9 +136,9 @@ export PATH=$MAVEN_HOME/bin:$PATH
 
 右键 "计算机"，选择 "属性"，之后点击 "高级系统设置"，点击"环境变量"，来设置环境变量，有以下系统变量需要配置：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200108143017.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/01/b34ec4a17bec49dfa42a1ad7364b763c.png)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200108143038.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/01/bb3be76a3fe64aa98439414213773743.png)
 
 ### 检测安装成功
 
@@ -266,15 +266,15 @@ java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
 
 依次点击 File -> New -> Project 打开创建工程对话框，选择 Maven 工程。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1555414103572.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/04/cfcf9005082e4f5cbbcf2fab2e653eb7.png)
 
 （2）输入项目信息
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1555415549748.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/04/913b4ae3141d47489de032857e63d861.png)
 
 （3）点击 Intellij 侧边栏中的 Maven 工具界面，有几个可以直接使用的 maven 命令，可以帮助你进行构建。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1555415806237.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/04/11a6137f118d426b9526e115e8833c2d.png)
 
 ### 在 Eclipse 中创建 Maven 工程
 
@@ -286,7 +286,7 @@ java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
 
 点击 Help -> Eclipse Marketplace，搜索 maven 关键字，选择安装红框对应的 Maven 插件。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20181127195117.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/11/53aee94e2cc5414c875a2207443e638b.png)
 
 （2）Maven 环境配置
 
@@ -294,7 +294,7 @@ java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
 
 如下图所示，配置 settings.xml 文件的位置
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20181127195128.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/11/9287fd478b964713ac28075348eac63d.png)
 
 （3）创建 Maven 工程
 
@@ -302,7 +302,7 @@ File -> New -> Maven Project -> Next，在接下来的窗口中会看到一大�
 
 接下来设置项目的参数，如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20181127195151.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/11/37e68f53550b4d69920f71b716a2dde0.png)
 
 **groupId**是项目组织唯一的标识符，实际对应 JAVA 的包的结构，是 main 目录里 java 的目录结构。
 
@@ -316,11 +316,11 @@ Eclipse 中构建方式：
 
 在 Elipse 项目上右击 -> Run As 就能看到很多 Maven 操作。这些操作和 maven 命令是等效的。例如 Maven clean，等同于 mvn clean 命令。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20181127195208.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/11/bce98fdd9c204cfc97b8b3071a25f1d2.png)
 
 你也可以点击 Maven build，输入组合命令，并保存下来。如下图：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20181127195219.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/11/fb1d97b7148644908f79b681050c1f18.png)
 
 Maven 命令构建方式：
 
@@ -328,7 +328,7 @@ Maven 命令构建方式：
 
 进入工程所在目录，输入 maven 命令就可以了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20181127195243.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/11/f6fd9daddc114a8cacc06b9dce5ad9d0.png)
 
 ## 使用说明
 

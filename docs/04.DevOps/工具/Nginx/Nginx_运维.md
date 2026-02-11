@@ -21,11 +21,11 @@ permalink: /pages/59b71e66/
 
 （1）进入[官方下载地址](https://nginx.org/en/download.html)，选择合适版本（nginx/Windows-xxx）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20180920181023092347.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/09/6962d508f65f4202bced681874c850bc.png)
 
 （2）解压到本地
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20180920181023092044.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/09/c4c0f7a0fecd45bcb819f515e5e2de33.png)
 
 （3）启动
 
@@ -146,7 +146,7 @@ $ firewall-cmd --reload
 
 启动后，访问站点：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20180920181016133223.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2018/09/4f604c6aed6d49b8b422c072d55a2a30.png)
 
 #### Linux 开机自启动
 

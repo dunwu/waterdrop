@@ -18,7 +18,7 @@ index: false
 >
 > **重构的目的是为了提高代码的质量和性能**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210430112157.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/10930a32a0714b55b46b1d9ab6c177b6.png)
 
 ## 📖 内容
 

@@ -658,7 +658,7 @@ public class EnumMapDemo {
 
 ## 小结
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1553002212154.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/306a749407e94eeb965b9729ba9a7b78.png)
 
 ## 参考资料
 

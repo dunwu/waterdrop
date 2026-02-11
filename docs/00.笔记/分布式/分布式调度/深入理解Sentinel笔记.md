@@ -26,15 +26,15 @@ permalink: /pages/f7d4ff23/
 
 当一切正常时，整体系统如下所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202401280931974.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/01/3ed28b9b8d59421ca0aba8e03daa3315.png)
 
 在分布式系统架构下，这些强依赖的子服务稳定与否对系统的影响非常大。但是，依赖的子服务可能有很多不可控问题：如网络连接、资源繁忙、服务宕机等。例如：下图中有一个 QPS 为 50 的依赖服务 I 出现不可用，但是其他依赖服务是可用的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202401280931939.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/01/f728fc0f29554541984e63189f5e84f3.png)
 
 当流量很大的情况下，某个依赖的阻塞，会导致上游服务请求被阻塞。当这种级联故障愈演愈烈，就可能造成整个线上服务不可用的雪崩效应，如下图。这种情况若持续恶化，如果上游服务本身还被其他服务所依赖，就可能出现多米洛骨牌效应，导致多个服务都无法正常工作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081544885.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7b5ae09432714c1a91dc2acd21d06f32.png)
 
 ## 为什么需要服务降级以及常见的几种降级方式
 

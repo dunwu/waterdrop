@@ -1,6 +1,6 @@
 ---
 title: Java 基础面试一
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110803916.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2024-06-18 22:46:20
 order: 1
 categories:
@@ -37,7 +37,7 @@ permalink: /pages/6ca01ab7/
 | 功能性   | Java 11 之后，OracleJDK 和 OpenJDK 的功能基本一致 |                                                        |
 | 协议     | GPL v2                                            | BCL/OTN                                                |
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202504030804687.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/d1f144f5b1bd4d46a526fb4f2a889e26.png)
 
 ### 【简单】Java SE 和 Java EE 有什么区别？
 
@@ -68,7 +68,7 @@ JRE = JVM + Java 类库 + Java 运行库
 JVM = 类加载系统 + 运行时内存区域 + 执行引擎
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202504030804019.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/1713e34f9ed8477a8faf3feeb2d00335.png)
 
 ::: tip 扩展
 
@@ -879,7 +879,7 @@ public class VariableLengthArgument {
 
 ## Java 异常
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202504030805467.webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/211503dd66164d2d94ba14bd5ed56c26.webp)
 
 ### 【简单】Exception 和 Error 有什么区别？
 

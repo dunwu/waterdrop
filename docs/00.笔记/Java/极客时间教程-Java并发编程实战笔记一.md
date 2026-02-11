@@ -14,7 +14,7 @@ permalink: /pages/ed3f0c85/
 
 ## 学习攻略 如何才能学好并发编程？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261435639.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/8a2ebe85df1d43c49126f1972c13bdf8.png)
 
 ## 开篇词 你为什么需要学习并发编程？
 
@@ -42,11 +42,11 @@ CPU、内存、I/O 设备三者的速度存在很大差异。为了合理利用 
 
 例如在下面的图中，线程 A 和线程 B 都是操作同一个 CPU 里面的缓存，所以线程 A 更新了变量 V 的值，那么线程 B 之后再访问变量 V，得到的一定是 V 的最新值（线程 A 写过的值）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261442765.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/730d6af712c347298f67cd9e99622ec8.png)
 
 对于**多核**，当多个线程在不同的 CPU 上执行时，这些线程操作的是不同的 CPU 缓存。这时两个线程对于变量的操作就不具备可见性了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261444744.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/1e69175b321848e48b3b325657558a24.png)
 
 【示例】计数器的并发安全问题示例
 
@@ -85,11 +85,11 @@ public class Test {
 
 操作系统允许某个进程执行一小段时间，例如 50 毫秒，过了 50 毫秒操作系统就会重新选择一个进程来执行（我们称为“任务切换”），这个 50 毫秒称为“**时间片**”。现代的操作系统都基于更轻量的线程来调度，现在我们提到的“任务切换”都是指“线程切换”。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261450096.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/681b590828ed41a3af84bff62303cb79.png)
 
 Java 的并发也是基于任务切换。Java 中，即使是一条语句，也可能需要执行多条 CPU 指令。**一个或者多个操作在 CPU 执行的过程中不被中断的特性称为原子性**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292035170.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/8736467ba93f4ad7aeff928ae09fc4a9.png)
 
 ### 编译优化带来的有序性问题
 
@@ -126,7 +126,7 @@ public class Singleton {
 
 优化后会导致什么问题呢？我们假设线程 A 先执行 getInstance() 方法，当执行完指令 2 时恰好发生了线程切换，切换到了线程 B 上；如果此时线程 B 也执行 getInstance() 方法，那么线程 B 在执行第一个判断时会发现 `instance != null` ，所以直接返回 instance，而此时的 instance 是没有初始化过的，如果我们这个时候访问 instance 的成员变量就可能触发空指针异常。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261457434.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/8c3b002320a24895849dbd9149c19ccf.png)
 
 ## Java 内存模型：看 Java 如何解决可见性和有序性问题
 
@@ -153,7 +153,7 @@ public class Singleton {
 
 举例来说，long 型变量是 64 位，在 32 位 CPU 上执行写操作会被拆分成两次写操作（写高 32 位和写低 32 位，如下图所示）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261524478.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/7d94ecc28af04e51bb5212c0fc6b447a.png)
 
 在多核场景下，同一时刻，有可能有两个线程同时在执行，一个线程执行在 CPU-1 上，一个线程执行在 CPU-2 上，此时禁止 CPU 中断，只能保证 CPU 上的线程连续执行，并不能保证同一时刻只有一个线程执行，如果这两个线程同时写 long 型变量高 32 位的话，那就有可能出现我们开头提及的诡异 Bug 了。
 
@@ -163,13 +163,13 @@ public class Singleton {
 
 一段需要互斥执行的代码称为**临界区**。线程在进入临界区之前，首先尝试加锁 lock()，如果成功，则进入临界区，此时称这个线程持有锁；否则就等待，直到持有锁的线程解锁；持有锁的线程执行完临界区的代码后，执行解锁 unlock()。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292036259.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/7a89e2585de64852993ac524d189c38b.png)
 
 ### 改进后的锁模型
 
 首先，我们要把临界区要保护的资源标注出来，如图中临界区里增加了一个元素：受保护的资源 R；其次，我们要保护资源 R 就得为它创建一把锁 LR；最后，针对这把锁 LR，我们还需在进出临界区时添上加锁操作和解锁操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292036343.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/d6ee6fae6e2440088c191acd2a1045b3.png)
 
 ### Java 语言提供的锁技术：synchronized
 
@@ -215,7 +215,7 @@ class SafeCalc {
 }
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261541380.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/615fa48f45d94efc99f760ce1101dd8c.png)
 
 ### 锁和受保护资源的关系
 
@@ -235,7 +235,7 @@ class SafeCalc {
 }
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261545832.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/a124365b348e48459bd3e4aa4fbc32a6.png)
 
 【示例】synchronized 实现并发安全的计数器错误示例
 
@@ -332,7 +332,7 @@ class Account {
 
 synchronized 可以保护 this 对象持有的资源，但不能保护 target 对象持有的资源。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261603806.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/d15aaa05fed54a8ebc8669baacce5bdb.png)
 
 ### 使用锁的正确姿势
 
@@ -377,7 +377,7 @@ class Account {
 }
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261610209.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/6aae2001fefa41768f0ab05a62031593.png)
 
 ## 一不小心就死锁了，怎么办？
 
@@ -404,7 +404,7 @@ class Account {
 }
 ```
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261612406.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/9832934fc044414a9b998632a9f41d32.png)
 
 ### 如何预防死锁
 
@@ -534,7 +534,7 @@ class Account {
 
 在 Java 中，等待-通知机制有多种实现方式，比如 Java 语言内置的 synchronized 配合 wait()、notify()、notifyAll() 这三个方法就能轻松实现。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292037649.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/0aedca99c182428bba9b6b87ff2a5ced.png)
 
 wait()、notify()、notifyAll() 方法操作的等待队列是互斥锁的等待队列，所以如果 synchronized 锁定的是 this，那么对应的一定是 this.wait()、this.notify()、this.notifyAll()；如果 synchronized 锁定的是 target，那么对应的一定是 target.wait()、target.notify()、target.notifyAll() 。而且 wait()、notify()、notifyAll() 这三个方法能够被调用的前提是已经获取了相应的互斥锁，所以我们会发现 wait()、notify()、notifyAll() 都是在 synchronized{}内部被调用的。如果在 synchronized{}外部调用，或者锁定的 this，而用 target.wait() 调用的话，JVM 会抛出一个运行时异常：`java.lang.IllegalMonitorStateException`。
 
@@ -643,13 +643,13 @@ Java 参考了 MESA 模型，语言内置的管程（synchronized）对 MESA 模
 
 将共享变量及其对共享变量的操作统一封装起来。在下图中，管程 X 将共享变量 queue 这个队列和相关的操作入队 enq()、出队 deq() 都封装起来了；线程 A 和线程 B 如果想访问共享变量 queue，只能通过调用管程提供的 enq()、deq() 方法来实现；enq()、deq() 保证互斥性，只允许一个线程进入管程。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408261940150.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/064d0729db5a407e80d588f32149c697.png)
 
 管程是如何解决线程间的**同步**问题的：
 
 在管程模型里，共享变量和对共享变量的操作是被封装起来的，图中最外层的框就代表封装的意思。框的上面只有一个入口，并且在入口旁边还有一个入口等待队列。当多个线程同时试图进入管程内部时，只允许一个线程进入，其他线程则在入口等待队列中等待。管程里还引入了条件变量的概念，而且**每个条件变量都对应有一个等待队列**，如下图，条件变量 A 和条件变量 B 分别都有自己的等待队列。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270725745.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/98f980ca00954813bb288ab9a991ab3a.png)
 
 ## Java 线程（上）：Java 线程的生命周期
 
@@ -657,7 +657,7 @@ Java 参考了 MESA 模型，语言内置的管程（synchronized）对 MESA 模
 
 通用的线程生命周期：**初始状态、可运行状态、运行状态、休眠状态**和**终止状态**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270729535.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/0925452aead94f1ba6d4e0eef210b729.png)
 
 ### Java 中线程的生命周期
 
@@ -670,7 +670,7 @@ Java 中线程共有六种状态：
 5. TIMED_WAITING（有时限等待）
 6. TERMINATED（终止状态）
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270731084.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/d57e12e28c934036bd8c593511c545f8.png)
 
 ## Java 线程（中）：创建多少线程才是合适的？
 
@@ -701,7 +701,7 @@ Java 中线程共有六种状态：
 
 ### 方法是如何被执行的
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270751420.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/723a39fae7854d69aee28e0440d60a63.png)
 
 CPU 去哪里找到调用方法的参数和返回地址？
 
@@ -709,13 +709,13 @@ CPU 去哪里找到调用方法的参数和返回地址？
 
 例如，有三个方法 A、B、C，他们的调用关系是 A->B->C（A 调用 B，B 调用 C），在运行时，会构建出下面这样的调用栈。每个方法在调用栈里都有自己的独立空间，称为**栈帧**，每个栈帧里都有对应方法需要的参数和返回地址。当调用方法时，会创建新的栈帧，并压入调用栈；当方法返回时，对应的栈帧就会被自动弹出。也就是说，**栈帧和方法是同生共死的**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270753265.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/04da5269c8de49708cd349b67c80a4b3.png)
 
 ### 局部变量存哪里？
 
 局部变量的作用域是方法内部，也就是说当方法执行完，局部变量就没用了，局部变量应该和方法同生共死。此时你应该会想到调用栈的栈帧，调用栈的栈帧就是和方法同生共死的，所以局部变量放到调用栈里那儿是相当的合理。事实上，的确是这样的，**局部变量就是放到了调用栈里**。于是调用栈的结构就变成了下图这样。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270755942.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/ba943afdb47b41e388b7e86a26fce8a6.png)
 
 ### 调用栈与线程
 
@@ -723,7 +723,7 @@ CPU 去哪里找到调用方法的参数和返回地址？
 
 答案是：**每个线程都有自己独立的调用栈**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270756092.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/e023266be34041fa9440fe953cb25ef1.png)
 
 因为每个线程都有自己的调用栈，局部变量保存在线程各自的调用栈里面，不会共享，所以自然也就没有并发问题。再次重申一遍：没有共享，就没有伤害。
 
@@ -765,7 +765,7 @@ CPU 去哪里找到调用方法的参数和返回地址？
 
 管程，是 Java 并发编程技术的基础，是解决并发问题的万能钥匙。并发编程里两大核心问题——互斥和同步，都是可以由管程来解决的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408270805546.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/92dfec54fa6b4735b8f15ae463c96d3f.png)
 
 ## 参考资料
 

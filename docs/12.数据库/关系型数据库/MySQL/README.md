@@ -28,7 +28,7 @@ MySQL 是一种关联数据库管理系统，关联数据库将数据保存在�
 
 ## 📖 内容
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202309212108260.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/ed4d5381a82942639cb3fca5292f9301.png)
 
 - [MySQL 简介](MySQL_简介.md)
 - [MySQL CRUD](MySQL_CRUD.md)

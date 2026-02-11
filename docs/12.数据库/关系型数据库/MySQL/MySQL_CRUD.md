@@ -1,7 +1,7 @@
 ---
 icon: logos:mysql
 title: MySQL CRUD
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062319755.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/e27a633b69e5464c90a27a6b78c8df72.webp
 date: 2025-03-13 08:05:53
 categories:
   - 数据库

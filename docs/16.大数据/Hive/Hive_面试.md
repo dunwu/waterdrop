@@ -40,7 +40,7 @@ Hive 可以将结构化的数据文件映射成表，并提供类 SQL 查询功�
 
 Hive Metastore （HMS） 是关系数据库中 Hive 表和分区元数据的中央存储库，它使用元存储服务 API 为客户端（包括 Hive、Impala 和 Spark）提供对此信息的访问。它已成为利用各种开源软件（如 Apache Spark 和 Presto）的数据湖的构建块。事实上，整个工具生态系统，无论是开源的还是其他的，都是围绕 Hive Metastore 构建的，下图说明了其中一些。
 
-![Apache Software Foundation](https://raw.githubusercontent.com/dunwu/images/master/202602081634212.jpg)
+![Apache Software Foundation](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/c9213576c4ae4bf2a21403bb8a8a1270.jpg)
 
 :::
 
@@ -188,7 +188,7 @@ LOAD DATA LOCAL INPATH "/usr/file/emp30.txt" OVERWRITE INTO TABLE emp_partition 
 
 当调用 HashMap 的 put() 方法存储数据时，程序会先对 key 值调用 hashCode() 方法计算出 hashcode，然后对数组长度取模计算出 index，最后将数据存储在数组 index 位置的链表上，链表达到一定阈值后会转换为红黑树 (JDK1.8+)。下图为 HashMap 的数据结构图：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081633220.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9574882940cd49ae8a529b222453b874.png)
 
 > 图片引用自：[HashMap vs. Hashtable](http://www.itcuties.com/java/hashmap-hashtable/)
 
@@ -229,13 +229,13 @@ INSERT INTO TABLE emp_bucket SELECT *  FROM emp;  --这里的 emp 表就是一�
 
 可以从执行日志看到 CTAS 触发 MapReduce 操作，且 Reducer 数量和建表时候指定 bucket 数量一致：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081632838.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/256dfe4e8b5f4f08a08d5e4c98b0f715.png)
 
 查看分桶文件
 
 bucket（桶） 本质上就是表目录下的具体文件：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081632602.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/553e77f4bb7d4148861130ddb7281c2a.png)
 
 :::
 

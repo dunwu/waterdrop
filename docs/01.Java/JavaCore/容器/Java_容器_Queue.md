@@ -17,9 +17,7 @@ permalink: /pages/ff99d2e2/
 
 ## Queue 简介
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/Queue-diagrams.png" />
-</div>
+![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/Queue-diagrams.png)
 
 ### Queue 接口
 

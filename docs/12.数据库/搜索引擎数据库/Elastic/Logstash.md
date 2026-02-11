@@ -31,7 +31,7 @@ Logstash 有两个必要元素：`input` 和 `output` ，一个可选元素：`f
 
 这三个元素，分别代表 Logstash 事件处理的三个阶段：输入 > 过滤器 > 输出。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082158848.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/c9fdb355cb464fe29caf64be97db8e9b.png)
 
 - input 负责从数据源采集数据。
 - filter 将数据修改为你指定的格式或内容。

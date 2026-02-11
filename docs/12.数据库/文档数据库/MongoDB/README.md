@@ -1,7 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062315356.webp
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/295139522580418faa168e8a5d26b663.webp
 date: 2020-09-09 20:47:14
 categories:
   - 数据库

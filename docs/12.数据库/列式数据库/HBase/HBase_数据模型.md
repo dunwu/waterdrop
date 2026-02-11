@@ -50,11 +50,11 @@ HBase Table 中的所有行按照 `Row Key` 的字典序排列。HBase Tables �
 
 每个表一开始只有一个 `Region`，随着数据不断增加，`Region` 会不断增大，当增大到一个阀值的时候，`Region` 就会等分为两个新的 `Region`。当 Table 中的行不断增多，就会有越来越多的 `Region`。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082201901.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/99d2cb0498cc441bbafad5c709f1e5dc.png)
 
 `Region` 是 HBase 中**分布式存储和负载均衡的最小单元**。这意味着不同的 `Region` 可以分布在不同的 `Region Server` 上。但一个 `Region` 是不会拆分到多个 Server 上的。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602082201143.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/57150baad84f43a18c61a357e769ae85.png)
 
 ## HBase 数据模型示例
 
@@ -64,7 +64,7 @@ HBase Table 中的所有行按照 `Row Key` 的字典序排列。HBase Tables �
 - 该表具有两个列族，分别是 personal 和 office;
 - 其中列族 personal 拥有 name、city、phone 三个列，列族 office 拥有 tel、addres 两个列。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601172926.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/49d2fa930d82453fa511ea2796a1114a.png)
 
 > _图片引用自 : HBase 是列式存储数据库吗_ *https://www.iteblog.com/archives/2498.html*
 

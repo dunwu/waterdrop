@@ -47,7 +47,7 @@ index: false
 
 ## 📖 内容
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200702071922.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/7adb1c1610b34d5e9043fb4ece1267c7.png)
 
 - [数据结构和算法指南](数据结构和算法指南.md)
 - [复杂度分析](复杂度分析.md) - 关键词：**`时间复杂度`**、**`空间复杂度`**、**`大 O 表示法`**、**`复杂度量级`**

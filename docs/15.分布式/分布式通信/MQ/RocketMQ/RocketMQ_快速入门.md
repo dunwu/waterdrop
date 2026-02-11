@@ -200,7 +200,7 @@ RocketMQ 将这种正常情况下无法被消费的消息称为死信消息（De
 
 ## RocketMQ 组件
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220712060550.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/81249ed0d9934b6c995538ba0eb427f6.png)
 
 RocketMQ 由四部分组成：NameServer、Broker、Producer、Consumer。其中任意一个组成都可以水平扩展为集群模式，以避免单点故障问题。
 

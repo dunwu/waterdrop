@@ -26,7 +26,7 @@ permalink: /pages/d9dafb49/
 - **push 模式** - MQ 推送数据给消费者
 - **pull 模式** - 消费者主动向 MQ 请求数据
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502031317162.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/3d0a2301b6e2470391aba6c67f9d3251.png)
 
 Kafka 消费者（Consumer）以 pull 方式从 Broker 拉取消息。相比于 push 方式，pull 方式灵活度和扩展性更好，因为消费的主动性由消费者自身控制。
 
@@ -45,7 +45,7 @@ push 模式的优缺点：
 
 **一条消息只有被提交，才会被消费者获取到**。如下图，只能消费 Message0、Message1、Message2：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113917.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/7306e918c2ae4fbfb8d8d14b2b625913.png)
 
 ### 消费者群组
 
@@ -59,11 +59,11 @@ Kafka 消费者从属于消费者群组，**一个群组里的 Consumer 订阅�
 
 同一时刻，**一条消息只能被同一消费者组中的一个消费者实例消费**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070722981.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/29b36f29666e4111b1482440c5eb23e0.png)
 
 **不同消费者群组之间互不影响**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070723165.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/c47a58d33e82429e857fd7f890f07239.png)
 
 ### 消费流程
 
@@ -72,7 +72,7 @@ Kafka 消费者通过 `poll` 模式来获取消息，但是获取消息时并不
 - 消费者通过 `customer.poll(time)` 中设置等待时间
 - Broker 会等待累计一定量数据，然后发送给消费者。这样可以减少网络开销。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070724283.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/f3d0c34e18fb4f168a486ec90cfb580c.png)
 
 poll 除了获取消息外，还有其他作用：
 
@@ -357,7 +357,7 @@ try {
 
 （2）消费者通过向被指派为群组协调器（Coordinator）的 Broker 定期发送心跳来维持它们和群组的从属关系以及它们对分区的所有权。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070723810.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/6f39e1092bed4282afe8b10fca12c052.png)
 
 （3）群主从群组协调器获取群组成员列表，然后给每一个消费者进行分配分区 Partition。有两种分配策略：Range 和 RoundRobin。
 
@@ -437,11 +437,11 @@ try {
 
 （1）**如果提交的偏移量小于客户端处理的最后一个消息的偏移量，那么处于两个偏移量之间的消息就会被重复处理**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210412200354.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/d081d8938b4f4904a2b600be7d2ca076.png)
 
 （2）**如果提交的偏移量大于客户端处理的最后一个消息的偏移量，那么处于两个偏移量之间的消息将会丢失**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210412200405.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/95496b2903e14af89bcbdfa21c87cc0c.png)
 
 由此可知，处理偏移量，会对客户端处理数据产生影响。
 

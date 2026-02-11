@@ -1164,9 +1164,9 @@ POST /employees/_search
 
 在 ES 中，不仅仅是普通搜索，相关性计算（评分）和聚合计算也是先在每个 shard 的本地进行计算，再由 coordinate node 进行汇总。由于分片的本地计算是独立的，只能基于数据子集来进行计算，所以难免出现数据偏差。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012144894.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/0848782a8d894f078e0f7f9583ed6743.png)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012145912.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/3656b57ba1f4491ebc4a2297f03d7bbc.png)
 
 要解决聚合准确性问题，有两个解决方案：
 

@@ -52,14 +52,14 @@ Kafka 生产者发送消息流程：
 - 如果**成功**，则返回一个 `RecordMetaData` 对象，它包含了主题、分区、偏移量；
 - 如果**失败**，则返回一个错误。生产者在收到错误后，可以进行重试，重试次数可以在配置中指定。失败一定次数后，就返回错误消息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200528224323.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/05/b89455640aa248e9bfeb1f4000652fe1.png)
 
 生产者向 Broker 发送消息时是怎么确定向哪一个 Broker 发送消息？
 
 - 生产者会向任意 broker 发送一个元数据请求（`MetadataRequest`），获取到每一个分区对应的 Leader 信息，并缓存到本地。
 - 生产者在发送消息时，会指定 Partition 或者通过 key 得到到一个 Partition，然后根据 Partition 从缓存中获取相应的 Leader 信息。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200621113043.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/3f7ed5e9c2e24c5da6553fd54189516a.png)
 
 ## 生产者 API
 
@@ -359,11 +359,11 @@ Producer<String, String> producer = new KafkaProducer<>(props);
 
 Broker 端在缓存中保存了这 seq number，对于接收的每条消息，如果其序号比 Broker 缓存中序号大于 1 则接受它，否则将其丢弃。这样就可以实现了消息重复提交了。但是，只能保证单个 Producer 对于同一个 `<Topic, Partition>` 的 Exactly Once 语义。不能保证同一个 Producer 一个 topic 不同的 partion 幂等。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081807989.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8a67a1cc43614e01965f736b7a2ce2d2.png)
 
 实现幂等之后：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081808952.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/cd526f88bba4445b9db21f46f54077fe.png)
 
 ### 生成 PID 的流程
 

@@ -56,7 +56,7 @@ Git 是分布式的。这是 Git 和其它非分布式的版本控制系统（�
 
 当你一个项目到本地或创建一个 git 项目，项目目录下会有一个隐藏的 `.git` 子目录。这个目录是 git 用来跟踪管理版本库的，如果不熟悉其工作机制，千万不要手动修改。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419093855.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/e28afb8204cd4173b645bb0dee139053.png)
 
 - `hooks` 目录：包含客户端或服务端的钩子脚本（hook scripts）
 - `info` 目录：包含一个全局性排除（global exclude）文件， 用以放置那些不希望被记录在 `.gitignore` 文件中的忽略模式（ignored patterns）。
@@ -104,9 +104,9 @@ Git 中使用这种哈希值的情况很多，你将经常看到这种哈希值�
 
 Git Flow 应该是目前流传最广的 Git 分支管理策略。Git Flow 围绕的核心点是版本发布（release），它适用于迭代版本较长的项目。
 
-> ![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419110634.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/04bafc57e13240c287416c01c8547bd2.png)
 
-> 详细内容，可以参考这篇文章：[Git 在团队中的最佳实践--如何正确使用 Git Flow](http://www.cnblogs.com/cnblogsfans/p/5075073.html)
+详细内容，可以参考这篇文章：[Git 在团队中的最佳实践--如何正确使用 Git Flow](http://www.cnblogs.com/cnblogsfans/p/5075073.html)
 
 Git Flow 常用分支：
 
@@ -120,7 +120,7 @@ Git Flow 工作流程
 
 #### 2.1. 主干分支
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419113532.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/65240254043a4e479a6ece6beac7a437.png)
 
 主干分支有两个，它们是伴随着项目生命周期长期存在的分支。
 
@@ -131,7 +131,7 @@ Git Flow 工作流程
 
 这个分支主要是用来开发一个新的功能，一旦开发完成，我们合并回 develop 分支进入下一个 release。feature 分支开发结束后，必须合并回 develop 分支，合并完分支后一般会删点这个 feature 分支，但是我们也可以保留。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419114042.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/326fbb51a21045879704ba83c290c376.png)
 
 #### 2.3. **`release` 分支**
 
@@ -143,7 +143,7 @@ release 分支基于 develop 分支创建，创建后，我们可以在这个 re
 
 当出现线上 bug 时，也意味着 master 存在 Bug。这时，我们需要基于 master 创建一个 hotfix 分支，在此分支上完成 bug 修复。修复后，我们应该将此分支合并回 master 和 develop 分支，同时在 master 上打一个 tag。所以，hotfix 的改动会进入下一个 release。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081747788.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8698442c5aef4d25a51b8d5b35e95f29.png)
 
 #### 2.5. 如何应用 Git Flow
 
@@ -163,7 +163,7 @@ git 提供了 `git flow` 命令来手动管理，但是比较麻烦，所以还�
 
 在 Github Flow 策略中，所有分支都是基于 master 创建。在 Feature 或 Bugfix 分支中完成工作后，将其合入 master，然后继续迭代。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420194518.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/a6673258ab294b8793b04273aa75af26.png)
 
 > 想了解更详细的 Github Flow 介绍，可以参考：[GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html)
 
@@ -175,11 +175,11 @@ Git 每次提交代码，都要写 Commit message（提交说明），否则就�
 
 先来看下图中不好的 Commit message 范例，从提交信息完全看不出来修改了什么。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420152215.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/5d17cc85a7174eaf8436ed8151b95487.png)
 
 再来一张较好的 Commit message 范例，每次提交的是什么内容，做了什么一目了然。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420151352.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/432a3d4ed983489080e1ef0c7d06a5e7.png)
 
 ### Commit message 的作用
 
@@ -226,11 +226,11 @@ Intellij 中有集成 [Angular Git Commit 规范](https://docs.google.com/docume
 
 第一步，安装插件
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419145223.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/cdda93acdf534b77a1d05dfbc99c05e0.png)
 
 第二步，提交代码时，按照模板填写 commit message
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210419145327.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/dea771466ab9407fba930a1d5812267d.png)
 
 ### 生成 Change log
 
@@ -466,7 +466,7 @@ hs_err_pid*
 
 示例，下面是携程 [apollo](https://github.com/ctripcorp/apollo) 的一个 Issue 模板，要求提问者填充 bug 描述、复现步骤、期望、截图、日志等细节。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420114644.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/3b46cd3eba7a44e5afc75c0b1db691c4.png)
 
 > 更多模板：[Github issue_templates 模板](https://github.com/stevemao/github-issue-templates)
 
@@ -478,7 +478,7 @@ hs_err_pid*
 
 （2）在 `.gitlab` 目录中添加 `issue_templates` 目录，在其中添加的 md 文件都会被 Gitlab 自动识，并将其作为 issue 的默认模板。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20210420141838.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2021/04/6dde0dfef7184c409f8b1ad4cdc55e0e.png)
 
 > 更多模板：[Gitlab 官方 issue_templates 模板](https://gitlab.com/gitlab-org/gitlab/-/tree/master/.gitlab/issue_templates)
 

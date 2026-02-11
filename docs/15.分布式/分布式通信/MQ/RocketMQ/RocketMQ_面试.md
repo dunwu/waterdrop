@@ -59,7 +59,7 @@ permalink: /pages/e162d7d1/
 
 :::
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202509272301766.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/09/8484db878a9448d1bdfb612db641cc60.png)
 
 1.  **Broker** 启动后向 **Name Server** 注册。
 2.  **Producer/Consumer** 启动时从 **Name Server** 获取路由信息（Topic 在哪些 Broker 上）。
@@ -81,7 +81,7 @@ RocketMQ 通过“单一日志顺序写，异步构建多索引”的架构，�
 
 Apache RocketMQ 消息默认存储在本地磁盘文件中，存储文件的根目录由配置参数 storePathRootDir 决定，存储结构如下图所示，其中 commitLog 文件夹存储消息物理文件，consumeQueue 文件夹存储逻辑队列索引。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202509272356323.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/09/78311371255d4f1fb0e39c0fb5e62f32.jpg)
 
 | 文件              | 核心作用                                        | 特点                                                                                |
 | :---------------- | :---------------------------------------------- | :---------------------------------------------------------------------------------- |
@@ -926,7 +926,7 @@ MQ 事务方案本质是利用 MQ 功能实现的本地消息表。事务消息�
 
 事务消息是 Apache RocketMQ 提供的一种困难消息类型，支持在分布式场景下保障消息生产和本地事务的最终一致性。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202509282123347.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/09/ee5fa22853b045119e12f9a96d41aec7.png)
 
 **事务消息处理流程**
 

@@ -33,7 +33,7 @@ permalink: /pages/76e8b6af/
 >
 > **JVM = 类加载系统 + 运行时内存区域 + 执行引擎**
 
-![enter image description here](https://raw.githubusercontent.com/dunwu/images/master/snap/202504030804019.png)
+![enter image description here](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/1713e34f9ed8477a8faf3feeb2d00335.png)
 
 > 摘自 [stackoverflow 高票问题 - What is the difference between JDK and JRE?](https://stackoverflow.com/questions/1906445/what-is-the-difference-between-jdk-and-jre)
 

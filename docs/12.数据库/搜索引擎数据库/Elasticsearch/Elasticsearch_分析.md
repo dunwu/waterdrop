@@ -1,7 +1,7 @@
 ---
 icon: logos:elasticsearch
 title: Elasticsearch 文本分析
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503110802917.png
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/1e1be330a2a148618050f1f20a089484.png
 date: 2022-02-22 21:01:01
 categories:
   - 数据库
@@ -43,7 +43,7 @@ Elasticsearch 需要先对文本数据进行文本分析，将原文本分词处
 
 [**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 由三个组件组成：零个或多个 [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)、有且仅有一个 [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)、零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)。分析的执行顺序为：`character filters -> tokenizer -> token filters`。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202412012129250.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/bcb1956f433042a0aeab132ad6d39f91.png)
 
 Elasticsearch 内置的分析器：
 

@@ -190,7 +190,7 @@ private void doReceived(Response res) {
 
 信号量模型还是很简单的，可以简单概括为：**一个计数器，一个等待队列，三个方法**。在信号量模型里，计数器和等待队列对外是透明的，所以只能通过信号量模型提供的三个方法来访问它们，这三个方法分别是：init()、down() 和 up()。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408280813940.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/eb52ee299dbb4219afb001ddc9ca569f.png)
 
 ```java
 class Semaphore{
@@ -571,7 +571,7 @@ try {
 
 ## CountDownLatch 和 CyclicBarrier：如何让多线程步调一致？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292030531.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/8d018c6bbdca4f97aee545dce521060b.png)
 
 对账系统串行处理流程：
 
@@ -590,9 +590,9 @@ while（存在未对账订单）{
 
 ### 利用并行优化对账系统
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292030390.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/74fd841e9f8b4c67b72f5f49b2336dbd.png)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292030333.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/e690248e3b864587b6c7b788460d561a.png)
 
 ### 用 CountDownLatch 实现线程等待
 
@@ -627,9 +627,9 @@ while（存在未对账订单）{
 
 ### 进一步优化性能
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292031238.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/5289fa0f62a842679d6d57e5c5089917.png)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292031656.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/4688ad37c9f0482f8d7497e16b706283.png)
 
 ### 用 CyclicBarrier 实现线程同步
 
@@ -703,7 +703,7 @@ CountDownLatch 的计数器是不能循环利用的，也就是说一旦计数�
 
 Java 在 1.5 版本之前所谓的线程安全的容器，主要指的就是**同步容器**。不过同步容器有个最大的问题，那就是性能差，所有方法都用 synchronized 来保证互斥，串行度太高了。因此 Java 在 1.5 及之后版本提供了性能更高的容器，我们一般称为**并发容器**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292032669.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/53a7f963fee04d7cbf3c881079ecfa22.png)
 
 #### （一）List
 
@@ -711,13 +711,13 @@ List 里面只有一个实现类就是** CopyOnWriteArrayList**。CopyOnWrite，
 
 CopyOnWriteArrayList 内部维护了一个数组，成员变量 array 就指向这个内部数组，所有的读操作都是基于 array 进行的，如下图所示，迭代器 Iterator 遍历的就是 array 数组。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292032762.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/388e89fd011a46f5aca76fa76c31e1d3.png)
 
 如果在遍历 array 的同时，还有一个写操作，例如增加元素，CopyOnWriteArrayList 是如何处理的呢？
 
 CopyOnWriteArrayList 会将 array 复制一份，然后在新复制处理的数组上执行增加元素的操作，执行完之后再将 array 指向这个新的数组。通过下图你可以看到，读写是可以并行的，遍历操作一直都是基于原 array 执行，而写操作则是基于新 array 进行。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292032731.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/35e29479e71f410c9cdce96d338d666b.png)
 
 使用 CopyOnWriteArrayList 需要注意的“坑”主要有两个方面。一个是应用场景，CopyOnWriteArrayList 仅适用于写操作非常少的场景，而且能够容忍读写的短暂不一致。例如上面的例子中，写入的新元素并不能立刻被遍历到。另一个需要注意的是，CopyOnWriteArrayList 迭代器是只读的，不支持增删改。因为迭代器遍历的仅仅是一个快照，而对快照进行增删改是没有意义的。
 
@@ -727,7 +727,7 @@ Map 接口的两个实现是 ConcurrentHashMap 和 ConcurrentSkipListMap，它�
 
 使用 ConcurrentHashMap 和 ConcurrentSkipListMap 需要注意的地方是，它们的 key 和 value 都不能为空，否则会抛出`NullPointerException`这个运行时异常。下面这个表格总结了 Map 相关的实现类对于 key 和 value 的要求，你可以对比学习。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292033594.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/3673a45639994d5a86abdf4ba2afde6b.png)
 
 ConcurrentSkipListMap 里面的 SkipList 本身就是一种数据结构，中文一般都翻译为“跳表”。跳表插入、删除、查询操作平均的时间复杂度是 O(log n)，理论上和并发线程数没有关系，所以在并发度非常高的情况下，若你对 ConcurrentHashMap 的性能还不满意，可以尝试一下 ConcurrentSkipListMap。
 
@@ -786,7 +786,7 @@ native boolean compareAndSwapLong(
 
 Java SDK 并发包里提供的原子类内容很丰富，我们可以将它们分为五个类别：**原子化的基本数据类型、原子化的对象引用类型、原子化数组、原子化对象属性更新器**和**原子化的累加器**。这五个类别提供的方法基本上是相似的，并且每个类别都有若干原子类。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292033394.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/2ed7a78b34cb4489957bd3f5bfd37ff5.png)
 
 #### 1. 原子化的基本数据类型
 
@@ -993,7 +993,7 @@ Integer result = futureTask.get();
 
 ### 实现最优的“烧水泡茶”程序
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292034424.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/4ac46e8e3b3a4a43a1db726ca66d9566.png)
 
 烧水泡茶最优分工方案
 
@@ -1362,7 +1362,7 @@ CompletionService 的实现类 ExecutorCompletionService，需要你自己创建
 
 **对于简单的并行任务，你可以通过“线程池 +Future”的方案来解决；如果任务之间有聚合关系，无论是 AND 聚合还是 OR 聚合，都可以通过 CompletableFuture 来解决；而批量的并行任务，则可以通过 CompletionService 来解决。**
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292001191.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/46679a0482b840f7a5bbadb1b752aa64.png)
 
 除了简单并行、聚合、批量并行这三种任务模型，还有一种“分治”的任务模型。
 
@@ -1372,7 +1372,7 @@ CompletionService 的实现类 ExecutorCompletionService，需要你自己创建
 
 这里你需要先深入了解一下分治任务模型，分治任务模型可分为两个阶段：一个阶段是**任务分解**，也就是将任务迭代地分解为子任务，直至子任务可以直接计算出结果；另一个阶段是**结果合并**，即逐层合并子任务的执行结果，直至获得最终结果。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292012846.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/09ced8464fe8439588ca41c14d14e3f3.png)
 
 简版分治任务模型图
 
@@ -1428,7 +1428,7 @@ ForkJoinPool 本质上也是一个生产者-消费者的实现，但是更加智
 
 ForkJoinPool 中的任务队列采用的是双端队列，工作线程正常获取任务和“窃取任务”分别是从任务队列不同的端消费，这样能避免很多不必要的数据竞争。我们这里介绍的仅仅是简化后的原理，ForkJoinPool 的实现远比我们这里介绍的复杂。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202408292016364.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/08/74e9a998de3c4fbba0bd2c8324bdbc70.png)
 
 ### 模拟 MapReduce 统计单词数量
 

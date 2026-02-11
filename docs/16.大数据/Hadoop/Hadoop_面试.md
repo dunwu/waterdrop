@@ -39,7 +39,7 @@ permalink: /pages/b3c18099/
 - **任务调度**：Azkaban、Oozie
 - **集群部署和监控**：Ambari、Cloudera Manager
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192251433.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/4179c2265ff94f93a725957112bb5f19.png)
 
 :::
 
@@ -290,7 +290,7 @@ HDFS 中，`FsImage`和`EditLog`是两个关键的文件，用于存储和管理
 
 :::details 要点
 
-![YARN Architecture](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192257406.gif)
+![YARN Architecture](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/61bce2a2382943b998a535fb3acd50d3.gif)
 
 YARN 有以下核心组件：
 
@@ -348,11 +348,11 @@ HDFS 写数据流程大致为：
 
 > 扩展：下面的漫画生动的展示了 HDFS 的写入流程，图片引用自博客：[翻译经典 HDFS 原理讲解漫画](https://blog.csdn.net/hudiefenmu/article/details/37655491)
 >
-> ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192300702.jpg)
+> ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/a25e029c9446450390522cba433f9763.jpg)
 >
-> ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192301943.jpg)
+> ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/20e821c05ed445fd8dfd128fce23192b.jpg)
 >
-> ![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192302127.jpg)
+> ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/e79898c9b6724c4fbd59437dfeb76c9e.jpg)
 
 HDFS 写数据的源码流程：
 
@@ -380,7 +380,7 @@ HDFS 读数据流程大致为：
    - 每个数据块对应的 DataNode（按距离客户端的远近排序）
 3. 客户端向 DataNode 读数据
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192303732.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/90dc3aa90a41479d809b59caae26cc75.jpg)
 
 HDFS 读数据的源码流程：
 
@@ -411,7 +411,7 @@ MapReduce 任务过程分为两个处理阶段：map 极端和 reduce 阶段。�
 
 MapReduce 编程模型中 `splitting` 和 `shuffing` 操作都是由框架实现的，需要我们自己编程实现的只有 `mapping` 和 `reducing`，这也就是 MapReduce 这个称呼的来源。
 
-![MapReduce 工作流](https://raw.githubusercontent.com/dunwu/images/master/snap/20200601162305.png)
+![MapReduce 工作流](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/d939d0d6c2784a3497513f7304c6b126.png)
 
 :::
 
@@ -419,7 +419,7 @@ MapReduce 编程模型中 `splitting` 和 `shuffing` 操作都是由框架实现
 
 :::details 要点
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192303306.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/515fa31c9cc24509a51b6eb44735a2fc.jpeg)
 
 这张图简单地标明了提交一个程序所经历的流程，接下来我们来具体说说每一步的过程。
 
@@ -458,7 +458,7 @@ HDFS 的默认副本数为 3，更多的副本意味着更高的数据安全性�
 - 在 HDFS 的配置文件 hdfs-site.xml 中，有一个名为 `dfs.replication` 的属性，可以设置**全局的默认副本数**。修改这个值后，需要重启 HDFS 使配置生效。
 - 针对单个文件或目录修改副本数：如果只想改变某个特定文件或目录的副本数，而不影响整个系统的默认设置，可以使用 HDFS 的命令行工具。例如，使用命令`hdfs dfs -setrep -w <副本数> <文件/目录路径>` 来修改特定文件或目录的副本数。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200224203958.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/02/c1f33b3c7cad49ce9375402511bb0088.png)
 
 **NameNode 全权管理数据块的复制**，它周期性地从集群中的每个 DataNode 接收心跳信号和块状态报告 (BlockReport)。接收到心跳信号意味着该 DataNode 节点工作正常。块状态报告包含了一个该 DataNode 上所有数据块的列表。
 
@@ -487,7 +487,7 @@ HDFS 默认的副本数为 3，此时 HDFS 的副本分布策略是：
 
 为了最大限度地减少带宽消耗和读取延迟，HDFS 在执行读取请求时，优先读取距离读取器最近的副本。如果在与读取器节点相同的机架上存在副本，则优先选择该副本。如果 HDFS 群集跨越多个数据中心，则优先选择本地数据中心上的副本。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192304008.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/10011624375c4272b49c47c344b5fc80.jpg)
 
 :::
 
@@ -526,9 +526,9 @@ HDFS 常见故障及检测方法：
   - 磁盘介质在存储过程中受环境或者老化影响，其存储的数据可能会出现错乱。HDFS 的应对措施是，对于存储在 DataNode 上的数据块，计算并存储校验和（CheckSum）。在读取数据的时候，重新计算读取出来的数据的校验和，如果校验不正确就抛出异常，应用程序捕获异常后就到其他 DataNode 上读取备份数据。
   - 如果 DataNode 监测到本机的某块磁盘损坏，就将该块磁盘上存储的所有 BlockID 报告给 NameNode，NameNode 检查这些数据块还在哪些 DataNode 上有备份，通知相应的 DataNode 服务器将对应的数据块复制到其他服务器上，以保证数据块的备份数满足要求。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192304755.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/f7b0f2ee38714319ad9f9ecc17cbc23b.jpg)
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192305651.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/db88ad4c30d2467da2239e9eff2bacb8.jpg)
 
 :::
 
@@ -548,7 +548,7 @@ HDFS 常见故障及检测方法：
 - 读数据先要通过 NameNode 寻址该数据块的所有 DataNode
 - 如果某 DataNode 宕机，则读取其他节点
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192305332.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/d90573510b0245f1b541bcd0de7efac5.jpg)
 
 :::
 
@@ -562,7 +562,7 @@ NameNode 会立即查找该 DataNode 上存储的数据块有哪些，以及这�
 
 随后，NameNode 通知这些 DataNode 再复制一份数据块到其他 DataNode 上，保证 HDFS 存储的数据块副本数符合配置数。即使再出现服务器宕机，也不会丢失数据。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192306957.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/9ce0a83fe2104af6afd1c86d4391ba67.jpg)
 
 :::
 
@@ -625,7 +625,7 @@ QJM 共享存储系统
 
 HDFS 高可用架构如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192307157.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/f205bbc3905442ffb165ec710b65fe28.png)
 
 HDFS 高可用架构主要由以下组件所构成：
 
@@ -639,7 +639,7 @@ HDFS 高可用架构主要由以下组件所构成：
 
 需要说明的是向 JournalNode 集群写入 EditLog 是遵循 “过半写入则成功” 的策略，所以你至少要有 3 个 JournalNode 节点，当然你也可以继续增加节点数量，但是应该保证节点总数是奇数。同时如果有 2N+1 台 JournalNode，那么根据过半写的原则，最多可以容忍有 N 台 JournalNode 节点挂掉。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192308642.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/9fe17e4d3093494cb3301b4cc24713f9.png)
 
 :::
 
@@ -649,7 +649,7 @@ HDFS 高可用架构主要由以下组件所构成：
 
 NameNode 实现主备切换的流程下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192308888.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/ef77dc2dfdca471e8b3b17cb175946a0.png)
 
 工作流程说明：
 
@@ -708,7 +708,7 @@ Controller 给 Broker 发送的请求中，都会携带 controller epoch 信息�
 
 YARN ResourceManager 的高可用与 HDFS NameNode 的高可用类似，但是 ResourceManager 不像 NameNode ，没有那么多的元数据信息需要维护，所以它的状态信息可以直接写到 Zookeeper 上，并依赖 Zookeeper 来进行主备选举。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502192309573.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/fa98290c144d4dbab52bca8c7a22dd02.png)
 
 :::
 

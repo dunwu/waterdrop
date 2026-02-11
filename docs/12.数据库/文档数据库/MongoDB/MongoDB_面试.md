@@ -1,7 +1,7 @@
 ---
 icon: logos:mongodb
 title: MongoDB 面试
-cover: https://raw.githubusercontent.com/dunwu/images/master/snap/202503062328094.jpg
+cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c395e54dfe444ffe8a7903e691994f60.jpg
 date: 2025-03-04 21:03:08
 categories:
   - 数据库
@@ -306,7 +306,7 @@ db.articles.find({
 
 > 注意：使用 [`db.collection.aggregate()`](https://www.mongodb.com/zh-cn/docs/manual/reference/method/db.collection.aggregate/#mongodb-method-db.collection.aggregate) 方法运行的聚合管道不会修改集合中的文档，除非管道包含 [`$merge`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge) 或 [`$out`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out) 阶段。
 
-![MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921092725.png)
+![MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/4fcab0841ee84b35aa92b2239117a1eb.png)
 
 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 的其他要点：
 
@@ -384,7 +384,7 @@ MongoDB pipeline 提供了许多等价于 SQL 中常见聚合语句的操作。 
 
 RDBM 聚合 vs. MongoDB 聚合：
 
-![SQL 聚合 vs. MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921200556.png)
+![SQL 聚合 vs. MongoDB 聚合](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/fa90a9f9eac44e6f93f21b6e03648ccc.png)
 
 ### 【中等】MongoDB Map-Reduce 有什么用？
 
@@ -392,7 +392,7 @@ RDBM 聚合 vs. MongoDB 聚合：
 
 Map-Reduce 是一种数据处理范式，用于将大量数据汇总为有用的聚合结果。为了执行 Map-Reduce 操作，MongoDB 提供了 [`mapReduce`](https://docs.mongodb.com/manual/reference/command/mapReduce/#dbcmd.mapReduce) 数据库命令。
 
-![Map-Reduce](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921155546.svg)
+![Map-Reduce](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/d344c32b56854ebfabb07dd4c5452f02.svg)
 
 在上面的操作中，MongoDB 将 map 阶段应用于每个输入 document（即 collection 中与查询条件匹配的 document）。 map 函数分发出多个键 - 值对。对于具有多个值的那些键，MongoDB 应用 reduce 阶段，该阶段收集并汇总聚合的数据。然后，MongoDB 将结果存储在 collection 中。可选地，reduce 函数的输出可以通过 finalize 函数来进一步汇总聚合结果。
 
@@ -425,7 +425,7 @@ MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/doc
 
 文档是 MongoDB 中的**基本数据单元**。**文档是一组有序键值对（即 BSON）**。MongoDB 的文档不需要设置相同的字段，并且相同的字段不需要相同的数据类型，这与关系型数据库有很大的区别，也是 MongoDB 非常突出的特点。
 
-![MongoDB Document](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024526.png)
+![MongoDB Document](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/d27963035cc44309934797be03165c89.png)
 
 需要注意的是：
 
@@ -463,7 +463,7 @@ MongoDB 将数据记录存储为 [BSON 文档](https://www.mongodb.com/zh-cn/doc
 
 集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System) 中的表（Table）。集合存在于数据库中，集合没有固定的结构，这意味着你在对集合可以插入不同格式和类型的数据，但通常情况下我们插入集合的数据都会有一定的关联性。
 
-![MongoDB Collection](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041024137.png)
+![MongoDB Collection](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c0035fd58205478ea124ceb0c9940c95.png)
 
 集合不需要事先创建，当第一个文档插入或者第一个索引创建时，如果该集合不存在，则会创建一个新的集合。使用 `.` 字符分隔不同命名空间的子集合是一种组织集合的惯例。例如，有一个具有博客功能的应用程序，可能包含名为 `blog.posts` 和名为 `blog.authors` 的集合。
 
@@ -617,7 +617,7 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 其整体结构如下图所示：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041050392.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/67dd4320b6ca4619a2f42fd48a255ed0.png)
 
 如果想要深入研究学习 WiredTiger 存储引擎，推荐阅读 MongoDB 中文社区的 [WiredTiger 存储引擎系列](https://mongoing.com/archives/category/wiredtiger 存储引擎系列)。
 
@@ -638,7 +638,7 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 索引是一种特殊的数据结构，它以易于遍历的形式存储一小部分集合数据集。**MongoDB 索引使用 [B-tree](https://en.wikipedia.org/wiki/B-tree) 数据结构**。索引可存储某个特定字段或多个字段的值，并按字段的值进行排序。索引条目的排序支持高效的相等匹配和基于范围的查询操作。此外，**MongoDB 还可使用索引中的顺序来返回排序后的结果**。
 
-![MongoDB 索引](https://raw.githubusercontent.com/dunwu/images/master/snap/20200921210621.svg)
+![MongoDB 索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/b92b31ce4d7e43298687500238cad1e9.svg)
 
 ### 【简单】MongoDB 支持哪些类型的索引？⭐⭐⭐
 
@@ -658,7 +658,7 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 下图显示了单个字段 `score` 上的一个索引：
 
-![单字段索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052211281.svg)
+![单字段索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/e98ae88ee9ac49d7845b8b2a0e7aa1bf.svg)
 
 > 要了解详情，请参阅 [单字段索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-single/#std-label-indexes-single-field)。
 
@@ -670,7 +670,7 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 例如，下图显示了一个复合索引，其中文档首先按 `userid` 分组并以升序（按字母顺序）排序。然后，每个 `userid` 的 `scores` 按降序排序：
 
-![复合索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052213721.svg)
+![复合索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/4a1199dd95b7433d997be4a10c60a856.svg)
 
 > 要了解详情，请参阅 [复合索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-compound/#std-label-index-type-compound)。
 
@@ -684,7 +684,7 @@ MongoDB 支持多种类型的索引，适用于不同的场景。
 
 下图显示了 `addr.zip` 字段的多键索引：
 
-![多键索引](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052214522.svg)
+![多键索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/09857616f765458faa22ce3450311ce7.svg)
 
 > 要了解详情，请参阅 [多键索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-multikey/#std-label-index-type-multikey)。
 
@@ -727,7 +727,7 @@ MongoDB 复合索引类似 MySQL，遵循最左匹配原则
 
 **排序键的排列顺序必须与其在索引中出现的顺序相同**。例如，索引键模式 `{ a: 1, b: 1 }` 可以支持对 `{ a: 1, b: 1 }` 排序，但不支持对 `{ b: 1, a: 1 }` 排序。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503041116883.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/499f6fe3048a4ad1875fcc70372886e8.png)
 
 在复合索引中，按照何种方式排序，决定了该索引在查询中是否能被应用到。
 
@@ -960,13 +960,13 @@ MongoDB 的复制集群又称为副本集群，是一组维护相同数据集合
 
 下图是一个典型的三成员副本集群：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042030712.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/bb6a022c04f747cc8999025b5d7bef14.png)
 
 主节点与备节点之间是通过 **oplog（操作日志）** 来同步数据的。oplog 是 local 库下的一个特殊的 **上限集合 (Capped Collection)** ，用来保存写操作所产生的增量日志，类似于 MySQL 中 的 Binlog。
 
 > 上限集合类似于定长的循环队列，数据顺序追加到集合的尾部，当集合空间达到上限时，它会覆盖集合中最旧的文档。上限集合的数据将会被顺序写入到磁盘的固定空间内，所以，I/O 速度非常快，如果不建立索引，性能更好。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042030639.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/3628a0a924714721a025c54815f3e041.png)
 
 当主节点上的一个写操作完成后，会向 oplog 集合写入一条对应的日志，而从节点则通过这个 oplog 不断拉取到新的日志，在本地进行回放以达到数据同步的目的。
 
@@ -987,7 +987,7 @@ MongoDB 的复制集群又称为副本集群，是一组维护相同数据集合
 
 MongoDB 的分片集群由如下三个部分组成（下图来源于 [官方文档对分片集群的介绍](https://www.mongodb.com/docs/manual/sharding/)）：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042043821.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/08c43ac199974020b8b25d58c231b3c2.png)
 
 - **Config Servers**：配置服务器，本质上是一个 MongoDB 的副本集，负责存储集群的各种元数据和配置，如分片地址、Chunks 等
 - **Mongos**：路由服务，不存具体数据，从 Config 获取集群配置讲请求转发到特定的分片，并且整合分片结果返回给客户端。
@@ -1024,7 +1024,7 @@ MongoDB 支持两种分片算法来满足不同的查询需求（摘自 [MongoDB
 
 **1、基于范围的分片**：
 
-![基于范围的分片](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042049549.png)
+![基于范围的分片](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/4c17311008ca4c9db691ccb4e5c00037.png)
 
 MongoDB 按照分片键（Shard Key）的值的范围将数据拆分为不同的块（Chunk），每个块包含了一段范围内的数据。当分片键的基数大、频率低且值非单调变更时，范围分片更高效。
 
@@ -1034,7 +1034,7 @@ MongoDB 按照分片键（Shard Key）的值的范围将数据拆分为不同的
 
 **2、基于 Hash 值的分片**
 
-![基于 Hash 值的分片](https://raw.githubusercontent.com/dunwu/images/master/snap/202503052222683.png)
+![基于 Hash 值的分片](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/4519806a1926493f965eec33c15dbfdb.png)
 
 MongoDB 计算单个字段的哈希值作为索引值，并以哈希值的范围将数据拆分为不同的块（Chunk）。
 
@@ -1052,13 +1052,13 @@ MongoDB 计算单个字段的哈希值作为索引值，并以哈希值的范围
 
 默认情况下，一个 Chunk 的最大值默认为 64MB（可调整，取值范围为 1~1024 MB。如无特殊需求，建议保持默认值），进行数据插入、更新、删除时，如果此时 Mongos 感知到了目标 Chunk 的大小或者其中的数据量超过上限，则会触发 **Chunk 分裂**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042053916.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/ab366dbffab24304b64b4c62d0089ae6.png)
 
 数据的增长会让 Chunk 分裂得越来越多。这个时候，各个分片上的 Chunk 数量可能会不平衡。Mongos 中的 **均衡器 (Balancer)** 组件就会执行自动平衡，尝试使各个 Shard 上 Chunk 的数量保持均衡，这个过程就是 **再平衡（Rebalance）**。默认情况下，数据库和集合的 Rebalance 是开启的。
 
 如下图所示，随着数据插入，导致 Chunk 分裂，让 AB 两个分片有 3 个 Chunk，C 分片只有一个，这个时候就会把 B 分配的迁移一个到 C 分片实现集群数据均衡。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202503042054456.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/01b7f629080f49129d3ad5fb564e1154.png)
 
 > Balancer 是 MongoDB 的一个运行在 Config Server 的 Primary 节点上（自 MongoDB 3.4 版本起）的后台进程，它监控每个分片上 Chunk 数量，并在某个分片上 Chunk 数量达到阈值进行迁移。
 

@@ -19,7 +19,7 @@ permalink: /pages/ce9efc62/
 
 # Java IO 之序列化
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220626163533.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/25578ae809114cc797d193be136ff9a1.png)
 
 ## 序列化简介
 
@@ -28,7 +28,7 @@ permalink: /pages/ce9efc62/
 - **序列化（serialize）**：序列化是将对象转换为二进制数据。
 - **反序列化（deserialize）**：反序列化是将二进制数据转换为对象。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619110947.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/ba8d88ee24c94088b3a389fc55e0bc18.png)
 
 **序列化用途**
 
@@ -113,7 +113,7 @@ public class SerializeDemo01 {
 
 JDK 的序列化过程是怎样完成的呢？
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20220619111512.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/06/941b3ab21f1c4d73b1cb0e2d0dc12ca6.png)
 
 图来自 RPC 实战与核心原理 - 序列化
 

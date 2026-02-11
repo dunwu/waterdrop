@@ -118,11 +118,11 @@ while(server is active) {
 
 在单核时代，所有的线程都是在一颗 CPU 上执行，CPU 缓存与内存的数据一致性容易解决。因为所有线程都是操作同一个 CPU 的缓存，一个线程对缓存的写，对另外一个线程来说一定是可见的。例如在下面的图中，线程 A 和线程 B 都是操作同一个 CPU 里面的缓存，所以线程 A 更新了变量 V 的值，那么线程 B 之后再访问变量 V，得到的一定是 V 的最新值（线程 A 写过的值）。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409042331169.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/453dca98b738418cbb666bea54047617.png)
 
 多核时代，每颗 CPU 都有自己的缓存，这时 CPU 缓存与内存的数据一致性就没那么容易解决了，当多个线程在不同的 CPU 上执行时，这些线程操作的是不同的 CPU 缓存。比如下图中，线程 A 操作的是 CPU-1 上的缓存，而线程 B 操作的是 CPU-2 上的缓存，很明显，这个时候线程 A 对变量 V 的操作对于线程 B 而言就不具备可见性了。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409042332517.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/c980ad7f084146cda33bc6ef5f770df7.png)
 
 ::: tabs#计数器示例
 
@@ -206,7 +206,7 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 
 因此，执行 `count += 1` 不是原子操作。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409042334004.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/5d408a9b8c60432b8db6a6bb815e0e4e.png)
 
 ### 编译优化带来的有序性问题
 
@@ -306,7 +306,7 @@ Java 中的 **无同步方案** 有：
 
 死锁是一种特定的程序状态，在实体之间，由于循环依赖导致彼此一直处于等待之中，没有任何个体可以继续前进。死锁不仅仅是在线程之间会发生，存在资源独占的进程之间同样也可能出现死锁。通常来说，我们大多是聚焦在多线程场景中的死锁，指两个或多个线程之间，由于互相持有对方需要的锁，而永久处于阻塞的状态。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409050712813.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/6798886d8aeb40f192444cbd16c7a16d.png)
 
 【示例】存在死锁的示例
 
@@ -360,7 +360,7 @@ class Account {
 
 想象这样一个例子：两个人在狭窄的走廊里相遇，二者都很礼貌，试图移到旁边让对方先通过。但是他们最终在没有取得任何进展的情况下左右摇摆，因为他们都在同一时间向相同的方向移动。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409050740102.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/fcb8b3cd83314468b8c62039442ff810.png)
 
 如图所示：两个线程想要通过一个 Worker 对象访问共享公共资源的情况，但是当他们看到另一个 Worker（在另一个线程上调用）也是“活动的”时，它们会尝试将该资源交给其他工作者并等待为它完成。如果最初我们让两名工作人员都活跃起来，他们将会面临活锁问题。
 
@@ -376,7 +376,7 @@ class Account {
 - 线程被永久堵塞在一个等待进入同步块的状态，因为其他线程总是能在它之前持续地对该同步块进行访问。
 - 线程在等待一个本身（在其上调用 wait()) 也处于永久等待完成的对象，因为其他线程总是被持续地获得唤醒。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202409050752194.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/e8b004ba76d94dde9f6a5fd54621e1cd.png)
 
 饥饿问题最经典的例子就是哲学家问题。如图所示：有五个哲学家用餐，每个人要获得两支筷子才可以就餐。当 2、4 就餐时，1、3、5 永远无法就餐，只能看着盘中的美食饥饿的等待着。
 
@@ -430,7 +430,7 @@ Java 不可能实现 100% 的公平性，我们依然可以通过同步结构在
 - **同步** - 是指线程之间如何协作。
 - **互斥** - 是指保证同一时刻只允许一个线程访问共享资源。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202504221021138.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/398206020e8a4e02b9b6048b8eab811b.png)
 
 ## J.U.C 简介
 

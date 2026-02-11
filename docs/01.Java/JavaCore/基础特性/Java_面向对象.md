@@ -70,7 +70,7 @@ String s = new String("abc");
 
 狗和鸟都是动物。如果将狗、鸟作为类，它们可以继承动物类。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1552641712126.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/d0ee56eb69c7460da7480952163d8260.png)
 
 类的继承形式：
 
@@ -82,7 +82,7 @@ class 子类 extends 父类 {}
 
 #### 继承类型
 
-![](https://raw.githubusercontent.com/dunwu/images/master/202602081741877.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b8481b5eee7440fdabab02faebe054ff.png)
 
 #### 继承的特性
 
@@ -129,7 +129,7 @@ Java 中提供的基本数据类型，只能表示单一的数值，这用于数
 
 类的形式如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/1552640231731.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/f173e9bfa6d04fc29b850992366f9170.png)
 
 ## 方法
 

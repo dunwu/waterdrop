@@ -24,11 +24,11 @@ Java 应用出现线上故障，如何进行诊断？
 
 一般来说，服务器故障诊断的整体思路如下：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200309181645.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/03/827e4fcb7f5e41c1a92f77cf8349fd2f.png)
 
 应用故障诊断思路：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200309181831.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/03/c6c3103740324c7da29bf5f32a56f003.png)
 
 ## CPU 问题
 

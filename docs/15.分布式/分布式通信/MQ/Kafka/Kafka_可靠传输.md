@@ -23,7 +23,7 @@ permalink: /pages/df6965b2/
 
 一条消息从生产到消费，可以划分三个阶段：
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/202502070727544.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/02/34a58a9972694faaafb421296f7d5bd7.png)
 
 - **生产阶段**：Producer 创建消息，并通过网络发送给 Broker。
 - **存储阶段**：Broker 收到消息并存储，如果是集群，还要同步副本给其他 Broker。
@@ -127,7 +127,7 @@ Broker 有 3 个配置参数会影响 Kafka 消息存储的可靠性。
 
 消费者唯一要做的是确保哪些消息是已经读取过的，哪些是没有读取过的（通过提交偏移量给 Broker 来确认）。如果消费者提交了偏移量却未能处理完消息，那么就有可能造成消息丢失，这也是消费者丢失消息的主要原因。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/snap/20200727140159.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/07/f265b495ad7c411face607063ca699e8.png)
 
 #### 消费者的可靠性配置
 
