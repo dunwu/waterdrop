@@ -174,7 +174,7 @@ insert into leaf_alloc(biz_tag, max_id, step, description) values('leaf-segment-
 
 大致架构如下图所示：
 
-![image](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2017/5e4ff128.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/4670063daaea4fada17b89b848133837.png)
 
 test_tag 在第一台 Leaf 机器上是 `1~1000` 的号段，当这个号段用完时，会去加载另一个长度为 step=1000 的号段，假设另外两台号段都没有更新，这个时候第一台机器新加载的号段就应该是 `3001~4000`。同时数据库对应的 biz_tag 这条数据的 max_id 会从 3000 被更新成 4000，更新号段的 SQL 语句如下：
 
@@ -224,7 +224,7 @@ Redis 的 String 类型提供 `INCR` 和 `INCRBY` 命令将 key 中储存的数�
 
 **每个需要 ID 编码的业务服务器可以看作是 ZooKeeper 的客户端**。ID 编码生成器可以作为 ZooKeeper 的服务端。客户端通过发送请求到 ZooKeeper 服务器，来获取编码信息，服务端接收到请求后，发送 ID 编码给客户端。
 
-![Drawing 2.png](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/ZooKeeper%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%9E%E6%88%98-%E5%AE%8C/assets/CgqCHl8RTBGAB7QNAAAvwu3rspw007.png)
+![Drawing 2.png](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d971189a0dea443187b7b6327358ee1a.png)
 
 可以利用 ZooKeeper 数据模型中的顺序节点作为 ID 编码。客户端通过调用 create 函数创建顺序节点。服务器成功创建节点后，会响应客户端请求，把创建好的节点信息发送给客户端。客户端用数据节点名称作为 ID 编码，进行之后的本地业务操作。
 
@@ -309,7 +309,7 @@ Math.pow(2, 41) / (365 * 24 * 60 * 60 * 1000L);
 
 雪花算法主键的详细结构见下图：
 
-![雪花算法](https://shardingsphere.apache.org/document/current/img/sharding/snowflake_cn_v2.png)
+![雪花算法](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5c3f3aafb4df450dbe3acb2e9f63553a.png)
 
 ### 时钟回拨
 

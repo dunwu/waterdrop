@@ -1147,7 +1147,7 @@ Kafka 采用 **多线程池 + 事件驱动** 模型，核心线程组分工如�
 - **Replica Manager**：副本同步（ISR）、Leader 选举。
 - **Delayed Operation**：处理延迟操作（如 `Produce` 的 ACK 等待）。
 
-![kafka broker internals](https://rahulvishwakarma.wordpress.com/wp-content/uploads/2016/06/kafka-broker-internals.png?w=634)
+![kafka broker internals](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/73c9cc1a2465449caefe9d0eb5952bec.png)
 
 **核心设计优势**
 

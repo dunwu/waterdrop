@@ -44,11 +44,11 @@ public void doFilter(ServletRequest request, ServletResponse response, FilterCha
 
 实际上，`FilterChainProxy` 可用于确定应使用哪个 `SecurityFilterChain`。如果您的应用程序可以为不同的模块提供完全独立的配置。
 
-![multi securityfilterchain](https://docs.spring.io/spring-security/site/docs/5.3.0.RELEASE/reference/html5/images/servlet/architecture/multi-securityfilterchain.png)
+![multi securityfilterchain](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d6d31a3a9a514a578b84773e54fd0c5c.png)
 
 ExceptionTranslationFilter 可以将 AccessDeniedException 和 AuthenticationException 转换为 HTTP 响应。
 
-![exceptiontranslationfilter](https://docs.spring.io/spring-security/site/docs/5.3.0.RELEASE/reference/html5/images/servlet/architecture/exceptiontranslationfilter.png)
+![exceptiontranslationfilter](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/30501efa2ad84d01817986059f21ee2f.png)
 
 核心源码：
 
@@ -95,7 +95,7 @@ SecurityContextHolder.setContext(context);
 
 AbstractAuthenticationProcessingFilter 用作验证用户凭据的基本过滤器。 在对凭证进行身份验证之前，Spring Security 通常使用 AuthenticationEntryPoint 请求凭证。
 
-![abstractauthenticationprocessingfilter](https://docs.spring.io/spring-security/site/docs/5.3.0.RELEASE/reference/html5/images/servlet/authentication/architecture/abstractauthenticationprocessingfilter.png)
+![abstractauthenticationprocessingfilter](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5fa6a017ebc64d039797a74685822902.png)
 
 - （1）当用户提交其凭据时，`AbstractAuthenticationProcessingFilter` 从要验证的 `HttpServletRequest` 创建一个 `Authentication`。创建的身份验证类型取决于 `AbstractAuthenticationProcessingFilter` 的子类。例如，`UsernamePasswordAuthenticationFilter` 根据在 `HttpServletRequest` 中提交的用户名和密码来创建 `UsernamePasswordAuthenticationToken`。
 - （2）接下来，将身份验证传递到 `AuthenticationManager` 进行身份验证。
@@ -128,11 +128,11 @@ AbstractAuthenticationProcessingFilter 用作验证用户凭据的基本过滤�
 
 spring security 支持通过从 html 表单获取登录时提交的用户名、密码。
 
-![loginurlauthenticationentrypoint](https://docs.spring.io/spring-security/site/docs/5.3.0.RELEASE/reference/html5/images/servlet/authentication/unpwd/loginurlauthenticationentrypoint.png)
+![loginurlauthenticationentrypoint](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/895ee214b5704db183da96b43f9f607e.png)
 
 一旦，登录信息被提交，`UsernamePasswordAuthenticationFilter` 就会验证用户名和密码。
 
-![usernamepasswordauthenticationfilter](https://docs.spring.io/spring-security/site/docs/5.3.0.RELEASE/reference/html5/images/servlet/authentication/unpwd/usernamepasswordauthenticationfilter.png)
+![usernamepasswordauthenticationfilter](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/de07cb4a159646ea97da71c0c49ca4b6.png)
 
 #### 基本认证
 
@@ -218,7 +218,7 @@ create unique index ix_auth_username on authorities (username,authority);
 
 Spring Security 的 servlet 支持通过与 `PasswordEncoder` 集成来安全地存储密码。 可以通过公开一个 PasswordEncoder Bean 来定制 Spring Security 使用的 PasswordEncoder 实现。
 
-![daoauthenticationprovider](https://docs.spring.io/spring-security/site/docs/5.3.0.RELEASE/reference/html5/images/servlet/authentication/unpwd/daoauthenticationprovider.png)
+![daoauthenticationprovider](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/052b5ce56e4546cfa4c6be4374617685.png)
 
 ### Remember-Me
 

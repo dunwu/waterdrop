@@ -537,7 +537,7 @@ Java 应用开启 JMX 后，可以使用 `jconsole` 或 `jvisualvm` 进行监控
 
 如果是远程 Java 进程，需要连接 Java 进程的 JMX 端口。
 
-![Connecting to a JMX Agent Using the JMX Service URL](https://docs.oracle.com/javase/8/docs/technotes/guides/management/figures/connectadv.gif)
+![Connecting to a JMX Agent Using the JMX Service URL](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/413eb78c835b45f680e4ea22f0d9f0c0.gif)
 
 #### jconsole 界面
 

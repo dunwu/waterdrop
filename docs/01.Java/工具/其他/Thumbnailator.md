@@ -175,11 +175,11 @@ Thumbnails.of("oldFile.png")
 
 **oldFile.png**
 
-![](http://upload-images.jianshu.io/upload_images/3101171-ba63439898602e8f.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/66eeca8d6ccc491fbb6171b9c707b8ad.png)
 
 **newFile_scale_1.0_0.5.png**
 
-![](http://upload-images.jianshu.io/upload_images/3101171-a01ea4515fff865d.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e3ef797d96fb48599b15a0876aef82c5.png)
 
 ### 图片旋转
 
@@ -199,7 +199,7 @@ Thumbnails.of("oldFile.png")
 
 **newFile_rotate_90.png**
 
-![](http://upload-images.jianshu.io/upload_images/3101171-17d54bc33b38d45b.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/fa9119c987d64fe2980be1a31bc93197.png)
 
 ### 加水印
 
@@ -215,11 +215,11 @@ Thumbnails.of("oldFile.png")
 
 **wartermarkFile.png**
 
-![](http://upload-images.jianshu.io/upload_images/3101171-97909ee6c066c195.png?imageMogr2/auto-orient/strip)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/edf8457c358e4f638dc79b3afff32184.png)
 
 **newFile_watermark.png**
 
-![](http://upload-images.jianshu.io/upload_images/3101171-93eb7ef71b811a0c.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/cc40d3b4bd184ef3b2b9a52358d2e21f.png)
 
 ### 批量处理图片
 

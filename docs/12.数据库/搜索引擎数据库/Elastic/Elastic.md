@@ -39,7 +39,7 @@ ELK 是指 Elastic 公司旗下三款产品 [ElasticSearch](https://www.elastic.
 
 ### Elastic Stack 架构
 
-![](https://www.elastic.co/guide/en/logstash/current/static/images/deploy3.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/f191f77a0208424aae4c320ac816d1b0.png)
 
 > **说明**
 >
@@ -218,7 +218,7 @@ Logstash 有两个必要元素：`input` 和 `output` ，一个可选元素：`f
 >
 > Beats 可以将数据直接传输到 Elasticsearch 或传输到 Logstash 。
 
-![](https://www.elastic.co/guide/en/beats/libbeat/current/images/beats-platform.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/141fbb22bd824437beb953fbbc74dc8d.png)
 
 Beats 有多种类型，可以根据实际应用需要选择合适的类型。
 
@@ -241,7 +241,7 @@ Filebeat 带有内部模块（auditd，Apache，Nginx，System 和 MySQL），�
 
 FileBeat 不会让你的管道超负荷。FileBeat 如果是向 Logstash 传输数据，当 Logstash 忙于处理数据，会通知 FileBeat 放慢读取速度。一旦拥塞得到解决，FileBeat 将恢复到原来的速度并继续传播。
 
-![](https://www.elastic.co/guide/en/beats/filebeat/current/images/filebeat.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1cb6a304870b4171993fae0024d8a4c9.png)
 
 ### Filebeat 原理
 

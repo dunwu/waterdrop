@@ -59,17 +59,17 @@ Ehcache 目前支持五种集群方式：
 
 如果网络有问题，或某台服务宕机，则存在数据无法同步的可能，导致数据不一致。
 
-![Ehcache Image](https://www.ehcache.org/images/documentation/rmi_replication.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/bae50ef8d2f5402ba23ffdfe51af4365.png)
 
 #### JMS
 
 JMS 类似 MQ，所有节点订阅消息，当某节点缓存发生变化，就向 JMS 发消息，其他节点感知变化后，同步数据。
 
-![Ehcache Image](https://www.ehcache.org/images/documentation/jms_replication.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/98379f814b364b00abbb986e03e14c09.png)
 
 #### Cache Server
 
-![Ehcache Image](https://www.ehcache.org/images/documentation/loadbalancer_hashing.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/0bdf59fd4bb1444d9996fa9b583a3ef7.png)
 
 ## 二、快速入门
 

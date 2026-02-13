@@ -33,7 +33,7 @@ permalink: /pages/11e409e5/
 
 **整型类型**包括 `TINYINT`、`SMALLINT`、`MEDIUMINT`、`INT`、`BIGINT`。这些类型的存储空间和取值范围各不相同。
 
-![image.png](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/MySQL%e5%ae%9e%e6%88%98%e5%ae%9d%e5%85%b8/assets/Cgp9HWCbM_CASy8bAAEA5n3G3Kc663.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a7740940813941048cc95c2896c83044.png)
 
 **浮点类型**包括 `FLOAT` 和 `DOUBLE`，但不推荐在生产环境中使用，因为存在精度问题。MySQL 8.0.17 版本后，使用 `FLOAT` 或 `DOUBLE` 会抛出警告，未来可能会废弃。
 
@@ -379,11 +379,11 @@ InnoDB 的数据是根据主键索引排序存储的，除了主键索引外，*
 
 **一地三中心架构**
 
-![5.png](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/MySQL%e5%ae%9e%e6%88%98%e5%ae%9d%e5%85%b8/assets/Cgp9HWDTCQyAFtFCAAF7qJpeUuM426.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7ff457c24809449b906fee115970ff82.png)
 
 **三地五中心**
 
-![6.png](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/MySQL%e5%ae%9e%e6%88%98%e5%ae%9d%e5%85%b8/assets/CioPOWDTCROAOWeTAAF4gz8w6PY448.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b8eab3370c6d46339c2290fe25d0f5cc.png)
 
 ## 19 高可用套件：选择这么多，你该如何选？
 

@@ -65,7 +65,7 @@ UML 工具非常多，到底哪种工具好，真的是仁者见仁智者见智�
 >
 > [亿图官网](http://www.edrawsoft.cn/)
 
-![](http://www.edrawsoft.cn/images/software/createsoftware.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/f429ba41ef9245a9b2eb7c12e29f8637.png)
 
 ### Visio
 
@@ -73,7 +73,7 @@ UML 工具非常多，到底哪种工具好，真的是仁者见仁智者见智�
 >
 > [Visio 官网](https://products.office.com/zh-cn/visio/flowchart-software)
 
-![](https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE2jMC4?ver=5361&q=90&h=675&w=830&b=%23FFFFFFFF&aim=true)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1e12ac5ee7d249b8956edd1c5f5d9742.net/cms/api/am/imageFileData/RE2jMC4)
 
 ### StarUML
 

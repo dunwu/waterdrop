@@ -120,7 +120,7 @@ rides
 
 每个 `keyBy` 会通过 shuffle 来为数据流进行重新分区。总体来说这个开销是很大的，它涉及网络通信、序列化和反序列化。
 
-![keyBy and network shuffle](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/keyBy.png)
+![keyBy and network shuffle](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/ce236e5927594c739292b33d72341e99.png)
 
 ### 通过计算得到键
 
@@ -314,11 +314,11 @@ keyHasBeenSeen.clear()
 
 相比于下面这种预先定义的转换：
 
-![simple transformation](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/transformation.svg)
+![simple transformation](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/cba2fccd5cac48f39c093dffd6b0c2dd.svg)
 
 有时你想要更灵活地调整转换的某些功能，比如数据流的阈值、规则或者其他参数。Flink 支持这种需求的模式称为 _connected streams_ ，一个单独的算子有两个输入流。
 
-![connected streams](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/connected-streams.svg)
+![connected streams](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/19ec52e32e024aa8bcc2271f0310aef6.svg)
 
 connected stream 也可以被用来实现流的关联。
 

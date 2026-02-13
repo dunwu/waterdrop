@@ -691,13 +691,13 @@ server.tomcat.max-threads=1
 
 JDK 原生线程池 `ThreadPoolExecutor` 提供了如下几个 public 的 setter 方法，如下图所示：
 
-![图 19 JDK 线程池参数设置接口](https://p1.meituan.net/travelcube/efd32f1211e9cf0a3ca9d35b0dc5de8588353.png)
+![图 19 JDK 线程池参数设置接口](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/55b3b306167a4c0a84b27bd86e409da7.png)
 
 JDK 允许线程池使用方通过 `ThreadPoolExecutor` 的实例来动态设置线程池的核心策略。
 
 重点是基于这几个 `public` 方法，我们只需要维护 `ThreadPoolExecutor` 的实例，并且在需要修改的时候拿到实例修改其参数即可。基于以上的思路，美团实现了线程池参数的动态化、线程池参数在管理平台可配置可修改，其效果图如下图所示：
 
-![图 21 可动态修改线程池参数](https://p0.meituan.net/travelcube/414ba7f3abd11e5f805c58635ae10988166121.png)
+![图 21 可动态修改线程池参数](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9be2af0749aa4d9f8daa515fa612d738.png)
 
 如果我们的项目也想要实现这种效果的话，可以借助现成的开源项目：
 

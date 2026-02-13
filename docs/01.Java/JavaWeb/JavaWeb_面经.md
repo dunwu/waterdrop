@@ -56,7 +56,7 @@ Servlet 技术出现之前，Web 主要使用 CGI 技术。它们的区别如下
 
 ### 简述 Servlet 生命周期
 
-![](http://www.runoob.com/wp-content/uploads/2014/07/Servlet-LifeCycle.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9b3261cc037c45b6978877f41c4f526e.jpg)
 
 Servlet 生命周期如下：
 
@@ -158,7 +158,7 @@ Servlet 生命周期如下：
 
 ### get 请求和 post 请求的区别
 
-![](https://upload-images.jianshu.io/upload_images/7779232-5be5ae990207f9d2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/814/format/webp)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/f497fd6a2e5647dc9e843fcce37fe199.png)
 
 - GET：
   - 从服务器上获取数据，一般不能使用在写操作接口

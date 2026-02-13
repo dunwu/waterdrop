@@ -29,7 +29,7 @@ Kubernetes（K8s）是一个**开源的容器编排平台**，用于**自动化�
 
 **核心概念**
 
-![](https://www.simplyblock.io/wp-content/media/a7fbb2_0290c594b9244137a8858165fa1c22f0mv2.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8d6c4f92377944c49d904a5f86876616.png)
 
 - **集群**：由 **Control Plane / Master Node** 和 **Worker Nodes** 组成。
 - **Pod**：最小部署单元，包含一个或多个紧密关联的容器。
@@ -84,7 +84,7 @@ _注意：必须加 `--restart=Never` 才会创建独立 Pod，否则会默认�
 
 ## 【中等】Kubernetes 中的 Service 和 Ingress 有什么区别？
 
-![](https://www.opsramp.com/wp-content/uploads/2022/07/Kubernetes-load-balances-traffic-across-the-services-1024x685-1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e8732156edb048669f47e5eb83a4e2e4.png)
 
 - **Service**：集群**内部**的通信与负载均衡。
 - **Ingress**：集群**外部**的 HTTP(S) 流量管理与路由。

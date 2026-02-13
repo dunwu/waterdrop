@@ -15,13 +15,13 @@ permalink: /pages/c5458deb/
 
 ## 开篇词 为什么我们要学习 Java 虚拟机？
 
-![](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/%E6%B7%B1%E5%85%A5%E6%8B%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA/assets/414248014bf825dd610c3095eed75377.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/88c9bc3aed624499a49be95a3ad92591.jpg)
 
 ## Java 代码是怎么运行的？
 
 从虚拟机视角来看，执行 Java 代码首先需要将它编译而成的 class 文件加载到 Java 虚拟机中。加载后的 Java 类会被存放于方法区（Method Area）中。实际运行时，虚拟机会执行方法区内的代码。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%8b%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba/assets/ab5c3523af08e0bf2f689c1d6033ef77.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/dd83962222bb41c082212725c8dc064e.png)
 
 在运行过程中，每当调用进入一个 Java 方法，Java 虚拟机会在当前线程的 Java 方法栈中生成一个栈帧，用以存放局部变量以及字节码的操作数。这个栈帧的大小是提前计算好的，而且 Java 虚拟机不要求栈帧在内存空间里连续分布。
 
@@ -31,11 +31,11 @@ permalink: /pages/c5458deb/
 
 在 HotSpot 里面，上述翻译过程有两种形式：第一种是解释执行，即逐条将字节码翻译成机器码并执行；第二种是即时编译（Just-In-Time compilation，JIT），即将一个方法中包含的所有字节码编译成机器码后再执行。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%8b%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba/assets/5ee351091464de78eed75438b6f9183b.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d3d86465ca89454ba954e1254a2f8bb0.png)
 
 ## Java 的基本类型
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%8b%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba/assets/77dfb788a8ad5877e77fc28ed2d51745.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2906a9fb62964492a0c4724fc9194392.png)
 
 ## Java 虚拟机是如何加载 Java 类的
 
@@ -78,7 +78,7 @@ Java 虚拟机中的即时编译器会使用内联缓存来加速动态绑定。
 
 Java 字节码中，每个方法对应一个异常表。当程序触发异常时，Java 虚拟机将查找异常表，并依此决定需要将控制流转移至哪个异常处理器之中。Java 代码中的 catch 代码块和 finally 代码块都会生成异常表条目。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%8b%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba/assets/17e2a3053b06b0a4383884f106e31c06.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a7b895454d37406684c97cca6973cec4.png)
 
 ## JVM 是如何实现反射的？
 
@@ -147,19 +147,19 @@ GC Roots 包括（但不限于）如下几种：
 
 标记-复制把内存区域分为两等分，分别用两个指针 from 和 to 来维护，并且只是用 from 指针指向的内存区域来分配内存。当发生垃圾回收时，便把存活的对象复制到 to 指针指向的内存区域中，并且交换 from 指针和 to 指针的内容。复制这种回收方式同样能够解决内存碎片化的问题，但是它的缺点也极其明显，即堆空间的使用效率极其低下。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%8b%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba/assets/4749cad235deb1542d4ca3b232ebf261.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/663ad7fd3d5544f5afd555099fc9cf73.png)
 
 #### 标记-清除
 
 标记-清除即把死亡对象所占据的内存标记为空闲内存，并记录在一个空闲列表（free list）之中。当需要新建对象时，内存管理模块便会从该空闲列表中寻找空闲内存，并划分给新建的对象。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%8b%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba/assets/f225126be24826658ca5a899fcff5003.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1e28d8d7f60e4ea5b4fb53a1ec6547b6.png)
 
 #### 标记-整理
 
 标记-整理把存活的对象聚集到内存区域的起始位置，从而留下一段连续的内存空间。这种做法能够解决内存碎片化的问题，但代价是压缩算法的性能开销。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%8b%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba/assets/415ee8e4aef12ff076b42e41660dad39.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/702026ff23bf4c20a77ed2e27b72f0b5.png)
 
 ## 垃圾回收（下）
 
@@ -167,7 +167,7 @@ Java 虚拟机将堆划分为新生代和老年代。其中，新生代又被划
 
 可以通过参数 -XX:SurvivorRatio 来调整 Eden 区和 Survivor 区的比例。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%8b%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba/assets/2cc29b8de676d3747416416a3523e4e5.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/146238f843b1409884db431dcc4315b0.png)
 
 当发生 Minor GC 时，Eden 区和 from 指向的 Survivor 区中的存活对象会被复制到 to 指向的 Survivor 区中，然后交换 from 和 to 指针，以保证下一次 Minor GC 时，to 指向的 Survivor 区还是空的。
 

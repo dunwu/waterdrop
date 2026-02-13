@@ -1041,7 +1041,7 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 
 时间轮（Timing Wheel）是 George Varghese 和 Tony Lauck 在 1996 年的论文 [Hashed and Hierarchical Timing Wheels: data structures to efficiently implement a timer facility](https://www.cse.wustl.edu/~cdgill/courses/cs6874/TimingWheels.ppt) 实现的，它在 Linux 内核中使用广泛，是 Linux 内核定时器的实现方法和基础之一。
 
-![图片 22.png](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Netty%20%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%E4%B8%8E%20RPC%20%E5%AE%9E%E8%B7%B5-%E5%AE%8C/assets/CgpVE1_okKiAGl0gAAMLshtTq-M933.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8bf5f55729b1407e8e68177e6997c7a6.png)
 
 **核心设计思想**
 

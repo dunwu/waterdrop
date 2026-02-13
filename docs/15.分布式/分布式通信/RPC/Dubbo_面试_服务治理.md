@@ -232,13 +232,13 @@ CAP 就是取 Consistency、Availability、Partition Tolerance 的首字母而�
 
 Dubbo3 以前的版本采用的是接口级服务发现。
 
-![interface-data1](https://cn.dubbo.apache.org/imgs/blog/proposals/discovery/interface-data1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/34fca120af53bb360f315bda0abe7f3f.png)
 
 Provider 部署的应用中通常会有多个 Service，每个 service 都可能会有其独有的配置。Service 服务发布的过程，其实就是基于这个服务配置生成地址 URL 的过程，生成的地址数据如图所示。
 
 注册中心的地址数据存储结构，以 Service 服务名为数据划分依据，将一个服务下的所有地址数据都作为子节点进行聚合，子节点的内容就是实际可访问的 ip 地址，也就是我们 Dubbo 中 URL，格式就是刚才 Provider 实例生成的。
 
-![interface-data2](https://cn.dubbo.apache.org/imgs/blog/proposals/discovery/interface-data2.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7a273fbb2033b92be829ac677fdf4ca9.png)
 
 这里把 URL 地址数据划分成了几份：
 
@@ -256,7 +256,7 @@ Provider 部署的应用中通常会有多个 Service，每个 service 都可能
 
 这就是一直以来 Dubbo2 在易用性、服务治理功能性、可扩展性上强于很多服务框架的真正原因。
 
-![interface-defect](https://cn.dubbo.apache.org/imgs/blog/proposals/discovery/interface-defect.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/16375fa452e6a9187ec1d06224a4d488.png)
 
 接口级注册的易用性是有代价的，它限制了整体架构的扩展性，在大规模 Dubbo 集群中尤为凸显。其突出问题如下：
 
@@ -272,7 +272,7 @@ Provider 部署的应用中通常会有多个 Service，每个 service 都可能
 
 :::
 
-![app-metadataservice](https://cn.dubbo.apache.org/imgs/blog/proposals/discovery/app-workflow.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e4b109cca65b8402d4b6edfc9f4455d5.png)
 
 **提供者服务注册**
 
@@ -508,14 +508,14 @@ public class CustomRouterFailover implements RouterListener {
 
 以下是 Dubbo 单个路由器的工作过程，路由器接收一个服务的实例地址集合作为输入，基于请求上下文 (Request Context) 和 (Router Rule) 实际的路由规则定义对输入地址进行匹配，所有匹配成功的实例组成一个地址子集，最终地址子集作为输出结果继续交给下一个路由器或者负载均衡组件处理。
 
-![Router](https://cn.dubbo.apache.org/imgs/v3/feature/traffic/router1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8425393389a090a081b6d42d70897697.png)
 
 通常，在 Dubbo 中，多个路由器组成一条路由链共同协作，前一个路由器的输出作为另一个路由器的输入，经过层层路由规则筛选后，最终生成有效的地址集合。
 
 - Dubbo 中的每个服务都有一条完全独立的路由链，每个服务的路由链组成可能不通，处理的规则各异，各个服务间互不影响。
 - 对单条路由链而言，即使每次输入的地址集合相同，根据每次请求上下文的不同，生成的地址子集结果也可能不同。
 
-![Router](https://cn.dubbo.apache.org/imgs/v3/feature/traffic/router2.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8425393389a090a081b6d42d70897697.png)
 
 ### 【中等】Dubbo 支持哪些路由方式？分别适用于什么场景？
 
@@ -546,11 +546,11 @@ Dubbo 支持以下路由规则：
 
 - 在标签路由中，一旦给某一台或几台机器实例打了标签，则这部分实例就会被立马从通用流量集合中移除，不同标签之间不会再有交集。有点类似下图，地址集合在输入阶段就已经划分明确。
 
-![tag-condition-compare](https://cn.dubbo.apache.org/imgs/v3/feature/traffic/tag-condition-compare1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/ef4a6e1019419653f843d4b2ca20562b.png)
 
 - 而从条件路由的视角，所有的实例都是一致的，路由过程中不存在分组隔离的问题，每次路由过滤都是基于全量地址中执行
 
-![tag-condition-compare](https://cn.dubbo.apache.org/imgs/v3/feature/traffic/tag-condition-compare2.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/ef4a6e1019419653f843d4b2ca20562b.png)
 
 条件路由规则的主体 `conditions` 主要包含两部分内容：
 

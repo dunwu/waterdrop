@@ -229,7 +229,7 @@ IntelliJ IDEA 作为一个以快捷键为中心的 IDE，为大多数操作建�
 
 ### Intellij IDEA 官方快捷键表
 
-![](http://upload-images.jianshu.io/upload_images/3101171-6a44121ae280a10e.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/40e5cee30d904589a0346cfe1f325a59.png)
 
 ## 插件
 

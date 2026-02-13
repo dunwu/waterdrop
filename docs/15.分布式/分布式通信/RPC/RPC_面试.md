@@ -190,7 +190,7 @@ Netty 还提供 FileRegion 中包装 NIO 的 FileChannel.transferTo() 方法实�
 
 RPC 框架会自动为要调用的接口生成一个代理类。当在项目中注入接口的时候，运行过程中实际绑定的就是这个接口生成的代理类。在接口方法被调用时，会被代理类拦截，这样，就可以在生成的代理类中，加入远程调用逻辑。
 
-![](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/RPC%E5%AE%9E%E6%88%98%E4%B8%8E%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/assets/aaf85f07dd40412aa1a6e53224b1e2ab.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/721415a8d207486c8b5e530328f763f3.jpg)
 
 除了 JDK 默认的 `InvocationHandler` 能完成代理功能，还有很多其他的第三方框架也可以，比如像 Javassist、Byte Buddy 这样的框架。
 
@@ -204,7 +204,7 @@ RPC 框架会自动为要调用的接口生成一个代理类。当在项目中�
 
 RPC 框架必须要有服务注册和发现机制，这样，集群中的节点才能知道通信方的请求地址。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/RPC%e5%ae%9e%e6%88%98%e4%b8%8e%e6%a0%b8%e5%bf%83%e5%8e%9f%e7%90%86/assets/2d4469c7ceb8496b844e8652f634673c.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/96728e3c761e4aee9965dc5b0b97b0d1.jpg)
 
 - **服务注册**：在服务提供方启动的时候，将对外暴露的接口注册到注册中心之中，注册中心将这个服务节点的 IP 和接口保存下来。
 - **服务订阅**：在服务调用方启动的时候，去注册中心查找并订阅服务提供方的 IP，然后缓存到本地，并用于后续的远程调用。
@@ -242,7 +242,7 @@ RPC 框架依赖的注册中心的服务数据的一致性其实并不需要满�
 
 到这儿，一个自适应的负载均衡我们就完成了，整体的设计方案如下图所示：
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/RPC%e5%ae%9e%e6%88%98%e4%b8%8e%e6%a0%b8%e5%bf%83%e5%8e%9f%e7%90%86/assets/e8aa1dfaeffd4a6b8745a36a2c15be5a.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8559e811e60845c9b03afb9c2a6b3b05.jpg)
 
 关键步骤我来解释下：
 
@@ -318,7 +318,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 当服务提供方要上线的时候，一般是通过部署系统完成实例重启。在这个过程中，服务提供方的团队并不会事先告诉调用方他们需要操作哪些机器，从而让调用方去事先切走流量。而对调用方来说，它也无法预测到服务提供方要对哪些机器重启上线，因此负载均衡就有可能把要正在重启的机器选出来，这样就会导致把请求发送到正在重启中的机器里面，从而导致调用方不能拿到正确的响应结果。
 
-![](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/RPC%E5%AE%9E%E6%88%98%E4%B8%8E%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/assets/a745ea3875594e399b297b41092bd326.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/59bcdbe06d3942f598ad9add7517c7d7.jpg)
 
 在服务重启的时候，对于调用方来说，这时候可能会存在以下几种情况：
 
@@ -327,7 +327,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 当出现第二种情况的时候，调用方业务会受损，如何避免这种问题呢。当服务提供方关闭前，是不是可以先通知注册中心进行下线，然后通过注册中心告诉调用方进行节点摘除？
 
-![](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/RPC%E5%AE%9E%E6%88%98%E4%B8%8E%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/assets/80de863eb7d142caaadfa7cbbbb1d55f.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/cd19ebe227944ee7bab8c9b7a6b9f436.jpg)
 
 如上图所示，整个关闭过程中依赖了两次 RPC 调用，一次是服务提供方通知注册中心下线操作，一次是注册中心通知服务调用方下线节点操作。注册中心通知服务调用方都是异步的。服务发现只保证最终一致性，并不保证实时性，所以注册中心在收到服务提供方下线的时候，并不能成功保证把这次要下线的节点推送到所有的调用方。所以这么来看，通过服务发现并不能做到应用无损关闭。
 
@@ -337,7 +337,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 关闭过程中已经在处理的请求会不会受到影响呢？如果进程结束过快会造成这些请求还没有来得及应答，同时调用方会也会抛出异常。为了尽可能地完成正在处理的请求，首先我们要把这些请求识别出来。可以在服务对象加上引用计数器，每开始处理请求之前加一，完成请求处理减一，通过该计数器我们就可以快速判断是否有正在处理的请求。服务对象在关闭过程中，会拒绝新的请求，同时根据引用计数器等待正在处理的请求全部结束之后才会真正关闭。但考虑到有些业务请求可能处理时间长，或者存在被挂住的情况，为了避免一直等待造成应用无法正常退出，我们可以在整个 ShutdownHook 里面，加上超时时间控制，当超过了指定时间没有结束，则强制退出应用。超时时间我建议可以设定成 10s，基本可以确保请求都处理完了。
 
-![](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/RPC%E5%AE%9E%E6%88%98%E4%B8%8E%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/assets/6f6233c36f5c4e5a89e2206696f21832.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/0ecd9fc566bf48a493bc38be710aea2b.jpg)
 
 ### 【中等】如何实现 RPC 优雅启动？
 
@@ -387,7 +387,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 服务治理，需要很多个模块的能力：服务发现、负载均衡、路由、容错、配置挂历等。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/RPC%e5%ae%9e%e6%88%98%e4%b8%8e%e6%a0%b8%e5%bf%83%e5%8e%9f%e7%90%86/assets/db030426b9b84d3e9794aea11c751469.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8a2e9f49d4ca48a0bbb5f922a73b2839.jpg)
 
 具备了这些能力就万事大吉了吗？RPC 框架很难一开始就面面俱到，但作为基础能力，在实际应用中，难免会有定制化的要求。这就要求 RPC 框架具备良好的扩展性。
 
@@ -395,7 +395,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 加上了插件功能之后，我们的RPC框架就包含了两大核心体系——核心功能体系与插件体系，如下图所示：
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/RPC%e5%ae%9e%e6%88%98%e4%b8%8e%e6%a0%b8%e5%bf%83%e5%8e%9f%e7%90%86/assets/8e566b59c5bf4e08bbed5e11c319e674.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e6c2943b16b24c6393caa2cf4a6dd7f6.jpg)
 
 ### 【困难】如何实现 RPC 异步调用？
 
@@ -407,7 +407,7 @@ RPC 在整合分布式链路跟踪需要做的最核心的两件事就是“埋�
 
 所谓的同步调用，不过是 RPC 框架在调用端的处理逻辑中主动执行了这个 Future 的 get 方法，让动态代理等待返回值；而异步调用则是 RPC 框架没有主动执行这个 Future 的 get 方法，用户可以从请求上下文中得到这个 Future，自己决定什么时候执行这个 Future 的 get 方法。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/RPC%e5%ae%9e%e6%88%98%e4%b8%8e%e6%a0%b8%e5%bf%83%e5%8e%9f%e7%90%86/assets/000a51dca2194170bcb3210cfe4b507d.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/4ef7cb9ac9724c6d971878f03cab4b19.jpg)
 
 如何做到 RPC 调用全异步？
 
@@ -443,7 +443,7 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 
 **时间轮是一种高效的、批量管理定时任务的调度模型**。时间轮可以理解为一种环形结构，像钟表一样被分为多个 slot 槽位。每个 slot 代表一个时间段，每个 slot 中可以存放多个任务，使用的是链表结构保存该时间段到期的所有任务。时间轮通过一个时针随着时间一个个 slot 转动，并执行 slot 中的所有到期任务。
 
-![图片 22.png](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Netty%20%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%E4%B8%8E%20RPC%20%E5%AE%9E%E8%B7%B5-%E5%AE%8C/assets/CgpVE1_okKiAGl0gAAMLshtTq-M933.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b7bcc352948142279c125bbde0b58f50.png)
 
 任务是如何添加到时间轮当中的呢？可以根据任务的到期时间进行取模，然后将任务分布到不同的 slot 中。如上图所示，时间轮被划分为 8 个 slot，每个 slot 代表 1s，当前时针指向 2。假如现在需要调度一个 3s 后执行的任务，应该加入 `2+3=5` 的 slot 中；如果需要调度一个 12s 以后的任务，需要等待时针完整走完一圈 round 零 4 个 slot，需要放入第 `(2+12)%8=6` 个 slot。
 

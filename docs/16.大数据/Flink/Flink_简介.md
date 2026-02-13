@@ -25,7 +25,7 @@ permalink: /pages/a2a3276a/
 1. **无界流** 有定义流的开始，但没有定义流的结束。它们会无休止地产生数据。无界流的数据必须持续处理，即数据被摄取后需要立刻处理。我们不能等到所有数据都到达再处理，因为输入是无限的，在任何时候输入都不会完成。处理无界数据通常要求以特定顺序摄取事件，例如事件发生的顺序，以便能够推断结果的完整性。
 2. **有界流** 有定义流的开始，也有定义流的结束。有界流可以在摄取所有数据后再进行计算。有界流所有数据可以被排序，所以并不需要有序摄取。有界流处理通常被称为批处理。
 
-![Bounded and unbounded streams](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/bounded-unbounded.png)
+![Bounded and unbounded streams](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/59184fe1046449fb9905e5fe5e6f839b.png)
 
 **Apache Flink 擅长处理无界和有界数据集** 精确的时间控制和状态化使得 Flink 的运行时(runtime)能够运行任何处理无界流的应用。有界流则由一些专为固定大小数据集特殊设计的算法和数据结构进行内部处理，产生了出色的性能。
 
@@ -35,13 +35,13 @@ permalink: /pages/a2a3276a/
 
 在 Flink 中，应用程序由用户自定义**算子**转换而来的**流式 dataflows** 所组成。这些流式 dataflows 形成了有向图，以一个或多个**源**（source）开始，并以一个或多个**汇**（sink）结束。
 
-![A DataStream program, and its dataflow.](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/program_dataflow.svg)
+![A DataStream program, and its dataflow.](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9e2b938ba97f42e5a21f2cf07b05dfee.svg)
 
 通常，程序代码中的 transformation 和 dataflow 中的算子（operator）之间是一一对应的。但有时也会出现一个 transformation 包含多个算子的情况，如上图所示。
 
 Flink 应用程序可以消费来自消息队列或分布式日志这类流式数据源（例如 Apache Kafka 或 Kinesis）的实时数据，也可以从各种的数据源中消费有界的历史数据。同样，Flink 应用程序生成的结果流也可以发送到各种数据汇中。
 
-![Flink application with sources and sinks](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/flink-application-sources-sinks.png)
+![Flink application with sources and sinks](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/0f80046b8f74467c8aff48ba58f8f5ab.png)
 
 ### 并行 Dataflows
 
@@ -49,7 +49,7 @@ Flink 程序本质上是分布式并行程序。在程序执行期间，一个�
 
 算子子任务数就是其对应算子的**并行度**。在同一程序中，不同算子也可能具有不同的并行度。
 
-![A parallel dataflow](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/parallel_dataflow.svg)
+![A parallel dataflow](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/596b6b23a14d4e90b002a5c66866b55a.svg)
 
 Flink 算子之间可以通过*一对一*（_直传_）模式或*重新分发*模式传输数据：
 
@@ -74,11 +74,11 @@ Flink 应用程序可以在分布式集群上并行运行，其中每个算子�
 
 如下图的 Flink 作业，其前三个算子的并行度为 2，最后一个 sink 算子的并行度为 1，其中第三个算子是有状态的，并且你可以看到第二个算子和第三个算子之间是全互联的（fully-connected），它们之间通过网络进行数据分发。通常情况下，实现这种类型的 Flink 程序是为了通过某些键对数据流进行分区，以便将需要一起处理的事件进行汇合，然后做统一计算处理。
 
-![State is sharded](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/parallel-job.png)
+![State is sharded](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/52854f4f5ceb4f62ab13470ac2922259.png)
 
 Flink 应用程序的状态访问都在本地进行，因为这有助于其提高吞吐量和降低延迟。通常情况下 Flink 应用程序都是将状态存储在 JVM 堆上，但如果状态太大，我们也可以选择将其以结构化数据格式存储在高速磁盘中。
 
-![State is local](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/local-state.png)
+![State is local](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/76385892c2af42d0b512d9aa560fb983.png)
 
 ### 通过状态快照实现的容错
 
@@ -208,7 +208,7 @@ stream.
 
 Flink 有一些内置的窗口分配器，如下所示：
 
-![Window assigners](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/window-assigners.svg)
+![Window assigners](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/bc80d3275fb64f74bc53c1cb275c6bc7.svg)
 
 通过一些示例来展示关于这些窗口如何使用，或者如何区分它们：
 

@@ -20,7 +20,7 @@ permalink: /pages/d3fd54bd/
 
 Sentinel 是面向分布式、多语言异构化服务架构的流量治理组件，主要以流量为切入点，从流量控制、流量路由、熔断降级、系统自适应保护等多个维度来帮助用户保障微服务的稳定性。
 
-![](https://sentinelguard.io/img/sentinel-flow-index-overview-cn.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e2536ce809e74c81bd4edfdb0e4a3ccc.jpg)
 
 Sentinel 中有两个基本概念：
 
@@ -46,7 +46,7 @@ Sentinel 会采用职责链模式，依次处理链上的各个插槽。这个�
 
 总体的框架如下:
 
-![arch overview](https://sentinelguard.io/docs/zh-cn/img/sentinel-slot-chain-architecture.png)
+![arch overview](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a0bdb08d03484537bb7eb3394b48a8cd.png)
 
 大致介绍一下 Sentinel 的核心插槽：
 
@@ -63,7 +63,7 @@ Sentinel 会采用职责链模式，依次处理链上的各个插槽。这个�
 - 1.7.2 版本以前用 `SlotChainBuilder` 作为 SPI
 - 1.7.2 版本以后用 `ProcessorSlot` 作为 SPI
 
-![Slot Chain SPI](https://user-images.githubusercontent.com/9434884/46783631-93324d00-cd5d-11e8-8ad1-a802bcc8f9c9.png)
+![Slot Chain SPI](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/124e5140f81f47f6abed813070a4fc03.png)
 
 下面将逐一详细讲解各插槽的用法。
 
@@ -158,7 +158,7 @@ idx origin  threadNum passedQps blockedQps totalQps aRt   1m-passed 1m-blocked 1
 
 Sentinel 底层采用高性能的滑动窗口数据结构 `LeapArray` 来统计实时的秒级指标数据，可以很好地支撑写多于读的高并发场景。
 
-![sliding-window-leap-array](https://user-images.githubusercontent.com/9434884/51955215-0af7c500-247e-11e9-8895-9fc0e4c10c8c.png)
+![sliding-window-leap-array](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/c5a3543c8e184cb58c12dc8fb17b4f5f.png)
 
 ### AuthoritySlot
 
@@ -281,7 +281,7 @@ Sentinel 支持以下几种规则：
 
 除了流量控制以外，对调用链路中不稳定的资源进行熔断降级也是保障高可用的重要措施之一。
 
-![chain](https://user-images.githubusercontent.com/9434884/62410811-cd871680-b61d-11e9-9df7-3ee41c618644.png)
+![chain](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/ef13e40104a94231a2abe5cbe016f3c5.png)
 
 Sentinel 提供以下几种熔断策略：
 
@@ -407,7 +407,7 @@ private boolean fallbackToLocalWhenFail = true;
 
 热点参数限流会统计传入参数中的热点参数，并根据配置的限流阈值与模式，对包含热点参数的资源调用进行限流。热点参数限流可以看做是一种特殊的流量控制，仅对包含热点参数的资源调用生效。
 
-![Sentinel Parameter Flow Control](https://github.com/alibaba/Sentinel/wiki/image/sentinel-hot-param-overview-1.png)
+![Sentinel Parameter Flow Control](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7c5f9bb1384d4d419cfc1819a197933f.png)
 
 Sentinel 利用 LRU 策略统计最近最常访问的热点参数，结合令牌桶算法来进行参数级别的流控。
 
@@ -543,7 +543,7 @@ DegradeRuleManager.loadRules(List<DegradeRule> rules); // 修改降级规则
 
 我们推荐**通过控制台设置规则后将规则推送到统一的规则中心，客户端实现** `ReadableDataSource` **接口端监听规则中心实时获取变更**，流程如下：
 
-![push-rules-from-dashboard-to-config-center](https://user-images.githubusercontent.com/9434884/45406233-645e8380-b698-11e8-8199-0c917403238f.png)
+![push-rules-from-dashboard-to-config-center](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5ab99305ebd848f1884af98636bdcc00.png)
 
 `DataSource` 扩展常见的实现方式有:
 

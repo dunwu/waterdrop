@@ -39,11 +39,11 @@ permalink: /pages/76e8b6af/
 
 ## 大厂面试题：你不得不掌握的 JVM 内存管理
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjWAPqAuAARqnz6cigo666.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1ba204687bb04839afbcc6c5bcf46466.png)
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjaANruFAAQKxZvgfSs652.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9c3aee1c21244c50849eee8502388283.png)
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4VrjaAIlgaAAJKReuKXII670.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/4a0adfde8c164ae683f5bda6953556b6.png)
 
 ## 大厂面试题：从覆盖 JDK 的类开始掌握类的加载机制
 
@@ -56,7 +56,7 @@ Java 类的完整生命周期包括以下几个阶段：
   - **解析（Resolution）** - 将常量池的符号引用替换为直接引用的过程
 - **初始化（Initialization）** - 为类的静态变量赋予正确的初始值，JVM 负责对类进行初始化，主要对类变量进行初始化
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/CgqCHl9ZjveAemjoAAB4J1dCVDo17.jpeg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5b51a4eb7f2547a6a5a413da73b3fee5.jpeg)
 
 类加载器
 
@@ -69,13 +69,13 @@ Java 类的完整生命周期包括以下几个阶段：
 
 **双亲委派机制** - 除了顶层的启动类加载器以外，其余的类加载器，在加载之前，都会委派给它的父加载器进行加载。
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4cQNeAZ4FuAABzsqSozok762.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2d78286796c14b66a8676220243e1a0c.png)
 
 ## 动手实践：从栈帧看字节码是如何在 JVM 中进行流转的
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/CgpOIF4ezuOAK_6bAACFY5oeX-Y174.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2c669567dcc64a4ca31d5f2e02391dd5.jpg)
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/CgpOIF4ezeKAHVCXAABv7rzSgXE896.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/65ffdffe48df490fa13315218c231608.jpg)
 
 - javap - javap 是 JDK 自带的反解析工具。它的作用是将 .class 字节码文件解析成可读的文件格式。
 
@@ -83,7 +83,7 @@ Java 类的完整生命周期包括以下几个阶段：
 
 ## 大厂面试题：得心应手应对 OOM 的疑难杂症
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4hefWAWKFZAAMwndGjScg437.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a2e5edadbf124c51ad0ec22624f194fe.png)
 
 对象生命周期判断
 
@@ -113,7 +113,7 @@ GC 分代收集：年轻代 GC 使用标记-复制算法；老年代 GC 使用�
 - 老年代：Serial Old、Parallel Old、CMS
 - 元空间：G1、ZGC
 
-![](https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e6%b7%b1%e5%85%a5%e6%b5%85%e5%87%ba%20Java%20%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ae%8c/assets/Cgq2xl4lQuiAHmINAACWihcFScA929.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a0611e2496004dfd987178b0b49b43da.jpg)
 
 GC 收集器配置参数：
 

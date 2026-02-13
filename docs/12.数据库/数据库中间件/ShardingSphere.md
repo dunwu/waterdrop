@@ -138,7 +138,7 @@ DataSource dataSource = ShardingSphereDataSourceFactory.createDataSource(dataSou
 
 按照业务拆分的方式称为垂直分片，又称为纵向拆分，它的核心理念是专库专用。 在拆分之前，一个数据库由多个数据表构成，每个表对应着不同的业务。而拆分之后，则是按照业务将表进行归类，分布到不同的数据库中，从而将压力分散至不同的数据库。 下图展示了根据业务需要，将用户表和订单表垂直分片到不同的数据库的方案。
 
-[![垂直分片](https://shardingsphere.apache.org/document/current/img/sharding/vertical_sharding.png)](https://shardingsphere.apache.org/document/current/img/sharding/vertical_sharding.png)
+![垂直分片](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/ba86ff267ab14c84ab8b670a17da0a38.png)
 
 垂直分片往往需要对架构和设计进行调整。通常来讲，是来不及应对互联网业务需求快速变化的；而且，它也并无法真正的解决单点瓶颈。 垂直拆分可以缓解数据量和访问量带来的问题，但无法根治。如果垂直拆分之后，表中的数据量依然超过单节点所能承载的阈值，则需要水平分片来进一步处理。
 
@@ -146,7 +146,7 @@ DataSource dataSource = ShardingSphereDataSourceFactory.createDataSource(dataSou
 
 水平分片又称为横向拆分。 相对于垂直分片，它不再将数据根据业务逻辑分类，而是通过某个字段（或某几个字段），根据某种规则将数据分散至多个库或表中，每个分片仅包含数据的一部分。 例如：根据主键分片，偶数主键的记录放入 0 库（或表），奇数主键的记录放入 1 库（或表），如下图所示。
 
-[![水平分片](https://shardingsphere.apache.org/document/current/img/sharding/horizontal_sharding.png)](https://shardingsphere.apache.org/document/current/img/sharding/horizontal_sharding.png)
+![水平分片](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/23e2609f722f464a93959fd491afa05d.png)
 
 水平分片从理论上突破了单机数据量处理的瓶颈，并且扩展相对自由，是分库分表的标准解决方案。
 
@@ -183,7 +183,7 @@ SELECT id, name FROM t_user WHERE status = 'ACTIVE' AND age > 18
 
 解析之后的为抽象语法树见下图。
 
-[![SQL抽象语法树](https://shardingsphere.apache.org/document/current/img/sharding/sql_ast.png)](https://shardingsphere.apache.org/document/current/img/sharding/sql_ast.png)
+![SQL抽象语法树](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/eb7a0ab00a394e71b0870d2528ebfeba.png)
 
 为了便于理解，抽象语法树中的关键字的 Token 用绿色表示，变量的 Token 用红色表示，灰色表示需要进一步拆分。
 
@@ -201,7 +201,7 @@ SQL 解析作为分库分表类产品的核心，其性能和兼容性是最重�
 
 第三代 SQL 解析引擎的整体结构划分如下图所示。
 
-[![解析引擎结构](https://shardingsphere.apache.org/document/current/img/sharding/parsing_architecture_cn.png)](https://shardingsphere.apache.org/document/current/img/sharding/parsing_architecture_cn.png)
+![解析引擎结构](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2825a901b6174e77859b0cf16b4c7173.png)
 
 ###
 

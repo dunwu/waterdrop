@@ -71,7 +71,7 @@ Dubbo 框架提供了自定义的高性能 RPC 通信协议：基于 HTTP/2 的 
 
 **Dubbo 框架不绑定任何通信协议，在实现上 Dubbo 对多协议的支持也非常灵活，它可以让你在一个应用内发布多个使用不同协议的服务，并且支持用同一个 port 端口对外发布所有协议。**
 
-![protocols](https://cn.dubbo.apache.org/imgs/v3/feature/protocols/protocol1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/3c1c048fc8c894d6f2aea07e23074b94.png)
 
 Dubbo 官方支持的协议如下：
 
@@ -339,7 +339,7 @@ Dubbo 的整体设计原则如下：
 
 :::
 
-![依赖关系](https://cn.dubbo.apache.org/imgs/dev/dubbo-relation.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8c3083ab757ee3d2c32c1fd8207645e3.jpg)
 
 - 图中小方块 Protocol, Cluster, Proxy, Service, Container, Registry, Monitor 代表层或模块，蓝色的表示与业务有交互，绿色的表示只对 Dubbo 内部交互。
 - 图中背景方块 Consumer, Provider, Registry, Monitor 代表部署逻辑拓扑节点。
@@ -352,7 +352,7 @@ Dubbo 的整体设计原则如下：
 
 展开总设计图的红色调用链，如下：
 
-![总设计图的红色调用链](https://cn.dubbo.apache.org/imgs/dev/dubbo-extension.jpg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/ad3fed30b1e170746da376e75a768ecc.jpg)
 
 > 扩展阅读：[Dubbo 框架设计](https://cn.dubbo.apache.org/zh-cn/docsv2.7/dev/design/)
 
@@ -631,7 +631,7 @@ dubbo.consumer.threads=50
 
 **老的线程池模型**
 
-![消费端线程池.png](https://cn.dubbo.apache.org/imgs/user/consumer-threadpool0.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/61e4e2c87e8af2e7b49bea9f2b6e983f.png)
 
 我们重点关注 Consumer 部分：
 
@@ -642,7 +642,7 @@ dubbo.consumer.threads=50
 
 **当前线程池模型**
 
-![消费端线程池新.png](https://cn.dubbo.apache.org/imgs/user/consumer-threadpool1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5d74f201ca2274883025f736844789ab.png)
 
 1. 业务线程发出请求，拿到一个 `Future` 实例。
 2. 在调用 `future.get()` 之前，先调用 `ThreadlessExecutor.wait()`，`wait` 会使业务线程在一个阻塞队列上等待，直到队列中被加入元素。
@@ -672,7 +672,7 @@ Dubbo 框架的线程模型与以上这五种行为息息相关，Dubbo 协议 P
 
 所有消息都派发到 Dubbo 线程池。
 
-![dubbo-provider-alldispatcher](https://cn.dubbo.apache.org/imgs/v3/feature/performance/threading-model/dubbo-provider-alldispatcher.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/94a98766db934c0d6e2df013bc9225d8.png)
 
 在 IO 线程中执行的操作有：
 
@@ -688,7 +688,7 @@ Dubbo 框架的线程模型与以上这五种行为息息相关，Dubbo 协议 P
 
 所有消息都不派发到 Dubbo 线程池，全部在 IO 线程上直接执行。
 
-![dubbo-provider-directDispatcher](https://cn.dubbo.apache.org/imgs/v3/feature/performance/threading-model/dubbo-provider-directDispatcher.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/009c0bee0095038bc1fd0e09605b78f7.png)
 
 在 IO 线程中执行的操作有：
 
@@ -701,7 +701,7 @@ Dubbo 框架的线程模型与以上这五种行为息息相关，Dubbo 协议 P
 
 只有请求消息派发到 Dubbo 线程池，不含响应，响应和其它连接断开事件，心跳等消息，直接在 IO 线程上执行。
 
-![dubbo-provider-ExecutionDispatcher](https://cn.dubbo.apache.org/imgs/v3/feature/performance/threading-model/dubbo-provider-executionDispatcher.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/622cf02e57f7187b5eba03e7587bb62d.png)
 
 在 IO 线程中执行的操作有：
 
@@ -717,7 +717,7 @@ Dubbo 框架的线程模型与以上这五种行为息息相关，Dubbo 协议 P
 
 在 Provider 端，Message Only Dispatcher 和 Execution Dispatcher 的线程模型是一致的，所以下图和 Execution Dispatcher 的图一致，区别在 Consumer 端。见下方 Consumer 端的线程模型。
 
-![dubbo-provider-ExecutionDispatcher](https://cn.dubbo.apache.org/imgs/v3/feature/performance/threading-model/dubbo-provider-executionDispatcher.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/622cf02e57f7187b5eba03e7587bb62d.png)
 
 在 IO 线程中执行的操作有：
 
@@ -731,7 +731,7 @@ Dubbo 框架的线程模型与以上这五种行为息息相关，Dubbo 协议 P
 
 **Connection Ordered Dispatcher**
 
-![dubbbo-provider-connectionOrderedDispatcher](https://cn.dubbo.apache.org/imgs/v3/feature/performance/threading-model/dubbbo-provider-connectionOrderedDispatcher.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/cd78c3b29e1e6ee8fa37018b8305c527.png)
 
 在 IO 线程中执行的操作有：
 
@@ -862,7 +862,7 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 
 **时间轮是一种高效的、批量管理定时任务的调度模型**。时间轮可以理解为一种环形结构，像钟表一样被分为多个 slot 槽位。每个 slot 代表一个时间段，每个 slot 中可以存放多个任务，使用的是链表结构保存该时间段到期的所有任务。时间轮通过一个时针随着时间一个个 slot 转动，并执行 slot 中的所有到期任务。
 
-![图片 22.png](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Netty%20%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%E4%B8%8E%20RPC%20%E5%AE%9E%E8%B7%B5-%E5%AE%8C/assets/CgpVE1_okKiAGl0gAAMLshtTq-M933.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2e5b382ae18f4b4db3d3b46baef3c09f.png)
 
 任务是如何添加到时间轮当中的呢？可以根据任务的到期时间进行取模，然后将任务分布到不同的 slot 中。如上图所示，时间轮被划分为 8 个 slot，每个 slot 代表 1s，当前时针指向 2。假如现在需要调度一个 3s 后执行的任务，应该加入 `2+3=5` 的 slot 中；如果需要调度一个 12s 以后的任务，需要等待时针完整走完一圈 round 零 4 个 slot，需要放入第 `(2+12)%8=6` 个 slot。
 
@@ -893,7 +893,7 @@ Dubbo 的架构设计采用**微内核+插件**架构，高度支持可扩展。
 
 基于扩展点，用户完全可以基于自身需求，替换 Dubbo 原生实现，来满足自身业务需求。
 
-![Admin 效果图](https://cn.dubbo.apache.org/imgs/v3/advantages/extensibility.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/adef4371aa9c9d96fe70d7f62f3c94f4.png)
 
 - **协议与编码扩展**。通信协议、序列化编码协议等
 - **流量管控扩展**。集群容错策略、路由规则、负载均衡、限流降级、熔断策略等
@@ -906,7 +906,7 @@ Dubbo 的架构设计采用**微内核+插件**架构，高度支持可扩展。
 
 Dubbo 调用链路中几乎所有核心节点都被定义为扩展点。
 
-![extensibility-echosystem.png](https://cn.dubbo.apache.org/imgs/v3/feature/extensibility/arc.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d3918cf36757d08234dfb8f2d0c952fe.png)
 
 以上是按架构层次划分的 Dubbo 内的一些核心扩展点定义及实现，可以从三个层次来展开：
 
@@ -915,13 +915,13 @@ Dubbo 调用链路中几乎所有核心节点都被定义为扩展点。
 - **Protocol** - Protocol 定义了 RPC 协议，利用这个扩展点可以实现灵活切换通信协议。Dubbo 官方提供了 Triple、gRPC、Dubbo2、REST 等 RPC 协议。
 - **Serialization** - Serialization 定义了序列化协议，利用这个扩展点可以实现灵活切换序列化协议。Dubbo 官方提供了 Fastjson、Protobuf、Hessian2、Kryo、FST 等序列化协议。
 
-![协议与编码原理图](https://cn.dubbo.apache.org/imgs/v3/feature/extensibility/protocol.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e2cf9665223a5e7319bd70981a524707.png)
 
 **（2）流量管控层**
 
 Dubbo 在服务调用链路上预置了大量扩展点，通过这些扩展点用户可以控制运行态的流量走向、改变运行时调用行为等，包括 Dubbo 内置的一些负载均衡策略、流量路由策略、超时等很多流量管控能力都是通过这类扩展点实现的。
 
-![协议与编码原理图](https://cn.dubbo.apache.org/imgs/v3/feature/extensibility/traffic.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/01d95c36219317c145e871816ebcedb1.png)
 
 - **Filter** - Filter 流量拦截器是 Dubbo 服务调用之上的 AOP 设计模式，Filter 用来对每次服务调用做一些预处理、后处理动作，使用 Filter 可以完成访问日志、加解密、流量统计、参数验证等任务，Dubbo 中的很多生态适配如限流降级 Sentinel、全链路追踪 Tracing 等都是通过 Fitler 扩展实现的。Filter 以链式串联工作，彼此独立。
   - 从消费端视角，它在请求发起前基于请求参数等做一些预处理工作，在接收到响应后，对响应结果做一些后置处理；
@@ -933,7 +933,7 @@ Dubbo 在服务调用链路上预置了大量扩展点，通过这些扩展点�
 
 Dubbo3 由注册中心 （服务发现）、配置中心和元数据中心构成了整个服务治理的核心。
 
-![服务治理架构图](https://cn.dubbo.apache.org/imgs/v3/concepts/threecenters.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/bf23f10b1dbef16081a65716935ca0a5.png)
 
 Dubbo 很多服务治理的核心能力都是通过上图描述的几个关键组件实现的。用户通过控制面或者 Admin 下发的各种规则与配置、各类微服务集群状态的展示等都是直接与注册中心、配置中心和元数据中心交互。在具体实现或者部署上，注册中心、配置中心和元数据中心可以是同一组件，比如 Zookeeper 可同时作为注册、配置和元数据中心，Nacos 也是如此。因此，三个中心只是从架构职责上的划分，你甚至可以用同一个 Zookeeper 集群来承担所有三个职责，只需要在应用里将他们设置为同一个集群地址就可以了。
 

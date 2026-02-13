@@ -184,7 +184,7 @@ MongoDB 负载均衡器是一个后台进程，用于监控每个分片集合的
 
 [分片集群](https://www.mongodb.com/zh-cn/docs/manual/reference/glossary/#std-term-sharded-cluster) 的均衡过程对用户和应用程序层是完全透明的，不过在执行过程中可能会对性能产生一些影响。
 
-![Diagram of a collection distributed across three shards. For this collection, the difference in the number of chunks between the shards reaches the *migration thresholds* (in this case, 2) and triggers migration.](https://www.mongodb.com/zh-cn/docs/manual/images/sharding-migrating.bakedsvg.svg)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/06db31bec799465b9fae7c899699decb.svg)
 
 负载均衡器在配置服务器副本集 (CSRS) 的主节点上运行。
 

@@ -29,7 +29,7 @@ K8S 主控组件（Master） 包含三个进程，都运行在集群中的某个
 
 ### K8S 功能
 
-![](https://www.opsramp.com/wp-content/uploads/2022/07/Kubernetes-Architecture.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e2661a03da6347e9a4ef02a8d86665e4.png)
 
 - 基于容器的应用部署、维护和滚动升级
 - 负载均衡和服务发现
@@ -51,7 +51,7 @@ Kubernetes 主要由以下几个核心组件组成：
 - Container runtime 负责镜像管理以及 Pod 和容器的真正运行（CRI）；
 - kube-proxy 负责为 Service 提供 cluster 内部的服务发现和负载均衡
 
-![](https://www.opsramp.com/wp-content/uploads/2022/07/Kubernetes-Architecture.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/36e20edbf9c545d2b7c7aacb98afe311.png)
 
 ### K8S 核心概念
 

@@ -38,8 +38,6 @@ permalink: /pages/b27a3029/
 
 单击侧面导航栏中的 `检索（Discover）` ，可以显示 `Kibana` 的数据查询功能功能。
 
-![](https://www.elastic.co/guide/en/kibana/current/images/tutorial-discover.png)
-
 在搜索栏中，您可以输入 Elasticsearch 查询条件来搜索您的数据。您可以在 `Discover` 页面中浏览结果并在 `Visualize` 页面中创建已保存搜索条件的可视化。
 
 当前索引模式显示在查询栏下方。索引模式确定提交查询时搜索哪些索引。要搜索一组不同的索引，请从下拉菜单中选择不同的模式。要添加索引模式（index pattern），请转至 `Management/Kibana/Index Patterns` 并单击 `Add New`。
@@ -48,7 +46,7 @@ permalink: /pages/b27a3029/
 
 默认情况下，每个匹配文档都显示所有字段。要选择要显示的文档字段，请将鼠标悬停在“可用字段”列表上，然后单击要包含的每个字段旁边的添加按钮。例如，如果只添加 account_number，则显示将更改为包含五个帐号的简单列表：
 
-![](https://www.elastic.co/guide/en/kibana/6.1/images/tutorial-discover-3.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8adebfe9f2ac4090aa69838bd748daaf.png)
 
 kibana 的搜索栏遵循 [query-string-syntax](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax) 文档中所说明的查询语义。
 
@@ -284,11 +282,9 @@ status:(active OR pending) title:(full text search)^2
 
 Visualize 工具使您能够以多种方式（如饼图、柱状图、曲线图、分布图等）查看数据。要开始使用，请点击蓝色的 `Create a visualization` 或 `+` 按钮。
 
-![https://www.elastic.co/guide/en/kibana/6.1/images/tutorial-visualize-landing.png](https://www.elastic.co/guide/en/kibana/6.1/images/tutorial-visualize-landing.png)
-
 有许多可视化类型可供选择。
 
-![https://www.elastic.co/guide/en/kibana/6.1/images/tutorial-visualize-wizard-step-1.png](https://www.elastic.co/guide/en/kibana/6.1/images/tutorial-visualize-wizard-step-1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a5de15a008394397be18293e3ec56eea.png)
 
 下面，我们来看创建几个图标示例：
 
@@ -298,7 +294,7 @@ Visualize 工具使您能够以多种方式（如饼图、柱状图、曲线图�
 
 默认搜索匹配所有文档。最初，一个“切片”包含整个饼图：
 
-![https://www.elastic.co/guide/en/kibana/6.1/images/tutorial-visualize-pie-1.png](https://www.elastic.co/guide/en/kibana/6.1/images/tutorial-visualize-pie-1.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b7ac8d6fa45848c5830b8375280cdafc.png)
 
 要指定在图表中展示哪些数据，请使用 Elasticsearch 存储桶聚合。分组汇总只是将与您的搜索条件相匹配的文档分类到不同的分类中，也称为分组。
 
@@ -307,9 +303,9 @@ Visualize 工具使您能够以多种方式（如饼图、柱状图、曲线图�
 1. 单击 `Split Slices`。
 2. 在 `Aggregation` 列表中选择 `Terms`。_注意：这里的 Terms 是 Elk 采集数据时定义好的字段或标签_。
 3. 在 `Field` 列表中选择 `level.keyword`。
-4. 点击 ![images/apply-changes-button.png](https://www.elastic.co/guide/en/kibana/6.1/images/apply-changes-button.png) 按钮来更新图表。
+4. 点击 ![images/apply-changes-button.png](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7a0e180b70474d468105ae67ec0f1fb2.png) 按钮来更新图表。
 
-![image.png](https://upload-images.jianshu.io/upload_images/3101171-7fb2042dc6d59520.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/03aa28fa9f32425493f227a127b7b521.png)
 
 完成后，如果想要保存这个图表，可以点击页面最上方一栏中的 `Save` 按钮。
 
@@ -321,9 +317,9 @@ Visualize 工具使您能够以多种方式（如饼图、柱状图、曲线图�
 2. 选择索引模式。由于您尚未定义任何 bucket ，因此您会看到一个大栏，显示与默认通配符查询匹配的文档总数。
 3. 指定 Y 轴所代表的字段
 4. 指定 X 轴所代表的字段
-5. 点击 ![images/apply-changes-button.png](https://www.elastic.co/guide/en/kibana/6.1/images/apply-changes-button.png) 按钮来更新图表。
+5. 点击 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5f92e4c11ce9b611ecaca74004e5c4bb.png) 按钮来更新图表。
 
-![image.png](https://upload-images.jianshu.io/upload_images/3101171-5aa7627284c19a56.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b6dc9e3ff8c94fb2bd20a3c22b0a9ecf.png)
 
 完成后，如果想要保存这个图表，可以点击页面最上方一栏中的 `Save` 按钮。
 
