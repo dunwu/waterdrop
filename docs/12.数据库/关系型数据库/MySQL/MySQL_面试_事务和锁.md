@@ -61,6 +61,8 @@ ACID 是数据库事务正确执行的四个基本要素。
 - **主从延迟问题**：主库执行时间长，从库同步及重放耗时增加，导致主从数据长时间不一致。
 - **回滚效率低下**：长事务执行中途失败时，回滚操作会浪费已执行的资源与时间，影响系统效率。
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/0b68ef2fd7a05245953cffc428ffd71f.jpg)
+
 ### 【中等】事务存在哪些并发一致性问题？⭐⭐⭐
 
 事务中存在的并发一致性问题有：
@@ -128,6 +130,8 @@ MySQL 中的事务功能是在存储引擎层实现的，**并非所有存储引
 
 **大部分数据库的默认隔离级别是“读已提交”**。然而，**InnoDB 的默认隔离级别是“可重复读”**。这是为了兼容早期 binlog 的 statement 格式问题。如果使用可重复读以下的隔离级别，使用了 statement 格式的 binlog 会产生主从数据不一致的问题。
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/b113486a47132ec91decc2bf71e9ef3b.png)
+
 此外，**在 InnoDB 中，可重复读隔离级别虽然不能解决幻读，但是可以很大程度的避免幻读的发生**。根据不同的查询方式，分别提出了避免幻读的方案：
 
 - 针对**快照读**（普通 `select` 语句），**通过 MVCC 方式解决了幻读**，因为可重复读隔离级别下，事务执行过程中看到的数据，一直跟这个事务启动时看到的数据是一致的，即使中途有其他事务插入了一条数据，是查询不出来这条数据的，所以就很好了避免幻读问题。
@@ -137,6 +141,8 @@ MySQL 中的事务功能是在存储引擎层实现的，**并非所有存储引
 
 - 对于快照读，MVCC 并不能完全避免幻读现象。因为当事务 A 更新了一条事务 B 插入的记录，那么事务 A 前后两次查询的记录条目就不一样了，所以就发生幻读。
 - 对于当前读，如果事务开启后，并没有执行当前读，而是先快照读，然后这期间如果其他事务插入了一条记录，那么事务后续使用当前读进行查询的时候，就会发现两次查询的记录条目就不一样了，所以就发生幻读。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/897fd1908dfc6cfb76bbf975f3786823.jpg)
 
 ### 【困难】MySQL 是如何实现事务的？⭐⭐
 
@@ -148,6 +154,8 @@ MySQL 主要是通过 **锁**、**Redo Log** 、**Undo Log**、**MVCC** 来实�
 - **MVCC（多版本并发控制）**，满足了非锁定读的需求，提高了并发度，**实现了读已提交和可重复读两种隔离级别**，实现了事务的隔离性。
 
 事务实现了原子性、隔离性和持久性特性后，本身就达到了一致性的目的。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/4c4798505c68a88797532bba7d4fac3e.jpg)
 
 ### 【困难】事务的二阶段提交是什么？⭐
 
@@ -304,6 +312,14 @@ MySQL InnoDB 引擎的默认隔离级别虽然是“可重复读”，但是它�
 - 针对**快照读**（普通 `SELECT` 语句），**通过 MVCC 方式解决了幻读**，因为可重复读隔离级别下，事务执行过程中看到的数据，一直跟这个事务启动时看到的数据是一致的，即使中途有其他事务插入了一条数据，是查询不出来这条数据的，所以就很好了避免幻读问题。
 - 针对**当前读**（`SELECT ... FOR UPDATE` 等语句），**通过 Next-Key Lock（记录锁+间隙锁）方式解决了幻读**，因为当执行 `SELECT ... FOR UPDATE` 语句的时候，会加上 Next-Key Lock，如果有其他事务在 Next-Key Lock 锁范围内插入了一条记录，那么这个插入语句就会被阻塞，无法成功插入，所以就很好的避免了幻读问题。
 
+### 【困难】二级索引有 MVCC 快照吗？
+
+二级索引没有 MVCC 快照。
+
+因为二级索引只存储了索引列值和主键，不包含隐式字段 `trx_id` 和 `roll_ptr`。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/62577754b68fa48038abc660d6f49cd2.jpg)
+
 ### 【困难】各事务隔离级别是如何实现的？⭐⭐
 
 四种隔离级别具体是如何实现的呢？
@@ -329,6 +345,8 @@ MySQL InnoDB 引擎的默认隔离级别虽然是“可重复读”，但是它�
 ### 【中等】MySQL 中有哪些锁？⭐⭐⭐
 
 为了解决并发一致性问题，MySQL 支持了很多种锁来实现不同程度的隔离性，以保证数据的安全性。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/db24af908dcf1dea85e186d78c6050da.jpg)
 
 ::: info 独享锁和共享锁
 :::
@@ -370,6 +388,8 @@ MySQL InnoDB 引擎的默认隔离级别虽然是“可重复读”，但是它�
   - 实现方式：**使用数据库中的锁机制**。
 - **乐观锁**：假设最好的情况——每次访问数据时，都假设数据不会被其他线程修改，不必加锁。只在更新的时候，判断一下在此期间是否有其他线程更新该数据。
   - 实现方式：**更新数据时，先使用版本号机制或 CAS 算法检查数据是否被修改**。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/04573c5c2bc7e8709a4c84581d0f7c15.jpg)
 
 > 为什么要引入乐观锁？
 
@@ -466,6 +486,8 @@ UNLOCK TABLES;
 ::: info 行级锁
 :::
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a890b2dc69207891ec7cd3613b903d65.jpg)
+
 （1）**记录锁**
 
 **记录锁（Record Lock）**：锁定索引中的**单条记录**。
@@ -542,3 +564,5 @@ INSERT INTO users VALUES (15, 'John');
 - **设置事务等待锁的超时时间**。这个超时时间可以通过参数 `innodb_lock_wait_timeout` 来设置。
 - **开启死锁检测**，发现死锁后，主动回滚死锁链条中的某一个事务，让其他事务得以继续执行。将参数 `innodb_deadlock_detect` 设置为 `on`，表示开启这个逻辑。
 - 手动 Kill：通过 `show engine innodb status` 获取死锁的日志信息，从而定位到死锁发生原因；快速找出被阻塞的事务及其线程 ID，手动 Kill。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/c0d512530fe9bf98fe0ec950f0d75cdd.png)

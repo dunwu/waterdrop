@@ -41,6 +41,8 @@ permalink: /pages/c3b86217/
 - **索引需要占用额外的物理空间**，除了数据表占数据空间之外，每一个索引还要占一定的物理空间，如果要建立联合索引那么需要的空间就会更大。
 - **写操作（`INSERT`/`UPDATE`/`DELETE`）时很可能需要更新索引，导致数据库的写操作性能降低**。
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/9ee51f31d3c6e04d68f09c944f76e8c2.jpg)
+
 ### 【中等】何时适用索引？何时不适用索引？⭐
 
 - **索引不是越多越好，不要为所有列都创建索引**。要考虑到索引的维护代价、空间占用和查询时回表的代价。索引一定是按需创建的，并且要尽可能确保足够轻量。一旦创建了多字段的联合索引，我们要考虑尽可能利用索引本身完成数据查询，减少回表的成本。
@@ -63,6 +65,8 @@ permalink: /pages/c3b86217/
   - 数据量大时，无法用内存排序，只能利用磁盘文件排序，速度很慢。
   - 数据页默认 16KB，存储数据有限，超出范围，需要扫描多次 I/O。
   - 这种类型的数据如果有查询需求，应考虑使用 ES 来进行全文检索。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/e85cc1c8c76c20434a58767edd7b1352.jpg)
 
 ### 【中等】哪些情况下，索引会失效？⭐⭐⭐
 
@@ -97,6 +101,8 @@ permalink: /pages/c3b86217/
   - ❌ `WHERE age NOT IN (18, 20)`
   - ❌ `WHERE phone IS NULL`
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/3899e4a66b13819ebe9ae2b44c860cd9.jpg)
+
 ### 【简单】索引有哪些分类？⭐
 
 MySQL 索引可以从以下四个维度来分类：
@@ -105,6 +111,8 @@ MySQL 索引可以从以下四个维度来分类：
 - 按【**物理存储**】分类：**聚簇索引、二级索引（辅助索引）**
 - 按【**字段特性**】分类：**主键索引、唯一索引 、普通索引、前缀索引**
 - 按【**字段个数**】分类：**单列索引、联合索引（复合索引、组合索引）**
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d90430f3fd786016612516d8ffa59992.jpg)
 
 ### 【简单】= 和 in 的顺序对于命中索引是否有影响？⭐
 
@@ -145,6 +153,8 @@ MySQL 索引的常见数据结构：
 InnoDB 选择 B+ 树，是其在**磁盘 I/O 效率**、**范围查询**、**稳定性**和**空间利用率**之间取得的最佳平衡。它特别适合处理数据库这种数据量巨大、且查询模式复杂（大量范围查询、排序、分组）的场景。
 
 即使现在 SSD 越来越普及，其随机读写性能远超 HDD，但减少 I/O 次数的核心思想依然没有变（SSD 的随机读写仍慢于顺序读写，且存在写入放大等问题），因此 B+ 树依然是数据库索引的黄金标准。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/40a8c237dfaf6980d31db0e3506dee4d.jpg)
 
 **减少磁盘 I/O 次数，提高查询效率**
 
@@ -262,7 +272,7 @@ InnoDB 选择 B+ 树，是其在**磁盘 I/O 效率**、**范围查询**、**稳
 - 如果语句是 `select * from T where ID=500`，即聚簇索引查询方式，则只需要搜索主键索引树；
 - 如果语句是 `select * from T where k=5`，即非聚簇索引查询方式，则需要先搜索 k 索引树，得到 ID 的值为 500，再到 ID 索引树搜索一次。这个过程称为**回表**。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/17c02829c9994728876f6f7ce13f9af7.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/4005dfde71c305ce8582fb75d39af71b.png)
 
 也就是说，**基于非聚簇索引的查询需要多扫描一棵索引树**。因此，我们在应用中应该尽量使用主键查询。
 
@@ -273,6 +283,8 @@ InnoDB 选择 B+ 树，是其在**磁盘 I/O 效率**、**范围查询**、**稳
 **覆盖索引是指：二级索引上的信息满足查询所需的所有字段，不需要回表查询聚簇索引上的数据**。
 
 **由于覆盖索引可以减少树的搜索次数，显著提升查询性能，所以使用覆盖索引是一个常用的性能优化手段**。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/0b794ae081e728860a8502f735141b08.jpg)
 
 ## 字段特性索引
 
@@ -358,6 +370,8 @@ InnoDB 在全局维护一个 `dict_sys.row_id` 值。每次插入一行数据时
 
 前缀索引的缺点是**会降低索引的区分度**。此外，**`order by` 无法使用前缀索引，无法把前缀索引用作覆盖索引**。
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/055ec579b24d6266083f6319742f55cc.png)
+
 ## 字段个数索引
 
 ### 【中等】什么是索引最左匹配原则？⭐⭐⭐
@@ -406,6 +420,8 @@ InnoDB 在全局维护一个 `dict_sys.row_id` 值。每次插入一行数据时
 - 综上，包含子查询，索引下推可能不会生效。
 - 使用函数或表达式时，索引下推不会生效。
 - 使用聚簇索引（主键）查询时，索引下推不会生效，因为它主要针对非聚簇索引。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/af5d396473614dc5c5e9d5afd602971d.jpg)
 
 > 扩展阅读：https://zhuanlan.zhihu.com/p/121084592
 
