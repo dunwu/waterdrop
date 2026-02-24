@@ -5,7 +5,7 @@ cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020
 date: 2020-07-13 17:03:42
 categories:
   - 数据库
-  - KV数据库
+  - KV 数据库
   - Redis
 tags:
   - 数据库
@@ -137,6 +137,7 @@ permalink: /pages/9145dbc8/
 - **List 类型**：列表对象的编码可以是 `ziplist` 或者 `linkedlist`。当列表对象可以同时满足以下两个条件时，列表对象使用 `ziplist` 编码；否则，使用 `linkedlist` 编码。
   - 列表对象保存的所有字符串元素的长度都小于 `64` 字节；
   - 列表对象保存的元素数量小于 `512` 个；
+    ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/3b6b3d715f35b4468490e74166dfe03d.jpg)
 - **Hash 类型**：哈希对象的编码可以是 `ziplist` 或者 `hashtable`。当哈希对象同时满足以下两个条件时，使用 `ziplist` 编码；否则，使用 `hashtable` 编码。
   - 哈希对象保存的所有键值对的键和值的字符串长度都小于 `64` 字节；
   - 哈希对象保存的键值对数量小于 `512` 个；
@@ -150,6 +151,8 @@ permalink: /pages/9145dbc8/
 ### 【困难】Redis 为什么用 `listpack` 替代 `ziplist`？
 
 **`listpack` 是 Redis 5.0 引入的优化结构，用来替代 `ziplist`**，作为 `hash`、`list`、`zset` 数据类型的实现编码之一。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/708ef46c4a15dadd46c785b46453e157.png)
 
 二者对比如下：
 
@@ -326,6 +329,10 @@ Redis 会在初始化服务器时， 共享值为 `0` 到 `9999`
 如果服务器打开了 `maxmemory` 选项， 并且服务器用于回收内存的算法为 `volatile-lru` 或者 `allkeys-lru` ， 那么当服务器占用的内存数超过了 `maxmemory` 选项所设置的上限值时， 空转时长较高的那部分键会优先被服务器释放， 从而回收内存。
 
 ## Redis 基础应用
+
+### 【中等】如何使用 Redis 实现队列/栈？
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/ea7a136e3f7e985cd630c3b0f6dafc86.jpg)
 
 ### 【中等】如何使用 Redis 实现排行榜？⭐⭐
 
