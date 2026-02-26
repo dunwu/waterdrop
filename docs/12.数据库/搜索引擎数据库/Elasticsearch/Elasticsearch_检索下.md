@@ -1,6 +1,6 @@
 ---
 icon: logos:elasticsearch
-title: Elasticsearch 搜索（下）
+title: Elasticsearch 检索（下）
 date: 2022-01-18 08:01:08
 categories:
   - 数据库
@@ -10,12 +10,11 @@ tags:
   - 数据库
   - 搜索引擎数据库
   - Elasticsearch
-  - 查询
-  - DSL
+  - 检索
 permalink: /pages/99c78958/
 ---
 
-# Elasticsearch 搜索（下）
+# Elasticsearch 检索（下）
 
 Elasticsearch 提供了基于 JSON 的 DSL（Domain Specific Language）来定义查询。
 

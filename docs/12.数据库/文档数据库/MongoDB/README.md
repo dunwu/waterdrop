@@ -32,7 +32,7 @@ MongoDB 最大的特点是它支持的查询语言非常强大，其语法有点
 
 ## 📖 内容
 
-- [MongoDB 简介](MongoDB_简介.md)
+- [MongoDB 概述](MongoDB_概述.md)
 - [MongoDB CRUD](MongoDB_CRUD.md)
 - [MongoDB 聚合](MongoDB_聚合.md)
 - [MongoDB 索引](MongoDB_索引.md)

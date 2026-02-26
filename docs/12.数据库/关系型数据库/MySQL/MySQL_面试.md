@@ -4,6 +4,7 @@ title: MySQL 面试
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2020-09-12 10:43:53
 categories:
+
   - 数据库
   - 关系型数据库
   - MySQL
@@ -339,7 +340,7 @@ https://www.cnblogs.com/eiffelzero/p/18608160
 - `DELETE` 删除数据，但保留表结构。执行 DELETE 后，空间大小不会立刻变化。这是因为，DLETE 操作实际上只是标记，被写入 biglog、redo log 和 undo log。
 - `TRUNCATE` 会删除全部表数据，且不会记录日志，因此无法回滚。`TRUNCATE` 执行后，自增主键重新从 1 开始。
 
-## MySQL 数据类型
+## MySQL 建模
 
 ::: tip 扩展
 
@@ -458,6 +459,29 @@ ALTER TABLE test CONVERT TO CHARSET utf8mb4;
 为了优化 TIMESTAMP 的使用，强烈建议使用显式的时区，而不是操作系统时区。比如在配置文件中显示地设置时区，而不要使用系统时区
 
 综上，由于 `TIMESTAMP` 存在时间上限和潜在性能问题，所以推荐使用 `DATETIME` 类型来存储时间字段。
+
+### 【简单】MySQL一张表最多可以有多少列？
+
+**理论上限 4096 列**，但实际受存储引擎制约——**InnoDB 引擎最多 1017 列**。
+
+**InnoDB 行格式差异**
+
+| 行格式         | 特点                 | 适用场景             |
+| :------------- | :------------------- | :------------------- |
+| **REDUNDANT**  | 768字节前缀          | 旧版本兼容           |
+| **COMPACT**    | 768字节前缀          | 5.0-5.7默认          |
+| **DYNAMIC**    | **仅20字节指针**     | **当前默认**（通用） |
+| **COMPRESSED** | 20字节指针，支持压缩 | 节省磁盘空间         |
+
+### 【中等】MySQL 在建表时需要注意什么？
+
+**建表决定命运——类型、主键、字符集、索引、约束，五大要点决定生死**。
+
+- 字段类型：够用就好：能用TINYINT不用INT，能用数字不用字符串，金额必须DECIMAL。
+- 主键设计：必须自增：必须有主键，最好BIGINT自增，严禁UUID（随机插入毁性能）。
+- 字符集：唯一选择utf8mb4：千万别用utf8，它存不了emoji。
+- 约束：能加就加：尽量NOT NULL，合理DEFAULT，必要UNIQUE。
+- 索引：精准打击：区分度高的放联合索引前面，单表不超过5个，避免冗余。
 
 ## MySQL 存储
 
@@ -584,8 +608,6 @@ Change Buffer 是一种特殊的内存数据结构，用于缓存对**非唯一�
 - `innodb_change_buffering`：指定缓冲的变更类型（all/none/inserts/deletes 等）
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8d46210ed8cde0f0744e3899216c58e4.png)
-
-## MySQL 日志
 
 ### 【简单】MySQL 有哪些类型的日志？
 
@@ -778,6 +800,19 @@ MySQL 5.7 引入了半同步复制：主库只需等待**至少 N 个从库**（
 
 ## MySQL 架构
 
+### 【简单】什么是 CDC（Change Data Capture）？
+
+CDC 即实时捕获数据库中的数据变更（增删改），并同步到其他系统。
+
+常见 CDC 工具：
+
+| 工具          | 支持数据库                   | 特点                           | 适用场景           | 记忆点         |
+| :------------ | :--------------------------- | :----------------------------- | :----------------- | :------------- |
+| **Canal**     | MySQL                        | 阿里开源，Java生态，解析binlog | MySQL→Kafka/ES     | "阿里运河"     |
+| **Debezium**  | MySQL, PG, MongoDB, Oracle等 | Kafka原生集成，云原生友好      | 全场景、Kafka生态  | "数据瑞士军刀" |
+| **Flink CDC** | MySQL, PG, Oracle等          | 基于Flink，支持Exactly-Once    | 实时计算、数据集成 | "流式计算CDC"  |
+| **Maxwell**   | MySQL                        | 轻量级，输出JSON               | 简单MySQL同步      | "轻量小工具"   |
+
 ### 【中等】SQL 查询语句的执行顺序是怎么样的？
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/06/710bd42c250f49ada0796d8a59d976b0.jpg)
@@ -834,6 +869,8 @@ MySQL 整个查询执行过程，总的来说分为 6 个步骤：
 
 用 explain 命令查看执行计划时，Extra 这个字段中的“Using filesort”表示的就是需要排序。
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/2b91f83cf74e02c165defabea246cdc1.png)
+
 ::: info 全字段排序
 :::
 
@@ -850,8 +887,6 @@ select city,name,age from t where city='杭州' order by name limit 1000;
 - 对 `sort_buffer` 中的数据按照排序字段进行排序。
 - 返回排序后的结果。
 
-![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/1d5a380080ae4a8e8a6ab59701ba0c2a.png)
-
 **内存与磁盘排序**：
 
 - 如果排序数据量小于 `sort_buffer_size`，排序在内存中完成。
@@ -866,8 +901,6 @@ select city,name,age from t where city='杭州' order by name limit 1000;
   - 当单行数据过大时，MySQL 会采用 `rowid` 排序，只将排序字段（如 `name`）和主键 `id` 放入 `sort_buffer`。
   - 排序完成后，根据 `id` 回表查询其他字段（如 `city`、`age`）。
 - **性能影响**：`rowid` 排序减少了 `sort_buffer` 的内存占用，但增加了回表操作，导致更多的磁盘 I/O。
-
-![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/07/40b5efca71a04ddfa9a9d659d808f32a.png)
 
 ::: info 全字段排序 VS rowid 排序
 :::

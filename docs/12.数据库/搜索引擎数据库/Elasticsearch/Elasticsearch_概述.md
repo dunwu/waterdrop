@@ -1,6 +1,6 @@
 ---
 icon: logos:elasticsearch
-title: Elasticsearch 简介
+title: Elasticsearch 概述
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/f769820186fe432da503bb095aec7817.png
 date: 2020-06-16 07:10:44
 categories:
@@ -14,7 +14,7 @@ tags:
 permalink: /pages/6a251952/
 ---
 
-# Elasticsearch 简介
+# Elasticsearch 概述
 
 ::: info 概述
 
@@ -144,7 +144,7 @@ ES 核心概念 vs. DB 核心概念：
 
 Elastic Stack 通常被用来作为日志采集、检索、可视化的解决方案。
 
-![ELK](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/ec41500c0b614c4db5245a202c266967.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/ec41500c0b614c4db5245a202c266967.png)
 
 Elastic Stack 也常被称为 ELK，这是 Elastic 公司旗下三款产品 [Elasticsearch](https://www.elastic.co/elasticsearch) 、[Logstash](https://www.elastic.co/products/logstash) 、[Kibana](https://www.elastic.co/kibana) 的首字母组合。
 
@@ -156,7 +156,7 @@ Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](
 
 此外，基于 Elastic Stack，其技术生态还可以和一些主流的分布式中间件进行集成，以应对各种不同的场景。
 
-![Elastic Stack](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/afa56f3c9bcf4f23b6c77dfd65c4eff8.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/afa56f3c9bcf4f23b6c77dfd65c4eff8.png)
 
 ## 参考资料
 

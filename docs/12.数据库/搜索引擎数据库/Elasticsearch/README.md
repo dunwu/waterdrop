@@ -28,12 +28,12 @@ Elasticsearch 是一个基于 Lucene 的搜索和数据分析工具，它提供�
 
 ## 📖 内容
 
-- [Elasticsearch 简介](Elasticsearch_简介.md)
+- [Elasticsearch 概述](Elasticsearch_概述.md)
+- [Elasticsearch 建模](Elasticsearch_建模.md)
 - [Elasticsearch CRUD](Elasticsearch_CRUD.md)
-- [Elasticsearch Mapping](Elasticsearch_Mapping.md)
 - [Elasticsearch 存储](Elasticsearch_存储.md)
-- [Elasticsearch 搜索（上）](Elasticsearch_搜索上.md)
-- [Elasticsearch 搜索（下）](Elasticsearch_搜索下.md)
+- [Elasticsearch 检索（上）](Elasticsearch_检索上.md)
+- [Elasticsearch 检索（下）](Elasticsearch_检索下.md)
 - [Elasticsearch 聚合](Elasticsearch_聚合.md)
 - [Elasticsearch 分析](Elasticsearch_分析.md)
 - [Elasticsearch 集群](Elasticsearch_集群.md)

@@ -1,6 +1,6 @@
 ---
 icon: logos:mysql
-title: MySQL 简介
+title: MySQL 概述
 cover: https://www.ovhcloud.com/sites/default/files/styles/large_screens_1x/public/2021-09/ECX-1909_Hero_MySQL_600x400%402x-1.webp
 date: 2025-03-13 08:05:53
 categories:
@@ -14,7 +14,7 @@ tags:
 permalink: /pages/eee00d6e/
 ---
 
-# MySQL 简介
+# MySQL 概述
 
 ::: info 概述
 

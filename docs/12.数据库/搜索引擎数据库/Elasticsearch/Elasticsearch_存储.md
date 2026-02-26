@@ -113,7 +113,7 @@ Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分�
 
 Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。简单来说，Lucene 就是一个 jar 包，里面包含了封装好的构建、管理倒排索引的算法代码。
 
-![Elasticsearch 物理存储](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/7fa4076e4ae24f63a6b8273c5cc10923.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/7fa4076e4ae24f63a6b8273c5cc10923.png)
 
 ## 倒排索引
 
@@ -138,9 +138,9 @@ Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索�
 
 除了要保存词项与 ID 的关系外，还需要保存这个词项在对应文档出现的位置、偏移量等信息，这是因为很多检索的场景中还需要判断关键词前后的内容是否符合搜索要求。
 
-![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/b3880af0bf2e4b29a35afb04c43ec5c9.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/b3880af0bf2e4b29a35afb04c43ec5c9.png)
 
-![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/06025626fc6148708b30ba20e7b157f3.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/06025626fc6148708b30ba20e7b157f3.png)
 
 有了倒排索引，搜索引擎可以很方便地响应用户的查询。比如用户输入查询 `明月`，搜索系统查找倒排索引，从中读出包含这个单词的文档，这些文档就是提供给用户的搜索结果。
 

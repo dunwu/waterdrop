@@ -1,6 +1,6 @@
 ---
 icon: logos:mysql
-title: MySQL 存储引擎
+title: MySQL 存储
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/216d3b9a363c44cba8954de9f8e8ba01.webp
 date: 2020-07-13 10:08:37
 categories:
@@ -11,12 +11,12 @@ tags:
   - 数据库
   - 关系型数据库
   - MySQL
-  - 存储引擎
+  - 存储
   - InnoDB
 permalink: /pages/312ce160/
 ---
 
-# MySQL 存储引擎
+# MySQL 存储
 
 ::: info 概述
 

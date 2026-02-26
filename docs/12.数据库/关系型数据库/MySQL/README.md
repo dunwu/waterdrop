@@ -30,15 +30,15 @@ MySQL 是一种关联数据库管理系统，关联数据库将数据保存在�
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/ed4d5381a82942639cb3fca5292f9301.png)
 
-- [MySQL 简介](MySQL_简介.md)
+- [MySQL 概述](MySQL_概述.md)
+- [MySQL 建模](MySQL_建模.md)
 - [MySQL CRUD](MySQL_CRUD.md)
-- [MySQL 数据类型](MySQL_数据类型.md)
-- [MySQL 架构](MySQL_架构.md)
-- [MySQL 存储引擎](MySQL_存储引擎.md)
+- [MySQL 存储](MySQL_存储.md)
 - [MySQL 索引](MySQL_索引.md)
 - [MySQL 事务](MySQL_事务.md)
 - [MySQL 锁](MySQL_锁.md)
 - [MySQL 复制](MySQL_复制.md)
+- [MySQL 架构](MySQL_架构.md)
 - [MySQL 优化](MySQL_优化.md)
 - [MySQL 运维](MySQL_运维.md)
 - [MySQL 面试](MySQL_面试.md) 💯

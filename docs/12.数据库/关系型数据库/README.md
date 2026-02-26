@@ -27,13 +27,15 @@ dir:
 
 ### MySQL
 
-- [MySQL 简介](MySQL/MySQL_简介.md)
-- [MySQL 架构](MySQL/MySQL_架构.md)
-- [MySQL 存储引擎](MySQL/MySQL_存储引擎.md)
+- [MySQL 概述](MySQL/MySQL_概述.md)
+- [MySQL 建模](MySQL/MySQL_建模.md)
+- [MySQL CRUD](MySQL/MySQL_CRUD.md)
+- [MySQL 存储](MySQL/MySQL_存储.md)
 - [MySQL 索引](MySQL/MySQL_索引.md)
 - [MySQL 事务](MySQL/MySQL_事务.md)
 - [MySQL 锁](MySQL/MySQL_锁.md)
 - [MySQL 复制](MySQL/MySQL_复制.md)
+- [MySQL 架构](MySQL/MySQL_架构.md)
 - [MySQL 优化](MySQL/MySQL_优化.md)
 - [MySQL 运维](MySQL/MySQL_运维.md)
 - [MySQL 面试](MySQL/MySQL_面试.md) 💯

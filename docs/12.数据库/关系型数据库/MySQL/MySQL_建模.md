@@ -1,6 +1,6 @@
 ---
 icon: logos:mysql
-title: MySQL 数据类型
+title: MySQL 建模
 date: 2025-03-13 08:05:53
 categories:
   - 数据库
@@ -14,7 +14,7 @@ tags:
 permalink: /pages/1fd0d9ea/
 ---
 
-# MySQL 数据类型
+# MySQL 建模
 
 ::: info 概述
 

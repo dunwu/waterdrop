@@ -26,7 +26,7 @@ permalink: /pages/447cbc4f/
 
 :::
 
-## Elasticsearch 简介
+## Elasticsearch 概述
 
 ::: tip 扩展
 
@@ -36,7 +36,7 @@ permalink: /pages/447cbc4f/
 
 ### 【简单】什么是 ES？
 
-![Elasticsearch](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/f769820186fe432da503bb095aec7817.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/f769820186fe432da503bb095aec7817.png)
 
 [**Elasticsearch**](https://github.com/elastic/elasticsearch) 是一个开源的分布式**搜索和分析引擎**。
 
@@ -69,6 +69,8 @@ Elasticsearch 被广泛应用于以下场景：
   - **性能监控**：监控和分析业务关键性能指标。
   - **OpenTelemetry**：使用 OpenTelemetry 标准，将遥测数据采集到 Elastic Stack。
 
+![](https://assets.bytebytego.com/diagrams/0380-top-6-elasticsearch-use-cases.png)
+
 ### 【简单】ES 有哪些里程碑版本？
 
 Elasticsearch 里程碑版本：
@@ -99,7 +101,7 @@ Elasticsearch 里程碑版本：
 
 Elastic Stack 通常被用来作为日志采集、检索、可视化的解决方案。
 
-![ELK](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/ec41500c0b614c4db5245a202c266967.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/ec41500c0b614c4db5245a202c266967.png)
 
 Elastic Stack 也常被称为 ELK，这是 Elastic 公司旗下三款产品 [Elasticsearch](https://www.elastic.co/elasticsearch) 、[Logstash](https://www.elastic.co/products/logstash) 、[Kibana](https://www.elastic.co/kibana) 的首字母组合。
 
@@ -111,22 +113,24 @@ Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](
 
 此外，基于 Elastic Stack，其技术生态还可以和一些主流的分布式中间件进行集成，以应对各种不同的场景。
 
-![Elastic Stack](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/afa56f3c9bcf4f23b6c77dfd65c4eff8.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/afa56f3c9bcf4f23b6c77dfd65c4eff8.png)
 
 ### 【简单】ES 有哪些基本概念？⭐
 
-```
-index -> type -> mapping -> document -> field
-```
+::: info Elasticsearch 集群维度核心概念
+:::
 
-Elasticsearch 集群的核心概念如下：
+Elasticsearch 集群维度核心概念如下：
 
 - **Cluster（集群）**：**由多个协同工作的 ES 实例组合成的集合称为集群**。集群架构使得 ES 具备了高可用性和可扩展性。
 - **Node（节点）**：**单个 ES 服务实例称为 Node，本质上就是一个 Java 进程**。每个节点都有各自的名字，默认是随机分配的，也可以通过 `node.name` 指定。
 - **Shard（分片）**：当单台机器不足以存储大量数据时，Elasticsearch 可以将一个索引中的数据切分为多个 **`分片（shard）`** 。 **`分片（shard）`** 分布在多台服务器上存储。有了 shard 就可以横向扩展，存储更多数据，让搜索和分析等操作分布到多台服务器上去执行，提升吞吐量和性能。每个 shard 都是一个 lucene index。
 - **Replica（副本）**：任何一个服务器随时可能故障或宕机，此时 shard 可能就会丢失，因此可以为每个 shard 创建多个 **`副本（replica）`**。replica 可以在 shard 故障时提供备用服务，保证数据不丢失，多个 replica 还可以提升搜索操作的吞吐量和性能。primary shard（建立索引时一次设置，不能修改，默认 5 个），replica shard（随时修改数量，默认 1 个），默认每个索引 10 个 shard，5 个 primary shard，5 个 replica shard，最小的高可用配置，是 2 台服务器。
 
-Elasticsearch 数据的核心概念如下：
+::: info Elasticsearch 数据维度核心概念
+:::
+
+Elasticsearch 数据维度核心概念如下：
 
 - **Index（索引）**：在 ES 中，**可以将索引视为文档（document）的集合**。
   - ES 会为所有字段建立索引，经过处理后写入一个倒排索引（Inverted Index）。查找数据的时候，直接查找该索引。
@@ -141,15 +145,16 @@ Elasticsearch 数据的核心概念如下：
   - [`_id`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html)：文档的 ID
   - [`_source`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html)：表示文档原文的 JSON
 
-ES 核心概念 vs. DB 核心概念：
+::: info ES 核心概念 vs. DB 核心概念
+:::
 
-| ES                               | DB                 |
-| -------------------------------- | ------------------ |
-| 索引（index）                    | 数据库（database） |
-| 类型（type，6.0 废弃，7.0 移除） | 数据表（table）    |
-| 文档（docuemnt）                 | 行（row）          |
-| 字符（field）                    | 列（column）       |
-| 映射（mapping）                  | 表结构（schema）   |
+| ES                                   | DB                     |
+| ------------------------------------ | ---------------------- |
+| **索引（index）**                    | **数据库（database）** |
+| **类型（type，6.0 废弃，7.0 移除）** | **数据表（table）**    |
+| **文档（docuemnt）**                 | **行（row）**          |
+| **字符（field）**                    | **列（column）**       |
+| **映射（mapping）**                  | **表结构（schema）**   |
 
 ## Elasticsearch 建模
 
@@ -157,6 +162,7 @@ ES 核心概念 vs. DB 核心概念：
 
 - [Elasticsearch 官方文档之 Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
 - [Elasticsearch 从入门到实践之 Mapping](https://www.itshujia.com/read/elasticsearch/351.html)
+- [Elasticsearch 官方文档之数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
 
 :::
 
@@ -164,22 +170,16 @@ ES 核心概念 vs. DB 核心概念：
 
 Elasticsearch 支持丰富的数据类型，常见的有：
 
-- 文本类型：[`text`](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html)、[`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#keyword-field-type)、[`constant_keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#constant-keyword-field-type)、 [`wildcard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#wildcard-field-type)
-- 二进制类型：[`binary`](https://www.elastic.co/guide/en/elasticsearch/reference/current/binary.html)
-- 数值类型：`long`、`float` 等
-- 日期类型：[`date`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html)
-- 布尔类型：[`boolean`](https://www.elastic.co/guide/en/elasticsearch/reference/current/boolean.html)
-- 对象类型：[`object`](https://www.elastic.co/guide/en/elasticsearch/reference/current/object.html)、[`nested`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html)
-
-::: tip 扩展
-
-[数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
-
-:::
+- **文本类型**：[`text`](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html)、[`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#keyword-field-type)、[`constant_keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#constant-keyword-field-type)、 [`wildcard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#wildcard-field-type)
+- **二进制类型**：[`binary`](https://www.elastic.co/guide/en/elasticsearch/reference/current/binary.html)
+- **数值类型**：`long`、`float` 等
+- **日期类型**：[`date`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html)
+- **布尔类型**：[`boolean`](https://www.elastic.co/guide/en/elasticsearch/reference/current/boolean.html)
+- **对象类型**：[`object`](https://www.elastic.co/guide/en/elasticsearch/reference/current/object.html)、[`nested`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html)
 
 ### 【简单】ES 如何识别字段的数据类型？⭐⭐
 
-在 Elasticsearch 中，`Mapping`（映射），用来定义一个文档以及其所包含的字段如何被存储和索引，可以在映射中事先定义字段的数据类型、字段的权重、分词器等属性，就如同在关系型数据库中创建数据表时会设置字段的类型。简言之，**Mapping 定义了索引中的文档有哪些字段及其类型、这些字段是如何存储和索引的，就好像数据库的表定义一样。**
+在 Elasticsearch 中，`Mapping`（映射）用来定义一个文档以及其所包含的字段如何被存储和索引，可以在映射中事先定义字段的数据类型、字段的权重、分词器等属性，就如同在关系型数据库中创建数据表时会设置字段的类型。简言之，**Mapping 定义了索引中的文档有哪些字段及其类型、这些字段是如何存储和检索的，就好像数据库的表定义一样。**
 
 Mapping 会把 json 文档映射成 Lucene 所需要的扁平格式
 
@@ -205,6 +205,10 @@ Elasticsearch 官方将静态映射称为**显式映射（[Explicit mapping](htt
 - 日期值的格式。
 - 用于控制动态添加字段的自定义规则。
 
+::: tabs#mapping 使用示例
+
+@tab 显示指定 mapping
+
 【示例】创建索引时，显示指定 mapping
 
 ```javascript
@@ -220,6 +224,8 @@ PUT /my-index-000001
 }
 ```
 
+@tab 指定 field 的属性
+
 【示例】在已存在的索引中，指定一个 field 的属性
 
 ```javascript
@@ -234,6 +240,8 @@ PUT /my-index-000001/_mapping
 }
 ```
 
+@tab 查看 mapping
+
 【示例】查看 mapping
 
 ```
@@ -245,6 +253,8 @@ GET /my-index-000001/_mapping
 ```
 GET /my-index-000001/_mapping/field/employee-id
 ```
+
+:::
 
 ::: info 动态映射
 :::
@@ -295,7 +305,7 @@ Elasticsearch 的基本 CRUD 方式如下：
 
 :::
 
-## Elasticsearch 搜索
+## Elasticsearch 检索
 
 ::: tip 扩展
 
@@ -320,7 +330,7 @@ ES 支持全文搜索的 API 主要有以下几个：
 - [match_bool_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-bool-prefix-query.html)：对检索文本分词，并根据这些分词构造一个布尔查询。除了最后一个分词之外的每个分词都进行 term 查询。最后一个分词用于 `prefix` 查询；其他分词都进行 `term` 查询。
 - [match_phrase](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html)：**短语匹配查询**，短语匹配会将检索内容分词，这些词语必须全部出现在被检索内容中，并且顺序必须一致，默认情况下这些词都必须连续。
 - [match_phrase_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html)：与 `match_phrase` 查询类似，但对最后一个单词执行通配符搜索。
-- [multi_match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html) 支持多字段 match 查询
+- [multi_match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html) 支持多字段 match 查询。
 - [combined_fields](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-combined-fields-query.html)：匹配多个字段，就像它们已索引到一个组合字段中一样。
 - [query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)：支持紧凑的 Lucene [query string（查询字符串）语法](https://www.elastic.co/guide/en/elasticsearch/reference/8.16/query-dsl-query-string-query.html#query-string-syntax)，允许指定 `AND|OR|NOT` 条件和单个查询字符串中的多字段搜索。仅适用于专家用户。
 - [simple_query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html)：更简单、更健壮的 `query_string` 语法版本，适合直接向用户公开。
@@ -378,8 +388,8 @@ ES 支持词项搜索的 API 主要有以下几个：
 
 在 Elasticsearch 中，可以在两个不同的上下文中执行查询：
 
-- `query` context：**有相关性计算**，采用相关性算法，计算文档与查询关键词之间的相关度，并根据评分（`_score`）大小排序。
-- `filter` context：**无相关性计算**，可以利用缓存，性能更好。
+- **`query` context**：**有相关性计算**，采用相关性算法，计算文档与查询关键词之间的相关度，并根据评分（`_score`）大小排序。
+- **`filter` context**：**无相关性计算**，可以利用缓存，性能更好。
 
 ::: tip 扩展
 
@@ -565,7 +575,7 @@ Elasticsearch 内置了很多分词过滤器，这里列举几个常见的：
 
 Elasticsearch 的逻辑存储被设计为层级结构，自上而下依次为：
 
-![Elasticsearch 逻辑存储](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/0fa7dbbd361c4dcd816f0c29737b6996.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/0fa7dbbd361c4dcd816f0c29737b6996.png)
 
 各层级结构的说明如下：
 
@@ -641,11 +651,11 @@ Elasticsearch 的物理存储，天然使用了分布式设计。
 
 每个 Elasticsearch 进程都从属于一个 cluster，一个 cluster 可以有一个或多个 node（即 Elasticsearch 进程）。
 
-Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分布在集群中不同节点上。正是由于这个机制，使得 Elasticsearch 有了水平扩展的能力。shard 也是 Elasticsearch 将数据从一个节点迁移到拎一个节点的最小单位。
+Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分布在集群中不同节点上。正是由于这个机制，使得 Elasticsearch 有了水平扩展的能力。shard 也是 Elasticsearch 将数据从一个节点迁移到另一个节点的最小单位。
 
 Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。简单来说，Lucene 就是一个 jar 包，里面包含了封装好的构建、管理倒排索引的算法代码。
 
-![Elasticsearch 物理存储](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/7fa4076e4ae24f63a6b8273c5cc10923.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/7fa4076e4ae24f63a6b8273c5cc10923.png)
 
 ### 【中等】什么是倒排索引？⭐⭐⭐
 
@@ -670,7 +680,7 @@ Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索�
 
 除了要保存词项与 ID 的关系外，还需要保存这个词项在对应文档出现的位置、偏移量等信息，这是因为很多检索的场景中还需要判断关键词前后的内容是否符合搜索要求。
 
-![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/b3880af0bf2e4b29a35afb04c43ec5c9.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/b3880af0bf2e4b29a35afb04c43ec5c9.png)
 
 有了倒排索引，搜索引擎可以很方便地响应用户的查询。比如用户输入查询 `明月`，搜索系统查找倒排索引，从中读出包含这个单词的文档，这些文档就是提供给用户的搜索结果。
 
@@ -687,7 +697,7 @@ Trie 遵循一个规则：如果两个字符串有共同的前缀，那么它们
 
 Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效。此外，Trie 有 Hash 不具备的**优点**：Trie 支持前缀搜索和排序。Trie 的主要**缺点**是：存储词项需要额外的空间，对于长文本，空间可能会变得很大。
 
-![字典树](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/81835bcf7ac2463780b0e22973a2caad.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/81835bcf7ac2463780b0e22973a2caad.png)
 
 ### 【困难】ES 如何实现倒排索引？⭐⭐⭐
 
@@ -697,7 +707,7 @@ Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效
 
 Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。
 
-![Elasticsearch 倒排索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/06025626fc6148708b30ba20e7b157f3.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/06025626fc6148708b30ba20e7b157f3.png)
 
 倒排索引的组成主要有 3 个部分：
 

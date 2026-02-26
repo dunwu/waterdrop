@@ -1,6 +1,6 @@
 ---
 icon: logos:elasticsearch
-title: Elasticsearch Mapping
+title: Elasticsearch 建模
 date: 2022-02-22 21:01:01
 categories:
   - 数据库
@@ -15,7 +15,7 @@ tags:
 permalink: /pages/fc7dd71b/
 ---
 
-# Elasticsearch Mapping
+# Elasticsearch 建模
 
 ::: info 概述
 

@@ -1,6 +1,6 @@
 ---
 icon: logos:mongodb
-title: MongoDB 简介
+title: MongoDB 概述
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/3752ae26956a47ba90682e13ae2ad9c0.webp
 date: 2020-09-07 07:54:19
 categories:
@@ -15,7 +15,7 @@ tags:
 permalink: /pages/c7910270/
 ---
 
-# MongoDB 简介
+# MongoDB 概述
 
 ::: info 概述
 

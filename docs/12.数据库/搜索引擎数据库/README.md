@@ -23,13 +23,16 @@ dir:
 
 > Elasticsearch 是一个基于 Lucene 的搜索和数据分析工具，它提供了一个分布式服务。Elasticsearch 是遵从 Apache 开源条款的一款开源产品，是当前主流的企业级搜索引擎。
 
-- [Elasticsearch 简介](Elasticsearch/Elasticsearch_简介.md)
+- [Elasticsearch 概述](Elasticsearch/Elasticsearch_概述.md)
+- [Elasticsearch 建模](Elasticsearch/Elasticsearch_建模.md)
+- [Elasticsearch CRUD](Elasticsearch/Elasticsearch_CRUD.md)
 - [Elasticsearch 存储](Elasticsearch/Elasticsearch_存储.md)
-- [Elasticsearch 搜索（上）](Elasticsearch/Elasticsearch_搜索上.md)
-- [Elasticsearch 搜索（下）](Elasticsearch/Elasticsearch_搜索下.md)
+- [Elasticsearch 检索（上）](Elasticsearch/Elasticsearch_检索上.md)
+- [Elasticsearch 检索（下）](Elasticsearch/Elasticsearch_检索下.md)
 - [Elasticsearch 聚合](Elasticsearch/Elasticsearch_聚合.md)
 - [Elasticsearch 分析](Elasticsearch/Elasticsearch_分析.md)
 - [Elasticsearch 集群](Elasticsearch/Elasticsearch_集群.md)
+- [Elasticsearch 架构](Elasticsearch/Elasticsearch_架构.md)
 - [Elasticsearch 优化](Elasticsearch/Elasticsearch_优化.md)
 - [Elasticsearch 运维](Elasticsearch/Elasticsearch_运维.md)
 - [Elasticsearch API](Elasticsearch/Elasticsearch_API.md)
