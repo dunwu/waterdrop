@@ -50,6 +50,8 @@ Java 提供了多种创建线程池的方法，主要通过 `java.util.concurren
 - **`CachedThreadPool`**： 可根据实际情况调整线程数量的线程池。线程池的线程数量不确定，但若有空闲线程可以复用，则会优先使用可复用的线程。若所有线程均在工作，又有新的任务提交，则会创建新的线程处理任务。所有线程在当前任务执行完毕后，将返回线程池进行复用。
 - **`ScheduledThreadPool`**：给定的延迟后运行任务或者定期执行任务的线程池。
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/3eb5fff39bec5cd51950b9f11e4499ca.jpg)
+
 **（2）直接使用 `ThreadPoolExecutor` 构造器**
 
 ```java
@@ -330,6 +332,8 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 
 **根据任务类型设置线程数指导**
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/57c20e84d64150eae2f7a907c033a9be.png)
+
 | 场景       | 推荐设置                     | 关键考虑                     |
 | :--------- | :--------------------------- | :--------------------------- |
 | CPU 密集型 | `核心数+1`                   | 避免上下文切换               |
@@ -362,6 +366,8 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 - 动态线程池优于静态配置
 
 **最佳实践**
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/d2eb46cd51e067e94f23768a087283ab.jpg)
 
 - 通过 `Runtime.getRuntime().availableProcessors()` 获取核心数
 - 配合有界队列+合理拒绝策略
@@ -571,6 +577,8 @@ executor.execute(() -> {
 
 :::
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7140bd7ebb766e419822879f3610e11e.jpg)
+
 ThreadPoolExecutor 提供了以下核心参数的动态修改方法：
 
 | 参数             | 修改方法                           | 注意事项                                           |
@@ -658,6 +666,10 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 >
 > - **[Hippo4j](https://github.com/opengoofy/hippo4j)**：异步线程池框架，支持线程池动态变更&监控&报警，无需修改代码轻松引入。支持多种使用模式，轻松引入，致力于提高系统运行保障能力。
 > - **[Dynamic TP](https://github.com/dromara/dynamic-tp)**：轻量级动态线程池，内置监控告警功能，集成三方中间件线程池管理，基于主流配置中心（已支持 Nacos、Apollo，Zookeeper、Consul、Etcd，可通过 SPI 自定义实现）。
+
+### 【中等】DelayQueue 和 ScheduledThreadPool 有什么区别？
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/68f78c2ce2b6d26c35107b7ba59f5d96.jpg)
 
 ## Java 并发同步工具
 
@@ -796,8 +808,12 @@ Semaphore 是基于 AQS 实现的限流同步工具，核心作用是**控制同
    - 抢许可证（`acquire()`）→ state 减 1
    - 还许可证（`release()`）→ state 加 1
 3. **两种模式**：
+   
    - 公平：按线程等待顺序抢证，避免饥饿；
+   
    - 非公平（默认）：直接抢证，性能更高，可能导致线程饥饿；
+   
+     ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/6f8b6e4367c0b860a521f7937ad9d2e4.jpg)
 4. **可响应中断 / 超时**：`acquireInterruptibly()` 响应线程中断，`tryAcquire(timeout)` 支持超时放弃抢证；
 5. **许可证可超额归还**：`release()` 不校验线程是否持有许可证，可手动调用增加许可证（需谨慎，避免超预期限流）。
 
@@ -882,6 +898,8 @@ Thread-4 占用资源
 | **是否支持回调** | 否                            | 是（屏障达成触发）         | 否                                         |
 | **典型场景**     | 多任务并行后汇总              | 多阶段并行计算、回合制同步 | 限流、数据库连接池、信号量                 |
 | **底层机制**     | AQS                           | ReentrantLock + Condition  | AQS                                        |
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a2d1794274bb877273c78d461a2e6059.jpg)
 
 **原理简述**
 
@@ -1463,3 +1481,9 @@ public class ProducerConsumerDemo03 {
 
 }
 ```
+
+## Java 容器
+
+### 【中等】Java 线程安全的集合有哪些?
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/3f7e1da990267bd02ce54177e71db170.jpg)

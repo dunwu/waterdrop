@@ -82,7 +82,7 @@ permalink: /pages/37e2c2f3/
 - **协程**：用户态线程，高效但需主动让出控制权。
 - **管程**：同步工具，简化多线程资源共享。
 
-进程和线程的差异：
+**进程和线程的差异**
 
 - 一个程序至少有一个进程，一个进程至少有一个线程。
 - 线程比进程划分更细，所以执行开销更小，并发性更高
@@ -91,6 +91,10 @@ permalink: /pages/37e2c2f3/
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/concurrent/processes-vs-threads.jpg)
 
 JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这就是为什么几个线程可以访问同一个对象。线程共享堆并拥有自己的堆栈空间。这是一个线程如何调用一个方法以及它的局部变量是如何保持线程安全的。但是堆不是线程安全的并且为了线程安全必须进行同步。
+
+**线程和协程的差异**
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/c435cd36568b570f8ef97a632f01200b.jpg)
 
 ### 【中等】Java 线程和操作系统的线程有什么区别？⭐
 
@@ -542,6 +546,8 @@ void read() {
 - **不要滥用**：仅适用于简单状态同步，复杂操作仍需锁或原子类。
 - **不适用于复合操作**：如 `check-then-act`（需 `synchronized` 或 CAS）。
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/76b2fbb0de08297de602cec87fbc9846.jpg)
+
 ::: info 保证可见性
 
 :::
@@ -956,6 +962,8 @@ final List<String> unsafeList = new ArrayList<>();
 - 使用 `CompletableFuture`
 - ...
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/914774c637b6bb6d5b7de0bef5a2767b.png)
+
 虽然，看似有多种多样的创建线程方式。但是，**从本质上来说，Java 就只有一种方式可以创建线程，那就是通过 `new Thread().start() ` 创建。不管是哪种方式，最终还是依赖于 `new Thread().start()`**。
 
 > 👉 扩展阅读：[大家都说 Java 有三种创建线程的方式！并发编程中的惊天骗局！](https://mp.weixin.qq.com/s/NspUsyhEmKnJ-4OprRFp9g)。
@@ -1087,6 +1095,8 @@ Java 的线程是不允许启动两次的，**第二次调用 `Thread.start()` �
 | **`Thread.join()`**         | `Thread` | **等待目标线程执行完毕**（阻塞当前线程）                 | ❌ 不释放锁 | 线程顺序执行，如主线程等待子线程结束       |
 | **`Object.wait()`**         | `Object` | **释放锁并进入等待，直到 `notify()`/`notifyAll()` 唤醒** | ✔️ 释放锁   | 线程间通信（需在 `synchronized` 块中使用） |
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7e80b09c6e296cceb33aacdc5b432f92.jpg)
+
 **锁的释放**
 
 - `wait()` 会释放锁，其他方法不会。
@@ -1123,6 +1133,8 @@ Java 的线程是不允许启动两次的，**第二次调用 `Thread.start()` �
 - **等待队列绑定对象**：调用 `wait()` 的线程会进入 **该对象的等待队列**，`notify()` 唤醒的也是同一对象队列中的线程，与对象强绑定。
 - **与 `Thread` 类职责分离**：`Thread` 类管理线程生命周期（如 `sleep()`、`join()`），而 `wait()`/`notify()` 是 **线程间协作机制**，属于锁（对象）的行为。
 - **设计一致性与历史原因**：遵循 **Monitor 模式**（操作系统同步原语），保持 `Thread` 简洁，避免功能混淆（如 `wait()` 和 `sleep()` 的误用）。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/7f363a4db65944fc23f779997734df6f.jpg)
 
 ### 【中等】为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？⭐
 
