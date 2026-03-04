@@ -255,6 +255,59 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/6798886d8aeb40f192444cbd16c7a16d.png)
 
+【示例】必然死锁的示例
+
+```java
+import java.util.concurrent.CountDownLatch;
+
+public class DeadlockWithCountDownLatch {
+    private static final Object lock1 = new Object();
+    private static final Object lock2 = new Object();
+    private static final CountDownLatch latch1 = new CountDownLatch(1);
+    private static final CountDownLatch latch2 = new CountDownLatch(1);
+    private static final CountDownLatch startLatch = new CountDownLatch(1);
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            try {
+                startLatch.await();                // 等待统一开始
+                synchronized (lock1) {
+                    System.out.println("T1 持有 lock1");
+                    latch1.countDown();             // 通知 T2：我已持有 lock1
+                    latch2.await();                  // 等待 T2 持有 lock2
+                    System.out.println("T1 尝试获取 lock2");
+                    synchronized (lock2) {           // 此时 lock2 被 T2 持有，阻塞
+                        System.out.println("T1 获取 lock2");
+                    }
+                }
+            } catch (InterruptedException e) {}
+        });
+
+        Thread t2 = new Thread(() -> {
+            try {
+                startLatch.await();
+                synchronized (lock2) {
+                    System.out.println("T2 持有 lock2");
+                    latch2.countDown();             // 通知 T1：我已持有 lock2
+                    latch1.await();                  // 等待 T1 持有 lock1（此时 latch1 已减，通过）
+                    System.out.println("T2 尝试获取 lock1");
+                    synchronized (lock1) {           // lock1 被 T1 持有，阻塞
+                        System.out.println("T2 获取 lock1");
+                    }
+                }
+            } catch (InterruptedException e) {}
+        });
+
+        t1.start();
+        t2.start();
+        startLatch.countDown();      // 同时启动两个线程
+
+        Thread.sleep(3000);           // 观察死锁
+        System.out.println("主线程：疑似死锁发生");
+    }
+}
+```
+
 ::: info 如何发现死锁？
 :::
 

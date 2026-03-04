@@ -69,7 +69,7 @@ Elasticsearch 被广泛应用于以下场景：
   - **性能监控**：监控和分析业务关键性能指标。
   - **OpenTelemetry**：使用 OpenTelemetry 标准，将遥测数据采集到 Elastic Stack。
 
-![](https://assets.bytebytego.com/diagrams/0380-top-6-elasticsearch-use-cases.png)
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/03/54ccece33273484fbdf3afe97eb56826.png)
 
 ### 【简单】ES 有哪些里程碑版本？
 

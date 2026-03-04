@@ -419,6 +419,24 @@ mysql> select * from test;
 
 :::
 
+### 【简单】IP 地址用什么类型存储？⭐
+
+**IPv4**
+
+- **IPv4 用 `INT UNSIGNED`（4字节）**
+- **类型**：`INT UNSIGNED`（0 ~ 4294967295）
+- **转换**：
+  - 存：`INET_ATON('192.168.1.1')` → 3232235777
+  - 取：`INET_NTOA(3232235777)` → '192.168.1.1'
+
+**IPv6**
+
+- **IPv6 用 `BINARY(16)` 或 `VARBINARY(16)`**
+- **转换**（MySQL 5.6+）：
+  - 存：`INET6_ATON('2001:db8::1')` → 二进制数据
+  - 取：`INET6_NTOA(binary_data)` → 字符串
+- **注意**：`BINARY(16)` 定长，适合所有IPv6地址长度固定。
+
 ### 【简单】如何存储 emoji 😃？
 
 在表结构设计中，除了将列定义为 `CHAR` 和 `VARCHAR` 用以存储字符以外，还需要额外定义字符对应的字符集，因为每种字符在不同字符集编码下，对应着不同的二进制值。常见的字符集有 `gbk`、`utf8`，通常推荐把默认字符集设置为 `utf8`。
@@ -482,6 +500,33 @@ ALTER TABLE test CONVERT TO CHARSET utf8mb4;
 - 字符集：唯一选择utf8mb4：千万别用utf8，它存不了emoji。
 - 约束：能加就加：尽量NOT NULL，合理DEFAULT，必要UNIQUE。
 - 索引：精准打击：区分度高的放联合索引前面，单表不超过5个，避免冗余。
+
+### 【困难】MySQL 大表如何高效的变更表结构、加索引？
+
+MySQL 早期方案（5.6 版本）：
+
+- 创建新表
+- 建立索引
+- 复制旧表数据
+- 替换表
+
+MySQL 5.6+ 后可以使用 **InPlace** 模式（Online DDL）：
+
+传统DDL通过拷贝全表数据实现，会长时间锁表，阻塞读写。
+
+MySQL Online DDL（InPlace模式）不拷贝表数据，直接扫描原表构建新索引，期间通过row log记录并发DML，构建完成后短暂锁表应用日志，使索引生效，整个过程允许并发读写，对业务影响小。
+
+云数据库进一步优化：优先使用原生Online DDL，不支持时采用自研无锁变更方案。
+
+MySQL 的 DDL 操作支持三种算法，可以通过 `ALGORITHM` 参数指定：
+
+```sql
+ALTER TABLE users ADD INDEX idx_name(name), ALGORITHM=INPLACE, LOCK=NONE;
+```
+
+1. **COPY**：最早的方式，创建临时表复制数据，全程锁表，一亿数据可能要跑几个小时。
+2. **INPLACE**：MySQL 5.6 引入，直接在原表上操作，大部分时间不锁表，但并非所有 DDL 都支持。
+3. **INSTANT**：MySQL 8.0.12 引入，只修改元数据，秒级完成，但只支持加列等少数操作。
 
 ## MySQL 存储
 
