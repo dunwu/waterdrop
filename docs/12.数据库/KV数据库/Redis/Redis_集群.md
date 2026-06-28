@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:redis
 title: Redis 集群
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/b1f53f47c555428094fe70c45e72f196.png

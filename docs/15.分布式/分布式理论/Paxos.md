@@ -1,4 +1,4 @@
----
+﻿---
 title: 深入剖析共识性算法 Paxos
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/10/eba86cbf98354c65b6de63ff0304ca0c.png
 date: 2020-02-02 22:00:00

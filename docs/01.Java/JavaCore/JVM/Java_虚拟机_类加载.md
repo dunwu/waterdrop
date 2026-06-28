@@ -1,4 +1,4 @@
----
+﻿---
 title: Java 虚拟机之类加载
 date: 2020-06-17 15:06:46
 order: 04
@@ -456,8 +456,8 @@ java -jar xxx.jar -classpath lib/*
 
 **`Class.forName()` 和 `ClassLoader.loadClass()` 区别**
 
-- `Class.forName()` 将类的 `.class` 文件加载到 jvm 中之外，还会对类进行解释，执行类中的 `static` 块；
-- `ClassLoader.loadClass()` 只干一件事情，就是将 `.class` 文件加载到 jvm 中，不会执行 `static` 中的内容，只有在 `newInstance` 才会去执行 `static` 块。
+- `Class.forName()` 将类的 `.class` 文件加载到 JVM 中之外，还会对类进行解释，执行类中的 `static` 块；
+- `ClassLoader.loadClass()` 只干一件事情，就是将 `.class` 文件加载到 JVM 中，不会执行 `static` 中的内容，只有在 `newInstance` 才会去执行 `static` 块。
 - `Class.forName(name, initialize, loader)` 带参函数也可控制是否加载 `static` 块。并且只有调用了 `newInstance()` 方法采用调用构造函数，创建类的对象 。
 
 ### 加载类错误

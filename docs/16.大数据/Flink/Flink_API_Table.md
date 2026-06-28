@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:apache-flink-icon
 title: Flink Table API & SQL
 date: 2022-03-18 14:33:03

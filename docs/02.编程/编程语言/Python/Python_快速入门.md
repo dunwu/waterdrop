@@ -97,7 +97,7 @@ Python 语言支持以下类型的运算符:
 
 ## 语句
 
-python 最具特色的就是使用缩进来表示代码块，不需要使用大括号 `{}` 。
+Python 最具特色的就是使用缩进来表示代码块，不需要使用大括号 `{}` 。
 
 缩进的空格数是可变的，但是同一个代码块的语句必须包含相同的缩进空格数。
 
@@ -252,7 +252,7 @@ input("\n按下 enter 键后退出。\n")
 
 ## 模块
 
-在 python 用 `import` 或者 `from...import` 来导入相应的模块。
+在 Python 用 `import` 或者 `from...import` 来导入相应的模块。
 
 将整个模块(somemodule)导入，格式为： `import somemodule`
 

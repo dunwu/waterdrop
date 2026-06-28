@@ -1,4 +1,4 @@
----
+﻿---
 title: Java 基础
 date: 2020-06-04 13:51:01
 categories:
@@ -39,7 +39,7 @@ dir:
 
 - **书籍**
   - Java 四大名著
-    - [《Java 编程思想（Thinking in java）》](https://book.douban.com/subject/2130190/)
+    - [《Java 编程思想（Thinking in Java）》](https://book.douban.com/subject/2130190/)
     - [《Java 核心技术 卷 I 基础知识》](https://book.douban.com/subject/26880667/)
     - [《Java 核心技术 卷 II 高级特性》](https://book.douban.com/subject/27165931/)
     - [《Effective Java》](https://book.douban.com/subject/30412517/)

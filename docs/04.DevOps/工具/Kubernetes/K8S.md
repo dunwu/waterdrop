@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:kubernetes
 title: Kubernetes 快速入门
 date: 2025-09-25 07:49:46

@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:elasticsearch
 title: Elasticsearch 文本分析
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/1e1be330a2a148618050f1f20a089484.png

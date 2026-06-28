@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:redis
 title: Redis 过期删除和内存淘汰
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/241e7c2423c449c29ec4a7df629f7efc.png

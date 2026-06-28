@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mongodb
 title: MongoDB 运维
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/3a5b178f9174480ba83b4b5757fe2bbd.png

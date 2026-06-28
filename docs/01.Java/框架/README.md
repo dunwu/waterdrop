@@ -1,4 +1,4 @@
----
+﻿---
 title: Java 框架
 date: 2022-02-18 08:53:11
 categories:
@@ -97,11 +97,11 @@ index: false
 
 ### 安全
 
-> Java 领域比较流行的安全框架就是 shiro 和 spring-security。
+> Java 领域比较流行的安全框架就是 Shiro 和 Spring-Security。
 >
-> shiro 更为简单、轻便，容易理解，能满足大多数基本安全场景下的需要。
+> Shiro 更为简单、轻便，容易理解，能满足大多数基本安全场景下的需要。
 >
-> spring-security 功能更丰富，也比 shiro 更复杂。值得一提的是由于 spring-security 是 spring 团队开发，所以集成 spring 和 spring-boot 框架更容易。
+> Spring-Security 功能更丰富，也比 Shiro 更复杂。值得一提的是由于 Spring-Security 是 Spring 团队开发，所以集成 Spring 和 Spring-Boot 框架更容易。
 
 - [Shiro](安全/Shiro.md)
 - [SpringSecurity](安全/SpringSecurity.md)
@@ -112,15 +112,15 @@ index: false
 
 ## 📚 资料
 
-- **Mybatis**
-  - [Mybatis Github](https://github.com/mybatis/mybatis-3)
-  - [Mybatis 官网](http://www.mybatis.org/mybatis-3/)
+- **MyBatis**
+  - [MyBatis Github](https://github.com/mybatis/mybatis-3)
+  - [MyBatis 官网](http://www.mybatis.org/mybatis-3/)
   - [MyBatis 官方代码生成（mybatis-generator）](https://github.com/mybatis/generator)
   - [MyBatis 官方集成 Spring（mybatis-spring）](https://github.com/mybatis/spring)
-  - [Mybatis 官方集成 Spring Boot（mybatis-spring-boot）](https://github.com/mybatis/spring-boot-starter)
+  - [MyBatis 官方集成 Spring Boot（mybatis-spring-boot）](https://github.com/mybatis/spring-boot-starter)
   - [MyBatis-Plus](https://github.com/baomidou/mybatis-plus) - CRUD 扩展插件、代码生成器、分页器等多功能
   - [Mapper](https://github.com/abel533/Mapper) - CRUD 扩展插件
-  - [Mybatis-PageHelper](https://github.com/pagehelper/Mybatis-PageHelper) - Mybatis 通用分页插件
+  - [MyBatis-PageHelper](https://github.com/pagehelper/Mybatis-PageHelper) - MyBatis 通用分页插件
 
 ## 🚪 传送
 

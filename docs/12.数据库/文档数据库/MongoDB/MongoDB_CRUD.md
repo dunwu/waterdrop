@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mongodb
 title: MongoDB CRUD
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/e27a633b69e5464c90a27a6b78c8df72.webp

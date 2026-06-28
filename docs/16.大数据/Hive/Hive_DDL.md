@@ -1,4 +1,4 @@
----
+﻿---
 icon: simple-icons:apachehive
 title: Hive 常用 DDL 操作
 date: 2020-02-24 21:14:47

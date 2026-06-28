@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mysql
 title: MySQL 面试之事务和锁篇
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg

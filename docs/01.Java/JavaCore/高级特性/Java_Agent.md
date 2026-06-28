@@ -1,4 +1,4 @@
----
+﻿---
 title: JavaAgent
 date: 2022-04-08 17:29:48
 order: 08
@@ -17,14 +17,14 @@ permalink: /pages/5a64d59b/
 
 Javaagent 是什么？
 
-Javaagent 是 java 命令的一个参数。参数 javaagent 可以用于指定一个 jar 包，它利用 JVM 提供的 Instrumentation API 来更改加载 JVM 中的现有字节码。
+Javaagent 是 Java 命令的一个参数。参数 javaagent 可以用于指定一个 jar 包，它利用 JVM 提供的 Instrumentation API 来更改加载 JVM 中的现有字节码。
 
 1. 这个 jar 包的 MANIFEST.MF 文件必须指定 Premain-Class 项。
 2. Premain-Class 指定的那个类必须实现 premain() 方法。
 
 premain 方法，从字面上理解，就是运行在 main 函数之前的的类。当 Java 虚拟机启动时，在执行 main 函数之前，JVM 会先运行`-javaagent`所指定 jar 包内 Premain-Class 这个类的 premain 方法 。
 
-在命令行输入 `java`可以看到相应的参数，其中有 和 java agent 相关的：
+在命令行输入 `java`可以看到相应的参数，其中有和 Java Agent 相关的：
 
 ```shell
 -agentlib:<libname>[=<选项>]

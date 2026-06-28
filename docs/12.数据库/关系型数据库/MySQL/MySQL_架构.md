@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mysql
 title: MySQL 架构
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2024/10/702667178a274a67ac92bc333a0ffbfd.png

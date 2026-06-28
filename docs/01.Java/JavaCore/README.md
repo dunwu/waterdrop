@@ -1,4 +1,4 @@
----
+﻿---
 title: JavaCore
 date: 2022-05-06 09:19:33
 categories:

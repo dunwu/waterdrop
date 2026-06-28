@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mongodb
 title: MongoDB 面试
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/c395e54dfe444ffe8a7903e691994f60.jpg

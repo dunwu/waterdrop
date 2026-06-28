@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mysql
 title: MySQL 锁
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/10/c01397411a8e4d779555fc2a5b978176.png

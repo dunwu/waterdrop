@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:redis
 title: Redis 教程
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/1a422c1e990a4499873ba2f9e73ad0a5.png

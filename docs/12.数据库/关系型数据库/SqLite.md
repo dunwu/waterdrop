@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:sqlite
 title: SQLite
 date: 2019-08-22 09:02:39

@@ -1,4 +1,4 @@
----
+﻿---
 title: JavaWeb 面经
 date: 2020-02-07 23:04:47
 order: 99
@@ -66,7 +66,7 @@ Servlet 生命周期如下：
 4. **销毁** - Servlet 通过调用 **destroy()** 方法终止（结束）。
 5. **卸载** - Servlet 是由 JVM 的垃圾回收器进行垃圾回收的。
 
-### 如何现实 servlet 的单线程模式
+### 如何实现 Servlet 的单线程模式
 
 ```java
 <%@ page isThreadSafe="false" %>
@@ -247,7 +247,7 @@ Servlet 生命周期如下：
 - SAX 解析
   - （a）边读边解析；
   - （b）不可以做增删改
-- DOM4J 解析（hibernate 底层采用)
+- DOM4J 解析（Hibernate 底层采用)
   - （a）可让 SAX 解析也产生树状结构。
   - （b）主要 api 开发步骤：
     - 1）SAXReader.read(xxx.xml)代表解析 xml 的文档，返回对象是 Document；

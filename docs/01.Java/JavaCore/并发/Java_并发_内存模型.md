@@ -1,4 +1,4 @@
----
+﻿---
 title: Java 并发之内存模型
 date: 2020-12-25 18:43:11
 categories:
@@ -977,7 +977,7 @@ public void increase() {
 
 `volatile` 和 `synchronized` 的区别在于：
 
-- `volatile` 本质是在告诉 jvm 当前变量在寄存器（工作内存）中的值是不确定的，需要从主存中读取；`synchronized` 则是锁定当前变量，只有当前线程可以访问该变量，其他线程被阻塞住。
+- `volatile` 本质是在告诉 JVM 当前变量在寄存器（工作内存）中的值是不确定的，需要从主存中读取；`synchronized` 则是锁定当前变量，只有当前线程可以访问该变量，其他线程被阻塞住。
 - `volatile` 仅能修饰变量；`synchronized` 可以修饰方法和代码块。
 - `volatile` 仅能实现变量的修改可见性，不能保证原子性；而 `synchronized` 则可以保证变量的修改可见性和原子性
 - `volatile` 不会造成线程的阻塞；`synchronized` 可能会造成线程的阻塞。

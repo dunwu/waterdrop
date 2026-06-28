@@ -1,4 +1,4 @@
----
+﻿---
 title: Spring 校验
 date: 2022-12-22 17:42:28
 order: 21
@@ -16,13 +16,13 @@ permalink: /pages/cc31cd57/
 
 # Spring 校验
 
-Java API 规范(`JSR303`)定义了`Bean`校验的标准`validation-api`，但没有提供实现。`hibernate validation`是对这个规范的实现，并增加了校验注解如`@Email`、`@Length`等。`Spring Validation`是对`hibernate validation`的二次封装，用于支持`spring mvc`参数自动校验。
+Java API 规范(`JSR303`)定义了`Bean`校验的标准`validation-api`，但没有提供实现。`Hibernate Validation`是对这个规范的实现，并增加了校验注解如`@Email`、`@Length`等。`Spring Validation`是对`Hibernate Validation`的二次封装，用于支持`Spring MVC`参数自动校验。
 
 ## 快速入门
 
 ### 引入依赖
 
-如果 spring-boot 版本小于 2.3.x，spring-boot-starter-web 会自动传入 hibernate-validator 依赖。如果 spring-boot 版本大于 2.3.x，则需要手动引入依赖：
+如果 Spring-Boot 版本小于 2.3.x，Spring-Boot-Starter-Web 会自动传入 Hibernate-Validator 依赖。如果 Spring-Boot 版本大于 2.3.x，则需要手动引入依赖：
 
 ```xml
 <dependency>

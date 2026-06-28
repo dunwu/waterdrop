@@ -1,4 +1,4 @@
----
+﻿---
 title: Java 虚拟机之工具
 date: 2020-07-30 17:56:33
 order: 11
@@ -131,7 +131,7 @@ jstat [option] VMID [interval] [count]
 - `interval` - 查询间隔
 - `count` - 查询次数
 
-> 【参考】更详细说明可以参考：[jstat 命令查看 jvm 的 GC 情况](https://www.cnblogs.com/yjd_hycf_space/p/7755633.html)
+> 【参考】更详细说明可以参考：[jstat 命令查看 JVM 的 GC 情况](https://www.cnblogs.com/yjd_hycf_space/p/7755633.html)
 
 jstat 使用示例：
 
@@ -416,7 +416,7 @@ jstack [option] pid
 
 - `-F` - 当正常输出请求不被响应时，强制输出线程堆栈
 - `-l` - 除堆栈外，显示关于锁的附加信息
-- `-m` - 打印 java 和 jni 框架的所有栈信息
+- `-m` - 打印 Java 和 JNI 框架的所有栈信息
 
 ::: tabs#jstack 使用示例
 
@@ -648,11 +648,11 @@ Arthas 支持 JDK 6+，支持 Linux/Mac/Windows，采用命令行交互模式，
 #### Arthas 基础命令
 
 - help——查看命令帮助信息
-- [cat](https://alibaba.github.io/arthas/cat.html)——打印文件内容，和 linux 里的 cat 命令类似
-- [echo](https://alibaba.github.io/arthas/echo.html)–打印参数，和 linux 里的 echo 命令类似
-- [grep](https://alibaba.github.io/arthas/grep.html)——匹配查找，和 linux 里的 grep 命令类似
-- [tee](https://alibaba.github.io/arthas/tee.html)——复制标准输入到标准输出和指定的文件，和 linux 里的 tee 命令类似
-- [pwd](https://alibaba.github.io/arthas/pwd.html)——返回当前的工作目录，和 linux 命令类似
+- [cat](https://alibaba.github.io/arthas/cat.html)——打印文件内容，和 Linux 里的 cat 命令类似
+- [echo](https://alibaba.github.io/arthas/echo.html)–打印参数，和 Linux 里的 echo 命令类似
+- [grep](https://alibaba.github.io/arthas/grep.html)——匹配查找，和 Linux 里的 grep 命令类似
+- [tee](https://alibaba.github.io/arthas/tee.html)——复制标准输入到标准输出和指定的文件，和 Linux 里的 tee 命令类似
+- [pwd](https://alibaba.github.io/arthas/pwd.html)——返回当前的工作目录，和 Linux 命令类似
 - cls——清空当前屏幕区域
 - session——查看当前会话的信息
 - [reset](https://alibaba.github.io/arthas/reset.html)——重置增强类，将被 Arthas 增强过的类全部还原，Arthas 服务端关闭时会重置所有增强过的类

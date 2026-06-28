@@ -1,4 +1,4 @@
----
+﻿---
 title: Java 中间件
 date: 2022-04-09 15:11:37
 categories:
@@ -35,14 +35,14 @@ index: false
 ## 📚 资料
 
 - **Mybatis**
-  - [Mybatis Github](https://github.com/mybatis/mybatis-3)
-  - [Mybatis 官网](http://www.mybatis.org/mybatis-3/)
+  - [MyBatis Github](https://github.com/mybatis/mybatis-3)
+  - [MyBatis 官网](http://www.mybatis.org/mybatis-3/)
   - [MyBatis 官方代码生成（mybatis-generator）](https://github.com/mybatis/generator)
   - [MyBatis 官方集成 Spring（mybatis-spring）](https://github.com/mybatis/spring)
-  - [Mybatis 官方集成 Spring Boot（mybatis-spring-boot）](https://github.com/mybatis/spring-boot-starter)
+  - [MyBatis 官方集成 Spring Boot（mybatis-spring-boot）](https://github.com/mybatis/spring-boot-starter)
   - [MyBatis-Plus](https://github.com/baomidou/mybatis-plus) - CRUD 扩展插件、代码生成器、分页器等多功能
   - [Mapper](https://github.com/abel533/Mapper) - CRUD 扩展插件
-  - [Mybatis-PageHelper](https://github.com/pagehelper/Mybatis-PageHelper) - Mybatis 通用分页插件
+  - [MyBatis-PageHelper](https://github.com/pagehelper/Mybatis-PageHelper) - MyBatis 通用分页插件
 
 ## 🚪 传送
 

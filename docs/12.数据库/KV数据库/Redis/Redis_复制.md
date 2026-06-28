@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:redis
 title: Redis 复制
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/1aa2be15292d48b882350d5d8357bcba.png

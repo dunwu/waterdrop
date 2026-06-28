@@ -1,4 +1,4 @@
----
+﻿---
 title: Java 虚拟机之调优
 date: 2019-10-28 22:04:39
 categories:
@@ -171,7 +171,7 @@ JAVA_OPTS="-server -Xms2000m -Xmx2000m -Xmn800m -XX:PermSize=64m -XX:MaxPermSize
 ```
 
 - `-Xms2000m -Xmx2000m -Xmn800m -XX:PermSize=64m -XX:MaxPermSize=256m`
-  Xms，即为 jvm 启动时得 JVM 初始堆大小,Xmx 为 jvm 的最大堆大小，xmn 为新生代的大小，permsize 为永久代的初始大小，MaxPermSize 为永久代的最大空间。
+  Xms，即为 JVM 启动时得 JVM 初始堆大小,Xmx 为 JVM 的最大堆大小，xmn 为新生代的大小，permsize 为永久代的初始大小，MaxPermSize 为永久代的最大空间。
 - `-XX:SurvivorRatio=4`
   SurvivorRatio 为新生代空间中的 Eden 区和救助空间 Survivor 区的大小比值，默认是 8，则两个 Survivor 区与一个 Eden 区的比值为 2:8,一个 Survivor 区占整个年轻代的 1/10。调小这个参数将增大 survivor 区，让对象尽量在 survitor 区呆长一点，减少进入年老代的对象。去掉救助空间的想法是让大部分不能马上回收的数据尽快进入年老代，加快年老代的回收频率，减少年老代暴涨的可能性，这个是通过将-XX:SurvivorRatio 设置成比较大的值（比如 65536)来做到。
 - `-verbose:gc -Xloggc:$CATALINA_HOME/logs/gc.log`
@@ -260,7 +260,7 @@ jstack 6795
 
 ```
 nid : 对应的 Linux 操作系统下的 tid 线程号，也就是前面转化的 16 进制数字
-tid: 这个应该是 jvm 的 jmm 内存规范中的唯一地址定位
+tid: 这个应该是 JVM 的 JMM 内存规范中的唯一地址定位
 ```
 
 在 CPU 过高的情况下，查找响应的线程，一般定位都是用 nid 来定位的。而如果发生死锁之类的问题，一般用 tid 来定位。

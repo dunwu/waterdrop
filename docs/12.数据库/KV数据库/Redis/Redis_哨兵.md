@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:redis
 title: Redis 哨兵
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/1f704468724345bd969b58e56f68a72f.png

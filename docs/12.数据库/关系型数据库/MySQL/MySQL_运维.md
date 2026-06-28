@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mysql
 title: MySQL 运维
 cover: https://miro.medium.com/v2/resize:fit:720/format:webp/0*7EM_33uoR9UdASR2.png

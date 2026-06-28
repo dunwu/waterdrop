@@ -20,8 +20,8 @@ index: false
 
 ### 编程语言
 
-- [shell](编程语言/Shell.md)
-- [scala](编程语言/Scala.md)
+- [Shell](编程语言/Shell.md)
+- [Scala](编程语言/Scala.md)
 
 ## 🚪 传送
 

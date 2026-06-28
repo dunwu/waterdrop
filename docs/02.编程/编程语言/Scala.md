@@ -24,7 +24,7 @@ Scala 基本语法需要注意以下几点：
 - **区分大小写** - Scala 是大小写敏感的。
 - **类名** - 对于所有的类名的第一个字母要大写。示例：`class MyFirstScalaClass`
 - **方法名称** - 所有的方法名称的第一个字母用小写。示例：`def myMethodName()`
-- **程序文件名** - 程序文件的名称应该与对象名称完全匹配(新版本不需要了，但建议保留这种习惯)。示例: 假设"HelloWorld"是对象的名称。那么该文件应保存为'HelloWorld.scala"
+- **程序文件名** - 程序文件的名称应该与对象名称完全匹配（新版本不需要了，但建议保留这种习惯）。示例：假设 "HelloWorld" 是对象的名称，那么该文件应保存为 `HelloWorld.scala`
 - **`def main(args: Array[String])`** - Scala 程序从 `main()` 方法开始处理，这是每一个 Scala 程序的强制程序入口部分。
 - 一行中只有空格或者带有注释，Scala 会认为其是空行，会忽略它。标记可以被空格或者注释来分割。
 - Scala 是面向行的语言，语句可以用分号（;）结束或换行符。
@@ -104,7 +104,7 @@ Scala 与 Java 有着相同的数据类型：
 | Any      | Any 是所有其他类的超类                                                                              |
 | AnyRef   | AnyRef 类是 Scala 里所有引用类(reference class)的基类                                               |
 
-上表中列出的数据类型都是**对象**，也就是说 scala 没有 java 中的原生类型。在 scala 是可以对数字等基础类型调用方法的。
+上表中列出的数据类型都是**对象**，也就是说 Scala 没有 Java 中的原生类型。在 Scala 是可以对数字等基础类型调用方法的。
 
 ## 数组
 
@@ -160,7 +160,7 @@ object WhileDemo {
 }
 ```
 
-**scala 不支持 `break` 和 `continue`**。但是，可以通过 `Breaks` 对象来进行循环控制。
+**Scala 不支持 `break` 和 `continue`**。但是，可以通过 `Breaks` 对象来进行循环控制。
 
 ```scala
 import scala.util.control._
@@ -194,7 +194,7 @@ object BreakDemo {
 
 ### 模式匹配
 
-scala 的 `match` 对应 Java 里的 `switch`，但是写在选择器表达式之后。即： **选择器 match {备选项}。**
+Scala 的 `match` 对应 Java 里的 `switch`，但是写在选择器表达式之后。即： **选择器 match {备选项}。**
 
 ```scala
 /**
@@ -520,7 +520,7 @@ import java.util.{HashMap => JavaHashMap}
 import java.util.{HashMap => _, _} // 引入了util包的所有成员，但是HashMap被隐藏了
 ```
 
-> **注意：**默认情况下，Scala 总会引入 java.lang._ 、 scala._ 和 Predef.\_，这里也能解释，为什么以 scala 开头的包，在使用时都是省去 scala.的。
+> **注意：**默认情况下，Scala 总会引入 java.lang._ 、 scala._ 和 Predef._，这里也能解释，为什么以 scala 开头的包，在使用时都是省去 scala.的。
 
 ### 访问修饰符
 

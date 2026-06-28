@@ -1,4 +1,4 @@
----
+﻿---
 title: Java ORM 框架
 date: 2022-02-17 22:34:30
 categories:
@@ -39,8 +39,8 @@ index: false
   - [Mapper](https://github.com/abel533/Mapper) - CRUD 扩展插件
   - [MyBatis-PageHelper](https://github.com/pagehelper/Mybatis-PageHelper) - MyBatis 通用分页插件
 - **文章**
-  - [深入理解 mybatis 原理](https://blog.csdn.net/luanlouis/article/details/40422941)
-  - [mybatis 源码中文注释](https://github.com/tuguangquan/mybatis)
+  - [深入理解 MyBatis 原理](https://blog.csdn.net/luanlouis/article/details/40422941)
+  - [MyBatis 源码中文注释](https://github.com/tuguangquan/mybatis)
   - [MyBatis Generator 详解](https://blog.csdn.net/isea533/article/details/42102297)
   - [MyBatis 常见面试题](https://juejin.im/post/5aa646cdf265da237e095da1)
   - [MyBatis 中强大的 resultMap](https://juejin.im/post/5cee8b61e51d455d88219ea4)

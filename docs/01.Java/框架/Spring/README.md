@@ -1,5 +1,5 @@
----
-title: SPRING 笔记
+﻿---
+title: Spring 笔记
 date: 2022-06-14 09:37:30
 categories:
   - Java
@@ -15,7 +15,7 @@ hidden: true
 index: false
 ---
 
-# SPRING 笔记
+# Spring 笔记
 
 ![license](https://badgen.net/github/license/dunwu/spring-tutorial)
 ![build](https://travis-ci.com/dunwu/spring-tutorial.svg?branch=master)

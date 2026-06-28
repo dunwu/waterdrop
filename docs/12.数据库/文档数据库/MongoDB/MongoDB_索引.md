@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mongodb
 title: MongoDB 索引
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/4b04a9cf5f644cda89601aa433f52c47.webp

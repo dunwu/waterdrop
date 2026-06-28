@@ -1,4 +1,4 @@
----
+﻿---
 title: 设计模式
 cover: https://raw.githubusercontent.com/dunwu/images/master/202509211833382.png
 date: 2020-08-10 10:59:18

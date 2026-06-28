@@ -1,4 +1,4 @@
----
+﻿---
 icon: logos:mysql
 title: MySQL 索引
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2023/10/37777c8de8774a95a653578128d4ea43.png
