@@ -1,7 +1,6 @@
 ---
 title: Markdown
 date: 2020-01-27 23:41:00
-order: 01
 categories:
   - 工作
   - 器
@@ -12,7 +11,9 @@ permalink: /pages/1f3d6f4e/
 
 # Markdown 极简教程
 
-## 目录
+> [Markdown](https://zh.wikipedia.org/wiki/Markdown) 是一种轻量级标记语言，由 John Gruber 于 2004 年创建。它允许人们使用易读易写的纯文本格式编写文档，然后转换成有效的 HTML 文档。
+>
+> Markdown 因其简洁的语法、易学易用的特点，已成为技术文档、博客写作、开源项目文档的首选格式。本文是一份极简教程，涵盖 Markdown 的核心语法和常用扩展特性。
 
 ## 标题
 
