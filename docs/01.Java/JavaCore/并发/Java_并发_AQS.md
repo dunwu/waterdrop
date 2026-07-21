@@ -315,6 +315,49 @@ protected boolean isHeldExclusively()
 
 **什么是钩子方法呢？** 钩子方法是一种被声明在抽象类中的方法，一般使用 `protected` 关键字修饰，它可以是空方法（由子类实现），也可以是默认实现的方法。模板设计模式通过钩子方法控制固定步骤的实现。
 
+## 典型应用场景
+
+### 场景一：自定义互斥锁
+
+```java
+public class MyLock extends AbstractQueuedSynchronizer {
+    protected boolean tryAcquire(int arg) {
+        return compareAndSetState(0, 1);
+    }
+    protected boolean tryRelease(int arg) {
+        setState(0); return true;
+    }
+}
+```
+
+### 场景二：自定义共享锁（如 Semaphore）
+
+AQS 的共享模式允许多个线程同时获取，适用于限流场景。
+
+### 场景三：理解 J.U.C 工具底层原理
+
+ReentrantLock、CountDownLatch、Semaphore 等都基于 AQS 实现。
+
+## 最佳实践
+
+1. **一般不需要直接使用 AQS**：使用基于 AQS 构建的高级工具即可。
+2. **自定义同步器时覆写 tryAcquire/tryRelease**：不要直接操作 state。
+3. **理解 CLH 队列**：这是 AQS 等待队列的核心算法。
+
+## 常见问题
+
+### Q1：AQS 的核心原理是什么？
+
+AQS 维护一个 volatile int state 和一个 FIFO 等待队列（CLH 变体）。通过 CAS 修改 state 获取锁，失败则将线程加入队列等待。
+
+### Q2：AQS 的独占模式和共享模式有什么区别？
+
+独占模式同一时刻只有一个线程能获取锁（如 ReentrantLock）；共享模式允许多个线程同时获取（如 Semaphore、CountDownLatch）。
+
+### Q3：为什么 AQS 使用 CLH 队列？
+
+CLH 队列无锁且 FIFO 公平，自旋等待时只访问前驱节点，减少缓存一致性流量。
+
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)

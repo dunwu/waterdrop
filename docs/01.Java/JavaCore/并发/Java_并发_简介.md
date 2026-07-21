@@ -512,6 +512,66 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 - **竞态条件（Race Condition）** - 程序的执行结果依赖多线程执行的顺序。通俗的说，即**多个线程竞争访问同一个资源**。
 - **临界区（Critical Sections）** - 指的是**访问共享资源的程序片段**。
 
+## 典型应用场景
+
+### 场景一：生产者-消费者模式
+
+使用 BlockingQueue 实现生产者-消费者：
+
+```java
+BlockingQueue<Task> queue = new LinkedBlockingQueue<>(100);
+// 生产者
+executor.submit(() -> {
+    while (running) queue.put(createTask());
+});
+// 消费者
+executor.submit(() -> {
+    while (running) process(queue.take());
+});
+```
+
+### 场景二：并行计算加速
+
+利用 ForkJoinPool 并行处理大量数据：
+
+```java
+ForkJoinPool pool = new ForkJoinPool();
+long sum = pool.invoke(new SumTask(array, 0, array.length));
+```
+
+### 场景三：异步任务编排
+
+使用 CompletableFuture 编排多个异步操作：
+
+```java
+CompletableFuture.supplyAsync(() -> fetchUser(id))
+    .thenCompose(user -> fetchOrders(user))
+    .thenApply(orders -> orders.stream().mapToInt(Order::getAmount).sum())
+    .exceptionally(ex -> { log.error("Failed", ex); return 0; });
+```
+
+## 最佳实践
+
+1. **优先使用高级并发工具**：J.U.C 包的工具比原生 synchronized/wait/notify 更安全高效。
+2. **避免共享可变状态**：减少并发问题的根本方法是减少共享。
+3. **使用不可变对象**：不可变对象天然线程安全。
+4. **合理设置线程池大小**：CPU 密集型 = CPU 核数 + 1，IO 密集型 = CPU 核数 * 2。
+5. **始终使用 tryLock 或超时机制**：避免死锁。
+
+## 常见问题
+
+### Q1：什么是线程安全？
+
+当多个线程同时访问某个对象时，无论运行时环境采用何种调度方式，调用者无需额外同步，对象的调用行为仍能产生正确结果，则称该对象是线程安全的。
+
+### Q2：如何检测线程安全问题？
+
+使用工具如 FindBugs、SpotBugs 的线程安全检测插件，或使用 JMH 基准测试验证并发行为。
+
+### Q3：volatile 和 synchronized 有什么区别？
+
+`volatile` 保证可见性和禁止指令重排，不保证原子性；`synchronized` 保证可见性、原子性和有序性。简单标志位用 volatile，复合操作用 synchronized。
+
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)

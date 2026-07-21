@@ -323,6 +323,34 @@ Send me
          #end please.
 ```
 
+## 典型应用场景
+
+- **代码生成工具**：在 MyBatis Generator、JHipster 等工具中使用 Velocity 模板批量生成 Java 类、Mapper、配置文件。
+- **邮件内容生成**：通过 Velocity 模板生成 HTML 邮件内容，支持变量替换、循环、条件判断。
+- **报表输出**：结合数据模型生成 XML、CSV、HTML 等格式的报表输出。
+- **配置文件生成**：根据环境变量和数据模型动态生成 Nginx、Docker 等配置文件。
+
+## 最佳实践
+
+- **保持模板简洁**：模板只负责数据展示，复杂业务逻辑应放在 Java 代码中处理后传入 Context。
+- **使用 `#if($var)` 判断空值**：Velocity 对空值不报错但会原样输出引用，使用 `#if` 判断避免输出 `$变量名`。
+- **配置模板缓存**：生产环境配置 `file.resource.loader.cache=true`，避免每次渲染都读取磁盘文件。
+- **避免使用废弃 API**：Velocity 2.x 移除了大量 1.x 的 API，升级时注意迁移文档。
+
+## 常见问题
+
+**Velocity 和 FreeMarker/Thymeleaf 如何选择？**
+
+Velocity 已进入 Apache 维护模式，更新缓慢。新项目 Web 场景推荐 Thymeleaf，非 Web 场景（代码生成）推荐 FreeMarker。老项目维护可继续使用 Velocity。
+
+**模板中变量输出为字面值（如 `$name`）？**
+
+变量未设置或为 null 时，Velocity 默认原样输出。解决方案：1）使用 `#if($name)$name#end` 判断；2）使用 `${!name}` 设置空值时的默认输出。
+
+**如何与 SpringBoot 集成？**
+
+SpringBoot 2.x 已移除对 Velocity 的自动配置。如需使用，需手动配置 `VelocityEngineFactoryBean` 或使用第三方 starter（如 `velocity-spring-boot-starter`）。
+
 ## 参考资料
 
 - [Velocity Github](https://github.com/apache/velocity-engine/)

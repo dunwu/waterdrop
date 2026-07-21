@@ -1107,6 +1107,64 @@ private void loadClass(Map<String, Class<?>> extensionClasses, java.net.URL reso
 
 如上，`loadClass` 方法操作了不同的缓存，比如 `cachedAdaptiveClass`、`cachedWrapperClasses` 和 `cachedNames` 等等。除此之外，该方法没有其他什么逻辑了。
 
+## 典型应用场景
+
+### 场景一：数据库驱动加载（JDBC）
+
+JDBC 通过 SPI 机制加载不同数据库的驱动，应用代码无需依赖具体驱动实现：
+
+```java
+// 只需调用，驱动会通过 SPI 自动加载
+Connection conn = DriverManager.getConnection(
+    "jdbc:mysql://localhost:3306/mydb", "user", "pass");
+```
+
+驱动包中只需在 `META-INF/services/java.sql.Driver` 文件中声明实现类的全限定名即可。
+
+### 场景二：插件化/微内核架构（Dubbo SPI）
+
+Dubbo 框架通过扩展 SPI 机制实现插件化，支持负载均衡、序列化、协议等多维度扩展：
+
+```java
+// 在 META-INF/dubbo/com.xxx.LoadBalance 中配置
+// myLB=com.example.MyLoadBalance
+
+LoadBalance lb = ExtensionLoader.getExtensionLoader(LoadBalance.class)
+    .getExtension("myLB");
+```
+
+### 场景三：Spring Boot Starter 自动装配
+
+Spring Boot 的 `spring.factories` 机制本质也是 SPI 思想，根据依赖自动装配配置：
+
+```properties
+# META-INF/spring.factories
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.example.MyAutoConfiguration
+```
+
+## 最佳实践
+
+1. **接口与实现分离** - SPI 接口定义在独立的 API 包中，实现放在独立的实现包中，避免接口包依赖实现
+2. **SPI 配置文件名必须为接口全限定名** - 放在 `META-INF/services/` 下，文件内容为实现类的全限定名，每行一个
+3. **实现类必须有无参构造函数** - `ServiceLoader` 通过反射 `newInstance()` 创建实例，必须有无参构造
+4. **Dubbo SPI 优先于 Java SPI** - Dubbo 扩展了 SPI 机制，支持自适应加载、包装类、激活策略等高级特性，复杂场景优先考虑 Dubbo SPI
+5. **避免在 SPI 实现中抛出异常** - 异常会导致整个加载失败，应在实现内部处理异常并记录日志
+
+## 常见问题
+
+**Q1：Java SPI 和 API 有什么区别？**
+
+API 是服务提供者定义的接口，调用方直接依赖实现；SPI 是服务消费者定义的接口，具体实现由第三方提供，运行时通过 `ServiceLoader` 动态加载，实现了调用与实现的解耦。
+
+**Q2：ServiceLoader 是线程安全的吗？**
+
+`ServiceLoader` 本身不是线程安全的。在多线程环境下，建议每次调用 `ServiceLoader.load()` 创建新实例，或使用缓存并加锁。
+
+**Q3：Java SPI 加载失败如何排查？**
+
+常见原因：配置文件路径或名称错误、实现类没有无参构造、实现类不在 classpath 中、ClassLoader 不匹配。可使用 `-Djava.util.logging.config.file` 配置日志查看加载过程。
+
 ## 参考资料
 
 - [Java SPI 思想梳理](https://zhuanlan.zhihu.com/p/28909673)

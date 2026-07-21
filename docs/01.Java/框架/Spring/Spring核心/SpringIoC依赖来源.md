@@ -118,6 +118,20 @@ Spring 依赖注入的来源有哪些？
 - Resolvable Dependency
 - `@Value` 外部化配置
 
+## 典型应用场景
+
+- **框架内部扩展**：利用内建 BeanDefinition 注册自定义后置处理器，如自定义注解处理器、权限校验拦截器等。
+- **单例对象注册**：通过 `SingletonBeanRegistry#registerSingleton` 将第三方库的实例对象注册到 Spring 容器，使其能被其他 Bean 依赖注入。
+- **Resolvable Dependency 注入**：通过 `registerResolvableDependency` 注入容器基础设施对象（如 `BeanFactory`、`ApplicationContext`），避免与业务 Bean 冲突。
+- **多来源组合装配**：在同一应用中混合使用 BeanDefinition、单例对象和外部化配置，实现灵活的组件管理。
+
+## 最佳实践
+
+- **优先使用 `BeanDefinition` 注册业务 Bean**：享受完整的生命周期管理和延迟初始化支持。
+- **谨慎使用单例对象注册**：单例对象无生命周期回调，不适合需要初始化/销毁逻辑的场景。
+- **利用内建 Bean 获取基础设施**：通过依赖查找获取 `Environment`、`MessageSource` 等内建 Bean，而非手动创建。
+- **避免重复注册 BeanDefinition**：在 `freezeConfiguration()` 之前完成所有 BeanDefinition 注册，否则可能引发异常。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

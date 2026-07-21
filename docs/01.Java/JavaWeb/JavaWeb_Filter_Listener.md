@@ -211,6 +211,36 @@ Filter 和 Listener 的本质区别：
 - `Filter` 的示例源码：[源码](https://github.com/dunwu/javatech/tree/master/codes/javaee-tutorial/javaee-tutorial-filter)
 - `Listener` 的示例源码：[源码](https://github.com/dunwu/javatech/tree/master/codes/javaee-tutorial/javaee-tutorial-listener)
 
+## 典型应用场景
+
+- **统一编码过滤器**：通过 Filter 统一设置请求和响应的字符编码（如 UTF-8），解决中文乱码问题。
+- **权限认证过滤器**：在请求到达 Servlet 前检查用户是否已登录、是否有访问权限，未登录则重定向到登录页。
+- **跨域处理过滤器**：统一设置 CORS 响应头，允许前端跨域访问后端 API。
+- **请求日志记录**：通过 Listener 监听应用启动/关闭事件，通过 Filter 记录每个请求的处理时间、URI、参数等信息。
+- **在线用户统计**：通过 HttpSessionListener 监听 Session 创建和销毁，实时统计在线用户数。
+
+## 最佳实践
+
+- **Filter 执行顺序明确**：多个 Filter 按 `<filter-mapping>` 在 web.xml 中的声明顺序执行，或使用 `@Order` 注解明确顺序。
+- **及时释放资源**：Filter 的 `doFilter` 方法中必须调用 `chain.doFilter()` 或返回响应，否则请求会挂起。
+- **避免在 Filter 中处理业务逻辑**：Filter 仅做通用的横切关注点（编码、权限、日志），业务逻辑应放在 Servlet/Controller 中。
+- **Listener 初始化资源**：在 `ServletContextListener.contextInitialized()` 中初始化全局资源（如连接池、缓存），在 `contextDestroyed()` 中释放。
+- **注意 Filter 和 Interceptor 的区别**：Filter 是 Servlet 规范，在 Servlet 容器层执行；Interceptor 是 Spring MVC 概念，在 DispatcherServlet 内部执行，可访问 Spring 上下文。
+
+## 常见问题
+
+**Filter、Interceptor 和 AOP 有什么区别？**
+
+Filter 是 Servlet 规范组件，在 Servlet 容器层拦截请求；Interceptor 是 Spring MVC 组件，可访问 Spring 上下文和 Handler 信息；AOP 是 Spring 的切面编程，可以拦截任意 Bean 方法。执行顺序：Filter → Interceptor → AOP → Controller。
+
+**为什么 Filter 中不能使用 Spring Bean？**
+
+Filter 在 Servlet 容器中注册，生命周期由容器管理，不受 Spring 管理。可通过 `DelegatingFilterProxy` 或 `FilterRegistrationBean` 将 Filter 注册为 Spring Bean，从而注入依赖。
+
+**Listener 和 Filter 的执行顺序是怎样的？**
+
+应用启动时：`ServletContextListener.contextInitialized()` 最先执行，然后 Filter 初始化。请求处理时：Filter 链先执行，然后是 Servlet。应用关闭时：Filter 先销毁，最后 `ServletContextListener.contextDestroyed()` 执行。
+
 ## 参考资料
 
 - [深入拆解 Tomcat & Jetty](https://time.geekbang.org/column/intro/100027701)

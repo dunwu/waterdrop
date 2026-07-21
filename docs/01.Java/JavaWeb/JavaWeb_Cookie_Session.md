@@ -587,3 +587,37 @@ Cookie 需要浏览器支持才能使用。
 
 - Cookie 支持跨域名。
 - Session 不支持跨域名。
+
+## 典型应用场景
+
+- **用户登录状态维持**：用户登录后将用户信息存入 Session，后续请求通过 JSESSIONID Cookie 识别用户身份，实现有状态的会话体验。
+- **购物车功能**：将用户选购的商品信息存入 Session，即使用户跳转多个页面，购物车数据始终可访问。
+- **“记住我”功能**：通过在客户端设置长期有效的 Cookie，实现下次访问自动登录。
+- **用户行为跟踪**：通过 Cookie 记录用户偏好设置（如语言、主题）、浏览历史，实现个性化推荐。
+
+## 最佳实践
+
+- **敏感数据存 Session，非敏感数据存 Cookie**：Session 存储在服务器端更安全，Cookie 在客户端可被窃取或篡改。
+- **Cookie 设置 HttpOnly 和 Secure 属性**：`HttpOnly` 防止 JavaScript 读取 Cookie，`Secure` 确保仅通过 HTTPS 传输。
+- **合理设置 Session 超时时间**：默认 20-30 分钟，根据业务需求调整，避免过长导致内存占用。
+- **分布式环境使用 Redis 存储 Session**：通过 Spring Session + Redis 实现会话共享，避免集群部署时会话丢失。
+- **控制 Cookie 大小**：每个 Cookie 不超过 4KB，总量不超过浏览器限制（通常 20-50 个）。
+
+## 常见问题
+
+**Cookie 被禁用后如何维持会话？**
+
+可以使用 URL 重写将会话 ID 附加到 URL 中（`response.encodeURL()`），或使用 Hidden 表单字段传递会话信息。Spring Session 也支持基于 Header 的会话跟踪。
+
+**Session 在分布式环境下有什么问题？**
+
+默认 Session 存储在单机内存中，集群部署时会话无法共享。解决方案：Spring Session + Redis、Sticky Session（负载均衡器将同一用户路由到同一台服务器）、或 JWT Token 无状态方案。
+
+**Cookie 和 Session 的安全风险有哪些？**
+
+Cookie 存在 XSS（跨站脚本）和 CSRF（跨站请求伪造）攻击风险；Session 存在会话固定攻击和会话劫持风险。防范措施包括：使用 HTTPS、设置 HttpOnly/Secure/SameSite 属性、定期更换 Session ID。
+
+## 参考资料
+
+- [深入拆解 Tomcat & Jetty](https://time.geekbang.org/column/intro/100027701)
+- [Java Web 整合开发王者归来](https://book.douban.com/subject/4189495/)

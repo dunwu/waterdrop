@@ -15,6 +15,10 @@ permalink: /pages/b529ddfd/
 
 # Java 虚拟机之类加载
 
+## 简介
+
+类加载机制是 JVM 将 `.class` 文件中的类信息加载到内存中的过程。它包括加载、验证、准备、解析、初始化五个阶段。类加载器采用双亲委派模型，确保核心类库的安全性和一致性。理解类加载机制对于解决类冲突、实现热部署和自定义加载策略至关重要。
+
 ## 类加载机制
 
 > 类是在运行期间动态加载的。
@@ -554,6 +558,56 @@ public class ClassCastExceptionDemo {
 Exception in thread "main" java.lang.ClassCastException: java.lang.Object cannot be cast to io.github.dunwu.javacore.jvm.classloader.exception.ClassCastExceptionDemo$EmptyClass
 	at io.github.dunwu.javacore.jvm.classloader.exception.ClassCastExceptionDemo.main(ClassCastExceptionDemo.java:11)
 ```
+
+## 典型应用场景
+
+### 场景一：SPI 机制打破双亲委派
+
+Java SPI（如 JDBC Driver）使用线程上下文类加载器打破双亲委派：
+
+```java
+Thread.currentThread().setContextClassLoader(customClassLoader);
+ServiceLoader.load(MyService.class);
+```
+
+### 场景二：实现热部署
+
+通过自定义 ClassLoader 实现类的热加载：
+
+```java
+public class HotClassLoader extends ClassLoader {
+    public Class<?> loadClassFromFile(String path) throws Exception {
+        byte[] bytes = Files.readAllBytes(Path.of(path));
+        return defineClass(null, bytes, 0, bytes.length);
+    }
+}
+```
+
+### 场景三：Tomcat 的类加载隔离
+
+Tomcat 为每个 Web 应用使用独立的 ClassLoader，实现应用间的类隔离。
+
+## 最佳实践
+
+1. **理解双亲委派模型**：避免自定义 ClassLoader 时出现类冲突。
+2. **使用 SPI 机制加载插件**：如 JDBC、SLF4J 等。
+3. **注意类的初始化时机**：只有“主动使用”才会触发初始化。
+4. **避免在构造器中引用未初始化的静态变量**：可能导致不可预期的行为。
+
+## 常见问题
+
+### Q1：双亲委派模型是什么？
+
+类加载请求先委托父加载器处理，父加载器无法加载时才由自己加载。这种机制保证了核心类库（如 `java.lang.String`）不会被篡改。
+
+### Q2：`Class.forName` 和 `ClassLoader.loadClass` 有什么区别？
+
+- `Class.forName`：加载并初始化类（执行静态代码块）。
+- `ClassLoader.loadClass`：只加载不初始化。
+
+### Q3：什么情况下类会被卸载？
+
+当类的所有实例都被 GC、加载该类的 ClassLoader 被 GC、且对应的 Class 对象不再被引用时，类会被卸载。
 
 ## 参考资料
 

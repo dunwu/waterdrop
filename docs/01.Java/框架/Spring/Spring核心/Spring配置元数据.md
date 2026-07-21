@@ -293,6 +293,30 @@ API 编程
 - XML 处理性能较差：Spring XML 基于 DOM Level 3 API 实现，该 API 便于理解，然而性能较差
 - XML 框架移植性差：很难适配高性能和便利性的 XML 框架，如 JAXB
 
+## 典型应用场景
+
+- **微服务配置模块化**：通过 `@Import` 将多个配置类组合，按功能模块拆分配置（如 DatabaseConfig、SecurityConfig、CacheConfig）。
+- **自定义 XML 元素扩展**：通过 Extensible XML authoring 机制封装自定义命名空间，简化复杂配置（如 Dubbo 的 `<dubbo:service>`）。
+- **外部化配置加载**：通过 `@PropertySource` 加载自定义 `.properties` 文件，将业务配置与框架配置分离。
+- **条件化配置装配**：结合 `@Conditional` 和 `@Profile` 实现按环境条件加载不同的 Bean 配置。
+
+## 最佳实践
+
+- **优先使用 Java 配置而非 XML**：Java 配置提供类型安全和 IDE 支持，可读性更强；XML 仅用于遗留项目或特定框架集成。
+- **合理拆分配置类**：避免单个配置类过于庞大，按业务域或技术栈拆分多个 `@Configuration` 类。
+- **使用 `@PropertySource` 加载自定义配置**：将业务配置与 `application.properties` 分离，提高配置的可维护性。
+- **避免过度使用 Extensible XML authoring**：其复杂度高且性能较差，优先通过注解和 Java 配置实现扩展。
+
+## 常见问题
+
+**`@Configuration` 与 `@Component` 的区别？**
+
+`@Configuration` 表示该类作为配置类，其中的 `@Bean` 方法会触发 CGLIB 代理，确保同一 Bean 不会被重复创建；`@Component` 是通用组件注解，不具备代理语义。
+
+**为什么 `@PropertySource` 不支持 YAML？**
+
+Spring 的 `@PropertySource` 默认使用 `PropertySourceFactory` 加载资源，而默认实现仅支持 `.properties` 格式。可通过自定义 `PropertySourceFactory` 支持 YAML。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

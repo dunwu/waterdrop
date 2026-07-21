@@ -471,6 +471,34 @@ private class SomeObject {
 
 > 示例源码：[javalib-io-json](https://github.com/dunwu/java-tutorial/tree/master/javalib-io-json)
 
+## 典型应用场景
+
+- **REST API 数据交换**：JSON 作为前后端数据交换的标准格式，通过 Jackson/Gson 实现 Java 对象与 JSON 的互转。
+- **配置文件存储**：使用 JSON 格式存储应用配置，支持嵌套结构，比 properties 文件更灵活。
+- **消息队列数据格式**：在 Kafka、RabbitMQ 等消息中间件中使用 JSON 作为消息体格式。
+- **NoSQL 数据库存储**：MongoDB 等文档数据库使用 BSON（类 JSON）格式存储数据。
+
+## 最佳实践
+
+- **首选 Jackson**：Jackson 是 Spring Boot 默认的 JSON 库，性能优秀且功能丰富。Gson 适合简单场景，Fastjson 存在安全漏洞风险。
+- **避免 Fastjson**：Fastjson 历史上多次出现反序列化安全漏洞，生产环境建议使用 Jackson 或 Gson。
+- **合理使用注解控制序列化**：`@JsonIgnore`、`@JsonProperty`、`@JsonFormat` 等注解精细控制序列化行为。
+- **注意 BigDecimal 精度**：金融场景下使用 `BigDecimal` 并通过 `@JsonDeserialize` 指定反序列化器，避免浮点数精度丢失。
+
+## 常见问题
+
+**Jackson、Gson、Fastjson 如何选择？**
+
+Jackson：功能最全面、性能优秀、Spring Boot 默认；Gson：Google 出品、API 简洁、适合简单场景；Fastjson：阿里出品但安全漏洞多，不推荐生产使用。
+
+**JSON 序列化时如何忽略 null 值？**
+
+Jackson：`@JsonInclude(JsonInclude.Include.NON_NULL)` 或全局配置 `ObjectMapper.setSerializationInclusion(Include.NON_NULL)`。Gson：`new GsonBuilder().serializeNulls()` 控制。
+
+**如何处理 JSON 中的日期格式？**
+
+Jackson：使用 `@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")` 注解或全局配置 `ObjectMapper.setDateFormat()`。
+
 ## 参考资料
 
 - **官方**

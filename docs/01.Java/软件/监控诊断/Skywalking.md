@@ -63,6 +63,30 @@ SkyWalking 是观察性分析平台和应用性能管理系统。
 - [UI setup document](https://github.com/apache/skywalking/blob/master/docs/en/setup/backend/ui-setup.md)
 - [CLI set up document](https://github.com/apache/skywalking-cli)
 
+## 典型应用场景
+
+- **微服务链路追踪**：自动埋点追踪 HTTP、RPC、MQ 等跨服务调用，生成调用链拓扑图，快速定位慢调用和故障节点。
+- **性能瓶颈分析**：通过 Trace 详情查看每个 Span 的耗时，结合 Metrics 和 Logs 定位性能瓶颈（如数据库慢查询、外部接口超时）。
+- **服务网格监控**：集成 Istio、Envoy 等 Service Mesh，采集 sidecar 遥测数据，实现对服务网格的全方位观测。
+- **告警与可视化**：配置基于指标的告警规则（如错误率、响应时间 P99），通过 Grafana 或内置 UI 展示实时监控大盘。
+
+## 最佳实践
+
+- **合理设置采样率**：生产环境建议采样率 10%-20%，核心接口可配置全量采样，避免过度采集导致存储压力。
+- **规范服务命名**：通过 `-Dskywalking.agent.service_name` 明确指定服务名，避免默认名导致的服务混淆。
+- **多环境隔离**：开发、测试、生产环境使用独立的 SkyWalking 实例或命名空间，避免数据混杂。
+- **定期清理数据**：配置数据 TTL（Time To Live），定期清理历史 Trace 和 Metrics 数据，控制存储规模。
+
+## 常见问题
+
+**SkyWalking Agent 对应用性能影响大吗？**
+
+SkyWalking 采用无侵入式字节码增强技术，对应用性能影响较小（通常 1%-3%）。如果影响较大，可检查：1) 是否开启了过多的插件；2) 采样率是否过高；3) 是否采集了过多自定义 Tag。
+
+**Trace 数据丢失或上报延迟？**
+
+常见原因：1) Agent 与 OAP 服务端网络不通，检查防火墙和端口；2) OAP 服务端负载过高，处理不过来，考虑扩容 OAP 集群；3) Agent 配置错误，检查 agent.config 中的 backend 地址是否正确。
+
 ## 参考资料
 
 - [SkyWalking Github](https://github.com/apache/skywalking)

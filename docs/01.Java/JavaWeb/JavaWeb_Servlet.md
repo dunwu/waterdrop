@@ -306,6 +306,36 @@ description The client must first authenticate itself with the proxy (Need authe
 Apache Tomcat/5.5.29
 ```
 
+## 典型应用场景
+
+- **传统 Web 应用**：Servlet 是 Java Web 的基础，早期的 Web 应用直接使用 Servlet 处理 HTTP 请求和生成动态网页。
+- **Spring MVC 底层支撑**：Spring MVC 的核心 `DispatcherServlet` 就是一个 Servlet，理解 Servlet 是理解 Spring Web 的基础。
+- **文件上传/下载**：通过 Servlet 3.0+ 的 `@MultipartConfig` 注解和 `Part` API 实现文件上传功能。
+- **API 网关/代理**：Servlet 可作为简单的 API 网关，转发请求到后端微服务，实现请求路由、协议转换等。
+- **自定义协议处理**：Servlet 不限于 HTTP，可用于处理任意协议的请求，如 WebSocket（JSR 356）。
+
+## 最佳实践
+
+- **不要在 Servlet 中写业务逻辑**：Servlet 仅负责请求解析和响应输出，业务逻辑应委托给 Service 层。
+- **使用 Servlet 3.0+ 注解配置**：使用 `@WebServlet`、`@WebFilter`、`@WebListener` 注解替代 web.xml，简化配置。
+- **合理使用异步 Servlet**：对于耗时操作（如长轮询、流式响应），使用 Servlet 3.0 的异步处理能力避免阻塞容器线程。
+- **注意线程安全**：Servlet 是单例多线程的，不要在 Servlet 中定义可变的成员变量，应使用局部变量或请求作用域。
+- **统一异常处理**：在 web.xml 中配置 `<error-page>` 或使用 Filter 统一捕获异常，避免将堆栈信息暴露给客户端。
+
+## 常见问题
+
+**Servlet 和 Spring MVC 的关系是什么？**
+
+Spring MVC 的 `DispatcherServlet` 本质是一个 Servlet，它在 `service()` 方法中拦截所有请求，然后分发给对应的 Handler（Controller）处理。Spring MVC 是 Servlet 之上的高级抽象层。
+
+**Servlet 为什么是线程不安全的？**
+
+Servlet 容器默认使用单例模式创建 Servlet 实例，多个请求共享同一个实例的不同线程。如果在 Servlet 中定义了成员变量，多个线程同时访问会导致数据竞争。解决方案：使用局部变量、将数据存入 request/session 作用域。
+
+**Servlet 3.0 异步处理与 Spring WebFlux 有什么区别？**
+
+Servlet 3.0 异步处理仍然是基于 Servlet 容器（Tomcat/Jetty）的线程池模型，只是不阻塞容器线程；Spring WebFlux 基于 Reactive Streams，使用非阻塞 I/O 模型（底层基于 Netty），在处理大量并发连接时资源消耗更少。
+
 ## 参考资料
 
 - [深入拆解 Tomcat & Jetty](https://time.geekbang.org/column/intro/100027701)

@@ -19,6 +19,10 @@ permalink: /pages/29303397/
 
 # Java 容器之 Set
 
+## 简介
+
+Set 是 Java 容器框架中用于存储不重复元素的集合。它继承自 `Collection` 接口，通过内部机制保证元素的唯一性。Java 提供了多种 Set 实现：`HashSet`（无序、高性能）、`LinkedHashSet`（保持插入顺序）、`TreeSet`（有序、红黑树）和 `EnumSet`（枚举专用），各自适用于不同的场景。
+
 ## Set 简介
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/Set-diagrams.png)
@@ -241,12 +245,90 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
 
 ## HashSet vs. LinkedHashSet vs. TreeSet
 
-`HashSet`、`LinkedHashSet` 和 `TreeSet` 都是 `Set` 接口的实现类，都能保证元素唯一，并且都不是线程安全的。
+| 特性 | HashSet | LinkedHashSet | TreeSet |
+| --- | --- | --- | --- |
+| 底层结构 | 哈希表（HashMap） | 链表+哈希表 | 红黑树（TreeMap） |
+| 元素顺序 | 无序 | 插入顺序 | 自然序/比较器序 |
+| null 元素 | 允许 1 个 | 允许 1 个 | 不允许 |
+| 时间复杂度 | O(1) | O(1) | O(log n) |
+| 线程安全 | 不安全 | 不安全 | 不安全 |
+| 适用场景 | 快速去重 | 去重且保持顺序 | 排序场景 |
 
-`HashSet`、`LinkedHashSet` 和 `TreeSet` 的主要区别在于底层数据结构不同。`HashSet` 的底层数据结构是哈希表（基于 `HashMap` 实现）。`LinkedHashSet` 的底层数据结构是链表和哈希表，元素的插入和取出顺序满足 FIFO。`TreeSet` 底层数据结构是红黑树，元素是有序的，排序的方式有自然排序和定制排序。
+## 典型应用场景
 
-底层数据结构不同又导致这三者的应用场景不同。`HashSet` 用于不需要保证元素插入和取出顺序的场景，`LinkedHashSet` 用于保证元素的插入和取出顺序满足 FIFO 的场景，`TreeSet` 用于支持对元素自定义排序规则的场景。
+### 场景一：数据去重
+
+快速去除列表中的重复元素：
+
+```java
+List<String> names = Arrays.asList("Alice", "Bob", "Alice", "Charlie", "Bob");
+Set<String> uniqueNames = new HashSet<>(names);
+// 结果：[Alice, Bob, Charlie]
+```
+
+### 场景二：集合运算（交集、并集、差集）
+
+利用 Set 的数学集合特性进行交并差运算：
+
+```java
+Set<Integer> set1 = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
+Set<Integer> set2 = new HashSet<>(Arrays.asList(4, 5, 6, 7, 8));
+
+// 交集
+Set<Integer> intersection = new HashSet<>(set1);
+intersection.retainAll(set2); // [4, 5]
+
+// 并集
+Set<Integer> union = new HashSet<>(set1);
+union.addAll(set2); // [1, 2, 3, 4, 5, 6, 7, 8]
+
+// 差集
+Set<Integer> difference = new HashSet<>(set1);
+difference.removeAll(set2); // [1, 2, 3]
+```
+
+### 场景三：使用 TreeSet 实现范围查询
+
+利用 `NavigableSet` 的丰富方法进行范围查询：
+
+```java
+TreeSet<Integer> scores = new TreeSet<>(Arrays.asList(55, 72, 88, 91, 63, 45, 78));
+
+// 查找大于等于 80 分的学生
+NavigableSet<Integer> highScores = scores.tailSet(80, true); // [88, 91]
+
+// 查找分数在 60-80 之间的
+NavigableSet<Integer> midScores = scores.subSet(60, true, 80, false); // [63, 72, 78]
+```
+
+## 最佳实践
+
+1. **默认选择 `HashSet`**：如果没有特殊需求，`HashSet` 是最佳选择，O(1) 的时间复杂度最优。
+2. **需要保持插入顺序时用 `LinkedHashSet`**：适合需要按插入顺序输出的场景，如配置项管理。
+3. **需要排序时用 `TreeSet`**：当元素需要自然序或自定义排序时使用，注意时间复杂度为 O(log n)。
+4. **枚举类型用 `EnumSet`**：性能远优于 `HashSet`，底层用位向量实现。
+5. **注意自定义对象的 `hashCode` 和 `equals`**：使用 `HashSet` 时，必须正确覆写这两个方法，否则无法正确去重。
+6. **并发环境使用 `ConcurrentHashMap.newKeySet()`**：比 `Collections.synchronizedSet` 性能更好。
+
+## 常见问题
+
+### Q1：HashSet 如何保证元素唯一性？
+
+`HashSet` 基于 `HashMap` 实现。添加元素时，先计算 `hashCode` 确定存储位置，再用 `equals` 比较是否已存在。如果 `hashCode` 和 `equals` 判断相同，则不会重复添加。这就是为什么自定义对象必须正确覆写这两个方法。
+
+### Q2：TreeSet 可以存储 null 吗？
+
+不可以。`TreeSet` 基于 `TreeMap`（红黑树），在插入时会调用 `compareTo` 或 `Comparator` 进行比较，`null` 会导致 `NullPointerException`。
+
+### Q3：HashSet、LinkedHashSet、TreeSet 如何选择？
+
+- 只需去重，不关心顺序 → `HashSet`
+- 需要保持插入顺序 → `LinkedHashSet`
+- 需要自然序或自定义排序 → `TreeSet`
+- 存储枚举类型 → `EnumSet`
 
 ## 参考资料
 
 - [Java 编程思想（Thinking in java）](https://item.jd.com/10058164.html)
+- [《Effective Java》第 3 版](https://book.douban.com/subject/30412517/)
+- [Java Set 官方文档](https://docs.oracle.com/javase/8/docs/api/java/util/Set.html)

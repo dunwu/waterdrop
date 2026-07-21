@@ -394,6 +394,30 @@ public class AdviseDefine {
 
 around advice 和前面的 before advice 差不多, 只是我们把注解 **@Before** 改为了 **@Around** 了.
 
+## 典型应用场景
+
+- **日志记录**：通过 `@Around` 通知拦截 Service 层方法，统一记录请求参数、执行耗时和返回结果，避免日志代码侵入业务逻辑。
+- **权限校验**：在 Controller 方法执行前通过 `@Before` 通知检查用户权限，未授权时直接抛出异常，实现统一的访问控制。
+- **事务管理**：Spring 通过 `@Transactional` 注解基于 AOP 实现声明式事务，在目标方法前开启事务，正常返回后提交，异常时回滚。
+- **性能监控**：利用 `@Around` 通知记录方法执行时间，超过阈值时触发告警，常用于核心链路的性能瓶颈分析。
+- **缓存处理**：`@Cacheable`、`@CacheEvict` 等注解基于 AOP 拦截方法调用，实现透明的缓存读取和失效管理。
+
+## 最佳实践
+
+- **优先基于接口编程**：Spring AOP 默认使用 JDK 动态代理，基于接口编程能获得更好的兼容性和可测试性。
+- **避免过度使用 AOP**：仅将日志、事务、权限等横切关注点抽取为切面，避免将核心业务逻辑放入切面中。
+- **使用 `@Around` 而非 `@Before` + `@After`**：环绕通知能完全控制方法执行流程，比组合多个通知更高效且不易出错。
+- **合理设计切点表达式**：过于宽泛的切点会导致性能下降（每个匹配方法都会创建代理拦截），应精确匹配目标方法。
+- **注意同类内部调用失效**：Spring AOP 基于代理，同一类内部方法直接调用（`this.method()`）不经过代理，切面不生效。需通过 `AopContext.currentProxy()` 获取代理对象调用。
+
+## 常见问题
+
+- **为什么 `final` 方法上的切面不生效？** CGLIB 代理基于继承生成子类，无法重写 `final` 方法，导致切面逻辑无法织入。
+- **为什么 `private` 方法上的切面不生效？** Spring AOP 只能拦截 Spring 容器中 Bean 的 `public` 方法，代理无法访问 `private` 方法。
+- **多个切面的执行顺序如何控制？** 通过 `@Order` 注解或实现 `Ordered` 接口指定优先级，数值越小优先级越高。
+- **AOP 代理和 AspectJ 有什么区别？** Spring AOP 是运行时动态代理，仅支持方法级别拦截；AspectJ 支持编译时/类加载时织入，可拦截构造器、字段等，功能更强大但配置复杂。
+
 ## 参考资料
 
 - [《 Spring 实战（第 4 版）》](https://item.jd.com/11899370.html)
+- [Spring 官方文档之 AOP](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop)

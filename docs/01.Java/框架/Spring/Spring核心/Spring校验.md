@@ -630,6 +630,30 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 - Java Bean 属性错误描述：`org.springframework.validation.FieldError`
 - Bean Validation 适配：`org.springframework.validation.beanvalidation.LocalValidatorFactoryBean`
 
+## 典型应用场景
+
+- **Web API 入参校验**：在 Controller 层通过 `@Valid` / `@Validated` 对请求体、查询参数进行自动校验。
+- **业务规则校验**：通过自定义 `Validator` 实现复杂业务规则校验，如跨字段关联校验、数据库唯一性校验。
+- **分组校验**：同一 DTO 在新增、编辑、查询等不同操作下应用不同的校验规则。
+- **嵌套对象校验**：对 DTO 中包含的子对象递归执行校验，如订单中的商品列表。
+
+## 最佳实践
+
+- **全局异常处理统一返回格式**：通过 `@ControllerAdvice` 统一处理 `ConstraintViolationException` 和 `MethodArgumentNotValidException`。
+- **开启 Fail Fast 模式**：对于性能敏感场景，配置 `failFast(true)` 在首个校验失败后立即返回。
+- **自定义校验注解复用业务规则**：将常用校验逻辑封装为自定义注解（如 `@IsMobile`、`@IsEmail`），提高复用性。
+- **避免在校验器中执行 IO 操作**：校验注解应保持纯逻辑，数据库查询等重操作应放在 Service 层。
+
+## 常见问题
+
+**`@Valid` 和 `@Validated` 的区别？**
+
+`@Valid` 是 JSR-303 标准注解，不支持分组校验；`@Validated` 是 Spring 扩展注解，支持分组校验和方法级别参数校验。
+
+**为什么 `@RequestBody` 参数校验失败抛出 `MethodArgumentNotValidException`，而 `@RequestParam` 抛出 `ConstraintViolationException`？**
+
+`@RequestBody` 参数由 `RequestResponseBodyMethodProcessor` 处理，封装为 `MethodArgumentNotValidException`；`@RequestParam`/`@PathVariable` 参数由 AOP 拦截器处理，直接抛出 `ConstraintViolationException`。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

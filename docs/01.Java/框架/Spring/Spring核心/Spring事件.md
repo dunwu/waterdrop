@@ -226,6 +226,26 @@ Spring 3.0 错误处理接口 - org.springframework.util.ErrorHandler
 - Spring 同步事件 - 绝大多数 Spring 使用场景，如 ContextRefreshedEvent
 - Spring 异步事件 - 主要 @EventListener 与 @Async 配合，实现异步处理，不阻塞主线程，比如长时间的数据计算任务等。不要轻易调整 SimpleApplicationEventMulticaster 中关联的 taskExecutor 对象，除非使用者非常了解 Spring 事件机制，否则容易出现异常行为。
 
+## 典型应用场景
+
+- **业务解耦**：订单创建后发布 `OrderCreatedEvent`，库存服务、通知服务分别监听处理，避免主流程与下游逻辑强耦合。
+- **启动后初始化**：监听 `ApplicationReadyEvent`，在应用完全就绪后执行数据预热、缓存加载等初始化任务。
+- **异步通知**：通过 `@EventListener` + `@Async` 实现异步事件处理，如发送邮件、短信通知，避免阻塞主业务线程。
+- **审计日志**：通过监听业务事件，统一记录操作日志和审计跟踪，实现日志与业务的解耦。
+
+## 最佳实践
+
+- **事件对象设计为不可变**：事件发布后不应修改，避免监听器之间互相干扰。
+- **异步事件搭配 `@Async`**：对于耗时操作（如发邮件、调外部 API），用异步事件避免阻塞发布者。
+- **注意同步事件的事务边界**：同步事件监听器在同一事务中执行，若监听器抛异常，整个事务会回滚。
+- **避免在事件中执行复杂业务**：事件应作为轻量级通知，复杂逻辑应委托给专门的 Service 处理。
+
+## 常见问题
+
+- **Spring 事件是同步还是异步？** 默认是同步执行，监听器在发布者的线程中执行。可通过 `@Async` 或配置 `TaskExecutor` 切换为异步。
+- **父子容器的事件传播机制？** 子容器发布的事件会向父容器传播，但父容器的事件不会向子容器传播。
+- **如何保证事件顺序？** 通过 `@Order` 注解控制监听器的执行顺序，数值越小优先级越高。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

@@ -261,6 +261,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 完整示例：[源码](https://github.com/dunwu/spring-boot-tutorial/tree/master/codes/spring-boot-web-fastjson)
 
+## 典型应用场景
+
+- **RESTful API 数据序列化**：自动将 Java 对象序列化为 JSON 响应，反序列化请求体为 Java 对象。
+- **多格式数据支持**：同时支持 JSON、XML 等多种数据格式，通过内容协商机制自动选择。
+- **敏感字段过滤**：通过 `@JsonIgnore`、`@JsonView` 注解控制序列化时是否包含敏感字段。
+- **日期时间格式化**：通过 `@JsonFormat` 或全局配置统一日期序列化格式。
+
+## 最佳实践
+
+- **统一 Jackson 全局配置**：通过 `application.yml` 或 `Jackson2ObjectMapperBuilderCustomizer` 统一配置日期格式、空值处理等。
+- **避免直接暴露数据库实体**：使用 DTO 对象作为 API 响应，防止内部结构泄露。
+- **合理使用 `@JsonProperty`**：为字段指定别名，兼容前后端命名差异。
+- **生产环境禁止序列化 `null` 值**：通过 `NON_NULL` 策略减少响应体大小。
+
 ## 引申和引用
 
 **引申**

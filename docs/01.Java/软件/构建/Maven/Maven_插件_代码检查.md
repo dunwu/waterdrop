@@ -421,6 +421,30 @@ permalink: /pages/1e846e6f/
 
 配置好后，可以执行 `mvn clean pmd:check` 检查代码。
 
+## 典型应用场景
+
+- **统一代码风格**：通过 maven-checkstyle-plugin 强制团队遵循统一的代码规范（如阿里巴巴 Java 开发规范），在构建时自动检查并报告违规。
+- **静态代码分析**：使用 PMD、FindBugs/SpotBugs 等工具发现潜在 bug、性能问题和安全漏洞，在代码提交前拦截问题。
+- **集成到 CI 流水线**：在 Jenkins、GitLab CI 中执行代码检查插件，构建失败时自动阻断合并，确保代码质量门禁。
+- **生成质量报告**：配置 site 插件生成包含 Checkstyle、PMD、FindBugs 等报告的站点，供团队定期 review。
+
+## 最佳实践
+
+- **渐进式引入**：新项目直接启用严格规则，老项目先用宽松规则逐步收紧，避免因大量违规导致构建频繁失败。
+- **自定义规则集**：基于团队实际情况定制 checkstyle.xml 和 pmd-ruleset.xml，避免一刀切的标准降低开发效率。
+- **failOnViolation 策略**：开发环境设置 `failOnViolation=false` 仅报告不阻断，生产环境设置为 true 强制拦截，平衡开发效率和代码质量。
+- **与 IDE 联动**：在 IDE 中安装 Checkstyle、PMD 插件，使用与 Maven 相同的配置文件，实现编码时实时检查。
+
+## 常见问题
+
+**Checkstyle 报告中文乱码？**
+
+在 checkstyle.xml 中指定文件编码 `<property name="charset" value="UTF-8"/>`，并确保 pom.xml 中 `<project.build.sourceEncoding>` 也设置为 UTF-8。
+
+**PMD 误报太多怎么办？**
+
+可以通过 `// NOPMD` 注释抑制特定行的误报，或在 pmd-ruleset.xml 中排除特定规则。建议定期 review 误报情况，优化规则配置而非简单抑制。
+
 ## 参考资料
 
 - https://maven.apache.org/plugins/maven-checkstyle-plugin/

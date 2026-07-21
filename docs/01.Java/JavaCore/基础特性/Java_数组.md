@@ -373,6 +373,85 @@ Java 中，提供了一个很有用的数组工具类：Arrays。
 
 > 扩展阅读：https://juejin.im/post/5a6ade5c518825733e60acb8
 
+## 典型应用场景
+
+### 场景一：算法与数据处理
+
+数组是算法实现中最基本的数据结构，常用于排序、查找、动态规划等：
+
+```java
+// 二分查找 - 在有序数组中查找目标值
+public static int binarySearch(int[] arr, int target) {
+    int left = 0, right = arr.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] == target) return mid;
+        else if (arr[mid] < target) left = mid + 1;
+        else right = mid - 1;
+    }
+    return -1;
+}
+```
+
+### 场景二：缓冲区与批量数据处理
+
+数组适合作为 I/O 操作的缓冲区，或批量处理数据的容器：
+
+```java
+// 文件读取缓冲区
+byte[] buffer = new byte[8192];
+int bytesRead;
+try (InputStream is = new FileInputStream("data.bin")) {
+    while ((bytesRead = is.read(buffer)) != -1) {
+        processBytes(buffer, bytesRead);
+    }
+}
+```
+
+### 场景三：矩阵与多维数据
+
+在科学计算、图像处理等场景中，多维数组用于表示矩阵和网格数据：
+
+```java
+// 矩阵转置
+public static int[][] transpose(int[][] matrix) {
+    int rows = matrix.length;
+    int cols = matrix[0].length;
+    int[][] result = new int[cols][rows];
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            result[j][i] = matrix[i][j];
+        }
+    }
+    return result;
+}
+```
+
+## 最佳实践
+
+1. **优先使用容器类**：除非对性能有极致要求，否则优先使用 `ArrayList`、`List` 等容器。
+2. **指定合理的初始容量**：创建数组或 ArrayList 时，如果知道大致大小，应指定初始容量避免扩容。
+3. **使用 `Arrays` 工具类**：利用 `Arrays.sort()`、`Arrays.binarySearch()`、`Arrays.equals()` 等方法简化操作。
+4. **避免数组越界**：访问数组前始终检查下标合法性，或使用增强 for 循环避免手动索引。
+5. **使用 `System.arraycopy` 复制数组**：比循环逐个赋值更高效。
+6. **多维数组不超过三维**：以人的理解能力，超过三维的数组难以维护，应考虑重构。
+7. **数组初始化时注意默认值**：基本类型默认为 0/false，引用类型默认为 null，使用前必须检查。
+
+## 常见问题
+
+### Q1：数组和 ArrayList 如何选择？
+
+- **数组**：固定大小、性能更高、可以存储基本类型。适用于大小确定且不变的场景。
+- **ArrayList**：动态扩容、提供丰富的 API、支持泛型。适用于大多数业务场景。
+
+### Q2：为什么 Java 不支持泛型数组？
+
+因为泛型通过类型擦除实现，在运行时泛型信息不可知。而数组是具体化的（reified），在运行时知道元素类型。两者不兼容：如果允许泛型数组，可能导致运行时类型安全问题（数组协变 + 泛型擦除 = 类型漏洞）。
+
+### Q3：如何优雅地打印数组内容？
+
+直接打印数组对象只会输出内存地址的哈希值。应使用 `Arrays.toString()` 打印一维数组，`Arrays.deepToString()` 打印多维数组。
+
 ## 小结
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/b45006449d794e10b8b3284ddfae02f1.png)

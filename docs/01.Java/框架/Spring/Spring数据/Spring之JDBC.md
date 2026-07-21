@@ -761,6 +761,20 @@ Spring Data 项目包含了对 JDBC 的存储库支持，并将自动为 `CrudRe
 
 > 更多 Spring Data JDBC 细节，可以参考 [Spring Data JDBC 官方文档](http://spring.io/projects/spring-data-jdbc)。
 
+## 典型应用场景
+
+- **轻量级数据访问**：对于简单 CRUD 场景，使用 `JdbcTemplate` 比 ORM 更轻量高效。
+- **批量操作**：通过 `batchUpdate()` 实现大量数据批量插入/更新，性能优于逐条执行。
+- **存储过程调用**：通过 `SimpleJdbcCall` 调用数据库存储过程。
+- **自定义 SQL 优化**：对于性能敏感场景，直接编写优化 SQL 而非依赖 ORM 生成。
+
+## 最佳实践
+
+- **使用命名参数**：通过 `NamedParameterJdbcTemplate` 使用命名参数，提高 SQL 可读性。
+- **RowMapper 复用**：将 `RowMapper` 抽取为静态常量，避免每次查询重复创建。
+- **事务与 JDBC 配合**：在 Service 层添加 `@Transactional`，确保多步操作原子性。
+- **Spring Data JDBC 简化开发**：对于简单场景，使用 Spring Data JDBC 的 Repository 模式替代手动编写 `JdbcTemplate` 代码。
+
 ## 参考资料
 
 - [Spring 官网](https://spring.io/)

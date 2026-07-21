@@ -14,6 +14,10 @@ permalink: /pages/5ca3da83/
 
 # Java 虚拟机之调优
 
+## 简介
+
+JVM 调优是通过调整 JVM 参数来优化应用性能的过程。主要关注两个指标：停顿时间（延迟）和吞吐量。调优的核心包括选择合适的 GC、配置堆内存大小、调整新生代比例等。调优应基于 GC 日志和监控数据，而非猜测。
+
 ## JVM 调优概述
 
 ### GC 性能指标
@@ -423,6 +427,52 @@ address 即为远程 debug 的监听端口。
 | `-XX:+PrintGCDetails`             | 打印 GC 日志             |
 | `-Xloggc:<filename>`              | 指定 GC 日志文件名       |
 | `-XX:+HeapDumpOnOutOfMemoryError` | 内存溢出时输出堆快照文件 |
+
+## 典型应用场景
+
+### 场景一：Web 服务调优（低延迟）
+
+```bash
+java -Xms4g -Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 \
+     -XX:+ParallelRefProcEnabled -XX:+UseStringDeduplication \
+     -Xlog:gc*:file=gc.log -jar app.jar
+```
+
+### 场景二：批处理调优（高吞吐量）
+
+```bash
+java -Xms8g -Xmx8g -XX:+UseParallelGC -XX:ParallelGCThreads=8 \
+     -XX:+UseAdaptiveSizePolicy -jar batch.jar
+```
+
+### 场景三：小内存环境调优
+
+```bash
+java -Xms256m -Xmx256m -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m \
+     -jar embedded.jar
+```
+
+## 最佳实践
+
+1. **先监控后调优**：没有数据支撑的调优是盲目的。
+2. **一次只改一个参数**：便于评估效果。
+3. **保持 -Xms = -Xmx**：避免动态扩容的抖动。
+4. **选择合适的 GC 比调参更重要**：GC 选型错误再怎么调效果都有限。
+5. **定期回顾 GC 日志**：应用变化后需要重新评估调优参数。
+
+## 常见问题
+
+### Q1：调优的目标是什么？
+
+主要是两个互斥的指标：降低停顿时间（提高响应性）和提高吞吐量（处理更多请求）。根据应用类型确定侧重点。
+
+### Q2：如何确定合适的堆大小？
+
+通过监控实际内存使用情况，取峰值的 1.5-2 倍。过大浪费资源且 GC 时间更长，过小频繁 GC 甚至 OOM。
+
+### Q3：调优后性能没有提升怎么办？
+
+性能瓶颈可能不在 JVM，而在数据库、网络、锁竞争或算法效率。先用工具定位瓶颈所在层。
 
 ## 参考资料
 

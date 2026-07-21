@@ -694,6 +694,20 @@ public class XsltController {
 </html>
 ```
 
+## 典型应用场景
+
+- **服务端渲染页面**：通过 Thymeleaf/FreeMarker 模板引擎渲染 HTML 页面，适用于 SEO 友好的网站。
+- **报表导出**：通过自定义 View 实现 Excel、PDF 报表导出。
+- **JSON/XML API 响应**：通过 `MappingJackson2JsonView` 或 `MarshallingView` 返回结构化数据。
+- **错误页面定制**：配置自定义错误视图，提供友好的用户错误体验。
+
+## 最佳实践
+
+- **API 服务优先使用 `@RestController`**：避免不必要的视图解析开销。
+- **模板选择考虑团队熟悉度**：Thymeleaf 是 Spring Boot 默认推荐的模板引擎，生态更完善。
+- **静态资源与视图分离**：将 CSS/JS/图片放在独立的静态资源目录，通过 `ResourceHandler` 提供服务。
+- **避免在视图中写复杂逻辑**：数据处理应在 Controller 或 Service 层完成，视图仅负责展示。
+
 ## 参考资料
 
 - [Spring Framework 官方文档](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/index.html)

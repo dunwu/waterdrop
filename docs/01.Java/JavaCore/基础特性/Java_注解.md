@@ -816,6 +816,118 @@ public class RegexValidDemo {
 }
 ```
 
+## 典型应用场景
+
+### 场景一：ORM 框架实体映射
+
+使用注解将 Java 类映射到数据库表：
+
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Table {
+    String name();
+}
+
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Column {
+    String name();
+    boolean nullable() default true;
+}
+
+// 使用
+@Table(name = "t_user")
+public class User {
+    @Column(name = "id", nullable = false)
+    private Long id;
+    @Column(name = "username")
+    private String username;
+}
+```
+
+### 场景二：参数校验
+
+使用注解实现声明式参数校验：
+
+```java
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface NotNull {
+    String message() default "不能为空";
+}
+
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Size {
+    int min() default 0;
+    int max() default Integer.MAX_VALUE;
+    String message() default "长度不在范围内";
+}
+
+// 使用
+public class CreateUserRequest {
+    @NotNull(message = "用户名不能为空")
+    @Size(min = 2, max = 20, message = "用户名长度 2-20")
+    private String username;
+
+    @NotNull(message = "邮箱不能为空")
+    private String email;
+}
+```
+
+### 场景三：接口限流与日志
+
+在 Spring 应用中使用注解实现接口限流：
+
+```java
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RateLimit {
+    int value() default 100;  // 每秒请求数
+    String key() default "";
+}
+
+// 使用
+@RestController
+public class OrderController {
+    @RateLimit(value = 50, key = "create_order")
+    @PostMapping("/orders")
+    public Result<Order> createOrder(@RequestBody OrderRequest request) {
+        // 业务逻辑
+    }
+}
+```
+
+## 最佳实践
+
+1. **注解命名以形容词或过去分词命名**：如 `@Deprecated`、`@Override`、`@Nullable`。
+2. **指定合理的默认值**：注解属性应尽可能提供默认值，减少使用者的配置负担。
+3. **元注解不可少**：自定义注解必须指定 `@Target` 和 `@Retention`，否则行为不可预期。
+4. **注解不应包含逻辑**：注解只是元数据，业务逻辑应在注解处理器中实现。
+5. **优先使用编译期注解**：如果能在编译期发现问题（如 Lombok），不要留到运行时。
+6. **避免注解滥用**：简单的配置用配置文件，注解适合用于减少重复代码的场景。
+
+## 常见问题
+
+### Q1：注解的生命周期有哪些？
+
+- `SOURCE`：只在源文件中有效，编译后丢弃（如 `@Override`、Lombok 注解）。
+- `CLASS`：编译后在 class 文件中存在，但 JVM 不加载（默认值）。
+- `RUNTIME`：运行时可通过反射获取（大多数自定义注解）。
+
+### Q2：注解可以继承吗？
+
+默认不能。需要使用 `@Inherited` 元注解标记，子类才会继承父类上的注解。但注意 `@Inherited` 只对类有效，对方法、字段无效。
+
+### Q3：如何在运行时获取注解信息？
+
+通过反射 API：
+- `class.isAnnotationPresent(XxxAnnotation.class)` 判断是否存在某注解
+- `class.getAnnotation(XxxAnnotation.class)` 获取指定注解实例
+- `method.getAnnotations()` 获取方法上所有注解
+- `field.getAnnotation(XxxAnnotation.class)` 获取字段上的注解
+
 ## 小结
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/xmind/注解简介.svg)

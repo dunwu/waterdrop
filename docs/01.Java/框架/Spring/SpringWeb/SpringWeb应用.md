@@ -937,6 +937,30 @@ Spring MVC 中对 `@ExceptionHandler` 方法的支持建立在 `DispatcherServle
 
 
 
+## 典型应用场景
+
+- **CRUD 管理后台**：通过 `@RequestMapping` 组织资源控制器，实现增删改查操作。
+- **数据导出服务**：结合 `HttpServletResponse` 输出流实现 Excel、PDF 等文件导出。
+- **文件上传与下载**：使用 `MultipartFile` 处理文件上传，通过 `Resource` 实现文件下载。
+- **API 接口服务**：通过 `@RestController` + `@ResponseBody` 返回 JSON 格式的 RESTful 接口。
+
+## 最佳实践
+
+- **Controller 层仅做参数接收和响应返回**：业务逻辑封装在 Service 层，保持控制器简洁。
+- **合理使用 `@Validated` 分组校验**：新增和编辑操作使用不同校验规则。
+- **统一响应格式**：封装统一的 `Result<T>` 响应对象，包含 code、message、data 字段。
+- **避免在方法签名中直接依赖 `HttpServletRequest`**：通过 Spring 参数解析器获取所需数据，保持代码可测试性。
+
+## 常见问题
+
+**`@Controller` 和 `@RestController` 的区别？**
+
+`@RestController` 是 `@Controller` + `@ResponseBody` 的组合，所有方法返回值都直接作为响应体返回。`@Controller` 返回的字符串通常被解析为视图名称。
+
+**如何解决 404 问题？**
+
+检查 `@RequestMapping` 路径是否正确、`@ComponentScan` 是否包含控制器所在包、静态资源是否被拦截。
+
 ## 参考资料
 
 - [Spring Framework 官方文档](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/index.html)

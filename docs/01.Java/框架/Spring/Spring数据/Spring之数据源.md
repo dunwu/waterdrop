@@ -548,6 +548,20 @@ public class DataSourceAutoConfiguration {
   - 当满足 `EmbeddedDatabaseConfiguration` 的示例化条件时，将引入 `EmbeddedDataSourceConfiguration` 类初始化数据源，这个类实际上是加载嵌入式数据源驱动的 ClassLoader 去进行初始化。
   - 当满足 `PooledDataSourceConfiguration` 的示例化条件时，将引入 `DataSourceConfiguration.Hikari.class`、`DataSourceConfiguration.Tomcat.class`、`DataSourceConfiguration.Dbcp2.class`、`DataSourceConfiguration.OracleUcp.class`、`DataSourceConfiguration.Generic.class`、`DataSourceJmxConfiguration.class` 这些配置类，分别对应不同的数据库连接池方式。具体选用哪种数据库连接池，可以通过 `spring.datasource.type` 配置指定。其中，Hikari 是 Spring Boot 默认的数据库连接池，spring-boot-starter-data-jdbc 中内置了 Hikari 连接池驱动包。如果想要替换其他数据库连接池，前提是必须先手动引入对应的连接池驱动包。
 
+## 典型应用场景
+
+- **连接池管理**：通过 HikariCP/Druid 等连接池复用数据库连接，提升并发性能。
+- **多数据源配置**：在微服务架构中，单个应用可能需要访问多个数据库，通过 `AbstractRoutingDataSource` 实现动态切换。
+- **读写分离**：将读请求路由到从库，写请求路由到主库，提升数据库整体吞吐。
+- **嵌入式数据库测试**：在单元测试中使用 H2/HSQLDB 嵌入式数据源，避免依赖外部数据库。
+
+## 最佳实践
+
+- **默认使用 HikariCP**：Spring Boot 默认连接池，性能优于 Druid、DBCP2 等。
+- **合理配置连接池参数**：根据并发量设置 `maximumPoolSize`，避免连接耗尽或过度占用。
+- **生产环境配置连接健康检查**：通过 `connectionTestQuery` 或 `validationQuery` 确保连接可用。
+- **敏感信息外置**：数据库密码通过配置中心或环境变量注入，禁止明文存储。
+
 ## 参考资料
 
 - [Spring 官网](https://spring.io/)

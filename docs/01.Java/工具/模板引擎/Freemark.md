@@ -168,6 +168,34 @@ FTL 支持的所有转义字符：
 | `\a`     | &符：`&`                                                                                                                                       |
 | `\xCode` | 字符的 16 进制 [Unicode](http://freemarker.foofun.cn/gloss.html#gloss.unicode) 码 ([UCS](http://freemarker.foofun.cn/gloss.html#gloss.UCS) 码) |
 
+## 典型应用场景
+
+- **动态网页生成**：在 Spring MVC 中使用 FreeMarker 作为视图层，将数据模型渲染为 HTML 页面。
+- **邮件模板渲染**：将订单确认、密码重置等邮件内容用 FTL 模板生成，支持变量替换和条件判断。
+- **代码生成器**：在 MyBatis Generator、JHipster 等工具中，使用 FreeMarker 模板生成 Java 类、配置文件、前端代码。
+- **静态站点生成**：结合数据模型批量生成静态 HTML 页面，用于文档站点、博客等。
+
+## 最佳实践
+
+- **避免在模板中写复杂逻辑**：模板只负责展示，复杂业务逻辑应放在 Java 代码中处理后通过数据模型传入。
+- **使用 `??` 判断变量存在性**：通过 `<#if var??>` 判断变量是否存在，避免模板渲染时因空值报错。
+- **配置模板缓存**：生产环境开启模板缓存（`template_update_delay=60000`），避免每次请求都重新加载模板。
+- **自定义指令封装复用逻辑**：将重复的展示逻辑封装为 `<#macro>` 自定义指令，提高模板复用性。
+
+## 常见问题
+
+**FreeMarker 和 Thymeleaf 如何选择？**
+
+SpringBoot 官方推荐 Thymeleaf，与 Spring 集成更紧密，支持自然模板（可直接浏览器打开）。FreeMarker 功能更强大，适合非 Web 场景（代码生成、邮件模板）。
+
+**模板渲染报 TemplateNotFoundException？**
+
+检查：1）模板文件路径是否正确；2）模板后缀是否为 `.ftl`；3）Configuration 中的 `setDirectoryForTemplateLoading` 或 `setClassForTemplateLoading` 是否指向正确目录。
+
+**如何处理模板中的空值？**
+
+使用 `!` 运算符提供默认值：`${user.name!"\u672a\u77e5"}`；或使用 `<#if user.name??>` 判断存在性后再使用。
+
 ## 参考资料
 
 - [Freemark Github](https://github.com/apache/freemarker)

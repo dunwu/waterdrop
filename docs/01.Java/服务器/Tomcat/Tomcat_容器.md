@@ -717,6 +717,34 @@ public boolean processSocket(SocketWrapperBase<S> socketWrapper,
 
 请你注意 createSocketProcessor 函数的第二个参数是 SocketEvent，这里我们传入的是 OPEN_READ。通过这个参数，我们就能控制 SocketProcessor 的行为，因为我们不需要再把请求发送到容器进行处理，只需要向浏览器端发送数据，并且重新在这个 Socket 上监听新的请求就行了。
 
+## 典型应用场景
+
+- **理解 Tomcat 架构**：通过了解容器层级（Server > Service > Engine > Host > Context > Wrapper），定位配置问题和性能瓶颈。
+- **多应用部署**：通过配置多个 Host 和 Context，在同一台 Tomcat 上部署多个 Web 应用。
+- **会话管理**：配置 Manager 组件控制 Session 的创建、存储、过期和持久化策略。
+- **热部署配置**：开发环境配置热加载（`reloadable=true`），生产环境配置热部署，提升发布效率。
+
+## 最佳实践
+
+- **生产环境关闭热加载**：设置 `reloadable=false`，避免 Tomcat 定期检查类文件变化导致性能下降。
+- **使用 Context 配置分离**：将每个应用的 Context 配置放在 `conf/Catalina/localhost/` 下的独立 XML 文件中，避免修改 server.xml。
+- **限制并发 Session 数**：通过 Manager 的 `maxActiveSessions` 限制并发会话数，防止内存溢出。
+- **定期清理过期 Session**：配置 Manager 的 `processExpiresFrequency` 参数，及时清理过期会话释放内存。
+
+## 常见问题
+
+**Tomcat 容器层级是什么关系？**
+
+Server（服务器）包含多个 Service（服务），每个 Service 包含一个 Engine（引擎）和多个 Connector（连接器）。Engine 包含多个 Host（虚拟主机），每个 Host 包含多个 Context（Web 应用），每个 Context 包含多个 Wrapper（Servlet）。
+
+**如何配置多虚拟主机？**
+
+在 Engine 下配置多个 Host 元素，每个 Host 指定 `name`（域名）和 `appBase`（应用目录）。通过域名将请求路由到不同的虚拟主机。
+
+**Context 中 reloadable=true 的副作用？**
+
+会开启后台线程定期检查类文件变化，发现变化时重新加载整个应用并清空 Session。会导致频繁 GC 和 CPU 占用，生产环境必须关闭。
+
 ## 参考资料
 
 - **官方**

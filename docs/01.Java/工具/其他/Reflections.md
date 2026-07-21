@@ -106,3 +106,36 @@ Set<Method> listMethodsFromCollectionToBoolean =
 
 Set<Field> fields = getAllFields(SomeClass.class, withAnnotation(annotation), withTypeAssignableTo(type));
 ```
+
+## 典型应用场景
+
+- **自动发现 SPI 实现**：扫描 classpath 下某个接口的所有实现类，实现插件机制的自动加载，如 Spring 的 `@Component` 扫描。
+- **自定义注解处理**：扫描带有特定注解的类/方法/字段，实现自定义框架的声明式编程，如路由注册、权限标记。
+- **资源文件扫描**：通过 `getResources()` 扫描 classpath 下的配置文件、模板文件等资源。
+- **API 文档生成**：扫描带有 `@Path`、`@ApiOperation` 等注解的类和方法，自动生成 API 文档。
+
+## 最佳实践
+
+- **缩小扫描范围**：通过 `filterInputsBy` 限定包名范围，避免全 classpath 扫描导致启动缓慢。
+- **缓存扫描结果**：Reflections 扫描是耗时操作，将结果缓存起来而不是每次使用时重新扫描。
+- **指定 Scanner**：只配置需要的 Scanner（如 SubTypesScanner、TypeAnnotationsScanner），避免不必要的扫描开销。
+- **生产环境预扫描**：在构建阶段预先扫描并序列化结果，运行时直接加载，避免启动时扫描。
+
+## 常见问题
+
+**扫描不到预期的类？**
+
+检查：1）包名是否正确配置；2）类是否在当前 classpath 下；3）是否配置了正确的 Scanner；4）Filter 是否排除了目标包。
+
+**Reflections 扫描性能差？**
+
+扫描整个 classpath 是耗时操作。解决方案：1）限定扫描包范围；2）使用 `ConfigurationBuilder` 只配置需要的 Scanner；3）考虑使用 Spring 的 `ClassPathScanningCandidateComponentProvider` 替代。
+
+**与 Spring 的 `@ComponentScan` 有什么区别？**
+
+Spring 的组件扫描基于 Spring 容器，只扫描 Spring 管理的 Bean。Reflections 是独立工具，可扫描任意 classpath 下的类，不依赖 Spring 容器，适用于非 Spring 项目或框架层级的类发现。
+
+## 参考资料
+
+- [Reflections Github](https://github.com/ronmamo/reflections)
+- [Reflections 官方文档](https://github.com/ronmamo/reflections/wiki)

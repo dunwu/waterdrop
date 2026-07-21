@@ -15,6 +15,10 @@ permalink: /pages/700204ee/
 
 # Java 虚拟机简介
 
+## 简介
+
+Java 虚拟机（JVM）是运行 Java 程序的抽象计算引擎。它屏蔽了底层硬件和操作系统的差异，使得 Java 程序具有“一次编写，到处运行”的跨平台能力。JVM 的主要组件包括类加载器、运行时数据区和执行引擎。Hotspot 是目前最流行的 JVM 实现。
+
 > JVM 能跨平台工作，主要是由于 JVM 屏蔽了与各个计算机平台相关的软件、硬件之间的差异。
 
 ## JVM 简介
@@ -90,6 +94,71 @@ Java 启动后，作为一个进程运行在操作系统中。
 - 栈内存：线程
 - 本地内存：NIO、JNI
 
+## 典型应用场景
+
+### 场景一：选择合适的垃圾收集器
+
+根据应用特点选择合适的 GC：
+
+- **低延迟应用**（如 Web 服务）：选择 G1 或 ZGC，减少 GC 停顿时间
+- **高吞吐量应用**（如批处理）：选择 Parallel GC，最大化 CPU 利用率
+- **内存受限环境**（如嵌入式）：选择 Serial GC，减少资源开销
+
+### 场景二：JVM 内存配置优化
+
+根据服务器资源合理配置 JVM 参数：
+
+```bash
+# 典型的生产环境 JVM 配置
+java -Xms4g -Xmx4g 
+     -XX:+UseG1GC 
+     -XX:MaxGCPauseMillis=200 
+     -XX:+HeapDumpOnOutOfMemoryError 
+     -XX:HeapDumpPath=/tmp/heapdump.hprof 
+     -jar app.jar
+```
+
+### 场景三：诊断线上性能问题
+
+使用 JVM 工具定位性能瓶颈：
+
+```bash
+# 查看 GC 状态
+jstat -gcutil <pid> 1000
+
+# 导出堆快照分析内存泄漏
+jmap -dump:format=b,file=heap.hprof <pid>
+
+# 查看线程死锁
+jstack -l <pid> | grep -A 20 "Found one Java-level deadlock"
+```
+
+## 最佳实践
+
+1. **设置相同的 -Xms 和 -Xmx**：避免堆内存动态扩容带来的性能波动。
+2. **生产环境开启 HeapDump**：`-XX:+HeapDumpOnOutOfMemoryError` 方便事后分析 OOM。
+3. **选择合适的 GC**：JDK 11+ 优先考虑 G1 或 ZGC，JDK 8 可考虑 CMS 或 G1。
+4. **记录 GC 日志**：`-Xlog:gc*:file=gc.log` 便于分析 GC 行为。
+5. **监控 JVM 指标**：通过 JMX 或 Prometheus 监控堆内存、GC、线程等关键指标。
+
+## 常见问题
+
+### Q1：JVM 和 JRE、JDK 有什么区别？
+
+- **JVM**：运行 Java 字节码的虚拟机引擎
+- **JRE**：JVM + Java 核心类库，可以运行但不能编译 Java 程序
+- **JDK**：JRE + 编译器（javac）+ 工具（jstack/jmap 等），完整的开发环境
+
+### Q2：什么是 JIT 编译器？
+
+JIT（Just-In-Time）编译器在程序运行时将热点代码编译为本地机器码，提高执行速度。C1 编译器优化启动速度，C2 编译器优化峰值性能。JDK 9+ 的 AOT 编译可以在启动前预编译。
+
+### Q3：为什么 Java 被称为“跨平台”语言？
+
+Java 源码编译为字节码（.class 文件），字节码由 JVM 解释执行。不同平台有各自的 JVM 实现，但都支持相同的字节码格式，因此同一份字节码可以在不同平台运行。
+
 ## 参考资料
 
 - [《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)
+- [《Java 性能调优实战》](https://time.geekbang.org/column/intro/100028001)
+- [Oracle JVM 官方文档](https://docs.oracle.com/en/java/javase/17/gctuning/)

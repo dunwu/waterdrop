@@ -292,6 +292,19 @@ interface PersonRepository extends Repository<Person, Long> {
 
 ## Spring Data 扩展
 
+## 典型应用场景
+
+- **统一数据访问层**：通过 Spring Data 统一 API 访问关系型、NoSQL 等不同类型数据库。
+- **Repository 模式**：定义接口继承 `JpaRepository`、`RedisRepository` 等，自动生成实现类。
+- **方法名查询**：通过 `findByUserName`、`findByAgeGreaterThan` 等方法名自动生成查询语句。
+- **分页与排序**：通过 `Pageable` 参数实现分页查询，无需手动拼接 SQL。
+
+## 最佳实践
+
+- **自定义 Repository 扩展**：通过实现自定义接口 + `@Query` 注解处理复杂查询场景。
+- **避免过度依赖方法名查询**：复杂查询使用 `@Query` 显式定义，避免方法名过长难维护。
+- **事务与 Repository 配合**：在 Service 层添加 `@Transactional`，Repository 层仅负责数据访问。
+
 ## 参考资料
 
 - [Redis 官网](https://redis.io/)

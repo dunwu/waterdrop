@@ -141,6 +141,27 @@ Spring 组合注解（Composed Annotations）中的元注允许是 Spring 模式
   - org.springframework.context.annotation.ConfigurationClassPostProcessor
   - org.springframework.context.annotation.ConfigurationClassParser
 
+## 典型应用场景
+
+- **组件分层注册**：通过 `@Repository`、`@Service`、`@Controller` 分别标识 DAO、Service、Web 层组件，实现职责清晰的分层架构。
+- **模块化功能开关**：使用 `@EnableAsync`、`@EnableCaching`、`@EnableScheduling` 等 `@Enable` 系列注解按需开启异步处理、缓存、定时任务等功能模块。
+- **环境隔离配置**：通过 `@Profile("dev")` 和 `@Profile("prod")` 标记不同环境的 Bean，实现开发/测试/生产环境的配置隔离。
+- **自定义 Starter 开发**：基于 `@Configuration` + `@ConditionalOnClass` + `@ConditionalOnMissingBean` 实现自动配置类，打包为 SpringBoot Starter 提供给其他项目复用。
+
+## 最佳实践
+
+- **优先使用组合注解**：如 `@SpringBootApplication` 已组合 `@Configuration` + `@EnableAutoConfiguration` + `@ComponentScan`，避免重复标注。
+- **`@Autowired` 搭配 `@Qualifier` 消除歧义**：当容器中存在多个同类型 Bean 时，用 `@Qualifier` 指定 Bean 名称，或用 `@Primary` 标记优先注入的 Bean。
+- **避免注解过于分散**：大型项目中注解扫描范围过大可能导致启动慢，应通过 `@ComponentScan(basePackages = "com.xxx")` 精确控制扫描路径。
+- **`@Conditional` 系列用于精细化控制**：`@ConditionalOnProperty`、`@ConditionalOnBean` 等可用于根据配置或容器状态决定是否注册 Bean，是自定义 Starter 的核心能力。
+
+## 常见问题
+
+- **`@Component` 和 `@Bean` 有什么区别？** `@Component` 用于类级别自动扫描注册；`@Bean` 用于方法级别，可精确控制实例化逻辑，适合第三方类注册。
+- **`@Autowired` 和 `@Resource` 有什么区别？** `@Autowired` 是 Spring 原生注解，默认按类型注入；`@Resource` 是 JSR-250 标准注解，默认按名称注入。
+- **为什么 `@Autowired` 有时注入为 null？** 常见原因：Bean 未被 Spring 管理（手动 new 的对象）、扫描路径未覆盖、存在多个同类型 Bean 未指定名称。
+- **`@EnableXXX` 注解的工作原理是什么？** 通过 `@Import` 导入配置类或 `ImportSelector`，动态注册特定功能所需的 Bean 到容器中。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

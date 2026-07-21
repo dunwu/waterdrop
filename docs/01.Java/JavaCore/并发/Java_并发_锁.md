@@ -1108,6 +1108,54 @@ try {
 }
 ```
 
+## 典型应用场景
+
+### 场景一：使用 ReentrantLock 实现可中断锁
+
+```java
+ReentrantLock lock = new ReentrantLock();
+try { lock.lockInterruptibly(); /* 可中断地获取锁 */ } 
+finally { lock.unlock(); }
+```
+
+### 场景二：使用读写锁提升读多写少场景性能
+
+```java
+ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+rwLock.readLock().lock(); // 多个线程可同时持有读锁
+try { return cache.get(key); } finally { rwLock.readLock().unlock(); }
+```
+
+### 场景三：StampedLock 乐观读
+
+```java
+StampedLock sl = new StampedLock();
+long stamp = sl.tryOptimisticRead(); // 乐观读，无锁
+if (!sl.validate(stamp)) { stamp = sl.readLock(); /* 升级为悲观读 */ }
+```
+
+## 最佳实践
+
+1. **默认使用 synchronized**：JDK 6+ 已大幅优化，简单易用。
+2. **需要高级功能时用 ReentrantLock**：如可中断锁、超时锁、公平锁。
+3. **读多写少用 ReadWriteLock**：显著提升读性能。
+4. **始终在 finally 中释放锁**：防止死锁。
+5. **避免锁粒度太大**：尽量缩小锁的范围。
+
+## 常见问题
+
+### Q1：synchronized 和 ReentrantLock 有什么区别？
+
+synchronized 是 JVM 内置锁，自动释放；ReentrantLock 是 API 锁，需手动释放但功能更丰富（可中断、超时、公平）。
+
+### Q2：什么是锁升级？
+
+JDK 6 引入的优化：无锁 → 偏向锁 → 轻量级锁 → 重量级锁，根据竞争程度自动升级。
+
+### Q3：公平锁和非公平锁有什么区别？
+
+公平锁按等待顺序获取，避免饥饿；非公平锁允许插队，性能更高。默认是非公平锁。
+
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)

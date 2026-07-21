@@ -108,6 +108,18 @@ Spring 的核心模块主要包括以下部分：
 
 ### 【中等】Spring 通知有哪些类型？
 
+Spring AOP 定义了 **5 种通知类型**，通过 `Advice` 接口实现，精确控制切面逻辑在目标方法执行的**哪个时机**介入：
+
+| 通知类型                    | 接口                           | 触发时机                                  | 典型场景                       |
+| :-------------------------- | :----------------------------- | :---------------------------------------- | :----------------------------- |
+| **前置通知（Before）**      | `MethodBeforeAdvice`           | 目标方法**执行前**触发                    | 参数校验、权限检查、日志记录   |
+| **后置返回通知（AfterReturning）** | `AfterReturningAdvice`  | 目标方法**正常返回后**触发                | 结果审计、返回值日志           |
+| **后置异常通知（AfterThrowing）**  | `ThrowsAdvice`          | 目标方法**抛出异常后**触发                | 异常告警、错误日志             |
+| **后置最终通知（After）**   | 无对应接口（注解方式）         | 目标方法**执行完毕后**触发（无论正常/异常）| 资源释放，类似 `finally`       |
+| **环绕通知（Around）**      | `MethodInterceptor`            | **包裹**目标方法，可控制是否执行、修改返回值 | 性能监控、事务管理、缓存处理 |
+
+**环绕通知**是最强大的通知类型，它能完全控制目标方法的执行流程，包括是否执行、修改参数、修改返回值、处理异常等。在实际开发中使用频率最高。
+
 ## Bean
 
 ### 【简单】什么是 Spring Bean？
@@ -309,6 +321,23 @@ Spring IoC 容器初始化分为四个核心阶段：
 2. **填充属性时循环引用**：为 A 注入 B 时，触发创建 B。B 在注入 A 时，能从**三级缓存**的工厂中获取到 A 的早期引用。
 3. **升级缓存 & 完成注入**：将获取到的早期引用 A 放入**二级缓存**，并注入给 B，从而让 B 和 A 都能顺利完成创建。
 
+```mermaid
+graph TD
+    A[实例化 Bean A] --> B[将 A 的 ObjectFactory 放入三级缓存 singletonFactories]
+    B --> C[为 A 注入属性 触发创建 Bean B]
+    C --> D[实例化 Bean B]
+    D --> E[B 需要注入 A 从三级缓存获取工厂]
+    E --> F[调用 getObject 获取 A 的早期引用]
+    F --> G{A 是否需要 AOP 代理?}
+    G -->|是| H[工厂返回 A 的代理对象]
+    G -->|否| I[工厂返回 A 的原始对象]
+    H --> J[早期引用升级到二级缓存 earlySingletonObjects]
+    I --> J
+    J --> K[B 注入 A 的早期引用 完成初始化]
+    K --> L[B 完成创建 放入一级缓存 singletonObjects]
+    L --> M[A 注入 B 完成初始化 放入一级缓存]
+```
+
 ### 【困难】Spring 解决循环依赖为什么一定要用三级缓存？⭐⭐⭐
 
 选择**三级缓存**而非二级缓存，主要出于 **AOP 代理**的考虑，而非单纯解决循环依赖。
@@ -365,6 +394,21 @@ Spring AOP 基于**动态代理**，主要分为两种实现方式：
 - **强制配置**：可通过设置 `proxy-target-class=true` **强制**所有情况都使用 **CGLIB**。
 
 **一句话总结**：Spring AOP 在运行时通过 **JDK 代理（基于接口）** 或 **CGLIB 代理（基于继承）** 动态生成代理对象，从而将切面逻辑织入目标方法。
+
+```mermaid
+graph TD
+    A[Spring AOP 创建代理] --> B{目标类是否实现了接口?}
+    B -->|是| C[JDK 动态代理]
+    B -->|否| D[CGLIB 代理]
+    C --> E[通过 Proxy 生成实现相同接口的代理类]
+    E --> F[调用 InvocationHandler.invoke 转发到目标对象]
+    D --> G[通过 ASM 字节码框架生成目标类的子类]
+    G --> H[重写父类方法 插入切面逻辑]
+    F --> I{是否强制 proxy-target-class=true?}
+    H --> I
+    I -->|是| D
+    I -->|否| J[代理对象就绪 织入切面逻辑]
+```
 
 ### 【中等】Spring AOP 和 AspectJ 有什么区别？
 
@@ -498,7 +542,23 @@ Spring MVC 的引入使 Web 层关注点分离，代码简洁且易于维护。
 5. **处理器返回 ModelAndView**：处理器处理完请求后，返回包含模型数据和视图信息的 ModelAndView 对象。
 6. **ViewResolver 解析视图**：DispatcherServlet 使用 ViewResolver 将逻辑视图名解析为具体的视图实现（如 JSP）。
 7. **渲染视图**：视图组件将模型数据填充到视图中，生成最终的响应内容。
-8. **返回响应**：DispatcherServlet 将渲染后的视图返回给客户端，完成请求-响应的整个过程。
+. **返回响应**：DispatcherServlet 将渲染后的视图返回给客户端，完成请求-响应的整个过程。
+
+```mermaid
+graph TD
+    A[客户端发送 HTTP 请求] --> B[DispatcherServlet 接收请求]
+    B --> C[HandlerMapping 根据 URL 匹配 Handler]
+    C --> D[HandlerInterceptor.preHandle 前置拦截]
+    D --> E[HandlerAdapter 调用 Controller 执行业务逻辑]
+    E --> F{返回值类型?}
+    F -->|ModelAndView| G[ViewResolver 解析逻辑视图名]
+    G --> H[View 渲染模型数据生成响应]
+    F -->|@ResponseBody| I[HttpMessageConverter 直接序列化响应]
+    H --> J[HandlerInterceptor.postHandle 后置处理]
+    I --> J
+    J --> K[HandlerInterceptor.afterCompletion 完成处理]
+    K --> L[返回响应给客户端]
+```
 
 **配置与扩展**
 
@@ -550,6 +610,48 @@ Controller 核心职责与工作方式如下：
 Spring MVC 中的视图解析器（ViewResolver）用于将控制器返回的逻辑视图名称解析为具体的视图对象（View）。其核心作用是解耦控制器与视图技术，控制器只需返回逻辑名（如 "userList"），无需关心实际渲染使用 JSP、Thymeleaf 还是其他模板。通过配置视图解析器（如设置前缀后缀），可统一管理视图位置并灵活切换视图技术。多个视图解析器可组成链式顺序尝试解析，直至成功。最终由 DispatcherServlet 调用解析出的视图对象渲染响应。
 
 ### 【中等】Spring MVC 中的拦截器是什么？如何定义一个拦截器？
+
+Spring MVC 拦截器（`HandlerInterceptor`）是 Spring MVC 层面的请求拦截机制，可在 Controller 方法执行前后插入自定义逻辑，常用于权限校验、日志记录、登录检查等。
+
+**定义方式**：实现 `HandlerInterceptor` 接口或继承 `HandlerInterceptorAdapter`：
+
+```java
+public class AuthInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        // Controller 执行前：返回 true 放行，false 拦截
+        return request.getSession().getAttribute("user") != null;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response,
+                           Object handler, ModelAndView modelAndView) {
+        // Controller 执行后、视图渲染前
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+                                Object handler, Exception ex) {
+        // 请求完成后（无论正常/异常）
+    }
+}
+```
+
+**注册拦截器**：
+
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new AuthInterceptor())
+                .addPathPatterns("/api/**")
+                .excludePathPatterns("/api/login");
+    }
+}
+```
+
+**与 Filter 的区别**：拦截器基于 Spring MVC，能访问 Spring 容器中的 Bean、获取 Handler 信息；Filter 基于 Servlet 规范，拦截粒度更粗，在 Spring MVC 之前执行。
 
 ### 【中等】Spring MVC 中的国际化是如何实现？
 

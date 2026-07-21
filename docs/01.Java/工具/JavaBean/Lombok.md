@@ -529,6 +529,34 @@ public void testEqualsAndHashCodeDemo() {
 
 上面的单元测试可以通过，但如果将 `@EqualsAndHashCode(callSuper = true, exclude = { "address", "city", "state", "zip" })` 注掉就会报错。
 
+## 典型应用场景
+
+- **POJO / DTO 快速开发**：通过 `@Data` 一键生成 getter/setter/toString/equals/hashCode，大幅减少样板代码，常用于数据库实体、接口传输对象。
+- **不可变对象构建**：结合 `@Value` + `@Builder` 创建线程安全的不可变对象，适用于配置类、值对象等场景。
+- **日志声明简化**：通过 `@Slf4j` / `@Log4j2` 注解自动注入 `log` 变量，避免每个类手动声明 Logger。
+- **资源自动关闭**：使用 `@Cleanup` 自动在 finally 块中调用 `close()` 方法，简化 IO/Stream 资源管理。
+
+## 最佳实践
+
+- **避免滥用 `@Data`**：在有继承关系的类上使用 `@Data` 时，务必加上 `@EqualsAndHashCode(callSuper = true)`，否则父类属性不参与比较。
+- **`@Builder` 必须配合 `@NoArgsConstructor`**：当类需要被反序列化（JSON/ORM）时，必须同时添加 `@NoArgsConstructor` 和 `@AllArgsConstructor`，否则会报缺少默认构造方法的错误。
+- **优先使用 `@Value` 创建不可变类**：对于配置类、常量对象，使用 `@Value` 代替 `@Data`，自动生成 final 字段、全参构造和 getter。
+- **生产环境谨慎使用 `@SneakyThrows`**：该注解会隐藏受检异常，不利于异常的可控处理，仅在工具方法或确认不会抛出异常的场景使用。
+
+## 常见问题
+
+**`@Data` 和 `@Builder` 一起用，反序列化报错？**
+
+`@Builder` 会生成全参私有构造，导致没有默认构造方法。解决方案：同时添加 `@NoArgsConstructor` 和 `@AllArgsConstructor`。
+
+**Lombok 在编译期生成代码，调试时怎么看？**
+
+在 IDE 中安装 Lombok 插件即可识别生成的方法。IntelliJ IDEA 2020.3+ 已内置支持。如需查看生成的字节码，可使用 `javap -c` 反编译。
+
+**为什么 `@EqualsAndHashCode` 在继承场景下有问题？**
+
+Lombok 默认不调用 `super.equals()/super.hashCode()`，父类属性不参与比较。加上 `callSuper = true` 即可解决。
+
 ## 参考资料
 
 - [Lombok 官网](https://projectlombok.org/)

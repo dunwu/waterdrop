@@ -196,6 +196,26 @@ source.registerCorsConfiguration("/**", config);
 CorsFilter filter = new CorsFilter(source);
 ```
 
+## 典型应用场景
+
+- **前后端分离架构**：前端（React/Vue）与后端 API 部署在不同域名下，需配置 CORS 允许跨域访问。
+- **微服务网关统一配置**：在 API Gateway 层统一配置跨域策略，避免每个微服务单独配置。
+- **第三方 API 开放平台**：允许外部应用通过跨域请求访问开放 API 服务。
+- **移动端 H5 应用**：WebView 中的 H5 页面需要跨域访问后端服务接口。
+
+## 最佳实践
+
+- **最小化权限原则**：仅允许必要的 Origin、Header 和 Method，避免使用 `*` 通配符。
+- **生产环境禁止 `allowCredentials=true` + `allowedOrigin=*`**：两者同时配置会引发安全漏洞。
+- **优先使用全局配置**：通过 `CorsConfigurationSource` 统一管理跨域策略，避免注解散落各处。
+- **结合 Spring Security 使用 `CorsFilter`**：确保 CORS 过滤器在 Security 过滤器链之前执行。
+
+## 常见问题
+
+**为什么配置了 `@CrossOrigin` 仍然跨域失败？**
+
+可能是预检请求（OPTIONS）被拦截，检查是否有安全过滤器拦截了 OPTIONS 请求；或 `allowedHeaders` 未包含客户端发送的自定义 Header。
+
 ## 参考资料
 
 - [Spring Framework 官方文档](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/index.html)

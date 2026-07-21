@@ -16,6 +16,10 @@ permalink: /pages/4f183431/
 
 # Java 虚拟机之字节码
 
+## 简介
+
+Java 字节码是 Java 源代码编译后的中间表示形式，存储在 `.class` 文件中。字节码是一种平台无关的指令集，由 JVM 的解释器或 JIT 编译器执行。理解字节码结构有助于深入理解 Java 的编译、加载和执行机制，也是学习字节码增强技术（ASM、Javassist、ByteBuddy）的基础。
+
 ## 字节码简介
 
 Java 字节码是 Java 虚拟机执行的一种指令格式。之所以被称之为字节码，是因为：**Java 字节码文件（`.class`）是一种以 8 位字节为基础单位的二进制流文件**，各个数据项严格按照顺序紧凑地排列在 .class 文件中，中间没有添加任何分隔符。**整个 .class 文件本质上就是一张表**。
@@ -139,6 +143,69 @@ Asm Tree API 可以类比解析 XML 文件中的 DOM 方式，把整个类的结
 - `CtClass（compile-time class）` - 编译时类信息，它是一个 class 文件在代码中的抽象表现形式，可以通过一个类的全限定名来获取一个 CtClass 对象，用来表示这个类文件。
 - `ClassPool` - 从开发视角来看，ClassPool 是一张保存 CtClass 信息的 HashTable，key 为类名，value 为类名对应的 CtClass 对象。当我们需要对某个类进行修改时，就是通过 pool.getCtClass("className") 方法从 pool 中获取到相应的 CtClass。
 - `CtMethod`、`CtField` - 这两个比较好理解，对应的是类中的方法和属性。
+
+## 典型应用场景
+
+### 场景一：使用 ASM 生成类
+
+在运行时动态生成新的类：
+
+```java
+ClassWriter cw = new ClassWriter(0);
+cw.visit(V1_8, ACC_PUBLIC, "com/example/Hello", null, "java/lang/Object", null);
+MethodVisitor mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "hello", "()V", null, null);
+mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+mv.visitLdcInsn("Hello ASM!");
+mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+mv.visitInsn(RETURN);
+mv.visitEnd();
+```
+
+### 场景二：使用 Javassist 实现 AOP
+
+在方法前后添加日志：
+
+```java
+ClassPool pool = ClassPool.getDefault();
+CtClass cc = pool.get("com.example.UserService");
+CtMethod method = cc.getDeclaredMethod("getUser");
+method.insertBefore("System.out.println(\"Entering getUser\");");
+method.insertAfter("System.out.println(\"Exiting getUser\");");
+```
+
+### 场景三：使用 ByteBuddy 实现热修复
+
+在不重启 JVM 的情况下修改类行为：
+
+```java
+new ByteBuddy()
+    .redefine(UserService.class)
+    .method(named("getUser"))
+    .intercept(FixedValue.value("mocked"))
+    .make()
+    .load(getClass().getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
+```
+
+## 最佳实践
+
+1. **使用 `javap -c` 查看字节码**：理解编译器如何转换代码，发现隐藏的装箱/拆箱等开销。
+2. **字节码增强优先使用高级框架**：Javassist 和 ByteBuddy 比 ASM 更容易使用和维护。
+3. **避免过度使用字节码操作**：调试困难且容易出错，优先考虑反射或代理模式。
+4. **注意 ClassLoader 隔离**：字节码增强的类必须在正确的 ClassLoader 中加载。
+
+## 常见问题
+
+### Q1：字节码和机器码有什么区别？
+
+字节码是 JVM 指令集，平台无关，由 JVM 解释执行或 JIT 编译。机器码是 CPU 原生指令，平台相关，直接由 CPU 执行。字节码通过 JIT 编译可以转换为机器码。
+
+### Q2：为什么 Java 使用字节码而不是直接编译为机器码？
+
+字节码实现了“一次编译，到处运行”的跨平台能力。如果直接编译为机器码，每个平台都需要单独编译。字节码还便于在运行时进行优化（JIT）和动态加载。
+
+### Q3：Kotlin/Scala 等 JVM 语言也生成字节码吗？
+
+是的。所有 JVM 语言（Kotlin、Scala、Groovy、Clojure 等）都编译为 JVM 字节码，因此可以无缝互操作。
 
 ## 参考资料
 

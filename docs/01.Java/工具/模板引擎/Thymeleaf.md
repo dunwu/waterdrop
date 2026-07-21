@@ -476,6 +476,34 @@ Thymeleaf 允许在应用程序中配置 URL 重写过滤器，它通过调用 T
 
 TODO
 
+## 典型应用场景
+
+- **SpringBoot Web 视图层**：作为 SpringBoot 推荐的模板引擎，替代 JSP 渲染动态 HTML 页面。
+- **邮件模板**：使用 Thymeleaf 模板生成 HTML 邮件，支持变量替换、循环、条件判断。
+- **自然模板原型设计**：利用 Thymeleaf 的自然模板特性，设计师可以直接在浏览器中打开模板预览效果。
+- **微服务前端页面**：在 Spring Cloud Gateway 或单体应用中，用 Thymeleaf 渲染服务端页面，无需引入前端框架。
+
+## 最佳实践
+
+- **优先使用 `th:text` 而非 `th:utext`**：`th:text` 会自动转义 HTML 标签防止 XSS，`th:utext` 不转义，仅在确认安全时使用。
+- **使用 Fragment 复用模板**：通过 `th:fragment` 定义可复用的页面片段（如 header、footer），用 `th:replace` / `th:include` 引用。
+- **避免在模板中写复杂表达式**：复杂逻辑应放在 Controller 或 Service 中，模板只做简单的条件判断和循环。
+- **开发环境关闭缓存**：配置 `spring.thymeleaf.cache=false` 实现热更新，生产环境再开启缓存。
+
+## 常见问题
+
+**Thymeleaf 和 JSP 的区别？**
+
+JSP 本质是 Servlet，与 Servlet 容器强耦合；Thymeleaf 是纯模板引擎，不依赖 Servlet API，可用于非 Web 场景。Thymeleaf 支持自然模板，JSP 不支持。
+
+**模板中如何格式化日期和数字？**
+
+使用内置工具对象：`${#dates.format(date, 'yyyy-MM-dd')}`、`${#numbers.formatDecimal(num, 1, 2)}`。Spring 集成后可使用 `@DateTimeFormat` 注解。
+
+**如何动态加载模板？**
+
+使用 `th:replace="~{${templateName} :: fragment}"` 可以动态指定模板名称。结合 `TemplateEngine.process()` 可以在非 Web 场景下渲染模板。
+
 ## 参考资料
 
 - [Thymeleaf 官网](https://www.thymeleaf.org/)

@@ -96,6 +96,19 @@ application Bean 是否可以被其他方案替代？
 
 可以的，实际上，“application” Bean 与“singleton” Bean 没有本质区别
 
+## 典型应用场景
+
+- **无状态服务层**：使用 `singleton` 作用域管理 Service/DAO Bean，节省内存和实例化开销。
+- **有状态对象封装**：使用 `prototype` 作用域创建用户会话数据封装、购物车等易变对象。
+- **Web 请求绑定**：使用 `request` 作用域将表单数据与单次 HTTP 请求绑定，请求结束后自动销毁。
+- **用户会话共享**：使用 `session` 作用域存储登录用户信息，同一会话内共享。
+
+## 最佳实践
+
+- **默认使用 singleton**：绝大多数 Bean 应设计为无状态单例，避免不必要的实例化开销。
+- **singleton 注入 prototype 时使用 ScopedProxy**：否则 prototype 只会在 singleton 创建时注入一次，失去多例效果。
+- **避免在 prototype Bean 中使用 `@PreDestroy`**：Spring 不管理 prototype Bean 的完整生命周期，销毁回调不会被执行。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

@@ -15,6 +15,10 @@ permalink: /pages/1261f141/
 
 # Java 容器之 Map
 
+## 简介
+
+Map 是 Java 容器框架中用于存储键值对（key-value）的接口，每个键最多映射一个值，且键不能重复。Map 的主要实现类包括：`HashMap`（无序、高性能）、`LinkedHashMap`（保持插入顺序）、`TreeMap`（有序、红黑树）和 `WeakHashMap`（弱键、GC 友好）。Map 是日常开发中使用最广泛的容器之一，适用于缓存、配置、索引等场景。
+
 ## Map 简介
 
 ### Map 架构
@@ -751,9 +755,92 @@ WeakHashMap 的 key 是**弱键**，即是 WeakReference 类型的；ReferenceQu
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/02/fb207a4ff9074a19a28be24f2e18d91c.png)
 
+## 典型应用场景
+
+### 场景一：缓存实现
+
+利用 `HashMap` 实现简单的本地缓存：
+
+```java
+public class SimpleCache<K, V> {
+    private final Map<K, V> cache = new HashMap<>();
+    private final int maxSize;
+
+    public SimpleCache(int maxSize) {
+        this.maxSize = maxSize;
+    }
+
+    public synchronized V get(K key) {
+        return cache.get(key);
+    }
+
+    public synchronized void put(K key, V value) {
+        if (cache.size() >= maxSize) {
+            cache.clear(); // 简单淘汰策略
+        }
+        cache.put(key, value);
+    }
+}
+```
+
+### 场景二：使用 LinkedHashMap 实现 LRU 缓存
+
+利用 `LinkedHashMap` 的访问顺序特性实现最近最少使用缓存：
+
+```java
+Map<String, Object> lruCache = new LinkedHashMap<>(16, 0.75f, true) {
+    private static final int MAX_SIZE = 100;
+    @Override
+    protected boolean removeEldestEntry(Map.Entry eldest) {
+        return size() > MAX_SIZE;
+    }
+};
+```
+
+### 场景三：分组与统计
+
+按条件对数据分组统计：
+
+```java
+Map<String, Integer> wordCount = new HashMap<>();
+for (String word : words) {
+    wordCount.merge(word, 1, Integer::sum);
+}
+```
+
+## 最佳实践
+
+1. **默认使用 `HashMap`**：无序存储首选，O(1) 时间复杂度。
+2. **指定初始容量和负载因子**：`new HashMap<>(expectedSize / 0.75f + 1)` 避免多次扩容。
+3. **需要顺序时用 `LinkedHashMap`**：保持插入顺序或访问顺序。
+4. **需要排序时用 `TreeMap`**：基于红黑树，O(log n) 复杂度。
+5. **并发场景使用 `ConcurrentHashMap`**：分段锁设计，性能优于 `Collections.synchronizedMap`。
+6. **Key 必须正确覆写 `hashCode` 和 `equals`**：否则 Map 无法正确查找和存储。
+7. **使用 `computeIfAbsent` / `merge` / `putIfAbsent`**：简化常见操作，避免冗长的 if-else。
+
+## 常见问题
+
+### Q1：HashMap 为什么线程不安全？
+
+在多线程环境下，HashMap 的 `put` 操作可能导致死循环（JDK 7 的链表头插法）或数据丢失（JDK 8+ 的尾插法）。并发场景应使用 `ConcurrentHashMap`。
+
+### Q2：HashMap 的 key 可以是 null 吗？
+
+可以。`HashMap` 允许一个 `null` key（特殊处理存储在 table[0]）和多个 `null` value。而 `TreeMap` 和 `ConcurrentHashMap` 不允许 `null` key。
+
+### Q3：HashMap、LinkedHashMap、TreeMap 如何选择？
+
+| 特性 | HashMap | LinkedHashMap | TreeMap |
+| --- | --- | --- | --- |
+| 顺序 | 无序 | 插入顺序/访问顺序 | 自然序/比较器序 |
+| 时间复杂度 | O(1) | O(1) | O(log n) |
+| null key | 允许 1 个 | 允许 1 个 | 不允许 |
+| 适用场景 | 通用键值存储 | LRU 缓存 | 排序场景 |
+
 ## 参考资料
 
 - [Java-HashMap 工作原理及实现](https://yikun.github.io/2015/04/01/Java-HashMap工作原理及实现)
+- [《Effective Java》第 3 版](https://book.douban.com/subject/30412517/)
 - [Map 综述（二）：彻头彻尾理解 LinkedHashMap](https://blog.csdn.net/justloveyou_/article/details/71713781)
 - [Java 集合系列 09 之 Map 架构](http://www.cnblogs.com/skywang12345/p/3308931.html)
 - [Java 集合系列 13 之 WeakHashMap 详细介绍(源码解析)和使用示例](http://www.cnblogs.com/skywang12345/p/3311092.html)

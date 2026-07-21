@@ -1389,6 +1389,72 @@ test
 
 综上可知：减少不需要获取的分组，可以提高正则表达式的性能。
 
+## 典型应用场景
+
+### 场景一：表单输入校验
+
+验证手机号、邮箱、身份证等用户输入是否合法：
+
+```java
+// 手机号校验（中国大陆 11 位）
+Pattern phonePattern = Pattern.compile("^1[3-9]\\d{9}$");
+boolean isValid = phonePattern.matcher("13812345678").matches();
+
+// 邮箱校验
+Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+boolean isEmail = emailPattern.matcher("user@example.com").matches();
+```
+
+### 场景二：日志/文本数据提取
+
+从日志文件中提取关键信息（如 IP、时间、状态码）：
+
+```java
+String log = "[2024-01-15 10:30:22] 192.168.1.100 GET /api/users 200 123ms";
+Pattern pattern = Pattern.compile("\\[(.+?)] (\\S+) (\\S+) (\\S+) (\\d+) (\\d+)ms");
+Matcher matcher = pattern.matcher(log);
+if (matcher.find()) {
+    String time = matcher.group(1);     // 2024-01-15 10:30:22
+    String ip = matcher.group(2);       // 192.168.1.100
+    int statusCode = Integer.parseInt(matcher.group(5)); // 200
+}
+```
+
+### 场景三：文本内容替换与清洗
+
+对 HTML 标签、敏感信息进行替换或脱敏：
+
+```java
+// 去除 HTML 标签
+String cleanText = html.replaceAll("<[^>]+>", "");
+
+// 手机号脱敏（中间 4 位替换为 *）
+String masked = phone.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+// 13812345678 → 138****5678
+```
+
+## 最佳实践
+
+1. **复用 Pattern 对象** - `Pattern` 编译成本高，应定义为静态常量复用，避免每次匹配都重新编译
+2. **善用预编译 Pattern** - `Pattern.compile(regex, Pattern.CASE_INSENSITIVE)` 比在正则中使用 `(?i)` 更直观
+3. **避免贪婪匹配的性能陷阱** - 对于大文本，`.*` 会回溯大量位置，优先使用 `.*?`（懒惰匹配）或否定字符类 `[^>]*`
+4. **命名分组提升可读性** - 使用 `(?<name>pattern)` 命名分组，通过 `matcher.group("name")` 获取，代码更直观
+5. **复杂正则拆分为多个简单正则** - 一个过于复杂的正则难以维护，可以拆分为多个步骤验证
+
+## 常见问题
+
+**Q1：Java 正则为什么在某些场景下很慢？**
+
+Java 使用 NFA（非确定有限自动机）引擎，支持回溯。当正则表达式包含大量可选分支、嵌套量词时，回溯会导致指数级时间复杂度（“灾难性回溯”）。解决方案：避免嵌套量词，使用原子组 `(?>...)` 或占有量词 `++` 禁止回溯。
+
+**Q2：`matches()`、`find()`、`lookingAt()` 有什么区别？**
+
+`matches()` 要求整个字符串匹配正则；`find()` 查找字符串中任意位置的匹配；`lookingAt()` 只从字符串开头匹配，但不要求匹配到结尾。
+
+**Q3：如何在正则中匹配中文？**
+
+使用 Unicode 范围：`[\u4e00-\u9fa5]` 匹配常见中文汉字，更完整的可使用 `\p{IsHan}` 或 `\p{Script=Han}`。
+
 ## 参考资料
 
 - [正则表达式 30 分钟入门教程](http://deerchao.net/tutorials/regex/regex.htm)

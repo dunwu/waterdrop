@@ -335,6 +335,19 @@ InvalidURIException: Cannot open Redis connection due invalid URI
 
 至此，spring 4 升级结束。后面如果遇到其他升级问题再补充。
 
+## 典型应用场景
+
+- **老旧项目升级**：将 Spring 3.x 项目升级到 Spring 4.x/5.x，享受新特性和安全补丁。
+- **Java 8+ 适配**：升级后可利用 Lambda、Stream 等 Java 8 特性简化代码。
+- **依赖兼容性验证**：升级过程中验证第三方库（如 MyBatis、Redis 客户端）与新版本的兼容性。
+
+## 最佳实践
+
+- **分步升级**：先升级 Spring 核心，再升级 Web、Data 等模块，逐步验证功能。
+- **关注废弃 API**：升级前扫描 `@Deprecated` 标注，提前替换为新版 API。
+- **充分测试**：升级后进行全量回归测试，特别关注类型转换、XML Schema 解析等行为变化。
+- **备份配置**：升级前备份原有配置和依赖版本，便于快速回滚。
+
 ## 资料
 
 - https://spring.io/blog/2013/05/21/spring-framework-4-0-m1-3-2-3-available/

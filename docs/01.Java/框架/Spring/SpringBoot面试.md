@@ -241,6 +241,22 @@ public class KafkaAutoConfiguration {
 @SpringBootApplication -> @EnableAutoConfiguration -> @Import({AutoConfigurationImportSelector.class}) -> 扫描 META-INF/spring.factories 文件 -> 自动加载文件中的配置 -> XXXAutoConfiguration 中根据 @ConditionalOnXXX 按需加载
 ```
 
+```mermaid
+graph TD
+    A["@SpringBootApplication"] --> B["@EnableAutoConfiguration"]
+    B --> C["@Import AutoConfigurationImportSelector"]
+    C --> D[扫描 META-INF/spring.factories]
+    D --> E[加载所有候选自动配置类]
+    E --> F{"@ConditionalOnClass 条件满足?"}
+    F -->|否| G[跳过该配置]
+    F -->|是| H{"@ConditionalOnMissingBean 条件满足?"}
+    H -->|否| G
+    H -->|是| I[注册 Bean 到容器]
+    I --> J{"@ConditionalOnProperty 条件满足?"}
+    J -->|否| G
+    J -->|是| I
+```
+
 ### 【中等】SpringBoot 是如何通过 main 方法启动 web 项目的？⭐
 
 Spring Boot 应用的启动流程都封装在 `SpringApplication.run` 方法中，它的大部分逻辑都是复用 Spring 启动的流程，只不过在它的基础上做了大量的扩展。
@@ -298,6 +314,24 @@ Spring Boot 启动流程大致分为六个关键阶段。
 - **工厂加载机制 (SPI)**：通过 `META-INF/spring.factories` 文件自动加载配置和组件，实现**约定优于配置**。
 - **钩子方法**：提供大量扩展点（如 `*Aware`, `*Processor`, `*Runner` 接口），方便定制。
 - **内嵌服务器**：在刷新上下文的 `onRefresh()` 钩子中启动 Web 服务器，这是独立运行（`java -jar`）的基石。
+
+```mermaid
+graph TD
+    A["main 方法调用 SpringApplication.run"] --> B[实例化 SpringApplication]
+    B --> C[推断应用类型 Servlet/Reactive/None]
+    C --> D[加载 ApplicationContextInitializer 和 ApplicationListener]
+    D --> E["发布 ApplicationStartingEvent"]
+    E --> F[准备 Environment 加载配置文件]
+    F --> G["发布 ApplicationEnvironmentPreparedEvent"]
+    G --> H[创建 ApplicationContext]
+    H --> I[执行 Initializer 设置环境]
+    I --> J[refreshContext 刷新上下文]
+    J --> K[解析自动配置 注册 Bean]
+    K --> L["onRefresh 启动内嵌 Web 服务器"]
+    L --> M[初始化所有单例 Bean]
+    M --> N["发布 ApplicationReadyEvent"]
+    N --> O[执行 CommandLineRunner/ApplicationRunner]
+```
 
 ### 【困难】如何自定义一个 starter 包？⭐⭐⭐
 

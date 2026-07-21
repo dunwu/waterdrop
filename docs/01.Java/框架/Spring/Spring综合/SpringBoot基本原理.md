@@ -281,6 +281,26 @@ public abstract class SpringFactoriesLoader {
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/03128c6f018a4086a1efebaf1e0fac46.webp)
 
+## 典型应用场景
+
+- **自动配置原理理解**：理解 `@EnableAutoConfiguration` 如何通过 `spring.factories` 机制自动装配组件。
+- **自定义 Starter 开发**：基于自动配置原理，开发业务 Starter，将常用配置封装为开箱即用的组件。
+- **条件化装配**：通过 `@ConditionalOnClass`、`@ConditionalOnProperty` 等注解实现按环境条件装配 Bean。
+- **插件化架构**：利用自动配置机制实现服务模块的插拔式加载。
+
+## 最佳实践
+
+- **Starter 命名规范**：官方 Starter 命名 `spring-boot-starter-xxx`，自定义 Starter 命名 `xxx-spring-boot-starter`。
+- **提供合理的默认配置**：Starter 应开箱即用，同时允许用户通过 `application.properties` 覆盖默认值。
+- **避免自动配置过于复杂**：单个自动配置类不应负责过多 Bean 的装配，按功能拆分多个配置类。
+- **使用 `@AutoConfigureBefore/After` 控制顺序**：当自动配置类之间有依赖关系时，显式声明顺序。
+
+## 常见问题
+
+**`@SpringBootApplication` 包含哪些注解？**
+
+组合了 `@SpringBootConfiguration`（配置类）、`@EnableAutoConfiguration`（启用自动配置）和 `@ComponentScan`（组件扫描）三个注解。
+
 ## 参考资料
 
 - [一文搞懂 springboot 启动原理](https://www.jianshu.com/p/943650ab7dfd)

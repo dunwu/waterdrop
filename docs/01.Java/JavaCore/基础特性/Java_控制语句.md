@@ -15,6 +15,10 @@ permalink: /pages/c67f25cc/
 
 # Java 控制语句
 
+## 简介
+
+控制语句是 Java 程序的核心流程控制工具，决定了程序执行的顺序和路径。通过控制语句，程序可以实现条件判断、循环迭代和流程跳转。掌握控制语句的正确使用方式，是编写清晰、高效、无 bug 代码的基础。
+
 > Java 控制语句大致可分为三大类：
 >
 > - 选择语句
@@ -29,6 +33,22 @@ permalink: /pages/c67f25cc/
 >   - break
 >   - continue
 >   - return
+
+### 控制流概览
+
+```mermaid
+graph TB
+    A[程序入口] --> B{控制语句}
+    B -->|选择| C[if/switch]
+    B -->|循环| D[while/for/foreach]
+    B -->|中断| E[break/continue/return]
+    C --> F[执行对应分支]
+    D --> G{条件是否满足}
+    G -->|是| H[执行循环体]
+    H --> G
+    G -->|否| I[跳出循环]
+    E --> J[转移控制权]
+```
 
 ## 选择语句
 
@@ -482,6 +502,84 @@ public class ReturnDemo {
 ```
 
 > 🔔 注意：请仔细体会一下 `return` 和 `break` 的区别。
+
+## 典型应用场景
+
+### 场景一：多级权限判断
+
+在权限控制系统中，使用 if-else if-else 进行多级别权限判断：
+
+```java
+public String getAccessLevel(User user) {
+    if (user.isAdmin()) {
+        return "FULL_ACCESS";
+    } else if (user.isManager()) {
+        return "MANAGE_ACCESS";
+    } else if (user.isActive()) {
+        return "READ_ACCESS";
+    } else {
+        return "NO_ACCESS";
+    }
+}
+```
+
+### 场景二：状态机处理
+
+使用 switch 语句实现订单状态机：
+
+```java
+public void handleOrderEvent(Order order, OrderEvent event) {
+    switch (order.getStatus()) {
+        case CREATED:
+            if (event == OrderEvent.PAY) order.setStatus(Status.PAID);
+            break;
+        case PAID:
+            if (event == OrderEvent.SHIP) order.setStatus(Status.SHIPPED);
+            break;
+        case SHIPPED:
+            if (event == OrderEvent.CONFIRM) order.setStatus(Status.COMPLETED);
+            break;
+        case COMPLETED:
+        case CANCELLED:
+            throw new IllegalStateException("订单已结束，无法操作");
+        default:
+            throw new IllegalArgumentException("未知状态: " + order.getStatus());
+    }
+}
+```
+
+### 场景三：数据过滤与转换
+
+使用 foreach + continue 实现高效的数据过滤：
+
+```java
+public List<User> getActiveUsers(List<User> allUsers) {
+    List<User> activeUsers = new ArrayList<>();
+    for (User user : allUsers) {
+        if (!user.isActive()) continue;       // 跳过非活跃用户
+        if (user.isBanned()) continue;         // 跳过封禁用户
+        activeUsers.add(user);
+    }
+    return activeUsers;
+}
+```
+
+## 常见问题
+
+### Q1：switch 语句中不写 break 会怎样？
+
+如果不写 break，程序会继续执行下一个 case 的代码（称为"穿透"或"fall-through"）。这有时是故意的（如多个 case 共享逻辑），但大多数时候是程序员的疏忽，会导致逻辑错误。建议每个 case 都加上 break，或者使用 JDK 14 的 switch 表达式（自动不穿透）。
+
+### Q2：foreach 循环中能否删除集合元素？
+
+不能直接在 foreach 循环中调用集合的 `remove()` 方法，否则会抛出 `ConcurrentModificationException`。正确做法是使用 `Iterator` 的 `remove()` 方法，或使用 `Collection.removeIf()` (JDK8)。
+
+### Q3：for 和 while 怎么选择？
+
+- **for**：适合已知循环次数的场景（如遍历数组、执行 N 次操作）。
+- **while**：适合不确定循环次数、根据条件判断是否继续的场景。
+- **do-while**：保证至少执行一次的场景（如菜单显示、输入验证）。
+- **foreach**：遍历集合或数组时的首选，代码最简洁且不易出错。
 
 ## 最佳实践
 

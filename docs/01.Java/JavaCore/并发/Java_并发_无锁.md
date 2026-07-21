@@ -19,6 +19,10 @@ permalink: /pages/3d79d585/
 
 # Java 并发之无锁
 
+## 简介
+
+无锁（Lock-Free）编程是解决并发安全问题的另一种思路，与互斥同步（加锁）相对。无锁方案通过 **CAS（Compare-And-Swap）硬件指令**、**不可变对象**、**ThreadLocal 线程本地存储**、**Copy-on-Write** 等技术手段，在不加锁的前提下保证线程安全，避免了线程阻塞和上下文切换的开销，在高并发场景下能显著提升性能。
+
 并发安全需要保证几个基本特性：
 
 - **可见性** - 是一个线程修改了某个共享变量，其状态能够立即被其他线程知晓，通常被解释为将线程本地状态反映到主内存上，`volatile` 就是负责保证可见性的。
@@ -1179,6 +1183,89 @@ public class SafeWM {
 Java 支持 `CopyOnWriteArrayList` 和 `CopyOnWriteArraySet` 两种并发容器，其设计思想就是 CoW；通过 Copy-on-Write 这两个容器实现的读操作是无锁的，由于无锁，所以将读操作的性能发挥到了极致。
 
 CoW 是一项非常通用的技术方案，在很多领域都有着广泛的应用。不过，它也有缺点的，那就是消耗内存，每次修改都需要复制一个新的副本出来。
+
+## 典型应用场景
+
+### 场景一：高并发计数器（AtomicLong/LongAdder）
+
+统计网站访问量，使用原子类避免加锁：
+
+```java
+// 简单场景使用 AtomicLong
+AtomicLong counter = new AtomicLong(0);
+counter.incrementAndGet();
+
+// 高并发场景使用 LongAdder（分段累加，减少竞争）
+LongAdder adder = new LongAdder();
+adder.increment();
+long total = adder.sum(); // 获取当前总和
+```
+
+`LongAdder` 在高竞争场景下性能比 `AtomicLong` 高一个数量级，因为它将值分散到多个 Cell 中，最后汇总。
+
+### 场景二：线程上下文传递（ThreadLocal）
+
+保存用户登录信息，整个请求链路中任何地方都能获取，且线程间互不干扰：
+
+```java
+public class UserContext {
+    private static final ThreadLocal<UserInfo> HOLDER = new ThreadLocal<>();
+
+    public static void set(UserInfo user) { HOLDER.set(user); }
+    public static UserInfo get() { return HOLDER.get(); }
+    public static void clear() { HOLDER.remove(); }
+}
+
+// 拦截器中设置
+UserContext.set(userService.getCurrentUser());
+try {
+    chain.doFilter(request, response);
+} finally {
+    UserContext.clear(); // 必须清理，防止线程池复用时污染
+}
+```
+
+### 场景三：无锁队列/原子引用更新（CAS）
+
+实现无锁的单链表入队操作：
+
+```java
+AtomicReference<Node<E>> tail = new AtomicReference<>(head);
+
+public void enqueue(E item) {
+    Node<E> newNode = new Node<>(item);
+    while (true) {
+        Node<E> currentTail = tail.get();
+        newNode.next = currentTail;
+        if (tail.compareAndSet(currentTail, newNode)) {
+            return; // CAS 成功，入队完成
+        }
+        // CAS 失败，重试
+    }
+}
+```
+
+## 最佳实践
+
+1. **高并发计数优先用 LongAdder** - 在统计、监控、限流等场景，`LongAdder` 比 `AtomicLong` 性能更高，但牺牲了实时性（`sum()` 是近似值）
+2. **ThreadLocal 必须在 finally 中清理** - 线程池场景下线程被复用，不清理会导致数据污染和内存泄漏（ThreadLocalMap 的弱引用 Key 已解决部分问题，但仍建议主动清理）
+3. **CAS 自旋要设置重试上限** - 高竞争场景下 CAS 自旋会大量消耗 CPU，应设置重试次数或退避策略，否则不如直接用锁
+4. **优先使用 JDK 提供的原子类** - `AtomicReference`、`AtomicInteger`、`AtomicBoolean` 等已经封装了 CAS 操作，避免直接使用 `Unsafe` 类
+5. **不可变对象用 final 修饰** - 确保对象的引用和状态都不会改变，无需任何同步机制即可保证线程安全
+
+## 常见问题
+
+**Q1：CAS 的 ABA 问题如何解决？**
+
+CAS 只比较值是否相等，如果值从 A 变成 B 再变回 A，CAS 会认为没有变化。解决方案是使用 `AtomicStampedReference`，它同时比较值和版本号（时间戳），每次修改都会递增版本号。
+
+**Q2：ThreadLocal 为什么会导致内存泄漏？**
+
+`ThreadLocalMap` 的 key 是 `ThreadLocal` 的弱引用，如果 `ThreadLocal` 对象被回收，key 变为 null，但 value 是强引用不会被回收，导致 value 一直占用内存。解决方案：使用完毕后务必调用 `remove()` 方法。
+
+**Q3：CAS 自旋和互斥锁如何选择？**
+
+竞争不激烈时，CAS 自旋比互斥锁性能好（避免了线程切换开销）；竞争激烈时，CAS 自旋会大量消耗 CPU，此时应改用互斥锁。JDK 中的 `ConcurrentHashMap`、`AtomicInteger` 等都自动结合了两种策略。
 
 ## 参考资料
 

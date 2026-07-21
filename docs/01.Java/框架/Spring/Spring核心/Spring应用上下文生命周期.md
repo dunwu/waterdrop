@@ -165,6 +165,30 @@ AbstractApplicationContext#close() 方法
 - 停止阶段 - ConfigurableApplicationContext#stop()
 - 关闭阶段 - ConfigurableApplicationContext#close()
 
+## 典型应用场景
+
+- **应用启动预热**：通过监听 `ContextRefreshedEvent` 在上下文刷新完成后执行缓存预热、数据初始化等操作。
+- **优雅停机**：通过 `SmartLifecycle` 接口在应用关闭时执行异步任务清理、连接池释放等操作。
+- **动态资源加载**：在 `onRefresh()` 阶段启动嵌入式 Web 服务器（如 Spring Boot 的 Tomcat/Jetty 启动）。
+- **自定义上下文扩展**：通过覆盖 `postProcessBeanFactory()` 方法为特定 Web 环境注册专用 BeanPostProcessor。
+
+## 最佳实践
+
+- **避免在 `refresh()` 阶段执行耗时操作**：会拖慢应用启动速度，应将异步任务延迟到 `ApplicationReadyEvent` 后执行。
+- **实现 `SmartLifecycle` 管理组件启停**：比 `ApplicationListener<ContextStartedEvent>` 更可靠，支持自动启动和有序停止。
+- **利用 `ContextClosedEvent` 清理资源**：确保所有非 Spring 管理的资源（如线程池、连接）在关闭时正确释放。
+- **注意 `refresh()` 的幂等性**：Spring 不支持多次调用 `refresh()`，重复调用会抛出 `IllegalStateException`。
+
+## 常见问题
+
+**`refresh()` 和 `start()` 的区别？**
+
+`refresh()` 完成 BeanFactory 创建、BeanDefinition 加载和 Bean 实例化等初始化工作；`start()` 仅触发 `Lifecycle` Bean 的启动，通常在 `refresh()` 之后调用。
+
+**为什么 `ApplicationContext` 关闭时 `@PreDestroy` 未被调用？**
+
+可能是未正确注册 Shutdown Hook，或在非 Web 应用中未调用 `close()` 方法。确保通过 `registerShutdownHook()` 或显式关闭上下文。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

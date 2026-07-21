@@ -128,6 +128,17 @@ public ThreadPoolExecutor(int corePoolSize,// 线程池的核心线程数量
    - **线程数达 `maximumPoolSize` 且队列满** → 触发拒绝策略（`RejectedExecutionHandler`）。
 3. **线程回收**：线程空闲时间超过 `keepAliveTime` ，且当前线程数大于核心线程数，会被回收。设置 `allowCoreThreadTimeOut=true`，可以回收核心线程。
 
+```mermaid
+graph TD
+    A[提交任务] --> B{工作线程数 < corePoolSize?}
+    B -->|是| C[创建核心线程执行任务]
+    B -->|否| D{工作队列是否已满?}
+    D -->|否| E[任务加入工作队列等待执行]
+    D -->|是| F{工作线程数 < maximumPoolSize?}
+    F -->|是| G[创建非核心线程执行任务]
+    F -->|否| H[触发拒绝策略 RejectedExecutionHandler]
+```
+
 ::: info 线程分配和队列管理源码
 
 :::
@@ -697,6 +708,20 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 5. **支持中断**：`await(long timeout, TimeUnit unit)`可设置超时，也可响应线程中断，避免永久阻塞。
 
 **核心流程**
+
+```mermaid
+graph TD
+    A[主线程调用 await] --> B{计数器 > 0?}
+    B -->|是| C[进入 AQS 共享队列阻塞等待]
+    B -->|否| D[直接返回]
+    E[子线程完成任务] --> F[调用 countDown]
+    F --> G[atomic CAS state 减 1]
+    G --> H{计数器 == 0?}
+    H -->|是| I[唤醒所有等待线程]
+    H -->|否| J[无额外操作]
+    I --> D
+    C -->|被唤醒| D
+```
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/10/4050a64b7ad141ecb59cdbda6abf0bcb.png)
 

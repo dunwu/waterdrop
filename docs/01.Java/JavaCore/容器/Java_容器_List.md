@@ -18,6 +18,10 @@ permalink: /pages/8e8c4a27/
 
 # Java 容器之 List
 
+## 简介
+
+List 是 Java 容器框架中最常用的接口，继承自 `Collection`，表示一个**有序的、可重复的元素序列**。它支持按索引访问、插入、删除等操作。主要实现类包括 `ArrayList`（基于动态数组，随机访问快）和 `LinkedList`（基于双链表，头尾操作快）。在日常开发中，`ArrayList` 是 List 的首选实现。
+
 > `List` 是 `Collection` 的子接口，其中可以保存各个重复的内容。
 
 ## List 简介
@@ -676,8 +680,62 @@ List<Integer> subList = new ArrayList<>(list.subList(1, 4));
 List<Integer> subList = list.stream().skip(1).limit(3).collect(Collectors.toList());
 ```
 
+## 典型应用场景
+
+### 场景一：分页查询
+
+利用 `subList` 实现内存中的分页：
+
+```java
+public <T> List<T> paginate(List<T> list, int page, int pageSize) {
+    int fromIndex = (page - 1) * pageSize;
+    int toIndex = Math.min(fromIndex + pageSize, list.size());
+    if (fromIndex >= list.size()) return Collections.emptyList();
+    return new ArrayList<>(list.subList(fromIndex, toIndex));
+}
+```
+
+### 场景二：数据合并与去重
+
+合并两个有序列表并去重：
+
+```java
+List<String> merged = Stream.concat(list1.stream(), list2.stream())
+    .distinct()
+    .sorted()
+    .collect(Collectors.toList());
+```
+
+### 场景三：使用 CopyOnWriteArrayList 实现观察者模式
+
+并发场景下的事件监听器列表：
+
+```java
+List<EventListener> listeners = new CopyOnWriteArrayList<>();
+
+public void register(EventListener listener) {
+    listeners.add(listener);
+}
+
+public void notify(Event event) {
+    for (EventListener listener : listeners) {
+        listener.onEvent(event); // 迭代过程中可以安全地增删监听器
+    }
+}
+```
+
+## 最佳实践
+
+1. **默认使用 `ArrayList`**：几乎所有场景都是首选，随机访问 O(1)，内存局部性好。
+2. **预分配容量**：已知数据量时使用 `new ArrayList<>(capacity)`，避免多次扩容。
+3. **避免使用 `LinkedList`**：Josh Bloch 本人都说从不用它，`ArrayList` 在绝大多数场景下性能更好。
+4. **`subList` 返回的是视图**：修改子列表会影响原列表，如需独立副本应用 `new ArrayList<>(subList)`。
+5. **并发场景使用 `CopyOnWriteArrayList`**：读多写少场景性能好，写多场景不适用。
+6. **批量操作用 `addAll/removeAll/retainAll`**：比循环调用单个方法效率更高。
+
 ## 参考资料
 
 - [Java 编程思想（第 4 版）](https://item.jd.com/10058164.html)
+- [《Effective Java》第 3 版](https://book.douban.com/subject/30412517/)
 - https://www.cnblogs.com/skywang12345/p/3308556.html
 - http://www.cnblogs.com/skywang12345/p/3308807.html

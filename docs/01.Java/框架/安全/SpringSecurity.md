@@ -231,6 +231,37 @@ Spring Security 的 servlet 支持通过与 `PasswordEncoder` 集成来安全地
 - configure(WebSecurity)：通过重载该方法，可配置 Spring Security 的 Filter 链。
 - configure(HttpSecurity)：通过重载该方法，可配置如何通过拦截器保护请求。
 
+## 典型应用场景
+
+- **Spring Boot Web 应用安全**：为 Spring Boot 应用提供认证、授权、会话管理等安全能力，是 Spring Boot 项目的默认安全方案。
+- **OAuth2 资源服务器 / 授权服务器**：通过 Spring Security OAuth2 实现第三方登录、API 网关认证、微服务间安全通信。
+- **前后端分离应用 JWT 认证**：结合 JWT Token 实现无状态认证，适用于 SPA、移动端 App 等前后端分离场景。
+- **RBAC 权限模型**：基于用户-角色-权限的三层架构实现细粒度的访问控制，适用于企业级应用和 SaaS 平台。
+- **微服务安全网关**：在 Spring Cloud Gateway 中集成 Spring Security，实现统一认证、限流、CORS 等安全策略。
+
+## 最佳实践
+
+- **使用 BCrypt 密码加密**：通过 `BCryptPasswordEncoder` 加密密码，禁止使用 MD5 或明文存储。BCrypt 自带 Salt 且计算成本可调。
+- **最小权限原则**：默认拒绝所有访问，仅显式开放必要的接口。使用 `.anyRequest().authenticated()` 作为基线配置。
+- **开启 CORS 和 CSRF 配置**：前后端分离场景下正确配置 CORS；非前后端分离场景保留 CSRF 保护防止跨站请求伪造。
+- **自定义 UserDetailsService**：实现自定义的 `UserDetailsService` 从数据库加载用户信息，而非使用内存存储。
+- **分离安全配置**：将 `WebSecurityConfigurerAdapter` 配置拆分为多个 `SecurityFilterChain` Bean，针对不同 URL 模式应用不同安全策略。
+- **敏感信息保护**：使用 Spring Boot Actuator 时务必配置访问控制，防止敏感端点泄露。
+
+## 常见问题
+
+**Spring Security 过滤链的执行顺序是怎样的？**
+
+Spring Security 过滤器按固定顺序执行：`SecurityContextPersistenceFilter` → `LogoutFilter` → `UsernamePasswordAuthenticationFilter` → `BasicAuthenticationFilter` → `RequestCacheAwareFilter` → `ExceptionTranslationFilter` → `FilterSecurityInterceptor`。理解顺序对调试安全配置至关重要。
+
+**如何自定义登录页面和登录成功/失败处理？**
+
+通过 `HttpSecurity.formLogin()` 配置自定义登录页、登录成功处理器（`AuthenticationSuccessHandler`）和失败处理器（`AuthenticationFailureHandler`），可以实现登录日志记录、验证码验证、登录重试限制等功能。
+
+**如何实现基于 JWT 的无状态认证？**
+
+实现 `OncePerRequestFilter` 解析请求头中的 JWT Token，验证后设置 `SecurityContextHolder`。禁用 CSRF 和 Session 创建（`SessionCreationPolicy.STATELESS`），将 JWT Filter 添加到 `UsernamePasswordAuthenticationFilter` 之前。
+
 ## 参考资料
 
 - [Spring Security Architecture](https://spring.io/guides/topicals/spring-security-architecture)

@@ -430,6 +430,37 @@ token.setRememberMe(true);
 SecurityUtils.getSubject().login(token);
 ```
 
+## 典型应用场景
+
+- **传统 Web 应用认证授权**：为传统 MVC 应用提供基于表单的登录认证、角色/权限控制，适用于后台管理系统、ERP 等内部系统。
+- **多数据源认证**：通过多 Realm 配置支持多种认证源（如数据库 + LDAP + OAuth），适用于企业级多租户统一认证。
+- **细粒度权限控制**：基于字符串权限表达式（如 `printer:print:laserjet4400n`）实现资源级别的访问控制，适用于权限敏感型应用。
+- **分布式会话管理**：通过 SessionDAO 将会话存储到 Redis，实现分布式环境下的会话共享，适用于集群部署的 Web 应用。
+- **单点登录（SSO）集成**：结合 CAS 等单点登录协议，实现跨应用的统一认证。
+
+## 最佳实践
+
+- **使用基于权限的授权而非基于角色**：基于权限的授权与业务功能紧密关联，代码变更影响面更小，更安全。
+- **密码加密存储**：使用 `Sha256Hash` 加 Salt 并多次迭代（建议 1024 次以上），禁止明文存储密码。
+- **会话存储在 Redis**：生产环境中通过 `SessionDAO` 将会话存储到 Redis，支持分布式部署并避免内存溢出。
+- **合理配置过滤链**：静态资源（CSS/JS/图片）配置 `anon` 跳过认证，API 接口配置 `authc` 或 `jwt` 认证。
+- **使用注解简化权限控制**：在 Service 层使用 `@RequiresPermissions`、`@RequiresRoles` 注解，避免在 Controller 中编写权限检查代码。
+- **定期更新 Shiro 版本**：Shiro 历史上曾有多个安全漏洞（如反序列化漏洞 CVE-2016-4437），需及时更新至最新版本。
+
+## 常见问题
+
+**Shiro 与 Spring Security 如何选择？**
+
+Shiro 轻量级、学习曲线平缓、灵活性强，适合中小型项目或需要自定义认证逻辑的场景；Spring Security 功能全面、生态丰富、与 Spring 深度集成，适合复杂的 Spring Boot 项目。新项目优先考虑 Spring Security。
+
+**Shiro 反序列化漏洞如何防范？**
+
+Shiro 550 漏洞源于 rememberMe Cookie 的 AES 加密密钥硬编码。解决方案：升级到 Shiro 1.2.5+ 版本（使用随机密钥）、禁用 rememberMe 功能、或配置自定义的加密密钥。
+
+**如何集成 JWT 实现无状态认证？**
+
+自定义 `JwtFilter` 继承 `BasicHttpAuthenticationFilter`，在 `isAccessAllowed` 中解析 JWT Token 并验证。将 JWT Filter 配置到过滤链中替代传统的 Session 认证，实现前后端分离场景下的无状态认证。
+
 ## 参考资料
 
 - [Shiro 官方文档](http://shiro.apache.org/reference.html)

@@ -434,6 +434,50 @@ public class SemaphoreRateLimit {
 - **多阶段并发任务需在阶段间同步** → `CyclicBarrier`
 - **控制资源的最大并发访问数** → `Semaphore`
 
+## 典型应用场景
+
+### 场景一：CountDownLatch 等待多个任务完成
+
+```java
+CountDownLatch latch = new CountDownLatch(3);
+executor.submit(() -> { doTask1(); latch.countDown(); });
+executor.submit(() -> { doTask2(); latch.countDown(); });
+executor.submit(() -> { doTask3(); latch.countDown(); });
+latch.await(); // 等待所有任务完成
+```
+
+### 场景二：CyclicBarrier 多线程同步点
+
+多个线程到达屏障后同时继续执行，适用于并行计算的分阶段同步。
+
+### 场景三：Semaphore 限流
+
+```java
+Semaphore semaphore = new Semaphore(10); // 最多 10 个并发
+semaphore.acquire();
+try { accessResource(); } finally { semaphore.release(); }
+```
+
+## 最佳实践
+
+1. **CountDownLatch 用一次性的场景**：它不能重置，需重复用改用 CyclicBarrier。
+2. **Semaphore 用于限流**：如控制数据库连接数、API 并发限制。
+3. **Exchanger 用于线程间数据交换**：如生产者-消费者的数据传递。
+
+## 常见问题
+
+### Q1：CountDownLatch 和 CyclicBarrier 有什么区别？
+
+CountDownLatch 一次性使用，等待多个线程完成；CyclicBarrier 可重复使用，等待所有线程到达屏障。
+
+### Q2：Semaphore 的公平模式是什么？
+
+fair=true 时按等待顺序获取许可，避免饥饿；fair=false 时允许抢占，性能更高。
+
+### Q3：Phaser 是什么？
+
+Phaser 是 JDK 7 引入的更灵活的同步工具，可以动态注册/注销参与者，适合分阶段并行计算。
+
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)

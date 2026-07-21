@@ -570,6 +570,34 @@ class FooWraper {
 }
 ```
 
+## 典型应用场景
+
+- **Service 层隔离测试**：用 `@Mock` 模拟 DAO/Repository 层，验证 Service 业务逻辑而不依赖数据库。
+- **外部服务调用模拟**：Mock 第三方 API 客户端（如支付网关、短信服务），避免测试时依赖外部网络。
+- **异常场景验证**：通过 `when(...).thenThrow(...)` 模拟异常响应，测试代码的容错和降级逻辑。
+- **行为验证（Behavior Testing）**：使用 `verify()` 验证方法是否被调用、调用次数和参数，确保业务流转正确。
+
+## 最佳实践
+
+- **使用 `@Mock` + `@InjectMocks`**：通过注解创建 mock 并自动注入，代码更简洁。配合 `@ExtendWith(MockitoExtension.class)` 在 JUnit 5 中使用。
+- **避免过度 Mock**：只 mock 当前测试需要的行为，不要用 `when(...).thenReturn(...)` 配置所有方法，否则测试难以维护。
+- **`Spy` 用于部分模拟**：当需要保留真实方法行为，只覆盖部分方法时，使用 `spy()` 而不是 `mock()`。
+- **用 `ArgumentCaptor` 验证复杂参数**：当参数是对象而不是简单值时，用 captor 捕获后做详细断言。
+
+## 常见问题
+
+**Mockito 无法 mock final 类/方法？**
+
+Mockito 2.x+ 通过 mockito-extensions 支持 mock final，需在 `src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker` 文件中写入 `mock-maker-inline`。
+
+**`when()` 和 `doReturn()` 的区别？**
+
+`when(obj.method()).thenReturn(value)` 会先真实调用方法再打桩，对于 spy 对象可能触发真实逻辑。`doReturn(value).when(obj).method()` 不会调用真实方法，是 spy 对象的推荐用法。
+
+**多个测试之间 mock 状态污染？**
+
+使用 `@ExtendWith(MockitoExtension.class)` 会自动在每个测试后重置 mock。如果手动创建 mock，需在 `@AfterEach` 中调用 `Mockito.reset(mock)`。
+
 ## 引用和引申
 
 - [官网](https://site.mockito.org/)

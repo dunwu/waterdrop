@@ -165,6 +165,30 @@ Instrumented client 和 server 是分别使用了 ZipKin Client 的服务，Zipk
 
 一般不会手动编写 Trace 相关的代码，Brave 提供可一些开箱即用的库，帮助我们追踪一些特定的请求。比如：dubbo、grpc、servlet、mysql、httpClient、kafka、springMVC 等。
 
+## 典型应用场景
+
+- **分布式链路追踪**：追踪跨服务的 HTTP/RPC 调用链，通过 Trace ID 串联整个调用流程，快速定位故障节点和慢调用。
+- **依赖关系可视化**：通过 Zipkin UI 的依赖图展示服务间调用关系，识别核心服务和潜在的单点故障。
+- **性能分析**：查看 Span 的详细耗时和标签信息，分析各阶段的性能瓶颈，如数据库查询、缓存访问、外部接口调用。
+- **故障排查**：通过 Trace 详情查看失败请求的完整调用链，定位具体失败的服务和方法，结合日志快速恢复。
+
+## 最佳实践
+
+- **合理设置采样率**：生产环境建议采样率 1%-10%，核心接口可配置全量采样，避免存储压力过大。
+- **规范 Span 命名**：Span 名称应清晰表达操作类型（如 `GET /api/users`、`INSERT user_table`），避免过于笼统的命名。
+- **添加关键 Tag**：在 Span 中添加业务相关的 Tag（如 userId、orderId），便于后续查询和过滤。
+- **定期清理数据**：配置存储 TTL 或定期清理历史 Trace 数据，避免 Elasticsearch/MySQL 存储空间耗尽。
+
+## 常见问题
+
+**Zipkin 数据上报失败？**
+
+常见原因：1) Zipkin Server 未启动或地址配置错误；2) 网络不通，检查防火墙和端口（默认 9411）；3) 传输方式配置错误（HTTP/Kafka/RabbitMQ），确认 Collector 地址和认证信息正确。
+
+**Zipkin 和 SkyWalking 如何选择？**
+
+Zipkin 专注于分布式追踪，轻量易用，适合中小规模系统；SkyWalking 是完整的 APM 平台，除追踪外还提供 Metrics、Logs、Service Mesh 支持，适合大型微服务架构。如果只需要链路追踪选 Zipkin，需要全方位可观测性选 SkyWalking。
+
 ## 参考资料
 
 - [Zipkin 官网](https://zipkin.io/)

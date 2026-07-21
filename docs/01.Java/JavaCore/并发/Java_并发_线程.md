@@ -925,6 +925,59 @@ Java 的每个对象中都有一个称之为 monitor 监视器的锁，由于每
 
 > 最佳线程数=1 +（I/O 耗时 / CPU 耗时）
 
+## 典型应用场景
+
+### 场景一：使用 Callable 和 Future 获取异步结果
+
+```java
+ExecutorService executor = Executors.newSingleThreadExecutor();
+Future<String> future = executor.submit(() -> fetchDataFromRemote());
+String result = future.get(5, TimeUnit.SECONDS); // 带超时的获取
+```
+
+### 场景二：线程中断协作
+
+```java
+Thread worker = new Thread(() -> {
+    while (!Thread.currentThread().isInterrupted()) {
+        // 执行任务
+    }
+});
+worker.start();
+worker.interrupt(); // 协作式停止
+```
+
+### 场景三：守护线程
+
+```java
+Thread daemon = new Thread(() -> {
+    while (true) { monitor(); }
+});
+daemon.setDaemon(true); // 主线程结束时自动退出
+daemon.start();
+```
+
+## 最佳实践
+
+1. **不要直接操作 Thread**：使用 ExecutorService 管理线程生命周期。
+2. **使用中断机制停止线程**：不要使用 `stop()`（已废弃），用 `interrupt()` + 检查中断状态。
+3. **合理设置线程名称**：便于排查问题时识别线程。
+4. **理解线程状态转换**：NEW/RUNNABLE/BLOCKED/WAITING/TIMED_WAITING/TERMINATED。
+
+## 常见问题
+
+### Q1：Runnable 和 Callable 有什么区别？
+
+Runnable 没有返回值，不能抛受检异常；Callable 有返回值（通过 Future），可以抛受检异常。
+
+### Q2：什么是守护线程？
+
+守护线程（Daemon Thread）是为其他线程提供服务的线程（如 GC 线程）。当所有非守护线程结束时，守护线程自动退出。
+
+### Q3：Thread.sleep 和 Object.wait 有什么区别？
+
+sleep 不释放锁，wait 释放锁。sleep 是 Thread 的静态方法，wait 是 Object 的实例方法，必须在 synchronized 块中调用。
+
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)

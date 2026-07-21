@@ -175,6 +175,30 @@ DataBinder 与 BeanWrapper
 | java.beans.MethodDescriptor   | Java Bean 方法描述符     |
 | java.beans.EventSetDescriptor | Java Bean 事件集合描述符 |
 
+## 典型应用场景
+
+- **Web 表单参数绑定**：通过 `WebDataBinder` 将 HTTP 请求参数自动绑定到 Java Bean 对象，简化 Controller 层参数处理。
+- **Bean 属性批量赋值**：利用 `DataBinder` 从 `PropertyValues` 中批量设置 Bean 属性，用于数据导入、批量更新场景。
+- **表单校验与错误收集**：结合 `Validator` 在数据绑定后自动执行校验，通过 `BindingResult` 收集错误信息。
+- **嵌套对象属性绑定**：支持通过 `user.address.city` 形式的路径表达式绑定嵌套对象属性。
+
+## 最佳实践
+
+- **合理设置 `allowedFields` 和 `disallowedFields`**：防止恶意用户通过提交额外参数修改敏感字段（如 `id`、`role`）。
+- **对关键属性设置 `requiredFields`**：确保必须绑定的字段不会因参数缺失而被忽略。
+- **配合 `@InitBinder` 全局配置**：在 Controller 基类中通过 `@InitBinder` 统一配置 `DataBinder` 的转换器和校验器。
+- **关闭 `autoGrowNestedPaths` 防范 OGNL 注入**：在安全敏感场景中，避免自动创建嵌套路径对象被利用。
+
+## 常见问题
+
+**`DataBinder` 与 `BeanWrapper` 的区别？**
+
+`BeanWrapper` 是底层 JavaBeans 操作接口，提供属性读写和嵌套路径支持；`DataBinder` 在此基础上增加了校验、格式化和绑定结果分析能力，更适合用户输入场景。
+
+**绑定失败时如何获取错误信息？**
+
+通过 `DataBinder#getBindingResult()` 获取 `BindingResult` 对象，其中包含所有 `ObjectError` 和 `FieldError`，可结合 `MessageSource` 获取国际化错误文案。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

@@ -741,6 +741,26 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 一旦 Servlet multipart 配置好，就可以添加一个名为 `multipartResolver` 的 `StandardServletMultipartResolver` 类型的 bean。
 
+## 典型应用场景
+
+- **统一请求分发**：作为前端控制器，将所有 HTTP 请求统一路由到对应的 Controller 处理。
+- **多租户应用**：通过配置多个 `DispatcherServlet` 实例，为不同租户提供独立的请求处理链。
+- **API 版本管理**：结合 `HandlerMapping` 实现基于 URL 前缀或 Header 的 API 版本分发。
+- **自定义异常处理**：配置 `HandlerExceptionResolver` 统一处理控制器层抛出的异常。
+
+## 最佳实践
+
+- **避免自定义 `DispatcherServlet`**：其默认实现已足够灵活，通常只需配置 `HandlerMapping`、`HandlerAdapter` 等组件。
+- **合理配置 `url-pattern`**：推荐使用 `/` 作为映射路径，避免使用 `/*` 导致静态资源被拦截。
+- **启用异步支持**：对于长连接、SSE 等场景，在 `web.xml` 或 Java Config 中开启异步模式。
+- **配合 `@EnableWebMvc` 启用默认配置**：在 Spring Boot 中无需显式配置，框架自动完成组件注册。
+
+## 常见问题
+
+**`DispatcherServlet` 与 `Filter` 的执行顺序？**
+
+`Filter` 在 `DispatcherServlet` 之前执行，Filter 链拦截请求后才会进入 Servlet 处理流程。
+
 ## 参考资料
 
 - [Spring Framework 官方文档](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/index.html)

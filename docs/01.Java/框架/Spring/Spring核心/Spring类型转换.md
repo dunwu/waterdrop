@@ -208,6 +208,30 @@ GenericConverter 优化接口 - `ConditionalGenericConverter`
 - 类型条件接口 - `org.springframework.core.convert.converter.ConditionalConverter`
 - 综合类型转换接口 - `org.springframework.core.convert.converter.ConditionalGenericConverter`
 
+## 典型应用场景
+
+- **Web 请求参数转换**：将 HTTP 请求中的 String 参数自动转换为 `Date`、`LocalDateTime`、`Enum` 等目标类型。
+- **配置属性类型转换**：将 Properties/YAML 中的字符串值转换为 `Duration`、`DataSize`、自定义对象等类型。
+- **数据格式化**：通过 `Formatter` 实现日期时间、货币、百分比等复杂类型的双向格式化。
+- **自定义类型转换**：实现 `Converter` 接口处理业务特有的类型转换，如将加密字符串转换为解密对象。
+
+## 最佳实践
+
+- **优先使用 `ConversionService` 而非 `PropertyEditor`**：`ConversionService` 支持任意类型转换，而 `PropertyEditor` 仅支持 String 到目标类型。
+- **使用 `@DateTimeFormat` 注解统一日期格式**：避免全局修改 `ConversionService` 导致影响其他转换。
+- **线程安全设计**：`Converter` 实现必须是无状态的，因为 `ConversionService` 是单例且被多线程共享。
+- **注册自定义 Converter 时使用 `ConversionServiceFactoryBean`**：统一管理所有自定义转换器，避免分散注册。
+
+## 常见问题
+
+**为什么 `PropertyEditor` 不推荐用于新开发？**
+
+`PropertyEditor` 只能将 String 转换为目标类型，且接口包含 Java GUI 和事件相关方法，违反单一职责原则。Spring 3.0+ 推荐用 `Converter` 替代。
+
+**`GenericConverter` 与 `Converter` 的区别？**
+
+`Converter` 处理单一源类型到目标类型的转换；`GenericConverter` 支持多种类型组合转换（如 `Collection<String>` → `List<Integer>`），适用于复合类型场景。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

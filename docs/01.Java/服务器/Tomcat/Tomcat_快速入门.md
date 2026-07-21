@@ -852,6 +852,34 @@ Note :
 onError/ onTimeout 触发后，会紧接着回调 onComplete
 onComplete 执行后，就不可再操作 request 和 response
 
+## 典型应用场景
+
+- **传统 WAR 包部署**：将 Java Web 应用打包为 WAR 文件，部署到 Tomcat 的 webapps 目录下。
+- **SpringBoot 内嵌 Tomcat**：SpringBoot 默认内嵌 Tomcat，开发者无需安装独立 Tomcat，通过 `java -jar` 直接运行。
+- **反向代理后端**：Nginx 作为前端反向代理，Tomcat 作为后端 Servlet 容器处理动态请求。
+- **多环境部署**：通过配置不同的 server.xml 或使用 Spring Profile，在 dev/test/prod 环境使用不同配置。
+
+## 最佳实践
+
+- **删除默认应用**：清理 webapps 下的 ROOT、docs、examples、host-manager、manager，减少安全风险和资源占用。
+- **使用 NIO 连接器**：Tomcat 8.5+ 默认 NIO，确保不要回退到 BIO 模式。
+- **配置访问日志**：开启 `AccessLogValve`，记录请求 IP、时间、状态码，便于问题排查和安全审计。
+- **分离应用部署**：每个应用使用独立的 Context XML 配置，而不是将所有配置放在 server.xml 中。
+
+## 常见问题
+
+**Tomcat 默认端口冲突（8080 被占用）？**
+
+修改 `conf/server.xml` 中 `<Connector port="8080" ...>` 的端口号。SpringBoot 中通过 `server.port=8081` 配置。
+
+**如何查看 Tomcat 版本信息？**
+
+运行 `bin/version.sh` 或在浏览器访问 `/manager` 页面。安全建议：在生产环境中隐藏版本信息，修改 `conf/server.xml` 中 Connector 的 `server` 属性。
+
+**Tomcat 和 SpringBoot 内嵌 Tomcat 的区别？**
+
+功能完全相同，区别仅在启动方式：独立 Tomcat 通过 `catalina.sh` 启动，应用部署到 webapps；内嵌 Tomcat 通过应用 main 方法启动，应用打包在 JAR 中。
+
 ## 5. 参考资料
 
 - **官方**

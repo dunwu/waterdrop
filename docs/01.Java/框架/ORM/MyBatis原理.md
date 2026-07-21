@@ -852,6 +852,37 @@ public List<Object> handleResultSets(Statement stmt) throws SQLException {
 }
 ```
 
+## 典型应用场景
+
+- **复杂 SQL 动态拼接**：利用 MyBatis 动态 SQL 标签（`<if>`、`<choose>`、`<foreach>`）根据业务条件动态生成 SQL，适用于高级搜索、多条件筛选等场景。
+- **高性能批量操作**：通过 `BatchExecutor` 或 `<foreach>` 标签实现批量插入/更新，适用于数据同步、报表生成等大数据量场景。
+- **多数据源与分库分表**：结合 `AbstractRoutingDataSource` 或 ShardingSphere 实现动态数据源切换，适用于多租户 SaaS 系统。
+- **自定义类型映射**：通过 `TypeHandler` 处理特殊类型转换（如 JSON 字段映射为 Java 对象、枚举值转换），适用于非标准数据类型场景。
+- **插件扩展**：通过拦截器机制实现 SQL 审计日志、自动分页、数据权限过滤等横切关注点。
+
+## 最佳实践
+
+- **SqlSessionFactory 单例化**：应用中只创建一个 `SqlSessionFactory` 实例，通过 Spring 管理的 `SqlSessionFactoryBean` 确保单例。
+- **合理使用一级缓存**：一级缓存默认开启，注意在同一个 `SqlSession` 中执行相同查询会命中缓存，执行 insert/update/delete 会自动清除缓存。
+- **二级缓存慎用**：多表查询场景下二级缓存可能导致数据不一致，建议仅对单表查询且数据变更不频繁的场景开启。
+- **使用 `#{}` 而非 `${}`**：`#{}` 使用预编译参数防止 SQL 注入，`${}` 直接拼接字符串存在安全风险。
+- **合理选择执行器类型**：批量操作场景使用 `BatchExecutor` 并记得调用 `flushStatements()`；普通场景使用默认的 `SimpleExecutor`。
+- **ResultMap 处理复杂映射**：对于嵌套对象、一对多/多对多关系，优先使用 `ResultMap` 而非 `ResultType`。
+
+## 常见问题
+
+**MyBatis 的一级缓存和二级缓存有什么区别？**
+
+一级缓存是 `SqlSession` 级别的本地缓存，默认开启，生命周期与会话相同；二级缓存是 `Mapper` 级别的应用缓存，需显式开启（`cacheEnabled=true`），可跨 `SqlSession` 共享。但二级缓存在分布式环境下易出现数据不一致，需谨慎使用。
+
+**MyBatis 如何实现动态 SQL？**
+
+MyBatis 通过 OGNL 表达式引擎解析 XML 中的 `<if>`、`<where>`、`<choose>`、`<foreach>` 等动态标签，根据传入参数的值动态拼接 SQL 语句，最终生成 `BoundSql` 对象。动态 SQL 生成发生在 `Executor` 层的 `MappedStatement.getBoundSql()` 方法中。
+
+**Mapper 接口为什么不需要实现类？**
+
+MyBatis 通过 JDK 动态代理为 Mapper 接口生成代理对象。当调用 Mapper 方法时，代理对象根据方法名和参数类型确定对应的 `MappedStatement`，然后通过 `SqlSession` 执行实际的数据库操作。
+
 ## 参考资料
 
 - **官方**

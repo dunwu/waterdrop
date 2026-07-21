@@ -641,6 +641,104 @@ public class Example {
 }
 ```
 
+## 典型应用场景
+
+### 场景一：通用容器类
+
+使用泛型实现类型安全的通用容器：
+
+```java
+// 通用响应包装器
+public class Result<T> {
+    private int code;
+    private String message;
+    private T data;
+
+    public static <T> Result<T> success(T data) {
+        Result<T> result = new Result<>();
+        result.code = 0;
+        result.message = "success";
+        result.data = data;
+        return result;
+    }
+
+    public static <T> Result<T> fail(String message) {
+        Result<T> result = new Result<>();
+        result.code = -1;
+        result.message = message;
+        return result;
+    }
+}
+```
+
+### 场景二：通用工具方法
+
+使用泛型方法实现通用的比较、转换等操作：
+
+```java
+// 通用比较方法
+public static <T extends Comparable<T>> T max(T a, T b) {
+    return a.compareTo(b) >= 0 ? a : b;
+}
+
+// 通用集合转换
+public static <T, R> List<R> map(List<T> list, Function<T, R> mapper) {
+    List<R> result = new ArrayList<>(list.size());
+    for (T item : list) {
+        result.add(mapper.apply(item));
+    }
+    return result;
+}
+```
+
+### 场景三：类型安全的 Builder 模式
+
+结合泛型实现类型安全的 Builder 模式：
+
+```java
+public class QueryBuilder<T> {
+    private Class<T> entityType;
+    private List<Condition> conditions = new ArrayList<>();
+
+    public QueryBuilder(Class<T> entityType) {
+        this.entityType = entityType;
+    }
+
+    public QueryBuilder<T> where(String field, Object value) {
+        conditions.add(new Condition(field, value));
+        return this;
+    }
+
+    public List<T> execute() {
+        // 根据条件查询并返回类型安全的结果
+    }
+}
+
+// 使用
+List<User> users = new QueryBuilder<>(User.class)
+    .where("age", 25)
+    .where("status", "ACTIVE")
+    .execute();
+```
+
+## 常见问题
+
+### Q1：为什么泛型不能用于基本类型？
+
+因为 Java 泛型通过类型擦除实现，在运行时泛型参数都被替换为 Object。而基本类型不是 Object 的子类，所以不能直接用于泛型。Java 提供了包装类（如 Integer、Double）作为解决方案。Valhalla 项目（未来 Java 版本）可能会解决这个问题。
+
+### Q2：List<?> 和 List\<Object\> 有什么区别？
+
+- `List<?>`（无界通配符）：表示“任意类型的 List”，是只读的，不能向其中添加元素（除了 null）。它是所有 `List<T>` 的父类型。
+- `List<Object>`：表示“元素类型是 Object 的 List”，可以向其中添加任何对象。但 `List<String>` 不是 `List<Object>` 的子类型。
+
+### Q3：什么是 PECS 原则？
+
+PECS 是 "Producer Extends, Consumer Super" 的缩写，是泛型通配符使用的指导原则：
+- 如果参数是“生产者”（只读取），使用 `<? extends T>`
+- 如果参数是“消费者”（只写入），使用 `<? super T>`
+- 如果既读又写，不使用通配符
+
 ## 泛型最佳实践
 
 ### 泛型命名

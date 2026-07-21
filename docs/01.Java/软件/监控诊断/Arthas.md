@@ -420,6 +420,30 @@ Arthas 支持使用管道对上述命令的结果进行进一步的处理，如`
 - [批处理的支持](https://alibaba.github.io/arthas/batch-support.html)
 - [ognl 表达式的用法说明](https://github.com/alibaba/arthas/issues/11)
 
+## 典型应用场景
+
+- **线上问题快速定位**：生产环境无法 debug 时，使用 Arthas 的 watch、trace、stack 命令实时观察方法入参、返回值、调用链和耗时，快速定位问题。
+- **代码热更新**：使用 retransform 命令热加载修改后的 class 文件，无需重启应用即可验证修复效果，特别适合紧急 bug 修复。
+- **性能瓶颈分析**：通过 trace 命令追踪方法调用链耗时，找出慢调用节点；通过 dashboard 实时查看 CPU、内存、线程状态。
+- **类加载问题排查**：使用 sc、sm、classloader 命令查看类的加载来源、方法信息、类加载器继承关系，解决 ClassNotFoundException、NoClassDefFoundError 等问题。
+
+## 最佳实践
+
+- **最小影响原则**：诊断完成后及时执行 reset 或 shutdown 命令，避免长期挂载影响应用性能；生产环境避免使用 mc 编译大文件。
+- **精准定位**：使用 OGNL 表达式过滤特定条件的调用，如 `watch demo.MathGame primeFactors returnObj 'params[0]<0'` 只观察负数入参。
+- **结果持久化**：使用 `-n` 参数限制捕获次数，使用 `> log.txt` 重定向输出到文件，避免大量数据刷屏。
+- **安全退出**：使用 quit 退出当前连接但保持 Arthas 服务端运行，下次可直接连接；使用 shutdown 完全退出 Arthas 并释放资源。
+
+## 常见问题
+
+**Arthas attach 不上目标进程？**
+
+常见原因：1) 用户权限不一致，需用相同用户启动 Arthas 和目标进程；2) JDK 版本不兼容，确保目标进程使用 JDK 6+；3) 进程已 attach 过其他工具，尝试重启目标进程；4) 查看 ~/logs/arthas/ 目录下的日志定位具体错误。
+
+**retransform 和 redefine 的区别？**
+
+redefine 是旧命令，使用 Instrumentation.redefineClasses() 替换类，可能影响已加载的实例；retransform 是新命令，使用 Instrumentation.retransformClasses() 更安全，推荐优先使用 retransform。
+
 ## 参考资料
 
 - [Arthas Github](https://github.com/alibaba/arthas)

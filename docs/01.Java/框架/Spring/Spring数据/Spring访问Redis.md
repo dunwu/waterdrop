@@ -239,6 +239,20 @@ public class RedisQuickstartTests {
 
 更多 Spring 访问 Redis 示例请参考：[Redis 示例源码](https://github.com/dunwu/spring-tutorial/tree/master/codes/data/nosql/redis)
 
+## 典型应用场景
+
+- **会话缓存**：存储用户登录态、购物车等会话数据，支持分布式多实例共享。
+- **热点数据缓存**：缓存频繁查询的数据库记录，减轻 DB 压力。
+- **分布式锁**：利用 Redis 的 `SETNX` 实现分布式互斥锁。
+- **排行榜与计数器**：利用 ZSet 实现排行榜，利用 INCR 实现访问计数。
+
+## 最佳实践
+
+- **使用 `RedisTemplate` 时指定序列化器**：默认 JDK 序列化可读性差，建议使用 `StringRedisSerializer` + `GenericJackson2JsonRedisSerializer`。
+- **合理设置 Key 过期时间**：避免内存无限制增长，根据业务场景设置合适的 TTL。
+- **使用连接池**：配置 Lettuce 或 Jedis 连接池，避免频繁创建/销毁连接。
+- **生产环境使用集群或哨兵**：单节点 Redis 无法满足高可用和横向扩展需求。
+
 ## 参考资料
 
 - [Redis 官网](https://redis.io/)

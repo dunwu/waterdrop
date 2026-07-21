@@ -454,3 +454,37 @@ public static void main(String[] args) throws Exception {
     System.out.println("message forwarded successfully....");
 }
 ```
+
+## 典型应用场景
+
+- **系统通知邮件**：用户注册、密码重置、订单状态变更等场景自动发送通知邮件。
+- **报告定时发送**：结合定时任务，定期将业务数据报表以 HTML 邮件形式发送给管理层。
+- **异常告警邮件**：应用捕获到严重异常时，自动将异常堆栈、环境信息通过邮件发送给运维人员。
+- **批量营销邮件**：通过模板引擎生成个性化内容，批量发送给目标用户列表。
+
+## 最佳实践
+
+- **使用 Spring Mail 封装**：在 Spring 项目中优先使用 `JavaMailSender` + `SimpleMailMessage` / `MimeMessageHelper`，简化配置和发送流程。
+- **异步发送邮件**：邮件发送涉及网络 IO，应在异步线程中执行，避免阻塞主业务流程。
+- **使用模板引擎生成 HTML**：复杂邮件内容使用 Thymeleaf / Freemarker 渲染模板，而不是拼接字符串。
+- **配置连接超时和重试**：设置 `mail.smtp.connectiontimeout` 和 `mail.smtp.timeout`，避免网络异常时线程长时间阻塞。
+
+## 常见问题
+
+**邮件发送失败报 AuthenticationFailedException？**
+
+检查：1）SMTP 服务器地址和端口是否正确；2）是否开启了 SSL/TLS（如 465 端口需要 `mail.smtp.ssl.enable=true`）；3）用户名密码是否正确；4）邮件服务器是否开启了应用密码/授权码。
+
+**邮件内容中文乱码？**
+
+确保 `setContent` 时指定了字符集：`text/html;charset=UTF-8`。同时确保 Properties 中的属性值没有中文编码问题。
+
+**附件文件名中文乱码？**
+
+使用 `MimeUtility.encodeText(filename)` 对附件文件名进行编码，避免中文文件名在某些邮件客户端显示乱码。
+
+## 参考资料
+
+- [JavaMail 官方文档](https://javaee.github.io/javamail/)
+- [JavaMail Github](https://github.com/javaee/javamail)
+- [Spring Framework - Email 支持](https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#mail)

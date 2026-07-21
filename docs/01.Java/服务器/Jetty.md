@@ -669,6 +669,34 @@ SelectorProducer 是 ManagedSelector 的内部类，SelectorProducer 实现了 E
 2. 如果没有 I/O 事件就绪，就干点杂活，看看有没有客户提交了更新 Selector 上事件注册的任务，也就是上面提到的 SelectorUpdate 任务类。
 3. 干完杂活继续执行 select 方法，侦测 I/O 就绪事件。
 
+## 典型应用场景
+
+- **SpringBoot 内嵌服务器**：SpringBoot 支持以 Jetty 替代默认 Tomcat 作为内嵌 Servlet 容器，适用于高并发低延迟场景。
+- **微服务嵌入服务器**：Jetty 体积小、启动快，适合作为微服务的嵌入式 HTTP 服务器，减少资源占用。
+- **长连接 / WebSocket 服务**：Jetty 对 WebSocket 和长连接支持优秀，适合即时通讯、推送通知等场景。
+- **开发调试服务器**：Jetty 支持热加载，修改代码后无需重启，开发调试效率高。
+
+## 最佳实践
+
+- **合理配置线程池**：通过 `QueuedThreadPool` 配置 min/max 线程数，max 建议设为 CPU 核数 * 2 或根据负载调整。
+- **使用 NIO 连接器**：Jetty 默认使用 NIO 连接器（ServerConnector），性能优异，无需额外配置。
+- **静态资源交由 Nginx**：Jetty 处理动态请求，静态资源由前端 Nginx 代理处理，减轻 Jetty 负担。
+- **开启 Gzip 压缩**：配置 `GzipHandler` 对响应体压缩，减少网络传输量。
+
+## 常见问题
+
+**Jetty 和 Tomcat 如何选择？**
+
+Tomcat 生态更成熟，文档丰富，社区庞大。Jetty 更轻量、启动更快、对 WebSocket 支持更好。SpringBoot 项目可通过配置切换，一般默认 Tomcat 即可，高并发场景可考虑 Jetty。
+
+**Jetty 内存占用过高？**
+
+检查是否配置了过大的线程池或缓冲区。调整 `-Xmx` 参数，配置 `HttpConfiguration` 的 `requestHeaderSize` 和 `responseHeaderSize`，避免不必要的内存分配。
+
+**如何配置 Jetty 的 SSL/HTTPS？**
+
+通过 `SslContextFactory` 配置 keystore 路径和密码，然后创建 `ServerConnector` 传入 SslContextFactory 实例。SpringBoot 中只需配置 `server.ssl.*` 属性。
+
 ## 参考资料
 
 - [Jetty 官方网址](http://www.eclipse.org/jetty/index.html)

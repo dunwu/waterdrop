@@ -521,6 +521,35 @@ public class BookRepositoryImpl implements BookRepository {
 }
 ```
 
+## 典型应用场景
+
+- **单机应用本地缓存**：Ehcache 作为轻量级本地缓存，适用于不需要分布式共享的小型应用或工具类缓存。
+- **Hibernate 二级缓存**：Ehcache 是 Hibernate 的默认二级缓存提供者，用于缓存实体、查询结果。
+- **多级缓存架构中的 L1 缓存**：在 Ehcache（本地）+ Redis（分布式）的多级缓存架构中，Ehcache 作为一级缓存减少远程访问。
+- **静态数据缓存**：缓存配置信息、字典表等不常变化的数据，减少数据库查询压力。
+
+## 最佳实践
+
+- **合理配置缓存容量**：根据内存情况设置 `maxEntriesLocalHeap` 和 `maxBytesLocalHeap`，避免 OOM。
+- **选择合适的淘汰策略**：常用 `LRU`（最近最少使用），读多写少场景用 `LFU`（最不常用）。
+- **设置合理的 TTL**：根据数据更新频率配置 `timeToLiveSeconds` 和 `timeToIdleSeconds`，避免缓存数据过期不及时。
+- **监控缓存命中率**：通过 JMX 或 Spring Boot Actuator 监控缓存命中率，命中率低于 80% 时考虑调整配置。
+- **生产环境慎用 Ehcache 做分布式缓存**：Ehcache 的集群同步机制不适合大规模分布式场景，推荐 Redis。
+
+## 常见问题
+
+**Ehcache 和 Redis 如何选择？**
+
+Ehcache 是进程内缓存，速度快但无法跨 JVM 共享，适合单机或小规模应用；Redis 是分布式缓存，支持持久化、集群、发布订阅等，适合分布式架构。通常两者结合使用：Ehcache 做 L1 缓存，Redis 做 L2 缓存。
+
+**Ehcache 缓存过期后如何自动刷新？**
+
+Ehcache 本身不支持自动刷新，可通过自定义 `CacheLoaderWriter` 实现加载逻辑，或在应用层通过定时任务定期预热缓存。
+
+**Ehcache 3.x 与 2.x 有什么区别？**
+
+3.x 完全重写，支持堆外内存（off-heap）和磁盘持久化，引入了 `CacheManager` 的新 API，支持 JSR-107 (JCache) 标准。2.x 已停止维护，新项目建议使用 3.x。
+
 ## 参考资料
 
 - **官方**

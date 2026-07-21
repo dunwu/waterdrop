@@ -224,6 +224,20 @@ ehcache.xml 中的配置内容完全符合 Ehcache 的官方配置标准。
 
 我的示例代码地址：[spring-tutorial-integration-cache](https://github.com/dunwu/spring-tutorial/tree/master/spring-tutorial/spring-tutorial-integration/spring-tutorial-integration-cache)
 
+## 典型应用场景
+
+- **热点数据缓存**：对频繁查询的数据库数据使用 `@Cacheable` 缓存，减轻 DB 压力。
+- **接口幂等性保证**：通过缓存 Token 或请求 ID 实现接口幂等性控制。
+- **计算结果缓存**：对复杂计算、报表生成等耗时操作缓存结果，提升响应速度。
+- **分布式缓存集成**：结合 Redis + Spring Cache 实现多实例间共享缓存。
+
+## 最佳实践
+
+- **合理设置过期时间**：避免缓存长期存在导致数据不一致，结合业务场景设置 TTL。
+- **使用 Caffeine 作为本地缓存**：相比 Guava Cache，Caffeine 性能更优，命中率更高。
+- **避免缓存穿透和雪崩**：对空值进行短缓存，使用随机过期时间防止集中失效。
+- **缓存 Key 设计要合理**：包含足够的区分度，避免不同查询返回相同缓存数据。
+
 ## 参考资料
 
 - [Spring 官方文档之缓存抽象](https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#cache)

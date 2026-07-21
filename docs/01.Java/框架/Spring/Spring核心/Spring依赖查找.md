@@ -143,6 +143,20 @@ Bean 延迟依赖查找接口
 | `BeanCreationException`           | 当 Bean 初始化过程中                       | Bean 初始化方法执行异常时                    |
 | `BeanDefinitionStoreException`    | 当 `BeanDefinition` 配置元信息非法时       | XML 配置资源无法打开时                       |
 
+## 典型应用场景
+
+- **框架扩展开发**：通过 `ListableBeanFactory#getBeansOfType` 查找所有实现某接口的 Bean，动态注册策略处理器、插件等。
+- **延迟初始化优化**：使用 `ObjectProvider` 延迟查找 Bean，避免在启动时实例化昂贵的 Bean，实现按需加载。
+- **安全查找避免异常**：在不确定 Bean 是否存在的场景中使用 `ObjectProvider#getIfAvailable` 避免 `NoSuchBeanDefinitionException`。
+- **事件广播器查找**：通过 `getBean(ApplicationEventMulticaster.class)` 获取内建 Bean 发布自定义事件。
+
+## 最佳实践
+
+- **优先使用类型查找而非名称查找**：类型查找更健壮，重构时不易出错。
+- **使用 `ObjectProvider` 处理可选依赖**：比 `@Autowired(required=false)` 更灵活，支持 Stream 操作和函数式 API。
+- **避免在 Bean 构造器中执行依赖查找**：可能导致循环依赖问题，应在 `@PostConstruct` 或生命周期回调中执行。
+- **注意层次性查找的性能**：在子容器中查找 Bean 会逐级向上搜索，层次过深时影响性能。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

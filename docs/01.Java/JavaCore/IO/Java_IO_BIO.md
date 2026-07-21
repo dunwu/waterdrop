@@ -20,6 +20,10 @@ permalink: /pages/84fba019/
 
 # Java IO 之 BIO
 
+## 简介
+
+BIO（Blocking IO）即同步阻塞 IO，是 Java 传统的 IO 模型，基于 `java.io` 包实现。BIO 以流（Stream）为单位处理数据，分为字节流和字符流两大类。其特点是 API 简洁、易于理解，但在高并发场景下每个连接需要一个线程，资源开销大。BIO 适用于连接数较少且固定的场景。
+
 ## BIO
 
 BIO（blocking IO） 即阻塞 IO。指的主要是传统的 `java.io` 包，它基于流模型实现。流从概念上来说是一个连续的数据流。当程序需要读数据的时候就需要使用输入流读取数据，当需要往外写数据的时候就需要输出流。
@@ -1007,6 +1011,81 @@ public static void main(String[] args) throws IOException {
     br.close();
 }
 ```
+
+## 典型应用场景
+
+### 场景一：配置文件读取
+
+使用 BIO 读取 properties 配置文件：
+
+```java
+Properties props = new Properties();
+try (InputStream is = new FileInputStream("app.properties")) {
+    props.load(is);
+    String dbUrl = props.getProperty("database.url");
+}
+```
+
+### 场景二：文件复制
+
+使用缓冲流高效复制文件：
+
+```java
+public static void copyFile(File src, File dest) throws IOException {
+    try (InputStream in = new BufferedInputStream(new FileInputStream(src));
+         OutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
+        byte[] buffer = new byte[8192];
+        int len;
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
+        }
+    }
+}
+```
+
+### 场景三：简单的 TCP 服务器
+
+使用 BIO 实现简单的 TCP Echo 服务器：
+
+```java
+try (ServerSocket server = new ServerSocket(9090)) {
+    while (true) {
+        Socket client = server.accept(); // 阻塞等待连接
+        new Thread(() -> {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    out.println("Echo: " + line);
+                }
+            } catch (IOException e) { e.printStackTrace(); }
+        }).start();
+    }
+}
+```
+
+## 最佳实践
+
+1. **始终使用 try-with-resources**：自动关闭流，避免资源泄漏。
+2. **使用缓冲流包装**：`BufferedInputStream`/`BufferedReader` 减少系统调用。
+3. **字节流与字符流的选择**：处理文本用字符流（Reader/Writer），处理二进制用字节流（InputStream/OutputStream）。
+4. **指定字符集**：使用 `InputStreamReader(is, StandardCharsets.UTF_8)` 避免乱码。
+5. **高并发场景不要使用 BIO**：每个连接一个线程的模式无法支撑万级并发。
+
+## 常见问题
+
+### Q1：字节流和字符流有什么区别？
+
+- **字节流**（InputStream/OutputStream）：以字节（8bit）为单位，适合处理图片、音频等二进制数据。
+- **字符流**（Reader/Writer）：以字符为单位，内部处理编码转换，适合处理文本数据。
+
+### Q2：BIO 的 ServerSocket 如何实现高并发？
+
+传统 BIO 通过线程池可以一定程度上提升并发能力，但本质上仍是一个连接一个线程。真正的万级并发需要使用 NIO（如 Netty 框架）。BIO 在高并发下线程数会急剧膨胀，导致栈溢出或 OOM。
+
+### Q3：`FileInputStream` 和 `FileReader` 的区别？
+
+`FileInputStream` 读取原始字节，`FileReader` 基于系统默认字符集将字节转为字符。推荐显式使用 `new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)` 代替 `FileReader`。
 
 ## 参考资料
 

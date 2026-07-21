@@ -1040,6 +1040,62 @@ JMM 要求 `lock`、`unlock`、`read`、`load`、`assign`、`use`、`store`、`w
 
 不过实际开发中，Java 内存模型强烈建议虚拟机把 64 位数据的读写实现为具有原子性，目前各种平台下的商用虚拟机都选择把 64 位数据的读写操作作为原子操作来对待，因此我们在编写代码时一般不需要把用到的 `long` 和 `double` 变量专门声明为 `volatile`。
 
+## 典型应用场景
+
+### 场景一：使用 volatile 保证可见性
+
+```java
+volatile boolean running = true;
+// 工作线程检查标志位
+while (running) { doWork(); }
+// 主线程停止
+running = false;
+```
+
+### 场景二：双重检查锁定单例
+
+```java
+private static volatile Singleton instance;
+public static Singleton getInstance() {
+    if (instance == null) {
+        synchronized (Singleton.class) {
+            if (instance == null) instance = new Singleton();
+        }
+    }
+    return instance;
+}
+```
+
+### 场景三：使用 final 保证安全发布
+
+```java
+class Config {
+    final Map<String, String> data; // final 保证构造完成后对其他线程可见
+    Config() { data = loadConfig(); }
+}
+```
+
+## 最佳实践
+
+1. **优先使用 volatile 保护简单标志位**：比 synchronized 轻量。
+2. **双重检查锁定必须加 volatile**：防止指令重排导致半初始化对象。
+3. **使用 final 字段保证安全发布**：构造完成后不可变的对象。
+4. **理解 happens-before 规则**：它是判断可见性的理论基础。
+
+## 常见问题
+
+### Q1：volatile 能保证原子性吗？
+
+不能。`volatile` 只保证可见性和有序性。`volatile int count; count++` 仍然不是原子操作，需要使用 AtomicInteger。
+
+### Q2：happens-before 规则有哪些？
+
+程序顺序规则、锁规则、volatile 变量规则、线程启动/终止规则、中断规则、终结器规则、传递性。
+
+### Q3：什么是指令重排序？
+
+编译器和 CPU 可能重新排列指令顺序以优化性能，只要不改变单线程语义。多线程下可能导致意外行为，用 volatile 或 synchronized 禁止。
+
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)

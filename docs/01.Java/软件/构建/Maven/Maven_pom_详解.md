@@ -798,6 +798,30 @@ POM 执行的预设条件。
 </project>
 ```
 
+## 典型应用场景
+
+- **多模块项目管理**：通过 parent POM + modules 统一管理多模块的依赖版本、插件配置和构建生命周期，确保子模块间依赖一致性。
+- **多环境构建**：利用 profiles 定义 dev/test/prod 不同环境的数据库连接、日志级别等配置，通过 `-P` 参数切换环境。
+- **依赖版本仲裁**：通过 dependencyManagement 集中管理第三方依赖版本号，避免子模块各自引入不同版本导致冲突。
+- **企业级发布管理**：结合 distributionManagement + GPG 签名 + Nexus 私服，实现构件的自动签名和发布到私有仓库。
+
+## 最佳实践
+
+- **锁定依赖版本**：所有第三方依赖版本在 dependencyManagement 中统一声明，子模块只声明 groupId 和 artifactId，不指定 version。
+- **善用 properties**：将版本号、编码等可变量提取为 properties，便于全局修改和 CI/CD 参数化传入。
+- **最小化原则**：pom.xml 只保留必要的配置，避免冗余的默认配置（如默认的编译插件版本），保持文件简洁可读。
+- **避免 scope 滥用**：合理选择 compile/provided/runtime/test/import 作用域，特别是 provided 不要用于非容器提供的依赖。
+
+## 常见问题
+
+**dependencyManagement 和 dependencies 的区别是什么？**
+
+dependencyManagement 只声明依赖版本，不会实际引入依赖；dependencies 才真正引入依赖。子模块继承父 POM 后，如果在 dependencyManagement 中已声明版本，则子模块的 dependencies 可省略 version 标签。
+
+**为什么子模块找不到父 POM？**
+
+Maven 默认从本地仓库和上级目录（../pom.xml）查找父 POM。如果父 POM 未安装到本地仓库且不在上级目录，需在子模块中通过 relativePath 指定父 POM 路径，或先将父 POM 执行 `mvn install`。
+
 ## 参考资料
 
 - [maven 官方文档之 pom](https://maven.apache.org/pom.html)

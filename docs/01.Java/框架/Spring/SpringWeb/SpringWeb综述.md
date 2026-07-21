@@ -106,6 +106,26 @@ Spring MVC 的工作流程可以用一幅图来说明：
 7. `ViewResolver` 结合`Model`和`View`，来渲染视图。
 8. 视图负责将渲染结果返回给客户端。
 
+## 典型应用场景
+
+- **RESTful API 服务**：通过 `@RestController` 构建无状态 API 服务，支持 JSON/XML 响应。
+- **传统 Web 应用**：通过 `@Controller` + 视图解析器构建服务端渲染的 Web 应用。
+- **微服务网关**：结合 Spring Cloud Gateway 构建 API 网关，统一路由和拦截请求。
+- **文件上传服务**：利用 `MultipartResolver` 处理文件上传请求。
+
+## 最佳实践
+
+- **统一异常处理**：通过 `@ControllerAdvice` + `@ExceptionHandler` 集中处理全局异常，返回标准化响应。
+- **合理使用 `@RequestMapping` 层级**：类级别指定基础路径，方法级别指定具体操作路径。
+- **避免在 Controller 中写业务逻辑**：Controller 仅负责请求路由和参数校验，业务逻辑应放在 Service 层。
+- **善用参数绑定注解**：`@PathVariable`、`@RequestParam`、`@RequestBody` 根据场景选择，避免手动解析请求。
+
+## 常见问题
+
+**Spring MVC 与 Struts2 的区别？**
+
+Spring MVC 基于 Servlet 实现，支持注解驱动、方法级别拦截；Struts2 基于 Filter 实现，配置繁琐。Spring MVC 与 Spring 生态无缝集成，已成为主流选择。
+
 ## 参考资料
 
 - **官方**

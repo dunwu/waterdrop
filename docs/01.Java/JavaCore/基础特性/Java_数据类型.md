@@ -15,6 +15,15 @@ permalink: /pages/cba76603/
 
 # 深入理解 Java 基本数据类型
 
+## 简介
+
+Java 是一门强类型语言，每个变量和表达式都有一个明确的数据类型。Java 的数据类型体系是语言的基础，决定了数据在内存中的存储方式、取值范围以及可执行的操作。深入理解数据类型及其转换机制，是避免运行时错误和性能问题的关键。
+
+Java 中的数据类型分为两大类：
+
+- **值类型（基本数据类型）**：直接存储数值，存储在栈中，包括 8 种基本类型。
+- **引用类型**：存储对象的内存地址引用，包括类、接口、数组、String 等。
+
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2022/04/2870d86f26494e0f884ef53d67c7f660.png)
 
 ## 数据类型分类
@@ -722,6 +731,83 @@ try {
     ex.printStackTrace();
 }
 ```
+
+## 典型应用场景
+
+### 场景一：金融计算
+
+在涉及金额计算的业务场景中，必须使用 `BigDecimal` 而非 `double`/`float`，以避免精度丢失：
+
+```java
+// 订单金额计算
+BigDecimal price = new BigDecimal("19.99");
+BigDecimal quantity = new BigDecimal("3");
+BigDecimal discount = new BigDecimal("0.95");
+BigDecimal total = price.multiply(quantity).multiply(discount);
+// total = 56.9715，再四舍五入保留两位小数
+BigDecimal finalAmount = total.setScale(2, RoundingMode.HALF_UP);
+// finalAmount = 56.97
+```
+
+### 场景二：计数器与统计
+
+在高并发统计场景中，使用 `AtomicLong` 或 `LongAdder` 替代 `long` 包装类的自增操作：
+
+```java
+// 使用 LongAdder 实现高并发计数
+LongAdder counter = new LongAdder();
+// 多线程环境下安全自增
+counter.increment();
+counter.add(10);
+long total = counter.sum();
+```
+
+### 场景三：数据传输与序列化
+
+在网络传输和文件读写中，需要明确数据类型的大小和字节序：
+
+```java
+// 使用 byte 数组处理二进制数据
+byte[] header = new byte[4];
+header[0] = (byte) 0xFF;  // 魔数
+header[1] = (byte) 0xD8;  // JPEG 标识
+
+// int 转 byte 数组（大端序）
+public static byte[] intToBytes(int value) {
+    return new byte[] {
+        (byte)(value >> 24), (byte)(value >> 16),
+        (byte)(value >> 8),  (byte)(value)
+    };
+}
+```
+
+## 最佳实践
+
+1. **优先使用基本数据类型**：在没有泛型需求时，优先使用 `int`、`long` 等基本类型，避免不必要的装箱/拆箱开销。
+2. **金额计算用 BigDecimal**：浮点数运算存在精度丢失风险，涉及金额的场景务必使用 `BigDecimal` 并以字符串构造。
+3. **包装类比较使用 equals**：`Integer`、`Long` 等包装类的比较操作必须使用 `equals()` 而非 `==`。
+4. **避免频繁装箱**：装箱操作可能创建新对象，在循环或高频调用中应尽量避免。
+5. **警惕数值溢出**：使用 `Math.addExact()` 等方法进行运算，可在溢出时主动抛出异常。
+6. **大整数使用 BigInteger**：当数值可能超出 `long` 范围时，使用 `BigInteger` 进行科学计算。
+7. **BigDecimal 判等用 compareTo**：`BigDecimal` 的 `equals` 同时比较值和精度（scale），判等应使用 `compareTo`。
+
+## 常见问题
+
+### Q1：为什么 `0.1 + 0.2 != 0.3`？
+
+因为浮点数在计算机中以二进制存储，0.1 和 0.2 无法精确表示为二进制小数。IEEE 754 标准的近似存储导致运算结果存在微小误差。解决方案是使用 `BigDecimal` 并以字符串方式初始化。
+
+### Q2：`Integer a = 127; Integer b = 127; a == b` 为 true，但 128 就为 false？
+
+因为 `Integer` 内部缓存了 [-128, 127] 范围的对象。在这个范围内的自动装箱会复用缓存对象（同一引用），超出范围则每次都创建新对象。可通过 `-XX:AutoBoxCacheMax` 调整缓存上限。
+
+### Q3：`long` 赋值为什么要加 `L` 后缀？
+
+Java 编译器默认将整数字面量视为 `int` 类型。当赋值给 `long` 变量且数值超出 `int` 范围时（如 `long x = 9999999999;`），编译器会报错。加上 `L` 后缀（如 `long x = 9999999999L;`）明确告诉编译器这是一个 `long` 字面量。
+
+### Q4：`char` 能存储中文吗？
+
+可以。Java 的 `char` 使用 16 位 Unicode 编码，可以存储大部分常用中文字符（在 BMP 范围内）。但对于一些特殊字符（如部分 emoji，属于补充平面），需要使用两个 `char`（代理对）来表示。
 
 ## 参考资料
 

@@ -15,6 +15,10 @@ permalink: /pages/64b8011b/
 
 # Java IO 之简介
 
+## 简介
+
+IO 即 `Input/Output`（输入和输出），指的是**计算机内存与外部设备之间拷贝数据的过程**。Java 提供了丰富的 IO 模型支持，包括传统的 BIO（同步阻塞）、NIO（多路复用）和 AIO（异步非阻塞）。理解各种 IO 模型的特性和适用场景，是构建高性能 Java 应用的基础。
+
 IO 即 `Input/Output`（输入和输出），指的是：**计算机内存与外部设备之间拷贝数据的过程**。由于 CPU 访问内存的速度远远高于外部设备，因此 CPU 是先把外部设备的数据读到内存里，然后再进行处理。
 
 ## UNIX I/O 模型
@@ -100,6 +104,77 @@ NIO 具有以下优点：
 ### AIO（Asynchronous IO）
 
 AIO（Asynchronous IO） 即异步非阻塞 IO，指的是 JDK7 中，对 NIO 有了进一步的改进，也称为 NIO2，引入了异步非阻塞 IO 方式。异步 IO 操作基于事件和回调机制，可以简单理解为，应用操作直接返回，而不会阻塞在那里，当后台处理完成，操作系统会通知相应线程进行后续工作。
+
+## 典型应用场景
+
+### 场景一：高并发 Web 服务器选用 NIO
+
+对于需要同时处理大量并发连接的场景（如 Web 服务器、聊天服务器），NIO 的多路复用模型可以只用少量线程处理成千上万个连接：
+
+```java
+// NIO 模型：单线程处理多连接
+Selector selector = Selector.open();
+ServerSocketChannel serverChannel = ServerSocketChannel.open();
+serverChannel.configureBlocking(false);
+serverChannel.bind(new InetSocketAddress(8080));
+serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+// 单个线程即可处理多个 Channel
+```
+
+### 场景二：文件处理选用 BIO
+
+对于简单的文件读写、配置文件解析等场景，BIO 的流式 API 最为简洁：
+
+```java
+try (BufferedReader reader = new BufferedReader(new FileReader("config.properties"))) {
+    String line;
+    while ((line = reader.readLine()) != null) {
+        processLine(line);
+    }
+}
+```
+
+### 场景三：高性能 RPC 框架选用 AIO
+
+异步 IO 适合对延迟敏感的高性能场景，如 RPC 框架的底层通信：
+
+```java
+AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
+channel.connect(address, null, new CompletionHandler<Void, Void>() {
+    public void completed(Void result, Void attachment) {
+        // 连接成功后的异步处理
+    }
+    public void failed(Throwable exc, Void attachment) {
+        // 连接失败的处理
+    }
+});
+```
+
+## 最佳实践
+
+1. **根据并发量选择 IO 模型**：低并发用 BIO（简单），高并发用 NIO（高效），超高并发考虑 Netty 等框架。
+2. **始终使用 try-with-resources**：确保 IO 资源正确关闭，避免资源泄漏。
+3. **使用缓冲流提升性能**：`BufferedReader`/`BufferedInputStream` 减少系统调用次数。
+4. **大文件使用内存映射**：`MappedByteBuffer` 可以减少数据拷贝，提升大文件读写性能。
+5. **注意字符编码**：始终显式指定字符集（如 `StandardCharsets.UTF_8`），避免乱码问题。
+
+## 常见问题
+
+### Q1：BIO、NIO、AIO 各自适用什么场景？
+
+| 模型 | 特点 | 适用场景 |
+| --- | --- | --- |
+| BIO | 同步阻塞，一个连接一个线程 | 连接数少且固定的架构，如传统的 Tomcat |
+| NIO | 多路复用，一个线程处理多连接 | 高并发、连接数多但操作较轻的场景，如 Netty |
+| AIO | 异步非阻塞，事件回调 | 连接数多且操作较重的场景，如文件异步读写 |
+
+### Q2：为什么 NIO 比 BIO 性能更好？
+
+BIO 每个连接需要一个线程，线程创建和切换开销大。NIO 使用 Selector 多路复用，一个线程可以监控多个 Channel，减少了线程资源消耗。此外 NIO 的 `DirectByteBuffer` 可以减少内核到用户空间的数据拷贝。
+
+### Q3：Netty 是基于 NIO 还是 AIO？
+
+Netty 基于 NIO（`java.nio`）封装，而非 AIO。虽然 AIO 理论上更优，但 Linux 上的 AIO 实现不够成熟，而 Netty 对 NIO 进行了大量优化（如零拷贝、池化 Buffer、Epoll 优化），实际性能优于原生 AIO。
 
 ## 参考资料
 

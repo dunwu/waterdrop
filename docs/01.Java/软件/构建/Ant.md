@@ -374,6 +374,30 @@ _——Ant1.8.0 新增特性。_
 
 在 target 元素中的例子里已提到过，不再赘述。
 
+## 典型应用场景
+
+- **老项目维护**：Ant 是 Maven 之前的主流构建工具，很多老项目仍在使用 build.xml 构建，维护时需理解其语法。
+- **自定义构建流程**：Ant 的灵活性允许定义任意构建步骤，适合构建流程复杂且不符合标准约定 的项目。
+- **集成到 CI/CD 流水线**：在 Jenkins 等 CI 工具中调用 Ant 脚本执行编译、打包、部署等任务。
+- **与 Ivy 配合管理依赖**：Ant + Ivy 组合可实现类似 Maven 的依赖管理，同时保留 Ant 的灵活性。
+
+## 最佳实践
+
+- **优先选择 Maven/Gradle**：新项目优先使用 Maven 或 Gradle，它们提供标准化的构建流程和依赖管理。Ant 仅用于无法迁移的老项目。
+- **模块化 build.xml**：将构建脚本拆分为多个 target，使用 depends 属性定义依赖关系，提高可维护性。
+- **使用 properties 文件**：将路径、版本等配置抽取到 .properties 文件中，避免硬编码在 build.xml 中。
+- **结合 Ivy 管理依赖**：使用 Apache Ivy 插件管理第三方依赖，避免手动下载和复制 JAR 文件。
+
+## 常见问题
+
+**Ant 和 Maven/Gradle 的区别？**
+
+Ant 是过程式构建工具，需要手动定义每个构建步骤；Maven/Gradle 是声明式构建工具，基于约定优于配置的原则。新项目不推荐使用 Ant。
+
+**build.xml 中的 classpath 配置复杂？**
+
+使用 `<path>` 元素定义可复用的 classpath，通过 `refid` 引用。结合 Ivy 可以自动下载依赖并构建 classpath。
+
 ## 参考资料
 
 - [ant 官方手册](http://ant.apache.org/manual/index.html)

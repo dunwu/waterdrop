@@ -15,6 +15,10 @@ permalink: /pages/03c7e4fa/
 
 # Java 国际化
 
+## 简介
+
+国际化（Internationalization，简称 i18n）是指让软件产品能够适应不同国家/地区的语言、文化和习惯，而无需修改源代码。Java 提供了完善的国际化支持，核心组件包括：`Locale`（语言地区标识）、`ResourceBundle`（资源包加载）、`MessageFormat`（消息格式化）、`NumberFormat`/`DateFormat`（数字和日期格式化）。通过合理设计，同一套应用可以为全球用户提供本地化的体验。
+
 ## 背景知识
 
 通讯的发达，使得世界各地交流越来越紧密。许多的软件产品也要面向世界上不同国家的用户。其中，语言障碍显然是产品在不同语种用户中进行推广的一个重要问题。
@@ -313,3 +317,65 @@ public class MessageFormatDemo {
 // Jack，你好！你于 22-12-23 上午11:05 消费 8,888 元。
 // At 11:05 AM On December 23, 2022，Jack paid $8,888.00.
 ```
+
+## 典型应用场景
+
+### 场景一：多语言 Web 应用
+
+根据用户浏览器语言设置自动切换界面语言：
+
+```java
+// 资源文件：messages_zh_CN.properties / messages_en_US.properties
+ResourceBundle bundle = ResourceBundle.getBundle("messages", userLocale);
+String welcome = bundle.getString("welcome.message");
+// 中文: "欢迎回来！"  英文: "Welcome back!"
+```
+
+### 场景二：多币种金额显示
+
+根据不同国家/地区格式化货币金额：
+
+```java
+NumberFormat cnFormat = NumberFormat.getCurrencyInstance(Locale.CHINA);
+NumberFormat usFormat = NumberFormat.getCurrencyInstance(Locale.US);
+System.out.println(cnFormat.format(1234.56)); // ￥1,234.56
+System.out.println(usFormat.format(1234.56)); // $1,234.56
+```
+
+### 场景三：多地区日期格式
+
+不同国家的日期习惯不同（中国：年-月-日，美国：月/日/年）：
+
+```java
+Date now = new Date();
+DateFormat cnDate = DateFormat.getDateInstance(DateFormat.LONG, Locale.CHINA);
+DateFormat usDate = DateFormat.getDateInstance(DateFormat.LONG, Locale.US);
+// 中文: 2024年1月15日  英文: January 15, 2024
+```
+
+## 最佳实践
+
+1. **资源文件与代码分离** - 所有用户可见的文本都应抽取到 properties 文件中，不要硬编码在代码中
+2. **使用 UTF-8 编码的资源文件** - JDK 9+ 默认支持 UTF-8 的 properties 文件，旧版本可使用 `native2ascii` 工具
+3. **优先使用 java.time API** - JDK 8+ 的 `DateTimeFormatter` 比旧的 `DateFormat` 线程安全且功能更强
+4. **Locale 默认值不要依赖系统** - 应用启动时应显式设置 `Locale.setDefault()`，避免不同服务器环境差异
+5. **注意数字和日期解析** - 格式化与解析必须使用相同的 Locale，否则 `1,234.56` 在某些地区会被解析为 `1.234`
+
+## 常见问题
+
+**Q1：ResourceBundle 的加载顺序是怎样的？**
+
+先尝试加载精确匹配的 `bundle_zh_CN`，找不到就尝试 `bundle_zh`，再找不到就用默认的 `bundle.properties`。如果所有文件都不存在，抛出 `MissingResourceException`。
+
+**Q2：如何在不重启应用的情况下更新国际化资源？**
+
+`ResourceBundle` 默认有缓存。可以通过 `ResourceBundle.clearCache()` 清除缓存后重新加载，或使用自定义的 `ResourceBundle.Control` 控制缓存策略。
+
+**Q3：Spring 项目的国际化与 Java 原生国际化有什么区别？**
+
+Spring 提供了 `MessageSource` 接口（如 `ReloadableResourceBundleMessageSource`），支持热加载资源文件、嵌套占位符、更灵活的 Locale 解析策略，推荐在 Spring 项目中使用 Spring 的国际化方案。
+
+## 参考资料
+
+- [《Java 核心技术 卷 II 高级特性》](https://book.douban.com/subject/36337685/)
+- [Java 官方国际化教程](https://docs.oracle.com/javase/tutorial/i18n/)

@@ -135,6 +135,20 @@ Java 泛型反射 API
 - 不变性设计（Immutability）
 - Fluent API 设计（Builder 模式），链式（流式）编程
 
+## 典型应用场景
+
+- **通用 Repository 模式**：通过泛型基类 `BaseRepository<T>` 定义通用 CRUD 方法，子类继承时自动解析实际类型参数。
+- **类型安全的事件处理**：通过泛型接口 `ApplicationListener<E>` 实现只处理特定事件类型的监听器。
+- **泛型服务注入**：利用 `ResolvableType` 在运行时解析泛型参数，实现按泛型类型限定注入不同实现。
+- **消息转换器匹配**：Spring MVC 利用泛型信息确定 `HttpMessageConverter` 的目标类型，实现精确序列化。
+
+## 最佳实践
+
+- **优先使用 `ResolvableType`**：它是 Spring 4.0+ 推荐的泛型处理 API，比 `GenericTypeResolver` 更简洁且支持 Fluent API。
+- **注意类型擦除的局限**：局部变量和匿名类的泛型信息在运行时无法获取，设计时应考虑这一限制。
+- **利用 `MethodParameter` 封装方法参数信息**：在自定义参数解析器、校验器等场景中，它提供统一的参数元信息访问。
+- **避免过度依赖泛型反射**：频繁的反射操作有性能开销，热点代码路径应缓存解析结果。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

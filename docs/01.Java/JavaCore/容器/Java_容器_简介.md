@@ -22,6 +22,10 @@ permalink: /pages/2668216d/
 
 # Java 容器简介
 
+## 简介
+
+Java 容器（Collections）是存储和管理对象的数据结构框架，位于 `java.util` 包中。容器框架提供了丰富的接口和实现类，包括 `List`、`Set`、`Queue`、`Map` 等，支持泛型、迭代器、比较器、并发安全等核心机制。深入理解容器框架是编写高质量 Java 程序的基础。
+
 ## 容器简介
 
 ### 数组与容器
@@ -459,9 +463,82 @@ fail-fast 有两种解决方案：
 
 > 同步容器和并发容器详情请参考：[Java 并发之容器](https://dunwu.github.io/waterdrop/pages/e987a43b/)
 
+## 典型应用场景
+
+### 场景一：使用泛型保证容器类型安全
+
+泛型使编译器在编译期检查类型错误，避免运行时的 `ClassCastException`：
+
+```java
+// 使用泛型确保类型安全
+List<String> names = new ArrayList<>();
+names.add("Alice");
+names.add("Bob");
+// names.add(123); // 编译期报错
+
+for (String name : names) {
+    System.out.println(name.toUpperCase()); // 无需强制转换
+}
+```
+
+### 场景二：使用 Iterator 安全删除元素
+
+在遍历过程中删除元素，必须使用 `Iterator` 而非 foreach 循环：
+
+```java
+List<String> list = new ArrayList<>(Arrays.asList("a", "b", "c", "d"));
+Iterator<String> it = list.iterator();
+while (it.hasNext()) {
+    String element = it.next();
+    if ("b".equals(element)) {
+        it.remove(); // 安全删除
+    }
+}
+// 结果：[a, c, d]
+```
+
+### 场景三：使用 Comparator 自定义排序
+
+对复杂对象按多个字段排序：
+
+```java
+List<Employee> employees = getEmployees();
+employees.sort(
+    Comparator.comparing(Employee::getDepartment)
+        .thenComparing(Comparator.comparingDouble(Employee::getSalary).reversed())
+);
+// 先按部门升序，同部门内按薪资降序
+```
+
+## 最佳实践
+
+1. **优先使用接口类型声明容器**：如 `List<String> list = new ArrayList<>()`，方便后期切换实现。
+2. **创建容器时指定初始容量**：如已知数据量，避免多次扩容的开销。
+3. **不要在 foreach 循环中修改容器**：使用 `Iterator` 或 `removeIf` 方法。
+4. **并发场景使用并发容器**：如 `ConcurrentHashMap`，而非手动包装的同步容器。
+5. **使用 `Collections.unmodifiableXXX` 创建只读容器**：保护数据不被修改，适合 API 返回值。
+6. **合理使用 `Arrays.asList`**：返回的 List 不支持 `add/remove`，如需可变列表应用 `new ArrayList<>(Arrays.asList(...))`。
+
+## 常见问题
+
+### Q1：`java.util` 和 `java.util.concurrent` 下的容器有什么区别？
+
+`java.util` 下的容器（如 `ArrayList`、`HashMap`）都不是线程安全的；`java.util.concurrent` 下的容器（如 `ConcurrentHashMap`、`CopyOnWriteArrayList`）专门设计用于并发场景，性能优于简单的 `synchronized` 包装。
+
+### Q2：容器中可以存储基本数据类型吗？
+
+不可以直接存储。容器只能存储引用类型，基本数据类型需要自动装箱为对应的包装类（如 `int` → `Integer`）。自动装箱/拆箱会带来额外开销，在性能敏感场景下需注意。
+
+### Q3：fail-fast 和 fail-safe 有什么区别？
+
+- **fail-fast**：遍历过程中如果容器结构被修改，立即抛出 `ConcurrentModificationException`。`java.util` 包下的容器大多采用此机制。
+- **fail-safe**：遍历的是容器的副本，不会抛出异常，但可能看不到最新修改。`java.util.concurrent` 包下的容器采用此机制。
+
 ## 参考资料
 
 - [Java 编程思想（第 4 版）](https://item.jd.com/10058164.html)
+- [《Effective Java》第 3 版](https://book.douban.com/subject/30412517/)
+- [Java Collections 官方文档](https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html)
 - [由浅入深理解 java 集合（一）——集合框架 Collection、Map](https://www.jianshu.com/p/589d58033841)
 - [由浅入深理解 java 集合（二）——集合 Set](https://www.jianshu.com/p/9081017a2d67)
 - [Java 提高篇（三十）-----Iterator](https://www.cnblogs.com/chenssy/p/3821328.html)

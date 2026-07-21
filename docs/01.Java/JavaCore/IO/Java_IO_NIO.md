@@ -20,6 +20,10 @@ permalink: /pages/8fb60136/
 
 # Java IO 之 NIO
 
+## 简介
+
+NIO（Non-blocking IO / New IO）是 JDK 1.4 引入的 IO 模型，位于 `java.nio` 包中。NIO 基于多路复用（Multiplexing）思想，通过 `Channel`、`Buffer`、`Selector` 三大核心组件，实现了一个线程管理多个 Channel 的高性能 IO 模型。NIO 是 Netty、Mina 等高性能网络框架的基础。
+
 ## NIO 简介
 
 在传统的 Java IO 模型（BIO）中，I/O 操作是以阻塞的方式进行的。也就是说，当一个线程执行一个 I/O 操作时，它会被阻塞直到操作完成。这种阻塞模型在处理多个并发连接时可能会导致性能瓶颈，因为需要为每个连接创建一个线程，而线程的创建和切换都是有开销的。
@@ -368,6 +372,74 @@ BIO 模式：
 NIO 模式：
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/06/aadd4de1c8aa47559c7ff7485d2fea68.png)
+
+## 典型应用场景
+
+### 场景一：高性能网络服务器
+
+Netty 等网络框架底层均基于 NIO 的多路复用模型：
+
+```java
+Selector selector = Selector.open();
+ServerSocketChannel serverChannel = ServerSocketChannel.open();
+serverChannel.configureBlocking(false);
+serverChannel.bind(new InetSocketAddress(8080));
+serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+while (true) {
+    selector.select(); // 阻塞直到有就绪事件
+    for (SelectionKey key : selector.selectedKeys()) {
+        if (key.isAcceptable()) handleAccept(key);
+        if (key.isReadable()) handleRead(key);
+    }
+    selector.selectedKeys().clear();
+}
+```
+
+### 场景二：大文件高效读写
+
+利用 `MappedByteBuffer` 内存映射实现大文件快速读写：
+
+```java
+try (FileChannel channel = FileChannel.open(Path.of("large.dat"), READ, WRITE)) {
+    MappedByteBuffer buffer = channel.map(READ_WRITE, 0, channel.size());
+    buffer.put(0, (byte) 'H'); // 直接修改内存映射区域
+}
+```
+
+### 场景三：文件快速拷贝（零拷贝）
+
+利用 `FileChannel.transferTo` 实现零拷贝文件传输：
+
+```java
+try (FileChannel in = FileChannel.open(Path.of("source.dat"), READ);
+     FileChannel out = FileChannel.open(Path.of("dest.dat"), WRITE)) {
+    in.transferTo(0, in.size(), out); // 内核态直接传输，无用户态拷贝
+}
+```
+
+## 最佳实践
+
+1. **网络 IO 优先使用 NIO**：高并发场景下，NIO 的多路复用比 BIO 的线程模型高效得多。
+2. **使用 `DirectByteBuffer` 减少拷贝**：对于频繁的网络 IO，直接内存可以避免 JVM 堆到内核的额外拷贝。
+3. **注意 Buffer 的 flip/clear/rewind**：Buffer 的状态管理是 NIO 编程的难点，务必理解 position、limit、capacity 的关系。
+4. **Selector 的 selectedKeys 必须清理**：每次处理后要清空，否则会重复处理。
+5. **生产环境建议使用 Netty**：NIO 编程复杂度高，Netty 封装了各种优化且经过广泛验证。
+
+## 常见问题
+
+### Q1：NIO 的 Buffer 和 BIO 的 Stream 有什么区别？
+
+- **Stream**：单向的字节流或字符流，数据只能顺序读取，无法回退。
+- **Buffer**：可双向读写的内存块，支持 position/limit/flip 等操作，可以重复读写同一段数据。
+
+### Q2：什么是零拷贝？
+
+零拷贝是指数据从磁盘到网络的过程中，避免在内核空间和用户空间之间来回复制。NIO 的 `FileChannel.transferTo` 和 `MappedByteBuffer` 都实现了零拷贝，减少 CPU 占用和内存拷贝开销。
+
+### Q3：Selector 为什么比多线程更高效？
+
+多线程模型中，每个连接需要一个线程，线程创建、切换、栈内存都有开销。Selector 用一个线程监控多个 Channel，通过事件驱动避免了空转等待，资源利用率更高。
 
 ## 参考资料
 

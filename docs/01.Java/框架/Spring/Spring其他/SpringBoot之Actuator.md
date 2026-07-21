@@ -366,6 +366,26 @@ Spring Boot Actuator 支持简单的审计功能。如果应用中启用了 Spri
 - `ApplicationPidFileWriter` 创建一个包含应用程序 PID 的文件（默认情况下，在应用程序目录中，文件名为 `application.pid`）。
 - `WebServerPortFileWriter` 创建一个文件（或多个文件），其中包含正在运行的 Web 服务器的端口（默认情况下，在应用程序目录中，文件名为 `application.port`）。
 
+## 典型应用场景
+
+- **健康检查**：通过 `/actuator/health` 接口监控应用健康状态，配合 K8s 实现自动重启。
+- **指标监控**：通过 `/actuator/metrics` 暴露 JVM、HTTP 请求等指标，接入 Prometheus + Grafana。
+- **配置查看与调试**：通过 `/actuator/env`、`/actuator/configprops` 查看运行时配置，快速定位配置问题。
+- **日志级别动态调整**：通过 `/actuator/loggers` 动态修改日志级别，无需重启应用。
+
+## 最佳实践
+
+- **生产环境限制暴露的端点**：仅开放必要端点（如 health、info），通过 `management.endpoints.web.exposure.include` 配置。
+- **添加安全保护**：通过 Spring Security 保护 Actuator 端点，避免未授权访问。
+- **自定义 Health Indicator**：实现 `HealthIndicator` 接口检查数据库、缓存等外部依赖健康状态。
+- **使用 InMemoryHttpTraceRepository 仅限开发环境**：生产环境应使用 Zipkin 等分布式追踪方案。
+
+## 常见问题
+
+**为什么 Actuator 端点返回 404？**
+
+检查是否引入了 `spring-boot-starter-actuator` 依赖，确认 `management.endpoints.web.exposure.include` 配置是否包含目标端点。
+
 ## 参考资料
 
 - [Spring Boot 官方文档之 Production-ready Features](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator)

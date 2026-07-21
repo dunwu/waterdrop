@@ -548,6 +548,30 @@ mvn clean install -Dmaven.test.skip=true -B -U
 > - [Maven 构建生命周期说明](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)
 > - [Maven 命令行参数说明](https://maven.apache.org/ref/3.6.3/maven-embedder/cli.html)
 
+## 典型应用场景
+
+- **快速搭建项目骨架**：使用 archetype 快速生成项目结构，如 `mvn archetype:generate -DarchetypeArtifactId=maven-archetype-quickstart` 创建标准 Java 项目。
+- **依赖管理自动化**：在 pom.xml 中声明依赖，Maven 自动下载并管理传递依赖，避免手动下载 jar 包和版本冲突。
+- **标准化构建流程**：通过 Maven 生命周期（clean、compile、test、package、install、deploy）统一团队构建命令，降低沟通成本。
+- **集成 CI/CD**：在 Jenkins、GitLab CI 中调用 Maven 命令，实现自动化构建、测试、打包和部署。
+
+## 最佳实践
+
+- **遵循约定优于配置**：使用 Maven 标准目录结构（src/main/java、src/test/java 等），减少自定义配置，提高项目可维护性。
+- **合理使用插件**：选择成熟稳定的插件版本，避免使用 SNAPSHOT 插件，定期更新插件以获取 bug 修复和安全补丁。
+- **依赖版本管理**：使用 dependencyManagement 统一管理依赖版本，避免在子模块中重复声明版本号。
+- **保持构建可重复**：确保相同的源码在任何环境、任何时间构建出相同的结果，避免依赖 SNAPSHOT 版本和环境相关配置。
+
+## 常见问题
+
+**Maven 构建失败报 "Could not resolve dependencies"？**
+
+常见原因：1) 网络连接问题，检查代理配置和镜像设置；2) 依赖版本不存在，确认版本号正确；3) 本地仓库缓存损坏，删除 .m2/repository 下对应目录重新下载；4) 私服权限问题，检查 settings.xml 中的 server 认证配置。
+
+**如何加速 Maven 构建？**
+
+1) 使用 `-T` 参数开启多线程构建，如 `mvn clean install -T 1C`（每个 CPU 核心一个线程）；2) 使用 `-DskipTests` 跳过测试；3) 使用 `-o` 离线模式避免重复检查更新；4) 配置阿里云镜像加速依赖下载；5) 使用 `mvnd`（Maven Daemon）替代 mvn 命令。
+
 ## 参考资料
 
 - [Maven Github](https://github.com/apache/maven)

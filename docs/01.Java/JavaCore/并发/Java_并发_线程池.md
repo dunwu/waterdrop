@@ -704,6 +704,53 @@ JDK 允许线程池使用方通过 `ThreadPoolExecutor` 的实例来动态设置
 - **[Hippo4jopen](https://github.com/opengoofy/hippo4j)** - 异步线程池框架，支持线程池动态变更&监控&报警，无需修改代码轻松引入。支持多种使用模式，轻松引入，致力于提高系统运行保障能力。
 - **[Dynamic TPopen](https://github.com/dromara/dynamic-tp)** - 轻量级动态线程池，内置监控告警功能，集成三方中间件线程池管理，基于主流配置中心（已支持 Nacos、Apollo，Zookeeper、Consul、Etcd，可通过 SPI 自定义实现）。
 
+## 典型应用场景
+
+### 场景一：IO 密集型服务线程池
+
+```java
+ThreadPoolExecutor executor = new ThreadPoolExecutor(
+    50, 100, 60L, TimeUnit.SECONDS,
+    new LinkedBlockingQueue<>(1000),
+    new ThreadPoolExecutor.CallerRunsPolicy());
+```
+
+### 场景二：定时任务调度
+
+```java
+ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
+scheduler.scheduleAtFixedRate(() -> cleanup(), 0, 1, TimeUnit.HOURS);
+```
+
+### 场景三：异步任务编排与线程池隔离
+
+不同类型任务使用不同线程池，避免互相影响。
+
+## 最佳实践
+
+1. **不要用 Executors 工厂方法**：newFixedThreadPool 和 newCachedThreadPool 的队列/线程数无限制，有 OOM 风险。
+2. **明确设置拒绝策略**：CallerRunsPolicy 或自定义策略。
+3. **合理配置核心参数**：corePoolSize、maxPoolSize、keepAliveTime 根据业务特点设置。
+4. **监控线程池状态**：getActiveCount、getCompletedTaskCount 等。
+5. **优雅关闭**：shutdown + awaitTermination。
+
+## 常见问题
+
+### Q1：ThreadPoolExecutor 的 7 个参数分别是什么？
+
+corePoolSize、maxPoolSize、keepAliveTime、unit、workQueue、threadFactory、rejectedHandler。
+
+### Q2：任务提交后线程池的执行流程是什么？
+
+1. 核心线程未满 → 创建核心线程执行
+2. 核心线程满 → 任务入队列
+3. 队列满 → 创建非核心线程
+4. 非核心线程也满 → 触发拒绝策略
+
+### Q3：为什么不建议使用 Executors.newCachedThreadPool？
+
+maxPoolSize 为 Integer.MAX_VALUE，高并发时会创建大量线程导致 OOM。
+
 ## 参考资料
 
 - [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)

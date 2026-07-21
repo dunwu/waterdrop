@@ -17,6 +17,10 @@ permalink: /pages/e987a43b/
 
 # Java 并发之容器
 
+## 简介
+
+在并发编程中，容器是存储和管理数据的核心组件。普通的集合容器（如 `ArrayList`、`HashMap`）不是线程安全的，在多线程环境下会出现数据不一致问题。Java 提供了两类并发容器：**同步容器**（通过 `synchronized` 实现线程安全，性能较低）和**并发容器**（通过更精细的并发设计实现更高性能，如 `ConcurrentHashMap`、`CopyOnWriteArrayList`、`BlockingQueue` 等）。选择合适的并发容器是高并发程序的关键。
+
 ## 同步容器
 
 ### 同步容器简介
@@ -1027,6 +1031,78 @@ private final ReentrantLock putLock = new ReentrantLock();
 // 如果写操作的时候队列是满的，那么等待 notFull 条件
 private final Condition notFull = putLock.newCondition();
 ```
+
+## 典型应用场景
+
+### 场景一：高并发缓存（ConcurrentHashMap）
+
+实现本地缓存，多个工作线程同时读写，利用 `computeIfAbsent` 保证原子性：
+
+```java
+ConcurrentHashMap<String, User> cache = new ConcurrentHashMap<>();
+
+public User getUser(String id) {
+    return cache.computeIfAbsent(id, key -> userService.loadFromDB(key));
+}
+```
+
+`ConcurrentHashMap` 在 JDK 8 后使用 CAS + synchronized 实现分段锁，读操作完全无锁，写操作只锁对应的桶，性能远超 `Collections.synchronizedMap()`。
+
+### 场景二：事件广播通知（CopyOnWriteArrayList）
+
+观察者模式中，监听器列表读多写少，使用 CoW 容器避免遍历时的并发修改异常：
+
+```java
+CopyOnWriteArrayList<EventListener> listeners = new CopyOnWriteArrayList<>();
+
+public void fireEvent(Event event) {
+    for (EventListener listener : listeners) { // 读无锁，安全遍历
+        listener.onEvent(event);
+    }
+}
+
+public void addListener(EventListener listener) {
+    listeners.add(listener); // 写时复制底层数组
+}
+```
+
+### 场景三：生产者-消费者模型（BlockingQueue）
+
+使用 `ArrayBlockingQueue` 实现任务缓冲，生产者与消费者解耦：
+
+```java
+BlockingQueue<Task> queue = new ArrayBlockingQueue<>(1000);
+
+// 生产者
+queue.put(task); // 队列满时阻塞
+
+// 消费者
+Task task = queue.take(); // 队列空时阻塞
+```
+
+`LinkedBlockingQueue` 使用双锁设计（入队锁和出队锁分离），在高并发场景下吞吐量更高。
+
+## 最佳实践
+
+1. **优先使用 ConcurrentHashMap 而非 Hashtable/synchronizedMap** - ConcurrentHashMap 读操作完全无锁，写操作仅锁单个桶，并发性能远优于全表锁的方案
+2. **读多写少场景选 CopyOnWriteArrayList** - 例如配置列表、监听器列表，写操作较少时 CoW 方案性能最优，写多场景则考虑 `Collections.synchronizedList`
+3. **BlockingQueue 作为缓冲时务必设置容量** - 无界队列（如默认构造的 `LinkedBlockingQueue`）在任务堆积时可能导致 OOM
+4. **ConcurrentHashMap 的 `computeIfAbsent` 避免嵌套调用** - 在 `mappingFunction` 中再次调用 `computeIfAbsent` 可能导致死锁
+5. **避免对并发容器进行"先检查后执行"模式** - `if (!map.containsKey(k)) map.put(k, v)` 不是原子操作，应使用 `putIfAbsent` 或 `computeIfAbsent`
+
+## 常见问题
+
+**Q1：ConcurrentHashMap 的 size() 是精确的吗？**
+
+是的，JDK 8 的 ConcurrentHashMap 通过 `baseCount` + `CounterCell[]` 实现精确计数，类似 LongAdder 的分段累加思路。但 `size()` 返回的是调用时刻的快照值，在高并发场景下可能调用后立即过时。
+
+**Q2：CopyOnWriteArrayList 的写操作性能如何？**
+
+每次写操作都会复制整个底层数组（`Arrays.copyOf`），写操作的时间复杂度为 O(n)。因此它只适合读多写少的场景，写操作频繁时应该用 `Collections.synchronizedList` 或其他方案。
+
+**Q3：ArrayBlockingQueue 和 LinkedBlockingQueue 如何选？**
+
+`ArrayBlockingQueue` 使用数组存储，创建时需指定容量，GC 压力小，适合对延迟敏感的场景；`LinkedBlockingQueue` 使用链表节点，可无界，但每个元素都需要创建 Node 对象，GC 压力更大，适合任务量波动大的场景。
 
 ## 参考资料
 

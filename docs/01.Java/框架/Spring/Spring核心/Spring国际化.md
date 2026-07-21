@@ -115,6 +115,24 @@ permalink: /pages/cc90e358/
 - Java Concurrency : `java.util.concurrent.ExecutorService`
 - Spring：`org.springframework.context.support.AbstractMessageSource`
 
+## 典型应用场景
+
+- **多语言 Web 应用**：根据用户浏览器语言自动切换界面文本，如中英文站点切换。
+- **错误消息国际化**：将校验错误提示、业务异常信息按语言组织到不同资源文件中。
+- **邮件/短信模板**：根据用户语言偏好发送对应语言的邮件或短信通知。
+
+## 最佳实践
+
+- **统一使用 `MessageSource` 接口**：而非直接使用 `ResourceBundle`，保持与 Spring 生态的集成。
+- **开发环境使用 `ReloadableResourceBundleMessageSource`**：支持热加载资源文件，无需重启应用。
+- **生产环境使用 `ResourceBundleMessageSource`**：性能更优，资源文件只加载一次。
+- **资源文件命名规范**：`messages_zh_CN.properties`、`messages_en_US.properties`，遵循 `{basename}_{locale}.properties` 规则。
+
+## 常见问题
+
+- **中文乱码如何解决？** 资源文件默认使用 ISO-8859-1 编码，中文需转为 Unicode 转义（`\uXXXX`），或在 `MessageSource` 中设置 `defaultEncoding = "UTF-8"`。
+- **如何在运行时动态切换语言？** 通过 `LocaleResolver` 解析请求中的 `Accept-Language` 头或参数，动态设置当前线程的 `Locale`。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

@@ -382,6 +382,30 @@ public class AcmeProperties {
 
 > 示例源码：[spring-boot-property](https://github.com/dunwu/spring-boot-tutorial/tree/master/codes/spring-boot-property)
 
+## 典型应用场景
+
+- **多环境配置管理**：通过 `application-{profile}.properties` 为不同环境配置数据库连接、日志级别、服务地址等。
+- **第三方服务集成**：使用 `@ConfigurationProperties` 将外部 API 密钥、超时时间等配置绑定为类型安全的 Java 对象。
+- **动态业务参数配置**：通过配置中心或命令行参数覆盖默认配置，实现运行期参数调整。
+- **安全配置外置**：将敏感信息（密码、密钥）从代码中分离，通过环境变量或外部配置文件注入。
+
+## 最佳实践
+
+- **优先使用 `@ConfigurationProperties` 而非 `@Value`**：前者支持类型安全绑定、松散匹配和校验，更适合结构化配置。
+- **合理设置属性加载优先级**：了解加载顺序，避免高优先级配置被意外覆盖。
+- **生产环境禁止使用默认配置**：显式指定所有关键参数，避免因配置缺失导致故障。
+- **使用 YAML 管理复杂配置**：对于层级结构复杂的配置，YAML 比 Properties 更直观。
+
+## 常见问题
+
+**为什么 `@PropertySource` 不支持 YAML？**
+
+Spring 的 `@PropertySource` 注解默认仅支持 `.properties` 文件。如需加载 YAML，需自定义 `PropertySourceFactory` 实现。
+
+**配置属性值未生效怎么办？**
+
+检查是否存在多个配置源冲突，确认加载顺序。可通过 `debug` 模式查看启动日志中的 PropertySources 顺序。
+
 ## 参考资料
 
 - [Spring Boot 官方文档之 boot-features-external-config](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config)

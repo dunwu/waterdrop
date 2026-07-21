@@ -784,6 +784,34 @@ SubClassPrime 和 SubClassPrime2 是 SuperClassPrime 的子类。
 
 superAttribute 和 superAttr 的映射规则会被子类所继承，所以不必再重复的在子类中去声明。
 
+## 典型应用场景
+
+- **DTO 与 Entity 互转**：在分层架构中，Controller 层使用 DTO 接收请求，Service 层通过 Dozer 将 DTO 转换为 Entity 进行持久化操作，避免手动逐字段赋值。
+- **API 版本兼容**：不同版本的 API 返回不同结构的对象，通过 Dozer 在内部模型和外部响应对象之间做映射，实现版本平滑过渡。
+- **异构系统集成**：当两个系统使用不同的数据模型（如订单系统 vs 物流系统），Dozer 可在各自的 JavaBean 之间进行字段映射和类型转换。
+- **深拷贝实现**：利用 Dozer 的递归映射能力，对复杂嵌套对象进行深拷贝，避免共享引用带来的副作用。
+
+## 最佳实践
+
+- **复用 Mapper 实例**：DozerBeanMapper 是线程安全的，应将其定义为单例或由 Spring 容器管理，避免每次映射都创建新实例造成性能浪费。
+- **优先使用注解映射**：简单场景优先使用 `@Mapping` 注解，减少 XML 配置文件的维护成本；复杂场景（深度映射、集合映射）再使用 XML。
+- **善用 wildcard 属性**：设置 `wildcard="true"` 可自动映射同名属性，只需在 XML 中配置不同名的字段，减少冗余配置。
+- **定制 CustomConverter**：对于 Dozer 内置不支持的类型转换（如自定义枚举与字符串），实现 `CustomConverter` 接口注册到全局配置中。
+
+## 常见问题
+
+**Dozer 与 MapStruct 如何选择？**
+
+Dozer 基于反射在运行时执行映射，灵活性高但性能较低；MapStruct 在编译期生成映射代码，性能更优且类型安全。新项目推荐 MapStruct，老项目维护可继续使用 Dozer。
+
+**映射后目标对象属性为 null？**
+
+检查：1）源对象属性是否有 getter 方法；2）XML 中 `<a>` 和 `<b>` 是否与 `<class-a>` / `<class-b>` 对应；3）是否配置了 `wildcard="false"` 导致同名属性未自动映射。
+
+**循环引用导致 StackOverflowError？**
+
+Dozer 默认不处理循环引用。需要在映射配置中通过 `field-exclude` 排除引起循环的字段，或使用 `relationship-type` 控制映射行为。
+
 ## 参考
 
 [Dozer 官方文档](http://dozer.sourceforge.net/documentation/gettingstarted.html) | [Dozer 源码地址](https://github.com/DozerMapper/dozer)

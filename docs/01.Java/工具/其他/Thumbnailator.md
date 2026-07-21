@@ -237,6 +237,34 @@ Thumbnails.of("oldFile.png", "oldFile2.png")
 
 > **需要参考完整测试例代码请** [<u>**点击这里**</u>](https://github.com/dunwu/JavaParty/blob/master/toolbox/image/src/test/java/org/zp/image/ThumbnailatorTest.java)
 
+## 典型应用场景
+
+- **用户头像生成**：上传用户头像时自动生成多种尺寸的缩略图（如 64x64、128x128），节省存储空间和加载时间。
+- **电商商品图片处理**：批量生成商品展示图、列表缩略图、详情大图等不同规格的图片。
+- **图片水印保护**：为原创图片添加品牌水印，保护知识产权同时不影响图片展示效果。
+- **社交媒体图片预处理**：用户上传的图片统一压缩、裁剪、加水印后存储，控制存储成本和加载速度。
+
+## 最佳实践
+
+- **使用 `scale` 而非 `size` 保持比例**：如果需要保持图片宽高比，使用 `scale(0.5)` 而不是 `size(w, h)`，避免图片变形。
+- **控制输出质量**：通过 `outputQuality(0.8)` 平衡文件大小和图片质量，通常 0.7-0.85 是最佳范围。
+- **批量处理用 `toFiles`**：批量处理时使用 `toFiles(Rename)` 而不是循环调用 `toFile`，代码更简洁。
+- **注意内存占用**：处理大图片时注意 JVM 内存，可通过 `-Xmx` 增加堆内存，或分批处理避免 OOM。
+
+## 常见问题
+
+**输出图片模糊不清？**
+
+调整 `outputQuality` 参数（默认约 0.75），设置为 0.9 或 1.0 可提高质量但文件更大。同时检查缩放算法，Thumbnailator 默认使用渐进式缩放，质量较好。
+
+**支持 GIF 动图吗？**
+
+Thumbnailator 不支持 GIF 动图处理，只会取第一帧。如需处理 GIF，可使用 `javax.imageio` 原生 API 或专用 GIF 库。
+
+**PNG 透明背景变黑？**
+
+PNG 透明区域变黑是因为输出格式不支持透明。确保输出格式为 PNG 而不是 JPG：`outputFormat("png")`。
+
 ## 参考
 
 [Thumbnailator 官方示例文档](https://github.com/coobird/thumbnailator/wiki/Examples)

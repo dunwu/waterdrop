@@ -92,6 +92,34 @@ public String decode(String filepath) throws IOException, NotFoundException {
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/1a6f2fba5522499e964cc108a9957740.webp)
 
+## 典型应用场景
+
+- **支付二维码生成**：生成包含订单信息的支付二维码，用户扫码即可完成支付，广泛应用于电商、线下收银场景。
+- **电子票务验证**：将订单号、座位信息编码为二维码，入场时通过扫码快速验证票务真伪。
+- **商品条形码管理**：生成和解析 EAN/UPC 等条形码，用于商品库存管理、物流追踪和扫码购物。
+- **登录扫码认证**：生成合动态 token 的二维码，用户扫码后服务端验证 token 完成登录。
+
+## 最佳实践
+
+- **设置合适的容错级别**：通过 `ErrorCorrectionLevel` 设置容错级别（L/M/Q/H），场景越复杂建议越高，H 级可容忍 30% 损坏。
+- **指定字符集为 UTF-8**：生成和解析时均设置 `CHARACTER_SET` 为 `UTF-8`，避免中文内容乱码。
+- **控制二维码尺寸**：根据场景选择合适的宽高，太小会影响识别率，太大浪费空间。一般 200x200 以上为宜。
+- **添加 Logo 时提高容错**：在二维码中心添加 Logo 时，将容错级别设为 H，确保遮挡部分不影响识别。
+
+## 常见问题
+
+**解析二维码报 NotFoundException？**
+
+可能原因：1）图片分辨率太低；2）二维码损坏或遮挡过多；3）未设置正确的字符集。尝试提高图片分辨率或使用 `TryHarder` 提示。
+
+**生成的二维码扫描不出来？**
+
+检查：1）内容是否过长（QR Code 有容量上限，约 2953 字节）；2）容错级别是否足够；3）图片尺寸是否过小；4）背景是否有干扰。
+
+**ZXing 支持哪些编码格式？**
+
+ZXing 支持 QR Code、Data Matrix、PDF417、EAN-13、EAN-8、UPC-A、UPC-E、Code 39、Code 128 等主流 1D/2D 编码格式。
+
 ## 参考
 
 [ZXing github 仓库](https://github.com/zxing/zxing)

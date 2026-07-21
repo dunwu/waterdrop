@@ -15,7 +15,9 @@ permalink: /pages/5a64d59b/
 
 # JavaAgent
 
-Javaagent 是什么？
+## 简介
+
+Java Agent（Java 探针）是 Java 提供的一种强大的运行时增强能力。它利用 JVM 提供的 `Instrumentation` API，可以在不修改源代码的情况下，在类加载时或运行时动态修改类的字节码。Java Agent 广泛应用于 **APM（应用性能监控）**、**链路追踪**、**热部署**、**动态代理**、**代码分析** 等场景，是 SkyWalking、Arthas、JRebel 等工具的核心技术基础。
 
 Javaagent 是 Java 命令的一个参数。参数 javaagent 可以用于指定一个 jar 包，它利用 JVM 提供的 Instrumentation API 来更改加载 JVM 中的现有字节码。
 
@@ -367,6 +369,69 @@ public class APPMain {
 ```
 
 这样我们在程序启动后再去动态修改字节码文件的简单案例就完成了。
+
+## 典型应用场景
+
+### 场景一：APM 应用性能监控（SkyWalking/Pinpoint）
+
+通过 Java Agent 无侵入地拦截方法调用，采集响应时间、异常、调用链等数据：
+
+```java
+public class PerfAgent {
+    public static void premain(String args, Instrumentation inst) {
+        inst.addTransformer((loader, className, classBeingRedefined,
+                             protectionDomain, classfileBuffer) -> {
+            if (className.startsWith("com/myapp/service")) {
+                // 用 ASM/ByteBuddy 注入计时逻辑
+                return injectTimingBytecode(classfileBuffer);
+            }
+            return null; // 不修改
+        });
+    }
+}
+```
+
+### 场景二：在线诊断工具（Arthas）
+
+通过 Attach API 动态加载 Agent，实时查看方法调用参数、返回值、耗时：
+
+```bash
+# Arthas 连接到目标 JVM
+java -jar arthas-boot.jar
+# 监控方法调用
+watch com.myapp.UserService getUser "{params, returnObj, throwExp}"
+```
+
+### 场景三：热部署/热修复（JRebel/DCEVM）
+
+开发阶段通过 Agent 监听 class 文件变化，自动重新加载修改的类，无需重启 JVM：
+
+```java
+// 检测到 class 文件变更后重新定义类
+inst.redefineClasses(new ClassDefinition(targetClass, newBytecode));
+```
+
+## 最佳实践
+
+1. **优先使用 ByteBuddy/ASM 操作字节码** - 直接操作 class 字节码非常复杂且易出错，ByteBuddy 提供了高级抽象 API
+2. **premain 和 agentmain 都要实现** - `premain` 用于启动时加载，`agentmain` 用于运行时 Attach 加载，实现两者可以覆盖更多场景
+3. **避免在 Agent 中引入复杂逻辑** - Agent 代码运行在每个类的加载路径上，复杂逻辑会严重影响类加载性能
+4. **MANIFEST.MF 配置不能遗漏** - `Premain-Class`、`Agent-Class`、`Can-Redefine-Classes`、`Can-Retransform-Classes` 都要正确配置
+5. **注意类加载顺序** - Agent 中的类可能比应用类先加载，注意依赖关系和 ClassLoader 隔离
+
+## 常见问题
+
+**Q1：`premain` 和 `agentmain` 有什么区别？**
+
+`premain` 在 JVM 启动时、main 方法执行前运行，通过 `-javaagent` 参数加载；`agentmain` 在 JVM 运行过程中动态加载，通过 Attach API（`VirtualMachine.attach(pid)`）加载。前者适合始终启用的 Agent，后者适合按需诊断工具。
+
+**Q2：Java Agent 会影响应用性能吗？**
+
+会有一定影响。字节码增强本身会增加类加载时间，注入的拦截逻辑会增加方法执行时间。但在实际使用中（如 SkyWalking），影响通常在 3%~5% 以内，可以通过采样策略降低开销。
+
+**Q3：Attach API 在某些环境下无法使用怎么办？**
+
+在容器化环境（如 Docker/K8s）中，Attach API 可能因为 PID namespace 隔离而失败。解决方案：开启 `--pid=host`，或使用基于 premain 的方式替代动态 attach。
 
 ## 参考资料
 

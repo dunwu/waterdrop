@@ -174,6 +174,35 @@ Caffeine 实现了 W-TinyLFU(**LFU** + **LRU** 算法的变种)，其**命中率
 
 总结一下：**如果不需要淘汰算法则选择 `ConcurrentHashMap`，如果需要淘汰算法和一些丰富的 API，推荐选择 `Caffeine`**。
 
+## 典型应用场景
+
+- **热点数据缓存**：将频繁访问的数据（如配置信息、字典表）缓存在内存中，提升访问速度。
+- **计算结果缓存**：缓存耗时的计算结果（如报表统计、复杂算法），避免重复计算。
+- **会话状态缓存**：在单机应用中缓存用户会话状态，减少数据库查询。
+- **API 响应缓存**：缓存第三方 API 的响应结果，降低网络延迟和调用频率限制。
+
+## 最佳实践
+
+- **优先选择 Caffeine**：Caffeine 是当前性能最优的 Java 本地缓存，基于 W-TinyLFU 淘汰算法，命中率和性能优于 Guava Cache。
+- **合理设置最大容量**：通过 `maximumSize` 限制缓存大小，避免内存溢出。建议设置为热点数据的 2 倍。
+- **设置合适的过期时间**：使用 `expireAfterWrite` 或 `expireAfterAccess`，根据数据更新频率配置。
+- **使用异步加载**：通过 `CacheLoader` 的 `loadAll` 批量加载或异步刷新，避免缓存未命中时阻塞请求。
+- **监控缓存指标**：通过 `recordStats()` 开启统计，监控命中率、驱逐数、加载时间等指标。
+
+## 常见问题
+
+**Caffeine 和 Guava Cache 如何选择？**
+
+Caffeine 是 Guava Cache 的继任者，性能更优（W-TinyLFU 算法），API 更丰富，且 Guava Cache 已进入维护模式。新项目直接使用 Caffeine。
+
+**进程内缓存如何实现手动刷新？**
+
+Caffeine 支持 `refreshAfterWrite` 配置自动刷新，也可以调用 `cache.refresh(key)` 手动触发刷新。刷新是异步的，不会阻塞当前请求。
+
+**进程内缓存在分布式环境下有什么问题？**
+
+每个 JVM 实例维护独立的本地缓存，数据更新时其他实例无法感知。解决方案：1）结合 Redis 发布/订阅实现缓存失效通知；2）使用多级缓存框架（如 JetCache）自动同步。
+
 ## 参考资料
 
 - [caffeine github](https://github.com/ben-manes/caffeine)

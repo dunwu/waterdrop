@@ -14,6 +14,10 @@ permalink: /pages/d2b4f7d2/
 
 # Java 虚拟机之内存区域
 
+## 简介
+
+JVM 运行时数据区是 Java 程序执行时的内存布局。包括线程私有的程序计数器、虚拟机栈、本地方法栈，以及线程共享的 Java 堆和方法区。理解内存区域的划分是进行内存调优、排查 OOM 和 StackOverflow 等问题的基础。
+
 ## 运行时数据区域
 
 JVM 在执行 Java 程序的过程中会把它所管理的内存划分为若干个不同的数据区域。这些区域都有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而存在，有些区域则依赖用户线程的启动和结束而建立和销毁。如下图所示：
@@ -838,6 +842,55 @@ public class StackOverflowErrorDemo2 {
 
 }
 ```
+
+## 典型应用场景
+
+### 场景一：排查 StackOverflowError
+
+方法递归过深导致栈溢出，通过 jstack 分析栈帧：
+
+```bash
+jstack -l <pid> | grep -A 20 "StackOverflowError"
+```
+
+### 场景二：分析堆内存泄漏
+
+使用 MAT 工具分析 HeapDump 中的 GC Roots 引用链：
+
+```bash
+jmap -dump:format=b,file=heap.hprof <pid>
+# 用 Eclipse MAT 打开 heap.hprof 分析内存泄漏
+```
+
+### 场景三：元空间配置优化
+
+配置元空间大小避免类加载过多导致 OOM：
+
+```bash
+-XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m
+```
+
+## 最佳实践
+
+1. **设置相同的 -Xms 和 -Xmx**：避免堆内存动态扩容的抖动。
+2. **合理配置元空间**：根据应用加载的类数量设置合适的 Metaspace 大小。
+3. **使用 -XX:+UseCompressedOops**：开启指针压缩，减少对象引用的内存占用（默认开启）。
+4. **监控各区域使用率**：通过 JMX 或 jstat 监控堆、栈、元空间的使用情况。
+
+## 常见问题
+
+### Q1：堆和栈的区别？
+
+- **堆**：存储对象实例，被所有线程共享，由 GC 管理。
+- **栈**：存储局部变量和方法调用帧，线程私有，自动回收。
+
+### Q2：什么是方法区/元空间？
+
+方法区存储类的元数据、常量、静态变量等。JDK 8 之前用永久代实现，JDK 8 后改为元空间（使用本地内存而非堆内存）。
+
+### Q3：直接内存是什么？
+
+直接内存是 JVM 之外通过 `DirectByteBuffer` 分配的堆外内存，不受 GC 直接管理，但受 `-XX:MaxDirectMemorySize` 限制。常用于 NIO 的高性能场景。
 
 ## 参考资料
 

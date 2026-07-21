@@ -57,6 +57,20 @@ permalink: /pages/eb2bb125/
 
 Spring MVC 通过控制器上的注解为 CORS 配置提供细粒度支持。但是，当与 Spring Security 一起使用时，建议依赖内置的 `CorsFilter`，它必须在 Spring Security 的过滤器链之前订阅。
 
+## 典型应用场景
+
+- **CORS 跨域处理**：通过 `CorsFilter` 统一处理跨域请求，替代在每个 Controller 上添加 `@CrossOrigin`。
+- **请求日志记录**：自定义 Filter 记录请求耗时、IP 地址等信息，用于监控和排查。
+- **身份认证拦截**：在 Filter 层校验 Token，未认证请求直接拒绝，避免进入业务层。
+- **敏感信息脱敏**：通过 Filter 对响应内容中的敏感字段（如手机号、身份证）进行脱敏处理。
+
+## 最佳实践
+
+- **优先使用 Spring 内置 Filter**：如 `ShallowEtagHeaderFilter`、`CorsFilter`，避免重复造轮子。
+- **注意 Filter 顺序**：安全 Filter 应在业务 Filter 之前执行，使用 `@Order` 或 `FilterRegistrationBean` 控制顺序。
+- **异步请求支持**：注册 Filter 时确保包含 `DispatcherType.ASYNC`，否则异步请求不会被拦截。
+- **避免在 Filter 中执行重业务逻辑**：Filter 应仅负责请求/响应的通用处理，复杂逻辑应放在拦截器或 AOP 中。
+
 ## 参考资料
 
 - [Spring Framework 官方文档](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/index.html)

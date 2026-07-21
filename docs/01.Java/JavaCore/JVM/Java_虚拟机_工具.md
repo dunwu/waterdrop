@@ -16,6 +16,10 @@ permalink: /pages/ee46cdc8/
 
 # Java 虚拟机之工具
 
+## 简介
+
+JVM 提供了丰富的诊断和监控工具，用于分析 Java 应用的运行状态。命令行工具包括 jps、jstat、jmap、jstack、jcmd 等；图形化工具包括 JConsole、VisualVM、Arthas 等。熟练使用这些工具是排查性能问题和生产故障的必备技能。
+
 ## JVM 命令行工具
 
 > Java 程序员免不了故障排查工作，所以经常需要使用一些 JVM 工具。
@@ -1049,6 +1053,58 @@ synchronized(obj) {
 （2）"Wait Set"里面的线程
 
 当线程获得了 Monitor，进入了临界区之后，如果发现线程继续运行的条件没有满足，它则调用对象（通常是被 synchronized 的对象）的 wait() 方法，放弃 Monitor，进入 "Wait Set"队列。只有当别的线程在该对象上调用了 notify() 或者 notifyAll() 方法，"Wait Set"队列中的线程才得到机会去竞争，但是只有一个线程获得对象的 Monitor，恢复到运行态。"Wait Set"中的线程在 Thread Dump 中显示的状态为 in Object.wait()。通常来说，当 CPU 很忙的时候关注 Runnable 状态的线程，反之则关注 waiting for monitor entry 状态的线程。
+
+## 典型应用场景
+
+### 场景一：使用 Arthas 线上诊断
+
+```bash
+# 启动 Arthas
+java -jar arthas-boot.jar
+# 查看方法执行耗时
+watch com.example.UserService getUser '{params, returnObj, throwExp}' -x 2
+trace com.example.UserService getUser
+```
+
+### 场景二：使用 jcmd 综合诊断
+
+```bash
+# 查看 JVM 参数
+jcmd <pid> VM.flags
+# 导出堆转储
+jcmd <pid> GC.heap_dump /tmp/heap.hprof
+# 查看线程栈
+jcmd <pid> Thread.print -l
+```
+
+### 场景三：使用 JFR 记录飞行数据
+
+```bash
+# 启动 JFR 记录
+jcmd <pid> JFR.start name=recording duration=60s filename=/tmp/flight.jfr
+# 用 JDK Mission Control 分析 .jfr 文件
+```
+
+## 最佳实践
+
+1. **生产环境优先使用 Arthas**：无需重启应用，功能强大。
+2. **开启 JFR**：低开销的持续监控工具，JDK 11+ 默认免费。
+3. **配合监控系统使用**：Prometheus + Grafana 实现长期趋势分析。
+4. **熟悉常用命令**：jps、jstat、jstack、jmap 是最基本的四大工具。
+
+## 常见问题
+
+### Q1：Arthas 和传统 JDK 工具有什么区别？
+
+Arthas 可以在不重启应用的情况下动态反编译、追踪方法、修改类，而 jstack/jmap 等只能导出快照。Arthas 功能更全面但侵入性也更强。
+
+### Q2：JFR 会影响性能吗？
+
+JFR 默认开启时性能开销小于 1%，适合在生产环境持续运行。
+
+### Q3：如何远程连接 JConsole/VisualVM？
+
+需要添加 JMX 参数：`-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false`
 
 ## 参考资料
 

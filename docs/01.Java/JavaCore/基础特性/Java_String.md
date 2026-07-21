@@ -16,11 +16,11 @@ permalink: /pages/51a6ed6e/
 
 # 深入理解 Java String 类型
 
-> String 类型可能是 Java 中应用最频繁的引用类型，但它的性能问题却常常被忽略。高效的使用字符串，可以提升系统的整体性能。当然，要做到高效使用字符串，需要深入了解其特性。
+## 简介
 
-## String 的不可变性
+`String` 是 Java 中应用最频繁的引用类型，几乎所有 Java 程序都离不开字符串的操作。深入理解 String 的内部机制，对于编写高性能、安全的 Java 程序至关重要。
 
-我们先来看下 `String` 的定义：
+`String` 类定义在 `java.lang` 包中，被声明为 `final class`，这意味着它不能被继承，其内部实现也不可被篡改。
 
 ```java
 public final class String
@@ -29,21 +29,150 @@ public final class String
     private final char value[];
 ```
 
+> JDK 9 之后，`String` 内部存储从 `char[]` 改为 `byte[]`，并引入了 Compact Strings 优化，对 Latin-1 字符只占用 1 字节，节省内存。
+
+## 特性
+
+### 不可变性（Immutable）
+
 `String` 类被 `final` 关键字修饰，表示**不可继承 `String` 类**。
 
 `String` 类的数据存储于 `char[]` 数组，这个数组被 `final` 关键字修饰，表示 **`String` 对象不可被更改**。
 
-为什么 Java 要这样设计？
+```java
+String str = "Hello";
+str = str + " World";  // 并非修改原对象，而是创建了新的 String 对象
+```
 
-（1）**保证 String 对象安全性**。避免 String 被篡改。
+不可变性带来的好处：
 
-（2）**保证 hash 值不会频繁变更**。
+1. **线程安全**：不可变对象天然线程安全，无需同步操作。
+2. **hash 值缓存**：String 的 hashCode 只需计算一次，之后可缓存使用，非常适合作为 HashMap 的 key。
+3. **字符串常量池**：相同内容的字符串可以共享同一个对象，节约内存。
+4. **安全性**：作为类加载器、网络连接等参数时不会被篡改。
 
-（3）**可以实现字符串常量池**。通常有两种创建字符串对象的方式，一种是通过字符串常量的方式创建，如 `String str="abc";` 另一种是字符串变量通过 new 形式的创建，如 `String str = new String("abc")`。
+### 字符串常量池（String Pool）
 
-使用第一种方式创建字符串对象时，JVM 首先会检查该对象是否在字符串常量池中，如果在，就返回该对象引用，否则新的字符串将在常量池中被创建。这种方式可以减少同一个值的字符串对象的重复创建，节约内存。
+JVM 维护了一个特殊的内存区域——字符串常量池，用于存储所有字符串字面量：
 
-`String str = new String("abc")` 这种方式，首先在编译类文件时，`"abc"` 常量字符串将会放入到常量结构中，在类加载时，`"abc"` 将会在常量池中创建；其次，在调用 new 时，JVM 命令将会调用 `String` 的构造函数，同时引用常量池中的 `"abc"` 字符串，在堆内存中创建一个 `String` 对象；最后，str 将引用 `String` 对象。
+```mermaid
+graph TB
+    A["String str1 = \"abc\""] -->|检查常量池| B{常量池中是否有 \"abc\"?}
+    B -->|有| C[返回已有对象引用]
+    B -->|没有| D[在常量池创建新对象]
+    D --> C
+    E["String str2 = new String(\"abc\")"] -->|在堆中创建新对象| F[堆中的 String 对象]
+    F -->|引用常量池| G[常量池中的 \"abc\"]
+```
+
+### 比较方式
+
+```java
+String s1 = "abc";
+String s2 = "abc";
+String s3 = new String("abc");
+
+System.out.println(s1 == s2);      // true - 同一常量池对象
+System.out.println(s1 == s3);      // false - 不同堆对象
+System.out.println(s1.equals(s3)); // true - 内容相同
+```
+
+## 原理
+
+### String 的内部结构
+
+```mermaid
+graph LR
+    A[String 对象] --> B["char[] value (final)"]
+    A --> C["int hash (缓存)"]
+    A --> D["implements Serializable"]
+    A --> E["implements Comparable"]
+    A --> F["implements CharSequence"]
+```
+
+### 字符串创建机制
+
+创建 String 对象有两种主要方式，其内存分配机制不同：
+
+```mermaid
+graph TB
+    A[创建字符串] --> B{创建方式}
+    B -->|"字面量 \"abc\""| C[检查字符串常量池]
+    C -->|已存在| D[返回池中对象引用]
+    C -->|不存在| E[在池中创建新对象]
+    E --> D
+    B -->|"new String(\"abc\")"| F[在堆中创建新对象]
+    F --> G[同时在常量池中创建/复用]
+    F --> H[返回堆中对象引用]
+```
+
+### String.intern() 工作原理
+
+`intern()` 方法用于将字符串放入常量池：
+
+- 如果常量池中已存在相同内容的字符串，返回池中已有对象的引用。
+- 如果不存在，将当前字符串加入常量池并返回其引用。
+
+## 典型应用场景
+
+### 场景一：字符串拼接与性能优化
+
+在循环中拼接字符串时，必须使用 `StringBuilder` 而非 `+` 操作符：
+
+```java
+// ❌ 错误方式 - 每次循环创建新对象
+String result = "";
+for (int i = 0; i < 10000; i++) {
+    result += i;  // 每次都创建新的 String 对象
+}
+
+// ✅ 正确方式 - 使用 StringBuilder
+StringBuilder sb = new StringBuilder(10000);
+for (int i = 0; i < 10000; i++) {
+    sb.append(i);
+}
+String result = sb.toString();
+```
+
+### 场景二：作为 HashMap 的 Key
+
+String 是 HashMap 最常用的 Key 类型，得益于其不可变性和 hashCode 缓存：
+
+```java
+Map<String, Object> config = new HashMap<>();
+config.put("database.url", "jdbc:mysql://localhost:3306/mydb");
+config.put("database.username", "root");
+config.put("database.poolSize", 10);
+
+// 由于 String 不可变，hashCode 被缓存，查询效率高
+Object url = config.get("database.url");
+```
+
+### 场景三：模板字符串处理
+
+在代码生成、邮件模板等场景中，使用 String 的 replace 或第三方模板引擎处理动态内容：
+
+```java
+String template = "尊敬的 {name}，您的订单 {orderId} 已发货，预计 {days} 天到达。";
+String message = template
+    .replace("{name}", "张三")
+    .replace("{orderId}", "ORD20240101001")
+    .replace("{days}", "3");
+// 输出：尊敬的 张三，您的订单 ORD20240101001 已发货，预计 3 天到达。
+```
+
+### 场景四：JSON/XML 数据解析
+
+在微服务架构中，字符串作为 JSON 数据的载体，需要高效地进行解析和序列化：
+
+```java
+// 接收到的 JSON 字符串
+String jsonStr = "{\"name\":\"Alice\",\"age\":25,\"city\":\"Beijing\"}";
+
+// 使用 Jackson 解析
+ObjectMapper mapper = new ObjectMapper();
+User user = mapper.readValue(jsonStr, User.class);
+```
 
 ## String 的性能考量
 
@@ -51,12 +180,9 @@ public final class String
 
 **字符串常量的拼接，编译器会将其优化为一个常量字符串**。
 
-【示例】字符串常量拼接
-
 ```java
 public static void main(String[] args) {
-    // 本行代码在 class 文件中，会被编译器直接优化为：
-    // String str = "abc";
+    // 编译器优化后等价于：String str = "abc";
     String str = "a" + "b" + "c";
     System.out.println("str = " + str);
 }
@@ -64,74 +190,100 @@ public static void main(String[] args) {
 
 **字符串变量的拼接，编译器会优化成 `StringBuilder` 的方式**。
 
-【示例】字符串变量的拼接
-
 ```java
 public static void main(String[] args) {
     String str = "";
     for(int i=0; i<1000; i++) {
-        // 本行代码会被编译器优化为：
+        // 编译器优化为：
         // str = (new StringBuilder(String.valueOf(str))).append(i).toString();
         str = str + i;
     }
 }
 ```
 
-但是，每次循环都会生成一个新的 `StringBuilder` 实例，同样也会降低系统的性能。
-
-字符串拼接的正确方案：
-
-- 如果需要使用**字符串拼接，应该优先考虑 `StringBuilder` 的 `append` 方法替代使用 `+` 号**。
-- 如果在并发编程中，`String` 对象的拼接涉及到线程安全，可以使用 `StringBuffer`。但是要注意，由于 `StringBuffer` 是线程安全的，涉及到锁竞争，所以从性能上来说，要比 `StringBuilder` 差一些。
+但每次循环都会生成新的 `StringBuilder` 实例，同样会降低性能。正确做法是手动使用 `StringBuilder`。
 
 ### 字符串分割
 
-**`String` 的 `split()` 方法使用正则表达式实现其强大的分割功能**。而正则表达式的性能是非常不稳定的，使用不恰当会引起回溯问题，很可能导致 CPU 居高不下。
+**`String` 的 `split()` 方法使用正则表达式实现分割功能**。正则表达式的性能不稳定，使用不当会引起回溯问题，导致 CPU 居高不下。
 
-所以，应该慎重使用 `split()` 方法，**可以考虑用 `String.indexOf()` 方法代替 `split()` 方法完成字符串的分割**。如果实在无法满足需求，你就在使用 Split() 方法时，对回溯问题加以重视就可以了。
+可以考虑用 `String.indexOf()` 方法代替 `split()` 方法完成简单场景的字符串分割：
+
+```java
+// 使用 indexOf 手动分割 "key=value" 格式
+String input = "database.url=jdbc:mysql://localhost";
+int index = input.indexOf('=');
+String key = input.substring(0, index);
+String value = input.substring(index + 1);
+```
 
 ### String.intern
 
-**在每次赋值的时候使用 `String` 的 `intern` 方法，如果常量池中有相同值，就会重复使用该对象，返回对象引用，这样一开始的对象就可以被回收掉**。
+**使用 `intern` 方法可以在常量池中复用相同内容的字符串对象**，减少内存占用。但需要注意控制驻留字符串的数量，因为常量池的实现类似于 HashTable，数据过大会增加查找时间。
 
-在字符串常量中，默认会将对象放入常量池；在字符串变量中，对象是会创建在堆内存中，同时也会在常量池中创建一个字符串对象，复制到堆内存对象中，并返回堆内存对象引用。
+## String、StringBuffer、StringBuilder 对比
 
-如果调用 `intern` 方法，会去查看字符串常量池中是否有等于该对象的字符串，如果没有，就在常量池中新增该对象，并返回该对象引用；如果有，就返回常量池中的字符串引用。堆内存中原有的对象由于没有引用指向它，将会通过垃圾回收器回收。
+| 特性 | String | StringBuffer | StringBuilder |
+| --- | --- | --- | --- |
+| 可变性 | 不可变 | 可变 | 可变 |
+| 线程安全 | 安全（不可变） | 安全（synchronized） | 不安全 |
+| 性能 | 拼接产生新对象，低 | 中等（锁开销） | 最高 |
+| 适用场景 | 少量操作 | 多线程环境 | 单线程环境（首选） |
 
-【示例】
+**最佳选择策略**：
+
+- 少量字符串操作 → `String`
+- 大量字符串拼接（单线程）→ `StringBuilder`
+- 大量字符串拼接（多线程）→ `StringBuffer`
+
+### 初始化容量
+
+`StringBuffer` 和 `StringBuilder` 的默认初始容量为 16。如果预知拼接结果较长，应指定初始容量避免多次扩容：
 
 ```java
-public class SharedLocation {
-
-	private String city;
-	private String region;
-	private String countryCode;
-}
-
-SharedLocation sharedLocation = new SharedLocation();
-sharedLocation.setCity(messageInfo.getCity().intern());		sharedLocation.setCountryCode(messageInfo.getRegion().intern());
-sharedLocation.setRegion(messageInfo.getCountryCode().intern());
+// ✅ 指定初始容量，避免扩容开销
+StringBuilder sb = new StringBuilder(1024);
 ```
 
-> 使用 `intern` 方法需要注意：一定要结合实际场景。因为常量池的实现是类似于一个 HashTable 的实现方式，HashTable 存储的数据越大，遍历的时间复杂度就会增加。如果数据过大，会增加整个字符串常量池的负担。
+## 最佳实践
 
-## String、StringBuffer、StringBuilder 有什么区别
+1. **循环拼接必须用 StringBuilder**：永远不要在循环中使用 `+` 拼接字符串。
+2. **避免不必要的 String 对象创建**：不要写 `String s = new String("abc")`，直接使用字面量 `String s = "abc"`。
+3. **split 方法慎用正则**：简单分隔场景优先使用 `indexOf` + `substring`。
+4. **intern 要控制数量**：大量字符串调用 intern 时，需设置 `-XX:StringTableSize` 参数。
+5. **使用 `String.format` 或 `MessageFormat`**：在需要格式化输出时，使用专门的格式化工具而非手动拼接。
+6. **注意编码问题**：字符串与字节数组转换时，始终显式指定字符集 `StandardCharsets.UTF_8`。
+7. **使用 `StringUtils` 工具类**：Apache Commons Lang 或 Spring 提供的工具方法可以简化判空、截取等常见操作。
 
-`String` 是 Java 语言非常基础和重要的类，提供了构造和管理字符串的各种基本逻辑。它是典型的 `Immutable` 类，被声明成为 `final class`，所有属性也都是 `final` 的。也由于它的不可变性，类似拼接、裁剪字符串等动作，都会产生新的 `String` 对象。由于字符串操作的普遍性，所以相关操作的效率往往对应用性能有明显影响。
+## 常见问题
 
-`StringBuffer` 是为解决上面提到拼接产生太多中间对象的问题而提供的一个类，我们可以用 `append` 或者 `add` 方法，把字符串添加到已有序列的末尾或者指定位置。`StringBuffer` 是一个**线程安全的**可修改字符序列。`StringBuffer` 的线程安全是通过在各种修改数据的方法上用 `synchronized` 关键字修饰实现的。
+### Q1：`String s = new String("abc")` 创建了几个对象？
 
-`StringBuilder` 是 Java 1.5 中新增的，在能力上和 StringBuffer 没有本质区别，但是它去掉了线程安全的部分，有效减小了开销，是绝大部分情况下进行字符串拼接的首选。
+在字符串常量池中创建 1 个对象（如果池中不存在），在堆中创建 1 个对象。所以最多创建 2 个对象，最少 1 个（池中已有则只创建堆中对象）。
 
-`StringBuffer` 和 `StringBuilder` 底层都是利用可修改的（char，JDK 9 以后是 byte）数组，二者都继承了 `AbstractStringBuilder`，里面包含了基本操作，区别仅在于最终的方法是否加了 `synchronized`。构建时初始字符串长度加 16（这意味着，如果没有构建对象时输入最初的字符串，那么初始值就是 16）。我们如果确定拼接会发生非常多次，而且大概是可预计的，那么就可以指定合适的大小，避免很多次扩容的开销。扩容会产生多重开销，因为要抛弃原有数组，创建新的（可以简单认为是倍数）数组，还要进行 `arraycopy`。
+### Q2：String 真的是不可变的吗？
 
-**除非有线程安全的需要，不然一般都使用 `StringBuilder`**。
+是的，`String` 类被 `final` 修饰不可继承，内部 `char[]`（JDK9 后为 `byte[]`）也被 `final` 修饰。所有"修改"操作（如 `concat`、`replace`）实际上都返回了新对象。不过通过反射可以修改内部数组，但这属于破坏封装的非常规操作。
+
+### Q3：为什么 `"abc" == "abc"` 为 true，而 `new String("abc") == new String("abc")` 为 false？
+
+字面量 `"abc"` 使用常量池机制，相同内容的字面量共享同一个对象。而 `new` 总是在堆中创建新对象，两个新对象的地址不同，`==` 比较地址返回 false。
+
+### Q4：String、StringBuilder、StringBuffer 如何选择？
+
+- **String**：适用于少量操作或字符串不可变的场景（如 Map 的 key）。
+- **StringBuilder**：适用于大量字符串操作的单线程场景，性能最优。
+- **StringBuffer**：适用于多线程环境下需要线程安全的字符串操作。
+
+### Q5：`String.intern()` 在什么场景下有用？
+
+当程序中存在大量重复字符串（如日志中的固定标识、协议中的固定字段）时，使用 `intern()` 可以显著减少内存占用。但不适合对大量不重复的字符串调用，否则会增加常量池压力。
 
 ## 参考资料
 
-- [《Java 编程思想（Thinking in java）》](https://book.douban.com/subject/2130190/)
+- [《Java 编程思想（Thinking in Java）》](https://book.douban.com/subject/2130190/)
 - [《Java 核心技术 卷 I 基础知识》](https://book.douban.com/subject/26880667/)
 - [极客时间教程 - Java 性能调优实战](https://time.geekbang.org/column/intro/100028001)
 - [极客时间教程 - Java 核心技术面试精讲](https://time.geekbang.org/column/intro/82)
-- [Java 基本数据类型和引用类型](https://juejin.im/post/59cd71835188255d3448faf6)
-- [深入剖析 Java 中的装箱和拆箱](https://www.cnblogs.com/dolphin0520/p/3780005.html)
+- [JEP 254: Compact Strings](https://openjdk.org/jeps/254)
+- [深入解析 String 的 intern 方法](https://blog.csdn.net/soonfly/article/details/70147205)

@@ -16,6 +16,10 @@ permalink: /pages/d6d1907d/
 
 # Java 编码和加密
 
+## 简介
+
+在现代软件开发中，数据的安全传输和存储至关重要。Java 提供了丰富的编码和加密 API，涵盖以下核心技术：**Base64 编码**（将二进制数据转为可打印字符）、**消息摘要**（将任意数据压缩为固定长度哈希值，如 MD5、SHA）、**数字签名**（用私钥签名、公钥验签，确保数据完整性和不可否认性）、**对称加密**（加密解密使用相同密钥，如 AES、DES）和**非对称加密**（公私钥对，如 RSA）。合理组合这些技术，可以构建安全可靠的通信和存储系统。
+
 > 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`、`MD5`、`SHA`、`HMAC`、`AES`、`DES`、`DESede`、`RSA`
 
 ## Base64 编码
@@ -970,6 +974,75 @@ public class RSACoder {
 - **加密密钥(Encryption Key)**：指通过加密算法进行加密操作用的密钥。
 - **解密密钥(Decryption Key)**：指通过解密算法进行解密操作用的密钥。
 - **信道(Channel)**：通信的通道，是信号传输的媒介。
+
+## 典型应用场景
+
+### 场景一：用户密码安全存储（消息摘要 + 盐值）
+
+使用 SHA-256 + 随机盐值对用户密码进行哈希存储，防止密码泄露：
+
+```java
+public static String hashPassword(String password) {
+    byte[] salt = new byte[16];
+    new SecureRandom().nextBytes(salt);
+    MessageDigest md = MessageDigest.getInstance("SHA-256");
+    md.update(salt);
+    byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
+    return Base64.getEncoder().encodeToString(salt) + ":" +
+           Base64.getEncoder().encodeToString(hash);
+}
+```
+
+### 场景二：接口请求签名验证（数字签名）
+
+支付接口请求防篡改，客户端用私钥签名，服务端用公钥验签：
+
+```java
+// 客户端签名
+Signature sig = Signature.getInstance("SHA256withRSA");
+sig.initSign(privateKey);
+sig.update(requestBody.getBytes());
+byte[] signature = sig.sign();
+
+// 服务端验签
+Signature verifySig = Signature.getInstance("SHA256withRSA");
+verifySig.initVerify(publicKey);
+verifySig.update(requestBody.getBytes());
+boolean isValid = verifySig.verify(signature);
+```
+
+### 场景三：敏感数据传输加密（AES 对称加密）
+
+对敏感数据（如身份证、银行卡）进行 AES 加密后传输：
+
+```java
+SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(), "AES");
+Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+cipher.init(Cipher.ENCRYPT_MODE, key);
+byte[] encrypted = cipher.doFinal(plaintext.getBytes());
+```
+
+## 最佳实践
+
+1. **密码存储禁用 MD5** - MD5 已被证明不安全，容易被彩虹表攻破，应使用 SHA-256 加盐或 BCrypt/SCrypt
+2. **使用 GCM 模式而非 ECB/CBC** - AES/GCM 同时提供加密和完整性校验，比 ECB/CBC 更安全且性能更好
+3. **密钥不要硬编码在代码中** - 密钥应存储在环境变量、密钥管理服务（如 Vault、KMS）或加密的配置文件中
+4. **使用 SecureRandom 而非 Random** - 加密场景下的随机数（如盐值、IV）必须使用密码学安全的随机数生成器
+5. **大文件加密使用流式 API** - 不要将整个文件读入内存，使用 `CipherOutputStream`/`CipherInputStream` 流式处理
+
+## 常见问题
+
+**Q1：对称加密和非对称加密如何选择？**
+
+对称加密（AES）速度快，适合加密大量数据；非对称加密（RSA）速度慢但密钥管理方便，适合加密小数据（如密钥本身）和数字签名。实际中常组合使用：RSA 加密 AES 密钥，AES 加密实际数据。
+
+**Q2：Base64 是加密吗？**
+
+Base64 不是加密，只是一种编码方式，任何人都可以解码。它的用途是将二进制数据转为可打印字符，适合在 URL、JSON、邮件等场景中传输二进制数据。
+
+**Q3：RSA 密钥长度应该多长？**
+
+目前安全建议 RSA 密钥至少 2048 位。1024 位已经被认为不安全，4096 位更安全但性能开销更大。对于高安全场景，可考虑椭圆曲线加密（ECDSA）替代 RSA。
 
 ## 参考资料
 

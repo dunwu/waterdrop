@@ -382,6 +382,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 > 示例源码：[spring-boot-web-helloworld](https://github.com/dunwu/spring-boot-tutorial/tree/master/codes/web/spring-boot-web-helloworld)
 
+## 典型应用场景
+
+- **RESTful API 服务**：通过 `spring-boot-starter-web` 快速构建微服务接口，实现 JSON/XML 数据响应。
+- **定时任务服务**：引入 `spring-boot-starter` + `@Scheduled` 快速搭建后台定时作业系统。
+- **原型验证（Prototype）**：利用 Spring Initializr 在几分钟内创建可运行的原型应用，验证技术可行性。
+- **内部工具平台**：结合 Thymeleaf 或前端模板，快速开发内部管理后台、配置中心等工具应用。
+
+## 最佳实践
+
+- **统一使用 `spring-boot-starter-parent`**：避免手动管理依赖版本，减少版本冲突风险。
+- **合理拆分包结构**：按照 Controller/Service/Repository 分层组织代码，配合 `@ComponentScan` 精确扫描。
+- **使用 Actuator 监控应用**：引入 `spring-boot-starter-actuator` 暴露健康检查、指标接口。
+- **使用 DevTools 提升开发体验**：开发环境引入 `spring-boot-devtools` 实现热重载，提高调试效率。
+
+## 常见问题
+
+**Spring Boot 启动失败常见原因？**
+
+- 端口被占用：修改 `server.port` 或释放占用端口的进程。
+- 依赖冲突：检查 `mvn dependency:tree` 排查版本冲突。
+- 配置错误：检查 `application.properties` 中数据库、Redis 等连接配置。
+
+**Spring Boot 如何打包为可执行 JAR？**
+
+在 pom.xml 中添加 `spring-boot-maven-plugin` 插件，执行 `mvn package` 即可生成可执行 JAR，通过 `java -jar` 运行。
+
 ## 参考资料
 
 - [Spring Boot 官方文档之 Getting Started](https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html#getting-started)

@@ -471,6 +471,30 @@ $ mvn clean package -Dmaven.skip.test=true -P zp
 $ mvn clean deploy -Dmaven.skip.test=true -P zp
 ```
 
+## 典型应用场景
+
+- **内部库发布**：将通用工具类、基础框架发布到公司私有 Nexus/Artifactory 仓库，供其他团队项目依赖使用。
+- **开源项目发布**：将开源项目发布到 Maven Central，需要 GPG 签名、Javadoc/Sources 打包、Sonatype 工单审批等流程。
+- **版本管理**：通过 maven-release-plugin 自动化版本号升级、Git 打 tag、发布到仓库的完整流程。
+- **多模块发布**：父 POM 执行 release，子模块自动继承版本号并统一发布，确保模块间版本一致性。
+
+## 最佳实践
+
+- **语义化版本**：遵循 MAJOR.MINOR.PATCH 版本号规范，主版本号表示不兼容变更，次版本号表示向下兼容的新功能，修订号表示 bug 修复。
+- **GPG 签名**：发布到 Central 必须签名，使用 `maven-gpg-plugin` 自动签名，私钥妥善保管，公钥上传到公钥服务器。
+- **跳过测试**：发布时使用 `-Dmaven.skip.test=true` 跳过测试，避免测试失败阻塞发布，但确保发布前已在 CI 环境通过测试。
+- **使用 release profile**：在 settings.xml 中配置 release profile，包含 GPG、source/javadoc 打包、deploy 配置，发布时通过 `-P release` 激活。
+
+## 常见问题
+
+**发布到 Central 时报错 "Could not transfer artifact"？**
+
+通常是网络问题或 Nexus 服务不稳定。可以尝试：1) 检查 GPG 签名是否正确；2) 确认 Sonatype 工单已审批；3) 使用 `-DretryFailedDeploymentCount=10` 自动重试失败部署。
+
+**SNAPSHOT 和 RELEASE 版本的区别？**
+
+SNAPSHOT 是开发版本，每次构建会覆盖；RELEASE 是正式版本，一旦发布不可修改。Maven 默认禁止覆盖 RELEASE 版本，需在 Nexus 中配置 release policy 为 allow 才能重新部署（不推荐）。
+
 ## 参考资料
 
 - https://www.jianshu.com/p/8c3d7fb09bce

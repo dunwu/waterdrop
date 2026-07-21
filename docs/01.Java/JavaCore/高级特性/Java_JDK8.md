@@ -15,6 +15,10 @@ permalink: /pages/dd3aebbb/
 
 # JDK8 入门指南
 
+## 简介
+
+JDK 8 是 Java 历史上最具里程碑意义的版本之一，于 2014 年发布，也是长期支持（LTS）版本。它引入了大量现代语言特性，极大提升了 Java 的表达力和开发效率：`Lambda` 表达式让函数式编程更简洁，`Stream API` 让集合数据处理更优雅，`Optional` 让空指针防护更规范，`默认方法` 让接口演进更平滑。JDK 8 也是目前企业中使用最广泛的 Java 版本之一。
+
 > JDK8 升级常见问题章节是我个人的经验整理。其他内容基本翻译自 [java8-tutorial](https://github.com/winterbe/java8-tutorial)
 >
 > **📦 本文以及示例源码已归档在 [javacore](https://github.com/dunwu/javacore/)**
@@ -940,6 +944,65 @@ java.lang.UnsupportedClassVersionError: PR/Sort : Unsupported major.minor versio
 ./configure --prefix=/usr/local/resin  --with-java=/usr/local/jdk1.8.0_121
 make & make install
 ```
+
+## 典型应用场景
+
+### 场景一：集合数据处理（Stream + Lambda）
+
+从订单列表筛选金额大于 100 的订单并按时间排序：
+
+```java
+List<Order> result = orders.stream()
+    .filter(o -> o.getAmount() > 100)
+    .sorted(Comparator.comparing(Order::getCreateTime))
+    .collect(Collectors.toList());
+```
+
+### 场景二：空值安全处理（Optional）
+
+链式获取嵌套对象属性，避免 NPE：
+
+```java
+String city = Optional.ofNullable(user)
+    .map(User::getAddress)
+    .map(Address::getCity)
+    .orElse("未知");
+```
+
+### 场景三：接口向后兼容演进（Default Methods）
+
+给已有接口添加新方法而不破坏现有实现：
+
+```java
+public interface Logger {
+    void log(String msg);
+
+    default void info(String msg) { log("[INFO] " + msg); }
+    default void error(String msg) { log("[ERROR] " + msg); }
+}
+```
+
+## 最佳实践
+
+1. **Lambda 保持简洁** - Lambda 表达式应尽量短小，复杂逻辑应抽取为方法引用，提升可读性
+2. **Stream 避免嵌套** - 超过 3 层的链式调用应拆分为多个变量或方法，否则调试困难
+3. **Optional 不应用作字段/参数** - `Optional` 仅适合作为方法返回值，不应作为类字段或方法参数
+4. **并行 Stream 仅用于大数据量** - 数据量小于 1 万时并行 Stream 反而更慢，线程切换开销大于并行收益
+5. **`collect` 而非 `forEach` 收集结果** - `forEach` 常用于副作用操作，收集结果应使用 `collect` 或 `toArray`
+
+## 常见问题
+
+**Q1：Lambda 表达式和匿名内部类有什么区别？**
+
+Lambda 编译后生成 `invokedynamic` 指令，不生成新的 class 文件，性能更好。匿名内部类会生成独立的 class 文件，且 `this` 指向不同（Lambda 的 `this` 指向外部类）。
+
+**Q2：Stream 的 `map` 和 `flatMap` 有什么区别？**
+
+`map` 是一对一转换，每个元素转换为一个新元素；`flatMap` 是一对多转换，每个元素转换为一个 Stream，然后将所有 Stream 扁平化为一个 Stream。
+
+**Q3：JDK 8 升级最常见的兼容性问题是什么？**
+
+常见问题包括：删除了 `sun.*` 内部 API、PermGen 被 Metaspace 替代、`DateTime` API 引入导致新旧日期类混用问题、以及某些旧框架（如老版本 Spring）与 JDK 8 字节码不兼容。
 
 ## 参考资料
 

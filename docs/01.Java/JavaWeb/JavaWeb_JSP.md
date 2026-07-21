@@ -1728,3 +1728,37 @@ This is custom tag
 </attribute>
 .....
 ```
+
+## 典型应用场景
+
+- **传统 MVC Web 应用**：JSP 作为 View 层，与 Servlet（Controller）和 JavaBean（Model）配合实现经典的 MVC 架构。
+- **企业内部管理系统**：JSP + JSTL + EL 表达式构建后台管理界面，适用于报表展示、表单操作等场景。
+- **动态内容渲染**：通过 JSP 的隐式对象和 EL 表达式动态展示服务端数据，如商品列表、用户信息等。
+- **遗留系统维护**：大量存量 Java Web 项目仍使用 JSP，了解其工作原理对维护老系统至关重要。
+
+## 最佳实践
+
+- **避免在 JSP 中写 Java 代码**：尽量使用 JSTL 标签和 EL 表达式代替脚本片段，保持 JSP 的可读性和可维护性。
+- **使用 MVC 分离关注点**：业务逻辑放在 Servlet/Controller 中，JSP 仅负责视图渲染。
+- **统一编码设置**：在 JSP 顶部设置 `<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>`，防止中文乱码。
+- **使用 `<c:out>` 输出用户数据**：自动转义 HTML 特殊字符，防止 XSS 攻击。
+- **合理选择 include 方式**：静态内容用 `<%@ include %>` 指令（编译时包含），动态内容用 `<jsp:include>` 动作（运行时包含）。
+
+## 常见问题
+
+**JSP 和 Thymeleaf/Freemarker 有什么区别？**
+
+JSP 是传统的 Java Web 视图技术，与 Servlet 容器紧密耦合；Thymeleaf 支持自然模板（可直接在浏览器中打开），更适合 Spring Boot 项目；Freemarker 是纯模板引擎，不依赖 Servlet 容器。新项目推荐使用 Thymeleaf。
+
+**JSP 中 `<%@ include %>` 和 `<jsp:include>` 有什么区别？**
+
+`<%@ include %>` 是静态包含，在 JSP 编译前将文件内容合并，然后统一编译为一个 Servlet；`<jsp:include>` 是动态包含，在运行时先执行被包含页面，再将结果插入，两者各自编译为独立的 Servlet。
+
+**JSP 在现代开发中的定位是什么？**
+
+JSP 已属于遗留技术，现代 Java Web 开发多采用前后端分离架构（Vue/React + Spring Boot API）。但在维护老系统或快速构建简单内部工具时，JSP 仍有其价值。
+
+## 参考资料
+
+- [深入拆解 Tomcat & Jetty](https://time.geekbang.org/column/intro/100027701)
+- [Java Web 整合开发王者归来](https://book.douban.com/subject/4189495/)

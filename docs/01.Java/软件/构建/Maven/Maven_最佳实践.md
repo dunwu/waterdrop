@@ -294,3 +294,33 @@ spring-boot-dependencies 的 pom.xml 形式：
     </dependencies>
 </dependencyManagement>
 ```
+
+## 典型应用场景
+
+- **企业级项目标准化**：建立公司级 parent POM，统一编码、JDK 版本、插件配置，所有项目继承该 POM 确保一致性。
+- **BOM 导入管理**：通过 `<scope>import</scope>` 引入 Spring Boot、Spring Cloud 等 BOM，简化依赖版本管理，避免版本冲突。
+- **微服务架构**：父 POM 管理公共依赖和插件，子模块按需引入特定依赖，实现模块间解耦和依赖复用。
+- **开源项目发布**：配置完整的发布流程（GPG 签名、Javadoc/Sources 打包、Nexus 部署），确保符合 Maven Central 要求。
+
+## 最佳实践
+
+- **单一职责原则**：每个模块只负责一个业务领域或技术层面，避免模块职责混乱导致依赖混乱。
+- **依赖最小化**：只声明必要的依赖，避免引入冗余 jar 包，减少冲突风险，加快构建速度。
+- **版本锁定**：在 dependencyManagement 中锁定所有第三方依赖版本，子模块不指定 version，确保版本一致性。
+- **定期更新依赖**：使用 `versions-maven-plugin` 定期检查依赖更新，及时修复安全漏洞和获取性能优化。
+
+## 常见问题
+
+**为什么推荐使用 BOM 而不是直接指定版本？**
+
+BOM（Bill of Materials）由框架官方维护，内部依赖经过严格测试，版本组合稳定可靠。直接指定版本容易出现版本不兼容问题，且升级时需要手动调整多个依赖版本。
+
+**如何避免依赖冲突？**
+
+1) 使用 `mvn dependency:tree` 查看依赖树，定位冲突来源；2) 使用 `<exclusions>` 排除不需要的传递依赖；3) 在 dependencyManagement 中显式指定冲突依赖的版本；4) 使用 `maven-enforcer-plugin` 强制约束依赖版本。
+
+## 参考资料
+
+- [Maven 官方最佳实践](https://maven.apache.org/guides/mini/guide-maven-pom-code-convention.html)
+- [Spring Boot 依赖管理](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.build-systems.dependency-management)
+- [Maven 多模块项目指南](https://maven.apache.org/guides/mini/guide-multiple-modules.html)

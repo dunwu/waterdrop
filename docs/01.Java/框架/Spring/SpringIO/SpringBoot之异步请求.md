@@ -133,6 +133,26 @@ public class MyAsyncUncaughtExceptionHandler implements AsyncUncaughtExceptionHa
 
 > 示例源码：[spring-boot-async](https://github.com/dunwu/spring-boot-tutorial/tree/master/codes/spring-boot-async)
 
+## 典型应用场景
+
+- **异步任务执行**：通过 `@Async` 将耗时操作（邮件发送、报表生成）放入后台线程异步执行。
+- **并行计算**：将多个独立任务并行执行，汇总结果后返回，提升响应速度。
+- **事件驱动处理**：异步处理 Spring 事件，避免阻塞主线程。
+- **定时任务异步化**：结合 `@Scheduled` 与异步执行器实现不阻塞主线程的定时任务。
+
+## 最佳实践
+
+- **自定义线程池**：避免使用默认的 `SimpleAsyncTaskExecutor`，配置 `ThreadPoolTaskExecutor` 控制线程数和队列容量。
+- **设置合理的超时时间**：通过 `Future.get(timeout)` 避免异步任务无限等待。
+- **异常处理不能忽略**：配置 `AsyncUncaughtExceptionHandler` 捕获未处理异常，避免静默失败。
+- **避免在 `@Async` 方法中调用同类方法**：同类内部调用不会触发代理，导致异步失效。
+
+## 常见问题
+
+**为什么 `@Async` 方法没有异步执行？**
+
+`@Async` 基于 AOP 代理实现，同类内部方法调用不会经过代理。需将异步方法放在单独的 Bean 中或通过 `AopContext.currentProxy()` 调用。
+
 ## 参考资料
 
 - [Spring Boot 官方文档之 boot-features-external-config](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config)

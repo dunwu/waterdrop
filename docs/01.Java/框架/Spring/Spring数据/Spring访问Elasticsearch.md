@@ -121,6 +121,18 @@ Spring 和 Elasticsearch 匹配版本：
 | 3.0.x[[1](https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#_footnotedef_1)] |     5.5.0     |      5.0.13      |    2.0.x    |
 | 2.1.x[[1](https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#_footnotedef_1)] |     2.4.0     |      4.3.25      |    1.5.x    |
 
+## 典型应用场景
+
+- **全文搜索**：利用 ES 的倒排索引实现商品、文章等内容的全文检索。
+- **日志分析**：结合 ELK（Elasticsearch + Logstash + Kibana）实现应用日志收集与分析。
+- **实时数据分析**：利用 ES 的聚合查询能力实现实时统计和数据看板。
+
+## 最佳实践
+
+- **合理设计索引结构**：提前规划 Mapping，避免动态 Mapping 导致类型冲突。
+- **使用 `RestHighLevelClient`**：相比已废弃的 `TransportClient`，REST 客户端兼容性更好。
+- **批量操作提升性能**：使用 `BulkRequest` 批量插入/更新文档，避免逐条操作。
+
 ## 参考资料
 
 - **官方**

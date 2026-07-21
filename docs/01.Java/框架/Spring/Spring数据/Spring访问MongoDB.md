@@ -174,6 +174,18 @@ Customer(id=63d6157b265e7c5e48077f64, firstName=Bob, lastName=Smith)
 
 更多 Spring 访问 MongoDB 示例请参考：[MongoDB 示例源码](https://github.com/dunwu/spring-tutorial/tree/master/codes/data/nosql/mongodb)
 
+## 典型应用场景
+
+- **文档存储**：存储结构灵活、字段不固定的文档型数据（如用户画像、日志）。
+- **内容管理系统**：存储文章、评论等嵌套结构的复杂数据。
+- **实时大数据分析**：结合 MongoDB 的聚合管道实现实时数据处理。
+
+## 最佳实践
+
+- **合理设计文档结构**：避免过度嵌套，读取频率高的数据考虑内嵌而非引用。
+- **创建必要索引**：对查询频繁字段建立索引，利用复合索引优化多条件查询。
+- **使用 `MongoTemplate` 处理复杂操作**：对于聚合查询、批量操作等场景，`MongoTemplate` 比 Repository 更灵活。
+
 ## 参考资料
 
 - [MongoDB 官网](https://www.mongodb.com/)

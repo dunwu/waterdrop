@@ -126,6 +126,18 @@ spring:
 
 > 示例源码：[spring-boot-banner](https://github.com/dunwu/spring-boot-tutorial/tree/master/codes/spring-boot-banner)
 
+## 典型应用场景
+
+- **品牌标识**：为企业应用定制专属 Banner，展示公司 Logo 或项目名称。
+- **环境标识**：通过 Banner 显示当前环境信息（dev/test/prod），避免误操作。
+- **版本信息展示**：在 Banner 中嵌入应用版本、Git 提交信息等。
+
+## 最佳实践
+
+- **生产环境关闭 Banner**：通过 `spring.main.banner-mode=off` 减少启动日志干扰。
+- **使用 ASCII 艺术生成工具**：如 `patorjk.com` 生成美观的 ASCII 艺术字体。
+- **包含关键信息**：在 Banner 中显示 `${application.version}`、`${spring-boot.version}` 等变量。
+
 ## 参考资料
 
 - [Spring Boot 官方文档之 Customizing the Banner](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-banner)

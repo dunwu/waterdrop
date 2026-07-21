@@ -15,7 +15,83 @@ permalink: /pages/e67da890/
 
 # 深入理解 Java 异常
 
+## 简介
+
+异常（Exception）是 Java 程序在运行过程中发生的非正常事件，它会打断程序的正常执行流程。Java 的异常处理机制是保证程序健壮性的核心手段，通过捕获和处理异常，程序可以在出错时优雅地降级或恢复，而不是直接崩溃。
+
+Java 异常处理基于“抛出-捕获”模型：当异常发生时，方法可以抛出异常对象；调用方可以选择捕获并处理，或继续向上抛出。
+
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2019/03/404fe3f8b5784e55bb446b2636d93c03.png)
+
+## 典型应用场景
+
+### 场景一：业务异常与系统异常分层处理
+
+在 Web 应用中，区分业务异常和系统异常，返回不同的错误码和信息：
+
+```java
+// 业务异常 - 用户可预期的错误
+public class BusinessException extends RuntimeException {
+    private final String errorCode;
+    public BusinessException(String errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+}
+
+// 全局异常处理器
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(BusinessException.class)
+    public Result<?> handleBizException(BusinessException e) {
+        return Result.fail(e.getErrorCode(), e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public Result<?> handleSystemException(Exception e) {
+        log.error("系统异常", e);
+        return Result.fail("SYSTEM_ERROR", "系统繁忙，请稍后再试");
+    }
+}
+```
+
+### 场景二：资源管理与 try-with-resources
+
+使用 try-with-resources 自动管理可关闭资源，避免资源泄漯：
+
+```java
+// JDK7 的 try-with-resources 自动关闭资源
+public String readFile(String path) throws IOException {
+    try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line).append("\n");
+        }
+        return sb.toString();
+    }
+    // reader 自动关闭，无需 finally 块
+}
+```
+
+### 场景三：重试机制
+
+在分布式系统中，利用异常处理实现自动重试：
+
+```java
+public <T> T retryOnFailure(Supplier<T> action, int maxRetries, long delayMs) {
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return action.get();
+        } catch (Exception e) {
+            if (attempt == maxRetries) throw e;
+            log.warn("第 {} 次尝试失败，{}ms 后重试", attempt, delayMs);
+            Thread.sleep(delayMs);
+        }
+    }
+    throw new IllegalStateException("unreachable");
+}
+```
 
 ## 异常框架
 
@@ -453,6 +529,22 @@ public class ExceptionOverrideDemo {
 >
 > - [Effective java 中文版 之 第九章 异常](https://book.douban.com/subject/3360807/)
 > - [优雅的处理你的 Java 异常](https://my.oschina.net/c5ms/blog/1827907)
+
+## 常见问题
+
+### Q1：Checked Exception 和 Unchecked Exception 有什么区别？
+
+- **Checked Exception**：编译器强制要求处理的异常（如 `IOException`、`SQLException`）。要么 try-catch 捕获，要么 throws 声明抛出。
+- **Unchecked Exception**：继承 `RuntimeException` 的异常，编译器不强制要求处理。如 `NullPointerException`、`IllegalArgumentException`。
+
+### Q2：什么时候应该用异常，什么时候用返回值？
+
+- **用异常**：当操作失败是真正的“异常”情况（如文件不存在、网络连接断开）。
+- **用返回值**：当失败是可预期的正常流程（如用户不存在返回 null/Optional，验证码错误返回 false）。
+
+### Q3：为什么不建议 catch Exception？
+
+因为 `catch (Exception e)` 会捕获所有异常，包括编程错误（如 NPE、数组越界）和逻辑异常。这样会掩盖真正的 bug，使得问题难以定位。应该尽可能精确地捕获特定异常类型。
 
 ## 参考资料
 

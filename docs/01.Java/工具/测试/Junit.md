@@ -586,6 +586,40 @@ void palindromes(String candidate) {
 }
 ```
 
+## 典型应用场景
+
+- **Service 层单元测试**：结合 Mockito 模拟 DAO/Repository 层，验证 Service 业务逻辑的正确性，是日常开发最常用的场景。
+- **参数化测试验证边界值**：使用 `@ParameterizedTest` + `@ValueSource` / `@CsvSource` 批量验证方法在不同输入下的行为，如边界值、异常值。
+- **集成测试环境隔离**：通过 `@EnabledOnOs` / `@EnabledIfSystemProperty` 控制测试只在特定环境（CI/Dev）下运行，避免本地运行失败。
+- **嵌套测试组织复杂场景**：使用 `@Nested` 按业务场景组织测试用例，如“新建订单”→“当库存充足时”/“当库存不足时”。
+
+## 最佳实践
+
+- **测试方法命名清晰**：使用 `@DisplayName` 或 `should_xxx_when_xxx` 命名风格，让测试报告可读性更强。
+- **使用 `assertAll` 分组断言**：多个相关断言用 `assertAll` 包裹，失败时一次看到所有问题而不是只报第一个。
+- **避免测试间依赖**：每个测试方法应独立运行，通过 `@BeforeEach` 初始化状态，不依赖其他测试的执行顺序。
+- **善用 `@BeforeAll` 初始化重量级资源**：数据库连接、文件加载等开销大的操作放在 `@BeforeAll` 中只执行一次，而不是每个测试都重复。
+
+## 常见问题
+
+**JUnit 5 和 JUnit 4 注解的区别？**
+
+| JUnit 4 | JUnit 5 | 说明 |
+|---------|---------|------|
+| `@Before` | `@BeforeEach` | 每个测试前执行 |
+| `@After` | `@AfterEach` | 每个测试后执行 |
+| `@BeforeClass` | `@BeforeAll` | 所有测试前执行（需 static） |
+| `@Ignore` | `@Disabled` | 禁用测试 |
+| `@RunWith` | `@ExtendWith` | 扩展机制 |
+
+**`@BeforeAll` 方法报错 “must be static”？**
+
+默认情况下 `@BeforeAll` 方法必须是 static。如果不想用 static，可以在类上加 `@TestInstance(Lifecycle.PER_CLASS)`，使整个测试类共享一个实例。
+
+**如何运行指定 Tag 的测试？**
+
+使用 `@Tag("fast")` 标记测试，然后通过构建工具配置过滤：Maven Surefire 用 `-Dgroups=fast`，Gradle 用 `useJUnitPlatform { includeTags 'fast' }`。
+
 ## 参考资料
 
 - [Junit5 Github](https://github.com/junit-team/junit5)

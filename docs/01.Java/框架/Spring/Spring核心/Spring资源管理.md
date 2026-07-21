@@ -255,6 +255,30 @@ Spring 配置资源中有哪些常见类型？
 - Properties 资源
 - YAML 资源
 
+## 典型应用场景
+
+- **配置文件加载**：通过 `ClassPathResource` 加载类路径下的配置文件（XML、Properties、JSON），供应用初始化时使用。
+- **静态资源服务**：通过 `UrlResource` 或 `FileSystemResource` 加载文件系统或远程 URL 的图片、文档等静态资源。
+- **多环境配置文件扫描**：利用 `classpath*:` 前缀扫描所有 jar 包中的同名配置文件，实现微服务插件化配置。
+- **模板文件加载**：通过 `@Value` 注入 `Resource` 类型，将邮件模板、报表模板等资源文件注入到服务层。
+
+## 最佳实践
+
+- **使用资源前缀明确指定加载方式**：如 `classpath:` 或 `file:`，避免因 ApplicationContext 类型不同导致加载行为不一致。
+- **优先使用 `ResourceLoader` 而非直接 `new` 资源对象**：保持与 Spring 容器的一致性，便于测试和替换。
+- **批量加载时使用 `ResourcePatternResolver`**：通过 `classpath*:` 和 Ant 风格通配符批量加载资源，避免硬编码文件列表。
+- **资源依赖注入优于代码加载**：通过 `@Value` 或 XML 配置注入 `Resource`，使组件更易测试和配置。
+
+## 常见问题
+
+**为什么 `InputStreamResource` 只能读取一次？**
+
+`InputStreamResource` 封装的是一个已打开的 `InputStream`，流只能被消费一次。如需多次读取，应使用 `ByteArrayResource` 或其他可重复读取的实现。
+
+**`classpath:` 和 `classpath*:` 的区别？**
+
+`classpath:` 仅从第一个匹配的类路径加载资源；`classpath*:` 会扫描所有类路径（包括多个 jar 包）中的匹配资源，适用于多模块场景。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

@@ -208,6 +208,28 @@ Spring Bean 垃圾回收步骤：
 | [application](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes-application) | Scopes a single bean definition to the lifecycle of a `ServletContext`. Only valid in the context of a web-aware Spring `ApplicationContext`.                                                                                                                |
 | [websocket](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#websocket-stomp-websocket-scope)     | Scopes a single bean definition to the lifecycle of a `WebSocket`. Only valid in the context of a web-aware Spring `ApplicationContext`.                                                                                                                     |
 
+## 典型应用场景
+
+- **无状态 Service/DAO 层组件**：使用默认的 `singleton` 作用域，容器内共享同一实例，节省内存开销。
+- **有状态会话对象**：使用 `prototype` 作用域，每次请求创建新实例，避免多线程数据污染（如购物车、用户会话数据封装）。
+- **HTTP 请求绑定对象**：在 Web 应用中使用 `request` 作用域，每个 HTTP 请求独立拥有一个 Bean 实例，用于请求参数封装（如表单对象）。
+- **第三方库集成**：通过 `@Bean` + `@Configuration` 注册无法用 `@Component` 扫描的第三方类（如 `RestTemplate`、`RedisTemplate`、`DataSource` 等）。
+
+## 最佳实践
+
+- **默认使用单例 Bean**：绝大多数场景 Bean 应设计为无状态的 `singleton`，避免不必要的实例化开销。
+- **有状态 Bean 用 `prototype` + `ScopedProxy`**：当单例 Bean 需要注入 `prototype` Bean 时，必须使用 `@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)` 以确保每次获取新实例。
+- **初始化逻辑用 `@PostConstruct`**：而非构造器内执行，确保依赖注入完成后才执行初始化。
+- **避免在 Bean 中使用静态变量**：静态变量不受 Spring 容器管理，无法进行依赖注入和生命周期回调。
+- **合理使用 `@Lazy`**：对于启动耗时但低频使用的 Bean，延迟加载可加速应用启动。
+
+## 常见问题
+
+- **单例 Bean 是线程安全的吗？** 不是。单例 Bean 的线程安全取决于内部状态，无状态 Bean 天然线程安全，有可变成员变量的 Bean 需通过 `ThreadLocal`、同步机制或改为 `prototype` 解决。
+- **`@Bean` 和 `@Component` 有什么区别？** `@Bean` 用于方法级别，可精确控制实例化逻辑，适合第三方类；`@Component` 用于类级别，通过组件扫描自动注册。
+- **`BeanFactory` 和 `FactoryBean` 有什么区别？** `BeanFactory` 是 Spring IoC 容器接口；`FactoryBean` 是创建 Bean 的一种方式，实现其 `getObject()` 方法可返回自定义 Bean 实例。
+- **Bean 生命周期中各回调方法的执行顺序？** `@PostConstruct` → `InitializingBean.afterPropertiesSet()` → `@Bean(initMethod)`，销毁顺序同理。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

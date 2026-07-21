@@ -19,7 +19,11 @@ permalink: /pages/8b685389/
 
 # Java 并发之分工工具
 
-**对于简单的并行任务，你可以通过“线程池 + Future”的方案来解决；如果任务之间有聚合关系，无论是 AND 聚合还是 OR 聚合，都可以通过 CompletableFuture 来解决；而批量的并行任务，则可以通过 CompletionService 来解决。**
+## 简介
+
+Java 并发编程中，**分工工具**是处理复杂并行任务的核心利器。当单个任务过于庞大或具有复杂的依赖关系时，我们需要将其拆分为多个子任务并行执行，最后汇总结果。Java 提供了多种分工工具来应对不同场景：`ForkJoinPool` 面向分治递归任务，`CompletableFuture` 面向异步编排与聚合，`CompletionService` 面向批量并行任务的结果收集。
+
+**对于简单的并行任务，你可以通过"线程池 + Future"的方案来解决；如果任务之间有聚合关系，无论是 AND 聚合还是 OR 聚合，都可以通过 CompletableFuture 来解决；而批量的并行任务，则可以通过 CompletionService 来解决。**
 
 ## ForkJoinPool
 
@@ -878,6 +882,108 @@ Future<V> poll(long timeout, TimeUnit unit) throws InterruptedException;
 当需要批量提交异步任务的时候建议你使用 CompletionService。CompletionService 将线程池 Executor 和阻塞队列 BlockingQueue 的功能融合在了一起，能够让批量异步任务的管理更简单。除此之外，CompletionService 能够让异步任务的执行结果有序化，先执行完的先进入阻塞队列，利用这个特性，你可以轻松实现后续处理的有序性，避免无谓的等待，同时还可以快速实现诸如 Forking Cluster 这样的需求。
 
 CompletionService 的实现类 ExecutorCompletionService，需要你自己创建线程池，虽看上去有些啰嗦，但好处是你可以让多个 ExecutorCompletionService 的线程池隔离，这种隔离性能避免几个特别耗时的任务拖垮整个应用的风险。
+
+## 典型应用场景
+
+### 场景一：大数据量递归计算（ForkJoinPool）
+
+计算 1 到 1 亿的和，使用 ForkJoinPool 将任务递归拆分：
+
+```java
+public class SumTask extends RecursiveTask<Long> {
+    private static final int THRESHOLD = 10000;
+    private final long[] array;
+    private final int lo, hi;
+
+    public SumTask(long[] array, int lo, int hi) {
+        this.array = array; this.lo = lo; this.hi = hi;
+    }
+
+    @Override
+    protected Long compute() {
+        if (hi - lo <= THRESHOLD) {
+            long sum = 0;
+            for (int i = lo; i < hi; i++) sum += array[i];
+            return sum;
+        }
+        int mid = (lo + hi) >>> 1;
+        SumTask left = new SumTask(array, lo, mid);
+        SumTask right = new SumTask(array, mid, hi);
+        left.fork(); // 异步执行左半部分
+        long rightResult = right.compute(); // 当前线程执行右半部分
+        long leftResult = left.join(); // 等待左半部分结果
+        return leftResult + rightResult;
+    }
+}
+
+ForkJoinPool pool = new ForkJoinPool();
+long result = pool.invoke(new SumTask(array, 0, array.length));
+```
+
+### 场景二：多接口异步编排（CompletableFuture）
+
+电商商品详情页需要同时调用商品、库存、评价、推荐等多个微服务接口，使用 CompletableFuture 并行调用并聚合：
+
+```java
+CompletableFuture<ProductInfo> productFuture = CompletableFuture.supplyAsync(
+    () -> productService.getProduct(id), executor);
+CompletableFuture<StockInfo> stockFuture = CompletableFuture.supplyAsync(
+    () -> stockService.getStock(id), executor);
+CompletableFuture<List<Review>> reviewFuture = CompletableFuture.supplyAsync(
+    () -> reviewService.getReviews(id), executor);
+
+// AND 聚合：等所有结果就绪
+CompletableFuture<Void> allFutures = CompletableFuture.allOf(
+    productFuture, stockFuture, reviewFuture);
+allFutures.thenRun(() -> {
+    ProductDetail detail = new ProductDetail(
+        productFuture.join(), stockFuture.join(), reviewFuture.join());
+    render(detail);
+});
+```
+
+### 场景三：批量任务快速失败（CompletionService）
+
+实现 Forking Cluster 模式——向多个服务节点并行发送请求，取最先返回的成功结果：
+
+```java
+ExecutorService executor = Executors.newFixedThreadPool(nodes.size());
+CompletionService<Response> cs = new ExecutorCompletionService<>(executor);
+
+for (Node node : nodes) {
+    cs.submit(() -> node.sendRequest(request));
+}
+
+for (int i = 0; i < nodes.size(); i++) {
+    Future<Response> future = cs.take(); // 先完成的先返回
+    Response response = future.get();
+    if (response.isSuccess()) {
+        return response; // 快速返回第一个成功结果
+    }
+}
+```
+
+## 最佳实践
+
+1. **合理设置 ForkJoinPool 阈值** - 拆分粒度太细会导致任务调度开销大于计算开销，一般建议每个子任务工作量在 100~10000 个计算操作之间
+2. **CompletableFuture 务必指定线程池** - 默认的 `ForkJoinPool.commonPool()` 线程数少且全局共享，高并发场景下容易成为瓶颈，生产环境应传入自定义线程池
+3. **避免 CompletableFuture 中的阻塞调用** - 在 `supplyAsync` 中调用阻塞 IO 会导致线程被占住，应使用 `thenCompose` 链式组合或响应式方案
+4. **CompletionService 的线程池隔离** - 不同业务场景使用不同的 `ExecutorCompletionService` 实例和独立线程池，防止慢任务拖垮全局
+5. **ForkJoinPool 中使用 `fork()` + `compute()` 组合** - 一个子任务用 `fork()` 异步执行，另一个用 `compute()` 同步执行，可最大化利用当前线程
+
+## 常见问题
+
+**Q1：ForkJoinPool 和普通 ThreadPoolExecutor 有什么区别？**
+
+ForkJoinPool 专为可分解的递归任务设计，采用工作窃取（Work-Stealing）算法，空闲线程会从其他线程的任务队列中偷取任务，CPU 利用率更高。ThreadPoolExecutor 更适合处理大量独立的短期任务。
+
+**Q2：`CompletableFuture.allOf()` 和 `anyOf()` 分别适用什么场景？**
+
+`allOf()` 适用于需要等所有子任务都完成后才能继续的场景（如聚合多个数据源）；`anyOf()` 适用于只需要一个成功结果即可的场景（如竞速查询、容灾切换）。
+
+**Q3：CompletionService 相比直接用 Executor + Future 列表有什么优势？**
+
+直接使用 Future 列表，只能按提交顺序 `get()` 结果，如果第一个任务最慢，后续任务即使完成也必须等待。CompletionService 内部使用 BlockingQueue，先完成的任务先进队，实现"谁先完成谁先处理"，减少无谓等待。
 
 ## 参考资料
 

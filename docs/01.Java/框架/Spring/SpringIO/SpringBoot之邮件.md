@@ -273,6 +273,20 @@ public class MailService {
 
 > 示例源码：[spring-boot-mail](https://github.com/dunwu/spring-boot-tutorial/tree/master/codes/spring-boot-mail)
 
+## 典型应用场景
+
+- **用户注册验证**：发送邮箱验证链接，确认用户邮箱有效性。
+- **密码重置**：发送密码重置链接或验证码。
+- **业务通知**：订单状态变更、系统告警等业务场景发送通知邮件。
+- **定时报表**：定期生成业务报表并通过邮件发送给相关人员。
+
+## 最佳实践
+
+- **异步发送邮件**：使用 `@Async` 将邮件发送放入后台执行，避免阻塞主流程。
+- **使用模板引擎**：通过 Thymeleaf/FreeMarker 生成邮件 HTML 内容，提高可维护性。
+- **重试机制**：网络波动时邮件发送可能失败，配合重试机制提高可靠性。
+- **敏感信息外置**：SMTP 密码等配置通过环境变量或配置中心注入，禁止硬编码。
+
 ## 参考资料
 
 - [Spring Boot 官方文档之 Sending Email](https://docs.spring.io/spring-boot/docs/2.1.1.RELEASE/reference/htmlsingle/#boot-features-email)

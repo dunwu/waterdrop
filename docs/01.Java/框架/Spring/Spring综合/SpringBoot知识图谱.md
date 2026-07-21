@@ -939,6 +939,18 @@ public void initialize(ConfigurableApplicationContext context) {
 
 整个启动流程确实非常复杂，可以查询参考资料中的部分章节和内容，对照着源码，多看看，我想最终你都能弄清楚的。言而总之，Spring 才是核心，理解清楚 Spring 容器的启动流程，那 Spring Boot 启动流程就不在话下了。
 
+## 典型应用场景
+
+- **微服务架构构建**：基于 Spring Boot 快速搭建微服务，结合 Spring Cloud 实现服务注册、配置中心、网关等能力。
+- **自定义 Starter 开发**：将企业通用能力（日志、监控、安全）封装为 Starter，提升团队开发效率。
+- **应用监控与运维**：通过 Actuator 暴露健康检查、指标接口，结合 Prometheus + Grafana 实现监控可视化。
+
+## 最佳实践
+
+- **理解启动流程核心扩展点**：重点掌握 `ApplicationContextInitializer`、`ApplicationListener`、`BeanFactoryPostProcessor` 的作用时机。
+- **避免在启动流程中执行耗时操作**：利用异步初始化或延迟加载机制，提升应用启动速度。
+- **合理设计自定义 Starter**：保持功能单一、配置简洁，提供充分的文档和默认值。
+
 ## 参考资料
 
 [1][王福强 著；springboot 揭秘：快速构建微服务体系; 机械工业出版社, 2016](https://link.jianshu.com/?t=http%3A%2F%2Funion-click.jd.com%2Fjdc%3Fd%3D4jESQ9)

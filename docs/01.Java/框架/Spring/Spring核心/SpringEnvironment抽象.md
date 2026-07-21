@@ -161,6 +161,30 @@ Environment 底层实现
   - 管理 Spring 配置属性源
   - 管理 Profiles
 
+## 典型应用场景
+
+- **多环境配置切换**：通过 `Environment` 获取当前激活的 Profile，动态加载不同环境的配置。
+- **外部化属性解析**：通过 `@Value` 注入配置属性，`Environment` 底层统一处理占位符解析和类型转换。
+- **条件化 Bean 装配**：结合 `@Profile` 和 `Environment#acceptsProfiles()` 实现按环境条件注册 Bean。
+- **配置属性源扩展**：通过 API 编程动态添加自定义 `PropertySource`，如从数据库、配置中心加载属性。
+
+## 最佳实践
+
+- **优先使用 `Environment` 而非 `PropertyPlaceholderConfigurer`**：`Environment` 是 Spring 3.1+ 的统一属性管理抽象，功能更强大。
+- **合理组织 `PropertySource` 顺序**：通过 `addFirst()` / `addLast()` 控制属性源优先级。
+- **避免在 `Environment` 中存储敏感信息**：密码、密钥等应通过加密或外部密钥管理服务注入。
+- **使用 `@ConfigurationProperties` 代替 `@Value` 处理复杂配置**：对于嵌套对象、集合等结构化配置更友好。
+
+## 常见问题
+
+**`Environment` 与 `PropertyResolver` 的关系？**
+
+`Environment` 继承自 `PropertyResolver`，在其基础上增加了 Profile 管理能力。`PropertyResolver` 仅负责属性解析和占位符处理。
+
+**如何自定义 `PropertySource`？**
+
+实现 `PropertySource` 接口，在应用上下文启动前通过 `ConfigurableEnvironment#getPropertySources()` 添加到属性源列表中。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

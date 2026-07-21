@@ -372,6 +372,34 @@ Aware 系列接口回调
 | 依赖查找 | 主动     | 相对繁琐   | 侵入业务逻辑 | 依赖容器 API   | 良好   |
 | 依赖注入 | 被动     | 相对便利   | 低侵入性     | 不依赖容器 API | 一般   |
 
+## 典型应用场景
+
+- **微服务组件装配**：通过 `@Autowired` + 接口类型自动注入 Service、Repository 实现，实现组件间松耦合。
+- **策略模式实现**：利用 `@Qualifier` 限定注入特定实现的 Bean，在同一接口多实现场景中精确选择目标。
+- **可选依赖处理**：使用 `ObjectProvider` 延迟注入可选组件，避免在 Bean 不存在时启动失败。
+- **框架集成**：通过 Aware 接口回调注入容器基础设施对象（如 `ApplicationContext`、`Environment`），用于框架层扩展。
+
+## 最佳实践
+
+- **优先使用构造器注入**：确保依赖不可变且保证 Bean 在使用前已完全初始化，避免出现 `NullPointerException`。
+- **避免使用字段注入**：字段注入难以进行单元测试，且无法声明依赖为 `final`，推荐使用构造器或 Setter 注入。
+- **使用 `@Qualifier` 解决歧义**：当同一类型存在多个 Bean 时，通过 `@Qualifier` 或自定义限定注解精确指定。
+- **避免循环依赖**：重新设计组件关系，采用事件驱动或延迟注入打破循环引用。
+
+## 常见问题
+
+**构造器注入与 Setter 注入如何选择？**
+
+官方推荐构造器注入用于强制依赖，Setter 注入用于可选依赖。构造器注入保证 Bean 不可变且完全初始化，Setter 注入适合后期可修改的场景。
+
+**`@Autowired` 和 `@Resource` 的区别？**
+
+`@Autowired` 按类型注入，可配合 `@Qualifier` 按名称限定；`@Resource` 默认按名称注入，找不到时再按类型匹配。
+
+**为什么字段注入不推荐？**
+
+字段注入无法声明 `final` 字段，难以编写单元测试（需要反射），且隐藏了依赖关系，不利于代码维护。
+
 ## 参考资料
 
 - [Spring 官方文档之 Core Technologies](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans)

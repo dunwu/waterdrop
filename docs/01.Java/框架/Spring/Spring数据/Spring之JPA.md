@@ -602,6 +602,20 @@ Spring Data 翻页查询总是返回 Page 对象，Page 对象提供了以下常
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/01/a7650885b15846ecad8fe1ee75ffed7f.png)
 
+## 典型应用场景
+
+- **标准化数据访问**：通过 JPA 规范统一数据访问接口，便于底层 ORM 框架替换。
+- **实体关系映射**：处理一对多、多对多等复杂实体关系，通过级联操作自动维护关联数据。
+- **分页查询**：结合 Spring Data JPA 的 `Page` 和 `Pageable` 实现高效分页。
+- **乐观锁并发控制**：通过 `@Version` 注解实现乐观锁，防止并发更新丢失。
+
+## 最佳实践
+
+- **避免 N+1 查询问题**：使用 `@EntityGraph` 或 `JOIN FETCH` 显式加载关联实体。
+- **合理使用懒加载与急加载**：默认使用懒加载，仅在确实需要时配置急加载。
+- **批量操作使用 `saveAll` 而非循环 `save`**：配合 `spring.jpa.properties.hibernate.jdbc.batch_size` 提升批量性能。
+- **生产环境禁止 `ddl-auto=update`**：避免自动 DDL 修改生产数据库结构，使用 Flyway/Liquibase 管理。
+
 ## 参考资料
 
 - [Spring 官网](https://spring.io/)

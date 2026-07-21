@@ -15,7 +15,11 @@ permalink: /pages/cf0fb821/
 
 # 深入理解 Java 方法
 
-> **方法（有的人喜欢叫函数）是一段可重用的代码段。**
+## 简介
+
+**方法（有的人喜欢叫函数）是一段可重用的代码段。** 方法是 Java 程序的基本构建块，它将一组相关的语句组织在一起，完成特定的任务。良好的方法设计是提高代码可读性、可维护性和复用性的关键。
+
+在 Java 中，方法可以定义在类或接口中，支持多种修饰符来控制访问权限、继承行为和并发特性。理解方法的各种特性和最佳实践，是编写高质量 Java 代码的基础。
 
 ## 方法的使用
 
@@ -472,6 +476,102 @@ public class MethodOverloadDemo {
 // x + y = 30
 // x + y = 3.0
 ```
+
+## 典型应用场景
+
+### 场景一：工具类方法设计
+
+设计无状态的工具类方法，使用静态方法提供通用功能：
+
+```java
+public final class StringUtils {
+    // 私有构造器防止实例化
+    private StringUtils() {}
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
+
+    public static String defaultIfEmpty(String str, String defaultValue) {
+        return isEmpty(str) ? defaultValue : str;
+    }
+}
+```
+
+### 场景二：方法重载实现灵活 API
+
+通过方法重载提供多种调用方式：
+
+```java
+public class HttpClient {
+    // 简单 GET 请求
+    public Response get(String url) {
+        return get(url, Collections.emptyMap());
+    }
+
+    // 带请求头的 GET
+    public Response get(String url, Map<String, String> headers) {
+        return get(url, headers, 30_000);  // 默认超时 30 秒
+    }
+
+    // 完整参数版本
+    public Response get(String url, Map<String, String> headers, int timeoutMs) {
+        // 实际 HTTP 请求逻辑
+    }
+}
+```
+
+### 场景三：回调与函数式编程
+
+使用 Lambda 表达式和方法引用实现灵活的回调机制：
+
+```java
+// 使用函数式接口作为方法参数
+public class EventBus {
+    public void subscribe(String topic, Consumer<Event> handler) {
+        // 注册事件处理器
+    }
+}
+
+// 使用 Lambda 回调
+eventBus.subscribe("order.created", event -> {
+    sendNotification(event);
+    updateStatistics(event);
+});
+
+// 使用方法引用简化代码
+list.sort(Comparator.comparing(Person::getAge));
+```
+
+## 最佳实践
+
+1. **方法应该短小精悍**：一个方法只做一件事，建议不超过 20 行。如果方法过长，应该拆分为多个小方法。
+2. **参数数量尽量少**：理想的方法是 0~2 个参数。超过 3 个参数时考虑封装为对象。
+3. **避免副作用**：方法要么返回结果，要么修改对象状态，不要两者兼有。
+4. **方法命名要见名知意**：使用动词或动词短语，如 `calculateTotal`、`isValid`、`toJSON`。
+5. **避免使用 null 作为返回值**：返回空集合或 Optional 而非 null，减少 NPE 风险。
+6. **慎用可变参数**：可变参数会创建数组对象，在性能敏感场景应避免。
+7. **不要忽略异常**：空的 catch 块是危险的，至少应该记录日志。
+
+## 常见问题
+
+### Q1：Java 中只有值传递吗？
+
+是的，Java 只有值传递。对于基本类型，传递的是值的副本；对于引用类型，传递的是引用的副本（地址值的拷贝）。因此在方法内修改引用类型的属性会影响原对象，但重新赋值引用变量不会影响外部引用。
+
+### Q2：方法重载和方法重写的区别？
+
+| 特性 | 重载（Overload） | 重写（Override） |
+| --- | --- | --- |
+| 位置 | 同一个类中 | 父子类之间 |
+| 参数 | 必须不同 | 必须相同 |
+| 返回值 | 可以不同 | 必须相同或为子类型 |
+| 访问修饰符 | 无限制 | 不能比父类更严格 |
+| 异常 | 无限制 | 不能抛出更多受检异常 |
+
+### Q3：为什么不建议使用 finalize() 方法？
+
+`finalize()` 方法存在多个严重问题：执行时机不确定（GC 何时运行不可预测）；性能开销大（Finalizer 线程优先级低）；可能导致对象复活；不保证一定被调用。JDK 9 已将其标记为废弃。替代方案：使用 `try-with-resources`、`AutoCloseable` 或 `java.lang.ref.Cleaner`。
 
 ## 小结
 
