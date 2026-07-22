@@ -322,6 +322,883 @@ Raft 通过比较两份日志中最后一条日志条目的日志索引和 Term 
 
 生成一次快照可能耗时过长，影响正常日志同步。可以通过使用 copy-on-write 技术避免快照过程影响正常日志同步。
 
+## 特性
+
+Raft 算法具有以下核心特性：
+
+| 特性 | 说明 |
+| --- | --- |
+| **强领导者（Strong Leader）** | 系统中所有写请求都由 Leader 处理，简化了日志复制流程 |
+| **易理解性** | 相比 Paxos，Raft 通过问题分解（选举、日志复制、安全性）使算法更易理解和实现 |
+| **容错性** | 在 `2N+1` 个节点的集群中，容忍最多 `N` 个节点故障 |
+| **强一致性** | 保证已提交的日志在所有存活节点上最终一致 |
+| **顺序性** | 日志条目严格按照顺序提交和执行，保证状态机一致性 |
+| **成员变更** | 支持在线集群成员变更，无需停机 |
+
+### Raft 安全性保证
+
+Raft 算法通过以下机制保证安全性：
+
+- **选举限制**：只有拥有最新已提交日志的节点才能当选 Leader
+- **Leader 只追加**：Leader 永远不会覆盖或删除自己的日志条目，只追加
+- **日志匹配**：如果两条日志在同一索引位置且 Term 相同，则之前的所有日志也相同
+- **状态机安全**：如果一个日志条目在某个 Term 被提交，那么后续 Term 的 Leader 必定包含该条目
+
+### Raft 与 Paxos 对比
+
+| 对比维度 | Raft | Paxos |
+| --- | --- | --- |
+| **易理解性** | 高，分解为三个子问题 | 低，理论性强 |
+| **Leader 角色** | 强 Leader，所有请求经过 Leader | Multi-Paxos 有 Leader，Basic Paxos 无 |
+| **日志复制** | 单向，Leader 到 Follower | 双向协商 |
+| **工程实现** | 成熟实现多（etcd、Consul） | 实现复杂（Chubby） |
+| **成员变更** | 内置支持 | 需要额外扩展 |
+
+## 应用场景
+
+Raft 算法因其易理解性和强一致性，被广泛应用于现代分布式系统：
+
+### 1. 服务发现与配置管理
+
+- **etcd**：CoreOS 开发的分布式键值存储，Kubernetes 的核心组件，使用 Raft 保证数据一致性
+- **Consul**：HashiCorp 的服务发现和配置工具，使用 Raft 实现强一致性
+- **Nacos**：阿里巴巴的服务发现和配置管理平台，Raft 模式下用于一致性选举
+
+### 2. 分布式数据库
+
+- **TiKV**：PingCAP 的分布式事务型键值存储，每个 Region 使用一个 Raft Group
+- **CockroachDB**：分布式的 SQL 数据库，使用 Raft 实现数据副本一致性
+- **YugabyteDB**：分布式 SQL 数据库，基于 Raft 实现强一致性
+
+### 3. 消息队列
+
+- **Kafka (KRaft 模式)**：从 2.8 版本开始，Kafka 引入 KRaft 模式，使用 Raft 替代 ZooKeeper 进行元数据管理
+- **NATS Streaming**：使用 Raft 实现集群的高可用
+
+### 4. 分布式存储
+
+- **Ceph (可选)**：部分模块可使用 Raft 进行一致性保证
+- **MinIO**：对象存储系统，使用 Raft 保证元数据一致性
+- **Longhorn**：Kubernetes 的分布式块存储，使用 Raft 管理副本
+
+### 5. 分布式协调
+
+- **SOFA-JRaft**：蚂蚁金服开源的 Java Raft 实现，用于金融级分布式系统
+- **Apache Ratis**：Apache 基金会的 Raft Java 实现
+
+## 最佳实践
+
+### 案例 1：使用 etcd 实现分布式锁
+
+以下示例展示如何使用 etcd（Raft 实现）实现分布式锁：
+
+```java
+import io.etcd.jetcd.*;
+import io.etcd.jetcd.kv.PutResponse;
+import io.etcd.jetcd.lease.LeaseGrantResponse;
+import io.etcd.jetcd.lock.LockResponse;
+import io.etcd.jetcd.options.PutOption;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 基于 etcd (Raft) 的分布式锁实现
+ * 利用 etcd 的 Lease 机制和 Raft 协议保证一致性
+ */
+public class EtcdDistributedLock {
+
+    private final Client client;
+    private final Lock lockClient;
+    private final Lease leaseClient;
+    private final KV kvClient;
+    private long leaseId;
+
+    public EtcdDistributedLock(String endpoints) {
+        this.client = Client.builder()
+            .endpoints(endpoints.split(","))
+            .build();
+        this.lockClient = client.getLockClient();
+        this.leaseClient = client.getLeaseClient();
+        this.kvClient = client.getKVClient();
+    }
+
+    /**
+     * 获取分布式锁
+     *
+     * @param lockKey   锁的 key
+     * @param ttl       租约时间（秒）
+     * @return          租约 ID，用于释放锁
+     */
+    public long acquireLock(String lockKey, long ttl) throws Exception {
+        // 1. 创建租约，TTL 为 ttl 秒
+        CompletableFuture<LeaseGrantResponse> leaseFuture =
+            leaseClient.grant(ttl);
+        LeaseGrantResponse leaseResponse = leaseFuture.get();
+        this.leaseId = leaseResponse.getID();
+
+        // 2. 使用租约获取锁
+        CompletableFuture<LockResponse> lockFuture =
+            lockClient.lock(
+                ByteSequence.from(lockKey.getBytes()),
+                leaseId
+            );
+
+        LockResponse lockResponse = lockFuture.get();
+        System.out.println("获取锁成功: " + lockKey + ", leaseId=" + leaseId);
+        return leaseId;
+    }
+
+    /**
+     * 释放分布式锁
+     *
+     * @param lockKey 锁的 key
+     * @param leaseId 租约 ID
+     */
+    public void releaseLock(String lockKey, long leaseId) throws Exception {
+        // 释放锁并撤销租约
+        lockClient.unlock(ByteSequence.from(lockKey.getBytes())).get();
+        leaseClient.revoke(leaseId).get();
+        System.out.println("释放锁成功: " + lockKey);
+    }
+
+    /**
+     * 使用锁执行临界区操作
+     */
+    public <T> T executeWithLock(String lockKey, long ttl, java.util.concurrent.Callable<T> task) throws Exception {
+        long leaseId = acquireLock(lockKey, ttl);
+        try {
+            return task.call();
+        } finally {
+            releaseLock(lockKey, leaseId);
+        }
+    }
+
+    /**
+     * 写入配置数据（通过 Raft 保证一致性）
+     */
+    public void putConfig(String key, String value) throws Exception {
+        CompletableFuture<PutResponse> future = kvClient.put(
+            ByteSequence.from(key.getBytes()),
+            ByteSequence.from(value.getBytes())
+        );
+        PutResponse response = future.get();
+        System.out.println("写入配置: " + key + "=" + value + ", revision=" + response.getHeader().getRevision());
+    }
+
+    /**
+     * 读取配置数据
+     */
+    public String getConfig(String key) throws Exception {
+        CompletableFuture<io.etcd.jetcd.kv.GetResponse> future =
+            kvClient.get(ByteSequence.from(key.getBytes()));
+        io.etcd.jetcd.kv.GetResponse response = future.get();
+        if (response.getKvs().isEmpty()) {
+            return null;
+        }
+        return response.getKvs().get(0).getValue().toString();
+    }
+
+    public void close() {
+        client.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        // 连接 etcd 集群（3 节点 Raft 集群）
+        EtcdDistributedLock distributedLock = new EtcdDistributedLock(
+            "http://etcd-node1:2379,http://etcd-node2:2379,http://etcd-node3:2379"
+        );
+
+        try {
+            // 使用分布式锁执行操作
+            String result = distributedLock.executeWithLock("order-lock-123", 30, () -> {
+                System.out.println("执行临界区操作...");
+                Thread.sleep(2000);
+                return "操作完成";
+            });
+            System.out.println(result);
+
+            // 写入和读取配置
+            distributedLock.putConfig("/config/app/database-url", "jdbc:mysql://db:3306/mydb");
+            String dbUrl = distributedLock.getConfig("/config/app/database-url");
+            System.out.println("读取到配置: " + dbUrl);
+
+        } finally {
+            distributedLock.close();
+        }
+    }
+}
+```
+
+Maven 依赖：
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>io.etcd</groupId>
+        <artifactId>jetcd-core</artifactId>
+        <version>0.7.5</version>
+    </dependency>
+</dependencies>
+```
+
+### 案例 2：etcd Raft 集群部署配置
+
+```yaml
+# etcd 集群配置文件 etcd-config.yaml
+
+# 节点名称
+name: etcd-node1
+
+# 数据存储目录
+data-dir: /var/lib/etcd
+
+# 监听客户端请求的地址
+listen-client-urls: http://0.0.0.0:2379
+
+# 对外提供服务的地址
+advertise-client-urls: http://etcd-node1:2379
+
+# 监听集群内部通信的地址
+listen-peer-urls: http://0.0.0.0:2380
+
+# 集群内部通信的对外地址
+initial-advertise-peer-urls: http://etcd-node1:2380
+
+# 初始化集群配置
+initial-cluster: etcd-node1=http://etcd-node1:2380,etcd-node2=http://etcd-node2:2380,etcd-node3=http://etcd-node3:2380
+
+# 集群 token，用于区分不同集群
+initial-cluster-token: my-etcd-cluster
+
+# 初始化集群状态：new 表示新集群，existing 表示加入已有集群
+initial-cluster-state: new
+
+# 心跳间隔（毫秒）
+heartbeat-interval: 100
+
+# 选举超时时间（毫秒）
+election-timeout: 1000
+
+# 快照保留数量
+snapshot-count: 10000
+
+# 自动压缩：保留 1 小时的历史
+auto-compaction-retention: "1"
+
+# quota-backend-bytes: 2GB
+quota-backend-bytes: 2147483648
+```
+
+Docker Compose 部署 etcd 集群：
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  etcd-node1:
+    image: quay.io/coreos/etcd:v3.5.10
+    container_name: etcd-node1
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd-node1
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd-node1:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd-node1:2380
+      - --initial-cluster=etcd-node1=http://etcd-node1:2380,etcd-node2=http://etcd-node2:2380,etcd-node3=http://etcd-node3:2380
+      - --initial-cluster-token=my-etcd-cluster
+      - --initial-cluster-state=new
+      - --heartbeat-interval=100
+      - --election-timeout=1000
+    networks:
+      - etcd-net
+
+  etcd-node2:
+    image: quay.io/coreos/etcd:v3.5.10
+    container_name: etcd-node2
+    ports:
+      - "2381:2379"
+      - "2382:2380"
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd-node2
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd-node2:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd-node2:2380
+      - --initial-cluster=etcd-node1=http://etcd-node1:2380,etcd-node2=http://etcd-node2:2380,etcd-node3=http://etcd-node3:2380
+      - --initial-cluster-token=my-etcd-cluster
+      - --initial-cluster-state=new
+    networks:
+      - etcd-net
+
+  etcd-node3:
+    image: quay.io/coreos/etcd:v3.5.10
+    container_name: etcd-node3
+    ports:
+      - "2383:2379"
+      - "2384:2380"
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd-node3
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd-node3:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd-node3:2380
+      - --initial-cluster=etcd-node1=http://etcd-node1:2380,etcd-node2=http://etcd-node2:2380,etcd-node3=http://etcd-node3:2380
+      - --initial-cluster-token=my-etcd-cluster
+      - --initial-cluster-state=new
+    networks:
+      - etcd-net
+
+networks:
+  etcd-net:
+    driver: bridge
+```
+
+### 案例 3：使用 SOFA-JRaft 实现状态机复制
+
+```java
+import com.alipay.sofa.jraft.*;
+import com.alipay.sofa.jraft.entity.*;
+import com.alipay.sofa.jraft.option.*;
+import com.alipay.sofa.jraft.rpc.*;
+import com.alipay.sofa.jraft.storage.snapshot.*;
+import com.alipay.sofa.jraft.util.*;
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+
+/**
+ * 基于 SOFA-JRaft 实现的分布式 KV 存储
+ * 演示 Raft 状态机复制的完整流程
+ */
+public class JRaftKvStore {
+
+    /**
+     * 状态机实现：维护 KV 数据
+     */
+    public static class KvStateMachine implements StateMachine {
+
+        // 内存中的 KV 存储
+        private final ConcurrentHashMap<String, String> kvStore = new ConcurrentHashMap<>();
+
+        public ConcurrentHashMap<String, String> getKvStore() {
+            return kvStore;
+        }
+
+        @Override
+        public void onApply(Iterator iterator) {
+            // 应用日志条目到状态机
+            while (iterator.hasNext()) {
+                LogEntry entry = iterator.next();
+                ByteBuffer data = entry.getData();
+                String[] parts = new String(data.array()).split(":");
+                String op = parts[0];
+                String key = parts[1];
+
+                if ("PUT".equals(op)) {
+                    String value = parts[2];
+                    kvStore.put(key, value);
+                    System.out.println("[状态机] PUT " + key + "=" + value);
+                } else if ("DELETE".equals(op)) {
+                    kvStore.remove(key);
+                    System.out.println("[状态机] DELETE " + key);
+                }
+                iterator.next();
+            }
+        }
+
+        @Override
+        public void onSaveSnapshot(SnapshotWriter writer, Closure done) {
+            // 保存快照
+            String snapshotFile = writer.getPath() + "/kv_snapshot.dat";
+            try (ObjectOutputStream oos = new ObjectOutputStream(
+                    new FileOutputStream(snapshotFile))) {
+                oos.writeObject(kvStore);
+                writer.addFile("kv_snapshot.dat");
+                done.run(Status.OK());
+            } catch (IOException e) {
+                done.run(new Status(RaftError.EIO, "保存快照失败: " + e.getMessage()));
+            }
+        }
+
+        @Override
+        public boolean onSnapshotLoad(SnapshotReader reader) {
+            // 加载快照
+            String snapshotFile = reader.getPath() + "/kv_snapshot.dat";
+            if (!new File(snapshotFile).exists()) {
+                return false;
+            }
+            try (ObjectInputStream ois = new ObjectInputStream(
+                    new FileInputStream(snapshotFile))) {
+                @SuppressWarnings("unchecked")
+                ConcurrentHashMap<String, String> loaded =
+                    (ConcurrentHashMap<String, String>) ois.readObject();
+                kvStore.clear();
+                kvStore.putAll(loaded);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        @Override
+        public void onLeaderStart(long term) {
+            System.out.println("[状态机] 成为 Leader, term=" + term);
+        }
+
+        @Override
+        public void onLeaderStop(Status status) {
+            System.out.println("[状态机] 不再是 Leader");
+        }
+    }
+
+    /**
+     * KV 操作的 Task
+     */
+    public static class KvTask implements Closure {
+        private final String operation; // PUT 或 DELETE
+        private final String key;
+        private final String value;
+        private final CountDownLatch latch;
+        private Status status;
+
+        public KvTask(String operation, String key, String value, CountDownLatch latch) {
+            this.operation = operation;
+            this.key = key;
+            this.value = value;
+            this.latch = latch;
+        }
+
+        public ByteBuffer getData() {
+            if ("PUT".equals(operation)) {
+                return ByteBuffer.wrap((operation + ":" + key + ":" + value).getBytes());
+            } else {
+                return ByteBuffer.wrap((operation + ":" + key).getBytes());
+            }
+        }
+
+        @Override
+        public void run(Status status) {
+            this.status = status;
+            latch.countDown();
+        }
+
+        public Status getStatus() { return status; }
+    }
+
+    public static void main(String[] args) throws Exception {
+        String groupId = "kv-store-group";
+        String serverAddress = "127.0.0.1:8081";
+
+        // 初始化 RPC 服务器
+        RaftRpcServer rpcServer = RaftRpcServerFactory.createRaftRpcServer(serverAddress);
+
+        // 状态机
+        KvStateMachine stateMachine = new KvStateMachine();
+
+        // 节点选项
+        NodeOptions nodeOptions = new NodeOptions();
+        nodeOptions.setFsm(stateMachine);
+        nodeOptions.setLogUri("./raft/log");
+        nodeOptions.setRaftMetaUri("./raft/meta");
+        nodeOptions.setSnapshotUri("./raft/snapshot");
+        nodeOptions.setSnapshotIntervalSecs(3600); // 每小时做一次快照
+
+        // 集群配置
+        Configuration conf = new Configuration();
+        conf.addPeer(new PeerId("127.0.0.1", 8081));
+        nodeOptions.setInitialConf(conf);
+
+        // 启动节点
+        RpcServer rpcServerImpl = new GrpcRpcServer(serverAddress);
+        NodeManager.getInstance().addAddress(new Endpoint("127.0.0.1", 8081));
+        RaftGroupService raftGroupService = new RaftGroupService(
+            groupId, nodeOptions, rpcServerImpl);
+        Node node = raftGroupService.start();
+
+        // 等待选举完成
+        Thread.sleep(3000);
+
+        // 提交操作
+        CountDownLatch latch1 = new CountDownLatch(1);
+        KvTask putTask = new KvTask("PUT", "name", "Raft-User", latch1);
+        node.apply(putTask);
+        latch1.await();
+        System.out.println("PUT 操作结果: " + putTask.getStatus());
+
+        // 读取数据
+        System.out.println("当前 KV 存储: " + stateMachine.getKvStore());
+
+        // 关闭
+        node.shutdown();
+        rpcServerImpl.shutdown();
+    }
+}
+```
+
+Maven 依赖：
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.alipay.sofa</groupId>
+        <artifactId>jraft-core</artifactId>
+        <version>1.3.13</version>
+    </dependency>
+</dependencies>
+```
+
+## 常见问题
+
+### 问题 1：脑裂导致数据不一致
+
+**问题描述**：在网络分区的情况下，集群分裂为多个子集群，每个子集群可能选举出各自的 Leader，导致数据不一致。
+
+**原因分析**：
+
+假设 5 节点集群发生网络分区：
+- 分区 A：节点 S1、S2（2 个节点，不足多数派）
+- 分区 B：节点 S3、S4、S5（3 个节点，形成多数派）
+
+分区 A 中的节点无法选出 Leader（因为没有多数派），不会处理写请求。分区 B 可以选出 Leader 并正常处理请求。网络恢复后，分区 A 的节点会通过日志同步追上最新数据。
+
+但如果错误配置导致分区 A 也认为自己是多数派（如错误的 `initial-cluster` 配置），就会产生脑裂。
+
+**解决方案**：确保集群配置正确，Raft 的多数派机制天然防止脑裂。
+
+```java
+import java.util.*;
+
+/**
+ * Raft 脑裂防护演示
+ * 验证网络分区时只有多数派分区能正常工作
+ */
+public class RaftSplitBrainPrevention {
+
+    /**
+     * 模拟 Raft 集群
+     */
+    static class RaftNode {
+        String id;
+        String state = "Follower"; // Leader / Follower / Candidate
+        int term = 0;
+        Set<String> reachablePeers = new HashSet<>();
+
+        RaftNode(String id) {
+            this.id = id;
+        }
+
+        /**
+         * 尝试发起选举
+         */
+        boolean tryStartElection() {
+            // Raft 选举需要多数派支持
+            int voteCount = 1; // 投自己
+            for (String peer : reachablePeers) {
+                voteCount++; // 假设可达的 peer 都投票
+            }
+            int majority = (5 / 2) + 1; // 5 节点集群，多数派 = 3
+            if (voteCount >= majority) {
+                this.state = "Leader";
+                this.term++;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public static void main(String[] args) {
+        List<RaftNode> cluster = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            cluster.add(new RaftNode("S" + i));
+        }
+
+        // 模拟网络分区: {S1, S2} 和 {S3, S4, S5}
+        cluster.get(0).reachablePeers.add("S2");  // S1 可达 S2
+        cluster.get(1).reachablePeers.add("S1");  // S2 可达 S1
+
+        cluster.get(2).reachablePeers.addAll(Arrays.asList("S4", "S5")); // S3 可达 S4, S5
+        cluster.get(3).reachablePeers.addAll(Arrays.asList("S3", "S5")); // S4 可达 S3, S5
+        cluster.get(4).reachablePeers.addAll(Arrays.asList("S3", "S4")); // S5 可达 S3, S4
+
+        System.out.println("=== 网络分区后的选举结果 ===");
+        for (RaftNode node : cluster) {
+            boolean elected = node.tryStartElection();
+            System.out.println(node.id + ": 可达节点数=" + node.reachablePeers.size() +
+                ", 选举结果=" + (elected ? "成为 Leader (term=" + node.term + ")" : "无法选举"));
+        }
+        // 输出：
+        // S1: 可达节点数=1, 选举结果=无法选举 (只有2票，不足多数派)
+        // S2: 可达节点数=1, 选举结果=无法选举 (只有2票，不足多数派)
+        // S3: 可达节点数=2, 选举结果=成为 Leader (3票，满足多数派)
+        // S4: 可达节点数=2, 选举结果=成为 Leader (3票，满足多数派)
+        // S5: 可达节点数=2, 选举结果=成为 Leader (3票，满足多数派)
+        // 注意：实际 Raft 中，同一 term 只会有一个 Leader
+        System.out.println("\n结论: 分区 {S1, S2} 无法选举 Leader，不会产生脑裂");
+    }
+}
+```
+
+### 问题 2：选举超时配置不当导致频繁选举
+
+**问题描述**：集群 Leader 频繁切换，导致服务不稳定，写请求频繁失败。
+
+**原因分析**：
+
+选举超时时间（`election-timeout`）配置过小，会导致：
+1. 网络稍有延迟，Follower 就认为 Leader 宕机，发起选举
+2. 多个 Follower 同时超时，同时发起选举，导致选票瓜分
+3. 新选举的 Leader 还没来得及稳定，又触发下一轮选举
+
+**解决方案**：合理配置选举超时时间和心跳间隔。
+
+```java
+/**
+ * Raft 选举超时时间配置建议
+ */
+public class RaftTimeoutConfig {
+
+    /**
+     * 计算推荐的选举超时时间
+     *
+     * @param heartbeatInterval 心跳间隔（毫秒）
+     * @param networkLatency    网络平均延迟（毫秒）
+     * @return 推荐的选举超时时间范围（毫秒）
+     */
+    public static long[] recommendElectionTimeout(long heartbeatInterval, long networkLatency) {
+        // 选举超时应该至少是心跳间隔的 10 倍
+        long minTimeout = heartbeatInterval * 10;
+        // 考虑网络延迟：超时时间应远大于网络延迟
+        long latencyBasedTimeout = networkLatency * 5;
+        long baseTimeout = Math.max(minTimeout, latencyBasedTimeout);
+
+        // 随机化范围：baseTimeout ~ baseTimeout * 2
+        return new long[]{baseTimeout, baseTimeout * 2};
+    }
+
+    public static void main(String[] args) {
+        // 典型的 LAN 环境
+        long[] lanTimeout = recommendElectionTimeout(50, 1);
+        System.out.println("LAN 环境推荐选举超时: " + lanTimeout[0] + "ms ~ " + lanTimeout[1] + "ms");
+
+        // 典型的 WAN 跨数据中心环境
+        long[] wanTimeout = recommendElectionTimeout(100, 50);
+        System.out.println("WAN 环境推荐选举超时: " + wanTimeout[0] + "ms ~ " + wanTimeout[1] + "ms");
+
+        // 最佳实践配置表
+        System.out.println("\n=== Raft 超时时间配置建议 ===");
+        System.out.println("| 环境          | 心跳间隔 | 选举超时范围       |");
+        System.out.println("|---------------|----------|-------------------|");
+        System.out.println("| LAN (低延迟)  | 50ms     | 500ms ~ 1000ms    |");
+        System.out.println("| WAN (跨机房)  | 100ms    | 1000ms ~ 2000ms   |");
+        System.out.println("| 云环境 (中等) | 100ms    | 1000ms ~ 3000ms   |");
+    }
+}
+```
+
+etcd 推荐配置：
+
+```yaml
+# etcd 推荐的超时配置
+
+# 心跳间隔：LAN 环境用 50-100ms，WAN 环境用 100-200ms
+heartbeat-interval: 100
+
+# 选举超时：至少是心跳间隔的 10 倍
+election-timeout: 1000
+
+# 快照触发阈值：根据写入量调整
+snapshot-count: 10000
+
+# 写请求超时
+# (在客户端代码中配置)
+```
+
+### 问题 3：日志无限增长导致磁盘耗尽
+
+**问题描述**：长时间运行的 Raft 集群，日志不断增长，最终导致磁盘空间耗尽，节点无法启动。
+
+**原因分析**：
+
+Raft 算法本身不会自动清理日志。如果不配置快照机制，所有已提交的日志条目都会保留在磁盘上。对于高频写入的系统，日志增长非常快。
+
+**解决方案**：配置快照机制，定期对已提交的日志做快照，清理旧日志。
+
+```java
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * Raft 日志压缩和快照管理示例
+ * 演示如何通过快照机制控制日志增长
+ */
+public class RaftLogCompaction {
+
+    // 已提交的日志条目
+    private final List<LogEntry> logEntries = new CopyOnWriteArrayList<>();
+    // 最后一次快照包含的日志索引
+    private final AtomicLong lastSnapshotIndex = new AtomicLong(0);
+    // 快照存储路径
+    private final String snapshotDir;
+    // 快照触发阈值
+    private final long snapshotThreshold;
+
+    public RaftLogCompaction(String snapshotDir, long snapshotThreshold) {
+        this.snapshotDir = snapshotDir;
+        this.snapshotThreshold = snapshotThreshold;
+        new File(snapshotDir).mkdirs();
+    }
+
+    /**
+     * 日志条目
+     */
+    static class LogEntry implements Serializable {
+        final long index;
+        final long term;
+        final String command;
+
+        LogEntry(long index, long term, String command) {
+            this.index = index;
+            this.term = term;
+            this.command = command;
+        }
+    }
+
+    /**
+     * 应用日志到状态机后的数据
+     */
+    private final ConcurrentHashMap<String, String> stateMachine = new ConcurrentHashMap<>();
+
+    /**
+     * 添加日志条目
+     */
+    public void appendLog(long term, String command) {
+        long index = logEntries.size();
+        LogEntry entry = new LogEntry(index, term, command);
+        logEntries.add(entry);
+
+        // 应用到状态机
+        String[] parts = command.split(":");
+        if ("PUT".equals(parts[0])) {
+            stateMachine.put(parts[1], parts[2]);
+        }
+
+        // 检查是否需要做快照
+        if (logEntries.size() - lastSnapshotIndex.get() >= snapshotThreshold) {
+            takeSnapshot();
+        }
+    }
+
+    /**
+     * 创建快照并清理旧日志
+     */
+    public synchronized void takeSnapshot() {
+        long snapshotIndex = logEntries.size() - 1;
+        if (snapshotIndex <= lastSnapshotIndex.get()) {
+            return;
+        }
+
+        String snapshotFile = snapshotDir + "/snapshot_" + snapshotIndex + ".dat";
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(snapshotFile))) {
+            // 保存状态机数据
+            oos.writeObject(new HashMap<>(stateMachine));
+            oos.writeLong(snapshotIndex);
+
+            // 清理已快照的日志
+            int removeCount = (int) (snapshotIndex - lastSnapshotIndex.get());
+            for (int i = 0; i < removeCount && !logEntries.isEmpty(); i++) {
+                logEntries.remove(0);
+            }
+
+            lastSnapshotIndex.set(snapshotIndex);
+            System.out.println("快照已创建: " + snapshotFile +
+                ", 清理日志条目数: " + removeCount +
+                ", 剩余日志: " + logEntries.size());
+        } catch (IOException e) {
+            System.err.println("快照创建失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 从快照恢复
+     */
+    @SuppressWarnings("unchecked")
+    public void loadFromSnapshot(String snapshotFile) throws Exception {
+        try (ObjectInputStream ois = new ObjectInputStream(
+                new FileInputStream(snapshotFile))) {
+            Map<String, String> loaded = (Map<String, String>) ois.readObject();
+            long snapshotIndex = ois.readLong();
+
+            stateMachine.clear();
+            stateMachine.putAll(loaded);
+            lastSnapshotIndex.set(snapshotIndex);
+            logEntries.clear();
+
+            System.out.println("从快照恢复成功: " + snapshotFile +
+                ", 状态机大小: " + stateMachine.size());
+        }
+    }
+
+    public void printStatus() {
+        System.out.println("=== Raft 日志状态 ===");
+        System.out.println("日志条目数: " + logEntries.size());
+        System.out.println("状态机大小: " + stateMachine.size());
+        System.out.println("最后快照索引: " + lastSnapshotIndex.get());
+
+        // 计算磁盘使用
+        File dir = new File(snapshotDir);
+        long totalSize = 0;
+        if (dir.exists()) {
+            for (File f : dir.listFiles()) {
+                totalSize += f.length();
+            }
+        }
+        System.out.println("快照磁盘占用: " + (totalSize / 1024) + " KB");
+    }
+
+    public static void main(String[] args) throws Exception {
+        // 每 1000 条日志做一次快照
+        RaftLogCompaction raft = new RaftLogCompaction("./raft-snapshots", 1000);
+
+        // 模拟写入 5000 条日志
+        System.out.println("写入 5000 条日志...");
+        for (int i = 0; i < 5000; i++) {
+            raft.appendLog(1, "PUT:key" + i + ":value" + i);
+        }
+
+        raft.printStatus();
+        // 输出：日志条目数约为 1000（已清理 4000），快照已创建
+
+        // 从最新快照恢复
+        File snapshotDir = new File("./raft-snapshots");
+        File[] snapshots = snapshotDir.listFiles((d, name) -> name.startsWith("snapshot_"));
+        if (snapshots != null && snapshots.length > 0) {
+            Arrays.sort(snapshots, Comparator.comparing(File::getName).reversed());
+            raft.loadFromSnapshot(snapshots[0].getAbsolutePath());
+            raft.printStatus();
+        }
+    }
+}
+```
+
 > 说明：本文仅阐述 Raft 算法的核心内容，不包括算法论证、评估等
 
 ## 参考资料

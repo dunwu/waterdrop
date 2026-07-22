@@ -47,40 +47,40 @@ index: false
 
 ### 数据库综合
 
-- [Nosql 技术选型](数据库综合/Nosql技术选型.md)
-- [数据结构与数据库索引](数据库综合/数据结构与数据库索引.md)
+- [Nosql 技术选型](数据库综合/Nosql技术选型.md) - 关键词：`NoSQL`、`列式数据库`、`K-V数据库`、`文档数据库`、`图数据库`、`全文搜索引擎`、`ACID`、`技术选型`
+- [数据结构与数据库索引](数据库综合/数据结构与数据库索引.md) - 关键词：`B+树`、`LSM树`、`倒排索引`、`哈希索引`、`聚簇索引`、`数组`、`链表`、`磁盘I/O`
 
 ### 数据库中间件
 
-- [ShardingSphere](数据库中间件/ShardingSphere.md)
-- [Flyway](数据库中间件/Flyway.md)
+- [ShardingSphere](数据库中间件/ShardingSphere.md) - 关键词：`ShardingSphere`、`分库分表`、`数据分片`、`读写分离`、`分布式事务`、`SQL解析`、`Sharding-JDBC`、`Sharding-Proxy`
+- [Flyway](数据库中间件/Flyway.md) - 关键词：`Flyway`、`数据迁移`、`Migration`、`版本管理`、`Schema`、`DDL`、`CI/CD`、`Callbacks`
 
 ### 关系型数据库
 
 > [关系型数据库](关系型数据库) 整理主流关系型数据库知识点。
 
-- [关系数据库简介](关系型数据库/关系数据库简介.md)
-- [SQL](关系型数据库/SQL.md)
-- [PostgreSQL](关系型数据库/PostgreSQL.md)
-- [H2](关系型数据库/H2.md)
-- [SqLite](关系型数据库/SqLite.md)
+- [关系数据库简介](关系型数据库/关系数据库简介.md) - 关键词：`关系型数据库`、`SQL`、`范式`、`ER图`、`函数依赖`、`数据模型`、`主键`、`反范式`
+- [SQL](关系型数据库/SQL.md) - 关键词：`SQL`、`CRUD`、`JOIN`、`事务`、`索引`、`存储过程`、`触发器`、`DDL`
+- [PostgreSQL](关系型数据库/PostgreSQL.md) - 关键词：`PostgreSQL`、`psql`、`RDBMS`、`数据库安装`、`SQL`、`备份恢复`、`用户管理`
+- [H2](关系型数据库/H2.md) - 关键词：`H2`、`嵌入式数据库`、`内存模式`、`JDBC`、`兼容模式`、`Spring`、`集群`、`单元测试`
+- [SqLite](关系型数据库/SqLite.md) - 关键词：`SQLite`、`嵌入式`、`轻量级`、`无服务器`、`动态类型`、`ACID`、`亲和类型`、`跨平台`
 
 #### [MySQL](关系型数据库/MySQL)
 
-- [MySQL 概述](关系型数据库/MySQL/MySQL_概述.md)
-- [MySQL 建模](关系型数据库/MySQL/MySQL_建模.md)
-- [MySQL CRUD](关系型数据库/MySQL/MySQL_CRUD.md)
-- [MySQL 存储](关系型数据库/MySQL/MySQL_存储.md)
-- [MySQL 索引](关系型数据库/MySQL/MySQL_索引.md)
-- [MySQL 事务](关系型数据库/MySQL/MySQL_事务.md)
-- [MySQL 锁](关系型数据库/MySQL/MySQL_锁.md)
-- [MySQL 复制](关系型数据库/MySQL/MySQL_复制.md)
-- [MySQL 架构](关系型数据库/MySQL/MySQL_架构.md)
-- [MySQL 优化](关系型数据库/MySQL/MySQL_优化.md)
-- [MySQL 运维](关系型数据库/MySQL/MySQL_运维.md)
-- [MySQL 面试](关系型数据库/MySQL/MySQL_面试.md) 💯
-- [MySQL 面试之索引篇](关系型数据库/MySQL/MySQL_面试_索引.md) 💯
-- [MySQL 面试之事务和锁篇](关系型数据库/MySQL/MySQL_面试_事务和锁.md) 💯
+- [MySQL 概述](关系型数据库/MySQL/[MySQL]概述.md) - 关键词：`MySQL`、`关系型数据库`、`RDBMS`、`InnoDB`、`存储引擎`、`OLTP`、`OLAP`、`DBMS`
+- [MySQL 建模](关系型数据库/MySQL/[MySQL]建模.md) - 关键词：`数据类型`、`VARCHAR`、`CHAR`、`DECIMAL`、`BIGINT`、`DATETIME`、`TIMESTAMP`、`utf8mb4`
+- [MySQL CRUD](关系型数据库/MySQL/[MySQL]CRUD.md) - 关键词：`CRUD`、`DDL`、`INSERT`、`SELECT`、`UPDATE`、`DELETE`、`约束`、`索引管理`
+- [MySQL 存储](关系型数据库/MySQL/[MySQL]存储.md) - 关键词：`InnoDB`、`MyISAM`、`存储引擎`、`Buffer Pool`、`聚簇索引`、`Change Buffer`、`表空间`、`redo log`
+- [MySQL 索引](关系型数据库/MySQL/[MySQL]索引.md) - 关键词：`B+Tree索引`、`聚簇索引`、`覆盖索引`、`最左匹配`、`Hash索引`、`前缀索引`、`联合索引`、`索引失效`
+- [MySQL 事务](关系型数据库/MySQL/[MySQL]事务.md) - 关键词：`ACID`、`MVCC`、`事务隔离级别`、`可重复读`、`ReadView`、`UndoLog`、`幻读`、`分布式事务`
+- [MySQL 锁](关系型数据库/MySQL/[MySQL]锁.md) - 关键词：`行锁`、`间隙锁`、`Next-Key Lock`、`死锁`、`悲观锁`、`乐观锁`、`共享锁`、`独享锁`
+- [MySQL 复制](关系型数据库/MySQL/[MySQL]复制.md) - 关键词：`主从复制`、`binlog`、`读写分离`、`relay log`、`主备配置`、`数据同步`、`高可用`、`slave`
+- [MySQL 架构](关系型数据库/MySQL/[MySQL]架构.md) - 关键词：`Server层`、`存储引擎`、`redo log`、`binlog`、`WAL`、`两阶段提交`、`优化器`、`执行器`
+- [MySQL 优化](关系型数据库/MySQL/[MySQL]优化.md) - 关键词：`EXPLAIN`、`慢查询`、`索引优化`、`SQL优化`、`覆盖索引`、`分页优化`、`JOIN优化`、`执行计划`
+- [MySQL 运维](关系型数据库/MySQL/[MySQL]运维.md) - 关键词：`mysqldump`、`用户管理`、`主从部署`、`my.cnf`、`慢查询`、`max_connections`、`Buffer Pool`、`备份恢复`
+- [MySQL 面试](关系型数据库/MySQL/[MySQL]面试.md) 💯
+- [MySQL 面试之索引篇](关系型数据库/MySQL/[MySQL]面试之索引篇.md) 💯
+- [MySQL 面试之事务和锁篇](关系型数据库/MySQL/[MySQL]面试之事务和锁篇.md) 💯
 
 ### 文档数据库
 
@@ -92,38 +92,38 @@ index: false
 >
 > MongoDB 最大的特点是它支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引。
 
-- [MongoDB 概述](文档数据库/MongoDB/MongoDB_概述.md)
-- [MongoDB CRUD](文档数据库/MongoDB/MongoDB_CRUD.md)
-- [MongoDB 聚合](文档数据库/MongoDB/MongoDB_聚合.md)
-- [MongoDB 索引](文档数据库/MongoDB/MongoDB_索引.md)
-- [MongoDB 事务](文档数据库/MongoDB/MongoDB_事务.md)
-- [MongoDB 建模](文档数据库/MongoDB/MongoDB_建模.md)
-- [MongoDB 复制](文档数据库/MongoDB/MongoDB_复制.md)
-- [MongoDB 分片](文档数据库/MongoDB/MongoDB_分片.md)
-- [MongoDB 运维](文档数据库/MongoDB/MongoDB_运维.md)
-- [MongoDB 面试](文档数据库/MongoDB/MongoDB_面试.md) 💯
+- [MongoDB 概述](文档数据库/MongoDB/[MongoDB]概述.md) - 关键词：`BSON`、`文档模型`、`NoSQL`、`面向文档`、`集合`、`副本集`、`分片`、`无模式`
+- [MongoDB CRUD](文档数据库/MongoDB/[MongoDB]CRUD.md) - 关键词：`insertOne`、`find`、`updateOne`、`deleteOne`、`bulkWrite`、`upsert`、`原子性`、`ObjectId`
+- [MongoDB 聚合](文档数据库/MongoDB/[MongoDB]聚合.md) - 关键词：`聚合管道`、`$match`、`$group`、`$project`、`Map-Reduce`、`$lookup`、`管道优化`、`$sort`
+- [MongoDB 索引](文档数据库/MongoDB/[MongoDB]索引.md) - 关键词：`B-tree`、`复合索引`、`多键索引`、`文本索引`、`地理空间索引`、`ESR规则`、`createIndex`、`查询性能`
+- [MongoDB 事务](文档数据库/MongoDB/[MongoDB]事务.md) - 关键词：`ACID事务`、`多文档事务`、`读关注`、`写关注`、`分布式事务`、`快照隔离`、`majority`、`ClientSession`
+- [MongoDB 建模](文档数据库/MongoDB/[MongoDB]建模.md) - 关键词：`嵌入式文档`、`引用式`、`一对多关系`、`树形结构`、`实体化路径`、`子集模式`、`反规范化`、`文档大小`
+- [MongoDB 复制](文档数据库/MongoDB/[MongoDB]复制.md) - 关键词：`副本集`、`主节点`、`从节点`、`oplog`、`故障转移`、`读取偏好`、`仲裁节点`、`复制延迟`
+- [MongoDB 分片](文档数据库/MongoDB/[MongoDB]分片.md) - 关键词：`分片键`、`mongos`、`配置服务器`、`哈希分片`、`范围分片`、`负载均衡`、`chunk`、`区域`
+- [MongoDB 运维](文档数据库/MongoDB/[MongoDB]运维.md) - 关键词：`mongodump`、`mongorestore`、`mongoimport`、`mongoexport`、`WiredTiger`、`认证`、`profiling`、`mongod`
+- [MongoDB 面试](文档数据库/MongoDB/[MongoDB]面试.md) 💯
 
 ### KV 数据库
 
 #### [Redis](KV数据库/Redis)
 
-- [Redis 基本数据类型](KV数据库/Redis/Redis_数据类型.md) - 关键词：`String`、`Hash`、`List`、`Set`、`Zset`
-- [Redis 高级数据类型](KV数据库/Redis/Redis_数据类型二.md) - 关键词：`BitMap`、`HyperLogLog`、`Geo`、`Stream`
-- [Redis 数据结构](KV数据库/Redis/Redis_数据结构.md) - 关键词：`对象`、`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`
-- [Redis 内存管理](KV数据库/Redis/Redis_内存管理.md) - 关键词：`定时删除`、`惰性删除`、`定期删除`、`LRU`、`LFU`
-- [Redis 持久化](KV数据库/Redis/Redis_持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
-- [Redis 事件](KV数据库/Redis/Redis_事件.md) - 关键词：`文件事件`、`时间事件`
-- [Redis 复制](KV数据库/Redis/Redis_复制.md) - 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`命令传播`、`心跳`
-- [Redis 哨兵](KV数据库/Redis/Redis_哨兵.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`Raft`
-- [Redis 集群](KV数据库/Redis/Redis_集群.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`分区`、`Raft`、`Gossip`
-- [Redis 订阅](KV数据库/Redis/Redis_订阅.md) - 关键词：`订阅`、`SUBSCRIBE`、`PSUBSCRIBE`、`PUBLISH`、`观察者模式`
-- [Redis 独立功能](KV数据库/Redis/Redis_事务.md) - 关键词：`事务`、`ACID`、`MULTI`、`EXEC`、`DISCARD`、`WATCH`
-- [Redis 管道](KV数据库/Redis/Redis_管道.md) - 关键词：`Pipeline`
-- [Redis 脚本](KV数据库/Redis/Redis_脚本.md) - 关键词：`Lua`
-- [Redis 运维](KV数据库/Redis/Redis_运维.md) - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
-- [Redis 实战](KV数据库/Redis/Redis_实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
-- [Redis 面试](KV数据库/Redis/Redis_面试.md) 💯
-- [Redis 面试之应用篇](KV数据库/Redis/Redis_面试_应用.md) 💯
+- [Redis 基本数据类型](KV数据库/Redis/[Redis]数据类型.md) - 关键词：`String`、`Hash`、`List`、`Set`、`Zset`
+- [Redis 高级数据类型](KV数据库/Redis/[Redis]数据类型二.md) - 关键词：`BitMap`、`HyperLogLog`、`Geo`、`Stream`
+- [Redis 数据结构](KV数据库/Redis/[Redis]数据结构.md) - 关键词：`对象`、`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`
+- [Redis 内存管理](KV数据库/Redis/[Redis]内存管理.md) - 关键词：`定时删除`、`惰性删除`、`定期删除`、`LRU`、`LFU`
+- [Redis 持久化](KV数据库/Redis/[Redis]持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
+- [Redis 事件](KV数据库/Redis/[Redis]事件.md) - 关键词：`文件事件`、`时间事件`
+- [Redis 复制](KV数据库/Redis/[Redis]复制.md) - 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`命令传播`、`心跳`
+- [Redis 哨兵](KV数据库/Redis/[Redis]哨兵.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`Raft`
+- [Redis 集群](KV数据库/Redis/[Redis]集群.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`分区`、`Raft`、`Gossip`
+- [Redis 订阅](KV数据库/Redis/[Redis]订阅.md) - 关键词：`订阅`、`SUBSCRIBE`、`PSUBSCRIBE`、`PUBLISH`、`观察者模式`
+- [Redis 独立功能](KV数据库/Redis/[Redis]事务.md) - 关键词：`事务`、`ACID`、`MULTI`、`EXEC`、`DISCARD`、`WATCH`
+- [Redis 管道](KV数据库/Redis/[Redis]管道.md) - 关键词：`Pipeline`
+- [Redis 脚本](KV数据库/Redis/[Redis]脚本.md) - 关键词：`Lua`
+- [Redis 运维](KV数据库/Redis/[Redis]运维.md) - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`
+- [Redis 实战](KV数据库/Redis/[Redis]实战.md) - 关键词：`缓存`、`分布式锁`、`布隆过滤器`
+- [Redis 面试](KV数据库/Redis/[Redis]面试.md) 💯
+- [Redis 面试之应用篇](KV数据库/Redis/[Redis]面试之应用篇.md) 💯
 
 #### [Memcached](KV数据库/Memcached.md)
 
@@ -131,17 +131,17 @@ index: false
 
 #### HBase
 
-- [HBase 快速入门](列式数据库/HBase/HBase_快速入门.md)
-- [HBase 数据模型](列式数据库/HBase/HBase_数据模型.md)
-- [HBase Schema 设计](列式数据库/HBase/HBase_Schema.md)
-- [HBase 架构](列式数据库/HBase/HBase_架构.md)
-- [HBase Java API 基础特性](列式数据库/HBase/HBase_API_基础特性.md)
-- [HBase Java API 高级特性](列式数据库/HBase/HBase_API_高级特性.md)
-- [HBase Java API 高级特性之过滤器](列式数据库/HBase/HBase_API_高级特性_过滤器.md)
-- [HBase Java API 高级特性之协处理器](列式数据库/HBase/HBase_API_高级特性_协处理器.md)
-- [HBase 运维](列式数据库/HBase/HBase_运维.md)
-- [HBase 命令](列式数据库/HBase/HBase_命令.md)
-- [HBase 面试](列式数据库/HBase/HBase_面试.md) 💯
+- [HBase 快速入门](列式数据库/HBase/[HBase]快速入门.md) - 关键词：`HDFS`、`列式数据库`、`Row Key`、`Column Family`、`Cell`、`随机访问`、`Bigtable`、`Hadoop`
+- [HBase 数据模型](列式数据库/HBase/[HBase]数据模型.md) - 关键词：`Row Key`、`Column Family`、`Column Qualifier`、`Region`、`Timestamp`、`多版本`、`字典序`、`稀疏性`
+- [HBase Schema 设计](列式数据库/HBase/[HBase]Schema.md) - 关键词：`Row Key设计`、`热点问题`、`加盐`、`哈希`、`反转`、`Column Family`、`TTL`、`Version`
+- [HBase 架构](列式数据库/HBase/[HBase]架构.md) - 关键词：`Region`、`RegionServer`、`Master`、`WAL`、`MemStore`、`HFile`、`ZooKeeper`、`Compaction`
+- [HBase Java API 基础特性](列式数据库/HBase/[HBase]API基础特性.md) - 关键词：`HBaseClient`、`Connection`、`Table`、`Put`、`Get`、`Scan`、`Delete`、`ResultScanner`
+- [HBase Java API 高级特性](列式数据库/HBase/[HBase]API高级特性.md) - 关键词：`计数器`、`incr`、`CAS`、`原子操作`、`BulkLoad`、`Coprocessor`、`RegionServer`、`RPC`
+- [HBase Java API 高级特性之过滤器](列式数据库/HBase/[HBase]API高级特性之过滤器.md) - 关键词：`Filter`、`CompareFilter`、`RowFilter`、`ValueFilter`、`SingleColumnValueFilter`、`FilterList`、`谓词下推`、`PageFilter`
+- [HBase Java API 高级特性之协处理器](列式数据库/HBase/[HBase]API高级特性之协处理器.md) - 关键词：`Coprocessor`、`Observer`、`Endpoint`、`二级索引`、`RegionServer`、`服务端计算`、`权限控制`、`数据聚合`
+- [HBase 运维](列式数据库/HBase/[HBase]运维.md) - 关键词：`hbase-site.xml`、`RegionServer`、`分布式部署`、`ZooKeeper`、`HDFS`、`Compaction`、`MemStore`、`集群配置`
+- [HBase 命令](列式数据库/HBase/[HBase]命令.md) - 关键词：`HBase Shell`、`create`、`put`、`scan`、`get`、`delete`、`disable`、`drop`
+- [HBase 面试](列式数据库/HBase/[HBase]面试.md) 💯
 
 ### 搜索引擎数据库
 
@@ -149,28 +149,28 @@ index: false
 
 > Elasticsearch 是一个基于 Lucene 的搜索和数据分析工具，它提供了一个分布式服务。Elasticsearch 是遵从 Apache 开源条款的一款开源产品，是当前主流的企业级搜索引擎。
 
-- [Elasticsearch 概述](搜索引擎数据库/Elasticsearch/Elasticsearch_概述.md)
-- [Elasticsearch 建模](搜索引擎数据库/Elasticsearch/Elasticsearch_建模.md)
-- [Elasticsearch CRUD](搜索引擎数据库/Elasticsearch/Elasticsearch_CRUD.md)
-- [Elasticsearch 存储](搜索引擎数据库/Elasticsearch/Elasticsearch_存储.md)
-- [Elasticsearch 检索（上）](搜索引擎数据库/Elasticsearch/Elasticsearch_检索上.md)
-- [Elasticsearch 检索（下）](搜索引擎数据库/Elasticsearch/Elasticsearch_检索下.md)
-- [Elasticsearch 聚合](搜索引擎数据库/Elasticsearch/Elasticsearch_聚合.md)
-- [Elasticsearch 分析](搜索引擎数据库/Elasticsearch/Elasticsearch_分析.md)
-- [Elasticsearch 集群](搜索引擎数据库/Elasticsearch/Elasticsearch_集群.md)
-- [Elasticsearch 架构](搜索引擎数据库/Elasticsearch/Elasticsearch_架构.md)
-- [Elasticsearch 优化](搜索引擎数据库/Elasticsearch/Elasticsearch_优化.md)
-- [Elasticsearch 运维](搜索引擎数据库/Elasticsearch/Elasticsearch_运维.md)
-- [Elasticsearch API](搜索引擎数据库/Elasticsearch/Elasticsearch_API.md)
-- [ElasticSearch API 之 High Level REST Client](搜索引擎数据库/Elasticsearch/Elasticsearch_API_HighLevelRest.md)
-- [Elasticsearch 面试](搜索引擎数据库/Elasticsearch/Elasticsearch_面试.md) 💯
+- [Elasticsearch 概述](搜索引擎数据库/Elasticsearch/[Elasticsearch]概述.md) - 关键词：`Lucene`、`倒排索引`、`分布式`、`全文搜索`、`Elastic Stack`、`Logstash`、`Kibana`、`近实时`
+- [Elasticsearch 建模](搜索引擎数据库/Elasticsearch/[Elasticsearch]建模.md) - 关键词：`Mapping`、`动态映射`、`静态映射`、`数据类型`、`动态模板`、`运行时字段`、`嵌套类型`、`元数据字段`
+- [Elasticsearch CRUD](搜索引擎数据库/Elasticsearch/[Elasticsearch]CRUD.md) - 关键词：`Index API`、`Bulk API`、`Update API`、`Delete API`、`Multi Get`、`文档版本控制`、`批量操作`、`Refresh策略`
+- [Elasticsearch 存储](搜索引擎数据库/Elasticsearch/[Elasticsearch]存储.md) - 关键词：`倒排索引`、`正排索引`、`Shard`、`Segment`、`Index Setting`、`分词器`、`doc_values`、`逻辑存储`
+- [Elasticsearch 检索（上）](搜索引擎数据库/Elasticsearch/[Elasticsearch]检索上.md) - 关键词：`_search API`、`分页`、`排序`、`深分页`、`search_after`、`高亮`、`filter`、`相关性评分`
+- [Elasticsearch 检索（下）](搜索引擎数据库/Elasticsearch/[Elasticsearch]检索下.md) - 关键词：`Query DSL`、`全文查询`、`词项查询`、`bool查询`、`function_score`、`Suggester`、`多字段查询`、`模糊匹配`
+- [Elasticsearch 聚合](搜索引擎数据库/Elasticsearch/[Elasticsearch]聚合.md) - 关键词：`Bucket聚合`、`Metric聚合`、`Pipeline聚合`、`terms聚合`、`date_histogram`、`子聚合`、`cardinality`、`聚合精度`
+- [Elasticsearch 分析](搜索引擎数据库/Elasticsearch/[Elasticsearch]分析.md) - 关键词：`Analyzer`、`Tokenizer`、`Token Filter`、`Character Filter`、`中文分词`、`IK分词器`、`同义词`、`停用词`
+- [Elasticsearch 集群](搜索引擎数据库/Elasticsearch/[Elasticsearch]集群.md) - 关键词：`集群健康`、`主分片`、`副本分片`、`水平扩容`、`故障转移`、`段合并`、`Refresh`、`Translog`
+- [Elasticsearch 架构](搜索引擎数据库/Elasticsearch/[Elasticsearch]架构.md) - 关键词：`协调节点`、`数据路由`、`Query阶段`、`Fetch阶段`、`深度分页`、`Refresh`、`Translog`、`Merge`
+- [Elasticsearch 优化](搜索引擎数据库/Elasticsearch/[Elasticsearch]优化.md) - 关键词：`JVM内存`、`分片策略`、`Bulk提交`、`refresh_interval`、`SSD`、`Filter优化`、`Hot-Warm架构`、`节点角色分离`
+- [Elasticsearch 运维](搜索引擎数据库/Elasticsearch/[Elasticsearch]运维.md) - 关键词：`集群规划`、`elasticsearch.yml`、`vm.max_map_count`、`内存锁定`、`节点发现`、`JVM配置`、`分片分配`、`集群部署`
+- [Elasticsearch API](搜索引擎数据库/Elasticsearch/[Elasticsearch]API.md) - 关键词：`REST API`、`URI Search`、`Request Body`、`Bulk API`、`索引别名`、`cat API`、`集群健康`、`msearch`
+- [ElasticSearch API 之 High Level REST Client](搜索引擎数据库/Elasticsearch/[Elasticsearch]API之HighLevelRestClient.md) - 关键词：`RestHighLevelClient`、`Java REST Client`、`索引API`、`文档CRUD`、`SearchRequest`、`BulkRequest`、`RequestOptions`、`XContentType`
+- [Elasticsearch 面试](搜索引擎数据库/Elasticsearch/[Elasticsearch]面试.md) 💯
 
 #### Elastic
 
-- [Elastic](搜索引擎数据库/Elastic/Elastic.md)
-- [Kibana](搜索引擎数据库/Elastic/Kibana.md)
-- [Logstash](搜索引擎数据库/Elastic/Logstash.md)
-- [Filebeat](搜索引擎数据库/Elastic/Filebeat.md)
+- [Elastic](搜索引擎数据库/Elastic/Elastic.md) - 关键词：`Elastic Stack`、`ELK`、`Elasticsearch`、`Logstash`、`Kibana`、`Beats`、`日志采集`、`分布式架构`
+- [Kibana](搜索引擎数据库/Elastic/Kibana.md) - 关键词：`Discover`、`Visualize`、`Dashboard`、`Index Pattern`、`查询语法`、`数据可视化`、`Kibana配置`、`搜索栏`
+- [Logstash](搜索引擎数据库/Elastic/Logstash.md) - 关键词：`数据处理管道`、`Input插件`、`Filter插件`、`Output插件`、`Grok`、`事件处理`、`logstash.yml`、`pipeline配置`
+- [Filebeat](搜索引擎数据库/Elastic/Filebeat.md) - 关键词：`Beats`、`轻量级采集器`、`日志采集`、`filebeat.yml`、`Prospector`、`多行日志`、`背压机制`、`断点续传`
 
 ## 资料 📚
 

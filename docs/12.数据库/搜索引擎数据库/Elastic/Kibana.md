@@ -350,6 +350,30 @@ Unable to fetch mapping. Do you have indices matching the pattern?
 
 检查 logstash 与 elasticsearch 之间的通讯是否有问题，一般问题就出在这。
 
+## 应用场景
+
+- **日志可视化分析**：通过 Kibana Dashboard 可视化展示日志数据，如错误率趋势、访问量统计等。
+- **实时监控与告警**：配置监控规则，实时监控系统健康状态，异常时触发告警。
+- **数据探索与调试**：使用 Discover 功能探索原始数据，快速定位问题日志。
+- **报表生成与分享**：生成业务报表，分享给团队成员，支持定期汇报。
+
+## 最佳实践
+
+- **合理设计 Dashboard**：按业务模块组织 Dashboard，避免单个 Dashboard 过多图表。
+- **使用过滤器缩小范围**：通过过滤器筛选特定时间段、服务、错误类型，提升查询效率。
+- **定期备份配置**：Kibana 配置存储在 Elasticsearch 中，定期备份索引。
+- **控制访问权限**：使用 Kibana Spaces 和 RBAC 控制用户访问权限。
+
+## 常见问题
+
+**Kibana 查询很慢？**
+
+常见原因：1) 查询时间范围过大；2) 数据量过大未优化索引；3) 聚合计算复杂。优化方法：缩小时间范围、使用过滤器、优化索引设计。
+
+**Kibana 无法显示数据？**
+
+检查：1) Elasticsearch 是否有数据；2) Index Pattern 是否匹配；3) 时间范围是否正确；4) 字段名是否匹配。
+
 ## 参考资料
 
 - [Kibana 官网](https://www.elastic.co/cn/products/kibana)

@@ -19,28 +19,28 @@ dir:
 
 ## 📖 内容
 
-- [关系数据库简介](关系数据库简介.md)
-- [SQL](SQL.md)
-- [PostgreSQL](PostgreSQL.md)
-- [H2](H2.md)
-- [SqLite](SqLite.md)
+- [关系数据库简介](关系数据库简介.md) - 关键词：`关系型数据库`、`SQL`、`范式`、`ER图`、`函数依赖`、`数据模型`、`主键`、`反范式`
+- [SQL](SQL.md) - 关键词：`SQL`、`CRUD`、`JOIN`、`事务`、`索引`、`存储过程`、`触发器`、`DDL`
+- [PostgreSQL](PostgreSQL.md) - 关键词：`PostgreSQL`、`psql`、`RDBMS`、`数据库安装`、`SQL`、`备份恢复`、`用户管理`
+- [H2](H2.md) - 关键词：`H2`、`嵌入式数据库`、`内存模式`、`JDBC`、`兼容模式`、`Spring`、`集群`、`单元测试`
+- [SqLite](SqLite.md) - 关键词：`SQLite`、`嵌入式`、`轻量级`、`无服务器`、`动态类型`、`ACID`、`亲和类型`、`跨平台`
 
 ### MySQL
 
-- [MySQL 概述](MySQL/MySQL_概述.md)
-- [MySQL 建模](MySQL/MySQL_建模.md)
-- [MySQL CRUD](MySQL/MySQL_CRUD.md)
-- [MySQL 存储](MySQL/MySQL_存储.md)
-- [MySQL 索引](MySQL/MySQL_索引.md)
-- [MySQL 事务](MySQL/MySQL_事务.md)
-- [MySQL 锁](MySQL/MySQL_锁.md)
-- [MySQL 复制](MySQL/MySQL_复制.md)
-- [MySQL 架构](MySQL/MySQL_架构.md)
-- [MySQL 优化](MySQL/MySQL_优化.md)
-- [MySQL 运维](MySQL/MySQL_运维.md)
-- [MySQL 面试](MySQL/MySQL_面试.md) 💯
-- [MySQL 面试之索引篇](MySQL/MySQL_面试_索引.md) 💯
-- [MySQL 面试之事务和锁篇](MySQL/MySQL_面试_事务和锁.md) 💯
+- [MySQL 概述](MySQL/[MySQL]概述.md) - 关键词：`MySQL`、`关系型数据库`、`RDBMS`、`InnoDB`、`存储引擎`、`OLTP`、`OLAP`、`DBMS`
+- [MySQL 建模](MySQL/[MySQL]建模.md) - 关键词：`数据类型`、`VARCHAR`、`CHAR`、`DECIMAL`、`BIGINT`、`DATETIME`、`TIMESTAMP`、`utf8mb4`
+- [MySQL CRUD](MySQL/[MySQL]CRUD.md) - 关键词：`CRUD`、`DDL`、`INSERT`、`SELECT`、`UPDATE`、`DELETE`、`约束`、`索引管理`
+- [MySQL 存储](MySQL/[MySQL]存储.md) - 关键词：`InnoDB`、`MyISAM`、`存储引擎`、`Buffer Pool`、`聚簇索引`、`Change Buffer`、`表空间`、`redo log`
+- [MySQL 索引](MySQL/[MySQL]索引.md) - 关键词：`B+Tree索引`、`聚簇索引`、`覆盖索引`、`最左匹配`、`Hash索引`、`前缀索引`、`联合索引`、`索引失效`
+- [MySQL 事务](MySQL/[MySQL]事务.md) - 关键词：`ACID`、`MVCC`、`事务隔离级别`、`可重复读`、`ReadView`、`UndoLog`、`幻读`、`分布式事务`
+- [MySQL 锁](MySQL/[MySQL]锁.md) - 关键词：`行锁`、`间隙锁`、`Next-Key Lock`、`死锁`、`悲观锁`、`乐观锁`、`共享锁`、`独享锁`
+- [MySQL 复制](MySQL/[MySQL]复制.md) - 关键词：`主从复制`、`binlog`、`读写分离`、`relay log`、`主备配置`、`数据同步`、`高可用`、`slave`
+- [MySQL 架构](MySQL/[MySQL]架构.md) - 关键词：`Server层`、`存储引擎`、`redo log`、`binlog`、`WAL`、`两阶段提交`、`优化器`、`执行器`
+- [MySQL 优化](MySQL/[MySQL]优化.md) - 关键词：`EXPLAIN`、`慢查询`、`索引优化`、`SQL优化`、`覆盖索引`、`分页优化`、`JOIN优化`、`执行计划`
+- [MySQL 运维](MySQL/[MySQL]运维.md) - 关键词：`mysqldump`、`用户管理`、`主从部署`、`my.cnf`、`慢查询`、`max_connections`、`Buffer Pool`、`备份恢复`
+- [MySQL 面试](MySQL/[MySQL]面试.md) 💯
+- [MySQL 面试之索引篇](MySQL/[MySQL]面试之索引篇.md) 💯
+- [MySQL 面试之事务和锁篇](MySQL/[MySQL]面试之事务和锁篇.md) 💯
 
 ## 📚 资料
 

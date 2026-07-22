@@ -19,11 +19,10 @@ index: false
 
 ## 📖 内容
 
-- [Tomcat 快速入门](Tomcat_快速入门.md)
-- [Tomcat 连接器](Tomcat_连接器.md)
-- [Tomcat 容器](Tomcat_容器.md)
-- [Tomcat 优化](Tomcat_优化.md)
-- [Tomcat 和 Jetty](Tomcat_Jetty.md)
+- [Tomcat 快速入门]([Tomcat]快速入门.md)
+- [Tomcat 连接器]([Tomcat]连接器.md)
+- [Tomcat 容器]([Tomcat]容器.md)
+- [Tomcat 优化]([Tomcat]优化.md)
 
 ## 📚 资料
 

@@ -30,12 +30,12 @@ index: false
 
 ## 📖 内容
 
-- [Maven 快速入门](Maven_快速入门.md)
-- [Maven 教程之 pom.xml 详解](Maven_pom_详解.md)
-- [Maven 教程之 settings.xml 详解](Maven_settings_详解.md)
-- [Maven 实战问题和最佳实践](Maven_最佳实践.md)
-- [Maven 教程之发布 jar 到私服或中央仓库](Maven_发布.md)
-- [Maven 插件之代码检查](Maven_插件_代码检查.md)
+- [Maven 快速入门]([Maven]快速入门.md)
+- [Maven 教程之 pom.xml 详解]([Maven]pom详解.md)
+- [Maven 教程之 settings.xml 详解]([Maven]settings详解.md)
+- [Maven 实战问题和最佳实践]([Maven]最佳实践.md)
+- [Maven 教程之发布 jar 到私服或中央仓库]([Maven]发布.md)
+- [Maven 插件]([Maven]插件.md)
 
 ## 📚 资料
 

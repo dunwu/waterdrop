@@ -23,12 +23,12 @@ dir:
 
 ## 📖 内容
 
-- [Java 容器简介](Java_容器_简介.md) - 关键词：`泛型`、`Iterable`、`Iterator`、`Comparable`、`Comparator`、`Cloneable`、`fail-fast`
-- [Java 容器之 List](Java_容器_List.md) - 关键词：`List`、`ArrayList`、`LinkedList`
-- [Java 容器之 Map](Java_容器_Map.md) - 关键词：`Map`、`HashMap`、`TreeMap`、`LinkedHashMap`、`WeakHashMap`
-- [Java 容器之 Set](Java_容器_Set.md) - 关键词：`Set`、`HashSet`、`TreeSet`、`LinkedHashSet`、`EnumSet`
-- [Java 容器之 Queue](Java_容器_Queue.md) - 关键词：`Queue`、`Deque`、`ArrayDeque`、`LinkedList`、`PriorityQueue`
-- [Java 容器之 Stream](Java_容器_Stream.md)
+- [Java 容器简介]([JavaCore][容器]简介.md) - 关键词：`Collection`、`Map`、`泛型`、`Iterable`、`Iterator`、`Comparable`、`Comparator`、`Cloneable`、`fail-fast`、`fail-safe`
+- [Java 容器之 List]([JavaCore][容器]List.md) - 关键词：`ArrayList`、`LinkedList`、`Vector`、`Stack`、`RandomAccess`、`动态扩容`、`Arrays.asList`、`subList`
+- [Java 容器之 Map]([JavaCore][容器]Map.md) - 关键词：`HashMap`、`LinkedHashMap`、`TreeMap`、`WeakHashMap`、`Hashtable`、`红黑树`、`负载因子`、`扩容`、`哈希冲突`
+- [Java 容器之 Set]([JavaCore][容器]Set.md) - 关键词：`HashSet`、`LinkedHashSet`、`TreeSet`、`EnumSet`、`去重`、`NavigableSet`、`HashMap`
+- [Java 容器之 Queue]([JavaCore][容器]Queue.md) - 关键词：`Queue`、`Deque`、`ArrayDeque`、`PriorityQueue`、`LinkedList`、`BlockingQueue`、`FIFO`、`二叉堆`
+- [Java 容器之 Stream]([JavaCore][容器]Stream.md) - 关键词：`Stream`、`parallelStream`、`中间操作`、`终结操作`、`惰性求值`、`filter`、`map`、`flatMap`、`collect`、`Collector`
 
 ## 📚 资料
 

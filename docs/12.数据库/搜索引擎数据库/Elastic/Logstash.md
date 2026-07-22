@@ -514,6 +514,30 @@ PID=`ps -ef | grep logstash | awk '{ print $2}' | head -n 1`
 kill -9 ${PID}
 ```
 
+## 应用场景
+
+- **日志解析与转换**：使用 Grok、Date、Mutate 等插件解析和转换日志数据。
+- **多数据源集成**：通过 Input 插件收集多种数据源（如文件、数据库、消息队列）的数据。
+- **数据过滤与清洗**：使用 Filter 插件过滤、清洗、转换数据，提取有价值的字段。
+- **数据路由与分发**：根据条件将数据路由到不同的 Elasticsearch 索引或输出端。
+
+## 最佳实践
+
+- **合理配置 Pipeline**：根据日志量调整 pipeline.workers 和 pipeline.batch.size。
+- **使用 Grok 调试器**：先用 Grok Debugger 测试正则表达式，避免配置错误导致解析失败。
+- **定期更新插件**：定期更新 Logstash 插件，获取 bug 修复和新功能。
+- **监控 Logstash 性能**：监控 Logstash 队列、事件处理速率、插件性能。
+
+## 常见问题
+
+**Logstash 性能瓶颈？**
+
+常见原因：1) pipeline.workers 设置过小；2) 复杂 Filter 插件消耗过多 CPU；3) 输出端处理能力不足。优化方法：增加 worker、简化 Filter、扩容输出端。
+
+**Grok 解析失败怎么办？**
+
+检查：1) 正则表达式是否匹配日志格式；2) 使用 Grok Debugger 测试；3) 考虑使用 dissect 插件替代 Grok，性能更好。
+
 ## 参考资料
 
 - [Logstash 官网](https://www.elastic.co/cn/products/logstash)

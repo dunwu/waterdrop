@@ -18,7 +18,7 @@ permalink: /pages/fc674dbb/
 
 ## SpringBoot 简介
 
-### 【简单】什么是 SpringBoot？
+### 【简单】什么是 SpringBoot？⭐⭐
 
 Spring Boot 是一个基于 Spring 框架的“开箱即用”的脚手架框架，它基于**约定优于配置**的原则，极大地简化了 Spring 应用的搭建和开发过程。
 
@@ -89,7 +89,7 @@ public @interface EnableAutoConfiguration {
 }
 ```
 
-其中，最关键点在于 `@Import(AutoConfigurationImportSelector.class)` 注解，表示导入 `AutoConfigurationImportSelector`。`AutoConfigurationImportSelector` 正式自动导入配置的关键。
+其中，最关键点在于 `@Import(AutoConfigurationImportSelector.class)` 注解，表示导入 `AutoConfigurationImportSelector`。`AutoConfigurationImportSelector` 正是自动导入配置的关键。
 
 #### @Import(AutoConfigurationImportSelector.class)
 
@@ -477,6 +477,404 @@ my-spring-boot-starter
 ```
 
 使用 `spring-boot-configuration-processor` 依赖会在项目编译时自动生成这部分元数据。
+
+## 条件注解
+
+### 【中等】SpringBoot 有哪些条件注解？⭐
+
+条件注解是 SpringBoot 自动配置的核心机制，均以 `@Conditional` 为基础扩展而来。当条件满足时，对应的 Bean 或配置类才会被注册到容器中。
+
+**类条件注解**
+
+| 注解 | 说明 |
+| :--- | :--- |
+| `@ConditionalOnClass` | 类路径下存在指定类时，配置生效 |
+| `@ConditionalOnMissingClass` | 类路径下不存在指定类时，配置生效 |
+
+**Bean 条件注解**
+
+| 注解 | 说明 |
+| :--- | :--- |
+| `@ConditionalOnBean` | 容器中存在指定类型的 Bean 时生效 |
+| `@ConditionalOnMissingBean` | 容器中不存在指定类型的 Bean 时生效（**用户自定义优先**） |
+| `@ConditionalOnSingleCandidate` | 容器中指定类型的 Bean 只有一个或虽有多个但有一个 @Primary 时生效 |
+
+**属性条件注解**
+
+| 注解 | 说明 |
+| :--- | :--- |
+| `@ConditionalOnProperty` | 配置文件中指定属性满足条件时生效，支持 `prefix`、`name`、`havingValue`、`matchIfMissing` |
+
+**资源条件注解**
+
+| 注解 | 说明 |
+| :--- | :--- |
+| `@ConditionalOnResource` | 类路径下存在指定资源文件时生效 |
+
+**Web 应用条件注解**
+
+| 注解 | 说明 |
+| :--- | :--- |
+| `@ConditionalOnWebApplication` | 当前应用是 Web 应用（Servlet 或 Reactive）时生效 |
+| `@ConditionalOnNotWebApplication` | 当前应用不是 Web 应用时生效 |
+
+**其他条件注解**
+
+| 注解 | 说明 |
+| :--- | :--- |
+| `@ConditionalOnExpression` | SpEL 表达式结果为 true 时生效 |
+| `@ConditionalOnJava` | JDK 版本满足条件时生效 |
+| `@ConditionalOnCloudPlatform` | 运行在指定云平台（如 K8s）时生效 |
+
+::::tip 核心设计思想
+`@ConditionalOnMissingBean` 是实现"用户配置优先覆盖自动配置"的关键。SpringBoot 在自动配置类上大量使用该注解，确保开发者自定义的 Bean 不会被框架的默认配置覆盖。这也是 SpringBoot "约定优于配置"但"配置可覆盖"的设计哲学体现。
+::::
+
+## 内嵌容器
+
+### 【中等】SpringBoot 支持哪些内嵌 Web 容器？如何切换？⭐
+
+SpringBoot 默认内嵌 **Tomcat** 作为 Web 服务器，同时支持 **Jetty** 和 **Undertow**，三者均实现了 Servlet 规范。
+
+**三种容器对比**
+
+| 特性 | Tomcat | Jetty | Undertow |
+| :--- | :--- | :--- | :--- |
+| **默认** | 是 | 否 | 否 |
+| **性能** | 中等 | 中等 | 最高（内存占用最小） |
+| **成熟度** | 最高，使用最广泛 | 高，轻量级 | 较高，Red Hat 维护 |
+| **适用场景** | 通用 Web 应用 | 长连接、异步场景（如 WebSocket） | 高并发、资源敏感型 |
+| **Servlet 支持** | 完整 | 完整 | 完整 |
+| **内存占用** | 较高 | 较低 | 最低 |
+
+**切换方式（以切换为 Undertow 为例）**
+
+```xml
+<!-- 1. 排除默认的 Tomcat -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<!-- 2. 引入 Undertow -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-undertow</artifactId>
+</dependency>
+```
+
+**自定义容器配置**
+
+```yaml
+server:
+  port: 8080
+  undertow:
+    threads:
+      io: 2          # IO 线程数，默认 CPU 核心数
+      worker: 256    # 工作线程数，默认 10 * IO 线程数
+    buffer-size: 1024  # 每个缓冲区大小
+    direct-buffers: true  # 直接内存分配
+```
+
+### 【简单】SpringBoot 是如何内嵌 Tomcat 的？⭐⭐
+
+SpringBoot 内嵌 Tomcat 的核心机制是在应用启动时，通过 `WebServerFactory` 创建并启动 Tomcat 实例，无需外部容器部署。
+
+**核心流程**
+
+1. **`ServletWebServerApplicationContext`**：SpringBoot 专用的应用上下文，在 `onRefresh()` 阶段调用 `createWebServer()` 方法。
+2. **`ServletWebServerFactory`**：工厂接口，`TomcatServletWebServerFactory` 是其默认实现，负责创建和配置 `Tomcat` 实例。
+3. **`TomcatWebServer`**：封装了 `Tomcat` 实例，`start()` 方法启动 Tomcat，`stop()` 方法关闭。
+4. **`DispatcherServlet`**：自动注册到内嵌 Tomcat 的 ServletContext 中，映射 `/` 路径，处理所有 HTTP 请求。
+
+::::tip 与传统 WAR 部署的区别
+传统方式需要将应用打包成 WAR 部署到外部 Tomcat，由 Tomcat 管理应用生命周期。SpringBoot 内嵌容器则是应用管理容器生命周期，`main` 方法启动即创建 Tomcat 并注册 Servlet，实现 `java -jar` 一键启动。
+::::
+
+## 配置管理
+
+### 【中等】SpringBoot 的配置文件优先级是怎样的？⭐
+
+SpringBoot 支持多种配置来源，加载时按以下优先级从高到低覆盖（高优先级覆盖低优先级）：
+
+1. **命令行参数**：`java -jar app.jar --server.port=9090`
+2. **SPRING_APPLICATION_JSON**：环境变量或命令行中的 JSON 配置
+3. **ServletConfig / ServletContext** 初始化参数
+4. **JNDI 属性**：`java:comp/env/xxx`
+5. **Java 系统属性**：`System.getProperties()`
+6. **操作系统环境变量**
+7. **`RandomValuePropertySource`**：`random.*` 属性
+8. **jar 包外的 `application-{profile}.yml/properties`**：与 jar 同级目录
+9. **jar 包内的 `application-{profile}.yml/properties`**：类路径下
+10. **jar 包外的 `application.yml/properties`**
+11. **jar 包内的 `application.yml/properties`**
+12. **`@PropertySource`** 注解指定的配置文件
+13. **默认属性**：`SpringApplication.setDefaultProperties()`
+
+::::tip 实践建议
+- **多环境**：使用 `application-{profile}.yml` 区分 dev/test/prod，通过 `spring.profiles.active` 激活。
+- **敏感配置**：数据库密码等敏感信息使用环境变量或配置中心管理，不要硬编码。
+- **覆盖优先**：命令行参数优先级最高，常用于运维临时调整（如端口号）。
+::::
+
+### 【中等】@ConfigurationProperties 和 @Value 有什么区别？⭐
+
+| 维度 | `@ConfigurationProperties` | `@Value` |
+| :--- | :--- | :--- |
+| **功能** | 批量绑定配置到 Bean 的字段 | 单个属性注入 |
+| **松散绑定** | 支持（`my-name` ↔ `myName`） | 不支持 |
+| **SpEL** | 不支持 | 支持 `#{...}` |
+| **元数据** | 支持自动生成配置提示 | 不支持 |
+| **校验** | 支持 `@Validated` JSR-303 校验 | 不支持 |
+| **适用场景** | 结构化配置（如数据库连接池） | 简单的单值注入 |
+
+**使用示例**
+
+```java
+// 方式一：@ConfigurationProperties 批量绑定
+@Component
+@ConfigurationProperties(prefix = "app.datasource")
+@Validated
+public class DataSourceProperties {
+
+    @NotBlank
+    private String url;
+
+    @Min(1)
+    @Max(65535)
+    private int port = 3306;
+
+    private String username;
+    private String password;
+    // getter/setter 省略
+}
+
+// 方式二：@Value 单值注入
+@Component
+public class MyComponent {
+
+    @Value("${app.datasource.url}")
+    private String url;
+
+    @Value("#{T(java.lang.Math).random() * 100}")
+    private double randomValue;
+}
+```
+
+## Actuator
+
+### 【中等】SpringBoot Actuator 是什么？有哪些核心端点？⭐
+
+SpringBoot Actuator 是生产级的监控和管理模块，通过 HTTP 或 JMX 端点暴露应用运行时信息，无需额外开发即可实现健康检查、指标监控等功能。
+
+**核心端点**
+
+| 端点 | 调用方法 | 说明 |
+| :--- | :--- | :--- |
+| `/actuator/health` | GET | 健康检查，显示应用及组件（DB、Redis 等）状态 |
+| `/actuator/info` | GET | 应用基本信息（需手动配置） |
+| `/actuator/metrics` | GET | 应用指标（JVM、HTTP 请求等） |
+| `/actuator/env` | GET | 环境变量和配置属性 |
+| `/actuator/loggers` | GET/POST | 动态查看和修改日志级别 |
+| `/actuator/beans` | GET | 容器中所有 Bean 列表 |
+| `/actuator/mappings` | GET | 所有 `@RequestMapping` 路径 |
+| `/actuator/threaddump` | GET | 线程栈信息 |
+| `/actuator/heapdump` | GET | 堆 dump 文件下载 |
+| `/actuator/refresh` | POST | 刷新配置（需集成 Spring Cloud Config） |
+
+**配置示例**
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers  # 暴露指定端点
+        exclude: env,beans                     # 排除敏感端点
+  endpoint:
+    health:
+      show-details: always  # 显示健康详情（默认 never）
+  server:
+    port: 8081  # 独立端口，与业务端口隔离（安全建议）
+```
+
+::::warning 安全提示
+生产环境中，`env`、`beans`、`heapdump` 等端点可能暴露敏感信息，应通过 `management.endpoints.web.exposure.include` 精确控制暴露范围，并配合 Spring Security 进行鉴权。
+::::
+
+## SpringBoot 3.x
+
+### 【困难】SpringBoot 3.x 有哪些重要新特性？⭐⭐
+
+**1. 最低要求 JDK 17**
+
+SpringBoot 3.x 要求 JDK 17+，全面使用现代 Java 特性（Record、Sealed Classes、Pattern Matching 等）。
+
+**2. Jakarta EE 迁移**
+
+`javax.*` 包名全部迁移到 `jakarta.*`，影响 Servlet、JPA、Validation 等 API。升级时需同步更新依赖和 import。
+
+```java
+// SpringBoot 2.x
+import javax.servlet.http.HttpServletRequest;
+import javax.persistence.Entity;
+
+// SpringBoot 3.x
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.persistence.Entity;
+```
+
+**3. GraalVM 原生镜像支持**
+
+SpringBoot 3.x 一等公民支持 GraalVM Native Image，应用可编译为独立可执行文件，启动时间从秒级降至毫秒级，内存占用大幅降低。
+
+```xml
+<!-- pom.xml 添加 native 构建工具 -->
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+```
+
+```bash
+# 编译为原生镜像
+mvn -Pnative native:compile
+```
+
+| 维度 | JVM 模式 | Native Image |
+| :--- | :--- | :--- |
+| **启动时间** | 1-5 秒 | 10-100 毫秒 |
+| **内存占用** | 200MB-1GB | 50-100MB |
+| **峰值性能** | 高（JIT 预热后） | 较低（AOT 无 JIT 优化） |
+| **构建时间** | 快 | 慢（分钟级） |
+| **动态特性** | 完整支持 | 受限（反射需配置） |
+
+**4. Micrometer Observation API**
+
+统一可观测性 API，取代原有的 Sleuth，通过单一 API 同时产生 Metrics、Tracing、Logging 数据。
+
+```java
+@Service
+public class MyService {
+
+    private final ObservationRegistry registry;
+
+    public MyService(ObservationRegistry registry) {
+        this.registry = registry;
+    }
+
+    public String doSomething() {
+        return Observation.createNotStarted("my-operation", registry)
+            .lowCardinalityKeyValue("type", "demo")
+            .observe(() -> {
+                // 业务逻辑
+                return "result";
+            });
+    }
+}
+```
+
+**5. HTTP Interface（声明式 HTTP 客户端）**
+
+内置声明式 HTTP 客户端，无需 Feign 即可定义 HTTP 接口。
+
+```java
+@HttpExchange(url = "/api/users", accept = "application/json")
+public interface UserApi {
+
+    @GetExchange("/{id}")
+    User getUser(@PathVariable Long id);
+
+    @PostExchange
+    User createUser(@RequestBody User user);
+}
+
+// 配置
+@Configuration
+public class HttpConfig {
+
+    @Bean
+    public UserApi userApi(WebClient.Builder builder) {
+        WebClient client = builder.baseUrl("http://user-service").build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+            .builderFor(WebClientAdapter.create(client)).build();
+        return factory.createClient(UserApi.class);
+    }
+}
+```
+
+## 常见问题
+
+### 【中等】SpringBoot 启动慢的原因有哪些？如何优化？⭐
+
+**启动慢的常见原因**
+
+1. **自动配置类过多**：SpringBoot 扫描加载大量 `@AutoConfiguration`，即使大部分不生效也需条件判断。
+2. **Bean 初始化耗时**：数据库连接池创建、Redis 连接、HTTP 客户端初始化等。
+3. **组件扫描范围过大**：`@ComponentScan` 扫描了过多无关包。
+4. **`@PostConstruct` / `InitializingBean`** 中执行了耗时逻辑。
+5. **日志框架初始化**：某些日志框架启动时扫描类路径。
+
+**优化手段**
+
+| 优化方向 | 具体措施 |
+| :--- | :--- |
+| **精简自动配置** | 使用 `spring.autoconfigure.exclude` 排除不需要的自动配置类 |
+| **懒加载** | `spring.main.lazy-initialization=true`，启动时只创建必需 Bean |
+| **缩小扫描范围** | `@SpringBootApplication(scanBasePackages = "com.xxx.service")` 精确指定 |
+| **异步初始化** | 用 `@Async` 或 `ApplicationRunner` 将非关键初始化延后 |
+| **JVM 参数** | `-XX:TieredStopAtLevel=1`（仅 C1 编译，减少 JIT 时间） |
+
+### 【中等】SpringBoot 如何解决 jar 包冲突？⭐
+
+**排查步骤**
+
+1. **查看依赖树**：`mvn dependency:tree -Dverbose -Dincludes=groupId:artifactId`
+2. **定位冲突**：找到同一 artifact 的多个版本，确认哪个版本被加载。
+3. **排除依赖**：在引入冲突依赖的地方使用 `<exclusions>` 排除不需要的版本。
+4. **统一版本**：在 `<dependencyManagement>` 中统一指定版本。
+
+**示例**
+
+```xml
+<!-- 排除传递依赖中的冲突版本 -->
+<dependency>
+    <groupId>com.example</groupId>
+    <artifactId>lib-a</artifactId>
+    <version>1.0</version>
+    <exclusions>
+        <exclusion>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<!-- 统一版本管理 -->
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>32.1.3-jre</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+
+::::tip SpringBoot 的依赖管理
+SpringBoot 通过 `spring-boot-dependencies` BOM 统一管理了数百个常用库的版本，引入 Starter 时会自动继承这些版本，大大减少了手动解决版本冲突的需要。只有当引入非 SpringBoot 管理的库时，才需要手动处理冲突。
+::::
 
 ## 资料
 

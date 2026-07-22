@@ -486,6 +486,34 @@ Flyway 的功能主要围绕着 7 个基本命令：[Migrate](https://flywaydb.o
 - [Derby](https://flywaydb.org/documentation/database/derby)
 - [SQLite](https://flywaydb.org/documentation/database/sqlite)
 
+## 应用场景
+
+- **持续集成/持续部署**：在 CI/CD 流水线中自动执行数据库迁移，确保每个环境的数据库版本与代码版本一致
+- **多环境同步**：开发、测试、生产环境的数据库结构保持一致，避免手动执行 SQL 脚本导致的差异
+- **团队协作**：多人协作开发时，通过版本化的 migration 文件解决数据库变更冲突，像代码一样管理数据库变更
+- **数据库版本回滚**：结合 undo migrations（专业版）实现数据库版本的回滚，支持灰度发布和快速回退
+
+## 最佳实践
+
+- **Migration 命名规范**：严格遵循命名规则 `V<version>__<description>.sql`，版本号递增且不可重复
+- **幂等性设计**：确保 migration 脚本可以安全重复执行，使用 `CREATE TABLE IF NOT EXISTS` 等语法
+- **小步提交**：每个 migration 文件只包含一个小变更，避免单个大脚本导致的问题
+- **禁止修改已执行的 Migration**：已执行的 migration 不可修改（checksum 会变化），只能通过新增 migration 来修复
+
+## 常见问题
+
+**Migration 执行失败怎么办？**
+
+Flyway 会记录失败的 migration 到 schema history 表。需要先修复问题，然后执行 `flyway repair` 清理失败记录，再重新执行 `flyway migrate`。
+
+**如何处理不同环境的数据库差异？**
+
+使用 Flyway 的占位符功能（placeholders），在不同环境配置不同的占位符值。也可通过 `locations` 参数指定不同环境的 migration 目录。
+
+**Flyway 支持哪些数据库？**
+
+支持主流关系型数据库：MySQL、PostgreSQL、Oracle、SQL Server、H2、SQLite 等。详见官方支持的数据库列表。
+
 ## 资料
 
 | [Github](https://github.com/flyway/flyway) | [官方文档](https://flywaydb.org/) |

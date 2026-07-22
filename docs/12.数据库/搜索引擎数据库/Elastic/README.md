@@ -28,10 +28,10 @@ index: false
 
 ## 📖 内容
 
-- [Elastic](Elastic.md)
-- [Kibana](Kibana.md)
-- [Logstash](Logstash.md)
-- [Filebeat](Filebeat.md)
+- [Elastic](Elastic.md) - 关键词：`Elastic Stack`、`ELK`、`Elasticsearch`、`Logstash`、`Kibana`、`Beats`、`日志采集`、`分布式架构`
+- [Kibana](Kibana.md) - 关键词：`Discover`、`Visualize`、`Dashboard`、`Index Pattern`、`查询语法`、`数据可视化`、`Kibana配置`、`搜索栏`
+- [Logstash](Logstash.md) - 关键词：`数据处理管道`、`Input插件`、`Filter插件`、`Output插件`、`Grok`、`事件处理`、`logstash.yml`、`pipeline配置`
+- [Filebeat](Filebeat.md) - 关键词：`Beats`、`轻量级采集器`、`日志采集`、`filebeat.yml`、`Prospector`、`多行日志`、`背压机制`、`断点续传`
 
 ## 📚 资料
 

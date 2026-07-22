@@ -28,16 +28,16 @@ dir:
 >
 > MongoDB 最大的特点是它支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引。
 
-- [MongoDB 概述](MongoDB/MongoDB_概述.md)
-- [MongoDB CRUD](MongoDB/MongoDB_CRUD.md)
-- [MongoDB 聚合](MongoDB/MongoDB_聚合.md)
-- [MongoDB 索引](MongoDB/MongoDB_索引.md)
-- [MongoDB 事务](MongoDB/MongoDB_事务.md)
-- [MongoDB 建模](MongoDB/MongoDB_建模.md)
-- [MongoDB 复制](MongoDB/MongoDB_复制.md)
-- [MongoDB 分片](MongoDB/MongoDB_分片.md)
-- [MongoDB 运维](MongoDB/MongoDB_运维.md)
-- [MongoDB 面试](MongoDB/MongoDB_面试.md) 💯
+- [MongoDB 概述](MongoDB/[MongoDB]概述.md) - 关键词：`BSON`、`文档模型`、`NoSQL`、`面向文档`、`集合`、`副本集`、`分片`、`无模式`
+- [MongoDB CRUD](MongoDB/[MongoDB]CRUD.md) - 关键词：`insertOne`、`find`、`updateOne`、`deleteOne`、`bulkWrite`、`upsert`、`原子性`、`ObjectId`
+- [MongoDB 聚合](MongoDB/[MongoDB]聚合.md) - 关键词：`聚合管道`、`$match`、`$group`、`$project`、`Map-Reduce`、`$lookup`、`管道优化`、`$sort`
+- [MongoDB 索引](MongoDB/[MongoDB]索引.md) - 关键词：`B-tree`、`复合索引`、`多键索引`、`文本索引`、`地理空间索引`、`ESR规则`、`createIndex`、`查询性能`
+- [MongoDB 事务](MongoDB/[MongoDB]事务.md) - 关键词：`ACID事务`、`多文档事务`、`读关注`、`写关注`、`分布式事务`、`快照隔离`、`majority`、`ClientSession`
+- [MongoDB 建模](MongoDB/[MongoDB]建模.md) - 关键词：`嵌入式文档`、`引用式`、`一对多关系`、`树形结构`、`实体化路径`、`子集模式`、`反规范化`、`文档大小`
+- [MongoDB 复制](MongoDB/[MongoDB]复制.md) - 关键词：`副本集`、`主节点`、`从节点`、`oplog`、`故障转移`、`读取偏好`、`仲裁节点`、`复制延迟`
+- [MongoDB 分片](MongoDB/[MongoDB]分片.md) - 关键词：`分片键`、`mongos`、`配置服务器`、`哈希分片`、`范围分片`、`负载均衡`、`chunk`、`区域`
+- [MongoDB 运维](MongoDB/[MongoDB]运维.md) - 关键词：`mongodump`、`mongorestore`、`mongoimport`、`mongoexport`、`WiredTiger`、`认证`、`profiling`、`mongod`
+- [MongoDB 面试](MongoDB/[MongoDB]面试.md) 💯
 
 
 ## 📚 资料

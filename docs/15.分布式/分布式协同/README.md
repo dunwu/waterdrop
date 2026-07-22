@@ -28,12 +28,12 @@ dir:
 - [分布式 ID](分布式ID.md) - 关键词：`UUID`、`自增序列`、`雪花算法`、`Leaf`
 - [分布式协同面试](分布式协同面试.md) 💯
 - **ZooKeeper**
-  - [ZooKeeper 原理](ZooKeeper/ZooKeeper_原理.md)
-  - [ZooKeeper Java Api](ZooKeeper/ZooKeeper_API.md)
-  - [ZooKeeper 命令](ZooKeeper/ZooKeeper_命令.md)
-  - [ZooKeeper 运维](ZooKeeper/ZooKeeper_运维.md)
-  - [ZooKeeper Acl](ZooKeeper/ZooKeeper_ACL.md)
-  - [ZooKeeper 面试](ZooKeeper/ZooKeeper_面试.md) 💯
+  - [ZooKeeper 原理](ZooKeeper/[ZooKeeper]原理.md)
+  - [ZooKeeper Java Api](ZooKeeper/[ZooKeeper]API.md)
+  - [ZooKeeper 命令](ZooKeeper/[ZooKeeper]命令.md)
+  - [ZooKeeper 运维](ZooKeeper/[ZooKeeper]运维.md)
+  - [ZooKeeper Acl](ZooKeeper/[ZooKeeper]ACL.md)
+  - [ZooKeeper 面试](ZooKeeper/[ZooKeeper]面试.md) 💯
 
 ## 🚪 传送
 

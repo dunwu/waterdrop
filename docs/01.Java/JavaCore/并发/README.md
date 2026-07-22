@@ -25,16 +25,16 @@ dir:
 
 ## 📖 内容
 
-- [Java 并发简介](Java_并发_简介.md) - 关键词：并发、线程、安全性、活跃性、性能、死锁、活锁
-- [Java 并发之内存模型](Java_并发_内存模型.md) - 关键词：JMM、Happens-Before、内存屏障、volatile、synchronized、final、指令重排序
-- [Java 并发之线程](Java_并发_线程.md) - 关键词：Thread、Runnable、Callable、Future、FutureTask、线程生命周期
-- [Java 并发之锁](Java_并发_锁.md) - 关键词：锁、Lock、Condition、ReentrantLock、ReentrantReadWriteLock、StampedLock
-- [Java 并发之无锁](Java_并发_无锁.md) - 关键词：CAS、ThreadLocal、Immutability、Copy-on-Write
-- [Java 并发之 AQS](Java_并发_AQS.md) - 关键词：AQS、独占锁、共享锁
-- [Java 并发之容器](Java_并发_容器.md) - 关键词：ConcurrentHashMap、CopyOnWriteArrayList
-- [Java 并发之线程池](Java_并发_线程池.md) - 关键词：Executor、ExecutorService、ThreadPoolExecutor、Executors
-- [Java 并发之同步工具](Java_并发_同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
-- [Java 并发之分工工具](Java_并发_分工工具.md) - 关键词：FutureTask、CompletableFuture、CompletionStage、CompletionService、ForkJoinPool
+- [Java 并发简介]([JavaCore][并发]简介.md) - 关键词：`并发`、`线程`、`原子性`、`可见性`、`有序性`、`死锁`、`上下文切换`、`J.U.C`、`管程`、`非阻塞同步`
+- [Java 并发之内存模型]([JavaCore][并发]内存模型.md) - 关键词：`JMM`、`Happens-Before`、`内存屏障`、`指令重排序`、`volatile`、`synchronized`、`锁升级`、`偏向锁`、`轻量级锁`、`重量级锁`
+- [Java 并发之线程]([JavaCore][并发]线程.md) - 关键词：`Thread`、`Runnable`、`Callable`、`Future`、`线程生命周期`、`start`、`interrupt`、`join`、`sleep`、`守护线程`
+- [Java 并发之锁]([JavaCore][并发]锁.md) - 关键词：`Lock`、`ReentrantLock`、`ReentrantReadWriteLock`、`公平锁`、`可重入锁`、`悲观锁`、`乐观锁`、`独占锁`、`CAS`、`AQS`
+- [Java 并发之无锁]([JavaCore][并发]无锁.md) - 关键词：`CAS`、`ABA 问题`、`原子类`、`AtomicInteger`、`LongAdder`、`ThreadLocal`、`ThreadLocalMap`、`内存泄漏`、`Immutability`、`Copy-on-Write`
+- [Java 并发之 AQS]([JavaCore][并发]AQS.md) - 关键词：`AQS`、`CLH 队列`、`state`、`独占锁`、`共享锁`、`acquire`、`release`、`模板方法`、`Condition`、`ReentrantLock`
+- [Java 并发之容器]([JavaCore][并发]容器.md) - 关键词：`同步容器`、`并发容器`、`ConcurrentHashMap`、`分段锁`、`CAS`、`CopyOnWriteArrayList`、`BlockingQueue`、`ArrayBlockingQueue`、`LinkedBlockingQueue`、`ConcurrentModificationException`
+- [Java 并发之线程池]([JavaCore][并发]线程池.md) - 关键词：`ThreadPoolExecutor`、`Executors`、`corePoolSize`、`maximumPoolSize`、`workQueue`、`拒绝策略`、`FixedThreadPool`、`CachedThreadPool`、`ScheduledThreadPool`、`Future`
+- [Java 并发之同步工具]([JavaCore][并发]同步工具.md) - 关键词：`Semaphore`、`CountDownLatch`、`CyclicBarrier`、`信号量`、`限流`、`acquire`、`await`、`countDown`、`AQS`、`可重用`
+- [Java 并发之分工工具]([JavaCore][并发]分工工具.md) - 关键词：`FutureTask`、`CompletableFuture`、`CompletionService`、`ForkJoinPool`、`分治`、`工作窃取`、`异步编排`、`supplyAsync`、`thenApply`、`allOf`
 
 ## 📚 资料
 

@@ -25,12 +25,12 @@ index: false
 
 ### Maven
 
-- [Maven 快速入门](Maven/Maven_快速入门.md)
-- [Maven 教程之 pom.xml 详解](Maven/Maven_pom_详解.md)
-- [Maven 教程之 settings.xml 详解](Maven/Maven_settings_详解.md)
-- [Maven 实战问题和最佳实践](Maven/Maven_最佳实践.md)
-- [Maven 教程之发布 jar 到私服或中央仓库](Maven/Maven_发布.md)
-- [Maven 插件之代码检查](Maven/Maven_插件_代码检查.md)
+- [Maven 快速入门](Maven/[Maven]快速入门.md)
+- [Maven 教程之 pom.xml 详解](Maven/[Maven]pom详解.md)
+- [Maven 教程之 settings.xml 详解](Maven/[Maven]settings详解.md)
+- [Maven 实战问题和最佳实践](Maven/[Maven]最佳实践.md)
+- [Maven 教程之发布 jar 到私服或中央仓库](Maven/[Maven]发布.md)
+- [Maven 插件之代码检查](Maven/[Maven]插件.md)
 
 ### Ant
 

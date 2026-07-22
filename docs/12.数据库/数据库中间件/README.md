@@ -19,8 +19,8 @@ dir:
 
 ## 📖 内容
 
-- [ShardingSphere](ShardingSphere.md)
-- [Flyway](Flyway.md)
+- [ShardingSphere](ShardingSphere.md) - 关键词：`ShardingSphere`、`分库分表`、`数据分片`、`读写分离`、`分布式事务`、`SQL解析`、`Sharding-JDBC`、`Sharding-Proxy`
+- [Flyway](Flyway.md) - 关键词：`Flyway`、`数据迁移`、`Migration`、`版本管理`、`Schema`、`DDL`、`CI/CD`、`Callbacks`
 
 ## 📚 资料
 

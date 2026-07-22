@@ -16,6 +16,14 @@ permalink: /pages/4fdfe265/
 
 # ActiveMQ 快速入门
 
+## 简介
+
+`ActiveMQ` 是 Apache 软件基金会旗下的一个开源消息中间件，由 Java 语言编写。它完全支持 JMS（Java Message Service）规范，提供了企业级的消息传递能力，是早期 Java 生态中最流行的消息中间件之一。
+
+ActiveMQ 主要解决分布式系统中的异步通信、应用解耦、流量削峰、可靠传输等问题。通过引入消息中间件，生产者无需等待消费者处理完毕即可返回，提升了系统的响应速度；同时，生产者和消费者之间的耦合度大大降低，各自可以独立演进和扩展。
+
+ActiveMQ 支持多种语言客户端（Java、C/C++、.NET、Python、Ruby 等），支持多种传输协议（OpenWire、STOMP、MQTT、AMQP 等），既可以作为点对点模型的消息队列使用，也可以作为发布/订阅模型的消息主题使用。它还支持持久化存储（KahaDB、JDBC、LevelDB 等）、消息事务、消息确认机制等企业级特性。
+
 ## JMS 基本概念
 
 `JMS` 即 **Java 消息服务（Java Message Service）API**，是一个 Java 平台中关于面向消息中间件的 API。它用于在两个应用程序之间，或分布式系统中发送消息，进行异步通信。Java 消息服务是一个与具体平台无关的 API，绝大多数 MOM 提供商都对 JMS 提供支持。
@@ -305,7 +313,397 @@ Receiver 的输出内容
 收到消息ActiveMQ 发送消息3
 ```
 
+## 特性
+
+ActiveMQ 作为成熟的消息中间件，具有以下核心特性：
+
+| 特性类别 | 说明 |
+| --- | --- |
+| **JMS 规范** | 完全实现 JMS 1.1 规范，支持 JMS 客户端 API |
+| **多协议支持** | 支持 OpenWire、STOMP、MQTT、AMQP、WS 协议 |
+| **多语言客户端** | 支持 Java、C、C++、C#、Ruby、Perl、Python、PHP 等语言 |
+| **消息模型** | 支持 P2P（点对点）和 Pub/Sub（发布订阅）两种模型 |
+| **持久化** | 支持 KahaDB、LevelDB、JDBC 等多种持久化方式 |
+| **高可用** | 支持主备（Master/Slave）模式，实现故障切换 |
+| **集群** | 支持 Network of Brousters 集群模式，实现消息路由 |
+| **事务** | 支持本地事务和 XA 事务 |
+| **消息确认** | 支持自动确认、客户端确认、DUPS_OK 确认等机制 |
+| **消息过滤** | 支持基于 SQL92 语法的消息选择器 |
+| **消息转换** | 支持消息格式转换，适应异构系统 |
+| **REST API** | 提供消息收发的 REST 接口 |
+| **JMX 监控** | 通过 JMX 提供监控管理能力 |
+
+## 原理
+
+### ActiveMQ 架构
+
+ActiveMQ 的核心架构由以下几个部分组成：
+
+```mermaid
+graph TB
+    subgraph 客户端
+        P[Producer 生产者]
+        C[Consumer 消费者]
+    end
+    subgraph ActiveMQ Broker
+        T[Transport 传输层]
+        B[Broker 消息代理]
+        S[Store 持久化存储]
+    end
+    P -->|发送消息| T
+    T --> B
+    B --> S
+    B -->|投递消息| T
+    T -->|接收消息| C
+```
+
+### 消息流转原理
+
+ActiveMQ 的消息流转主要经历以下阶段：
+
+1. **生产者发送消息**：生产者通过 `MessageProducer` 将消息发送到 `Destination`（Queue 或 Topic）。
+2. **Broker 接收消息**：Broker 接收到消息后，根据消息模型将其路由到对应的 Queue 或 Topic。
+3. **持久化存储**：如果消息是持久化的，Broker 会先将消息写入持久化存储（如 KahaDB），写入成功后再向生产者返回确认。
+4. **消费者拉取消息**：消费者通过 `MessageConsumer` 从 Queue 或 Topic 中拉取消息。
+5. **消息确认**：消费者处理完消息后，根据确认模式向 Broker 发送确认。Broker 收到确认后，才会将消息从存储中删除。
+
+### 持久化原理
+
+ActiveMQ 默认使用 `KahaDB` 作为持久化存储。KahaDB 是一个基于文件的、面向消息的持久化引擎，具有以下特点：
+
+- **日志结构存储**：消息以追加方式写入日志文件，避免随机写，提升性能。
+- **索引机制**：通过 BTree 索引快速定位消息。
+- **数据恢复**：重启时通过重放日志恢复内存状态。
+
+### 主备切换原理
+
+ActiveMQ 的主备切换基于共享存储或复制机制：
+
+- **共享存储**：多个 Broker 共享同一个存储介质（如共享文件系统、JDBC 数据库）。同一时刻只有一个 Broker（Master）可以访问存储，当 Master 宕机时，Slave 获取存储锁并升级为 Master。
+- **复制机制**：Master 将消息实时复制到 Slave，当 Master 宕机时，Slave 接管服务。复制模式无需共享存储，但会引入复制延迟。
+
+## 应用场景
+
+ActiveMQ 适用于以下典型场景：
+
+- **异步处理**：如用户注册后异步发送邮件、短信通知，提升接口响应速度。
+- **应用解耦**：如订单系统与库存系统、物流系统解耦，订单系统发送消息后立即返回，下游系统按需消费。
+- **流量削峰**：在秒杀、抢购等高并发场景中，通过消息队列缓冲请求，保护下游系统。
+- **日志收集**：作为日志收集管道，将分散的日志聚合后统一处理。
+- **事件驱动架构**：在微服务架构中作为事件总线，实现服务间的事件通知。
+- **跨系统数据同步**：在异构系统间同步数据，如 MySQL 到 Elasticsearch 的数据同步。
+
+## 最佳实践
+
+### 案例一：Spring Boot 整合 ActiveMQ 实现异步邮件发送
+
+引入依赖：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-activemq</artifactId>
+</dependency>
+```
+
+配置 `application.yml`：
+
+```yaml
+spring:
+  activemq:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+  jms:
+    pub-sub-domain: false  # false 表示使用 Queue，true 表示使用 Topic
+    template:
+      default-destination: mail.queue
+```
+
+生产者服务：
+
+```java
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MailProducer {
+
+    private final JmsTemplate jmsTemplate;
+
+    public MailProducer(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
+    public void sendMail(String to, String subject, String content) {
+        MailMessage mailMessage = new MailMessage(to, subject, content);
+        jmsTemplate.convertAndSend("mail.queue", mailMessage);
+        System.out.println("邮件消息已发送至队列: " + mailMessage);
+    }
+}
+```
+
+消费者监听：
+
+```java
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MailConsumer {
+
+    @JmsListener(destination = "mail.queue")
+    public void receiveMail(MailMessage mailMessage) {
+        System.out.println("收到邮件消息，开始发送邮件: " + mailMessage);
+        // 实际发送邮件逻辑
+        sendMail(mailMessage);
+    }
+
+    private void sendMail(MailMessage mailMessage) {
+        // 调用邮件发送服务
+    }
+}
+```
+
+`MailMessage` 实体：
+
+```java
+import java.io.Serializable;
+
+public class MailMessage implements Serializable {
+
+    private String to;
+    private String subject;
+    private String content;
+
+    public MailMessage(String to, String subject, String content) {
+        this.to = to;
+        this.subject = subject;
+        this.content = content;
+    }
+
+    // 省略 getter/setter
+}
+```
+
+### 案例二：使用 Topic 实现发布订阅
+
+当一条消息需要被多个消费者处理时，使用 Topic 模式：
+
+```java
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.DeliveryMode;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
+
+public class TopicPublisher {
+
+    public static void main(String[] args) throws Exception {
+        ConnectionFactory connectionFactory =
+            new ActiveMQConnectionFactory("tcp://localhost:61616");
+        Connection connection = connectionFactory.createConnection();
+        connection.start();
+
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Topic topic = session.createTopic("news.topic");
+
+        MessageProducer producer = session.createProducer(topic);
+        producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+
+        for (int i = 0; i < 10; i++) {
+            TextMessage message = session.createTextMessage("新闻消息 " + i);
+            producer.send(message);
+            System.out.println("已发布: " + message.getText());
+        }
+
+        session.close();
+        connection.close();
+    }
+}
+```
+
+### 案例三：配置 ActiveMQ 主备集群
+
+使用共享存储的主备配置示例，`activemq.xml`：
+
+```xml
+<beans>
+  <broker xmlns="http://activemq.apache.org/schema/core"
+          brokerName="localhost"
+          dataDirectory="${activemq.data}">
+
+    <persistenceAdapter>
+      <!-- 共享存储目录，多个 Broker 指向同一目录 -->
+      <kahaDB directory="/shared/storage/kahadb"/>
+    </persistenceAdapter>
+
+    <transportConnectors>
+      <transportConnector name="openwire"
+                          uri="tcp://0.0.0.0:61616?maximumConnections=1000"/>
+    </transportConnectors>
+  </broker>
+</beans>
+```
+
+> 说明：多个 Broker 实例配置相同的共享存储目录，同一时刻只有一个 Broker 能获取到存储锁成为 Master，其他成为 Slave。当 Master 宕机时，Slave 会自动获取锁并升级为 Master，实现高可用。
+
+## 常见问题
+
+### 问题一：消息积压导致内存溢出
+
+**问题描述**：生产者发送消息速度快于消费者处理速度，导致大量消息堆积在 Broker 内存中，最终引发 OOM（Out Of Memory）。
+
+**原因分析**：ActiveMQ 默认会将消息加载到内存中以提升投递速度。当消息积压量超过内存限制时，就会发生 OOM。默认的内存限制是 Broker 堆内存的一定比例。
+
+**解决方案**：
+
+1. 配置 `memoryLimit` 限制 Destination 的内存使用量：
+
+```xml
+<systemUsage>
+  <systemUsage>
+    <memoryUsage>
+      <memoryUsage limit="1 gb"/>
+    </memoryUsage>
+    <storeUsage>
+      <storeUsage limit="10 gb"/>
+    </storeUsage>
+    <tempUsage>
+      <tempUsage limit="5 gb"/>
+    </tempUsage>
+  </systemUsage>
+</systemUsage>
+```
+
+2. 配置消息满后的策略（如转为持久化或拒绝接收）：
+
+```xml
+<policyEntry topic=">" producerFlowControl="true"
+             memoryLimit="100mb"
+             optimalPrefetch="1">
+  <pendingMessageLimitStrategy>
+    <constantPendingMessageLimitStrategy limit="1000"/>
+  </pendingMessageLimitStrategy>
+</policyEntry>
+```
+
+3. 提升消费者消费能力：增加消费者数量、优化消费逻辑。
+
+### 问题二：消费者接收消息重复
+
+**问题描述**：消费者偶尔会收到重复的消息，导致业务数据异常。
+
+**原因分析**：
+- 使用 `AUTO_ACKNOWLEDGE` 确认模式时，消费者在处理消息过程中崩溃，Broker 未收到确认，重启后重新投递。
+- 网络抖动导致确认消息丢失。
+- 主备切换时，Slave 尚未完全同步所有确认状态。
+
+**解决方案**：
+
+1. 在消费者端实现幂等性处理。使用消息的唯一 ID（`JMSMessageID`）进行去重：
+
+```java
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+public class IdempotentConsumer implements MessageListener {
+
+    // 生产环境应使用 Redis 等分布式缓存替代本地 Set
+    private final Set<String> processedMessageIds =
+        Collections.synchronizedSet(new HashSet<>());
+
+    @Override
+    public void onMessage(Message message) {
+        try {
+            String messageId = message.getJMSMessageID();
+            if (processedMessageIds.contains(messageId)) {
+                System.out.println("重复消息，忽略: " + messageId);
+                return;
+            }
+            // 处理消息
+            TextMessage textMessage = (TextMessage) message;
+            System.out.println("处理消息: " + textMessage.getText());
+
+            processedMessageIds.add(messageId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+2. 使用 `CLIENT_ACKNOWLEDGE` 模式，确保处理完消息后再确认。
+
+### 问题三：ActiveMQ 连接超时或断开
+
+**问题描述**：客户端连接 ActiveMQ 时报连接超时，或运行一段时间后连接自动断开。
+
+**原因分析**：
+- ActiveMQ 服务未启动或端口被占用。
+- 防火墙阻止了 61616 端口。
+- 客户端长时间空闲，Broker 主动关闭空闲连接。
+- 网络不稳定导致连接中断。
+
+**解决方案**：
+
+1. 检查 ActiveMQ 服务状态和端口：
+
+```bash
+# 检查 ActiveMQ 进程
+ps -ef | grep activemq
+
+# 检查 61616 端口是否被监听
+netstat -an | grep 61616
+```
+
+2. 调整连接超时和心跳参数：
+
+```java
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(
+    "tcp://localhost:61616?wireFormat.maxInactivityDuration=30000"
+);
+// maxInactivityDuration 表示最大不活动时间（毫秒），超过该时间无数据传输则发送心跳
+```
+
+3. 在 `activemq.xml` 中配置 Transport 的超时参数：
+
+```xml
+<transportConnectors>
+  <transportConnector name="openwire"
+                      uri="tcp://0.0.0.0:61616?wireFormat.maxInactivityDuration=30000&amp;connectionTimeout=60000"/>
+</transportConnectors>
+```
+
+4. 使用连接池（如 `PooledConnectionFactory`）管理连接，实现自动重连：
+
+```java
+import org.apache.activemq.pool.PooledConnectionFactory;
+
+PooledConnectionFactory pooledFactory = new PooledConnectionFactory();
+pooledFactory.setConnectionFactory(new ActiveMQConnectionFactory("tcp://localhost:61616"));
+pooledFactory.setMaxConnections(10);
+pooledFactory.setIdleTimeout(30000);  // 空闲连接超时时间
+```
+
 ## 资源
 
-- [ActiveMQ 官网](http://activemq.apache.org/)
-- [oracle 官方的 jms 介绍](https://docs.oracle.com/cd/E19575-01/819-3669/6n5sg7cgq/index.html)
+- **官方**
+  - [ActiveMQ 官网](http://activemq.apache.org/)
+  - [ActiveMQ 官方文档](http://activemq.apache.org/documentation.html)
+  - [ActiveMQ Github](https://github.com/apache/activemq)
+- **教程**
+  - [oracle 官方的 jms 介绍](https://docs.oracle.com/cd/E19575-01/819-3669/6n5sg7cgq/index.html)
+  - [ActiveMQ in Action](https://www.manning.com/books/activemq-in-action)
+- **文章**
+  - [ActiveMQ 消息中间件详解](https://www.cnblogs.com/yangyongjie/p/11257927.html)

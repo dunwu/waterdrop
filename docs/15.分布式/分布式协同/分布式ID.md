@@ -353,6 +353,437 @@ Math.pow(2, 41) / (365 * 24 * 60 * 60 * 1000L);
 
 当我们需要无序不能被猜测的 ID，并且需要一定高性能，且需要 long 型，那么就可以使用我们雪花算法。比如常见的订单 ID，用雪花算法别人就无法猜测你每天的订单量是多少。
 
+## 应用场景
+
+分布式 ID 在分布式系统中几乎无处不在，常见的典型应用场景包括：
+
+- **分库分表主键** - 当数据库采用分库分表方案后，单表的自增主键无法保证全局唯一，必须使用分布式 ID。例如：电商系统的订单表、支付流水表拆分到多个数据库实例后，订单号需要全局唯一。
+- **订单号 / 流水号** - 业务系统需要生成全局唯一的订单号、支付流水号、退款单号等。这些 ID 除了唯一性外，通常还要求趋势递增、不可猜测（防泄露业务量）。
+- **消息 ID** - 在消息队列中，消息需要全局唯一标识，以便消费端做幂等处理，避免重复消费。
+- **链路追踪 TraceId** - 分布式链路追踪系统中，一次请求跨越多个微服务，需要一个全局唯一的 TraceId 串联整个调用链路。
+- **分布式 Session** - 分布式会话管理中，每个会话需要全局唯一的 SessionID。
+- **文件 / 对象存储** - 分布式文件系统或对象存储中，每个文件 / 对象需要全局唯一的标识，如 FastDFS 的 file_id、OSS 的 object key。
+- **用户 ID / 商品 ID** - 用户量、商品量巨大时，ID 分配需要支持分布式生成，避免单点瓶颈。
+- **日志 / 操作记录 ID** - 分布式日志系统中，每条日志或操作记录需要全局唯一 ID 便于检索和去重。
+
+### 场景选型建议
+
+| 场景 | 推荐方案 | 理由 |
+| ---- | -------- | ---- |
+| 订单号 / 支付流水号 | 雪花算法 / Leaf | 趋势递增、不可猜测、高性能 |
+| 分库分表主键 | 雪花算法 / Leaf 号段 | 全局唯一、单调递增、对索引友好 |
+| 链路追踪 TraceId | 雪花算法变种 | 本地生成、无网络开销、高性能 |
+| 消息 ID | UUID / 雪花算法 | 唯一即可，无需递增 |
+| 用户 ID / 商品 ID | 数据库号段 (Leaf) | 趋势递增、可读性较好 |
+| 缓存 key 防穿透 | UUID | 仅需唯一性，无需递增 |
+
+## 最佳实践
+
+### 案例 1：基于 ShardingSphere 的雪花算法主键生成
+
+ShardingSphere 内置了雪花算法分布式主键生成器 `org.apache.shardingsphere.spi.keygen.core.snowflake.SnowflakeKeyGenerator`，可以直接用于分库分表场景。
+
+（1）Maven 依赖
+
+```xml
+<dependency>
+    <groupId>org.apache.shardingsphere</groupId>
+    <artifactId>shardingsphere-jdbc-core</artifactId>
+    <version>5.3.2</version>
+</dependency>
+```
+
+（2）分片规则配置（YAML）
+
+```yaml
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/demo_ds_0
+    username: root
+    password: root
+
+rules:
+- !SHARDING
+  tables:
+    t_order:
+      actualDataNodes: ds_${0..1}.t_order_${0..1}
+      tableStrategy:
+        standard:
+          shardingColumn: order_id
+          shardingAlgorithmName: t_order_inline
+      keyGenerateStrategy:
+        column: order_id
+        keyGeneratorName: snowflake
+  shardingAlgorithms:
+    t_order_inline:
+      type: INLINE
+      props:
+        algorithm-expression: t_order_${order_id % 2}
+  keyGenerators:
+    snowflake:
+      type: SNOWFLAKE
+      props:
+        worker-id: 123
+```
+
+（3）实体与 Mapper
+
+```java
+public class Order {
+    private Long orderId;
+    private Long userId;
+    private String status;
+    // 省略 getter/setter
+}
+```
+
+```java
+@Mapper
+public interface OrderMapper {
+    @Insert("INSERT INTO t_order (user_id, status) VALUES (#{userId}, #{status})")
+    int insert(Order order);
+}
+```
+
+说明：`order_id` 由 ShardingSphere 自动通过雪花算法生成并回填到实体对象，无需业务代码干预。
+
+### 案例 2：基于 Redis 的自增序列实现秒杀单号
+
+秒杀场景下，要求单号全局唯一、严格递增、生成速度极快，适合使用 Redis 的 `INCR` 命令。
+
+```java
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class RedisSerialIdGenerator {
+
+    private final JedisPool jedisPool;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    /**
+     * 生成订单号：前缀 + 日期 + 6 位自增序列
+     * 例如：SO20260721000001
+     */
+    public String generateOrderNo(String bizPrefix) {
+        String date = LocalDate.now().format(FORMATTER);
+        String key = "id:order:" + bizPrefix + ":" + date;
+        try (Jedis jedis = jedisPool.getResource()) {
+            // 使用 INCR 原子自增，并设置当天过期
+            long seq = jedis.incr(key);
+            if (seq == 1L) {
+                jedis.expire(key, 24 * 60 * 60 + 60);
+            }
+            return String.format("%s%s%06d", bizPrefix, date, seq);
+        }
+    }
+}
+```
+
+使用示例：
+
+```java
+JedisPool pool = new JedisPool("localhost", 6379);
+RedisSerialIdGenerator generator = new RedisSerialIdGenerator(pool);
+String orderNo = generator.generateOrderNo("SO");
+System.out.println(orderNo); // SO20260721000001
+```
+
+说明：通过 Redis 的 `INCR` 原子操作保证序列号唯一且递增；通过 key 加日期维度实现按天归零；通过设置过期时间避免 key 堆积。
+
+### 案例 3：基于 Leaf 号段模式的实现
+
+Leaf 是美团开源的分布式 ID 生成系统，支持号段（Segment）和 Snowflake 两种模式。下面演示号段模式的接入。
+
+（1）数据库初始化
+
+```sql
+CREATE TABLE `leaf_alloc` (
+  `biz_tag` varchar(128) NOT NULL DEFAULT '',
+  `max_id` bigint(20) NOT NULL DEFAULT '1',
+  `step` int(11) NOT NULL,
+  `description` varchar(256) DEFAULT NULL,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`biz_tag`)
+) ENGINE=InnoDB;
+
+INSERT INTO leaf_alloc(biz_tag, max_id, step, description)
+VALUES ('order-service', 1, 2000, '订单服务 ID 号段');
+```
+
+（2）Leaf Server 部署后，通过 HTTP 接口获取 ID
+
+```java
+import org.springframework.web.client.RestTemplate;
+
+public class LeafIdClient {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String leafServerUrl;
+
+    public LeafIdClient(String leafServerUrl) {
+        this.leafServerUrl = leafServerUrl;
+    }
+
+    public long nextId(String bizTag) {
+        String url = leafServerUrl + "/api/segment/get/" + bizTag;
+        String result = restTemplate.getForObject(url, String.class);
+        return Long.parseLong(result);
+    }
+}
+```
+
+（3）业务调用
+
+```java
+LeafIdClient client = new LeafIdClient("http://leaf-server:8080");
+long orderId = client.nextId("order-service");
+System.out.println("生成的订单 ID: " + orderId);
+```
+
+说明：Leaf 通过双 Buffer 优化，在号段消耗到一定比例时异步预加载下一个号段，避免号段切换时的阻塞。`biz_tag` 实现了业务隔离，不同业务的 ID 生成互不影响。
+
+## 常见问题
+
+### 问题 1：雪花算法时钟回拨导致 ID 重复
+
+**问题描述**：生产环境中，某台机器因 NTP 同步或人工调整时间，发生时钟回拨，导致雪花算法生成了重复的 ID，引发主键冲突。
+
+**原因分析**：雪花算法强依赖机器时钟，`41bit` 时间戳记录的是当前时间与起始时间的差值。当时钟回拨后，`lastTimestamp` 会大于当前时间，如果直接使用当前时间生成 ID，则可能与之前生成的 ID 重复（尤其是序列号位也在同一毫秒内被重置）。
+
+**解决方案**：在 `nextId()` 方法中加入时钟回拨检测与处理逻辑。
+
+```java
+public class SafeSnowflakeIdGenerator {
+
+    // 起始时间戳 (2026-01-01 00:00:00)
+    private static final long EPOCH = 1767196800000L;
+    private static final long WORKER_ID_BITS = 10L;
+    private static final long SEQUENCE_BITS = 12L;
+    private static final long MAX_WORKER_ID = ~(-1L << WORKER_ID_BITS);
+    private static final long SEQUENCE_MASK = ~(-1L << SEQUENCE_BITS);
+    private static final long WORKER_ID_SHIFT = SEQUENCE_BITS;
+    private static final long TIMESTAMP_LEFT_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS;
+
+    private final long workerId;
+    private long sequence = 0L;
+    private long lastTimestamp = -1L;
+    // 时钟回拨最大容忍毫秒数
+    private static final long MAX_BACKWARD_MS = 5L;
+
+    public SafeSnowflakeIdGenerator(long workerId) {
+        if (workerId < 0 || workerId > MAX_WORKER_ID) {
+            throw new IllegalArgumentException("workerId 非法");
+        }
+        this.workerId = workerId;
+    }
+
+    public synchronized long nextId() {
+        long currentTimestamp = System.currentTimeMillis();
+
+        // 时钟回拨检测
+        if (currentTimestamp < lastTimestamp) {
+            long offset = lastTimestamp - currentTimestamp;
+            if (offset <= MAX_BACKWARD_MS) {
+                // 回拨在容忍范围内，等待时钟追上
+                try {
+                    wait(offset + 1);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("时钟回拨等待被中断", e);
+                }
+                currentTimestamp = System.currentTimeMillis();
+                if (currentTimestamp < lastTimestamp) {
+                    throw new RuntimeException("时钟回拨超过容忍范围，拒绝生成 ID");
+                }
+            } else {
+                throw new RuntimeException("时钟回拨 " + offset + "ms，超过容忍范围 " + MAX_BACKWARD_MS + "ms");
+            }
+        }
+
+        if (currentTimestamp == lastTimestamp) {
+            sequence = (sequence + 1) & SEQUENCE_MASK;
+            if (sequence == 0L) {
+                // 同一毫秒序列号耗尽，等待下一毫秒
+                currentTimestamp = tilNextMillis(lastTimestamp);
+            }
+        } else {
+            sequence = 0L;
+        }
+
+        lastTimestamp = currentTimestamp;
+        return ((currentTimestamp - EPOCH) << TIMESTAMP_LEFT_SHIFT)
+                | (workerId << WORKER_ID_SHIFT)
+                | sequence;
+    }
+
+    private long tilNextMillis(long lastTimestamp) {
+        long timestamp = System.currentTimeMillis();
+        while (timestamp <= lastTimestamp) {
+            timestamp = System.currentTimeMillis();
+        }
+        return timestamp;
+    }
+}
+```
+
+说明：该实现中，当时钟回拨在 `MAX_BACKWARD_MS`（如 5ms）以内时，通过 `wait()` 等待时钟追上；超过容忍范围则直接抛出异常，拒绝生成 ID，避免重复。
+
+### 问题 2：UUID 作为 MySQL 主键导致性能下降
+
+**问题描述**：某系统将 `UUID.randomUUID().toString()` 生成的 32 位字符串作为 MySQL InnoDB 表的主键，随着数据量增长，写入性能急剧下降，且磁盘空间占用较大。
+
+**原因分析**：InnoDB 使用 B+ 树聚簇索引存储数据，数据物理存储顺序与主键顺序一致。UUID 是完全无序的，每次插入的主键值可能落在 B+ 树的任意位置，导致：
+1. **频繁页分裂**：新数据插入到已有数据页中间，触发页分裂与数据移动。
+2. **索引碎片化**：页分裂导致数据页不连续，磁盘随机 IO 增加。
+3. **空间浪费**：UUID 字符串占用 36 字节（含 `-`），远大于 `bigint` 的 8 字节，二级索引也会存储主键，导致空间放大。
+
+**解决方案**：将主键改为趋势递增的 `bigint`，使用雪花算法或数据库号段生成。
+
+```sql
+-- 1. 新增 bigint 主键列
+ALTER TABLE t_order ADD COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+-- 2. 删除原 UUID 主键
+ALTER TABLE t_order DROP PRIMARY KEY;
+-- 3. 将原 UUID 字段改为普通唯一索引（如业务仍需）
+ALTER TABLE t_order MODIFY uuid CHAR(36) NOT NULL, ADD UNIQUE KEY uk_uuid (uuid);
+```
+
+如果业务上确实需要保留 UUID 作为业务标识，应将其作为普通唯一索引，而用雪花算法生成的 `bigint` 作为物理主键：
+
+```java
+public class Order {
+    // 物理主键，由雪花算法生成，趋势递增，对 B+ 树友好
+    private Long id;
+    // 业务唯一标识，UUID 生成，仅用于业务层引用
+    private String uuid = java.util.UUID.randomUUID().toString();
+    // 其他字段...
+}
+```
+
+### 问题 3：数据库号段模式单点故障导致服务不可用
+
+**问题描述**：使用数据库号段模式生成 ID 的系统，在数据库主节点宕机后，ID 生成服务完全不可用，导致上游业务大面积报错。
+
+**原因分析**：号段模式依赖单一数据库实例，当该实例宕机或网络不通时，无法更新 `max_id` 获取新号段，所有依赖 ID 的业务均会失败。
+
+**解决方案**：
+
+1. **数据库高可用**：使用 MySQL 主从 + MHA / Orchestrator 等高可用方案，主节点故障时自动切换到从节点。
+2. **Leaf 双 Buffer 预加载**：在当前号段消耗到一定比例（如 20%）时，异步加载下一个号段，缓存在内存中。即使数据库短暂不可用，仍可从内存号段发号。
+3. **降级方案**：当数据库不可用时，降级到本地雪花算法生成 ID，保证业务可用性（牺牲短暂的趋势递增连续性）。
+
+下面是双 Buffer + 降级的简化实现：
+
+```java
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.concurrent.atomic.AtomicLong;
+
+public class SegmentBufferIdGenerator {
+
+    private final DataSource dataSource;
+    private final String bizTag;
+    private final int step;
+
+    // 双 Buffer
+    private volatile Segment current;
+    private volatile Segment next;
+    private volatile boolean isLoadingNext = false;
+    // 降级用的雪花算法
+    private final SafeSnowflakeIdGenerator fallback = new SafeSnowflakeIdGenerator(1);
+
+    public SegmentBufferIdGenerator(DataSource dataSource, String bizTag, int step) {
+        this.dataSource = dataSource;
+        this.bizTag = bizTag;
+        this.step = step;
+        this.current = loadSegment();
+    }
+
+    public synchronized long nextId() {
+        long id = current.nextId();
+        // 号段消耗超过 20%，异步加载下一个
+        if (!isLoadingNext && current.needLoadNext() && next == null) {
+            isLoadingNext = true;
+            new Thread(() -> {
+                try {
+                    next = loadSegment();
+                } catch (Exception e) {
+                    // 加载失败，next 保持 null
+                } finally {
+                    isLoadingNext = false;
+                }
+            }).start();
+        }
+        // 当前号段耗尽
+        if (id == -1L) {
+            if (next != null) {
+                current = next;
+                next = null;
+                id = current.nextId();
+            } else {
+                // 降级到雪花算法
+                return fallback.nextId();
+            }
+        }
+        return id;
+    }
+
+    private Segment loadSegment() {
+        try (Connection conn = dataSource.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement update = conn.prepareStatement(
+                    "UPDATE leaf_alloc SET max_id = max_id + step WHERE biz_tag = ?")) {
+                update.setString(1, bizTag);
+                update.executeUpdate();
+            }
+            try (PreparedStatement select = conn.prepareStatement(
+                    "SELECT max_id, step FROM leaf_alloc WHERE biz_tag = ?")) {
+                select.setString(1, bizTag);
+                ResultSet rs = select.executeQuery();
+                if (rs.next()) {
+                    long maxId = rs.getLong("max_id");
+                    int step = rs.getInt("step");
+                    conn.commit();
+                    return new Segment(maxId - step + 1, maxId, step);
+                }
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException("加载号段失败", e);
+        }
+        throw new RuntimeException("biz_tag 不存在: " + bizTag);
+    }
+
+    private static class Segment {
+        private final AtomicLong value;
+        private final long maxId;
+        private final long step;
+
+        Segment(long minId, long maxId, long step) {
+            this.value = new AtomicLong(minId);
+            this.maxId = maxId;
+            this.step = step;
+        }
+
+        long nextId() {
+            long id = value.getAndIncrement();
+            return id > maxId ? -1L : id;
+        }
+
+        boolean needLoadNext() {
+            return (maxId - value.get()) < step * 0.2;
+        }
+    }
+}
+```
+
+说明：该实现通过双 Buffer 异步预加载号段，数据库短暂不可用时仍可从内存发号；当内存号段也耗尽且数据库仍不可用时，降级到雪花算法，保证业务不中断。
+
 ## 参考资料
 
 - [如果再有人问你分布式 ID，这篇文章丢给他](https://juejin.im/post/5bb0217ef265da0ac2567b42)

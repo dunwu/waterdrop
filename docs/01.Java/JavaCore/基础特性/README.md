@@ -22,18 +22,18 @@ dir:
 
 ## 📖 内容
 
-- [Java 基础语法特性](Java_基础语法.md)
-- [Java 基本数据类型](Java_数据类型.md)
-- [Java 面向对象](Java_面向对象.md)
-- [Java 方法](Java_方法.md)
-- [Java 数组](Java_数组.md)
-- [Java 枚举](Java_枚举.md)
-- [Java 控制语句](Java_控制语句.md)
-- [Java 异常](Java_异常.md)
-- [Java 泛型](Java_泛型.md)
-- [Java 反射](Java_反射.md)
-- [Java 注解](Java_注解.md)
-- [Java String 类型](Java_String.md)
+- [Java 基础语法特性]([JavaCore]基础语法.md) - 关键词：`强类型`、`注释`、`变量`、`常量`、`操作符`、`访问修饰符`、`final`、`序列化`
+- [Java 基本数据类型]([JavaCore]数据类型.md) - 关键词：`值类型`、`引用类型`、`装箱`、`拆箱`、`包装类`、`缓存机制`、`equals`、`BigDecimal`、`精度丢失`
+- [Java 面向对象]([JavaCore]面向对象.md) - 关键词：`封装`、`继承`、`多态`、`类`、`接口`、`抽象类`、`访问权限`、`extends`、`implements`
+- [Java 方法]([JavaCore]方法.md) - 关键词：`方法定义`、`值传递`、`修饰符`、`static`、`final`、`构造方法`、`重载`、`覆写`、`可变参数`
+- [Java 数组]([JavaCore]数组.md) - 关键词：`引用类型`、`数组维度`、`多维数组`、`Arrays`、`下标`、`长度固定`
+- [Java 枚举]([JavaCore]枚举.md) - 关键词：`enum`、`Enum`、`枚举本质`、`EnumSet`、`EnumMap`、`单例模式`、`switch`、`状态机`
+- [Java 控制语句]([JavaCore]控制语句.md) - 关键词：`if`、`switch`、`while`、`for`、`foreach`、`break`、`continue`、`return`、`流程控制`
+- [Java 异常]([JavaCore]异常.md) - 关键词：`Throwable`、`Error`、`Exception`、`RuntimeException`、`try-catch-finally`、`throw`、`throws`、`异常链`、`Checked Exception`
+- [Java 泛型]([JavaCore]泛型.md) - 关键词：`泛型类`、`泛型方法`、`类型擦除`、`类型边界`、`通配符`、`PECS`、`extends`、`super`
+- [Java 反射]([JavaCore]反射.md) - 关键词：`Class`、`Field`、`Method`、`Constructor`、`invoke`、`动态代理`、`JDK 动态代理`、`CGLIB`、`InvocationHandler`
+- [Java 注解]([JavaCore]注解.md) - 关键词：`@interface`、`元注解`、`@Retention`、`@Target`、`@Override`、`反射解析`、`内置注解`、`自定义注解`
+- [Java String 类型]([JavaCore]String.md) - 关键词：`不可变`、`final`、`字符串常量池`、`intern`、`StringBuilder`、`StringBuffer`、`equals`、`hashCode`
 
 ## 📚 资料
 

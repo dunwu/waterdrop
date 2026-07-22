@@ -41,12 +41,12 @@ index: false
 - [服务容错](分布式治理/服务容错.md)
 - [分布式协同面试](分布式协同/分布式协同面试.md) 💯
 - **ZooKeeper**
-  - [ZooKeeper 原理](分布式协同/ZooKeeper/ZooKeeper_原理.md)
-  - [ZooKeeper Java Api](分布式协同/ZooKeeper/ZooKeeper_API.md)
-  - [ZooKeeper 命令](分布式协同/ZooKeeper/ZooKeeper_命令.md)
-  - [ZooKeeper 运维](分布式协同/ZooKeeper/ZooKeeper_运维.md)
-  - [ZooKeeper Acl](分布式协同/ZooKeeper/ZooKeeper_ACL.md)
-  - [ZooKeeper 面试](分布式协同/ZooKeeper/ZooKeeper_面试.md) 💯
+  - [ZooKeeper 原理](分布式协同/ZooKeeper/[ZooKeeper]原理.md)
+  - [ZooKeeper Java Api](分布式协同/ZooKeeper/[ZooKeeper]API.md)
+  - [ZooKeeper 命令](分布式协同/ZooKeeper/[ZooKeeper]命令.md)
+  - [ZooKeeper 运维](分布式协同/ZooKeeper/[ZooKeeper]运维.md)
+  - [ZooKeeper Acl](分布式协同/ZooKeeper/[ZooKeeper]ACL.md)
+  - [ZooKeeper 面试](分布式协同/ZooKeeper/[ZooKeeper]面试.md) 💯
 
 ### [分布式调度](分布式调度)
 
@@ -67,33 +67,33 @@ index: false
 
 #### [RPC](分布式通信/RPC)
 
-- [Dubbo 面试之服务治理](分布式通信/RPC/Dubbo_面试_服务治理.md) 💯
-- [Dubbo 面试之架构](分布式通信/RPC/Dubbo_面试_架构.md) 💯
-- [Dubbo 面试之应用](分布式通信/RPC/Dubbo_面试_应用.md) 💯
-- [RPC 面试](分布式通信/RPC/RPC_面试.md) 💯
+- [Dubbo 面试之服务治理](分布式通信/RPC/[Dubbo][面试]服务治理.md) 💯
+- [Dubbo 面试之架构](分布式通信/RPC/[Dubbo][面试]架构.md) 💯
+- [Dubbo 面试之应用](分布式通信/RPC/[Dubbo][面试]应用.md) 💯
+- [RPC 面试](分布式通信/RPC/RPC面试.md) 💯
 
 #### [MQ](分布式通信/MQ)
 
-- [MQ 面试](分布式通信/MQ/MQ_面试.md) 💯
-- [RabbitMQ 面试](分布式通信/MQ/RabbitMQ_面试.md) 💯
+- [MQ 面试](分布式通信/MQ/MQ面试.md) 💯
+- [RabbitMQ 面试](分布式通信/MQ/RabbitMQ面试.md) 💯
 - [ActiveMQ](分布式通信/MQ/ActiveMQ.md)
 
 ##### [Kafka](分布式通信/MQ/Kafka)
 
-- [Kafka 快速入门](分布式通信/MQ/Kafka/Kafka_快速入门.md)
-- [Kafka 生产](分布式通信/MQ/Kafka/Kafka_生产.md)
-- [Kafka 消费](分布式通信/MQ/Kafka/Kafka_消费.md)
-- [Kafka 集群](分布式通信/MQ/Kafka/Kafka_集群.md)
-- [Kafka 可靠传输](分布式通信/MQ/Kafka/Kafka_可靠传输.md)
-- [Kafka 存储](分布式通信/MQ/Kafka/Kafka_存储.md)
-- [Kafka 流式处理](分布式通信/MQ/Kafka/Kafka_流式处理.md)
-- [Kafka 运维](分布式通信/MQ/Kafka/Kafka_运维.md)
-- [Kafka 面试](分布式通信/MQ/Kafka/Kafka_面试.md) 💯
+- [Kafka 快速入门](分布式通信/MQ/Kafka/[Kafka]快速入门.md)
+- [Kafka 生产](分布式通信/MQ/Kafka/[Kafka]生产.md)
+- [Kafka 消费](分布式通信/MQ/Kafka/[Kafka]消费.md)
+- [Kafka 集群](分布式通信/MQ/Kafka/[Kafka]集群.md)
+- [Kafka 可靠传输](分布式通信/MQ/Kafka/[Kafka]可靠传输.md)
+- [Kafka 存储](分布式通信/MQ/Kafka/[Kafka]存储.md)
+- [Kafka 流式处理](分布式通信/MQ/Kafka/[Kafka]流式处理.md)
+- [Kafka 运维](分布式通信/MQ/Kafka/[Kafka]运维.md)
+- [Kafka 面试](分布式通信/MQ/Kafka/[Kafka]面试.md) 💯
 
 ##### [RocketMQ](分布式通信/MQ/RocketMQ)
 
-- [RocketMQ 快速入门](分布式通信/MQ/RocketMQ/RocketMQ_快速入门.md)
-- [RocketMQ 面试](分布式通信/MQ/RocketMQ/RocketMQ_面试.md) 💯
+- [RocketMQ 快速入门](分布式通信/MQ/RocketMQ/[RocketMQ]快速入门.md)
+- [RocketMQ 面试](分布式通信/MQ/RocketMQ/[RocketMQ]面试.md) 💯
 
 ### [分布式存储](分布式存储)
 
