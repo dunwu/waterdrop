@@ -20,7 +20,7 @@ index: false
 - [MapReduce](MapReduce.md)
 - [YARN](YARN.md)
 - [HDFS](HDFS.md)
-- [Hadoop 面试](Hadoop_面试.md) 💯
+- [Hadoop 面试](Hadoop面试.md) 💯
 
 ## 🚪 传送
 

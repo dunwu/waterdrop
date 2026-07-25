@@ -47,18 +47,18 @@ index: false
 - [HDFS](Hadoop/HDFS.md)
 - [YARN](Hadoop/YARN.md)
 - [MapReduce](Hadoop/MapReduce.md)
-- [Hadoop 面试](Hadoop/Hadoop_面试.md) 💯
+- [Hadoop 面试](Hadoop/Hadoop面试.md) 💯
 
 ### [HIVE](Hive)
 
-- [Hive 简介](Hive/Hive_简介.md)
-- [Hive 表](Hive/Hive_表.md)
-- [Hive 视图和索引](Hive/Hive_视图和索引.md)
-- [Hive 查询](Hive/Hive_查询.md)
-- [Hive DDL](Hive/Hive_DDL.md)
-- [Hive DML](Hive/Hive_DML.md)
-- [Hive 运维](Hive/Hive_运维.md)
-- [Hive 面试](Hive/Hive_面试.md) 💯
+- [Hive 简介](Hive/[Hive]简介.md)
+- [Hive 表](Hive/[Hive]表.md)
+- [Hive 视图和索引](Hive/[Hive]视图和索引.md)
+- [Hive 查询](Hive/[Hive]查询.md)
+- [Hive DDL](Hive/[Hive]DDL.md)
+- [Hive DML](Hive/[Hive]DML.md)
+- [Hive 运维](Hive/[Hive]运维.md)
+- [Hive 面试](Hive/[Hive]面试.md) 💯
 
 ### Kafka
 

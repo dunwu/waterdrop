@@ -15,7 +15,7 @@ index: false
 
 # Python 教程
 
-[初识 Python](Python_简介.md)
+[初识 Python]([Python]简介.md)
 
 ## 📚 资料
 
