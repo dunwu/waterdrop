@@ -14,17 +14,17 @@ index: false
 
 ## JavaCore
 
-- [Java 基础面试一](../01.Java/JavaCore/面试/Java_面试_基础（一）.md) 💯
-- [Java 基础面试二](../01.Java/JavaCore/面试/Java_面试_基础（二）.md) 💯
-- [Java 基础面试三](../01.Java/JavaCore/面试/Java_面试_基础（三）.md) 💯
-- [Java 容器面试一](../01.Java/JavaCore/面试/Java_面试_容器（一）.md) 💯
-- [Java 容器面试二](../01.Java/JavaCore/面试/Java_面试_容器（二）.md) 💯
-- [Java 容器面试三](../01.Java/JavaCore/面试/Java_面试_容器（三）.md) 💯
-- [Java 并发面试一](../01.Java/JavaCore/面试/Java_面试_并发（一）.md) 💯
-- [Java 并发面试二](../01.Java/JavaCore/面试/Java_面试_并发（二）.md) 💯
-- [Java 并发面试三](../01.Java/JavaCore/面试/Java_面试_并发（三）.md) 💯
-- [Java 虚拟机面试一](../01.Java/JavaCore/面试/Java_面试_虚拟机（一）.md) 💯
-- [Java 虚拟机面试二](../01.Java/JavaCore/面试/Java_面试_虚拟机（二）.md) 💯
+- [Java 基础面试一](../01.Java/JavaCore/面试/[JavaCore][面试]基础（一）.md) 💯
+- [Java 基础面试二](../01.Java/JavaCore/面试/[JavaCore][面试]基础（二）.md) 💯
+- [Java 基础面试三](../01.Java/JavaCore/面试/[JavaCore][面试]基础（三）.md) 💯
+- [Java 容器面试一](../01.Java/JavaCore/面试/[JavaCore][面试]容器（一）.md) 💯
+- [Java 容器面试二](../01.Java/JavaCore/面试/[JavaCore][面试]容器（二）.md) 💯
+- [Java 容器面试三](../01.Java/JavaCore/面试/[JavaCore][面试]容器（三）.md) 💯
+- [Java 并发面试一](../01.Java/JavaCore/面试/[JavaCore][面试]并发（一）.md) 💯
+- [Java 并发面试二](../01.Java/JavaCore/面试/[JavaCore][面试]并发（二）.md) 💯
+- [Java 并发面试三](../01.Java/JavaCore/面试/[JavaCore][面试]并发（三）.md) 💯
+- [Java 虚拟机面试一](../01.Java/JavaCore/面试/[JavaCore][面试]虚拟机（一）.md) 💯
+- [Java 虚拟机面试二](../01.Java/JavaCore/面试/[JavaCore][面试]虚拟机（二）.md) 💯
 
 ## Java 框架
 
@@ -74,9 +74,9 @@ index: false
 ## DevOps
 
 - [DevOps 面试](../04.DevOps/DevOps_面试.md) 💯
-- [Docker 面试](../04.DevOps/工具/Docker/Docker_面试.md) 💯
+- [Docker 面试](../04.DevOps/工具/Docker/[Docker]面试.md) 💯
 - [Kubernetes 面试](../04.DevOps/工具/Kubernetes/K8S_面试.md) 💯
-- [Nginx 面试](../04.DevOps/工具/Nginx/Nginx_面试.md) 💯
+- [Nginx 面试](../04.DevOps/工具/Nginx/[Nginx]面试.md) 💯
 
 ## 📚 资料
 

@@ -554,10 +554,10 @@ RPC 请求的次数=（行数、*每行列数）/Min（每行的列数，批量�
 
 ## 最佳实践
 
-- **批量操作优于循环**：使用 put(List<Put>) 批量写入，减少 RPC 次数，提升性能。
-- **合理使用 Scan 缓存**：设置 setBatch() 和 setCaching() 控制每次扫描返回的行数，避免内存溢出。
-- **关闭自动 flush**：批量写入时关闭 autoFlush，使用手动 flush 提升性能。
-- **资源及时释放**：使用 try-with-resources 确保 ResultScanner、Table 等资源及时关闭。
+- **批量操作优于循环**：使用 `put(List<Put>)` 批量写入，减少 RPC 次数，提升性能。
+- **合理使用 Scan 缓存**：设置 `setBatch()` 和 `setCaching()` 控制每次扫描返回的行数，避免内存溢出。
+- **关闭自动 flush**：批量写入时关闭 `autoFlush`，使用手动 flush 提升性能。
+- **资源及时释放**：使用 `try-with-resources` 确保 `ResultScanner`、`Table` 等资源及时关闭。
 
 ## 常见问题
 

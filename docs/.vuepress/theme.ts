@@ -10,8 +10,6 @@ export default hopeTheme({
     url: 'https://dunwu.github.io/waterdrop'
   },
 
-  iconAssets: 'iconify',
-
   logo: '/logo.svg',
 
   repo: 'dunwu/waterdrop',
@@ -74,9 +72,35 @@ export default hopeTheme({
   },
 
   markdown: {
+    align: true,
+    attrs: true,
+    codeTabs: true,
+    figure: true,
+    gfm: true,
+    imgLazyload: true,
+    imgSize: true,
+    include: true,
+    mark: true,
     math: {
-      type: "katex", // 支持数学公式 Tex
+      type: 'katex'
     },
+    stylize: [
+      {
+        matcher: 'Recommended',
+        replacer: ({ tag }) => {
+          if (tag === 'em')
+            return {
+              tag: 'Badge',
+              attrs: { type: 'tip' },
+              content: 'Recommended'
+            }
+        }
+      }
+    ],
+    sub: true,
+    sup: true,
+    tabs: true,
+    vPre: true
   },
 
   // page meta
@@ -87,51 +111,24 @@ export default hopeTheme({
   plugins: {
     blog: true,
 
-    comment: {
-      // You should generate and use your own comment service
-      provider: 'Waline',
-      serverURL: 'https://waline-comment.vuejs.press'
+    icon: {
+      assets: 'iconify'
     },
 
-    // all features are enabled for demo, only preserve features you need here
-    mdEnhance: {
-      align: true,
-      attrs: true,
-      chart: true,
-      codetabs: true,
-      demo: true,
-      echarts: true,
-      figure: true,
-      flowchart: true,
-      gfm: true,
-      imgLazyload: true,
-      imgSize: true,
-      include: true,
-      katex: true,
-      mark: true,
-      mermaid: true,
-      playground: {
-        presets: ['ts', 'vue']
-      },
-      presentation: ['highlight', 'math', 'search', 'notes', 'zoom'],
-      stylize: [
+    slimsearch: {
+      indexContent: false,
+      customFields: [
         {
-          matcher: 'Recommended',
-          replacer: ({ tag }) => {
-            if (tag === 'em')
-              return {
-                tag: 'Badge',
-                attrs: { type: 'tip' },
-                content: 'Recommended'
-              }
-          }
+          name: 'category',
+          getter: (page) => page.frontmatter.category,
+          formatter: '分类：$content'
+        },
+        {
+          name: 'tag',
+          getter: (page) => page.frontmatter.tag,
+          formatter: '标签：$content'
         }
-      ],
-      sub: true,
-      sup: true,
-      tabs: true,
-      vPre: true,
-      vuePlayground: true
+      ]
     }
 
     // uncomment these if you want a PWA

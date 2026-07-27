@@ -1,6 +1,6 @@
 ---
 home: true
-layout: BlogHome
+layout: Blog
 icon: mdi:home
 title: 首页
 #heroImage: /logo.svg

@@ -34,11 +34,11 @@ index: false
   - [Kubernetes 快速入门](工具/Kubernetes/K8S.md)
   - [Kubernetes 面试](工具/Kubernetes/K8S_面试.md)
 - [Nginx](工具/Nginx)
-  - [Nginx 快速入门](工具/Nginx/Nginx_快速入门.md)
-  - [Nginx 简介](工具/Nginx/Nginx_简介.md)
-  - [Nginx 配置](工具/Nginx/Nginx_配置.md)
-  - [Nginx 运维](工具/Nginx/Nginx_运维.md)
-  - [Nginx 面试](工具/Nginx/Nginx_面试.md)
+  - [Nginx 快速入门](工具/Nginx/[Nginx]快速入门.md)
+  - [Nginx 简介](工具/Nginx/[Nginx]简介.md)
+  - [Nginx 配置](工具/Nginx/[Nginx]配置.md)
+  - [Nginx 运维](工具/Nginx/[Nginx]运维.md)
+  - [Nginx 面试](工具/Nginx/[Nginx]面试.md)
 - 其他
   - [正则表达式](工具/其他/正则.md)
 

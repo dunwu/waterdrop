@@ -785,12 +785,6 @@ Dispatcher 决定了哪些事件在 IO 线程执行，哪些在 Dubbo 业务线�
 
 Dubbo 中，可以通过集成 Hystrix 或 Sentinel 来实现限流、熔断、降级。
 
-### 【中等】Dubbo 中的流量控制策略有哪些？⭐⭐
-
-流量控制策略主要包括：限流、熔断、降级
-
-Dubbo 中，可以通过集成 Hystrix 或 Sentinel 来实现限流、熔断、降级。
-
 ### 【中等】Dubbo 如何集成 Sentinel 实现限流降级？⭐⭐
 
 **Sentinel 集成方式**：

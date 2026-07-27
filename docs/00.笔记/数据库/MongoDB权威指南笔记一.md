@@ -482,9 +482,9 @@ db.collection.updateMany(
 > db.blog.posts.updateOne({"title":"A blog post"},{"$push":{"comments":{"name":"joe","email":"joe@example.com","content":"nice post."}}})
 ```
 
-**如果将数组视为队列或者栈，那么可以使用 "$pop"从任意一端删除元素**。`{"$pop":{"key":1}}` 会从数组末尾删除一个元素，`{"$pop":{"key":-1}}` 则会从头部删除它。
+**如果将数组视为队列或者栈，那么可以使用 `$pop` 从任意一端删除元素**。`{"$pop":{"key":1}}` 会从数组末尾删除一个元素，`{"$pop":{"key":-1}}` 则会从头部删除它。
 
-**"$pull" 用于删除与给定条件匹配的数组元素**。
+**`$pull` 用于删除与给定条件匹配的数组元素**。
 
 ```json
 > db.lists.updateOne({}, {"$pull" : {"todo" : "laundry"}})
