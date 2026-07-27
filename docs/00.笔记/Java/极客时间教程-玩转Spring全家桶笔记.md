@@ -22,11 +22,9 @@ permalink: /pages/2b294880/
 
 ### 02 | 一起认识 Spring 家族的主要成员
 
-Spring Framework - 用于构建企业级应用的轻量级一站式解决方案
-
-Spring Boot - 快速构建基于 Spring 的应用程序
-
-Spring Cloud - 简化分布式系统的开发
+- **Spring Framework**：构建企业级应用的轻量级一站式解决方案
+- **Spring Boot**：快速构建基于 Spring 的应用程序
+- **Spring Cloud**：简化分布式系统的开发
 
 ### 03 | 跟着 Spring 了解技术趋势
 
@@ -83,7 +81,7 @@ JdbcTemplateAutoConfiguration
 初始化内嵌数据库
 
 - `spring.datasource.initialization-mode=embedded|always|never`
-- spring.datasource.schema 与 spring.datasource.data 确定初始化 SQL ⽂文件
+- spring.datasource.schema 与 spring.datasource.data 确定初始化 SQL 文文件
 - `spring.datasource.platform=hsqldb | h2 | oracle | mysql | postgresql`（与前者对应）
 
 ### 06 | 如何配置多数据源
@@ -770,7 +768,7 @@ HikariCP
 Alibaba Druid
 
 - 内置 SQL 输出
-- https://github.com/alibaba/druid/wiki/Druid中使⽤用log4j2进⾏行行⽇日志输出
+- https://github.com/alibaba/druid/wiki/Druid中使用用log4j2进行行行日日志输出
 
 ### 38 | SpringBucks 实战项目进度小结
 
@@ -780,7 +778,7 @@ Alibaba Druid
 
 ### 39 | 编写第一个 Spring MVC Controller
 
-### 认识 Spring MVC
+#### 认识 Spring MVC
 
 DispatcherServlet
 
@@ -791,7 +789,7 @@ DispatcherServlet
 - MultipartResolver
 - HandlerMapping
 
-### Spring MVC 中的常⽤用注解
+#### Spring MVC 中的常用注解
 
 - @Controller
 - @RestController
@@ -802,7 +800,7 @@ DispatcherServlet
 
 ### 40 | 理解 Spring 的应用上下文
 
-### Spring 的应用程序上下文
+#### Spring 的应用程序上下文
 
 **关于上下文常用的接口**
 
@@ -832,13 +830,13 @@ Handler 处理
 
 ### 42 | 如何定义处理方法（上）
 
-### 定义映射关系
+#### 定义映射关系
 
 @Controller
 
 @RequestMapping
 
-- path / method 指定映射路路径与⽅方法
+- path / method 指定映射路径与方方法
 - params / headers 限定映射范围
 - consumes / produces 限定请求与响应格式
 
@@ -847,13 +845,13 @@ Handler 处理
 - @RestController
 - @GetMapping / @PostMapping / @PutMapping / @DeleteMapping / @PatchMapping
 
-### 定义处理方法
+#### 定义处理方法
 
 - @RequestBody / @ResponseBody / @ResponseStatus
 - @PathVariable / @RequestParam / @RequestHeader
 - HttpEntity / ResponseEntity
 
-### 定义类型转换
+#### 定义类型转换
 
 自己实现 WebMvcConfigurer
 
@@ -861,14 +859,14 @@ Handler 处理
 - 添加自定义的 Converter
 - 添加自定义的 Formatter
 
-### 定义校验
+#### 定义校验
 
 - 通过 Validator 对绑定结果进行校验
   - Hibernate Validator
 - @Valid 注解
 - BindingResult
 
-### Multipart 上传
+#### Multipart 上传
 
 - 配置 MultipartResolver
 - Spring Boot 自动配置 MultipartAutoConfiguration
@@ -894,7 +892,7 @@ ViewResolver 与 View 接口
 #### DispatcherServlet 中的视图解析逻辑
 
 - initStrategies()
-  - initViewResolvers() 初始化了了对应 ViewResolver
+  - initViewResolvers() 初始化了了对应 ViewResolver
 - doDispatch()
   - processDispatchResult()
     - 没有返回视图的话，尝试 RequestToViewNameTranslator
@@ -1110,7 +1108,7 @@ DELETE 请求
 
 ### 55 | 简单定制 RestTemplate
 
-#### RestTemplate ⽀支持的 HTTP 库
+#### RestTemplate 支支持的 HTTP 库
 
 通用接口
 
@@ -1207,7 +1205,7 @@ WebClient
 - 将资源合并为复合资源
 - 计算或处理函数
 
-### 资源的粒度
+#### 资源的粒度
 
 站在客户端的角度，要考虑
 
@@ -1228,7 +1226,7 @@ WebClient
 - 在 URI 的路径部分使用逗号 ( , ) 和分号 ( ; ) 来表示非层次元素
 - 使用连字符 ( - ) 和下划线 ( \_ ) 来改善长路径中名称的可读性
 - 在 URI 的查询部分使用“与”符号 ( & ) 来分隔参数
-- 在 URI 中避免出现文件扩展名 ( 例例如 .php，.aspx 和 .jsp )
+- 在 URI 中避免出现文件扩展名 ( 例如 .php，.aspx 和 .jsp )
 
 ### 60 | 什么是 HATEOAS
 
@@ -1339,7 +1337,7 @@ Spring Session
 
 #### WebMVC v.s. WebFlux
 
-- 已有 Spring MVC 应⽤用，运行正常，就别改了
+- 已有 Spring MVC 应用用，运行正常，就别改了
 - 依赖了大量阻塞式持久化 API 和网络 API，建议使用 Spring MVC
 - 已经使用了非阻塞技术栈，可以考虑使用 WebFlux
 - 想要使用 Java 8 Lambda 结合轻量级函数式框架，可以考虑 WebFlux
@@ -1371,7 +1369,7 @@ Spring Session
 
 ### 67 | 认识 Spring Boot 的组成部分
 
-### Spring Boot 的特性
+#### Spring Boot 的特性
 
 - 方便地创建可独立运行的 Spring 应用程序
 - 直接内嵌 Tomcat、Jetty 或 Undertow
@@ -1380,7 +1378,7 @@ Spring Session
 - 提供生产级特性
 - 无需生成代码或进行 XML 配置
 
-### Spring Boot 的四大核心
+#### Spring Boot 的四大核心
 
 - 自动配置 - Auto Configuration
 - 起步依赖 - Starter Dependency
@@ -1389,11 +1387,11 @@ Spring Session
 
 ### 68 | 了解自动配置的实现原理
 
-### 了解自动配置
+#### 了解自动配置
 
 **自动配置**
 
-- 基于添加的 JAR 依赖自动对 Spring Boot 应⽤用程序进行配置
+- 基于添加的 JAR 依赖自动对 Spring Boot 应用程序进行配置
 - spring-boot-autoconfiguration
 
 **开启自动配置**
@@ -1402,7 +1400,7 @@ Spring Session
   - `exclude = Class<?>[]`
 - `@SpringBootApplication`
 
-### 自动配置的实现原理
+#### 自动配置的实现原理
 
 **`@EnableAutoConfiguration`**
 
@@ -1419,7 +1417,7 @@ Spring Session
 - `@ConditionalOnProperty`
 - ……
 
-### 了解自动配置的情况
+#### 了解自动配置的情况
 
 **观察自动配置的判断结果**
 
@@ -1434,7 +1432,7 @@ Spring Session
 
 ### 69 | 动手实现自己的自动配置
 
-### 主要工作内容
+#### 主要工作内容
 
 - 编写 Java Config
   - `@Configuration`
@@ -1443,7 +1441,7 @@ Spring Session
 - 定位自动配置
   - `META-INF/spring.factories`
 
-### 条件注解
+#### 条件注解
 
 **条件注解**
 
@@ -1479,7 +1477,7 @@ Spring Session
 - `@ConditionalOnJava`
 - `@ConditionalOnJndi`
 
-### 自动配置的执行顺序
+#### 自动配置的执行顺序
 
 **执行顺序**
 
@@ -1489,7 +1487,7 @@ Spring Session
 
 ### 70 | 如何在低版本 Spring 中快速实现类似自动配置的功能
 
-### 需求与问题
+#### 需求与问题
 
 **核心的诉求**
 
@@ -1502,7 +1500,7 @@ Spring Session
 - 3.x 的 Spring 没有条件注解
 - 无法自动定位需要加载的自动配置
 
-### 核心解决思路
+#### 核心解决思路
 
 **条件判断**
 
@@ -1515,7 +1513,7 @@ Spring Session
 - 通过 component-scan
 - 通过 xml 文件 import
 
-### Spring 的扩展点
+#### Spring 的扩展点
 
 **BeanPostProcessor**
 
@@ -1531,7 +1529,7 @@ Spring Session
 
 - Java Config 中需要定义为 static 方法
 
-### 关于 Bean 的一些定制
+#### 关于 Bean 的一些定制
 
 #### 生命周期回调
 
@@ -1544,7 +1542,7 @@ Spring Session
 - `BeanFactoryAware`
 - `BeanNameAware`
 
-### 一些常用操作
+#### 一些常用操作
 
 **判断类是否存在**
 
@@ -1565,7 +1563,7 @@ Spring Session
 
 ### 71 | 了解起步依赖及其实现原理
 
-### Maven 依赖管理技巧
+#### Maven 依赖管理技巧
 
 了解你的依赖
 
@@ -1581,7 +1579,7 @@ Spring Session
 - dependencyManagement
 - Bill of Materials - bom
 
-### Spring Boot 的 starter 依赖
+#### Spring Boot 的 starter 依赖
 
 **Starter Dependencies**
 
@@ -1613,7 +1611,7 @@ Spring Session
 
 ### 73 | 深挖 Spring Boot 的配置加载机制
 
-### 外化配置加载顺序
+#### 外化配置加载顺序
 
 - 开启 DevTools 时，`~/.spring-boot-devtools.properties`
 - 测试类上的 `@TestPropertySource` 注解
@@ -1633,7 +1631,7 @@ Spring Session
 - @Configuration 类上的 @PropertySource
 - SpringApplication.setDefaultProperties() 设置的默认属性
 
-### application.properties
+#### application.properties
 
 默认位置
 
@@ -1642,24 +1640,24 @@ Spring Session
 - CLASSPATH 中的 `/config`
 - CLASSPATH 中的 `/`
 
-修改名字或路路径
+修改名字或路径
 
 - `spring.config.name`
 - `spring.config.location`
 - `spring.config.additional-location`
 
-### Relaxed Binding
+#### Relaxed Binding
 
 | 命名风格             | 使用范围                                   | 示例                            |
 | -------------------- | ------------------------------------------ | ------------------------------- |
 | 短划线分隔           | Properties 文件<br/>YAML 文件<br/>系统属性 | geektime.spring-boot.first-demo |
 | 驼峰式               | Properties 文件<br/>YAML 文件<br/>系统属性 | geektime.springBoot.firstDemo   |
 | 下划线分割           | Properties 文件<br/>YAML 文件<br/>系统属性 | geektime.spring_boot.first_demo |
-| 全⼤大写，下划线分隔 | 环境变量                                   | GEEKTIME_SPRINGBOOT_FIRSTDEMO   |
+| 全大写，下划线分隔 | 环境变量                                   | GEEKTIME_SPRINGBOOT_FIRSTDEMO   |
 
 ### 74 | 理解配置背后的 PropertySource 抽象
 
-### 添加 PropertySource
+#### 添加 PropertySource
 
 - `<context:property-placeholder>`
 - `PropertySourcesPlaceholderConfigurer`
@@ -1667,14 +1665,14 @@ Spring Session
 - `@PropertySource`
 - `@PropertySources`
 
-### Spring Boot 中的 @ConfigurationProperties
+#### Spring Boot 中的 @ConfigurationProperties
 
 - 可以将属性绑定到结构化对象上
 - 支持 Relaxed Binding
 - 支持安全的类型转换
 - `@EnableConfigurationProperties`
 
-### 定制 PropertySource
+#### 定制 PropertySource
 
 **主要步骤**
 
@@ -1691,7 +1689,7 @@ Spring Session
 
 ### 75 | 认识 Spring Boot 的各类 Actuator Endpoint
 
-### Actuator
+#### Actuator
 
 **目的**
 
@@ -1706,7 +1704,7 @@ Spring Session
 
 - spring-boot-starter-actuator
 
-### 一些常用 Endpoint
+#### 一些常用 Endpoint
 
 | ID             | 说明                                  | 默认开启 | 默认 HTTP | 默认 JMX |
 | -------------- | ------------------------------------- | -------- | --------- | -------- |
@@ -1727,7 +1725,7 @@ Spring Session
 | heapdump       | 返回 Heap Dump 文件，格式为 HPROF     | Y        | N         | N/A      |
 | prometheus     | 返回可供 Prometheus 抓取的信息        | Y        | N         | N/A      |
 
-### 如何访问 Actuator Endpoint
+#### 如何访问 Actuator Endpoint
 
 **HTTP 访问**
 
@@ -1754,7 +1752,7 @@ Spring Session
 
 ### 76 | 动手定制自己的 Health Indicator
 
-### Spring Boot 自带的 Health Indicator
+#### Spring Boot 自带的 Health Indicator
 
 目的
 
@@ -1806,7 +1804,7 @@ Spring Session
 
 - `RedisHealthIndicator`
 
-### 自定义 Health Indicator
+#### 自定义 Health Indicator
 
 **方法**
 
@@ -1816,14 +1814,14 @@ Spring Session
 
 ### 77 | 通过 Micrometer 获取运行数据
 
-### 认识 Micrometer
+#### 认识 Micrometer
 
 **特性**
 
-- 多维度度量量
+- 多维度度量
 - 支持 Tag
 - 预置大量探针
-- 缓存、类加载器器、GC、CPU 利利⽤用率、线程池……
+- 缓存、类加载器、GC、CPU 利用率、线程池……
 - 与 Spring 深度整合
 
 **支持多种监控系统**
@@ -1836,7 +1834,7 @@ Spring Session
 - Hierarchical
   - Graphite, Ganglia, JMX, Etsy StatsD
 
-### 一些核心度量指标
+#### 一些核心度量指标
 
 **核心接口**
 
@@ -1849,7 +1847,7 @@ Spring Session
 - Counter, FunctionCounter
 - DistributionSummary
 
-### Micrometer in Spring Boot 2.x
+#### Micrometer in Spring Boot 2.x
 
 **一些 URL**
 
@@ -1879,12 +1877,12 @@ Spring Session
 自定义度量指标
 
 - 通过 MeterRegistry 注册 Meter
-- 提供 MeterBinder Bean 让 Spring Boot ⾃自动绑定
-- 通过 MeterFilter 进⾏行行定制
+- 提供 MeterBinder Bean 让 Spring Boot 自自动绑定
+- 通过 MeterFilter 进行行行定制
 
 ### 78 | 通过 Spring Boot Admin 了解程序的运行状态
 
-### Spring Boot Admin
+#### Spring Boot Admin
 
 **目的**
 
@@ -1895,7 +1893,7 @@ Spring Session
 - 集中展示应用程序 Actuator 相关的内容
 - 变更通知
 
-### 快速上手
+#### 快速上手
 
 **服务端**
 
@@ -1909,7 +1907,7 @@ Spring Session
 - `spring.boot.admin.client.url=http://localhost:8080`
 - `management.endpoints.web.exposure.include=*`
 
-### 安全控制
+#### 安全控制
 
 安全相关依赖
 
@@ -1922,7 +1920,7 @@ Spring Session
 
 ### 79 | 如何定制 Web 容器的运行参数
 
-### 内嵌 Web 容器
+#### 内嵌 Web 容器
 
 可选容器列表
 
@@ -1931,7 +1929,7 @@ Spring Session
 - `spring-boot-starter-undertow`
 - `spring-boot-starter-reactor-netty`
 
-### 修改容器器配置
+#### 修改容器配置
 
 **端口**
 
@@ -1973,7 +1971,7 @@ Spring Session
 
 ### 80 | 如何配置容器支持 HTTP/2（上）
 
-### 配置 HTTPS 支持
+#### 配置 HTTPS 支持
 
 **通过参数进行配置**
 
@@ -1983,7 +1981,7 @@ Spring Session
   - server.ssl.key-store-type，JKS 或者 PKCS12
   - `server.ssl.key-store-password=secret`
 
-### 生成证书文件
+#### 生成证书文件
 
 **命令**
 
@@ -1997,7 +1995,7 @@ Spring Session
 - 算法，RSA、DSA 等
 - 长度，例如 2048
 
-### 客户端 HTTPS 支持
+#### 客户端 HTTPS 支持
 
 配置 HttpClient （ >= 4.4 ）
 
@@ -2011,7 +2009,7 @@ Spring Session
 
 ### 81 | 如何配置容器支持 HTTP/2（下）
 
-### 配置 HTTP/2 支持
+#### 配置 HTTP/2 支持
 
 前提条件
 
@@ -2023,7 +2021,7 @@ Spring Session
 
 - server.http2.enabled
 
-### 客户端 HTTP/2 支持
+#### 客户端 HTTP/2 支持
 
 HTTP 库选择
 
@@ -2036,7 +2034,7 @@ RestTemplate 配置
 
 ### 82 | 如何编写命令行运行的程序
 
-### 关闭 Web 容器
+#### 关闭 Web 容器
 
 控制依赖
 
@@ -2054,7 +2052,7 @@ RestTemplate 配置
 - `web()`
 - 在调用 `SpringApplication` 的 `run()` 方法前设置 `WebApplicationType`
 
-### 常用工具类
+#### 常用工具类
 
 不同的 Runner
 
@@ -2069,7 +2067,7 @@ RestTemplate 配置
 
 ### 83 | 了解可执行 Jar 背后的秘密
 
-### 认识可执行 Jar
+#### 认识可执行 Jar
 
 **其中包含**
 
@@ -2082,7 +2080,7 @@ RestTemplate 配置
 
 - JDK / JRE
 
-### 如何找到程序的入口
+#### 如何找到程序的入口
 
 **Jar 的启动类**
 
@@ -2097,18 +2095,18 @@ RestTemplate 配置
 
 ### 84 | 如何将 Spring Boot 应用打包成 Docker 镜像文件
 
-### 什么是 Docker 镜像
+#### 什么是 Docker 镜像
 
 - 镜像是静态的只读模板
-- 镜像中包含构建 Docker 容器器的指令
+- 镜像中包含构建 Docker 容器的指令
 - 镜像是分层的
 - 通过 Dockerfile 来创建镜像
 
-### Dockerfile
+#### Dockerfile
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/08/ddbea270b2664562bd51a53b8585a7f9.png)
 
-### 通过 Maven 构建 Docker 镜像
+#### 通过 Maven 构建 Docker 镜像
 
 准备工作
 
@@ -2132,64 +2130,36 @@ RestTemplate 配置
 
 ### 86 | 简单理解微服务
 
-微服务就是一些协同工作的小而自治的服务。
+**微服务**：一些协同工作的小而自治的服务。
 
-微服务的优点
+**优点**：易于部署、与组织结构对齐、可组合性、可替代性
 
-- 易于部署
-- 与组织结构对齐
-- 可组合性
-- 可替代性
-
-微服务的代价
-
-- 架构复杂
-- 运维复杂
+**代价**：架构复杂、运维复杂
 
 ### 87 | 如何理解云原生(Cloud Native)
 
-云原生技术有利于各组织在公有云、私有云和混合云等新型动态环境中，构建和运行可弹性扩展的应用。
+**云原生**：在公有云、私有云和混合云等动态环境中，构建和运行可弹性扩展的应用。
 
-云原生应用要求
-
-- DevOps
-- 持续交付
-- 微服务
-- 容器
-
-Cloud Native Computing Foundation，缩写 CNCF
+要求：DevOps、持续交付、微服务、容器。组织：**CNCF**（Cloud Native Computing Foundation）
 
 ### 88 | 12-Factor App（上）
 
 ### 89 | 12-Factor App（下）
 
-12-Factor 为构建 SaaS 应用提供了方法论。
+**12-Factor** 为构建 SaaS 应用提供了方法论（参考：https://12factor.net/zh_cn/）：
 
-参考资料：https://12factor.net/zh_cn/
-
-- 基准代码 - 一份基准代码，多份部署。解决方案：git
-
-- 依赖 - 显式声明依赖关系。解决方案：maven、gradle
-
-- 配置 - 在环境中存储配置。解决方案：apollo
-
-- 后端服务 - 把后端服务当作附加资源
-
-- 构建，发布，运行 - 严格分离构建和运行。解决方案：CI/CD（如：jenkins、sonar 等）
-
-- 进程 - 以一个或多个无状态进程运行应用
-
-- 端口绑定 - 通过端口绑定提供服务
-
-- 并发 - 通过进程模型进行扩展
-
-- 易处理 - 快速启动和优雅终止可最大化健壮性
-
-- 开发环境与线上环境等价 - 尽可能的保持开发，预发布，线上环境相同
-
-- 日志 - 把日志当作事件流
-
-- 管理进程 - 后台管理任务当作一次性进程运行
+1. **基准代码** - 一份基准代码，多份部署（git）
+2. **依赖** - 显式声明依赖关系（maven/gradle）
+3. **配置** - 在环境中存储配置（apollo）
+4. **后端服务** - 把后端服务当作附加资源
+5. **构建，发布，运行** - 严格分离构建和运行（CI/CD）
+6. **进程** - 以一个或多个无状态进程运行应用
+7. **端口绑定** - 通过端口绑定提供服务
+8. **并发** - 通过进程模型进行扩展
+9. **易处理** - 快速启动和优雅终止
+10. **开发环境与线上环境等价** - 保持各环境一致
+11. **日志** - 把日志当作事件流
+12. **管理进程** - 后台任务当作一次性进程运行
 
 ### 90 | 认识 Spring Cloud 的组成部分
 

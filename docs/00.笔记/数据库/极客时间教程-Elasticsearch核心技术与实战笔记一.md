@@ -199,36 +199,18 @@ ES 节点通过配置文件或 `-E node.name=xxx` 指定。
 
 #### 其他节点类型
 
-hot & warm 节点 - 不同硬件配置的 data node，用来实现 hot & warm 架构，降低集群部署成本。
-
-机器学习节点 - 负责跑机器学习的 Job，用来做异常检测
-
-tribe 节点 - 连接到不同的 ES 集群
+- **hot & warm 节点**：不同硬件配置的 data node，降低成本
+- **机器学习节点**：跑 ML Job，异常检测
+- **tribe 节点**：连接不同 ES 集群
 
 #### 分片
 
-主分片 - 用于水平扩展，以提升系统可承载的总数据量以及吞吐量。
+- **主分片**：水平扩展，创建时指定且不可修改
+- **副本**：冗余高可用，可动态调整
 
-- 一个分片是一个运行 Lucene 实例
-- 主分片数在索引创建时指定，后续不允许修改，除非 reindex
-
-副分片（副本） - 用于冗余，解决高可用的问题。
-
-- 副本数，可以动态调整
-- 增加副本数，可以在一定程度上提高服务的可用性，以及查询的吞吐量。
-
-生产环境的分片数，需要提前规划：
-
-分片数过小：
-
-- 无法通过增加节点实现水平扩展
-- 单个分片的数据量太大，导致数据重新分配耗时
-
-分片数过大：
-
-- 影响搜索结果的相关性打分，影响统计结果的准确性
-- 单个节点上过多的分片，会导致资源浪费，同时也会影响性能
-- 7.0 开始，默认主分片数设置为 1， 解决了 over-sharding 的问题
+**分片数规划**：
+- 过小：无法水平扩展，单分片数据量大
+- 过大：影响打分和统计，资源浪费（7.0 起默认 1 个主分片）
 
 #### 查看集群健康状态
 
@@ -444,27 +426,16 @@ DELETE test2
 
 ### 倒排索引入门
 
-什么是正排，什么是倒排？
+- **正排**：文档 ID → 文档内容和单词
+- **倒排**：单词 → 文档 ID
 
-- ** 正排 **：文档 ID 到文档内容和单词的关联
-- ** 倒排 **：单词到文档 ID 的关系
+**倒排索引组成**：
+- **单词词典**：所有文档的单词，单词→倒排列表的关联
+- **倒排列表**：单词对应文档集合，由倒排索引项组成
 
-倒排索引含两个部分
+**倒排索引项**：文档 ID、词频 TF（相关性评分）、位置（语句搜索）、偏移（高亮）
 
-- ** 单词词典 ** - 记录所有文档的单词，记录单词到倒排列表的关联关系
-- ** 倒排列表 ** - 记录了单词对应的文档结合，由倒排索引项组成。
-
-倒排索引项：
-
-- 文档 ID
-- 词频 TF - 单词在文档中出现的次数，用于相关性评分
-- 位置 - 单词文档中分词的位置。用于语句搜索
-- 偏移 - 记录单词的开始结束位置，实现高亮显示
-
-要点：
-
-- 文档中每个字段都有自己的倒排索引
-- 可以指定某些字段不做索引
+> 每个字段有自己的倒排索引，可指定某些字段不做索引
 
 【示例】
 
@@ -488,38 +459,19 @@ POST _analyze
 }
 ```
 
-### 通过分析器进行分词
+### 分析器分词
 
-** 分词 **：文本分析是把全文本转换一系列单词（term / token）的过程。
+**分词**：全文本转换为单词（term/token）序列。
 
-分析组件由如下三部分组成，它的执行顺序如下：
+**执行顺序**：`Character Filters` → `Tokenizer` → `Token Filters`
 
-```
-Character Filters -> Tokenizer -> Token Filters
-```
+- **Character Filters**：去除特殊字符、HTML 标签
+- **Tokenizer**：按策略切分单词
+- **Token Filters**：小写转换、停用词删除、同义词添加
 
-说明：
+**内置分析器**：Standard（默认）、Simple、Whitespace、Stop、Keyword、Pattern、Language、Fingerprint
 
-- Character Filters（字符过滤器） - 针对原始文本处理， 例如去除特殊字符、过了 html 标签
-- Tokenizer（分词器） - 按照策略将文本切分为单词
-- Token Filters（分词过滤器） - 对切分的单词进行加工，如：转为小写、删除 stop word、增加同义词等
-
-ES 内置分析器：
-
-- **[Standard Analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-standard-analyzer.html)** - 默认分词器，按词切分，小写处理。
-- **[Simple Analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-simple-analyzer.html)** - 按非字母切分（过滤符号），小写处理。
-- **[Whitespace Analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-whitespace-analyzer.html)** - 按空格切分，不转小写。
-- **[Stop Analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-analyzer.html)** - 小写处理，停用词过滤。
-- **[Keyword Analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-keyword-analyzer.html)** - 不分词，直接将输入当做输出。
-- **[Pattern Analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-analyzer.html)** - 按正则分词，默认正则为 `\W+`。
-- **[Language Analyzers](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lang-analyzer.html)** - 提供 30 多种常见语言的分词器。
-- **[Fingerprint Analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-fingerprint-analyzer.html)** - 可用于重复检测的指纹。
-
-中文分词
-
-elasticsearch-analysis-ik
-
-elasticsearch-thulac-plugin
+**中文分词**：elasticsearch-analysis-ik、elasticsearch-thulac-plugin
 
 【示例】
 
@@ -625,68 +577,14 @@ POST kibana_sample_data_ecommerce/_search
 
 ### URISearch 详解
 
-使用 `q` 指定查询字符串（query string）
+`q` 参数：查询字符串（Query String 语义），`df` 默认字段，`sort` 排序，`from/size` 分页
 
-- `q` - 指定查询语句，使用 Query String 语义
-- `df` - 默认字段
-- `sort` - 排序
-- `from/size` - 分页
-- `profile` - 显示查询是如何被执行的
-
-指定字段 vs. 泛查询
-
-- q=title:2012 / q=2012
-
-Term vs. Phrase
-
-- Beautiful Mind，等效于 Beautiful Or Mind
-- "Beautiful Mind"，等效于 Beautiful And Mind
-
-分组与引号
-
-- title:(Beautiful And Mind)
-- title="Beautiful Mind"
-
-布尔操作
-
-- AND / OR / NOT 或 `&&` / `||` / `!`
-- 必须大写
-- `title:(matrix NOT reloaded)`
-
-分组
-
-- `+` 表示 must
-- `-` 表示 must_not
-- `title:(+matrix -reloaded)`
-
-范围查询
-
-区间表示：[] 闭区间，{} 开区间
-
-- `year:{2019 TO 2018}`
-- `year:{* TO 2018}`
-
-算数符号
-
-- `year:>2010`
-- `year:(>2010 && <=2018)`
-- `year:(+>2010 +<=2018)`
-
-通配符查询（通配符查询效率低，占用内存大，不建议使用。特别是放在最前面）
-
-`?` 表示 1 个字符；`*` 表示任意个字符
-
-- `title:mi?d`
-- `title:be*`
-
-正则表达式
-
-- `title:[bt]oy`
-
-模糊匹配与近似查询
-
-- `title:befutifl~1`
-- `title:"lord rings"~2`
+- **指定字段** vs **泛查询**：`q=title:2012` vs `q=2012`
+- **Term vs Phrase**：`Beautiful Mind`（OR）vs `"Beautiful Mind"`（AND）
+- **布尔操作**：`AND`/`OR`/`NOT`（必须大写），`+` must / `-` must_not
+- **范围查询**：`[]` 闭区间，`{}` 开区间
+- **通配符**：`?` 单字符，`*` 多字符（效率低，不建议前缀通配）
+- **模糊匹配**：`~1`（编辑距离）、`~2`（近似度）
 
 ```shell
 
@@ -995,46 +893,21 @@ GET /movies/_search
 
 ### DynamicMapping 和常见字段类型
 
-#### 什么是 Mapping
+**Mapping**：类似数据库 schema，将 JSON 文档映射成 Lucene 数据格式
 
-Mapping 类似数据库中 schema 的定义
+**字段类型**：
+- 简单类型：Text/Keyword、Date、Integer/Floating、Boolean、IP
+- 复杂类型：对象类型/嵌套类型
+- 特殊类型：geo_point/geo_shape、percolator
 
-Mapping 会将 JSON 文档映射成 Lucene 所需要的数据格式
+**Dynamic Mapping**：写入文档时自动创建索引并推算字段类型（可能不准确）
 
-一个 Mapping 属于一个索引的 Type
+**Dynamic 模式**：
+- `true`：新增字段自动更新 Mapping
+- `false`：Mapping 不更新，新字段不被索引但出现在 `_source`
+- `strict`：文档写入失败
 
-#### 字段数据类型
-
-- 简单类型
-- Text / Keyword
-- Date
-- Integer / Floating
-- Boolean
-- Ipv4 / Ipv6
-- 复杂类型
-- 对象类型 / 嵌套类型
-- 特殊类型
-- get_point & geo_shape / percolator
-
-#### 什么是 Dynamic Mapping
-
-在写入文档时，如果索引不存在，会自动创建索引
-
-ES 会根据文档信息，自动推算出字段的类型
-
-有时候，推算可能会不准确，当类型设置错误时，可能会导致一些功能无法正常运行。例如范围查询
-
-#### 能否更改 Mapping 的字段类型
-
-Dynamic 设为 true 时，一旦有新增字段的文档写入，Mapping 也同时被更新
-
-Dynamic 设为 false 时，Mapping 不会被更新，新增字段的数据无法被索引，但是信息会出现在 \_source 中。
-
-Dynamic 设为 stric 时，文档写入失败
-
-对已有字段，一旦有数据写入，就不再支持修改字段的定义
-
-如果希望改变字段类型，必须 reindex API，重建索引
+> 已有字段一旦有数据写入就不支持修改类型，需使用 **reindex API** 重建索引
 
 【示例】
 
@@ -1121,18 +994,15 @@ PUT dynamic_mapping_test/_doc/12
 DELETE dynamic_mapping_test
 ```
 
-### 显式 Mapping 设置与常见参数介绍
+### 显式 Mapping 设置
 
-- index - 控制当前字段是否被索引
-- index_options - 控制倒排索引记录的内容
-  - docs - 记录 doc id
-  - freqs - 记录 doc id 和 term freqencies
-  - positions - 记录 doc id 和 term freqencies、term position
-  - offsets - 记录 doc id 和 term freqencies、term position、char offsets
-- null_value - 对 null 值实现搜索，只有 keyword 类型支持
-- copy_to - \_all 在 ES 7.X 被 copy_to 替代
+**常用参数**：
+- `index`：控制字段是否被索引
+- `index_options`：控制倒排索引内容（docs/freqs/positions/offsets）
+- `null_value`：对 null 值实现搜索（仅 keyword 支持）
+- `copy_to`：替代 `_all`（ES 7.X）
 
-ES 不提供专门的数组类型。但是任何字段 ，都可以包含多个相同类型的数值。
+> ES 不提供专门数组类型，任何字段都可包含多个同类型值
 
 ```shell
 #设置 index 为 false
@@ -1274,13 +1144,12 @@ POST users/_search
 GET users/_mapping
 ```
 
-### 多字段特性及 Mapping 中配置自定义 Analyzer
+### 多字段特性及自定义 Analyzer
 
-ES 内置的分析器无法满足需求时，可以自定义分析器，通过组合不同组件来进行定制：
-
-- Character Filter - html strip、mapping、pattern replace
-- Tokenizer - whitespace、standard、uax_url_email、pattern、keyword、path hierarchy
-- Token Filter - lowercase、stop、synonym
+自定义分析器组件：
+- **Character Filter**：html_strip、mapping、pattern_replace
+- **Tokenizer**：whitespace、standard、uax_url_email、pattern、keyword、path_hierarchy
+- **Token Filter**：lowercase、stop、synonym
 
 【示例】
 
@@ -1372,31 +1241,10 @@ GET _analyze
 
 ### IndexTemplate 和 DynamicTemplate
 
-集群上的索引会越来越多，可以根据时间周期性创建索引，例如：log-yyyyMMdd
+**Index Template**：自动匹配新索引并应用 mapping/setting（仅新建时生效，可设多个模板 merge，支持 order 控制合并顺序）
 
-index template - 帮助设定 mapping 和 setting，并按照一定规则，自动匹配到新创建的索引上。
-
-- 模板仅在一个索引被新建时，才会起作用。修改模板不会影响已创建的索引。
-- 可以设定多个索引模板，这些设置会被 merge 在一起
-- 可以指定 order，以控制模板合并过程
-
-什么是 Dynamic Template
-
-根据 ES 识别的数据类型，结合字段名称，来动态设定字段类型
-
-- 所有的字符串类型都设定成 keyword，或关闭 keyword 字段
-- is 开头的字段都设置成 boolean
-- long\_ 开头的都设置成 long 类型
-
-Dynamic Template 要点
-
-- Dynamic Template 是定义在某索引的 mapping 中
-- Template 有一个名称
-- 匹配规则是一个数组
-- 为匹配到字段设置 mapping
-- match_mapping_type - 匹配自动识别的字段类型，如 string、boolean 等
-- match、unmatch - 匹配字段名
-- path_match、path_unmatch
+**Dynamic Template**：根据 ES 识别的数据类型和字段名动态设定字段类型
+- 匹配规则：`match_mapping_type`、`match`/`unmatch`、`path_match`/`path_unmatch`
 
 【示例】
 
@@ -1533,16 +1381,15 @@ PUT my_index/_doc/1
 GET my_index/_search?q=full_name:John
 ```
 
-### Elasticsearch 聚合分析简介
+### 聚合分析
 
-聚合分类：
+**聚合分类**：
+- **Bucket**：满足特定条件的文档集合（分组）
+- **Metric**：数学运算（avg/max/min/sum/stats）
+- **Pipeline**：对聚合结果的二次聚合
+- **Matrix**：多字段操作的结果矩阵
 
-- **Bucket** - 一些字段满足特定条件的文档的集合（分组）
-- **Metric** - 一些数学运算，可以对文档字段进行统计分析
-- **Pipeline** - 对其他的聚合结果进行二次聚合
-- **Matrix** - 支持对多个字段的操作并提供一个结果矩阵
-
-聚合支持嵌套
+支持嵌套聚合。
 
 【示例】
 

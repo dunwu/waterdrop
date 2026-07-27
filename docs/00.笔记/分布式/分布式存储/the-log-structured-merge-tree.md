@@ -15,15 +15,12 @@ permalink: /pages/8dbf8dbe/
 
 # 《The Log-Structured Merge-Tree (LSM-Tree)》笔记
 
-LSM 被广泛应用于很多以文件结构存储数据的数据库，如：HBase, Cassandra, LevelDB, SQLite。
+**LSM-Tree** 被广泛应用于以文件结构存储数据的数据库：HBase、Cassandra、LevelDB、SQLite。
 
-LSM 的设计目标：通过顺序写来提高写操作吞吐量，替代传统的 B+ 树或 ISAM。
+**设计目标**：通过**顺序写**提高写操作吞吐量，替代传统的 B+ 树或 ISAM。
 
 ## 参考资料
 
-- 原文
-- [The Log-Structured-Merge-Tree](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.cs.umb.
-  edu/~poneil/lsmtree.pdf)
-- 扩展阅读
-- [Log Structured Merge Trees(LSM) 原理](https://www.open-open.com/lib/view/open1424916275249.html)
-- [Log Structured Merge Tree](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://lrita.github.io/images/posts/database/lsmtree-170129180333.pdf)
+- [The Log-Structured-Merge-Tree](https://www.cs.umb.edu/~poneil/lsmtree.pdf)
+- [Log Structured Merge Trees (LSM) 原理](https://www.open-open.com/lib/view/open1424916275249.html)
+- [Log Structured Merge Tree](https://lrita.github.io/images/posts/database/lsmtree-170129180333.pdf)

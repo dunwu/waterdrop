@@ -19,14 +19,10 @@ permalink: /pages/76e8b6af/
 
 ## 一探究竟：为什么需要 JVM？它处在什么位置？
 
-**JVM** - Java Virtual Machine 的缩写，即 Java 虚拟机。JVM 是运行 Java 字节码的虚拟机。JVM 不理解 Java 源代码，这就是为什么要将 `*.java` 文件编译为 JVM 可理解的 `*.class` 文件（字节码）。Java 有一句著名的口号：“Write Once, Run Anywhere（一次编写，随处运行）”，JVM 正是其核心所在。实际上，JVM 针对不同的系统（Windows、Linux、MacOS）有不同的实现，目的在于用相同的字节码执行同样的结果。
+- **JVM**（Java Virtual Machine）：运行 Java 字节码的虚拟机，针对不同系统实现相同执行结果
+- **JRE**（Java Runtime Environment）：运行已编译 Java 程序所需的一切，不能创建新程序
+- **JDK**（Java Development Kit）：包含 JRE + 编译器/调试工具，能够创建和编译程序
 
-**JRE** - Java Runtime Environment 的缩写，即 Java 运行时环境。它是运行已编译 Java 程序所需的一切的软件包，主要包括 JVM、Java 类库（Class Library）、Java 命令和其他基础结构。但是，它不能用于创建新程序。
-
-**JDK** - Java Development Kit 的缩写，即 Java SDK。它不仅包含 JRE 的所有功能，还包含编译器 (javac) 和工具（如 javadoc 和 jdb）。它能够创建和编译程序。
-
-> 总结来说，JDK、JRE、JVM 三者的关系是：JDK > JRE > JVM
->
 > **JDK = JRE + 开发/调试工具**
 >
 > **JRE = JVM + Java 类库 + Java 运行库**
@@ -58,13 +54,13 @@ Java 类的完整生命周期包括以下几个阶段：
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/5b51a4eb7f2547a6a5a413da73b3fee5.jpeg)
 
-类加载器
+### 类加载器
 
 - Bootstrap ClassLoader - 负责加载 `<JAVA_HOME>\lib` 或被 `-Xbootclasspath` 指定的路径
 
 - ExtClassLoader - 负责加载 `<JAVA_HOME>\lib\ext` 或被`java.ext.dir` 指定的路径
 
-- AppClassLoader - 负载加载 `classpath` 路径
+- AppClassLoader - 负责加载 `classpath` 路径
 - 自定义类加载器 - 继承自 `java.lang.ClassLoader`
 
 **双亲委派机制** - 除了顶层的启动类加载器以外，其余的类加载器，在加载之前，都会委派给它的父加载器进行加载。
@@ -85,12 +81,12 @@ Java 类的完整生命周期包括以下几个阶段：
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a2e5edadbf124c51ad0ec22624f194fe.png)
 
-对象生命周期判断
+### 对象生命周期判断
 
-- 引用计数法
-- 可达性分析法 - GC Roots
+- **引用计数法**
+- **可达性分析法** - GC Roots
 
-引用类型：
+### 引用类型
 
 - 强引用
 - 软引用
@@ -99,15 +95,15 @@ Java 类的完整生命周期包括以下几个阶段：
 
 ## 深入剖析：垃圾回收你真的了解吗？（上）
 
-垃圾回收算法
+### 垃圾回收算法
 
-- 标记-复制 - 效率最高，但会浪费大量内存空间
-- 标记-清除 - 效率一般，会产生大量内存碎片
-- 标记-整理 - 效率最差，但是不会浪费空间，也消除了内存碎片
+- **标记-复制** - 效率最高，但浪费大量内存空间
+- **标记-清除** - 效率一般，产生大量内存碎片
+- **标记-整理** - 效率最差，不浪费空间且消除内存碎片
 
-GC 分代收集：年轻代 GC 使用标记-复制算法；老年代 GC 使用标记-清除算法、标记-整理算法。
+**GC 分代收集**：年轻代 GC 使用标记-复制算法；老年代 GC 使用标记-清除/标记-整理算法。
 
-常见 GC 收集器：
+**常见 GC 收集器**：
 
 - 年轻代：Serial、ParNew、Parallel
 - 老年代：Serial Old、Parallel Old、CMS
@@ -119,7 +115,7 @@ GC 收集器配置参数：
 
 - **-XX:+UseSerialGC** 年轻代和老年代都用串行收集器
 - **-XX:+UseParNewGC** 年轻代使用 ParNew，老年代使用 Serial Old
-- **-XX:+UseParallelGC** 年轻代使用 ParallerGC，老年代使用 Serial Old
+- **-XX:+UseParallelGC** 年轻代使用 ParallelGC，老年代使用 Serial Old
 - **-XX:+UseParallelOldGC** 新生代和老年代都使用并行收集器
 - **-XX:+UseConcMarkSweepGC**，表示年轻代使用 ParNew，老年代的用 CMS
 - **-XX:+UseG1GC** 使用 G1 垃圾回收器
@@ -152,18 +148,17 @@ G1 最重要的概念，其实就是 Region。它采用分而治之，部分收�
 
 ## 案例实战：亿级流量高并发下如何进行估算和调优
 
-GC 指标：
+### GC 指标
 
 - 系统容量（Capacity）
 - 延迟（Latency）
 - 吞吐量（Throughput）
 
-**选择垃圾回收器**
+**选择垃圾回收器**：
 
-- 如果你的堆大小不是很大（比如 100MB），选择串行收集器一般是效率最高的。参数：-XX:+UseSerialGC。
-- 如果你的应用运行在单核的机器上，或者你的虚拟机核数只有 1C，选择串行收集器依然是合适的，这时候启用一些并行收集器没有任何收益。参数：-XX:+UseSerialGC。
-- 如果你的应用是“吞吐量”优先的，并且对较长时间的停顿没有什么特别的要求。选择并行收集器是比较好的。参数：-XX:+UseParallelGC。
-- 如果你的应用对响应时间要求较高，想要较少的停顿。甚至 1 秒的停顿都会引起大量的请求失败，那么选择 G1、ZGC、CMS 都是合理的。虽然这些收集器的 GC 停顿通常都比较短，但它需要一些额外的资源去处理这些工作，通常吞吐量会低一些。参数：-XX:+UseConcMarkSweepGC、-XX:+UseG1GC、-XX:+UseZGC 等。
+- **堆小（如 100MB）或单核机器** → 串行收集器（`-XX:+UseSerialGC`）
+- **吞吐量优先**，对停顿无特殊要求 → 并行收集器（`-XX:+UseParallelGC`）
+- **响应时间优先**，停顿敏感 → G1/ZGC/CMS（`-XX:+UseG1GC`、`-XX:+UseZGC`、`-XX:+UseConcMarkSweepGC`），吞吐量会略低
 
 ## 第 09 讲：案例实战：面对突如其来的 GC 问题如何下手解决
 
@@ -195,7 +190,7 @@ MAT 是用来分析内存快照的。
 
 ## 深入剖析：如何使用 Java Agent 技术对字节码进行修改
 
-## 23 动手实践：JIT 参数配置如何影响程序运行？
+## 动手实践：JIT 参数配置如何影响程序运行？
 
 ## 案例分析：大型项目如何进行性能瓶颈调优？
 
