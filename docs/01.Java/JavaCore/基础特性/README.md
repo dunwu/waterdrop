@@ -18,22 +18,22 @@ dir:
 
 # Java 基础特性
 
-> Java 基础篇总结 Java 的一些基础特性。
+> Java 基础特性涵盖语言核心语法、类型系统、面向对象三大范式、控制流与异常体系，以及泛型、反射、注解等运行时机制。这些是 Java 开发的基石，深入理解有助于编写健壮、可维护的代码，也是面试高频考察点。
 
 ## 📖 内容
 
-- [Java 基础语法特性]([JavaCore]基础语法.md) - 关键词：`强类型`、`注释`、`变量`、`常量`、`操作符`、`访问修饰符`、`final`、`序列化`
-- [Java 基本数据类型]([JavaCore]数据类型.md) - 关键词：`值类型`、`引用类型`、`装箱`、`拆箱`、`包装类`、`缓存机制`、`equals`、`BigDecimal`、`精度丢失`
-- [Java 面向对象]([JavaCore]面向对象.md) - 关键词：`封装`、`继承`、`多态`、`类`、`接口`、`抽象类`、`访问权限`、`extends`、`implements`
-- [Java 方法]([JavaCore]方法.md) - 关键词：`方法定义`、`值传递`、`修饰符`、`static`、`final`、`构造方法`、`重载`、`覆写`、`可变参数`
-- [Java 数组]([JavaCore]数组.md) - 关键词：`引用类型`、`数组维度`、`多维数组`、`Arrays`、`下标`、`长度固定`
-- [Java 枚举]([JavaCore]枚举.md) - 关键词：`enum`、`Enum`、`枚举本质`、`EnumSet`、`EnumMap`、`单例模式`、`switch`、`状态机`
-- [Java 控制语句]([JavaCore]控制语句.md) - 关键词：`if`、`switch`、`while`、`for`、`foreach`、`break`、`continue`、`return`、`流程控制`
-- [Java 异常]([JavaCore]异常.md) - 关键词：`Throwable`、`Error`、`Exception`、`RuntimeException`、`try-catch-finally`、`throw`、`throws`、`异常链`、`Checked Exception`
-- [Java 泛型]([JavaCore]泛型.md) - 关键词：`泛型类`、`泛型方法`、`类型擦除`、`类型边界`、`通配符`、`PECS`、`extends`、`super`
-- [Java 反射]([JavaCore]反射.md) - 关键词：`Class`、`Field`、`Method`、`Constructor`、`invoke`、`动态代理`、`JDK 动态代理`、`CGLIB`、`InvocationHandler`
-- [Java 注解]([JavaCore]注解.md) - 关键词：`@interface`、`元注解`、`@Retention`、`@Target`、`@Override`、`反射解析`、`内置注解`、`自定义注解`
-- [Java String 类型]([JavaCore]String.md) - 关键词：`不可变`、`final`、`字符串常量池`、`intern`、`StringBuilder`、`StringBuffer`、`equals`、`hashCode`
+- [Java 基础语法特性]([JavaCore]基础语法.md) - 关键词：`强类型`、`访问修饰符`、`final`、`操作符`、`序列化`
+- [Java 基本数据类型]([JavaCore]数据类型.md) - 关键词：`包装类`、`装箱拆箱`、`缓存机制`、`BigDecimal`、`精度丢失`
+- [Java 面向对象]([JavaCore]面向对象.md) - 关键词：`封装`、`继承`、`多态`、`接口`、`抽象类`
+- [Java 方法]([JavaCore]方法.md) - 关键词：`值传递`、`重载`、`覆写`、`static`、`可变参数`
+- [Java 数组]([JavaCore]数组.md) - 关键词：`引用类型`、`多维数组`、`Arrays`、`长度固定`、`下标`
+- [Java 枚举]([JavaCore]枚举.md) - 关键词：`enum`、`EnumSet`、`EnumMap`、`单例模式`、`状态机`
+- [Java 控制语句]([JavaCore]控制语句.md) - 关键词：`if`、`switch`、`while`、`for`、`break`
+- [Java 异常]([JavaCore]异常.md) - 关键词：`Throwable`、`RuntimeException`、`try-catch-finally`、`Checked Exception`、`异常链`
+- [Java 泛型]([JavaCore]泛型.md) - 关键词：`类型擦除`、`通配符`、`PECS`、`泛型类`、`类型边界`
+- [Java 反射]([JavaCore]反射.md) - 关键词：`Class`、`invoke`、`动态代理`、`CGLIB`、`InvocationHandler`
+- [Java 注解]([JavaCore]注解.md) - 关键词：`元注解`、`@Retention`、`@Target`、`自定义注解`、`反射解析`
+- [Java String 类型]([JavaCore]String.md) - 关键词：`不可变`、`字符串常量池`、`intern`、`StringBuilder`、`StringBuffer`
 
 ## 📚 资料
 

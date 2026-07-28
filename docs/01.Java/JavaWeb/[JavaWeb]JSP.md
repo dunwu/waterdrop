@@ -1,5 +1,5 @@
 ﻿---
-title: JavaWeb 之 Jsp 指南
+title: JavaWeb 之 JSP 指南
 date: 2020-02-07 23:04:47
 order: 02
 categories:
@@ -12,7 +12,7 @@ tags:
 permalink: /pages/e6778244/
 ---
 
-# JavaWeb 之 Jsp 指南
+# JavaWeb 之 JSP 指南
 
 ## 简介
 

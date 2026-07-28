@@ -14,13 +14,15 @@ index: false
 
 # JavaWeb
 
+> JavaWeb 专题围绕 Java EE Web 层开发的核心技术栈，系统梳理 Servlet 容器模型与生命周期、JSP 动态页面渲染、Filter 与 Listener 扩展机制、Cookie/Session 会话管理等经典主题。这些技术构成了 Spring MVC 等现代框架的底层规范基础，深入理解有助于把握 Web 应用的请求处理链路与状态管理本质。
+
 ## 📖 内容
 
-- [JavaWeb 之 Servlet 指南]([JavaWeb]Servlet.md)
-- [JavaWeb 之 Jsp 指南]([JavaWeb]Servlet.md)
-- [JavaWeb 之 Filter 和 Listener]([JavaWeb]Filter和Listener.md)
-- [JavaWeb 之 Cookie 和 Session]([JavaWeb]Cookie和Session.md)
-- [JavaWeb 面试]([JavaWeb]面试.md)
+- [JavaWeb 之 Servlet 指南]([JavaWeb]Servlet.md) - 关键词：`Servlet`、`生命周期`、`Servlet API`、`HTTP 状态码`、`Web 容器`
+- [JavaWeb 之 JSP 指南]([JavaWeb]JSP.md) - 关键词：`JSP`、`EL 表达式`、`JSTL`、`指令`、`内置对象`
+- [JavaWeb 之 Filter 和 Listener]([JavaWeb]Filter和Listener.md) - 关键词：`Filter`、`FilterChain`、`Listener`、`拦截链`、`Servlet 扩展`
+- [JavaWeb 之 Cookie 和 Session]([JavaWeb]Cookie和Session.md) - 关键词：`Cookie`、`Session`、`会话管理`、`URL 重写`、`分布式会话`
+- [JavaWeb 面试]([JavaWeb]面试.md) - 关键词：`Servlet 生命周期`、`XSS`、`CSRF`、`CORS`、`JWT`
 
 ## 📚 资料
 

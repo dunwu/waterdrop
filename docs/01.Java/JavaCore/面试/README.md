@@ -19,19 +19,21 @@ dir:
 
 # Java 面试
 
+> Java 面试篇精选 Java 核心技术各方向的经典面试题，覆盖基础语法、容器框架、并发编程、JVM 虚拟机四大板块。题目源自真实面试场景，侧重考察原理理解与实战应用能力，适合系统性备战 Java 技术面试。
+
 ## 📖 内容
 
-- [Java 基础面试一]([JavaCore][面试]基础（一）.md) - 关键词：`值传递`、`装箱`、`拆箱`、`缓存机制`、`BigDecimal`、`异常体系`、`try-with-resources`、`final`、`finally`、`finalize`
-- [Java 基础面试二]([JavaCore][面试]基础（二）.md) - 关键词：`接口 vs 抽象类`、`深拷贝`、`浅拷贝`、`equals`、`hashCode`、`String 不可变`、`StringBuilder`、`StringBuffer`、`字符串常量池`、`intern`
-- [Java 基础面试三]([JavaCore][面试]基础（三）.md) - 关键词：`泛型`、`类型擦除`、`PECS`、`反射`、`动态代理`、`CGLIB`、`SPI`、`序列化`、`NIO`、`Lambda`
-- [Java 容器面试一]([JavaCore][面试]容器（一）.md) - 关键词：`集合体系`、`fail-fast`、`ArrayList`、`扩容`、`LinkedList`、`CopyOnWriteArrayList`、`HashSet`、`PriorityQueue`、`BlockingQueue`、`ConcurrentModificationException`
-- [Java 容器面试二]([JavaCore][面试]容器（二）.md) - 关键词：`Hash 碰撞`、`HashMap`、`红黑树`、`负载因子`、`线程不安全`、`ConcurrentHashMap`、`分段锁`、`CAS`、`复合操作原子性`、`JDK8 改动`
-- [Java 容器面试三]([JavaCore][面试]容器（三）.md) - 关键词：`Collections`、`Collectors.toMap`、`NPE`、`Arrays.asList`、`UnsupportedOperationException`、`List.subList`、`视图`、`fail-fast`、`同步控制`、`Set 去重`
-- [Java 并发面试一]([JavaCore][面试]并发（一）.md) - 关键词：`并发`、`并行`、`原子性`、`可见性`、`有序性`、`JMM`、`Happens-Before`、`volatile`、`synchronized`、`死锁`
-- [Java 并发面试二]([JavaCore][面试]并发（二）.md) - 关键词：`公平锁`、`悲观锁`、`乐观锁`、`可重入锁`、`AQS`、`ReentrantLock`、`CAS`、`ABA 问题`、`ThreadLocal`、`内存泄漏`
-- [Java 并发面试三]([JavaCore][面试]并发（三）.md) - 关键词：`线程池`、`ThreadPoolExecutor`、`corePoolSize`、`maximumPoolSize`、`拒绝策略`、`CountDownLatch`、`CyclicBarrier`、`Semaphore`、`ForkJoinPool`、`CompletableFuture`
-- [Java 虚拟机面试一]([JavaCore][面试]虚拟机（一）.md) - 关键词：`类加载`、`双亲委派`、`内存区域`、`堆`、`方法区`、`元空间`、`对象头`、`Mark Word`、`JIT`、`逃逸分析`
-- [Java 虚拟机面试二]([JavaCore][面试]虚拟机（二）.md) - 关键词：`可达性分析`、`GC Roots`、`强引用`、`弱引用`、`分代收集`、`CMS`、`G1`、`ZGC`、`Full GC`、`GC 调优`
+- [Java 基础面试一]([JavaCore][面试]基础（一）.md) - 关键词：`值传递`、`装箱`、`拆箱`、`异常体系`、`final`
+- [Java 基础面试二]([JavaCore][面试]基础（二）.md) - 关键词：`equals`、`hashCode`、`String 不可变`、`深拷贝`、`浅拷贝`
+- [Java 基础面试三]([JavaCore][面试]基础（三）.md) - 关键词：`泛型`、`类型擦除`、`反射`、`动态代理`、`Lambda`
+- [Java 容器面试一]([JavaCore][面试]容器（一）.md) - 关键词：`ArrayList`、`fail-fast`、`扩容`、`BlockingQueue`、`集合体系`
+- [Java 容器面试二]([JavaCore][面试]容器（二）.md) - 关键词：`HashMap`、`红黑树`、`ConcurrentHashMap`、`CAS`、`负载因子`
+- [Java 容器面试三]([JavaCore][面试]容器（三）.md) - 关键词：`Collections`、`Arrays.asList`、`List.subList`、`fail-fast`、`Set 去重`
+- [Java 并发面试一]([JavaCore][面试]并发（一）.md) - 关键词：`原子性`、`可见性`、`JMM`、`volatile`、`synchronized`
+- [Java 并发面试二]([JavaCore][面试]并发（二）.md) - 关键词：`AQS`、`ReentrantLock`、`CAS`、`ThreadLocal`、`悲观锁`
+- [Java 并发面试三]([JavaCore][面试]并发（三）.md) - 关键词：`线程池`、`ThreadPoolExecutor`、`拒绝策略`、`CountDownLatch`、`CompletableFuture`
+- [Java 虚拟机面试一]([JavaCore][面试]虚拟机（一）.md) - 关键词：`类加载`、`双亲委派`、`内存区域`、`堆`、`元空间`
+- [Java 虚拟机面试二]([JavaCore][面试]虚拟机（二）.md) - 关键词：`GC Roots`、`可达性分析`、`分代收集`、`CMS`、`G1`
 
 ## 📚 资料
 

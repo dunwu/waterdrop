@@ -18,16 +18,16 @@ dir:
 
 # Java 高级特性
 
-> Java 高级总结 Java 的一些高级特性。
+> Java 高级特性涵盖正则表达式引擎、编解码与密码学、国际化、SPI 服务发现机制、JavaAgent 字节码增强以及 JDK8 函数式编程范式。这些进阶内容为构建高性能、可扩展的企业级应用提供了关键支撑，也是区分初中级与高级工程师的重要知识域。
 
 ## 📖 内容
 
-- [Java 正则]([JavaCore]正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`反向引用`、`零宽断言`、`贪婪与懒惰`、`元字符`、`DFA`、`NFA`
-- [Java 编码和加密]([JavaCore]编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`、`MD5`、`SHA`、`HMAC`、`AES`、`RSA`
+- [Java 正则]([JavaCore]正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`零宽断言`、`贪婪与懒惰`
+- [Java 编码和加密]([JavaCore]编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`
 - [Java 国际化]([JavaCore]国际化.md) - 关键词：`Locale`、`ResourceBundle`、`NumberFormat`、`DateFormat`、`MessageFormat`
-- [Java SPI]([JavaCore]SPI.md) - 关键词：`SPI`、`ClassLoader`、`ServiceLoader`、`扩展点`
-- [JavaAgent]([JavaCore]Agent.md) - 关键词：`Instrumentation`、`premain`、`agentmain`、`ClassFileTransformer`、`字节码增强`、`Attach`、`JVMTI`、`javassist`、`MANIFEST.MF`
-- [Java JDK8]([JavaCore]JDK8.md) - 关键词：`Stream`、`lambda`、`Optional`、`@FunctionalInterface`
+- [Java SPI]([JavaCore]SPI.md) - 关键词：`SPI`、`ServiceLoader`、`ClassLoader`、`扩展点`
+- [JavaAgent]([JavaCore]Agent.md) - 关键词：`Instrumentation`、`premain`、`ClassFileTransformer`、`字节码增强`、`JVMTI`
+- [Java JDK8]([JavaCore]JDK8.md) - 关键词：`Stream`、`Lambda`、`Optional`、`@FunctionalInterface`
 
 ## 📚 资料
 

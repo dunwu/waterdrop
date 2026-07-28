@@ -19,16 +19,16 @@ dir:
 
 # Java 容器
 
-> Java 容器涉及许多数据结构知识点，所以设立专题进行总结。
+> Java 容器框架以 Collection 和 Map 两大体系为核心，涵盖 List、Set、Queue 等经典数据结构及其底层实现原理（数组、链表、红黑树、哈希表）。结合 Stream API 的声明式数据处理能力，构成 Java 日常开发中数据组织、操作与转换的完整工具链，是面试中考察数据结构与算法功底的核心阵地。
 
 ## 📖 内容
 
-- [Java 容器简介]([JavaCore][容器]简介.md) - 关键词：`Collection`、`Map`、`泛型`、`Iterable`、`Iterator`、`Comparable`、`Comparator`、`Cloneable`、`fail-fast`、`fail-safe`
-- [Java 容器之 List]([JavaCore][容器]List.md) - 关键词：`ArrayList`、`LinkedList`、`Vector`、`Stack`、`RandomAccess`、`动态扩容`、`Arrays.asList`、`subList`
-- [Java 容器之 Map]([JavaCore][容器]Map.md) - 关键词：`HashMap`、`LinkedHashMap`、`TreeMap`、`WeakHashMap`、`Hashtable`、`红黑树`、`负载因子`、`扩容`、`哈希冲突`
-- [Java 容器之 Set]([JavaCore][容器]Set.md) - 关键词：`HashSet`、`LinkedHashSet`、`TreeSet`、`EnumSet`、`去重`、`NavigableSet`、`HashMap`
-- [Java 容器之 Queue]([JavaCore][容器]Queue.md) - 关键词：`Queue`、`Deque`、`ArrayDeque`、`PriorityQueue`、`LinkedList`、`BlockingQueue`、`FIFO`、`二叉堆`
-- [Java 容器之 Stream]([JavaCore][容器]Stream.md) - 关键词：`Stream`、`parallelStream`、`中间操作`、`终结操作`、`惰性求值`、`filter`、`map`、`flatMap`、`collect`、`Collector`
+- [Java 容器简介]([JavaCore][容器]简介.md) - 关键词：`Collection`、`Map`、`Iterator`、`Comparator`、`fail-fast`
+- [Java 容器之 List]([JavaCore][容器]List.md) - 关键词：`ArrayList`、`LinkedList`、`动态扩容`、`RandomAccess`、`subList`
+- [Java 容器之 Map]([JavaCore][容器]Map.md) - 关键词：`HashMap`、`LinkedHashMap`、`TreeMap`、`红黑树`、`负载因子`
+- [Java 容器之 Set]([JavaCore][容器]Set.md) - 关键词：`HashSet`、`LinkedHashSet`、`TreeSet`、`去重`、`NavigableSet`
+- [Java 容器之 Queue]([JavaCore][容器]Queue.md) - 关键词：`Deque`、`ArrayDeque`、`PriorityQueue`、`BlockingQueue`、`二叉堆`
+- [Java 容器之 Stream]([JavaCore][容器]Stream.md) - 关键词：`Stream`、`中间操作`、`终结操作`、`Collector`、`惰性求值`
 
 ## 📚 资料
 

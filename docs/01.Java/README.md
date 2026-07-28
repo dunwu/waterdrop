@@ -52,92 +52,118 @@ index: false
 
 ### JavaCore
 
+#### [Java 面试](JavaCore/面试)
+
+> Java 面试篇精选 Java 核心技术各方向的经典面试题，覆盖基础语法、容器框架、并发编程、JVM 虚拟机四大板块。题目源自真实面试场景，侧重考察原理理解与实战应用能力，适合系统性备战 Java 技术面试。
+
+- [Java 基础面试一](JavaCore/面试/[JavaCore][面试]基础（一）.md) - 关键词：`值传递`、`装箱`、`拆箱`、`异常体系`、`final`
+- [Java 基础面试二](JavaCore/面试/[JavaCore][面试]基础（二）.md) - 关键词：`equals`、`hashCode`、`String 不可变`、`深拷贝`、`浅拷贝`
+- [Java 基础面试三](JavaCore/面试/[JavaCore][面试]基础（三）.md) - 关键词：`泛型`、`类型擦除`、`反射`、`动态代理`、`Lambda`
+- [Java 容器面试一](JavaCore/面试/[JavaCore][面试]容器（一）.md) - 关键词：`ArrayList`、`fail-fast`、`扩容`、`BlockingQueue`、`集合体系`
+- [Java 容器面试二](JavaCore/面试/[JavaCore][面试]容器（二）.md) - 关键词：`HashMap`、`红黑树`、`ConcurrentHashMap`、`CAS`、`负载因子`
+- [Java 容器面试三](JavaCore/面试/[JavaCore][面试]容器（三）.md) - 关键词：`Collections`、`Arrays.asList`、`List.subList`、`fail-fast`、`Set 去重`
+- [Java 并发面试一](JavaCore/面试/[JavaCore][面试]并发（一）.md) - 关键词：`原子性`、`可见性`、`JMM`、`volatile`、`synchronized`
+- [Java 并发面试二](JavaCore/面试/[JavaCore][面试]并发（二）.md) - 关键词：`AQS`、`ReentrantLock`、`CAS`、`ThreadLocal`、`悲观锁`
+- [Java 并发面试三](JavaCore/面试/[JavaCore][面试]并发（三）.md) - 关键词：`线程池`、`ThreadPoolExecutor`、`拒绝策略`、`CountDownLatch`、`CompletableFuture`
+- [Java 虚拟机面试一](JavaCore/面试/[JavaCore][面试]虚拟机（一）.md) - 关键词：`类加载`、`双亲委派`、`内存区域`、`堆`、`元空间`
+- [Java 虚拟机面试二](JavaCore/面试/[JavaCore][面试]虚拟机（二）.md) - 关键词：`GC Roots`、`可达性分析`、`分代收集`、`CMS`、`G1`
+
 #### [Java 基础特性](JavaCore/基础特性)
 
-- [Java 基础语法特性](JavaCore/基础特性/[JavaCore]基础语法.md)
-- [Java 基本数据类型](JavaCore/基础特性/[JavaCore]数据类型.md)
-- [Java 面向对象](JavaCore/基础特性/[JavaCore]面向对象.md)
-- [Java 方法](JavaCore/基础特性/[JavaCore]方法.md)
-- [Java 数组](JavaCore/基础特性/[JavaCore]数组.md)
-- [Java 枚举](JavaCore/基础特性/[JavaCore]枚举.md)
-- [Java 控制语句](JavaCore/基础特性/[JavaCore]控制语句.md)
-- [Java 异常](JavaCore/基础特性/[JavaCore]异常.md)
-- [Java 泛型](JavaCore/基础特性/[JavaCore]泛型.md)
-- [Java 反射](JavaCore/基础特性/[JavaCore]反射.md)
-- [Java 注解](JavaCore/基础特性/[JavaCore]注解.md)
-- [Java String 类型](JavaCore/基础特性/[JavaCore]String.md)
+> Java 基础特性涵盖语言核心语法、类型系统、面向对象三大范式、控制流与异常体系，以及泛型、反射、注解等运行时机制。这些是 Java 开发的基石，深入理解有助于编写健壮、可维护的代码，也是面试高频考察点。
+
+- [Java 基础语法特性](JavaCore/基础特性/[JavaCore]基础语法.md) - 关键词：`强类型`、`访问修饰符`、`final`、`操作符`、`序列化`
+- [Java 基本数据类型](JavaCore/基础特性/[JavaCore]数据类型.md) - 关键词：`包装类`、`装箱拆箱`、`缓存机制`、`BigDecimal`、`精度丢失`
+- [Java 面向对象](JavaCore/基础特性/[JavaCore]面向对象.md) - 关键词：`封装`、`继承`、`多态`、`接口`、`抽象类`
+- [Java 方法](JavaCore/基础特性/[JavaCore]方法.md) - 关键词：`值传递`、`重载`、`覆写`、`static`、`可变参数`
+- [Java 数组](JavaCore/基础特性/[JavaCore]数组.md) - 关键词：`引用类型`、`多维数组`、`Arrays`、`长度固定`、`下标`
+- [Java 枚举](JavaCore/基础特性/[JavaCore]枚举.md) - 关键词：`enum`、`EnumSet`、`EnumMap`、`单例模式`、`状态机`
+- [Java 控制语句](JavaCore/基础特性/[JavaCore]控制语句.md) - 关键词：`if`、`switch`、`while`、`for`、`break`
+- [Java 异常](JavaCore/基础特性/[JavaCore]异常.md) - 关键词：`Throwable`、`RuntimeException`、`try-catch-finally`、`Checked Exception`、`异常链`
+- [Java 泛型](JavaCore/基础特性/[JavaCore]泛型.md) - 关键词：`类型擦除`、`通配符`、`PECS`、`泛型类`、`类型边界`
+- [Java 反射](JavaCore/基础特性/[JavaCore]反射.md) - 关键词：`Class`、`invoke`、`动态代理`、`CGLIB`、`InvocationHandler`
+- [Java 注解](JavaCore/基础特性/[JavaCore]注解.md) - 关键词：`元注解`、`@Retention`、`@Target`、`自定义注解`、`反射解析`
+- [Java String 类型](JavaCore/基础特性/[JavaCore]String.md) - 关键词：`不可变`、`字符串常量池`、`intern`、`StringBuilder`、`StringBuffer`
 
 #### [Java 高级特性](JavaCore/高级特性)
 
-- [Java 正则](JavaCore/高级特性/[JavaCore]正则.md) - 关键词：Pattern、Matcher、捕获与非捕获、反向引用、零宽断言、贪婪与懒惰、元字符、DFA、NFA
-- [Java 编码和加密](JavaCore/高级特性/[JavaCore]编码和加密.md) - 关键词：Base64、消息摘要、数字签名、对称加密、非对称加密、MD5、SHA、HMAC、AES、DES、DESede、RSA
-- [Java 国际化](JavaCore/高级特性/[JavaCore]国际化.md) - 关键词：Locale、ResourceBundle、NumberFormat、DateFormat、MessageFormat
-- [Java JDK8](JavaCore/高级特性/[JavaCore]JDK8.md) - 关键词：Stream、lambda、Optional、@FunctionalInterface
-- [Java SPI](JavaCore/高级特性/[JavaCore]SPI.md) - 关键词：SPI、ClassLoader
-- [JavaAgent](JavaCore/高级特性/[JavaCore]Agent.md)
+> Java 高级特性涵盖正则表达式引擎、编解码与密码学、国际化、SPI 服务发现机制、JavaAgent 字节码增强以及 JDK8 函数式编程范式。这些进阶内容为构建高性能、可扩展的企业级应用提供了关键支撑，也是区分初中级与高级工程师的重要知识域。
+
+- [Java 正则](JavaCore/高级特性/[JavaCore]正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`零宽断言`、`贪婪与懒惰`
+- [Java 编码和加密](JavaCore/高级特性/[JavaCore]编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`
+- [Java 国际化](JavaCore/高级特性/[JavaCore]国际化.md) - 关键词：`Locale`、`ResourceBundle`、`NumberFormat`、`DateFormat`、`MessageFormat`
+- [Java SPI](JavaCore/高级特性/[JavaCore]SPI.md) - 关键词：`SPI`、`ServiceLoader`、`ClassLoader`、`扩展点`
+- [JavaAgent](JavaCore/高级特性/[JavaCore]Agent.md) - 关键词：`Instrumentation`、`premain`、`ClassFileTransformer`、`字节码增强`、`JVMTI`
+- [Java JDK8](JavaCore/高级特性/[JavaCore]JDK8.md) - 关键词：`Stream`、`Lambda`、`Optional`、`@FunctionalInterface`
 
 #### [Java 容器](JavaCore/容器)
 
-- [Java 容器简介](JavaCore/容器/[JavaCore][容器]简介.md) - 关键词：泛型、Iterable、Iterator、Comparable、Comparator、Cloneable、fail-fast
-- [Java 容器之 List](JavaCore/容器/[JavaCore][容器]List.md) - 关键词：List、ArrayList、LinkedList
-- [Java 容器之 Map](JavaCore/容器/[JavaCore][容器]Map.md) - 关键词：Map、HashMap、TreeMap、LinkedHashMap、WeakHashMap
-- [Java 容器之 Set](JavaCore/容器/[JavaCore][容器]Set.md) - 关键词：Set、HashSet、TreeSet、LinkedHashSet、EnumSet
-- [Java 容器之 Queue](JavaCore/容器/[JavaCore][容器]Queue.md) - 关键词：Queue、Deque、ArrayDeque、LinkedList、PriorityQueue
-- [Java 容器之 Stream](JavaCore/容器/[JavaCore][容器]Stream.md)
+> Java 容器框架以 Collection 和 Map 两大体系为核心，涵盖 List、Set、Queue 等经典数据结构及其底层实现原理（数组、链表、红黑树、哈希表）。结合 Stream API 的声明式数据处理能力，构成 Java 日常开发中数据组织、操作与转换的完整工具链，是面试中考察数据结构与算法功底的核心阵地。
+
+- [Java 容器简介](JavaCore/容器/[JavaCore][容器]简介.md) - 关键词：`Collection`、`Map`、`Iterator`、`Comparator`、`fail-fast`
+- [Java 容器之 List](JavaCore/容器/[JavaCore][容器]List.md) - 关键词：`ArrayList`、`LinkedList`、`动态扩容`、`RandomAccess`、`subList`
+- [Java 容器之 Map](JavaCore/容器/[JavaCore][容器]Map.md) - 关键词：`HashMap`、`LinkedHashMap`、`TreeMap`、`红黑树`、`负载因子`
+- [Java 容器之 Set](JavaCore/容器/[JavaCore][容器]Set.md) - 关键词：`HashSet`、`LinkedHashSet`、`TreeSet`、`去重`、`NavigableSet`
+- [Java 容器之 Queue](JavaCore/容器/[JavaCore][容器]Queue.md) - 关键词：`Deque`、`ArrayDeque`、`PriorityQueue`、`BlockingQueue`、`二叉堆`
+- [Java 容器之 Stream](JavaCore/容器/[JavaCore][容器]Stream.md) - 关键词：`Stream`、`中间操作`、`终结操作`、`Collector`、`惰性求值`
 
 #### [Java IO](JavaCore/IO)
 
-- [Java IO 之 简介](JavaCore/IO/[JavaCore][IO]简介.md) - 关键词：BIO、NIO、AIO
-- [Java IO 之 BIO](JavaCore/IO/[JavaCore][IO]BIO.md) - 关键词：BIO、InputStream、OutputStream、Reader、Writer、File、Socket、ServerSocket
-- [Java IO 之 NIO](JavaCore/IO/[JavaCore][IO]NIO.md) - 关键词：NIO、Channel、Buffer、Selector、多路复用
-- [Java IO 之序列化](JavaCore/IO/[JavaCore][IO]序列化.md) - 关键词：Serializable、serialVersionUID、transient、Externalizable
+> Java IO 专题涵盖 Java 输入输出体系的核心知识，包括 BIO（同步阻塞）、NIO（多路复用）、AIO（异步非阻塞）三种 IO 模型的原理与实践。同时深入序列化与反序列化机制，涉及 JDK 原生序列化、Protobuf、Hessian 等主流方案的对比与应用。
+
+- [Java IO 之 简介](JavaCore/IO/[JavaCore][IO]简介.md) - 关键词：`BIO`、`NIO`、`AIO`、`I/O 多路复用`、`Reactor`
+- [Java IO 之 BIO](JavaCore/IO/[JavaCore][IO]BIO.md) - 关键词：`BIO`、`字节流`、`字符流`、`InputStream`、`Socket`
+- [Java IO 之 NIO](JavaCore/IO/[JavaCore][IO]NIO.md) - 关键词：`NIO`、`Channel`、`Buffer`、`Selector`、`零拷贝`
+- [Java IO 之序列化](JavaCore/IO/[JavaCore][IO]序列化.md) - 关键词：`Serializable`、`serialVersionUID`、`transient`、`Protobuf`、`JSON`
 
 #### [Java 并发](JavaCore/并发)
 
-- [Java 并发简介](JavaCore/并发/[JavaCore][并发]简介.md) - 关键词：并发、线程、安全性、活跃性、性能、死锁、活锁
-- [Java 并发之内存模型](JavaCore/并发/[JavaCore][并发]内存模型.md) - 关键词：JMM、Happens-Before、内存屏障、volatile、synchronized、final、指令重排序
-- [Java 并发之线程](JavaCore/并发/[JavaCore][并发]线程.md) - 关键词：Thread、Runnable、Callable、Future、FutureTask、线程生命周期
-- [Java 并发之锁](JavaCore/并发/[JavaCore][并发]锁.md) - 关键词：锁、Lock、Condition、ReentrantLock、ReentrantReadWriteLock、StampedLock
-- [Java 并发之无锁](JavaCore/并发/[JavaCore][并发]无锁.md) - 关键词：CAS、ThreadLocal、Immutability、Copy-on-Write
-- [Java 并发之 AQS](JavaCore/并发/[JavaCore][并发]AQS.md) - 关键词：AQS、独占锁、共享锁
-- [Java 并发之容器](JavaCore/并发/[JavaCore][并发]容器.md) - 关键词：ConcurrentHashMap、CopyOnWriteArrayList
-- [Java 并发之线程池](JavaCore/并发/[JavaCore][并发]线程池.md) - 关键词：Executor、ExecutorService、ThreadPoolExecutor、Executors
-- [Java 并发之同步工具](JavaCore/并发/[JavaCore][并发]同步工具.md) - 关键词：Semaphore、CountDownLatch、CyclicBarrier
-- [Java 并发之分工工具](JavaCore/并发/[JavaCore][并发]分工工具.md) - 关键词：CompletableFuture、CompletionStage、ForkJoinPool
+> Java 并发编程专题系统梳理多线程并发编程的核心知识体系，涵盖 Java 内存模型（JMM）、线程生命周期与同步机制、锁机制（synchronized/ReentrantLock/AQS）、无锁并发（CAS/原子类/ThreadLocal）等核心主题。同时深入线程池原理、并发容器、同步与分工工具类等实战内容，帮助理解并发编程的本质问题与解决方案。
+
+- [Java 并发简介](JavaCore/并发/[JavaCore][并发]简介.md) - 关键词：`原子性`、`可见性`、`有序性`、`死锁`、`上下文切换`
+- [Java 并发之内存模型](JavaCore/并发/[JavaCore][并发]内存模型.md) - 关键词：`JMM`、`Happens-Before`、`volatile`、`synchronized`、`锁升级`
+- [Java 并发之线程](JavaCore/并发/[JavaCore][并发]线程.md) - 关键词：`Thread`、`Runnable`、`Callable`、`线程生命周期`、`interrupt`
+- [Java 并发之锁](JavaCore/并发/[JavaCore][并发]锁.md) - 关键词：`ReentrantLock`、`AQS`、`CAS`、`悲观锁`、`乐观锁`
+- [Java 并发之无锁](JavaCore/并发/[JavaCore][并发]无锁.md) - 关键词：`CAS`、`原子类`、`ThreadLocal`、`ABA 问题`、`Copy-on-Write`
+- [Java 并发之 AQS](JavaCore/并发/[JavaCore][并发]AQS.md) - 关键词：`AQS`、`CLH 队列`、`独占锁`、`共享锁`、`Condition`
+- [Java 并发之容器](JavaCore/并发/[JavaCore][并发]容器.md) - 关键词：`ConcurrentHashMap`、`CopyOnWriteArrayList`、`BlockingQueue`、`分段锁`、`CAS`
+- [Java 并发之线程池](JavaCore/并发/[JavaCore][并发]线程池.md) - 关键词：`ThreadPoolExecutor`、`corePoolSize`、`拒绝策略`、`workQueue`、`Executors`
+- [Java 并发之同步工具](JavaCore/并发/[JavaCore][并发]同步工具.md) - 关键词：`CountDownLatch`、`Semaphore`、`CyclicBarrier`、`信号量`、`AQS`
+- [Java 并发之分工工具](JavaCore/并发/[JavaCore][并发]分工工具.md) - 关键词：`CompletableFuture`、`ForkJoinPool`、`FutureTask`、`工作窃取`、`异步编排`
 
 #### [Java 虚拟机](JavaCore/JVM)
 
-- [Java 虚拟机简介](JavaCore/JVM/[JavaCore][JVM]简介.md)
-- [Java 虚拟机之内存区域](JavaCore/JVM/[JavaCore][JVM]内存区域.md) - 关键词：`程序计数器`、`虚拟机栈`、`本地方法栈`、`堆`、`方法区`、`运行时常量池`、`直接内存`、`OutOfMemoryError`、`StackOverflowError`
-- [Java 虚拟机之垃圾收集](JavaCore/JVM/[JavaCore][JVM]垃圾收集.md) - 关键词：`GC Roots`、`Serial`、`Parallel`、`CMS`、`G1`、`Minor GC`、`Full GC`
-- [Java 虚拟机之字节码](JavaCore/JVM/[JavaCore][JVM]字节码.md) - 关键词：`bytecode`、`asm`、`javassist`
-- [Java 虚拟机之类加载](JavaCore/JVM/[JavaCore][JVM]类加载.md) - 关键词：`ClassLoader`、`双亲委派`
-- [Java 虚拟机之工具](JavaCore/JVM/[JavaCore][JVM]工具.md) - 关键词：`jps`、`jstat`、`jmap` 、`jstack`、`jhat`、`jinfo`、`jconsole`、`jvisualvm`、`MAT`、`JProfile`、`Arthas`
-- [Java 虚拟机之故障处理](JavaCore/JVM/[JavaCore][JVM]故障处理.md) - 关键词：`CPU`、`内存`、`磁盘`、`网络`、`GC`
-- [Java 虚拟机之调优](JavaCore/JVM/[JavaCore][JVM]调优.md) - 关键词：`配置`、`调优`
+> Java 虚拟机（JVM）专题深入剖析 JVM 的核心运行机制，涵盖运行时数据区（堆、栈、方法区）、垃圾收集算法与主流收集器（CMS、G1、ZGC）、字节码格式与类加载机制（双亲委派模型）等关键主题。同时涉及 JVM 性能调优方法论与常用诊断工具（Arthas、jstat、jmap、MAT），助力生产环境问题排查与性能优化。
 
-### JavaEE
+- [Java 虚拟机简介](JavaCore/JVM/[JavaCore][JVM]简介.md) - 关键词：`JVM`、`Hotspot`、`运行时数据区`、`类加载器`、`JIT`
+- [Java 虚拟机之内存区域](JavaCore/JVM/[JavaCore][JVM]内存区域.md) - 关键词：`堆`、`方法区`、`元空间`、`虚拟机栈`、`OutOfMemoryError`
+- [Java 虚拟机之垃圾收集](JavaCore/JVM/[JavaCore][JVM]垃圾收集.md) - 关键词：`GC Roots`、`可达性分析`、`分代收集`、`CMS`、`G1`
+- [Java 虚拟机之字节码](JavaCore/JVM/[JavaCore][JVM]字节码.md) - 关键词：`字节码`、`常量池`、`字节码指令`、`ASM`、`ByteBuddy`
+- [Java 虚拟机之类加载](JavaCore/JVM/[JavaCore][JVM]类加载.md) - 关键词：`类加载机制`、`双亲委派`、`ClassLoader`、`热部署`、`SPI`
+- [Java 虚拟机之工具](JavaCore/JVM/[JavaCore][JVM]工具.md) - 关键词：`Arthas`、`jstat`、`jmap`、`jstack`、`MAT`
+- [Java 虚拟机之故障处理](JavaCore/JVM/[JavaCore][JVM]故障处理.md) - 关键词：`CPU 飙升`、`内存泄漏`、`OOM`、`GC 频繁`、`死锁`
+- [Java 虚拟机之调优](JavaCore/JVM/[JavaCore][JVM]调优.md) - 关键词：`-Xms`、`-Xmx`、`GC 日志`、`吞吐量`、`停顿时间`
 
-#### JavaWeb
+### JavaWeb
 
-- [JavaWeb 面试](JavaWeb/[JavaWeb]面试.md)
-- [JavaWeb 之 Servlet 指南](JavaWeb/[JavaWeb]Servlet.md)
-- [JavaWeb 之 Jsp 指南](JavaWeb/[JavaWeb]JSP.md)
-- [JavaWeb 之 Filter 和 Listener](JavaWeb/[JavaWeb]Filter和Listener.md)
-- [JavaWeb 之 Cookie 和 Session](JavaWeb/[JavaWeb]Cookie和Session.md)
+> JavaWeb 专题围绕 Java EE Web 层开发的核心技术栈，系统梳理 Servlet 容器模型与生命周期、JSP 动态页面渲染、Filter 与 Listener 扩展机制、Cookie/Session 会话管理等经典主题。这些技术构成了 Spring MVC 等现代框架的底层规范基础，深入理解有助于把握 Web 应用的请求处理链路与状态管理本质。
 
-#### Java 服务器
+- [JavaWeb 之 Servlet 指南](JavaWeb/[JavaWeb]Servlet.md) - 关键词：`Servlet`、`生命周期`、`Servlet API`、`HTTP 状态码`、`Web 容器`
+- [JavaWeb 之 JSP 指南](JavaWeb/[JavaWeb]JSP.md) - 关键词：`JSP`、`EL 表达式`、`JSTL`、`指令`、`内置对象`
+- [JavaWeb 之 Filter 和 Listener](JavaWeb/[JavaWeb]Filter和Listener.md) - 关键词：`Filter`、`FilterChain`、`Listener`、`拦截链`、`Servlet 扩展`
+- [JavaWeb 之 Cookie 和 Session](JavaWeb/[JavaWeb]Cookie和Session.md) - 关键词：`Cookie`、`Session`、`会话管理`、`URL 重写`、`分布式会话`
+- [JavaWeb 面试](JavaWeb/[JavaWeb]面试.md) - 关键词：`Servlet 生命周期`、`XSS`、`CSRF`、`CORS`、`JWT`
 
-> Tomcat 和 Jetty 都是 Java 比较流行的轻量级服务器。
->
-> Nginx 是目前最流行的反向代理服务器，也常用于负载均衡。
+### Java 服务器
 
-- [Tomcat 快速入门](服务器/Tomcat/[Tomcat]快速入门.md)
-- [Tomcat 连接器](服务器/Tomcat/[Tomcat]连接器.md)
-- [Tomcat 容器](服务器/Tomcat/[Tomcat]容器.md)
-- [Tomcat 优化](服务器/Tomcat/[Tomcat]优化.md)
-- [Tomcat 和 Jetty](服务器/Tomcat和Jetty.md)
-- [Jetty](服务器/Jetty.md)
+> Java 服务器专题围绕 Servlet 容器的核心架构与性能优化展开，深入剖析 Tomcat 的连接器模型（NIO/NIO2）、容器体系（热部署、类加载、Servlet 规范实现）、启动优化策略，以及 Jetty 的 Handler 架构与线程模型。同时对比 Tomcat 与 Jetty 的设计差异与适用场景，帮助理解 Web 容器的请求处理链路与运维调优实践。
+
+- [Tomcat 快速入门](服务器/Tomcat/[Tomcat]快速入门.md) - 关键词：`Tomcat`、`Server 架构`、`Service`、`生命周期`、`server.xml`
+- [Tomcat 连接器](服务器/Tomcat/[Tomcat]连接器.md) - 关键词：`NioEndpoint`、`Acceptor`、`Poller`、`NIO`、`SocketProcessor`
+- [Tomcat 容器](服务器/Tomcat/[Tomcat]容器.md) - 关键词：`热部署`、`类加载机制`、`应用隔离`、`Servlet 规范`、`异步 Servlet`
+- [Tomcat 优化](服务器/Tomcat/[Tomcat]优化.md) - 关键词：`启动优化`、`TLD 扫描`、`Web-Fragment`、`并行启动`、`随机数熵源`
+- [Tomcat 和 Jetty](服务器/Tomcat和Jetty.md) - 关键词：`Tomcat`、`Jetty`、`Web 容器`、`架构对比`、`选型`
+- [Jetty](服务器/Jetty.md) - 关键词：`Jetty`、`Handler`、`Connector`、`线程策略`、`Selector`
 
 ### Java 软件
 
@@ -378,6 +404,19 @@ index: false
   - [advanced-java](https://github.com/doocs/advanced-java) - Github 上的 Java 面试教程，分布式部分从面试官视角讲解核心考察点
   - [java-design-patterns](https://github.com/iluwatar/java-design-patterns) - Github 上的 Java 版设计模式教程
   - [Java](https://github.com/TheAlgorithms/Java) - Github 上的 Java 算法教程
+
+## 🚪 传送
+
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾
+
+- [极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701) - 极客时间教程——基于 Java 生产环境的真实案例，讲解“避坑”的手段，很硬核
+- [极客时间教程 - Java 性能调优实战](https://time.geekbang.org/column/intro/100028001) - 极客时间教程——覆盖 80% 以上 Java 应用调优场景
+- [极客时间教程 - 深入拆解 Java 虚拟机](https://time.geekbang.org/column/intro/100010301) - 极客时间教程
+- [CS-Notes](https://github.com/CyC2018/CS-Notes) - Github 上的 Java 基础级面试教程，行文清晰简洁
+- [JavaGuide](https://github.com/Snailclimb/JavaGuide) - Github 上的 Java 面试教程，Java 基础部分讲解较为细致
+- [advanced-java](https://github.com/doocs/advanced-java) - Github 上的 Java 面试教程，分布式部分从面试官视角讲解核心考察点
+- [java-design-patterns](https://github.com/iluwatar/java-design-patterns) - Github 上的 Java 版设计模式教程
+- [Java](https://github.com/TheAlgorithms/Java) - Github 上的 Java 算法教程
 
 ## 🚪 传送
 

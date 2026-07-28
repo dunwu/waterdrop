@@ -19,14 +19,14 @@ dir:
 
 # Java IO
 
-> Java IO 是 Java 语言提供的输入输出能力，涵盖从磁盘文件、网络套接字到内存缓冲的多种数据流场景。Java 先后提供了三种 IO 模型：BIO（同步阻塞）、NIO（多路复用）、AIO（异步非阻塞），并通过序列化机制支持对象的持久化与网络传输。
+> Java IO 专题涵盖 Java 输入输出体系的核心知识，包括 BIO（同步阻塞）、NIO（多路复用）、AIO（异步非阻塞）三种 IO 模型的原理与实践。同时深入序列化与反序列化机制，涉及 JDK 原生序列化、Protobuf、Hessian 等主流方案的对比与应用。
 
 ## 📖 内容
 
-- [Java IO 之 简介]([JavaCore][IO]简介.md) - 关键词：`BIO`、`NIO`、`AIO`、`UNIX I/O 模型`、`同步阻塞`、`同步非阻塞`、`I/O 多路复用`、`信号驱动 I/O`、`异步非阻塞`、`Reactor`
-- [Java IO 之 BIO]([JavaCore][IO]BIO.md) - 关键词：`BIO`、`字节流`、`字符流`、`InputStream`、`OutputStream`、`Reader`、`Writer`、`RandomAccessFile`、`Socket`、`ServerSocket`
-- [Java IO 之 NIO]([JavaCore][IO]NIO.md) - 关键词：`NIO`、`Channel`、`Buffer`、`Selector`、`SelectionKey`、`多路复用`、`DirectBuffer`、`FileChannel`、`MappedByteBuffer`、`零拷贝`
-- [Java IO 之序列化]([JavaCore][IO]序列化.md) - 关键词：`Serializable`、`serialVersionUID`、`transient`、`Externalizable`、`readResolve`、`ObjectOutputStream`、`Protobuf`、`Hessian`、`Kryo`、`JSON`
+- [Java IO 之 简介]([JavaCore][IO]简介.md) - 关键词：`BIO`、`NIO`、`AIO`、`I/O 多路复用`、`Reactor`
+- [Java IO 之 BIO]([JavaCore][IO]BIO.md) - 关键词：`BIO`、`字节流`、`字符流`、`InputStream`、`Socket`
+- [Java IO 之 NIO]([JavaCore][IO]NIO.md) - 关键词：`NIO`、`Channel`、`Buffer`、`Selector`、`零拷贝`
+- [Java IO 之序列化]([JavaCore][IO]序列化.md) - 关键词：`Serializable`、`serialVersionUID`、`transient`、`Protobuf`、`JSON`
 
 ## 📚 资料
 
