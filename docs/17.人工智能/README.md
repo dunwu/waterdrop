@@ -1,3 +1,15 @@
+---
+title: AI 学习
+date: 2026-04-08 07:27:21
+categories:
+  - 人工智能
+tags:
+  - 人工智能
+permalink: /pages/5801eb13/
+hidden: true
+index: false
+---
+
 # AI 学习
 
 ## 学习规划
