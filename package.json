@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 vuepress-vite build docs",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=16384 vuepress-vite build docs",
     "start": "vuepress-vite dev docs --clean-cache",
     "dev": "vuepress-vite dev docs",
     "update": "pnpm dlx vp-update"
