@@ -18,8 +18,8 @@ index: false
 
 ## 📖 内容
 
-- [Shiro](Shiro.md)
-- [Spring Security](SpringSecurity.md)
+- [Shiro](Shiro.md) - 关键词：`Shiro`、`认证`、`授权`、`Realm`、`会话管理`
+- [Spring Security](SpringSecurity.md) - 关键词：`Spring Security`、`安全框架`、`认证授权`、`FilterChain`、`OAuth2`
 
 ## 📚 资料
 

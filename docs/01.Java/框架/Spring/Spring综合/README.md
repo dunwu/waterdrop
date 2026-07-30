@@ -20,10 +20,10 @@ index: false
 
 ## 📖 内容
 
-- [Spring 概述](Spring概述.md)
-- [SpringBoot 知识图谱](SpringBoot知识图谱.md)
-- [SpringBoot 基本原理](SpringBoot基本原理.md)
-- [Spring 面试](../Spring面试.md)
+- [Spring 概述](Spring概述.md) - 关键词：`Spring`、`IoC`、`AOP`、`Bean`、`Spring Framework`
+- [SpringBoot 知识图谱](SpringBoot知识图谱.md) - 关键词：`Spring Boot`、`自动配置`、`起步依赖`、`Actuator`、`IoC 容器`
+- [SpringBoot 基本原理](SpringBoot基本原理.md) - 关键词：`Spring Boot`、`自动配置`、`SpringApplication`、`启动原理`、`@SpringBootApplication`
+- [Spring 面试](../Spring面试.md) - 💯
 
 ## 📚 资料
 

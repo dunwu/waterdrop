@@ -30,12 +30,12 @@ index: false
 
 ## 📖 内容
 
-- [Maven 快速入门]([Maven]快速入门.md)
-- [Maven 教程之 pom.xml 详解]([Maven]pom详解.md)
-- [Maven 教程之 settings.xml 详解]([Maven]settings详解.md)
-- [Maven 实战问题和最佳实践]([Maven]最佳实践.md)
-- [Maven 教程之发布 jar 到私服或中央仓库]([Maven]发布.md)
-- [Maven 插件]([Maven]插件.md)
+- [Maven 快速入门]([Maven]快速入门.md) - 关键词：`Maven`、`pom.xml`、`依赖管理`、`生命周期`、`中央仓库`
+- [Maven 教程之 pom.xml 详解]([Maven]pom详解.md) - 关键词：`Maven`、`pom.xml`、`Project Object Model`、`依赖配置`、`坐标`
+- [Maven 教程之 settings.xml 详解]([Maven]settings详解.md) - 关键词：`Maven`、`settings.xml`、`全局配置`、`镜像`、`仓库认证`
+- [Maven 实战问题和最佳实践]([Maven]最佳实践.md) - 关键词：`Maven`、`dependencyManagement`、`多模块`、`版本管理`、`最佳实践`
+- [Maven 教程之发布 jar 到私服或中央仓库]([Maven]发布.md) - 关键词：`Maven`、`Sonatype`、`中央仓库`、`jar 发布`、`GPG 签名`
+- [Maven 插件]([Maven]插件.md) - 关键词：`Maven`、`插件`、`生命周期`、`Mojo`、`maven-compiler-plugin`
 
 ## 📚 资料
 

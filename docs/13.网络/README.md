@@ -35,17 +35,17 @@ index: false
 
 ### 网络协议
 
-- [超文本传输协议 HTTP](网络协议/HTTP.md)
+- [超文本传输协议 HTTP](网络协议/HTTP.md) - 关键词：`HTTP`、`HTTPS`、`HTTP 状态码`、`HTTP 方法`、`HTTP 缓存`
 - [域名系统协议 DNS](网络协议/DNS)
-- [传输控制协议 TCP](网络协议/TCP.md)
-- [用户数据报协议 UDP](网络协议/UDP.md)
-- [ICMP](网络协议/ICMP.md)
+- [传输控制协议 TCP](网络协议/TCP.md) - 关键词：`TCP`、`三次握手`、`四次挥手`、`流量控制`、`拥塞控制`
+- [用户数据报协议 UDP](网络协议/UDP.md) - 关键词：`UDP`、`无连接`、`数据报`、`低延迟`、`实时传输`
+- [ICMP](网络协议/ICMP.md) - 关键词：`ICMP`、`Ping`、`Traceroute`、`差错报文`、`网络诊断`
 
 ### 网络技术
 
-- [WebSocket](网络技术/WebSocket.md)
-- [CDN](网络技术/CDN.md)
-- [VPN](网络技术/VPN.md)
+- [WebSocket](网络技术/WebSocket.md) - 关键词：`WebSocket`、`全双工通信`、`长连接`、`实时通信`、`帧协议`
+- [CDN](网络技术/CDN.md) - 关键词：`CDN`、`内容分发`、`边缘节点`、`缓存加速`、`负载均衡`
+- [VPN](网络技术/VPN.md) - 关键词：`VPN`、`隧道技术`、`加密通信`、`远程访问`、`虚拟专用网络`
 
 ## 📚 资料
 

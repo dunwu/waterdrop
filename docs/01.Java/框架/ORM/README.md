@@ -22,9 +22,9 @@ index: false
 
 ## 📖 内容
 
-- [MyBatis 快速入门](MyBatis快速入门.md)
-- [MyBatis 原理](MyBatis原理.md)
-- [MyBatis 原理](MyBatis面试.md)
+- [MyBatis 快速入门](MyBatis快速入门.md) - 关键词：`MyBatis`、`ORM`、`SQL 映射`、`Mapper`、`XML 配置`
+- [MyBatis 原理](MyBatis原理.md) - 关键词：`MyBatis`、`源码分析`、`SqlSession`、`Executor`、`插件机制`
+- [MyBatis 原理](MyBatis面试.md) - 💯
 
 ## 📚 资料
 

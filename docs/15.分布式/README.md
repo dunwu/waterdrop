@@ -35,32 +35,32 @@ index: false
 - [分布式复制](分布式协同/分布式复制.md) - 关键词：`主从`、`多主`、`无主`
 - [分布式分区](分布式协同/分布式分区.md) - 关键词：`分区再均衡`、`路由`
 - [分布式共识](分布式协同/分布式共识.md) - 关键词：`共识`、`广播`、`epoch`、`quorum`
-- [分布式事务](分布式协同/分布式事务.md) - 关键词：`2PC`、`3PC`、`TCC`、`本地消息表`、`消息事务`、`SAGA`
-- [分布式锁](分布式协同/分布式锁.md) - 关键词：`互斥`、`可重入`、`死锁`、`容错`、`自旋尝试`、`公平性`
+- [分布式事务](分布式协同/分布式事务.md) - 关键词：`2PC`、`3PC`、`TCC`、`本地消息表`、`消息事务`
+- [分布式锁](分布式协同/分布式锁.md) - 关键词：`互斥`、`可重入`、`死锁`、`容错`、`自旋尝试`
 - [分布式 ID](分布式协同/分布式ID.md) - 关键词：`UUID`、`自增序列`、`雪花算法`、`Leaf`
-- [服务容错](分布式治理/服务容错.md)
+- [服务容错](分布式治理/服务容错.md) - 关键词：`服务容错`、`熔断`、`降级`、`限流`、`重试`
 - [分布式协同面试](分布式协同/分布式协同面试.md) 💯
 - **ZooKeeper**
-  - [ZooKeeper 原理](分布式协同/ZooKeeper/[ZooKeeper]原理.md)
-  - [ZooKeeper Java Api](分布式协同/ZooKeeper/[ZooKeeper]API.md)
-  - [ZooKeeper 命令](分布式协同/ZooKeeper/[ZooKeeper]命令.md)
-  - [ZooKeeper 运维](分布式协同/ZooKeeper/[ZooKeeper]运维.md)
-  - [ZooKeeper Acl](分布式协同/ZooKeeper/[ZooKeeper]ACL.md)
+  - [ZooKeeper 原理](分布式协同/ZooKeeper/[ZooKeeper]原理.md) - 关键词：`ZooKeeper`、`ZAB 协议`、`Watcher`、`znode`、`分布式协调`
+  - [ZooKeeper Java Api](分布式协同/ZooKeeper/[ZooKeeper]API.md) - 关键词：`ZooKeeper`、`Java API`、`Curator`、`Watcher`、`异步回调`
+  - [ZooKeeper 命令](分布式协同/ZooKeeper/[ZooKeeper]命令.md) - 关键词：`ZooKeeper`、`zkCli`、`四字命令`、`znode 操作`、`命令行工具`
+  - [ZooKeeper 运维](分布式协同/ZooKeeper/[ZooKeeper]运维.md) - 关键词：`ZooKeeper`、`集群部署`、`配置管理`、`性能调优`、`故障排查`
+  - [ZooKeeper Acl](分布式协同/ZooKeeper/[ZooKeeper]ACL.md) - 关键词：`ZooKeeper`、`ACL`、`权限控制`、`访问控制列表`、`安全认证`
   - [ZooKeeper 面试](分布式协同/ZooKeeper/[ZooKeeper]面试.md) 💯
 
 ### [分布式调度](分布式调度)
 
 - [服务注册和发现](分布式调度/服务注册和发现.md) - 关键词：`服务注册`、`服务发现`、`元数据`
 - [服务路由](分布式调度/服务路由.md) - 关键词：`路由`、`条件路由`、`脚本路由`、`标签路由`
-- [负载均衡](分布式调度/负载均衡.md) - 关键词：`轮询`、`随机`、`最少连接`、`最少响应时间`、`哈希`、`一致性哈希`、`虚拟哈希`
-- [流量控制](分布式调度/流量控制.md) - 关键词：`限流`、`熔断`、`降级`、`计数器法`、`时间窗口法`、`令牌桶法`、`漏桶法`
+- [负载均衡](分布式调度/负载均衡.md) - 关键词：`轮询`、`随机`、`最少连接`、`最少响应时间`、`哈希`
+- [流量控制](分布式调度/流量控制.md) - 关键词：`限流`、`熔断`、`降级`、`计数器法`、`时间窗口法`
 - [分布式调度面试](分布式调度/分布式调度面试.md) 💯
 
 ### [分布式治理](分布式治理)
 
-- [服务容错](分布式治理/服务容错.md)
-- [服务监控](分布式治理/服务监控.md)
-- [链路追踪](分布式治理/链路追踪.md)
+- [服务容错](分布式治理/服务容错.md) - 关键词：`服务容错`、`熔断`、`降级`、`限流`、`重试`
+- [服务监控](分布式治理/服务监控.md) - 关键词：`服务监控`、`监控体系`、`Prometheus`、`Grafana`、`告警`
+- [链路追踪](分布式治理/链路追踪.md) - 关键词：`链路追踪`、`SkyWalking`、`Zipkin`、`Span`、`可观测性`
 - [分布式治理面试](分布式治理/分布式治理面试.md) 💯
 
 ### [分布式通信](分布式通信)
@@ -76,30 +76,30 @@ index: false
 
 - [MQ 面试](分布式通信/MQ/MQ面试.md) 💯
 - [RabbitMQ 面试](分布式通信/MQ/RabbitMQ面试.md) 💯
-- [ActiveMQ](分布式通信/MQ/ActiveMQ.md)
+- [ActiveMQ](分布式通信/MQ/ActiveMQ.md) - 关键词：`ActiveMQ`、`JMS`、`消息中间件`、`点对点模式`、`发布订阅`
 
 ##### [Kafka](分布式通信/MQ/Kafka)
 
-- [Kafka 快速入门](分布式通信/MQ/Kafka/[Kafka]快速入门.md)
-- [Kafka 生产](分布式通信/MQ/Kafka/[Kafka]生产.md)
-- [Kafka 消费](分布式通信/MQ/Kafka/[Kafka]消费.md)
-- [Kafka 集群](分布式通信/MQ/Kafka/[Kafka]集群.md)
-- [Kafka 可靠传输](分布式通信/MQ/Kafka/[Kafka]可靠传输.md)
-- [Kafka 存储](分布式通信/MQ/Kafka/[Kafka]存储.md)
-- [Kafka 流式处理](分布式通信/MQ/Kafka/[Kafka]流式处理.md)
-- [Kafka 运维](分布式通信/MQ/Kafka/[Kafka]运维.md)
+- [Kafka 快速入门](分布式通信/MQ/Kafka/[Kafka]快速入门.md) - 关键词：`Kafka`、`消息队列`、`Topic`、`Partition`、`Broker`
+- [Kafka 生产](分布式通信/MQ/Kafka/[Kafka]生产.md) - 关键词：`Kafka`、`Producer`、`分区策略`、`消息发送`、`幂等生产者`
+- [Kafka 消费](分布式通信/MQ/Kafka/[Kafka]消费.md) - 关键词：`Kafka`、`Consumer`、`消费组`、`Offset`、`重平衡`
+- [Kafka 集群](分布式通信/MQ/Kafka/[Kafka]集群.md) - 关键词：`Kafka`、`集群管理`、`ZooKeeper`、`Controller 选举`、`副本机制`
+- [Kafka 可靠传输](分布式通信/MQ/Kafka/[Kafka]可靠传输.md) - 关键词：`Kafka`、`可靠传输`、`ACK 机制`、`ISR`、`Exactly-Once`
+- [Kafka 存储](分布式通信/MQ/Kafka/[Kafka]存储.md) - 关键词：`Kafka`、`存储机制`、`日志段`、`PageCache`、`零拷贝`
+- [Kafka 流式处理](分布式通信/MQ/Kafka/[Kafka]流式处理.md) - 关键词：`Kafka`、`流式处理`、`Kafka Streams`、`事件流`、`窗口计算`
+- [Kafka 运维](分布式通信/MQ/Kafka/[Kafka]运维.md) - 关键词：`Kafka`、`运维`、`集群监控`、`性能调优`、`故障排查`
 - [Kafka 面试](分布式通信/MQ/Kafka/[Kafka]面试.md) 💯
 
 ##### [RocketMQ](分布式通信/MQ/RocketMQ)
 
-- [RocketMQ 快速入门](分布式通信/MQ/RocketMQ/[RocketMQ]快速入门.md)
+- [RocketMQ 快速入门](分布式通信/MQ/RocketMQ/[RocketMQ]快速入门.md) - 关键词：`RocketMQ`、`消息模型`、`NameServer`、`Broker`、`消息类型`
 - [RocketMQ 面试](分布式通信/MQ/RocketMQ/[RocketMQ]面试.md) 💯
 
 ### [分布式存储](分布式存储)
 
-- [分布式缓存](分布式存储/分布式缓存.md) - 关键词：`进程内缓存`、`分布式缓存`、`缓存雪崩`、`缓存穿透`、`缓存击穿`、`缓存更新`、`缓存预热`、`缓存降级`
+- [分布式缓存](分布式存储/分布式缓存.md) - 关键词：`进程内缓存`、`分布式缓存`、`缓存雪崩`、`缓存穿透`、`缓存击穿`
 - [读写分离](分布式存储/读写分离.md) - 关键词：`读写分离`
-- [分库分表](分布式存储/分库分表.md) - 关键词：`分片`、`路由`、`迁移`、`扩容`、`双写`、`聚合`
+- [分库分表](分布式存储/分库分表.md) - 关键词：`分片`、`路由`、`迁移`、`扩容`、`双写`
 - [分布式存储面试](分布式存储/分布式存储面试.md) 💯
 
 ## 📚 资料

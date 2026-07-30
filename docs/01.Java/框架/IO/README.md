@@ -18,8 +18,8 @@ index: false
 
 ## 📖 内容
 
-- [Netty](Netty.md)
-- [Netty 面试](Netty面试.md)
+- [Netty](Netty.md) - 关键词：`Netty`、`NIO`、`网络通信`、`零拷贝`、`EventLoop`
+- [Netty 面试](Netty面试.md) 💯
 
 ## 📚 资料
 

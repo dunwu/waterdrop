@@ -56,17 +56,17 @@ index: false
 
 > Java 面试篇精选 Java 核心技术各方向的经典面试题，覆盖基础语法、容器框架、并发编程、JVM 虚拟机四大板块。题目源自真实面试场景，侧重考察原理理解与实战应用能力，适合系统性备战 Java 技术面试。
 
-- [Java 基础面试一](JavaCore/面试/[JavaCore][面试]基础（一）.md) - 关键词：`值传递`、`装箱`、`拆箱`、`异常体系`、`final`
-- [Java 基础面试二](JavaCore/面试/[JavaCore][面试]基础（二）.md) - 关键词：`equals`、`hashCode`、`String 不可变`、`深拷贝`、`浅拷贝`
-- [Java 基础面试三](JavaCore/面试/[JavaCore][面试]基础（三）.md) - 关键词：`泛型`、`类型擦除`、`反射`、`动态代理`、`Lambda`
-- [Java 容器面试一](JavaCore/面试/[JavaCore][面试]容器（一）.md) - 关键词：`ArrayList`、`fail-fast`、`扩容`、`BlockingQueue`、`集合体系`
-- [Java 容器面试二](JavaCore/面试/[JavaCore][面试]容器（二）.md) - 关键词：`HashMap`、`红黑树`、`ConcurrentHashMap`、`CAS`、`负载因子`
-- [Java 容器面试三](JavaCore/面试/[JavaCore][面试]容器（三）.md) - 关键词：`Collections`、`Arrays.asList`、`List.subList`、`fail-fast`、`Set 去重`
-- [Java 并发面试一](JavaCore/面试/[JavaCore][面试]并发（一）.md) - 关键词：`原子性`、`可见性`、`JMM`、`volatile`、`synchronized`
-- [Java 并发面试二](JavaCore/面试/[JavaCore][面试]并发（二）.md) - 关键词：`AQS`、`ReentrantLock`、`CAS`、`ThreadLocal`、`悲观锁`
-- [Java 并发面试三](JavaCore/面试/[JavaCore][面试]并发（三）.md) - 关键词：`线程池`、`ThreadPoolExecutor`、`拒绝策略`、`CountDownLatch`、`CompletableFuture`
-- [Java 虚拟机面试一](JavaCore/面试/[JavaCore][面试]虚拟机（一）.md) - 关键词：`类加载`、`双亲委派`、`内存区域`、`堆`、`元空间`
-- [Java 虚拟机面试二](JavaCore/面试/[JavaCore][面试]虚拟机（二）.md) - 关键词：`GC Roots`、`可达性分析`、`分代收集`、`CMS`、`G1`
+- [Java 基础面试一](JavaCore/面试/[JavaCore][面试]基础（一）.md) 💯
+- [Java 基础面试二](JavaCore/面试/[JavaCore][面试]基础（二）.md) 💯
+- [Java 基础面试三](JavaCore/面试/[JavaCore][面试]基础（三）.md) 💯
+- [Java 容器面试一](JavaCore/面试/[JavaCore][面试]容器（一）.md) 💯
+- [Java 容器面试二](JavaCore/面试/[JavaCore][面试]容器（二）.md) 💯
+- [Java 容器面试三](JavaCore/面试/[JavaCore][面试]容器（三）.md) 💯
+- [Java 并发面试一](JavaCore/面试/[JavaCore][面试]并发（一）.md) 💯
+- [Java 并发面试二](JavaCore/面试/[JavaCore][面试]并发（二）.md) 💯
+- [Java 并发面试三](JavaCore/面试/[JavaCore][面试]并发（三）.md) 💯
+- [Java 虚拟机面试一](JavaCore/面试/[JavaCore][面试]虚拟机（一）.md) 💯
+- [Java 虚拟机面试二](JavaCore/面试/[JavaCore][面试]虚拟机（二）.md) 💯
 
 #### [Java 基础特性](JavaCore/基础特性)
 
@@ -152,7 +152,7 @@ index: false
 - [JavaWeb 之 JSP 指南](JavaWeb/[JavaWeb]JSP.md) - 关键词：`JSP`、`EL 表达式`、`JSTL`、`指令`、`内置对象`
 - [JavaWeb 之 Filter 和 Listener](JavaWeb/[JavaWeb]Filter和Listener.md) - 关键词：`Filter`、`FilterChain`、`Listener`、`拦截链`、`Servlet 扩展`
 - [JavaWeb 之 Cookie 和 Session](JavaWeb/[JavaWeb]Cookie和Session.md) - 关键词：`Cookie`、`Session`、`会话管理`、`URL 重写`、`分布式会话`
-- [JavaWeb 面试](JavaWeb/[JavaWeb]面试.md) - 关键词：`Servlet 生命周期`、`XSS`、`CSRF`、`CORS`、`JWT`
+- [JavaWeb 面试](JavaWeb/[JavaWeb]面试.md) 💯
 
 ### Java 服务器
 
@@ -176,70 +176,70 @@ index: false
 > - Ant 功能比 Maven 和 Gradle 要弱，现代 Java 项目基本不用了，但也有一些传统的 Java 项目还在使用。
 
 - [Maven](软件/构建/Maven) 📚
-  - [Maven 快速入门](软件/构建/Maven/[Maven]快速入门.md)
-  - [Maven 教程之 pom.xml 详解](软件/构建/Maven/[Maven]pom详解.md)
-  - [Maven 教程之 settings.xml 详解](软件/构建/Maven/[Maven]settings详解.md)
-  - [Maven 实战问题和最佳实践](软件/构建/Maven/[Maven]最佳实践.md)
-  - [Maven 教程之发布 jar 到私服或中央仓库](软件/构建/Maven/[Maven]发布.md)
-  - [Maven 插件之代码检查](软件/构建/Maven/[Maven]插件.md)
-- [Ant 简易教程](软件/构建/Ant.md)
+  - [Maven 快速入门](软件/构建/Maven/[Maven]快速入门.md) - 关键词：`Maven`、`pom.xml`、`依赖管理`、`生命周期`、`中央仓库`
+  - [Maven 教程之 pom.xml 详解](软件/构建/Maven/[Maven]pom详解.md) - 关键词：`Maven`、`pom.xml`、`Project Object Model`、`依赖配置`、`坐标`
+  - [Maven 教程之 settings.xml 详解](软件/构建/Maven/[Maven]settings详解.md) - 关键词：`Maven`、`settings.xml`、`全局配置`、`镜像`、`仓库认证`
+  - [Maven 实战问题和最佳实践](软件/构建/Maven/[Maven]最佳实践.md) - 关键词：`Maven`、`dependencyManagement`、`多模块`、`版本管理`、`最佳实践`
+  - [Maven 教程之发布 jar 到私服或中央仓库](软件/构建/Maven/[Maven]发布.md) - 关键词：`Maven`、`Sonatype`、`中央仓库`、`jar 发布`、`GPG 签名`
+  - [Maven 插件之代码检查](软件/构建/Maven/[Maven]插件.md) - 关键词：`Maven`、`插件`、`生命周期`、`Mojo`、`maven-compiler-plugin`
+- [Ant 简易教程](软件/构建/Ant.md) - 关键词：`Ant`、`build.xml`、`构建工具`、`自动化构建`、`Apache`
 
 #### Java IDE
 
 > 自从有了 [**IDE**](软件/IDE)，写代码从此就告别了刀耕火种的蛮荒时代。
 >
-> - [Eclipse](软件/IDE/Eclipse.md) 是久负盛名的开源 Java IDE，我的学生时代一直使用它写 Java。
-> - 曾经抗拒从转 [Intellij Idea](软件/IDE/Intellij.md) ，但后来发现真香，不得不说，确实是目前最优秀的 Java IDE。
-> - 你可以在 [vscode](软件/IDE/VsCode.md) 中写各种语言，只要安装相应插件即可。如果你的项目中使用了很多种编程语言，又懒得在多个 IDE 之间切换，那么就用 vscode 来一网打尽吧。
+> - [Eclipse](软件/IDE/Eclipse.md) 是久负盛名的开源 Java IDE，我的学生时代一直使用它写 Java。 - 关键词：`Eclipse`、`IDE`、`代码提示`、`插件`、`Java 开发`
+> - 曾经抗拒从转 [Intellij Idea](软件/IDE/Intellij.md) ，但后来发现真香，不得不说，确实是目前最优秀的 Java IDE。 - 关键词：`IntelliJ IDEA`、`快捷键`、`IDE`、`代码重构`、`JetBrains`
+> - 你可以在 [vscode](软件/IDE/VsCode.md) 中写各种语言，只要安装相应插件即可。如果你的项目中使用了很多种编程语言，又懒得在多个 IDE 之间切换，那么就用 vscode 来一网打尽吧。 - 关键词：`VS Code`、`IDE`、`快捷键`、`命令面板`、`轻量编辑器`
 
-- [Intellij Idea](软件/IDE/Intellij.md)
-- [Eclipse](软件/IDE/Eclipse.md)
-- [vscode](软件/IDE/VsCode.md)
+- [Intellij Idea](软件/IDE/Intellij.md) - 关键词：`IntelliJ IDEA`、`快捷键`、`IDE`、`代码重构`、`JetBrains`
+- [Eclipse](软件/IDE/Eclipse.md) - 关键词：`Eclipse`、`IDE`、`代码提示`、`插件`、`Java 开发`
+- [vscode](软件/IDE/VsCode.md) - 关键词：`VS Code`、`IDE`、`快捷键`、`命令面板`、`轻量编辑器`
 
 #### Java 监控诊断
 
 > [监控/诊断](软件/监控诊断) 工具主要用于 Java 应用的运维。通过采集、分析、存储、可视化应用的有效数据，帮助开发者、使用者快速定位问题，找到性能瓶颈。
 
-- [监控工具对比](软件/监控诊断/监控工具.md)
-- [CAT](软件/监控诊断/CAT.md)
-- [Zipkin](软件/监控诊断/Zipkin.md)
-- [SkyWalking](软件/监控诊断/Skywalking.md)
-- [Arthas](软件/监控诊断/Arthas.md)
+- [监控工具对比](软件/监控诊断/监控工具.md) - 关键词：`监控工具`、`APM`、`CAT`、`Zipkin`、`SkyWalking`
+- [CAT](软件/监控诊断/CAT.md) - 关键词：`CAT`、`分布式监控`、`实时告警`、`链路追踪`、`美团`
+- [Zipkin](软件/监控诊断/Zipkin.md) - 关键词：`Zipkin`、`分布式追踪`、`Dapper`、`链路分析`、`Twitter`
+- [SkyWalking](软件/监控诊断/Skywalking.md) - 关键词：`SkyWalking`、`APM`、`分布式追踪`、`微服务监控`、`服务网格`
+- [Arthas](软件/监控诊断/Arthas.md) - 关键词：`Arthas`、`Java 诊断`、`在线排查`、`JVM`、`Alibaba`
 
 ### Java 工具
 
 #### Java IO
 
-- [JSON 序列化](工具/IO/JSON序列化.md) - [fastjson](https://github.com/alibaba/fastjson)、[Jackson](https://github.com/FasterXML/jackson)、[Gson](https://github.com/google/gson)
-- [二进制序列化](工具/IO/二进制序列化.md) - [Protobuf](https://developers.google.com/protocol-buffers)、[Thrift](https://thrift.apache.org/)、[Hessian](http://hessian.caucho.com/)、[Kryo](https://github.com/EsotericSoftware/kryo)、[FST](https://github.com/RuedigerMoeller/fast-serialization)
+- [JSON 序列化](工具/IO/JSON序列化.md) - [fastjson](https://github.com/alibaba/fastjson)、[Jackson](https://github.com/FasterXML/jackson)、[Gson](https://github.com/google/gson) - 关键词：`JSON`、`序列化`、`Jackson`、`Gson`、`Fastjson`
+- [二进制序列化](工具/IO/二进制序列化.md) - [Protobuf](https://developers.google.com/protocol-buffers)、[Thrift](https://thrift.apache.org/)、[Hessian](http://hessian.caucho.com/)、[Kryo](https://github.com/EsotericSoftware/kryo)、[FST](https://github.com/RuedigerMoeller/fast-serialization) - 关键词：`二进制序列化`、`Protobuf`、`Thrift`、`Hessian`、`Kryo`
 
 #### JavaBean 工具
 
-- [Lombok](工具/JavaBean/Lombok.md)
-- [Dozer](工具/JavaBean/Dozer.md)
+- [Lombok](工具/JavaBean/Lombok.md) - 关键词：`Lombok`、`注解`、`POJO`、`代码生成`、`@Data`
+- [Dozer](工具/JavaBean/Dozer.md) - 关键词：`Dozer`、`JavaBean 映射`、`对象转换`、`属性拷贝`、`映射配置`
 
 #### Java 模板引擎
 
-- [Freemark](工具/模板引擎/Freemark.md)
-- [Velocity](工具/模板引擎/Thymeleaf.md)
-- [Thymeleaf](工具/模板引擎/Velocity.md)
+- [Freemark](工具/模板引擎/Freemark.md) - 关键词：`FreeMarker`、`模板引擎`、`FTL`、`MVC`、`模板渲染`
+- [Velocity](工具/模板引擎/Thymeleaf.md) - 关键词：`Thymeleaf`、`模板引擎`、`标准方言`、`Spring Boot`、`自然模板`
+- [Thymeleaf](工具/模板引擎/Velocity.md) - 关键词：`Velocity`、`模板引擎`、`VTL`、`模板语法`、`MVC`
 
 #### Java 测试工具
 
-- [Junit](工具/测试/Junit.md)
-- [Mockito](工具/测试/Mockito.md)
-- [Jmeter](工具/测试/Jmeter.md)
-- [JMH](工具/测试/JMH.md)
+- [Junit](工具/测试/Junit.md) - 关键词：`JUnit5`、`单元测试`、`Jupiter`、`TestEngine`、`断言`
+- [Mockito](工具/测试/Mockito.md) - 关键词：`Mockito`、`Mock 框架`、`单元测试`、`Mock 对象`、`行为验证`
+- [Jmeter](工具/测试/Jmeter.md) - 关键词：`JMeter`、`性能测试`、`压力测试`、`HTTP 测试`、`Apache`
+- [JMH](工具/测试/JMH.md) - 关键词：`JMH`、`微基准测试`、`性能测试`、`Benchmark`、`OpenJDK`
 
 #### 其他
 
-- [Java 日志](工具/其他/Java日志.md)
-- [Java 工具包](工具/其他/Java工具包.md)
-- [Reflections](工具/其他/Reflections.md)
-- [JavaMail](工具/其他/JavaMail.md)
-- [Jsoup](工具/其他/Jsoup.md)
-- [Thumbnailator](工具/其他/Thumbnailator.md)
-- [Zxing](工具/其他/Zxing.md)
+- [Java 日志](工具/其他/Java日志.md) - 关键词：`日志框架`、`SLF4J`、`Log4j`、`Logback`、`Log4j2`
+- [Java 工具包](工具/其他/Java工具包.md) - 关键词：`Guava`、`Commons`、`工具类`、`集合操作`、`StringUtils`
+- [Reflections](工具/其他/Reflections.md) - 关键词：`Reflections`、`反射`、`类扫描`、`注解扫描`、`元数据`
+- [JavaMail](工具/其他/JavaMail.md) - 关键词：`JavaMail`、`邮件发送`、`SMTP`、`IMAP`、`MIME`
+- [Jsoup](工具/其他/Jsoup.md) - 关键词：`Jsoup`、`HTML 解析`、`CSS 选择器`、`DOM 操作`、`网页爬虫`
+- [Thumbnailator](工具/其他/Thumbnailator.md) - 关键词：`Thumbnailator`、`图片处理`、`图片缩放`、`水印`、`缩略图`
+- [Zxing](工具/其他/Zxing.md) - 关键词：`ZXing`、`二维码`、`条形码`、`扫码`、`QR Code`
 
 ### Java 框架
 
@@ -247,80 +247,80 @@ index: false
 
 ##### 综合
 
-- [Spring 概述](框架/Spring/Spring综合/Spring概述.md)
-- [SpringBoot 知识图谱](框架/Spring/Spring综合/SpringBoot知识图谱.md)
-- [SpringBoot 基本原理](框架/Spring/Spring综合/SpringBoot基本原理.md)
-- [Spring 面试](框架/Spring/Spring面试.md)
+- [Spring 概述](框架/Spring/Spring综合/Spring概述.md) - 关键词：`Spring`、`IoC`、`AOP`、`Bean`、`Spring Framework`
+- [SpringBoot 知识图谱](框架/Spring/Spring综合/SpringBoot知识图谱.md) - 关键词：`Spring Boot`、`自动配置`、`起步依赖`、`Actuator`、`IoC 容器`
+- [SpringBoot 基本原理](框架/Spring/Spring综合/SpringBoot基本原理.md) - 关键词：`Spring Boot`、`自动配置`、`SpringApplication`、`启动原理`、`@SpringBootApplication`
+- [Spring 面试](框架/Spring/Spring面试.md) - 💯
 
 ##### 核心
 
-- [Spring Bean](框架/Spring/Spring核心/SpringBean.md)
-- [Spring IoC](框架/Spring/Spring核心/SpringIoC.md)
-- [Spring 依赖查找](框架/Spring/Spring核心/Spring依赖查找.md)
-- [Spring 依赖注入](框架/Spring/Spring核心/Spring依赖注入.md)
-- [Spring IoC 依赖来源](框架/Spring/Spring核心/SpringIoC依赖来源.md)
-- [Spring Bean 作用域](框架/Spring/Spring核心/SpringBean作用域.md)
-- [Spring Bean 生命周期](框架/Spring/Spring核心/SpringBean生命周期.md)
-- [Spring 配置元数据](框架/Spring/Spring核心/Spring配置元数据.md)
-- [Spring AOP](框架/Spring/Spring核心/SpringAop.md)
-- [Spring 资源管理](框架/Spring/Spring核心/Spring资源管理.md)
-- [Spring 校验](框架/Spring/Spring核心/Spring校验.md)
-- [Spring 数据绑定](框架/Spring/Spring核心/Spring数据绑定.md)
-- [Spring 类型转换](框架/Spring/Spring核心/Spring类型转换.md)
-- [Spring EL 表达式](框架/Spring/Spring核心/SpringEL.md)
-- [Spring 事件](框架/Spring/Spring核心/Spring事件.md)
-- [Spring 国际化](框架/Spring/Spring核心/Spring国际化.md)
-- [Spring 泛型处理](框架/Spring/Spring核心/Spring泛型处理.md)
-- [Spring 注解](框架/Spring/Spring核心/Spring注解.md)
-- [Spring Environment 抽象](框架/Spring/Spring核心/SpringEnvironment抽象.md)
-- [SpringBoot 教程之快速入门](框架/Spring/Spring核心/SpringBoot之快速入门.md)
-- [SpringBoot 之属性加载](框架/Spring/Spring核心/SpringBoot之属性加载.md)
-- [SpringBoot 之 Profile](框架/Spring/Spring核心/SpringBoot之Profile.md)
+- [Spring Bean](框架/Spring/Spring核心/SpringBean.md) - 关键词：`Bean`、`BeanDefinition`、`@Bean`、`BeanFactory`、`FactoryBean`
+- [Spring IoC](框架/Spring/Spring核心/SpringIoC.md) - 关键词：`IoC`、`BeanFactory`、`ApplicationContext`、`依赖注入`、`配置元数据`
+- [Spring 依赖查找](框架/Spring/Spring核心/Spring依赖查找.md) - 关键词：`依赖查找`、`BeanFactory`、`ObjectProvider`、`ListableBeanFactory`、`getBean`
+- [Spring 依赖注入](框架/Spring/Spring核心/Spring依赖注入.md) - 关键词：`依赖注入`、`@Autowired`、`构造器注入`、`Setter 注入`、`自动装配`
+- [Spring IoC 依赖来源](框架/Spring/Spring核心/SpringIoC依赖来源.md) - 关键词：`依赖来源`、`BeanDefinition`、`单例对象`、`ResolvableDependency`、`registerSingleton`
+- [Spring Bean 作用域](框架/Spring/Spring核心/SpringBean作用域.md) - 关键词：`Scope`、`singleton`、`prototype`、`request`、`session`
+- [Spring Bean 生命周期](框架/Spring/Spring核心/SpringBean生命周期.md) - 关键词：`Bean 生命周期`、`BeanPostProcessor`、`@PostConstruct`、`@PreDestroy`、`InitializingBean`
+- [Spring 配置元数据](框架/Spring/Spring核心/Spring配置元数据.md) - 关键词：`配置元数据`、`BeanDefinition`、`@Configuration`、`@PropertySource`、`Extensible XML`
+- [Spring AOP](框架/Spring/Spring核心/SpringAop.md) - 关键词：`AOP`、`@Aspect`、`Pointcut`、`Advice`、`动态代理`
+- [Spring 资源管理](框架/Spring/Spring核心/Spring资源管理.md) - 关键词：`Resource`、`ResourceLoader`、`ResourcePatternResolver`、`classpath`、`ClassPathResource`
+- [Spring 校验](框架/Spring/Spring核心/Spring校验.md) - 关键词：`Validator`、`@Valid`、`@Validated`、`Hibernate Validator`、`ConstraintValidator`
+- [Spring 数据绑定](框架/Spring/Spring核心/Spring数据绑定.md) - 关键词：`DataBinder`、`BeanWrapper`、`PropertyValues`、`WebDataBinder`、`数据绑定`
+- [Spring 类型转换](框架/Spring/Spring核心/Spring类型转换.md) - 关键词：`类型转换`、`PropertyEditor`、`Converter`、`GenericConverter`、`ConversionService`
+- [Spring EL 表达式](框架/Spring/Spring核心/SpringEL.md) - 关键词：`SpEL`、`ExpressionParser`、`@Value`、`#{}`、`${}`
+- [Spring 事件](框架/Spring/Spring核心/Spring事件.md) - 关键词：`ApplicationEvent`、`ApplicationListener`、`@EventListener`、`事件发布`、`事件多播`
+- [Spring 国际化](框架/Spring/Spring核心/Spring国际化.md) - 关键词：`MessageSource`、`Locale`、`国际化`、`ResourceBundle`、`i18n`
+- [Spring 泛型处理](框架/Spring/Spring核心/Spring泛型处理.md) - 关键词：`泛型`、`ResolvableType`、`ParameterizedType`、`TypeVariable`、`类型擦除`
+- [Spring 注解](框架/Spring/Spring核心/Spring注解.md) - 关键词：`@Component`、`@Configuration`、`@ComponentScan`、`模式注解`、`元注解`
+- [Spring Environment 抽象](框架/Spring/Spring核心/SpringEnvironment抽象.md) - 关键词：`Environment`、`PropertySource`、`Profile`、`@Profile`、`占位符处理`
+- [SpringBoot 教程之快速入门](框架/Spring/Spring核心/SpringBoot之快速入门.md) - 关键词：`SpringBoot`、`@SpringBootApplication`、`自动配置`、`Starter`、`快速入门`
+- [SpringBoot 之属性加载](框架/Spring/Spring核心/SpringBoot之属性加载.md) - 关键词：`属性加载`、`application.properties`、`@Value`、`@ConfigurationProperties`、`PropertySource`
+- [SpringBoot 之 Profile](框架/Spring/Spring核心/SpringBoot之Profile.md) - 关键词：`Profile`、`@Profile`、`多环境配置`、`spring.profiles.active`、`条件装配`
 
 ##### 数据
 
-- [Spring 之数据源](框架/Spring/Spring数据/Spring之数据源.md)
-- [Spring 之 JDBC](框架/Spring/Spring数据/Spring之JDBC.md)
-- [Spring 之事务](框架/Spring/Spring数据/Spring之事务.md)
-- [Spring 之 JPA](框架/Spring/Spring数据/Spring之JPA.md)
-- [Spring 集成 Mybatis](框架/Spring/Spring数据/Spring集成Mybatis.md)
-- [Spring 访问 Redis](框架/Spring/Spring数据/Spring访问Redis.md)
-- [Spring 访问 MongoDB](框架/Spring/Spring数据/Spring访问MongoDB.md)
-- [Spring 访问 Elasticsearch](框架/Spring/Spring数据/Spring访问Elasticsearch.md)
+- [Spring 之数据源](框架/Spring/Spring数据/Spring之数据源.md) - 关键词：`DataSource`、`HikariCP`、`Druid`、`数据源配置`、`连接池`
+- [Spring 之 JDBC](框架/Spring/Spring数据/Spring之JDBC.md) - 关键词：`JDBC`、`JdbcTemplate`、`NamedParameterJdbcTemplate`、`SQLException`、`数据访问`
+- [Spring 之事务](框架/Spring/Spring数据/Spring之事务.md) - 关键词：`事务`、`@Transactional`、`PlatformTransactionManager`、`传播行为`、`隔离级别`
+- [Spring 之 JPA](框架/Spring/Spring数据/Spring之JPA.md) - 关键词：`JPA`、`Hibernate`、`@Entity`、`JpaRepository`、`Spring Data JPA`
+- [Spring 集成 Mybatis](框架/Spring/Spring数据/Spring集成Mybatis.md) - 关键词：`MyBatis`、`Mapper`、`SqlSessionFactory`、`PageHelper`、`MyBatis-Spring`
+- [Spring 访问 Redis](框架/Spring/Spring数据/Spring访问Redis.md) - 关键词：`Redis`、`RedisTemplate`、`Spring Data Redis`、`Lettuce`、`Jedis`
+- [Spring 访问 MongoDB](框架/Spring/Spring数据/Spring访问MongoDB.md) - 关键词：`MongoDB`、`MongoTemplate`、`Spring Data MongoDB`、`MongoRepository`、`文档数据库`
+- [Spring 访问 Elasticsearch](框架/Spring/Spring数据/Spring访问Elasticsearch.md) - 关键词：`Elasticsearch`、`Spring Data Elasticsearch`、`搜索引擎`、`全文检索`、`Repository`
 
 ##### Web
 
-- [SpringWeb 综述](框架/Spring/SpringWeb/SpringWeb综述.md)
-- [SpringWeb 应用](框架/Spring/SpringWeb/SpringWeb应用.md)
-- [DispatcherServlet](框架/Spring/SpringWeb/DispatcherServlet.md)
-- [Spring 过滤器](框架/Spring/SpringWeb/Spring过滤器.md)
-- [Spring 跨域](框架/Spring/SpringWeb/Spring跨域.md)
-- [Spring 视图](框架/Spring/SpringWeb/Spring视图.md)
-- [SpringBoot 之应用 EasyUI](框架/Spring/SpringWeb/SpringBoot之应用EasyUI.md)
+- [SpringWeb 综述](框架/Spring/SpringWeb/SpringWeb综述.md) - 关键词：`Spring MVC`、`Web 应用`、`@RestController`、`@RequestMapping`、`HTTP`
+- [SpringWeb 应用](框架/Spring/SpringWeb/SpringWeb应用.md) - 关键词：`Controller`、`@Controller`、`@RequestMapping`、`请求映射`、`参数绑定`
+- [DispatcherServlet](框架/Spring/SpringWeb/DispatcherServlet.md) - 关键词：`DispatcherServlet`、`前端控制器`、`HandlerMapping`、`HandlerAdapter`、`ViewResolver`
+- [Spring 过滤器](框架/Spring/SpringWeb/Spring过滤器.md) - 关键词：`Filter`、`FilterRegistrationBean`、`OncePerRequestFilter`、`过滤器链`、`请求拦截`
+- [Spring 跨域](框架/Spring/SpringWeb/Spring跨域.md) - 关键词：`CORS`、`@CrossOrigin`、`CorsFilter`、`WebMvcConfigurer`、`跨域资源共享`
+- [Spring 视图](框架/Spring/SpringWeb/Spring视图.md) - 关键词：`ViewResolver`、`Thymeleaf`、`JSP`、`视图技术`、`ModelAndView`
+- [SpringBoot 之应用 EasyUI](框架/Spring/SpringWeb/SpringBoot之应用EasyUI.md) - 关键词：`EasyUI`、`SpringBoot`、`DataGrid`、`前后端交互`、`Web 页面`
 
 ##### IO
 
-- [SpringBoot 之异步请求](框架/Spring/SpringIO/SpringBoot之异步请求.md)
-- [SpringBoot 之 Json](框架/Spring/SpringIO/SpringBoot之Json.md)
-- [SpringBoot 之邮件](框架/Spring/SpringIO/SpringBoot之邮件.md)
+- [SpringBoot 之异步请求](框架/Spring/SpringIO/SpringBoot之异步请求.md) - 关键词：`异步请求`、`@Async`、`Callable`、`DeferredResult`、`CompletableFuture`
+- [SpringBoot 之 Json](框架/Spring/SpringIO/SpringBoot之Json.md) - 关键词：`JSON`、`Jackson`、`@JsonFormat`、`HttpMessageConverter`、`序列化`
+- [SpringBoot 之邮件](框架/Spring/SpringIO/SpringBoot之邮件.md) - 关键词：`邮件`、`JavaMailSender`、`@EnableAsync`、`MimeMessage`、`邮件模板`
 
 ##### 集成
 
-- [Spring 集成缓存中间件](框架/Spring/Spring集成/Spring集成缓存.md)
-- [Spring 集成定时任务中间件](框架/Spring/Spring集成/Spring集成调度器.md)
-- [Spring 集成 Dubbo](框架/Spring/Spring集成/Spring集成Dubbo.md)
+- [Spring 集成缓存中间件](框架/Spring/Spring集成/Spring集成缓存.md) - 关键词：`缓存`、`@Cacheable`、`@CacheEvict`、`CacheManager`、`EhCache`
+- [Spring 集成定时任务中间件](框架/Spring/Spring集成/Spring集成调度器.md) - 关键词：`调度器`、`@Scheduled`、`ThreadPoolTaskScheduler`、`定时任务`、`Cron 表达式`
+- [Spring 集成 Dubbo](框架/Spring/Spring集成/Spring集成Dubbo.md) - 关键词：`Dubbo`、`@DubboService`、`@DubboReference`、`RPC`、`服务注册`
 
 ##### 其他
 
-- [Spring4 升级](框架/Spring/Spring其他/Spring4升级.md)
-- [SpringBoot 之 banner](框架/Spring/Spring其他/SpringBoot之banner.md)
-- [SpringBoot 之 Actuator](框架/Spring/Spring其他/SpringBoot之Actuator.md)
+- [Spring4 升级](框架/Spring/Spring其他/Spring4升级.md) - 关键词：`Spring4`、`版本升级`、`Java 8`、`泛型注入`、`@Conditional`
+- [SpringBoot 之 banner](框架/Spring/Spring其他/SpringBoot之banner.md) - 关键词：`Banner`、`banner.txt`、`SpringApplication`、`启动横幅`、`定制`
+- [SpringBoot 之 Actuator](框架/Spring/Spring其他/SpringBoot之Actuator.md) - 关键词：`Actuator`、`Endpoint`、`健康检查`、`监控`、`生产就绪`
 
 #### ORM
 
-- [MyBatis 快速入门](框架/ORM/MyBatis快速入门.md)
-- [MyBatis 原理](框架/ORM/MyBatis原理.md)
-- [MyBatis 原理](框架/ORM/MyBatis面试.md)
+- [MyBatis 快速入门](框架/ORM/MyBatis快速入门.md) - 关键词：`MyBatis`、`ORM`、`SQL 映射`、`Mapper`、`XML 配置`
+- [MyBatis 原理](框架/ORM/MyBatis原理.md) - 关键词：`MyBatis`、`源码分析`、`SqlSession`、`Executor`、`插件机制`
+- [MyBatis 原理](框架/ORM/MyBatis面试.md) - 💯
 
 #### 安全
 
@@ -330,12 +330,12 @@ index: false
 >
 > Spring-Security 功能更丰富，也比 Shiro 更复杂。值得一提的是由于 Spring-Security 是 Spring 团队开发，所以集成 Spring 和 Spring-Boot 框架更容易。
 
-- [Shiro](框架/安全/Shiro.md)
-- [SpringSecurity](框架/安全/SpringSecurity.md)
+- [Shiro](框架/安全/Shiro.md) - 关键词：`Shiro`、`认证`、`授权`、`Realm`、`会话管理`
+- [SpringSecurity](框架/安全/SpringSecurity.md) - 关键词：`Spring Security`、`安全框架`、`认证授权`、`FilterChain`、`OAuth2`
 
 #### IO
 
-- [Netty](框架/IO/Netty.md)
+- [Netty](框架/IO/Netty.md) - 关键词：`Netty`、`NIO`、`网络通信`、`零拷贝`、`EventLoop`
 
 ### Java 中间件
 
@@ -345,14 +345,14 @@ index: false
 >
 > 如果想深入学习缓存，建议先了解一下 [缓存基本原理](https://dunwu.github.io/design/distributed/分布式缓存.html)，有助于理解缓存的特性、原理，使用缓存常见的问题及解决方案。
 
-- [Java 缓存中间件](中间件/缓存/Java_缓存.md)
-- [Ehcache 快速入门](中间件/缓存/Ehcache.md)
-- [Java 进程内缓存](中间件/缓存/Java_进程内缓存.md)
-- [Http 缓存](中间件/缓存/Http_缓存.md)
+- [Java 缓存中间件](中间件/缓存/Java_缓存.md) - 关键词：`缓存`、`JSR 107`、`Spring Cache`、`CacheManager`、`J2Cache`
+- [Ehcache 快速入门](中间件/缓存/Ehcache.md) - 关键词：`Ehcache`、`进程内缓存`、`缓存淘汰`、`Hibernate`、`缓存策略`
+- [Java 进程内缓存](中间件/缓存/Java_进程内缓存.md) - 关键词：`进程内缓存`、`Caffeine`、`Guava Cache`、`LRU`、`ConcurrentHashMap`
+- [Http 缓存](中间件/缓存/Http_缓存.md) - 关键词：`HTTP 缓存`、`强缓存`、`协商缓存`、`Cache-Control`、`ETag`
 
 #### 流量控制
 
-- [Hystrix](中间件/流量控制/Hystrix.md)
+- [Hystrix](中间件/流量控制/Hystrix.md) - 关键词：`Hystrix`、`断路器`、`熔断`、`服务降级`、`Netflix`
 
 ### [大数据](https://dunwu.github.io/bigdata-tutorial)
 

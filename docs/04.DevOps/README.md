@@ -18,34 +18,34 @@ index: false
 ### 综合
 
 [DevOps 简介](DevOps_简介.md)
-[DevOps 面试](DevOps_面试.md)
+[DevOps 面试](DevOps_面试.md) 💯
 
 ### 工具
 
 - [Git](工具/Git)
-  - [如何优雅的玩转 Git](工具/Git/如何优雅的玩转Git.md)
-  - [Git 帮助手册](工具/Git/Git帮助手册.md)
+  - [如何优雅的玩转 Git](工具/Git/如何优雅的玩转Git.md) - 关键词：`Git`、`版本控制`、`分支管理`、`Git Flow`、`代码合并`
+  - [Git 帮助手册](工具/Git/Git帮助手册.md) - 关键词：`Git`、`常用命令`、`Cheat Sheet`、`配置管理`、`Git 工作流`
 - [Docker](工具/Docker)
   - [Docker 快速入门](工具/Docker/[Docker]快速入门.md)
   - [Docker Dockerfile](工具/Docker/[Docker]Dockerfile.md)
   - [Docker Compose](工具/Docker/[Docker]Compose.md)
-  - [Docker 面试](工具/Docker/[Docker]面试.md)
+  - [Docker 面试](工具/Docker/[Docker]面试.md) 💯
 - [Kubernetes](工具/Kubernetes)
   - [Kubernetes 快速入门](工具/Kubernetes/K8S.md)
-  - [Kubernetes 面试](工具/Kubernetes/K8S_面试.md)
+  - [Kubernetes 面试](工具/Kubernetes/K8S_面试.md) 💯
 - [Nginx](工具/Nginx)
   - [Nginx 快速入门](工具/Nginx/[Nginx]快速入门.md)
   - [Nginx 简介](工具/Nginx/[Nginx]简介.md)
   - [Nginx 配置](工具/Nginx/[Nginx]配置.md)
   - [Nginx 运维](工具/Nginx/[Nginx]运维.md)
-  - [Nginx 面试](工具/Nginx/[Nginx]面试.md)
+  - [Nginx 面试](工具/Nginx/[Nginx]面试.md) 💯
 - 其他
-  - [正则表达式](工具/其他/正则.md)
+  - [正则表达式](工具/其他/正则.md) - 关键词：`正则表达式`、`元字符`、`贪婪匹配`、`分组`、`字符串匹配`
 
 ### 监控
 
-- [监控体系](../15.分布式/分布式治理/服务监控.md)
-- [链路监控](../15.分布式/分布式治理/链路追踪.md)
+- [监控体系](../15.分布式/分布式治理/服务监控.md) - 关键词：`服务监控`、`监控体系`、`Prometheus`、`Grafana`、`告警`
+- [链路监控](../15.分布式/分布式治理/链路追踪.md) - 关键词：`链路追踪`、`SkyWalking`、`Zipkin`、`Span`、`可观测性`
 
 ## 📚 资料
 

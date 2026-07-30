@@ -21,7 +21,7 @@ index: false
 
 ## 📖 内容
 
-- [RocketMQ 快速入门]([RocketMQ]快速入门.md)
+- [RocketMQ 快速入门]([RocketMQ]快速入门.md) - 关键词：`RocketMQ`、`消息模型`、`NameServer`、`Broker`、`消息类型`
 - [RocketMQ 面试]([RocketMQ]面试.md) 💯
 
 ## 📚 资料

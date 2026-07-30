@@ -20,17 +20,17 @@ index: false
 
 ## 📖 内容
 
-- [HBase 快速入门]([HBase]快速入门.md) - 关键词：`HDFS`、`列式数据库`、`Row Key`、`Column Family`、`Cell`、`随机访问`、`Bigtable`、`Hadoop`
-- [HBase 数据模型]([HBase]数据模型.md) - 关键词：`Row Key`、`Column Family`、`Column Qualifier`、`Region`、`Timestamp`、`多版本`、`字典序`、`稀疏性`
-- [HBase Schema 设计]([HBase]Schema.md) - 关键词：`Row Key设计`、`热点问题`、`加盐`、`哈希`、`反转`、`Column Family`、`TTL`、`Version`
-- [HBase 架构]([HBase]架构.md) - 关键词：`Region`、`RegionServer`、`Master`、`WAL`、`MemStore`、`HFile`、`ZooKeeper`、`Compaction`
-- [HBase Java API 基础特性]([HBase]API基础特性.md) - 关键词：`HBaseClient`、`Connection`、`Table`、`Put`、`Get`、`Scan`、`Delete`、`ResultScanner`
-- [HBase Java API 高级特性]([HBase]API高级特性.md) - 关键词：`计数器`、`incr`、`CAS`、`原子操作`、`BulkLoad`、`Coprocessor`、`RegionServer`、`RPC`
-- [HBase Java API 高级特性之过滤器]([HBase]API高级特性之过滤器.md) - 关键词：`Filter`、`CompareFilter`、`RowFilter`、`ValueFilter`、`SingleColumnValueFilter`、`FilterList`、`谓词下推`、`PageFilter`
-- [HBase Java API 高级特性之协处理器]([HBase]API高级特性之协处理器.md) - 关键词：`Coprocessor`、`Observer`、`Endpoint`、`二级索引`、`RegionServer`、`服务端计算`、`权限控制`、`数据聚合`
+- [HBase 快速入门]([HBase]快速入门.md) - 关键词：`HDFS`、`列式数据库`、`Row Key`、`Column Family`、`Cell`
+- [HBase 数据模型]([HBase]数据模型.md) - 关键词：`Row Key`、`Column Family`、`Column Qualifier`、`Region`、`Timestamp`
+- [HBase Schema 设计]([HBase]Schema.md) - 关键词：`Row Key设计`、`热点问题`、`加盐`、`哈希`、`反转`
+- [HBase 架构]([HBase]架构.md) - 关键词：`Region`、`RegionServer`、`Master`、`WAL`、`MemStore`
+- [HBase Java API 基础特性]([HBase]API基础特性.md) - 关键词：`HBaseClient`、`Connection`、`Table`、`Put`、`Get`
+- [HBase Java API 高级特性]([HBase]API高级特性.md) - 关键词：`计数器`、`incr`、`CAS`、`原子操作`、`BulkLoad`
+- [HBase Java API 高级特性之过滤器]([HBase]API高级特性之过滤器.md) - 关键词：`Filter`、`CompareFilter`、`RowFilter`、`ValueFilter`、`SingleColumnValueFilter`
+- [HBase Java API 高级特性之协处理器]([HBase]API高级特性之协处理器.md) - 关键词：`Coprocessor`、`Observer`、`Endpoint`、`二级索引`、`RegionServer`
 - [HBase Java API 管理功能]([HBase]API管理功能.md)
-- [HBase 运维]([HBase]运维.md) - 关键词：`hbase-site.xml`、`RegionServer`、`分布式部署`、`ZooKeeper`、`HDFS`、`Compaction`、`MemStore`、`集群配置`
-- [HBase 命令]([HBase]命令.md) - 关键词：`HBase Shell`、`create`、`put`、`scan`、`get`、`delete`、`disable`、`drop`
+- [HBase 运维]([HBase]运维.md) - 关键词：`hbase-site.xml`、`RegionServer`、`分布式部署`、`ZooKeeper`、`HDFS`
+- [HBase 命令]([HBase]命令.md) - 关键词：`HBase Shell`、`create`、`put`、`scan`、`get`
 - [HBase 面试]([HBase]面试.md) 💯
 
 ## 📚 资料

@@ -21,9 +21,9 @@ index: false
 
 ## 📖 内容
 
-- [SpringBoot 之异步请求](SpringBoot之异步请求.md)
-- [SpringBoot 之 Json](SpringBoot之Json.md)
-- [SpringBoot 之邮件](SpringBoot之邮件.md)
+- [SpringBoot 之异步请求](SpringBoot之异步请求.md) - 关键词：`异步请求`、`@Async`、`Callable`、`DeferredResult`、`CompletableFuture`
+- [SpringBoot 之 Json](SpringBoot之Json.md) - 关键词：`JSON`、`Jackson`、`@JsonFormat`、`HttpMessageConverter`、`序列化`
+- [SpringBoot 之邮件](SpringBoot之邮件.md) - 关键词：`邮件`、`JavaMailSender`、`@EnableAsync`、`MimeMessage`、`邮件模板`
 
 ## 📚 资料
 

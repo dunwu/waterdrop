@@ -15,9 +15,9 @@ index: false
 
 ## 📖 内容
 
-- [WebSocket](WebSocket.md)
-- [CDN](CDN.md)
-- [VPN](VPN.md)
+- [WebSocket](WebSocket.md) - 关键词：`WebSocket`、`全双工通信`、`长连接`、`实时通信`、`帧协议`
+- [CDN](CDN.md) - 关键词：`CDN`、`内容分发`、`边缘节点`、`缓存加速`、`负载均衡`
+- [VPN](VPN.md) - 关键词：`VPN`、`隧道技术`、`加密通信`、`远程访问`、`虚拟专用网络`
 
 ## 📚 资料
 

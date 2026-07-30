@@ -43,15 +43,15 @@ Redis 支持很多丰富的特性，如：**事务** 、**Lua 脚本**、**发�
 
 - [Redis 基本数据类型]([Redis]数据类型.md) - 关键词：`String`、`Hash`、`List`、`Set`、`Zset`
 - [Redis 高级数据类型]([Redis]数据类型二.md) - 关键词：`BitMap`、`HyperLogLog`、`Geo`、`Stream`
-- [Redis 数据结构]([Redis]数据结构.md) - 关键词：`对象`、`SDS`、`链表`、`字典`、`跳表`、`整数集合`、`压缩列表`
+- [Redis 数据结构]([Redis]数据结构.md) - 关键词：`对象`、`SDS`、`链表`、`字典`、`跳表`
 - [Redis 内存管理]([Redis]内存管理.md) - 关键词：`定时删除`、`惰性删除`、`定期删除`、`LRU`、`LFU`
 - [Redis 持久化]([Redis]持久化.md) - 关键词：`RDB`、`AOF`、`SAVE`、`BGSAVE`、`appendfsync`
 - [Redis 事件]([Redis]事件.md) - 关键词：`文件事件`、`时间事件`
 - [Redis 复制]([Redis]复制.md) - 关键词：`SLAVEOF`、`SYNC`、`PSYNC`、`命令传播`、`心跳`
 - [Redis 哨兵]([Redis]哨兵.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`Raft`
-- [Redis 集群]([Redis]集群.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`分区`、`Raft`、`Gossip`
+- [Redis 集群]([Redis]集群.md) - 关键词：`高可用`、`监控`、`选主`、`故障转移`、`分区`
 - [Redis 订阅]([Redis]订阅.md) - 关键词：`订阅`、`SUBSCRIBE`、`PSUBSCRIBE`、`PUBLISH`、`观察者模式`
-- [Redis 独立功能]([Redis]事务.md) - 关键词：`事务`、`ACID`、`MULTI`、`EXEC`、`DISCARD`、`WATCH`
+- [Redis 独立功能]([Redis]事务.md) - 关键词：`事务`、`ACID`、`MULTI`、`EXEC`、`DISCARD`
 - [Redis 管道]([Redis]管道.md) - 关键词：`Pipeline`
 - [Redis 脚本]([Redis]脚本.md) - 关键词：`Lua`
 - [Redis 运维]([Redis]运维.md) - 关键词：`安装`、`配置`、`命令`、`集群`、`客户端`

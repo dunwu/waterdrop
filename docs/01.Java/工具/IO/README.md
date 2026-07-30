@@ -26,8 +26,8 @@ Java 官方的序列化存在许多问题，因此，很多人更愿意使用优
 
 ## 内容
 
-- [JSON](JSON序列化.md) - Fastjson、Jackson、Gson
-- [二进制](二进制序列化.md) - Protobuf、Thrift、Hessian、Kryo、FST
+- [JSON](JSON序列化.md) - Fastjson、Jackson、Gson - 关键词：`JSON`、`序列化`、`Jackson`、`Gson`、`Fastjson`
+- [二进制](二进制序列化.md) - Protobuf、Thrift、Hessian、Kryo、FST - 关键词：`二进制序列化`、`Protobuf`、`Thrift`、`Hessian`、`Kryo`
 
 ## 资料
 

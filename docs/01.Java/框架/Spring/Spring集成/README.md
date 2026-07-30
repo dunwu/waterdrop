@@ -23,9 +23,9 @@ index: false
 
 ## 📖 内容
 
-- [Spring 集成缓存中间件](Spring集成缓存.md)
-- [Spring 集成定时任务中间件](Spring集成调度器.md)
-- [Spring 集成 Dubbo](Spring集成Dubbo.md)
+- [Spring 集成缓存中间件](Spring集成缓存.md) - 关键词：`缓存`、`@Cacheable`、`@CacheEvict`、`CacheManager`、`EhCache`
+- [Spring 集成定时任务中间件](Spring集成调度器.md) - 关键词：`调度器`、`@Scheduled`、`ThreadPoolTaskScheduler`、`定时任务`、`Cron 表达式`
+- [Spring 集成 Dubbo](Spring集成Dubbo.md) - 关键词：`Dubbo`、`@DubboService`、`@DubboReference`、`RPC`、`服务注册`
 
 ## 📚 资料
 

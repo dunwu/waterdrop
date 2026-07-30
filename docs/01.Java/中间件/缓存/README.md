@@ -24,10 +24,10 @@ index: false
 
 ## 📖 内容
 
-- [Java 缓存框架](Java_缓存.md)
-- [Ehcache 快速入门](Ehcache.md)
-- [Java 缓存库](Java_进程内缓存.md)
-- [Http 缓存](Http_缓存.md)
+- [Java 缓存框架](Java_缓存.md) - 关键词：`缓存`、`JSR 107`、`Spring Cache`、`CacheManager`、`J2Cache`
+- [Ehcache 快速入门](Ehcache.md) - 关键词：`Ehcache`、`进程内缓存`、`缓存淘汰`、`Hibernate`、`缓存策略`
+- [Java 缓存库](Java_进程内缓存.md) - 关键词：`进程内缓存`、`Caffeine`、`Guava Cache`、`LRU`、`ConcurrentHashMap`
+- [Http 缓存](Http_缓存.md) - 关键词：`HTTP 缓存`、`强缓存`、`协商缓存`、`Cache-Control`、`ETag`
 
 ## 📚 资料
 

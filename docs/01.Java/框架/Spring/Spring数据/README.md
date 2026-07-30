@@ -21,14 +21,14 @@ index: false
 
 ## 📖 内容
 
-- [Spring 之数据源](Spring之数据源.md)
-- [Spring 之 JDBC](Spring之JDBC.md)
-- [Spring 之事务](Spring之事务.md)
-- [Spring 之 JPA](Spring之JPA.md)
-- [Spring 集成 Mybatis](Spring集成Mybatis.md)
-- [Spring 访问 Redis](Spring访问Redis.md)
-- [Spring 访问 MongoDB](Spring访问MongoDB.md)
-- [Spring 访问 Elasticsearch](Spring访问Elasticsearch.md)
+- [Spring 之数据源](Spring之数据源.md) - 关键词：`DataSource`、`HikariCP`、`Druid`、`数据源配置`、`连接池`
+- [Spring 之 JDBC](Spring之JDBC.md) - 关键词：`JDBC`、`JdbcTemplate`、`NamedParameterJdbcTemplate`、`SQLException`、`数据访问`
+- [Spring 之事务](Spring之事务.md) - 关键词：`事务`、`@Transactional`、`PlatformTransactionManager`、`传播行为`、`隔离级别`
+- [Spring 之 JPA](Spring之JPA.md) - 关键词：`JPA`、`Hibernate`、`@Entity`、`JpaRepository`、`Spring Data JPA`
+- [Spring 集成 Mybatis](Spring集成Mybatis.md) - 关键词：`MyBatis`、`Mapper`、`SqlSessionFactory`、`PageHelper`、`MyBatis-Spring`
+- [Spring 访问 Redis](Spring访问Redis.md) - 关键词：`Redis`、`RedisTemplate`、`Spring Data Redis`、`Lettuce`、`Jedis`
+- [Spring 访问 MongoDB](Spring访问MongoDB.md) - 关键词：`MongoDB`、`MongoTemplate`、`Spring Data MongoDB`、`MongoRepository`、`文档数据库`
+- [Spring 访问 Elasticsearch](Spring访问Elasticsearch.md) - 关键词：`Elasticsearch`、`Spring Data Elasticsearch`、`搜索引擎`、`全文检索`、`Repository`
 
 ## 💻 示例
 

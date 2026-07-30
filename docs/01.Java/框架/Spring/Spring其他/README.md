@@ -20,9 +20,9 @@ index: false
 
 ## 📖 内容
 
-- [Spring4 升级](Spring4升级.md)
-- [SpringBoot 之 banner](SpringBoot之banner.md)
-- [SpringBoot 之 Actuator](SpringBoot之Actuator.md)
+- [Spring4 升级](Spring4升级.md) - 关键词：`Spring4`、`版本升级`、`Java 8`、`泛型注入`、`@Conditional`
+- [SpringBoot 之 banner](SpringBoot之banner.md) - 关键词：`Banner`、`banner.txt`、`SpringApplication`、`启动横幅`、`定制`
+- [SpringBoot 之 Actuator](SpringBoot之Actuator.md) - 关键词：`Actuator`、`Endpoint`、`健康检查`、`监控`、`生产就绪`
 
 ## 📚 资料
 

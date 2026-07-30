@@ -22,7 +22,7 @@ index: false
 - [JavaWeb 之 JSP 指南]([JavaWeb]JSP.md) - 关键词：`JSP`、`EL 表达式`、`JSTL`、`指令`、`内置对象`
 - [JavaWeb 之 Filter 和 Listener]([JavaWeb]Filter和Listener.md) - 关键词：`Filter`、`FilterChain`、`Listener`、`拦截链`、`Servlet 扩展`
 - [JavaWeb 之 Cookie 和 Session]([JavaWeb]Cookie和Session.md) - 关键词：`Cookie`、`Session`、`会话管理`、`URL 重写`、`分布式会话`
-- [JavaWeb 面试]([JavaWeb]面试.md) - 关键词：`Servlet 生命周期`、`XSS`、`CSRF`、`CORS`、`JWT`
+- [JavaWeb 面试]([JavaWeb]面试.md) 💯
 
 ## 📚 资料
 

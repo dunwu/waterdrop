@@ -24,7 +24,7 @@ index: false
 - [Hive DDL]([Hive]DDL.md)
 - [Hive DML]([Hive]DML.md)
 - [Hive 运维]([Hive]运维.md)
-- [Hive 面试]([Hive]面试.md)
+- [Hive 面试]([Hive]面试.md) 💯
 
 ## 📚 资料
 

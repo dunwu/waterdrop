@@ -23,14 +23,14 @@ index: false
 >
 > 如果想深入学习缓存，建议先了解一下 [缓存基本原理](https://dunwu.github.io/design/distributed/分布式缓存.html)，有助于理解缓存的特性、原理，使用缓存常见的问题及解决方案。
 
-- [Java 缓存框架](缓存/Java_缓存.md)
-- [Ehcache 快速入门](缓存/Ehcache.md)
-- [Java 进程内缓存](缓存/Java_进程内缓存.md)
-- [Http 缓存](缓存/Http_缓存.md)
+- [Java 缓存框架](缓存/Java_缓存.md) - 关键词：`缓存`、`JSR 107`、`Spring Cache`、`CacheManager`、`J2Cache`
+- [Ehcache 快速入门](缓存/Ehcache.md) - 关键词：`Ehcache`、`进程内缓存`、`缓存淘汰`、`Hibernate`、`缓存策略`
+- [Java 进程内缓存](缓存/Java_进程内缓存.md) - 关键词：`进程内缓存`、`Caffeine`、`Guava Cache`、`LRU`、`ConcurrentHashMap`
+- [Http 缓存](缓存/Http_缓存.md) - 关键词：`HTTP 缓存`、`强缓存`、`协商缓存`、`Cache-Control`、`ETag`
 
 #### 流量控制
 
-- [Hystrix](流量控制/Hystrix.md)
+- [Hystrix](流量控制/Hystrix.md) - 关键词：`Hystrix`、`断路器`、`熔断`、`服务降级`、`Netflix`
 
 ## 📚 资料
 

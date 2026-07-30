@@ -19,7 +19,7 @@ index: false
 ## 📖 内容
 
 - [Kubernetes 快速入门](K8S.md)
-- [Kubernetes 面试](K8S_面试.md)
+- [Kubernetes 面试](K8S_面试.md) 💯
 
 ## 📚 资料
 

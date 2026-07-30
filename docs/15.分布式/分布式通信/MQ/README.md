@@ -28,23 +28,23 @@ dir:
 
 - [MQ 面试](MQ面试.md) 💯
 - [RabbitMQ 面试](RabbitMQ面试.md) 💯
-- [ActiveMQ](ActiveMQ.md)
+- [ActiveMQ](ActiveMQ.md) - 关键词：`ActiveMQ`、`JMS`、`消息中间件`、`点对点模式`、`发布订阅`
 
 ### [Kafka](Kafka)
 
-- [Kafka 快速入门](Kafka/[Kafka]快速入门.md)
-- [Kafka 生产](Kafka/[Kafka]生产.md)
-- [Kafka 消费](Kafka/[Kafka]消费.md)
-- [Kafka 集群](Kafka/[Kafka]集群.md)
-- [Kafka 可靠传输](Kafka/[Kafka]可靠传输.md)
-- [Kafka 存储](Kafka/[Kafka]存储.md)
-- [Kafka 流式处理](Kafka/[Kafka]流式处理.md)
-- [Kafka 运维](Kafka/[Kafka]运维.md)
+- [Kafka 快速入门](Kafka/[Kafka]快速入门.md) - 关键词：`Kafka`、`消息队列`、`Topic`、`Partition`、`Broker`
+- [Kafka 生产](Kafka/[Kafka]生产.md) - 关键词：`Kafka`、`Producer`、`分区策略`、`消息发送`、`幂等生产者`
+- [Kafka 消费](Kafka/[Kafka]消费.md) - 关键词：`Kafka`、`Consumer`、`消费组`、`Offset`、`重平衡`
+- [Kafka 集群](Kafka/[Kafka]集群.md) - 关键词：`Kafka`、`集群管理`、`ZooKeeper`、`Controller 选举`、`副本机制`
+- [Kafka 可靠传输](Kafka/[Kafka]可靠传输.md) - 关键词：`Kafka`、`可靠传输`、`ACK 机制`、`ISR`、`Exactly-Once`
+- [Kafka 存储](Kafka/[Kafka]存储.md) - 关键词：`Kafka`、`存储机制`、`日志段`、`PageCache`、`零拷贝`
+- [Kafka 流式处理](Kafka/[Kafka]流式处理.md) - 关键词：`Kafka`、`流式处理`、`Kafka Streams`、`事件流`、`窗口计算`
+- [Kafka 运维](Kafka/[Kafka]运维.md) - 关键词：`Kafka`、`运维`、`集群监控`、`性能调优`、`故障排查`
 - [Kafka 面试](Kafka/[Kafka]面试.md) 💯
 
 ### [RocketMQ](RocketMQ)
 
-- [RocketMQ 快速入门](RocketMQ/[RocketMQ]快速入门.md)
+- [RocketMQ 快速入门](RocketMQ/[RocketMQ]快速入门.md) - 关键词：`RocketMQ`、`消息模型`、`NameServer`、`Broker`、`消息类型`
 - [RocketMQ 面试](RocketMQ/[RocketMQ]面试.md) 💯
 
 ## 🎯 技术对比

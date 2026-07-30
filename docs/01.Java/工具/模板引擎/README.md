@@ -41,9 +41,9 @@ index: false
 
 ## 内容
 
-- [Freemark](Freemark.md)
-- [Thymeleaf](Thymeleaf.md)
-- [Velocity](Velocity.md)
+- [Freemark](Freemark.md) - 关键词：`FreeMarker`、`模板引擎`、`FTL`、`MVC`、`模板渲染`
+- [Thymeleaf](Thymeleaf.md) - 关键词：`Thymeleaf`、`模板引擎`、`标准方言`、`Spring Boot`、`自然模板`
+- [Velocity](Velocity.md) - 关键词：`Velocity`、`模板引擎`、`VTL`、`模板语法`、`MVC`
 
 ## 资源
 

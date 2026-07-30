@@ -19,7 +19,7 @@ index: false
 
 ## 📖 内容
 
-- [Java 日志](Java日志.md) - 关键词：`JCL`、`Log4j`、`Log4j2`、`Logback`、`SLF4J`、`JUL`
+- [Java 日志](Java日志.md) - 关键词：`JCL`、`Log4j`、`Log4j2`、`Logback`、`SLF4J`
 - [Java 工具包](Java工具包.md) - 关键词：`commons-lang`、`commons-collections`、`commons-io`、`guava`
 - [Reflections](Reflections.md) - 关键词：`反射`、`注解扫描`、`类扫描`
 - [JavaMail](JavaMail.md) - 关键词：`邮件`、`SMTP`、`POP3`、`IMAP`、`MIME`

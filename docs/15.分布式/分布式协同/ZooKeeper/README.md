@@ -26,11 +26,11 @@ index: false
 
 ## 📖 内容
 
-- [ZooKeeper 原理]([ZooKeeper]原理.md)
-- [ZooKeeper Java Api]([ZooKeeper]API.md)
-- [ZooKeeper 命令]([ZooKeeper]命令.md)
-- [ZooKeeper 运维]([ZooKeeper]运维.md)
-- [ZooKeeper Acl]([ZooKeeper]ACL.md)
+- [ZooKeeper 原理]([ZooKeeper]原理.md) - 关键词：`ZooKeeper`、`ZAB 协议`、`Watcher`、`znode`、`分布式协调`
+- [ZooKeeper Java Api]([ZooKeeper]API.md) - 关键词：`ZooKeeper`、`Java API`、`Curator`、`Watcher`、`异步回调`
+- [ZooKeeper 命令]([ZooKeeper]命令.md) - 关键词：`ZooKeeper`、`zkCli`、`四字命令`、`znode 操作`、`命令行工具`
+- [ZooKeeper 运维]([ZooKeeper]运维.md) - 关键词：`ZooKeeper`、`集群部署`、`配置管理`、`性能调优`、`故障排查`
+- [ZooKeeper Acl]([ZooKeeper]ACL.md) - 关键词：`ZooKeeper`、`ACL`、`权限控制`、`访问控制列表`、`安全认证`
 - [ZooKeeper 面试]([ZooKeeper]面试.md) 💯
 
 ## 📚 资料

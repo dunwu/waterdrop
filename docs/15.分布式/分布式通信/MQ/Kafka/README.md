@@ -25,14 +25,14 @@ index: false
 
 ## 📖 内容
 
-- [Kafka 快速入门]([Kafka]快速入门.md)
-- [Kafka 生产]([Kafka]生产.md)
-- [Kafka 消费]([Kafka]消费.md)
-- [Kafka 集群]([Kafka]集群.md)
-- [Kafka 可靠传输]([Kafka]可靠传输.md)
-- [Kafka 存储]([Kafka]存储.md)
-- [Kafka 流式处理]([Kafka]流式处理.md)
-- [Kafka 运维]([Kafka]运维.md)
+- [Kafka 快速入门]([Kafka]快速入门.md) - 关键词：`Kafka`、`消息队列`、`Topic`、`Partition`、`Broker`
+- [Kafka 生产]([Kafka]生产.md) - 关键词：`Kafka`、`Producer`、`分区策略`、`消息发送`、`幂等生产者`
+- [Kafka 消费]([Kafka]消费.md) - 关键词：`Kafka`、`Consumer`、`消费组`、`Offset`、`重平衡`
+- [Kafka 集群]([Kafka]集群.md) - 关键词：`Kafka`、`集群管理`、`ZooKeeper`、`Controller 选举`、`副本机制`
+- [Kafka 可靠传输]([Kafka]可靠传输.md) - 关键词：`Kafka`、`可靠传输`、`ACK 机制`、`ISR`、`Exactly-Once`
+- [Kafka 存储]([Kafka]存储.md) - 关键词：`Kafka`、`存储机制`、`日志段`、`PageCache`、`零拷贝`
+- [Kafka 流式处理]([Kafka]流式处理.md) - 关键词：`Kafka`、`流式处理`、`Kafka Streams`、`事件流`、`窗口计算`
+- [Kafka 运维]([Kafka]运维.md) - 关键词：`Kafka`、`运维`、`集群监控`、`性能调优`、`故障排查`
 - [Kafka 面试]([Kafka]面试.md) 💯
 
 ## 📚 资料

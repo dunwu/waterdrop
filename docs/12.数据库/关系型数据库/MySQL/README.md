@@ -30,17 +30,17 @@ MySQL 是一种关联数据库管理系统，关联数据库将数据保存在�
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2023/09/ed4d5381a82942639cb3fca5292f9301.png)
 
-- [MySQL 概述]([MySQL]概述.md) - 关键词：`MySQL`、`关系型数据库`、`RDBMS`、`InnoDB`、`存储引擎`、`OLTP`、`OLAP`、`DBMS`
-- [MySQL 建模]([MySQL]建模.md) - 关键词：`数据类型`、`VARCHAR`、`CHAR`、`DECIMAL`、`BIGINT`、`DATETIME`、`TIMESTAMP`、`utf8mb4`
-- [MySQL CRUD]([MySQL]CRUD.md) - 关键词：`CRUD`、`DDL`、`INSERT`、`SELECT`、`UPDATE`、`DELETE`、`约束`、`索引管理`
-- [MySQL 存储]([MySQL]存储.md) - 关键词：`InnoDB`、`MyISAM`、`存储引擎`、`Buffer Pool`、`聚簇索引`、`Change Buffer`、`表空间`、`redo log`
-- [MySQL 索引]([MySQL]索引.md) - 关键词：`B+Tree索引`、`聚簇索引`、`覆盖索引`、`最左匹配`、`Hash索引`、`前缀索引`、`联合索引`、`索引失效`
-- [MySQL 事务]([MySQL]事务.md) - 关键词：`ACID`、`MVCC`、`事务隔离级别`、`可重复读`、`ReadView`、`UndoLog`、`幻读`、`分布式事务`
-- [MySQL 锁]([MySQL]锁.md) - 关键词：`行锁`、`间隙锁`、`Next-Key Lock`、`死锁`、`悲观锁`、`乐观锁`、`共享锁`、`独享锁`
-- [MySQL 复制]([MySQL]复制.md) - 关键词：`主从复制`、`binlog`、`读写分离`、`relay log`、`主备配置`、`数据同步`、`高可用`、`slave`
-- [MySQL 架构]([MySQL]架构.md) - 关键词：`Server层`、`存储引擎`、`redo log`、`binlog`、`WAL`、`两阶段提交`、`优化器`、`执行器`
-- [MySQL 优化]([MySQL]优化.md) - 关键词：`EXPLAIN`、`慢查询`、`索引优化`、`SQL优化`、`覆盖索引`、`分页优化`、`JOIN优化`、`执行计划`
-- [MySQL 运维]([MySQL]运维.md) - 关键词：`mysqldump`、`用户管理`、`主从部署`、`my.cnf`、`慢查询`、`max_connections`、`Buffer Pool`、`备份恢复`
+- [MySQL 概述]([MySQL]概述.md) - 关键词：`MySQL`、`关系型数据库`、`RDBMS`、`InnoDB`、`存储引擎`
+- [MySQL 建模]([MySQL]建模.md) - 关键词：`数据类型`、`VARCHAR`、`CHAR`、`DECIMAL`、`BIGINT`
+- [MySQL CRUD]([MySQL]CRUD.md) - 关键词：`CRUD`、`DDL`、`INSERT`、`SELECT`、`UPDATE`
+- [MySQL 存储]([MySQL]存储.md) - 关键词：`InnoDB`、`MyISAM`、`存储引擎`、`Buffer Pool`、`聚簇索引`
+- [MySQL 索引]([MySQL]索引.md) - 关键词：`B+Tree索引`、`聚簇索引`、`覆盖索引`、`最左匹配`、`Hash索引`
+- [MySQL 事务]([MySQL]事务.md) - 关键词：`ACID`、`MVCC`、`事务隔离级别`、`可重复读`、`ReadView`
+- [MySQL 锁]([MySQL]锁.md) - 关键词：`行锁`、`间隙锁`、`Next-Key Lock`、`死锁`、`悲观锁`
+- [MySQL 复制]([MySQL]复制.md) - 关键词：`主从复制`、`binlog`、`读写分离`、`relay log`、`主备配置`
+- [MySQL 架构]([MySQL]架构.md) - 关键词：`Server层`、`存储引擎`、`redo log`、`binlog`、`WAL`
+- [MySQL 优化]([MySQL]优化.md) - 关键词：`EXPLAIN`、`慢查询`、`索引优化`、`SQL优化`、`覆盖索引`
+- [MySQL 运维]([MySQL]运维.md) - 关键词：`mysqldump`、`用户管理`、`主从部署`、`my.cnf`、`慢查询`
 - [MySQL 面试]([MySQL]面试.md) 💯
 - [MySQL 面试之索引篇]([MySQL]面试之索引篇.md) 💯
 - [MySQL 面试之事务和锁篇]([MySQL]面试之事务和锁篇.md) 💯

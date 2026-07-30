@@ -22,7 +22,7 @@ index: false
 
 - [Lombok](Lombok.md) - 关键词：`注解`、`getter/setter`、`@Data`、`@Builder`、`@Slf4j`
 - [Dozer](Dozer.md) - 关键词：`Bean 映射`、`Bean 拷贝`、`对象转换`、`反射`
-- [MapStruct](MapStruct.md) - 关键词：`代码生成`、`编译期`、`@Mapper`、`@Mapping`、`类型安全`、`高性能`
+- [MapStruct](MapStruct.md) - 关键词：`代码生成`、`编译期`、`@Mapper`、`@Mapping`、`类型安全`
 
 ## 📚 资料
 

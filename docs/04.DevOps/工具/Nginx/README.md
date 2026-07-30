@@ -22,7 +22,7 @@ index: false
 - [Nginx 简介]([Nginx]简介.md)
 - [Nginx 配置]([Nginx]配置.md)
 - [Nginx 运维]([Nginx]运维.md)
-- [Nginx 面试]([Nginx]面试.md)
+- [Nginx 面试]([Nginx]面试.md) 💯
 
 ## 📚 资料
 
