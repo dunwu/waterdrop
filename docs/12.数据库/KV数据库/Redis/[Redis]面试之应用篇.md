@@ -5,7 +5,7 @@ cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020
 date: 2020-07-13 17:03:42
 categories:
   - 数据库
-  - KV 数据库
+  - KV数据库
   - Redis
 tags:
   - 数据库

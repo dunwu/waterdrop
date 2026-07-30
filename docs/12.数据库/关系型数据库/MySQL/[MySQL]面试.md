@@ -4,7 +4,6 @@ title: MySQL 面试
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2020-09-12 10:43:53
 categories:
-
   - 数据库
   - 关系型数据库
   - MySQL

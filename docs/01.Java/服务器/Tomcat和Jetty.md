@@ -6,7 +6,6 @@ order: 05
 categories:
   - Java
   - 服务器
-  - Tomcat
 tags:
   - Java
   - 服务器
