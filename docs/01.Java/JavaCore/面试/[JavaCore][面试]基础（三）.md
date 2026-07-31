@@ -114,11 +114,11 @@ void addNumbers(List<? super Integer> list) {
 
 **通配符限定对比**
 
-| 类型 | 语法          | 读取          | 写入            | 应用           |
-| :--- | :------------ | :------------ | :-------------- | :------------- |
-| 上界 | `? extends T` | 安全（作为 T） | 禁止            | 生产者场景     |
+| 类型 | 语法          | 读取           | 写入             | 应用           |
+| :--- | :------------ | :------------- | :--------------- | :------------- |
+| 上界 | `? extends T` | 安全（作为 T） | 禁止             | 生产者场景     |
 | 下界 | `? super T`   | 需转 Object    | 安全（T 及子类） | 消费者场景     |
-| 无界 | `?`           | 作为 Object    | 禁止            | 完全不确定类型 |
+| 无界 | `?`           | 作为 Object    | 禁止             | 完全不确定类型 |
 
 **小结**
 
@@ -528,6 +528,61 @@ UserService proxy = (UserService) enhancer.create();  // 生成子类对象
 - **代码生成**：Lombok 的 `@Data`
 - **静态检查**：`@Nullable`、`@Deprecated`
 
+### 【中等】如何自定义注解并使用注解处理器？⭐
+
+**自定义注解**：
+
+```java
+@Target(ElementType.METHOD)           // 作用目标
+@Retention(RetentionPolicy.RUNTIME)   // 保留策略
+@Documented
+public @interface MyAnnotation {
+    String value() default "";
+    int priority() default 0;
+}
+```
+
+**元注解详解**：
+
+| **元注解**    | **作用**                                   |
+| ------------- | ------------------------------------------ |
+| `@Target`     | 作用目标（TYPE/FIELD/METHOD/PARAMETER 等） |
+| `@Retention`  | 保留策略（SOURCE/CLASS/RUNTIME）           |
+| `@Documented` | Javadoc 包含                               |
+| `@Inherited`  | 子类继承（仅类级别）                       |
+| `@Repeatable` | 可重复（Java 8+）                          |
+
+**使用与读取**：
+
+```java
+@MyAnnotation(value = "test", priority = 1)
+public void process() { ... }
+
+// 反射读取
+Method method = clazz.getMethod("process");
+MyAnnotation anno = method.getAnnotation(MyAnnotation.class);
+```
+
+**注解处理器（Annotation Processor）**：编译期处理注解，生成代码（如 Lombok）。
+
+```java
+@SupportedAnnotationTypes("com.example.MyAnnotation")
+public class MyProcessor extends AbstractProcessor {
+    @Override
+    public boolean process(Set<? extends TypeElement> annotations,
+                           RoundEnvironment roundEnv) {
+        for (Element e : roundEnv.getElementsAnnotatedWith(MyAnnotation.class)) {
+            // 用 Filer 生成源文件
+        }
+        return true;
+    }
+}
+```
+
+注册：`META-INF/services/javax.annotation.processing.Processor` 写入全限定名。
+
+**典型应用**：Lombok、ButterKnife、MapStruct、Dagger。
+
 ## Java 枚举
 
 ### 【中等】Java 枚举的原理是什么？⭐
@@ -559,14 +614,14 @@ public final class Color extends java.lang.Enum<Color> {
 
 **枚举的核心特性**：
 
-| **特性** | **说明** |
-| -------- | -------- |
-| **继承关系** | 隐式继承 `java.lang.Enum`，无法再继承其他类 |
-| **final 修饰** | 枚举类不可被继承（防止破坏单例） |
-| **实例唯一性** | 每个常量是 JVM 级别的单例（类加载时创建） |
-| **可定义成员** | 字段、方法、构造器（仅 private 包访问） |
-| **可实现接口** | 弥补无法继承的限制 |
-| **支持 switch** | 编译器优化为 `ordinal` 比较 |
+| **特性**        | **说明**                                    |
+| --------------- | ------------------------------------------- |
+| **继承关系**    | 隐式继承 `java.lang.Enum`，无法再继承其他类 |
+| **final 修饰**  | 枚举类不可被继承（防止破坏单例）            |
+| **实例唯一性**  | 每个常量是 JVM 级别的单例（类加载时创建）   |
+| **可定义成员**  | 字段、方法、构造器（仅 private 包访问）     |
+| **可实现接口**  | 弥补无法继承的限制                          |
+| **支持 switch** | 编译器优化为 `ordinal` 比较                 |
 
 **带属性和方法的枚举**：
 
@@ -617,13 +672,13 @@ public enum Singleton {
 Singleton.INSTANCE.doSomething();
 ```
 
-| **对比维度** | **枚举单例** | **饿汉式** | **懒汉式（DCL）** | **静态内部类** |
-| ------------ | ------------ | ---------- | ------------------ | -------------- |
-| **线程安全** | ✔️ JVM 保证 | ✔️ 类加载保证 | ✔️ volatile+synchronized | ✔️ 类加载保证 |
-| **防反射攻击** | ✔️ 强制禁止 | ❌ 可破坏 | ❌ 可破坏 | ❌ 可破坏 |
-| **防序列化破坏** | ✔️ 自动处理 | ❌ 需 readResolve | ❌ 需 readResolve | ❌ 需 readResolve |
-| **懒加载** | ❌ 否 | ❌ 否 | ✔️ 是 | ✔️ 是 |
-| **代码简洁** | ⭐ 最简洁 | 简单 | 复杂 | 较简单 |
+| **对比维度**     | **枚举单例** | **饿汉式**        | **懒汉式（DCL）**        | **静态内部类**    |
+| ---------------- | ------------ | ----------------- | ------------------------ | ----------------- |
+| **线程安全**     | ✔️ JVM 保证  | ✔️ 类加载保证     | ✔️ volatile+synchronized | ✔️ 类加载保证     |
+| **防反射攻击**   | ✔️ 强制禁止  | ❌ 可破坏         | ❌ 可破坏                | ❌ 可破坏         |
+| **防序列化破坏** | ✔️ 自动处理  | ❌ 需 readResolve | ❌ 需 readResolve        | ❌ 需 readResolve |
+| **懒加载**       | ❌ 否        | ❌ 否             | ✔️ 是                    | ✔️ 是             |
+| **代码简洁**     | ⭐ 最简洁    | 简单              | 复杂                     | 较简单            |
 
 **枚举单例的底层保证**：
 
@@ -666,12 +721,12 @@ EnumSet<Day> all = EnumSet.allOf(Day.class);
 
 **性能对比**：
 
-| **容器** | **底层** | **时间复杂度** | **内存占用** |
-| -------- | -------- | -------------- | ------------ |
-| EnumMap | 数组（索引=ordinal） | O(1) | 极小（固定长度数组） |
-| EnumSet | 位图（bitmask） | O(1) | 极小（1 个 long） |
-| HashMap | 哈希表 | O(1) 平均 | 较大（节点+桶） |
-| HashSet | HashMap | O(1) 平均 | 较大 |
+| **容器** | **底层**             | **时间复杂度** | **内存占用**         |
+| -------- | -------------------- | -------------- | -------------------- |
+| EnumMap  | 数组（索引=ordinal） | O(1)           | 极小（固定长度数组） |
+| EnumSet  | 位图（bitmask）      | O(1)           | 极小（1 个 long）    |
+| HashMap  | 哈希表               | O(1) 平均      | 较大（节点+桶）      |
+| HashSet  | HashMap              | O(1) 平均      | 较大                 |
 
 **适用场景**：
 
@@ -713,11 +768,11 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 
 **优势与局限**
 
-| **优势**       | **局限**                                |
-| -------------- | --------------------------------------- |
-| 实现热插拔     | 配置文件需严格规范                      |
+| **优势**       | **局限**                                  |
+| -------------- | ----------------------------------------- |
+| 实现热插拔     | 配置文件需严格规范                        |
 | 解耦接口与实现 | 原生 SPI 会加载所有实现类（可能浪费资源） |
-| 扩展性强       | 无默认实现筛选机制                      |
+| 扩展性强       | 无默认实现筛选机制                        |
 
 **与 API 的区别**
 
@@ -725,7 +780,7 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 | -------- | ------------------------ | ------------------------ |
 | 调用方向 | 由实现方提供，调用方选择 | 由提供方定义，调用方使用 |
 | 控制权   | 调用方控制               | 提供方控制               |
-| 典型场景 | JDBC 驱动、日志实现       | Java 标准库               |
+| 典型场景 | JDBC 驱动、日志实现      | Java 标准库              |
 
 **改进方案**
 
@@ -749,11 +804,11 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 
 **Java 实现方式**
 
-| 方式                            | 特点                     | 示例                                   |
-| ------------------------------- | ------------------------ | -------------------------------------- |
-| **`Serializable`接口**          | 标记接口，默认 Java 序列化 | `class User implements Serializable`   |
-| **`Externalizable`接口**        | 需手动实现读写逻辑       | 覆盖`writeExternal()`/`readExternal()` |
-| **第三方库**（JSON/Protobuf 等） | 跨语言、高效             | Gson、Jackson、Protobuf                |
+| 方式                             | 特点                       | 示例                                   |
+| -------------------------------- | -------------------------- | -------------------------------------- |
+| **`Serializable`接口**           | 标记接口，默认 Java 序列化 | `class User implements Serializable`   |
+| **`Externalizable`接口**         | 需手动实现读写逻辑         | 覆盖`writeExternal()`/`readExternal()` |
+| **第三方库**（JSON/Protobuf 等） | 跨语言、高效               | Gson、Jackson、Protobuf                |
 
 **关键注意事项**
 
@@ -776,12 +831,12 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 
 **常见序列化协议对比**
 
-| 协议         | 语言支持 | 可读性 | 性能 | 典型应用 |
-| ------------ | -------- | ------ | ---- | -------- |
-| **Java 原生** | 仅 Java   | 差     | 低   | Java RMI |
-| **JSON**     | 多语言   | 好     | 中   | Web API  |
-| **Protobuf** | 多语言   | 差     | 高   | gRPC     |
-| **Hessian**  | 多语言   | 差     | 中   | Dubbo    |
+| 协议          | 语言支持 | 可读性 | 性能 | 典型应用 |
+| ------------- | -------- | ------ | ---- | -------- |
+| **Java 原生** | 仅 Java  | 差     | 低   | Java RMI |
+| **JSON**      | 多语言   | 好     | 中   | Web API  |
+| **Protobuf**  | 多语言   | 差     | 高   | gRPC     |
+| **Hessian**   | 多语言   | 差     | 中   | Dubbo    |
 
 **安全风险**
 
@@ -1282,78 +1337,23 @@ String html = """
     """;
 ```
 
-## Java 新特性补充
+## JDK 8 新特性
 
-### 【中等】如何自定义注解并使用注解处理器？⭐
-
-**自定义注解**：
-
-```java
-@Target(ElementType.METHOD)           // 作用目标
-@Retention(RetentionPolicy.RUNTIME)   // 保留策略
-@Documented
-public @interface MyAnnotation {
-    String value() default "";
-    int priority() default 0;
-}
-```
-
-**元注解详解**：
-
-| **元注解** | **作用** |
-| ---------- | -------- |
-| `@Target` | 作用目标（TYPE/FIELD/METHOD/PARAMETER 等） |
-| `@Retention` | 保留策略（SOURCE/CLASS/RUNTIME） |
-| `@Documented` | Javadoc 包含 |
-| `@Inherited` | 子类继承（仅类级别） |
-| `@Repeatable` | 可重复（Java 8+） |
-
-**使用与读取**：
-
-```java
-@MyAnnotation(value = "test", priority = 1)
-public void process() { ... }
-
-// 反射读取
-Method method = clazz.getMethod("process");
-MyAnnotation anno = method.getAnnotation(MyAnnotation.class);
-```
-
-**注解处理器（Annotation Processor）**：编译期处理注解，生成代码（如 Lombok）。
-
-```java
-@SupportedAnnotationTypes("com.example.MyAnnotation")
-public class MyProcessor extends AbstractProcessor {
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations,
-                           RoundEnvironment roundEnv) {
-        for (Element e : roundEnv.getElementsAnnotatedWith(MyAnnotation.class)) {
-            // 用 Filer 生成源文件
-        }
-        return true;
-    }
-}
-```
-
-注册：`META-INF/services/javax.annotation.processing.Processor` 写入全限定名。
-
-**典型应用**：Lombok、ButterKnife、MapStruct、Dagger。
-
-### 【中等】Optional 的正确使用方式？⭐
+### 【中等】Optional 的正确使用方式？⭐⭐
 
 `Optional` 是 Java 8 引入的**容器对象**，优雅处理可能为 `null` 的值。
 
 **核心方法**：
 
-| **方法** | **说明** |
-| -------- | -------- |
-| `of(T)` | 非 null 创建（null 抛 NPE） |
-| `ofNullable(T)` | 允许 null |
-| `isPresent()` / `isEmpty()` | 是否有值（Java 11+ `isEmpty`） |
-| `orElse(T)` | 无值返回默认 |
-| `orElseGet(Supplier)` | 懒加载默认 |
-| `orElseThrow()` | 无值抛异常 |
-| `map` / `flatMap` / `filter` | 链式转换 |
+| **方法**                     | **说明**                       |
+| ---------------------------- | ------------------------------ |
+| `of(T)`                      | 非 null 创建（null 抛 NPE）    |
+| `ofNullable(T)`              | 允许 null                      |
+| `isPresent()` / `isEmpty()`  | 是否有值（Java 11+ `isEmpty`） |
+| `orElse(T)`                  | 无值返回默认                   |
+| `orElseGet(Supplier)`        | 懒加载默认                   |
+| `orElseThrow()`              | 无值抛异常                     |
+| `map` / `flatMap` / `filter` | 链式转换                       |
 
 **正确用法**：
 
@@ -1379,3 +1379,564 @@ public void process(Optional<String> input) { ... }
 // ❌ 直接 get
 String s = optional.get();  // 可能 NPE
 ```
+
+### 【中等】Lambda 表达式和函数式接口是什么？⭐⭐⭐
+
+**Lambda 表达式**是 Java 8 引入的**匿名函数**，将行为作为参数传递，简化函数式编程。
+
+```java
+// 传统匿名类
+Collections.sort(list, new Comparator<String>() {
+    public int compare(String a, String b) { return a.length() - b.length(); }
+});
+
+// Lambda 表达式
+Collections.sort(list, (a, b) -> a.length() - b.length());
+// 方法引用
+list.sort(Comparator.comparingInt(String::length));
+```
+
+**核心语法**：`(参数列表) -> { 方法体 }`
+
+| 形式 | 示例 |
+| :--- | :--- |
+| 无参 | `() -> System.out.println("hello")` |
+| 单参（可省略括号） | `s -> s.length()` |
+| 多参 | `(a, b) -> a + b` |
+| 方法引用 | `String::valueOf`、`System.out::println` |
+
+**函数式接口**：只有**一个抽象方法**的接口，用 `@FunctionalInterface` 注解。Lambda 本质是函数式接口的实例。
+
+| 函数式接口 | 方法 | 用途 |
+| :--- | :--- | :--- |
+| `Function<T,R>` | `R apply(T t)` | 输入 T 输出 R（转换） |
+| `Consumer<T>` | `void accept(T t)` | 消费 T（无返回） |
+| `Supplier<T>` | `T get()` | 生产 T（无输入） |
+| `Predicate<T>` | `boolean test(T t)` | 判断 T（返回布尔） |
+| `BiFunction<T,U,R>` | `R apply(T t, U u)` | 双输入单输出 |
+
+**记忆点**：Lambda = “行为参数化”，函数式接口 = “只有一个抽象方法的接口”，两者配合实现简洁的函数式编程。
+
+### 【困难】Stream API 的核心操作有哪些？⭐⭐⭐
+
+**Stream API（Java 8）**提供对集合的**声明式、链式、并行化**数据处理能力。
+
+**核心流程**：`数据源 → 中间操作（链式） → 终端操作（触发执行）`
+
+```java
+List<String> names = users.stream()           // 数据源
+    .filter(u -> u.getAge() > 18)              // 中间操作：过滤
+    .sorted(Comparator.comparing(User::getName)) // 中间操作：排序
+    .map(User::getName)                        // 中间操作：映射
+    .distinct()                                // 中间操作：去重
+    .limit(10)                                 // 中间操作：截断
+    .collect(Collectors.toList());              // 终端操作：收集
+```
+
+**中间操作 vs 终端操作**：
+
+| 类型 | 特点 | 常见操作 |
+| :--- | :--- | :--- |
+| **中间操作** | 返回 Stream，**懒执行**，链式调用 | `filter`、`map`、`flatMap`、`sorted`、`distinct`、`limit`、`skip`、`peek` |
+| **终端操作** | 触发实际计算，返回结果或副作用 | `collect`、`forEach`、`reduce`、`count`、`findFirst`、`anyMatch`、`toList` |
+
+**reduce vs collect**：
+
+```java
+// reduce：元素归约为单个值
+int sum = list.stream().reduce(0, Integer::sum);
+
+// collect：元素收集到容器
+Map<String, List<User>> groupByCity = users.stream()
+    .collect(Collectors.groupingBy(User::getCity));
+```
+
+**并行流**：
+
+```java
+long count = list.parallelStream()  // 利用多核 CPU 并行处理
+    .filter(x -> x > 0)
+    .count();
+```
+
+**注意事项**：
+- 并行流不适用于小数据集（线程开销 > 计算收益）
+- 避免在并行流中使用有副作用的操作
+- `findFirst` 在并行流中代价高（需全局同步），优先用 `findAny`
+
+### 【中等】Java 8 接口的默认方法和静态方法是什么？⭐⭐
+
+Java 8 允许接口定义**默认方法（`default`）**和**静态方法**，解决了接口演化问题。
+
+```java
+public interface Logger {
+    void log(String msg);  // 抽象方法
+
+    // 默认方法：提供默认实现，实现类可选择重写
+    default void info(String msg) {
+        log("[INFO] " + msg);
+    }
+
+    // 静态方法：通过接口名直接调用
+    static Logger of(String name) {
+        return msg -> System.out.println(name + ": " + msg);
+    }
+}
+```
+
+**默认方法的菱形冲突规则**：
+
+| 场景 | 规则 |
+| :--- | :--- |
+| 类方法 vs 接口默认方法 | **类优先**：类的实例方法始终胜出 |
+| 两个接口有同名默认方法 | **编译报错**，必须在子接口/实现类中显式重写 |
+| 子接口重写父接口默认方法 | 子接口的版本生效 |
+
+```java
+// 菱形冲突解决
+interface A { default void hello() { System.out.println("A"); } }
+interface B extends A { default void hello() { System.out.println("B"); } }
+class C implements A, B {
+    // 必须显式指定
+    public void hello() { B.super.hello(); }  // 选择 B 的实现
+}
+```
+
+### 【中等】Java 8 的 java.time API 解决了什么问题？⭐⭐
+
+`java.time`（JSR-310）解决了 `java.util.Date`/`Calendar` 的三大痛点：**非线程安全、设计混乱、时区处理复杂**。
+
+| 类 | 用途 | 示例 |
+| :--- | :--- | :--- |
+| `LocalDate` | 日期（无时间、无时区） | `LocalDate.of(2024, 1, 1)` |
+| `LocalTime` | 时间（无日期、无时区） | `LocalTime.of(14, 30)` |
+| `LocalDateTime` | 日期 + 时间（无时区） | `LocalDateTime.now()` |
+| `ZonedDateTime` | 日期 + 时间 + 时区 | `ZonedDateTime.now(ZoneId.of("Asia/Shanghai"))` |
+| `Instant` | 时间戳（UTC） | `Instant.now()` |
+| `Duration` | 时间间隔（时分秒） | `Duration.between(t1, t2)` |
+| `Period` | 日期间隔（年月日） | `Period.between(d1, d2)` |
+
+**核心优势**：
+
+- **不可变且线程安全**：所有类都是 `final` + `immutable`
+- **API 设计清晰**：`plus`/`minus`/`with` 语义明确
+- **时区支持完善**：`ZoneId` + `ZonedDateTime`
+
+```java
+// 计算两个日期之间的天数
+long days = ChronoUnit.DAYS.between(startDate, endDate);
+
+// 格式化
+String formatted = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+```
+
+## JDK 11 新特性
+
+### 【中等】Java 11 的 var 局部变量类型推断怎么用？有什么限制？⭐⭐
+
+**`var`（JDK 10 引入，JDK 11 扩展）**让编译器自动推断局部变量类型，减少冗余代码。
+
+```java
+// JDK 8：冗长的类型声明
+Map<String, List<String>> map = new HashMap<String, List<String>>();
+
+// var：编译器自动推断
+var map = new HashMap<String, List<String>>();  // 类型仍然是 Map<String, List<String>>
+
+// JDK 11 扩展：Lambda 参数上使用 var（可加注解）
+list.stream().filter((@NotNull var s) -> s.length() > 5);
+```
+
+**使用限制**：
+
+| 场景 | 是否支持 | 示例 |
+| :--- | :--- | :--- |
+| 局部变量 | ✔️ | `var list = new ArrayList<String>();` |
+| for 循环 | ✔️ | `for (var item : collection)` |
+| try-with-resources | ✔️ | `try (var reader = new BufferedReader(...))` |
+| 方法参数 | ❌ | `void method(var x)` — 不允许 |
+| 返回值 | ❌ | `var method()` — 不允许 |
+| 字段 | ❌ | `private var name;` — 不允许 |
+| 无初始化 | ❌ | `var x;` — 不允许，无法推断 |
+| 赋 null | ❌ | `var x = null;` — 不允许，无法推断 |
+
+**最佳实践**：仅在类型明显时（如构造器右侧）使用 `var`，避免降低代码可读性。
+
+### 【中等】Java 11 的 HTTP Client API 有什么特点？⭐⭐
+
+**`java.net.http.HttpClient`（JDK 11 正式版）**是 Java 原生异步 HTTP 客户端，替代老旧的 `HttpURLConnection`。
+
+```java
+HttpClient client = HttpClient.newHttpClient();
+
+// 同步请求
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.example.com/users"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"Tom\"}"))
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+// 异步请求（返回 CompletableFuture）
+client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+    .thenApply(HttpResponse::body)
+    .thenAccept(System.out::println);
+```
+
+**核心特点**：
+
+| 特性 | 说明 |
+| :--- | :--- |
+| **同步 + 异步** | `send()` 同步、`sendAsync()` 异步（返回 `CompletableFuture`） |
+| **HTTP/2** | 默认支持 HTTP/2（多路复用、头部压缩） |
+| **WebSocket** | 内置 WebSocket 客户端支持 |
+| **BodyHandlers** | 灵活处理响应体：`ofString`、`ofFile`、`ofByteArray`、`ofLines` |
+
+### 【中等】Java 11 的字符串 API 有哪些增强？⭐
+
+Java 11 为 `String` 类新增了多个实用方法：
+
+| 方法 | 说明 | 示例 |
+| :--- | :--- | :--- |
+| `isBlank()` | 是否为空或纯空白字符 | `" ".isBlank()` → `true` |
+| `strip()` | 去除首尾空白（支持 Unicode） | `" hello ".strip()` → `"hello"` |
+| `stripLeading()` | 去除前导空白 | |
+| `stripTrailing()` | 去除尾部空白 | |
+| `lines()` | 按行分割返回 Stream | `"a\nb\nc".lines().count()` → `3` |
+| `repeat(int)` | 重复拼接 | `"ab".repeat(3)` → `"ababab"` |
+
+**`strip()` vs `trim()`**：`strip()` 基于 `Character.isWhitespace()`，支持 Unicode 空白字符；`trim()` 仅处理 ASCII ≤ 32 的字符。
+
+### 【中等】Java 11 对 GC 有哪些重要更新？⭐⭐
+
+JDK 11 是 GC 领域的重要里程碑，引入了两个新一代垃圾收集器：
+
+| 收集器 | JDK 版本 | 核心特点 |
+| :--- | :--- | :--- |
+| **ZGC**（实验） | JDK 11 | 亚毫秒停顿（<10ms），支持 TB 级堆，基于着色指针 + 读屏障 |
+| **Shenandoah** | JDK 12 | 低延迟（与 ZGC 竞争），基于转发指针，Red Hat 开发 |
+
+**其他 GC 变更**：
+- **G1 成为默认 GC**（JDK 9 起）
+- **CMS 被标记为废弃**（JDK 9），JDK 14 正式移除
+- **Epsilon GC**（JDK 11）：不做任何回收，仅用于性能测试基准
+
+启用示例：
+
+```bash
+# JDK 11 启用 ZGC
+java -XX:+UseZGC -Xmx4g YourApplication
+
+# JDK 11 启用 Epsilon（不做 GC，堆满即 OOM）
+java -XX:+UseEpsilonGC -Xmx256m YourApplication
+```
+
+## JDK 17 新特性
+
+### 【中等】JDK 17 的 Sealed Classes（密封类）是什么？⭐⭐⭐
+
+**密封类（Sealed Classes，JDK 17 正式版）**通过 `sealed` + `permits` 显式声明允许的子类，**精确控制继承层级**。
+
+```java
+// 密封类：明确指定允许的子类
+public sealed class Shape permits Circle, Square, Triangle {}
+
+// 子类必须是 final、sealed 或 non-sealed 之一
+public final class Circle extends Shape { ... }       // 不再可继承
+public final class Square extends Shape { ... }       // 不再可继承
+public non-sealed class Triangle extends Shape { ... }  // 恢复开放继承
+```
+
+**与 Pattern Matching 结合（领域建模利器）**：
+
+```java
+public double area(Shape shape) {
+    return switch (shape) {  // 编译器检查所有子类，无需 default
+        case Circle c -> Math.PI * c.r() * c.r();
+        case Square s -> s.side() * s.side();
+        case Triangle t -> 0.5 * t.base() * t.height();
+    };
+}
+```
+
+**适用场景**：领域建模（限定业务概念取值范围）、类型安全的代数数据类型（ADT）、API 设计（配合 switch 穷尽检查）。
+
+### 【中等】JDK 17 的 Record（记录类）是什么？⭐⭐⭐
+
+**Record（JDK 16 正式版）**是 Java 的**不可变数据载体**，自动生成样板代码，是 Lombok `@Data` 的官方替代品。
+
+```java
+// 一行定义
+public record Point(int x, int y) {}
+
+// 等价的传统 Java 类需 60+ 行（构造器、getter、equals、hashCode、toString）
+
+// 使用
+Point p = new Point(3, 4);
+System.out.println(p.x());          // 3（注意：无 get 前缀）
+System.out.println(p);              // Point[x=3, y=4]
+```
+
+**紧凑构造器**：用于参数校验
+
+```java
+public record Range(int start, int end) {
+    public Range {  // 紧凑构造器
+        if (start > end) throw new IllegalArgumentException("start > end");
+    }
+}
+```
+
+**Record 的限制**：
+
+- **不能继承**其他类（隐式继承 `java.lang.Record`）
+- 字段**不可变**（`final`）
+- 不能声明 `native` 方法
+
+### 【中等】JDK 17 的文本块（Text Blocks）是什么？⭐⭐
+
+**文本块（Text Blocks，JDK 15 正式版）**用 `"""` 定义多行字符串，解决传统字符串拼接的可读性问题。
+
+```java
+// JDK 8：冗长的字符串拼接
+String json = "{\n" +
+    "  \"name\": \"Tom\",\n" +
+    "  \"age\": 18\n" +
+    "}";
+
+// 文本块：清晰的多行格式
+String json = """
+    {
+      "name": "Tom",
+      "age": 18
+    }
+    """;
+```
+
+**特性**：
+
+| 特性 | 说明 |
+| :--- | :--- |
+| **自动缩进** | 以公共缩进为基准，自动去除多余缩进 |
+| **换行符** | 统一为 `\n`（跨平台一致） |
+| **转义字符** | 支持 `\s`（保留尾部空格）、`\\`（行尾不换行） |
+| **String.formatted()** | JDK 15+ 支持 `"""...""".formatted(args)` |
+
+```java
+// 格式化文本块
+String sql = """
+    SELECT *
+    FROM users
+    WHERE age > %d AND city = '%s'
+    """.formatted(18, "北京");
+```
+
+### 【中等】JDK 17 的 instanceof 模式匹配是什么？⭐⭐
+
+**instanceof 模式匹配（JDK 16 正式版）**将类型检查和变量绑定合二为一，消除显式强制转换。
+
+```java
+// JDK 8：需要显式转换
+if (obj instanceof String) {
+    String s = (String) obj;
+    System.out.println(s.length());
+}
+
+// JDK 17：模式匹配，直接绑定变量
+if (obj instanceof String s) {
+    System.out.println(s.length());  // 无需转换
+}
+
+// 支持在条件中组合
+if (obj instanceof String s && s.length() > 5) {
+    System.out.println(s.toUpperCase());
+}
+```
+
+**作用域规则**：绑定变量的作用域仅限于模式匹配为 `true` 的分支。
+
+```java
+if (!(obj instanceof String s)) {
+    return;  // s 不可用
+}
+// s 在此处可用（因为只有匹配成功才能执行到这里）
+System.out.println(s.length());
+```
+
+### 【中等】JDK 17 的 switch 表达式增强是什么？⭐⭐
+
+**switch 表达式（JDK 14 正式版）**引入了 `->` 箭头语法和 `yield` 返回值，使 switch 可作为表达式使用。
+
+```java
+// JDK 8：传统 switch（需要 break，容易遗漏）
+int days;
+switch (month) {
+    case JANUARY: case MARCH: case MAY: days = 31; break;
+    case FEBRUARY: days = 28; break;
+    default: days = 30;
+}
+
+// JDK 17：switch 表达式（箭头语法，无需 break）
+int days = switch (month) {
+    case JANUARY, MARCH, MAY -> 31;
+    case FEBRUARY -> 28;
+    default -> 30;
+};
+
+// 多行代码块用 yield 返回值
+String result = switch (code) {
+    case 200 -> "OK";
+    case 404 -> "Not Found";
+    default -> {
+        String msg = "Unknown: " + code;
+        yield msg;  // 代码块中用 yield 返回值
+    }
+};
+```
+
+**核心优势**：
+
+| 特性 | 传统 switch | JDK 17 switch 表达式 |
+| :--- | :--- | :--- |
+| **返回值** | 不支持 | 可直接赋值给变量 |
+| **case 穿透** | 需 `break`（易遗漏） | `->` 自动不穿透 |
+| **多值合并** | 每个 case 一行 | `case A, B, C ->` |
+| **穷尽检查** | 无强制 | 表达式必须穷尽所有分支 |
+
+## JDK 21 新特性
+
+### 【中等】JDK 21 的 switch 模式匹配有什么增强？⭐⭐⭐
+
+**switch 模式匹配（JDK 21 正式版）**将 `switch` 从“值匹配”升级为“类型匹配 + 守卫条件 + null 处理”的强大模式匹配工具。
+
+**核心增强**：
+
+```java
+// 1. 类型模式 + 守卫条件
+Object obj = getShape();
+String result = switch (obj) {
+    case Circle c when c.radius() > 10 -> "大圆";
+    case Circle c                       -> "小圆";
+    case Square s                       -> "正方形，边长=" + s.side();
+    case null                           -> "null 值";  // 显式处理 null
+    default                             -> "其他";
+};
+
+// 2. 与密封类结合——编译器穷尽检查
+sealed interface Shape permits Circle, Square {}
+record Circle(double radius) implements Shape {}
+record Square(double side) implements Shape {}
+
+double area(Shape shape) {
+    return switch (shape) {  // 无需 default，编译器确保穷尽
+        case Circle c -> Math.PI * c.radius() * c.radius();
+        case Square s -> s.side() * s.side();
+    };
+}
+```
+
+**与传统 switch 的区别**：
+
+| 特性          | 传统 switch                     | JDK 21 switch 模式匹配  |
+| :------------ | :------------------------------ | :---------------------- |
+| **匹配对象**  | 仅值（`int`、`String`、`enum`） | 任意类型 + 模式         |
+| **null 处理** | 抛 NPE                          | `case null` 显式处理    |
+| **守卫条件**  | 不支持                          | `when` 子句添加额外条件 |
+| **穷尽检查**  | 仅 enum                         | 密封类 + enum 均可      |
+
+### 【中等】JDK 21 的记录模式（Record Patterns）是什么？⭐⭐
+
+**记录模式（Record Patterns，JDK 21 正式版）**允许在 `instanceof` 和 `switch` 中**解构 Record 的字段**，实现模式组合。
+
+```java
+record Point(int x, int y) {}
+record Line(Point start, Point end) {}
+
+// 1. instanceof 中解构
+Object obj = new Point(3, 4);
+if (obj instanceof Point(int x, int y)) {
+    System.out.println("x=" + x + ", y=" + y);  // 直接访问解构字段
+}
+
+// 2. 嵌套解构
+Object obj2 = new Line(new Point(0, 0), new Point(5, 5));
+if (obj2 instanceof Line(Point(var x1, var y1), Point(var x2, var y2))) {
+    double length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+// 3. switch 中解构
+String describe(Object obj) {
+    return switch (obj) {
+        case Point(int x, int y) when x == 0 && y == 0 -> "原点";
+        case Point(int x, int y)                        -> "点(" + x + "," + y + ")";
+        case Line(Point s, Point e)                     -> "线段";
+        default                                          -> "未知";
+    };
+}
+```
+
+**核心价值**：实现了**代数数据类型的完整模式匹配**，使 Java 具备了类似 Scala/Kotlin 的解构能力。
+
+### 【中等】JDK 21 的未命名变量（Unnamed Variables）是什么？⭐⭐
+
+**未命名变量（Unnamed Variables，JDK 21 预览）**用 `_` 表示“声明但不使用”的变量，提升代码可读性。
+
+```java
+// 1. 忽略不需要的变量
+var _ = someExpensiveComputation();  // 只关心副作用，不用返回值
+
+// 2. try-with-resources 中忽略资源
+try (var _ = acquireLock()) {
+    // 只关心锁的作用域，不使用锁对象
+    doWork();
+}
+
+// 3. for 循环中忽略循环变量
+for (var _ : collection) {
+    count++;  // 只关心元素个数
+}
+
+// 4. catch 中忽略异常
+try {
+    riskyOperation();
+} catch (Exception _) {  // 不关心异常对象
+    log("操作失败");
+}
+
+// 5. switch 中忽略模式变量
+switch (shape) {
+    case Circle _ -> "这是一个圆";  // 不需要访问圆的字段
+    case Square _ -> "这是一个正方形";
+}
+```
+
+**核心价值**：明确表示“这个变量是故意不用的”，避免 IDE 警告，提升代码意图表达。
+
+### 【中等】JDK 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？⭐⭐
+
+**Scoped Values（JDK 21 预览，JEP 446）** 是比 `ThreadLocal` 更安全、更高效的线程上下文传递方案，专为**虚拟线程**设计。
+
+| 维度             | ThreadLocal                       | Scoped Values                  |
+| :--------------- | :-------------------------------- | :----------------------------- |
+| **可变性**       | 可任意修改（`set`/`remove`）      | **不可变**，作用域内只读       |
+| **生命周期**     | 线程生命周期，需手动清理          | 作用域结束自动失效，无泄漏风险 |
+| **虚拟线程友好** | 百万虚拟线程时内存开销巨大        | 轻量级，专为虚拟线程优化       |
+| **继承性**       | InheritableThreadLocal 有性能问题 | 支持结构化并发中的安全传递     |
+
+```java
+// Scoped Values 用法
+private static final ScopedValue<String> USER = ScopedValue.newInstance();
+
+// 在作用域内绑定值
+ScopedValue.where(USER, "admin").run(() -> {
+    processRequest();  // 内部可读取 USER
+});
+
+// 在任意深度读取
+void processRequest() {
+    String user = USER.get();  // "admin"，无需参数传递
+}
+```
+
+**适用场景**：HTTP 请求上下文、用户身份、分布式追踪 ID 等“请求级”上下文传递，替代 Spring 中常见的 `ThreadLocal` 方案。

@@ -114,9 +114,9 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 | **栈内存占用**    | 默认 1MB（可调），虚拟线程仅 KB 级                  | Linux 默认 8MB（不可跨线程共享）               |
 | **典型应用场景**  | 通用并发编程，高并发推荐虚拟线程                    | 直接系统编程，需精细控制线程行为的场景         |
 
-### 【中等】Java 传统线程和虚拟线程有什么区别？⭐
+### 【中等】Java 传统线程和虚拟线程有什么区别？⭐⭐⭐
 
-**虚拟线程（Project Loom）实现与 OS 线程 M:N 映射**，显著提升并发能力。
+**虚拟线程（Virtual Threads，JDK 21 正式版，Project Loom）实现与 OS 线程 M:N 映射**，显著提升并发能力。
 
 **Java 虚拟线程用更少的资源支持更高的并发**。
 
@@ -130,6 +130,51 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 | **阻塞代价** | 整个 OS 线程阻塞    | 仅虚拟线程挂起      |
 | **调度方**   | 操作系统内核        | JVM（用户态调度器） |
 | **编程模型** | Thread API          | 相同的 Thread API   |
+
+**载体线程（Carrier Thread）**
+
+虚拟线程运行在**载体线程**（即 OS 内核线程）上。当虚拟线程执行阻塞操作时，JVM 会自动将虚拟线程从载体线程上**卸载（unmount）**，载体线程可以去执行其他虚拟线程。阻塞结束后，虚拟线程被**重新挂载（mount）**到载体线程上继续执行。
+
+**虚拟线程 Pinning（载体线程针住问题）**
+
+当虚拟线程在 `synchronized` 块或 `native` 方法中执行阻塞操作时，虚拟线程**无法从载体线程卸载**，导致载体线程被占用，这称为 **Pinning**。
+
+```java
+// 不良实践：synchronized + I/O 会导致 Pinning
+synchronized (lock) {
+    httpClient.send(request, bodyHandler); // 虚拟线程被钉在载体线程上
+}
+
+// 最佳实践：用 ReentrantLock 替代 synchronized
+private final ReentrantLock lock = new ReentrantLock();
+lock.lock();
+try {
+    httpClient.send(request, bodyHandler); // 虚拟线程可正常卸载
+} finally {
+    lock.unlock();
+}
+```
+
+**虚拟线程最佳实践**
+
+- **适用场景**：I/O 密集型任务（HTTP 调用、数据库查询、文件读写）
+- **不适用场景**：CPU 密集型计算任务（虚拟线程无法加速纯计算）
+- **避免使用 ThreadLocal**：虚拟线程数量可达百万，ThreadLocal 内存开销巨大，推荐用 **Scoped Values**（JDK 21 预览）
+- **避免 synchronized 包裹阻塞操作**：改用 `ReentrantLock` 避免 Pinning
+- **不池化虚拟线程**：虚拟线程创建成本极低，用 `Thread.ofVirtual().start()` 直接创建即可
+- **配合 ExecutorService**：`Executors.newVirtualThreadPerTaskExecutor()` 每个任务一个虚拟线程
+
+```java
+// JDK 21 推荐用法
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    IntStream.range(0, 100_000).forEach(i -> {
+        executor.submit(() -> {
+            Thread.sleep(Duration.ofSeconds(1)); // 不占用 OS 线程
+            return i;
+        });
+    });
+}
+```
 
 ### 【中等】单核 CPU 支持 Java 多线程吗？⭐
 

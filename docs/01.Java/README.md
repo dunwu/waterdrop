@@ -54,7 +54,7 @@ index: false
 
 #### [Java 面试](JavaCore/面试)
 
-> Java 面试篇精选 Java 核心技术各方向的经典面试题，覆盖基础语法、容器框架、并发编程、JVM 虚拟机四大板块。题目源自真实面试场景，侧重考察原理理解与实战应用能力，适合系统性备战 Java 技术面试。
+> 【Java 面试】专题精选 Java 核心技术各方向的经典面试题，覆盖基础语法、容器框架、并发编程、JVM 虚拟机四大板块。题目源自真实面试场景，侧重考察原理理解与实战应用能力，适合系统性备战 Java 技术面试。
 
 - [Java 基础面试一](JavaCore/面试/[JavaCore][面试]基础（一）.md) 💯
 - [Java 基础面试二](JavaCore/面试/[JavaCore][面试]基础（二）.md) 💯
@@ -70,7 +70,7 @@ index: false
 
 #### [Java 基础特性](JavaCore/基础特性)
 
-> Java 基础特性涵盖语言核心语法、类型系统、面向对象三大范式、控制流与异常体系，以及泛型、反射、注解等运行时机制。这些是 Java 开发的基石，深入理解有助于编写健壮、可维护的代码，也是面试高频考察点。
+> 【Java 基础特性】专题涵盖语言核心语法、类型系统、面向对象三大范式、控制流与异常体系，以及泛型、反射、注解等运行时机制。这些是 Java 开发的基石，深入理解有助于编写健壮、可维护的代码，也是面试高频考察点。
 
 - [Java 基础语法特性](JavaCore/基础特性/[JavaCore]基础语法.md) - 关键词：`强类型`、`访问修饰符`、`final`、`操作符`、`序列化`
 - [Java 基本数据类型](JavaCore/基础特性/[JavaCore]数据类型.md) - 关键词：`包装类`、`装箱拆箱`、`缓存机制`、`BigDecimal`、`精度丢失`
@@ -87,7 +87,7 @@ index: false
 
 #### [Java 高级特性](JavaCore/高级特性)
 
-> Java 高级特性涵盖正则表达式引擎、编解码与密码学、国际化、SPI 服务发现机制、JavaAgent 字节码增强以及 JDK8 函数式编程范式。这些进阶内容为构建高性能、可扩展的企业级应用提供了关键支撑，也是区分初中级与高级工程师的重要知识域。
+> 【Java 高级特性】专题涵盖正则表达式引擎、编解码与密码学、国际化、SPI 服务发现机制、JavaAgent 字节码增强以及 JDK8 函数式编程范式。这些进阶内容为构建高性能、可扩展的企业级应用提供了关键支撑，也是区分初中级与高级工程师的重要知识域。
 
 - [Java 正则](JavaCore/高级特性/[JavaCore]正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`零宽断言`、`贪婪与懒惰`
 - [Java 编码和加密](JavaCore/高级特性/[JavaCore]编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`
@@ -98,7 +98,7 @@ index: false
 
 #### [Java 容器](JavaCore/容器)
 
-> Java 容器框架以 Collection 和 Map 两大体系为核心，涵盖 List、Set、Queue 等经典数据结构及其底层实现原理（数组、链表、红黑树、哈希表）。结合 Stream API 的声明式数据处理能力，构成 Java 日常开发中数据组织、操作与转换的完整工具链，是面试中考察数据结构与算法功底的核心阵地。
+> 【Java 容器】专题以 Collection 和 Map 两大体系为核心，涵盖 List、Set、Queue 等经典数据结构及其底层实现原理（数组、链表、红黑树、哈希表）。结合 Stream API 的声明式数据处理能力，构成 Java 日常开发中数据组织、操作与转换的完整工具链，是面试中考察数据结构与算法功底的核心阵地。
 
 - [Java 容器简介](JavaCore/容器/[JavaCore][容器]简介.md) - 关键词：`Collection`、`Map`、`Iterator`、`Comparator`、`fail-fast`
 - [Java 容器之 List](JavaCore/容器/[JavaCore][容器]List.md) - 关键词：`ArrayList`、`LinkedList`、`动态扩容`、`RandomAccess`、`subList`
@@ -109,7 +109,7 @@ index: false
 
 #### [Java IO](JavaCore/IO)
 
-> Java IO 专题涵盖 Java 输入输出体系的核心知识，包括 BIO（同步阻塞）、NIO（多路复用）、AIO（异步非阻塞）三种 IO 模型的原理与实践。同时深入序列化与反序列化机制，涉及 JDK 原生序列化、Protobuf、Hessian 等主流方案的对比与应用。
+> 【Java IO】专题涵盖 Java 输入输出体系的核心知识，包括 BIO（同步阻塞）、NIO（多路复用）、AIO（异步非阻塞）三种 IO 模型的原理与实践。同时深入序列化与反序列化机制，涉及 JDK 原生序列化、Protobuf、Hessian 等主流方案的对比与应用。
 
 - [Java IO 之 简介](JavaCore/IO/[JavaCore][IO]简介.md) - 关键词：`BIO`、`NIO`、`AIO`、`I/O 多路复用`、`Reactor`
 - [Java IO 之 BIO](JavaCore/IO/[JavaCore][IO]BIO.md) - 关键词：`BIO`、`字节流`、`字符流`、`InputStream`、`Socket`
@@ -118,7 +118,7 @@ index: false
 
 #### [Java 并发](JavaCore/并发)
 
-> Java 并发编程专题系统梳理多线程并发编程的核心知识体系，涵盖 Java 内存模型（JMM）、线程生命周期与同步机制、锁机制（synchronized/ReentrantLock/AQS）、无锁并发（CAS/原子类/ThreadLocal）等核心主题。同时深入线程池原理、并发容器、同步与分工工具类等实战内容，帮助理解并发编程的本质问题与解决方案。
+> 【Java 并发】专题系统梳理多线程并发编程的核心知识体系，涵盖 Java 内存模型（JMM）、线程生命周期与同步机制、锁机制（synchronized/ReentrantLock/AQS）、无锁并发（CAS/原子类/ThreadLocal）等核心主题。同时深入线程池原理、并发容器、同步与分工工具类等实战内容，帮助理解并发编程的本质问题与解决方案。
 
 - [Java 并发简介](JavaCore/并发/[JavaCore][并发]简介.md) - 关键词：`原子性`、`可见性`、`有序性`、`死锁`、`上下文切换`
 - [Java 并发之内存模型](JavaCore/并发/[JavaCore][并发]内存模型.md) - 关键词：`JMM`、`Happens-Before`、`volatile`、`synchronized`、`锁升级`
@@ -133,7 +133,7 @@ index: false
 
 #### [Java 虚拟机](JavaCore/JVM)
 
-> Java 虚拟机（JVM）专题深入剖析 JVM 的核心运行机制，涵盖运行时数据区（堆、栈、方法区）、垃圾收集算法与主流收集器（CMS、G1、ZGC）、字节码格式与类加载机制（双亲委派模型）等关键主题。同时涉及 JVM 性能调优方法论与常用诊断工具（Arthas、jstat、jmap、MAT），助力生产环境问题排查与性能优化。
+> 【Java 虚拟机】专题深入剖析 JVM 的核心运行机制，涵盖运行时数据区（堆、栈、方法区）、垃圾收集算法与主流收集器（CMS、G1、ZGC）、字节码格式与类加载机制（双亲委派模型）等关键主题。同时涉及 JVM 性能调优方法论与常用诊断工具（Arthas、jstat、jmap、MAT），助力生产环境问题排查与性能优化。
 
 - [Java 虚拟机简介](JavaCore/JVM/[JavaCore][JVM]简介.md) - 关键词：`JVM`、`Hotspot`、`运行时数据区`、`类加载器`、`JIT`
 - [Java 虚拟机之内存区域](JavaCore/JVM/[JavaCore][JVM]内存区域.md) - 关键词：`堆`、`方法区`、`元空间`、`虚拟机栈`、`OutOfMemoryError`

@@ -62,6 +62,58 @@ Java 容器类主要位于 `java.util` 包，分为 **Collection** 和 **Map** �
 - 单线程：`ArrayList`、`HashMap`
 - 多线程：`ConcurrentHashMap`、`CopyOnWriteArrayList`
 
+### 【中等】什么是序列集合（Sequenced Collections）？⭐⭐⭐
+
+**序列集合（Sequenced Collections）**是 JDK 21 引入的新集合接口体系，为所有**有明确遇顺序的集合**提供统一的首尾访问能力。
+
+**问题背景**：在 JDK 21 之前，获取集合的“第一个”和“最后一个”元素没有统一的方式：
+
+```java
+// JDK 21 之前：不同集合获取最后一个元素的方式各不相同
+list.get(list.size() - 1);           // List
+treeSet.last();                       // TreeSet
+linkedHashSet.stream().skip(n-1);     // LinkedHashSet（无直接方法）
+deque.getLast();                      // Deque
+```
+
+**JDK 21 新增接口**：
+
+| 接口 | 继承关系 | 说明 |
+| :--- | :--- | :--- |
+| `SequencedCollection<E>` | `Collection<E>` | 有序集合基类，提供首尾访问 |
+| `SequencedSet<E>` | `Set<E>`, `SequencedCollection<E>` | 有序集合（不重复） |
+| `SequencedMap<K,V>` | `Map<K,V>` | 有序 Map |
+
+**核心统一方法**：
+
+```java
+// SequencedCollection 统一接口
+E first();                    // 获取第一个元素
+E last();                     // 获取最后一个元素
+SequencedCollection<E> reversed();  // 返回逆序视图
+void addFirst(E e);           // 添加到头部
+void addLast(E e);            // 添加到尾部
+E removeFirst();              // 删除第一个
+E removeLast();               // 删除最后一个
+
+// 实际使用
+List<String> list = new ArrayList<>(List.of("A", "B", "C"));
+list.first();    // "A"
+list.last();     // "C"
+list.reversed(); // ["C", "B", "A"]（逆序视图，非拷贝）
+```
+
+**实现类支持**：
+
+| 集合类型 | 实现接口 |
+| :--- | :--- |
+| `ArrayList`、`LinkedList` | `SequencedCollection` |
+| `LinkedHashSet`、`TreeSet` | `SequencedSet` |
+| `LinkedHashMap`、`TreeMap` | `SequencedMap` |
+| `ArrayDeque` | `SequencedCollection` |
+
+**设计意义**：统一了 `List`、`Set`、`Deque`、`Map` 等有序集合的首尾访问 API，消除了因集合类型不同而导致的 API 不一致问题。
+
 ### 【简单】Comparable 和 Comparator 有什么区别？⭐⭐
 
 `Comparable` 接口和 `Comparator` 接口都是 Java 中用于排序的接口，它们在实现类对象之间比较大小、排序等方面发挥了重要作用。

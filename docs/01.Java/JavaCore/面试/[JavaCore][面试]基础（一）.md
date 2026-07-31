@@ -12,6 +12,7 @@ tags:
   - JavaCore
   - 面试
 permalink: /pages/6ca01ab7/
+
 ---
 
 # Java 基础面试一
@@ -104,21 +105,38 @@ https://blog.csdn.net/m0_46487331/article/details/128827908
   - **新的日期时间 API**：`java.time`（`LocalDate`、`ZonedDateTime`）
   - **Optional**：优雅处理 `null`（`Optional.ofNullable(x)`）
   - **默认 GC 设为 G1**
+- **Java 9（2017）**
+  - **模块化系统（JPMS / Project Jigsaw）**：通过 `module-info.java` 声明模块依赖，实现类库级别的封装
+  - **Reactive Streams**：`java.util.concurrent.Flow` 定义响应式编程标准接口
+  - **接口私有方法**：接口中可定义 `private` 方法，复用默认方法中的逻辑
+  - **集合工厂方法**：`List.of()`、`Map.of()` 快速创建不可变集合
 - **Java 11（2018）**
   - **局部变量类型推断**：`var list = new ArrayList<String>()`
   - **HTTP Client API**：标准化的异步 HTTP 客户端（`HttpClient`）
   - **字符串 API 增强**：`isBlank()`、`lines()`、`repeat()`
   - **新垃圾收集器**：**ZGC**（低延迟）和 **Shenandoah**（并发回收）成为标准功能
+- **Java 14（2020）**
+  - **switch 表达式增强（正式版）**：支持 `->` 箭头语法和 `yield` 返回值
+  - **Record（预览）**：不可变数据载体类（`record Point(int x, int y) {}`）
+  - **Helpful NullPointerExceptions**：NPE 信息精确到具体变量（`Cannot invoke "String.length()" because "s" is null`）
+  - **instanceof 模式匹配（预览）**：`if (obj instanceof String s)` 直接绑定变量
 - **Java 17（2021）**
-  - **密封类（Sealed Classes）**：限制类继承（permits 子类）
-  - **模式匹配增强**：`instanceof` 直接类型转换（`if (obj instanceof String s)`）
-  - **文本块（正式版）**：多行字符串（"""..."""）
+  - **密封类（Sealed Classes）**：限制类继承（`permits` 子类）
+  - **instanceof 模式匹配（正式版）**：类型检查与转换合二为一
+  - **文本块（正式版）**：多行字符串（`"""..."""`)
+  - **Record（正式版）**：不可变数据类
+  - **switch 模式匹配（预览）**：`case Point p -> ...`
   - **移除实验性 AOT/JIT**：删除 **GraalVM** 相关实验性特性
 - **Java 21（2023）**
-  - **虚拟线程（Virtual Threads）**：轻量级线程（`Thread.startVirtualThread()`）
-  - **结构化并发**：简化多线程任务管理（`StructuredTaskScope`）
+  - **虚拟线程（Virtual Threads）**：轻量级线程（`Thread.startVirtualThread()`），M:N 调度模型
+  - **结构化并发（预览）**：简化多线程任务管理（`StructuredTaskScope`）
   - **记录模式（Record Patterns）**：解构记录类（`if (obj instanceof Point(int x, int y))`）
-  - **分代 ZGC**：针对年轻代优化的 ZGC，减少垃圾回收开销
+  - **switch 模式匹配（正式版）**：`switch` 中支持类型模式、守卫条件、`null` 分支
+  - **序列集合（Sequenced Collections）**：新增 `SequencedCollection`/`SequencedSet`/`SequencedMap` 接口，统一有序集合的首尾访问
+  - **未命名变量和模式（预览）**：用 `_` 表示不使用的变量（`var _ = compute();`）
+  - **字符串模板（预览）**：`STR."Hello \{name}"` 安全高效的字符串插值
+  - **作用域值 Scoped Values（预览）**：比 `ThreadLocal` 更安全高效的线程上下文传递方案，专为虚拟线程设计
+  - **分代 ZGC**：针对年轻代优化的 ZGC，大幅降低 GC 开销
   - **弃用 Windows 32-bit**：正式放弃对 32 位 Windows 的支持
 
 ## Java 基础语法
@@ -206,12 +224,12 @@ Java 的 `null` 不是关键字，类似于 `true` 和 `false`，它是一个字
 
 **四种用法**：
 
-| **修饰目标** | **特点** | **示例** |
-| ------------ | -------- | -------- |
-| **静态变量** | 类共享，所有实例访问同一份 | `static int count = 0;` |
-| **静态方法** | 可直接通过类名调用，不能访问实例成员 | `static int add(int a, int b)` |
-| **静态代码块** | 类加载时执行一次，用于初始化 | `static { init(); }` |
-| **静态内部类** | 不依赖外部实例，可独立创建 | `Outer.Inner inner = new Outer.Inner();` |
+| **修饰目标**   | **特点**                             | **示例**                                 |
+| -------------- | ------------------------------------ | ---------------------------------------- |
+| **静态变量**   | 类共享，所有实例访问同一份           | `static int count = 0;`                  |
+| **静态方法**   | 可直接通过类名调用，不能访问实例成员 | `static int add(int a, int b)`           |
+| **静态代码块** | 类加载时执行一次，用于初始化         | `static { init(); }`                     |
+| **静态内部类** | 不依赖外部实例，可独立创建           | `Outer.Inner inner = new Outer.Inner();` |
 
 **关键细节**：
 
@@ -246,11 +264,11 @@ public class Counter {
 
 **三大特性**：
 
-| **特性** | **说明** | **实现机制** |
-| -------- | -------- | ------------ |
+| **特性**   | **说明**                                       | **实现机制**                       |
+| ---------- | ---------------------------------------------- | ---------------------------------- |
 | **可见性** | 写入后立即刷新到主内存，读取时强制从主内存加载 | 基于 CPU 缓存一致性协议（如 MESI） |
-| **有序性** | 禁止指令重排序 | 插入**内存屏障**（Memory Barrier） |
-| **原子性** | **不保证**（`i++` 仍不安全） | 仅保证单次读/写原子性 |
+| **有序性** | 禁止指令重排序                                 | 插入**内存屏障**（Memory Barrier） |
+| **原子性** | **不保证**（`i++` 仍不安全）                   | 仅保证单次读/写原子性              |
 
 **典型应用场景**：
 
@@ -288,13 +306,13 @@ public void stop() { running = false; }  // 其他线程立即可见
 
 **volatile vs synchronized**：
 
-| **维度** | **volatile** | **synchronized** |
-| -------- | ------------ | ---------------- |
-| **原子性** | ❌ 不保证 | ✔️ 保证 |
-| **可见性** | ✔️ 保证 | ✔️ 保证 |
-| **有序性** | ✔️ 保证（禁止重排） | ✔️ 保证（加锁串行） |
-| **性能** | 高（无锁） | 低（涉及加锁/解锁） |
-| **适用场景** | 状态标志、DCL | 复合操作、临界区 |
+| **维度**     | **volatile**        | **synchronized**    |
+| ------------ | ------------------- | ------------------- |
+| **原子性**   | ❌ 不保证           | ✔️ 保证             |
+| **可见性**   | ✔️ 保证             | ✔️ 保证             |
+| **有序性**   | ✔️ 保证（禁止重排） | ✔️ 保证（加锁串行） |
+| **性能**     | 高（无锁）          | 低（涉及加锁/解锁） |
+| **适用场景** | 状态标志、DCL       | 复合操作、临界区    |
 
 ### 【中等】`transient` 关键字有什么用？⭐
 
@@ -761,13 +779,13 @@ System.out.println(min - 1);  // 2147483647（回绕到 MAX_VALUE）
 
 **安全的算术运算方法（Java 8+ `Math` 类）**：
 
-| **方法** | **行为** | **溢出时** |
-| -------- | -------- | ---------- |
-| `Math.addExact(a, b)` | 加法 | 抛 `ArithmeticException` |
-| `Math.subtractExact(a, b)` | 减法 | 抛 `ArithmeticException` |
-| `Math.multiplyExact(a, b)` | 乘法 | 抛 `ArithmeticException` |
-| `Math.toIntExact(long)` | long 转 int | 抛 `ArithmeticException` |
-| `Math.floorDiv(a, b)` | 除法（向负无穷取整） | 不抛异常 |
+| **方法**                   | **行为**             | **溢出时**               |
+| -------------------------- | -------------------- | ------------------------ |
+| `Math.addExact(a, b)`      | 加法                 | 抛 `ArithmeticException` |
+| `Math.subtractExact(a, b)` | 减法                 | 抛 `ArithmeticException` |
+| `Math.multiplyExact(a, b)` | 乘法                 | 抛 `ArithmeticException` |
+| `Math.toIntExact(long)`    | long 转 int          | 抛 `ArithmeticException` |
+| `Math.floorDiv(a, b)`      | 除法（向负无穷取整） | 不抛异常                 |
 
 ```java
 try {
@@ -1449,12 +1467,12 @@ String result = switch (day) {
 
 **核心改进**：
 
-| **特性** | **传统 switch** | **JDK 14+ switch 表达式** |
-| -------- | --------------- | ------------------------- |
-| **穿透** | 默认穿透，需 `break` 阻止 | 默认**无穿透**，每个分支独立 |
-| **返回值** | 不支持 | 支持（`yield` 或箭头返回） |
-| **多值标签** | 需多个 `case` | `case A, B, C ->` 一行搞定 |
-| **default** | 可选 | 表达式形式**必须**穷尽（强制 default） |
+| **特性**     | **传统 switch**           | **JDK 14+ switch 表达式**              |
+| ------------ | ------------------------- | -------------------------------------- |
+| **穿透**     | 默认穿透，需 `break` 阻止 | 默认**无穿透**，每个分支独立           |
+| **返回值**   | 不支持                    | 支持（`yield` 或箭头返回）             |
+| **多值标签** | 需多个 `case`             | `case A, B, C ->` 一行搞定             |
+| **default**  | 可选                      | 表达式形式**必须**穷尽（强制 default） |
 
 ### 【中等】Java 9 引入的模块化系统（JPMS）有什么用？⭐
 
@@ -1480,13 +1498,13 @@ module com.example.app {
 
 **关键关键字**：
 
-| **关键字** | **作用** |
-| ---------- | -------- |
-| `requires` | 声明依赖 |
-| `requires transitive` | 传递依赖（下游模块自动可用） |
-| `exports` | 导出包（编译期+运行时可见） |
-| `opens` | 仅运行时反射开放（给框架如 Spring/Jackson） |
-| `uses` / `provides` | 服务接口与实现（SPI） |
+| **关键字**            | **作用**                                    |
+| --------------------- | ------------------------------------------- |
+| `requires`            | 声明依赖                                    |
+| `requires transitive` | 传递依赖（下游模块自动可用）                |
+| `exports`             | 导出包（编译期+运行时可见）                 |
+| `opens`               | 仅运行时反射开放（给框架如 Spring/Jackson） |
+| `uses` / `provides`   | 服务接口与实现（SPI）                       |
 
 **实际影响**：
 
@@ -1581,4 +1599,4 @@ public double area(Shape shape) {
 
 - **领域建模**：限定业务概念的取值范围（如订单状态、支付方式）。
 - **类型安全的代数数据类型（ADT）**：函数式编程中的和类型。
-- **API 设计**：明确告知调用方"我有这几个实现"，配合 switch 穷尽检查。
+- **API 设计**：明确告知调用方“我有这几个实现”，配合 switch 穷尽检查。

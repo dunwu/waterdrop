@@ -19,7 +19,7 @@ dir:
 
 # Java IO
 
-> Java IO 专题涵盖 Java 输入输出体系的核心知识，包括 BIO（同步阻塞）、NIO（多路复用）、AIO（异步非阻塞）三种 IO 模型的原理与实践。同时深入序列化与反序列化机制，涉及 JDK 原生序列化、Protobuf、Hessian 等主流方案的对比与应用。
+> 【Java IO】专题涵盖 Java 输入输出体系的核心知识，包括 BIO（同步阻塞）、NIO（多路复用）、AIO（异步非阻塞）三种 IO 模型的原理与实践。同时深入序列化与反序列化机制，涉及 JDK 原生序列化、Protobuf、Hessian 等主流方案的对比与应用。
 
 ## 📖 内容
 
