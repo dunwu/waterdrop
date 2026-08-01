@@ -407,7 +407,7 @@ index: false
 
 ## 🚪 传送
 
-◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾
 
 - [极客时间教程 - Java 业务开发常见错误 100 例](https://time.geekbang.org/column/intro/100047701) - 极客时间教程——基于 Java 生产环境的真实案例，讲解“避坑”的手段，很硬核
 - [极客时间教程 - Java 性能调优实战](https://time.geekbang.org/column/intro/100028001) - 极客时间教程——覆盖 80% 以上 Java 应用调优场景
@@ -420,4 +420,4 @@ index: false
 
 ## 🚪 传送
 
-◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾
+◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾
