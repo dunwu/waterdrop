@@ -33,9 +33,9 @@ dir:
 | Java 常识     | Oracle JDK 和 Open JDK 有什么区别？                       | 简单 | ⭐⭐ |   ✅   |
 | Java 常识     | Java SE 和 Java EE 有什么区别？                           | 简单 | ⭐⭐ |   ✅   |
 | Java 常识     | JDK、JRE、JVM 之间有什么关系？                            | 简单 | ⭐⭐ |   ✅   |
-| Java 常识     | Java 如何调用外部可执行程序或系统命令？                   | 中等 | ⭐⭐ |        |
+| Java 常识     | Java 如何调用外部可执行程序或系统命令？                   | 中等 | ⭐⭐ |   ✅   |
 | Java 常识     | Java 和 C++、Go 语言的区别，各自的优缺点？                | 中等 | ⭐⭐ |   ✅   |
-| Java 常识     | Java 里程碑版本中的核心特性有哪些？                       | 中等 | ⭐⭐ |        |
+| Java 常识     | Java 里程碑版本中的核心特性有哪些？                       | 中等 | ⭐⭐ |   ⚠️   |
 | Java 基础语法 | Java 有几种注释形式？                                     | 简单 | ⭐⭐ |   ✅   |
 | Java 基础语法 | Java 有哪些标识符命名规则？                               | 简单 | ⭐⭐ |   ✅   |
 | Java 基础语法 | Java 中有哪些关键字？                                     | 简单 | ⭐⭐ |   ✅   |
@@ -53,7 +53,7 @@ dir:
 | Java 数据类型 | 如何解决浮点数运算的精度丢失问题？                        | 简单 | ⭐⭐ |   ✅   |
 | Java 数据类型 | 超过 long 整型的数据应该如何表示？                        | 简单 | ⭐⭐ |   ✅   |
 | Java 数据类型 | 自动装箱拆箱有哪些陷阱？                                  | 中等 | ⭐   |   ✅   |
-| Java 数据类型 | Java 是如何处理整数溢出的？                               | 中等 | ⭐   |        |
+| Java 数据类型 | Java 是如何处理整数溢出的？                               | 中等 | ⭐   |   ❌   |
 | Java 变量     | 静态变量、成员变量、局部变量的区别？                      | 简单 | ⭐⭐ |   ✅   |
 | Java 变量     | 为什么成员变量有默认值？                                  | 简单 | ⭐⭐ |   ✅   |
 | Java 变量     | 字符型常量和字符串常量的区别？                            | 简单 | ⭐⭐ |   ✅   |
@@ -83,21 +83,21 @@ dir:
 | Java 面向对象 | public、private、protected，以及无修饰符有什么区别？  | 简单 | ⭐⭐ |   ✅   |
 | Java 面向对象 | 对象实体与对象引用有何不同？                          | 简单 | ⭐⭐ |   ✅   |
 | Java 面向对象 | 接口和抽象类有什么区别？                              | 简单 | ⭐⭐ |   ✅   |
-| Java 面向对象 | 什么是 Java 内部类？内部类有什么作用？                | 中等 | ⭐⭐ |        |
-| Java 面向对象 | 四种内部类有什么区别？                                | 中等 | ⭐   |        |
+| Java 面向对象 | 什么是 Java 内部类？内部类有什么作用？                | 中等 | ⭐⭐ |   ✅   |
+| Java 面向对象 | 四种内部类有什么区别？                                | 中等 | ⭐   |   ⚠️   |
 | Java 面向对象 | 为什么 Java 不支持多重继承？                          | 简单 | ⭐⭐ |   ✅   |
 | Java 面向对象 | 深拷贝和浅拷贝有什么区别？                            | 中等 | ⭐⭐ |   ✅   |
 | Java 面向对象 | 面向对象和面向过程有什么区别？                        | 简单 | ⭐⭐ |   ✅   |
 | Java 面向对象 | 面向对象三大特征和五大原则是什么？                    | 中等 | ⭐⭐ |   ✅   |
 | Java 面向对象 | Java 中 final 关键字有什么用？                        | 简单 | ⭐   |   ✅   |
 | Java 面向对象 | `this` 和 `super` 关键字有什么用？                    | 中等 | ⭐   |   ✅   |
-| Java 面向对象 | 接口的默认方法冲突如何解决？                          | 中等 | ⭐   |        |
+| Java 面向对象 | 接口的默认方法冲突如何解决？                          | 中等 | ⭐   |   ⚠️   |
 | Java 面向对象 | Java 多态的实现原理是什么？                           | 中等 | ⭐   |   ✅   |
 | Object        | Object 类的常见方法有哪些？                           | 简单 | ⭐⭐ |   ✅   |
 | Object        | == 和 equals() 有什么区别？                           | 简单 | ⭐⭐ |   ✅   |
 | Object        | 为什么重写 equals() 时必须重写 hashCode() 方法？      | 简单 | ⭐⭐ |   ✅   |
 | Object        | finalize 有什么用？                                   | 简单 | ⭐⭐ |   ⚠️   |
-| Object        | Object#clone() 方法和 Cloneable 接口如何使用？        | 中等 | ⭐   |        |
+| Object        | Object#clone() 方法和 Cloneable 接口如何使用？        | 中等 | ⭐   |   ✅   |
 | String        | String、StringBuffer、StringBuilder 有什么区别？      | 简单 | ⭐⭐ |   ✅   |
 | String        | String 为什么是不可变的？                             | 简单 | ⭐⭐ |   ✅   |
 | String        | 字符串拼接用“+” 还是 StringBuilder?                   | 简单 | ⭐⭐ |   ✅   |
@@ -106,10 +106,10 @@ dir:
 | String        | `String s = new String("abc")` 创建了几个字符串对象？ | 简单 | ⭐⭐ |   ✅   |
 | String        | String#intern 方法有什么用？                          | 简单 | ⭐⭐ |   ⚠️   |
 | String        | String 类型的变量和常量做“+”运算时会发生什么？        | 简单 | ⭐⭐ |   ✅   |
-| String        | JDK 9 对 String 做了哪些优化（Compact Strings）？     | 中等 | ⭐   |        |
-| String        | StringJoiner 和 String.join 有什么用？                | 中等 | ⭐   |        |
+| String        | JDK 9 对 String 做了哪些优化（Compact Strings）？     | 中等 | ⭐   |   ❌   |
+| String        | StringJoiner 和 String.join 有什么用？                | 中等 | ⭐   |   ⚠️   |
 | String        | String 的 equals 方法是如何实现的？                   | 简单 | ⭐   |   ✅   |
-| String        | String、StringBuilder、StringBuffer 的扩容机制？      | 中等 | ⭐   |        |
+| String        | String、StringBuilder、StringBuffer 的扩容机制？      | 中等 | ⭐   |   ❌   |
 
 ### [Java 基础面试三]([JavaCore][面试]基础（三）.md)
 
@@ -122,35 +122,35 @@ dir:
 | Java 反射     | 反射有什么优缺点？                                          | 简单 | ⭐⭐   |   ✅   |
 | Java 反射     | 什么是 Java 中的动态代理？                                  | 中等 | ⭐⭐   |   ✅   |
 | Java 反射     | JDK 动态代理和 CGLIB 动态代理有什么区别？                   | 中等 | ⭐⭐   |   ✅   |
-| Java 注解     | Java 中的注解原理是什么？                                   | 中等 | ⭐⭐   |        |
+| Java 注解     | Java 中的注解原理是什么？                                   | 中等 | ⭐⭐   |   ✅   |
 | Java 注解     | 如何自定义注解并使用注解处理器？                            | 中等 | ⭐     |        |
-| Java 枚举     | Java 枚举的原理是什么？                                     | 中等 | ⭐     |        |
-| Java 枚举     | 为什么说枚举是实现单例的最佳方式？                          | 中等 | ⭐     |        |
-| Java 枚举     | EnumMap 和 EnumSet 有什么用？                               | 简单 | ⭐     |        |
+| Java 枚举     | Java 枚举的原理是什么？                                     | 中等 | ⭐     |   ⚠️   |
+| Java 枚举     | 为什么说枚举是实现单例的最佳方式？                          | 中等 | ⭐     |   ⚠️   |
+| Java 枚举     | EnumMap 和 EnumSet 有什么用？                               | 简单 | ⭐     |   ❌   |
 | Java SPI      | 什么是 SPI，有什么用？                                      | 中等 | ⭐⭐   |   ✅   |
 | Java IO       | 什么是序列化？什么是反序列化？                              | 简单 | ⭐⭐   |   ✅   |
-| Java IO       | Java 提供了哪些 IO 方式？                                   | 中等 | ⭐⭐   |        |
-| Java IO       | NIO 如何实现多路复用？                                      | 困难 | ⭐⭐   |        |
-| Java IO       | Java 写入文件到磁盘会经历哪些过程？                         | 困难 | ⭐⭐   |        |
+| Java IO       | Java 提供了哪些 IO 方式？                                   | 中等 | ⭐⭐   |   ⚠️   |
+| Java IO       | NIO 如何实现多路复用？                                      | 困难 | ⭐⭐   |   ⚠️   |
+| Java IO       | Java 写入文件到磁盘会经历哪些过程？                         | 困难 | ⭐⭐   |   ❌   |
 | Java 语法糖   | Java 中有哪些常见的语法糖？                                 | 中等 | ⭐⭐   |   ✅   |
 | JDK 8 新特性  | Optional 的正确使用方式？                                   | 中等 | ⭐⭐   |   ✅   |
 | JDK 8 新特性  | Lambda 表达式和函数式接口是什么？                           | 中等 | ⭐⭐⭐ |   ✅   |
 | JDK 8 新特性  | Stream API 的核心操作有哪些？                               | 困难 | ⭐⭐⭐ |   ⚠️   |
 | JDK 8 新特性  | Java 8 接口的默认方法和静态方法是什么？                     | 中等 | ⭐⭐   |   ✅   |
 | JDK 8 新特性  | Java 8 的 java.time API 解决了什么问题？                    | 中等 | ⭐⭐   |   ✅   |
-| JDK 11 新特性 | Java 11 的 var 局部变量类型推断怎么用？有什么限制？         | 中等 | ⭐⭐   |        |
-| JDK 11 新特性 | Java 11 的 HTTP Client API 有什么特点？                     | 中等 | ⭐⭐   |        |
-| JDK 11 新特性 | Java 11 的字符串 API 有哪些增强？                           | 中等 | ⭐     |        |
-| JDK 11 新特性 | Java 11 对 GC 有哪些重要更新？                              | 中等 | ⭐⭐   |        |
+| JDK 11 新特性 | Java 11 的 var 局部变量类型推断怎么用？有什么限制？         | 中等 | ⭐⭐   |   ❌   |
+| JDK 11 新特性 | Java 11 的 HTTP Client API 有什么特点？                     | 中等 | ⭐⭐   |   ❌   |
+| JDK 11 新特性 | Java 11 的字符串 API 有哪些增强？                           | 中等 | ⭐     |   ❌   |
+| JDK 11 新特性 | Java 11 对 GC 有哪些重要更新？                              | 中等 | ⭐⭐   |   ❌   |
 | JDK 17 新特性 | JDK 17 的 Sealed Classes（密封类）是什么？                  | 中等 | ⭐⭐⭐ |   ❌   |
 | JDK 17 新特性 | JDK 17 的 Record（记录类）是什么？                          | 中等 | ⭐⭐⭐ |   ❌   |
-| JDK 17 新特性 | JDK 17 的文本块（Text Blocks）是什么？                      | 中等 | ⭐⭐   |        |
+| JDK 17 新特性 | JDK 17 的文本块（Text Blocks）是什么？                      | 中等 | ⭐⭐   |   ❌   |
 | JDK 17 新特性 | JDK 17 的 instanceof 模式匹配是什么？                       | 中等 | ⭐⭐   |   ✅   |
 | JDK 17 新特性 | JDK 17 的 switch 表达式增强是什么？                         | 中等 | ⭐⭐   |   ⚠️   |
-| JDK 21 新特性 | JDK 21 的 switch 模式匹配有什么增强？                       | 中等 | ⭐⭐⭐ |        |
+| JDK 21 新特性 | JDK 21 的 switch 模式匹配有什么增强？                       | 中等 | ⭐⭐⭐ |   ❌   |
 | JDK 21 新特性 | JDK 21 的记录模式（Record Patterns）是什么？                | 中等 | ⭐⭐   |   ❌   |
-| JDK 21 新特性 | JDK 21 的未命名变量（Unnamed Variables）是什么？            | 中等 | ⭐⭐   |        |
-| JDK 21 新特性 | JDK 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？ | 中等 | ⭐⭐   |        |
+| JDK 21 新特性 | JDK 21 的未命名变量（Unnamed Variables）是什么？            | 中等 | ⭐⭐   |   ❌   |
+| JDK 21 新特性 | JDK 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？ | 中等 | ⭐⭐   |   ❌   |
 
 ### [Java 容器面试一]([JavaCore][面试]容器（一）.md)
 
@@ -159,22 +159,22 @@ dir:
 | Java 容器简介 | Java 中有哪些集合类？                                  | 简单 | ⭐⭐   |   ✅   |
 | Java 容器简介 | 什么是序列集合（Sequenced Collections）？              | 中等 | ⭐⭐⭐ |   ❌   |
 | Java 容器简介 | Comparable 和 Comparator 有什么区别？                  | 简单 | ⭐⭐   |   ✅   |
-| Java 容器简介 | 什么是 ConcurrentModificationException？               | 中等 | ⭐⭐   |        |
+| Java 容器简介 | 什么是 ConcurrentModificationException？               | 中等 | ⭐⭐   |   ⚠️   |
 | List          | ArrayList 可以添加 null 值吗？                         | 简单 | ⭐⭐   |   ✅   |
 | List          | ArrayList 如何扩容？                                   | 简单 | ⭐⭐⭐ |   ✅   |
 | List          | ArrayList 和数组有什么区别？                           | 简单 | ⭐⭐   |   ✅   |
 | List          | ArrayList 和 LinkedList 有什么区别？                   | 简单 | ⭐⭐   |   ✅   |
 | List          | CopyOnWriteArrayList 的原理是什么？                    | 中等 | ⭐⭐   |   ✅   |
-| List          | RandomAccess 接口有什么用？                            | 中等 | ⭐     |        |
-| List          | Iterator 和 Iterable 有什么区别？                      | 中等 | ⭐     |        |
+| List          | RandomAccess 接口有什么用？                            | 中等 | ⭐     |   ✅   |
+| List          | Iterator 和 Iterable 有什么区别？                      | 中等 | ⭐     |   ✅   |
 | List          | fail-fast 和 fail-safe 机制有什么区别？                | 中等 | ⭐     |   ❌   |
 | Set           | HashSet、LinkedHashSet 和 TreeSet 有什么区别？         | 简单 | ⭐⭐   |   ✅   |
 | Queue         | Queue 与 Deque 有什么区别？                            | 简单 | ⭐⭐   |   ✅   |
 | Queue         | ArrayDeque 与 LinkedList 有什么区别？                  | 简单 | ⭐⭐   |   ✅   |
 | Queue         | PriorityQueue 有什么用？                               | 简单 | ⭐⭐   |   ✅   |
 | Queue         | BlockingQueue 有什么用？                               | 简单 | ⭐⭐   |   ✅   |
-| Queue         | ArrayBlockingQueue 和 LinkedBlockingQueue 有什么区别？ | 中等 | ⭐⭐   |        |
-| Queue         | Vector 和 Stack 为什么被弃用？                         | 中等 | ⭐     |        |
+| Queue         | ArrayBlockingQueue 和 LinkedBlockingQueue 有什么区别？ | 中等 | ⭐⭐   |   ⚠️   |
+| Queue         | Vector 和 Stack 为什么被弃用？                         | 中等 | ⭐     |   ✅   |
 
 ### [Java 容器面试二]([JavaCore][面试]容器（二）.md)
 
@@ -187,14 +187,14 @@ dir:
 | Map  | HashMap 底层实现原理是什么？                        | 困难 | ⭐⭐⭐ |   ✅   |
 | Map  | JDK 1.8 对 HashMap 做了哪些改动？                   | 困难 | ⭐⭐⭐ |   ✅   |
 | Map  | HashMap 为什么线程不安全？                          | 困难 | ⭐⭐   |   ✅   |
-| Map  | WeakHashMap 有什么用？                              | 中等 | ⭐     |        |
+| Map  | WeakHashMap 有什么用？                              | 中等 | ⭐     |   ✅   |
 | Map  | ConcurrentHashMap 和 Hashtable 有什么区别？         | 中等 | ⭐⭐   |   ✅   |
 | Map  | ConcurrentHashMap 的底层实现原理是什么？            | 困难 | ⭐⭐⭐ |   ✅   |
 | Map  | ConcurrentHashMap 为什么 key 和 value 不能为 null？ | 中等 | ⭐     |   ⚠️   |
 | Map  | ConcurrentHashMap 能保证复合操作的原子性吗？        | 中等 | ⭐     |   ✅   |
 | Map  | HashMap 的扩容（resize）源码分析                    | 困难 | ⭐     |   ✅   |
 | Map  | HashMap 的负载因子为什么是 0.75？                   | 中等 | ⭐     |   ✅   |
-| Map  | ConcurrentHashMap 的 size() 方法如何实现？          | 中等 | ⭐     |        |
+| Map  | ConcurrentHashMap 的 size() 方法如何实现？          | 中等 | ⭐     |   ⚠️   |
 | Map  | HashMap 和 TreeMap 何时该用哪个？                   | 中等 | ⭐     |   ✅   |
 
 ### [Java 容器面试三]([JavaCore][面试]容器（三）.md)
@@ -217,7 +217,7 @@ dir:
 | 并发简介      | 同步和异步有什么区别？                                                                                    | 简单 | ⭐⭐   |   ✅   |
 | 并发简介      | 阻塞和非阻塞有什么区别？                                                                                  | 简单 | ⭐⭐   |   ✅   |
 | 并发简介      | 进程、线程、协程、管程有什么区别？                                                                        | 中等 | ⭐⭐   |   ✅   |
-| 并发简介      | Java 线程和操作系统的线程有什么区别？                                                                     | 中等 | ⭐     |        |
+| 并发简介      | Java 线程和操作系统的线程有什么区别？                                                                     | 中等 | ⭐     |   ⚠️   |
 | 并发简介      | Java 传统线程和虚拟线程有什么区别？                                                                       | 中等 | ⭐⭐⭐ |   ⚠️   |
 | 并发简介      | 单核 CPU 支持 Java 多线程吗？                                                                             | 中等 | ⭐     |   ✅   |
 | 并发简介      | 并发一定比串行更快吗？                                                                                    | 简单 | ⭐⭐   |   ✅   |
@@ -230,7 +230,7 @@ dir:
 | 并发简介      | 简单介绍一下 Java 并发编程？                                                                              | 简单 | ⭐     |   ✅   |
 | Java 内存模型 | 什么是 Java 内存模型？                                                                                    | 中等 | ⭐⭐   |   ⚠️   |
 | Java 内存模型 | 什么是 Happens-Before 规则？有什么用？                                                                    | 困难 | ⭐     |   ✅   |
-| Java 内存模型 | 什么是 Java 内存屏障？有什么用？                                                                          | 困难 | ⭐⭐   |        |
+| Java 内存模型 | 什么是 Java 内存屏障？有什么用？                                                                          | 困难 | ⭐⭐   |   ⚠️   |
 | Java 内存模型 | `volatile` 有什么作用？                                                                                   | 中等 | ⭐⭐⭐ |   ✅   |
 | Java 内存模型 | volatile 能完全保证并发安全吗？                                                                           | 中等 | ⭐⭐   |   ✅   |
 | Java 内存模型 | `volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？                            | 中等 | ⭐⭐   |   ✅   |
@@ -248,7 +248,7 @@ dir:
 | Java 线程     | 可以使用 `Thread.stop`，`Thread.suspend` 和 `Thread.resume` 停止线程吗？为什么？                          | 中等 | ⭐     |   ✅   |
 | Java 线程     | 一个线程两次调用 `Thread.start()` 方法会怎样？                                                            | 简单 | ⭐⭐   |   ✅   |
 | Java 线程     | `Thread.sleep()`、`Thread.yield()`、`Thread.join()`、`Object.wait()` 有什么区别？                         | 简单 | ⭐     |   ✅   |
-| Java 线程     | 为什么 `Thread.sleep()`、`Thread.yield()` 设计为静态方法？                                                | 中等 | ⭐     |        |
+| Java 线程     | 为什么 `Thread.sleep()`、`Thread.yield()` 设计为静态方法？                                                | 中等 | ⭐     |   ✅   |
 | Java 线程     | 为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？                | 中等 | ⭐     |   ✅   |
 | Java 线程     | 为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？ | 中等 | ⭐     |   ✅   |
 | Java 线程     | 使用 `volatile` 标记方式停止线程正确吗？                                                                  | 中等 | ⭐⭐   |   ✅   |
@@ -270,7 +270,7 @@ dir:
 | Java 锁   | ReentrantReadWriteLock 的实现原理是什么？                  | 困难 | ⭐⭐   |   ✅   |
 | Java 锁   | StampedLock 的实现原理是什么？                             | 困难 | ⭐     |   ⚠️   |
 | Java 锁   | Condition 的原理是什么？与 Object.wait/notify 有什么区别？ | 中等 | ⭐     |   ✅   |
-| Java 锁   | AQS 的 CLH 队列与原始 CLH 队列有什么区别？                 | 困难 | ⭐     |        |
+| Java 锁   | AQS 的 CLH 队列与原始 CLH 队列有什么区别？                 | 困难 | ⭐     |   ⚠️   |
 | Java 无锁 | 什么是 CAS？CAS 的实现原理是什么？                         | 中等 | ⭐⭐⭐ |   ✅   |
 | Java 无锁 | CAS 算法存在哪些问题？                                     | 中等 | ⭐⭐⭐ |   ✅   |
 | Java 无锁 | LongAdder 的原理是什么？为什么高并发下比 AtomicLong 快？   | 困难 | ⭐⭐   |   ✅   |
@@ -293,24 +293,24 @@ dir:
 | Java 线程池       | 如何合理地设置 Java 线程池的线程数？                                            | 中等 | ⭐     |   ✅   |
 | Java 线程池       | Java 线程池支持哪些阻塞队列，如何选择？                                         | 中等 | ⭐⭐   |   ✅   |
 | Java 线程池       | Java 线程池支持哪些拒绝策略？如何选择？                                         | 中等 | ⭐⭐   |   ✅   |
-| Java 线程池       | Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？                       | 中等 | ⭐     |        |
+| Java 线程池       | Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？                       | 中等 | ⭐     |   ✅   |
 | Java 线程池       | Java 线程池中 shutdown 与 shutdownNow 的区别是什么？                            | 中等 | ⭐     |   ⚠️   |
-| Java 线程池       | Java 线程池参数在运行过程中能修改吗？如何修改？                                 | 困难 | ⭐     |        |
-| Java 线程池       | DelayQueue 和 ScheduledThreadPool 有什么区别？                                  | 中等 | ⭐     |        |
+| Java 线程池       | Java 线程池参数在运行过程中能修改吗？如何修改？                                 | 困难 | ⭐     |   ✅   |
+| Java 线程池       | DelayQueue 和 ScheduledThreadPool 有什么区别？                                  | 中等 | ⭐     |   ⚠️   |
 | Java 线程池       | 1000 个任务，每个任务 0.1s，最大响应时间 1s，线程池参数怎么设置？               | 中等 | ⭐⭐   |   ✅   |
 | Java 并发同步工具 | CountDownLatch 的工作原理是什么？                                               | 中等 | ⭐⭐⭐ |   ✅   |
 | Java 并发同步工具 | CyclicBarrier 的工作原理是什么？                                                | 中等 | ⭐⭐   |   ⚠️   |
 | Java 并发同步工具 | Semaphore 的工作原理是什么？                                                    | 中等 | ⭐     |   ❌   |
-| Java 并发同步工具 | 对比一下 CountDownLatch、 CyclicBarrier、Semaphore？                            | 困难 | ⭐     |        |
-| Java 并发同步工具 | Exchanger 的工作原理是什么？                                                    | 中等 | ⭐     |        |
-| Java 并发同步工具 | Phaser 的工作原理是什么？                                                       | 中等 | ⭐     |        |
+| Java 并发同步工具 | 对比一下 CountDownLatch、 CyclicBarrier、Semaphore？                            | 困难 | ⭐     |   ⚠️   |
+| Java 并发同步工具 | Exchanger 的工作原理是什么？                                                    | 中等 | ⭐     |   ❌   |
+| Java 并发同步工具 | Phaser 的工作原理是什么？                                                       | 中等 | ⭐     |   ❌   |
 | Java 并发分工工具 | ForkJoinPool 的工作原理是什么？                                                 | 困难 | ⭐⭐   |   ✅   |
 | Java 并发分工工具 | CompleteFuture 有哪些用法？                                                     | 中等 | ⭐⭐   |   ⚠️   |
 | Java 并发分工工具 | CompleteFuture 的工作原理是什么？                                               | 困难 | ⭐     |   ❌   |
 | Java 并发分工工具 | 虚拟线程的结构化并发是什么？                                                    | 困难 | ⭐⭐   |   ❌   |
 | Java 并发分工工具 | BlockingQueue 的核心方法有哪些？抛异常/返回特殊值/阻塞/超时四类方法有什么区别？ | 中等 | ⭐     |   ✅   |
-| Java 并发分工工具 | Timer 的工作原理是什么？                                                        | 中等 | ⭐⭐   |        |
-| Java 并发分工工具 | 时间轮（Time Wheel）的工作原理是什么？                                          | 困难 | ⭐⭐   |        |
+| Java 并发分工工具 | Timer 的工作原理是什么？                                                        | 中等 | ⭐⭐   |   ❌   |
+| Java 并发分工工具 | 时间轮（Time Wheel）的工作原理是什么？                                          | 困难 | ⭐⭐   |   ✅   |
 | Java 并发应用     | Java 中如何控制多线程的执行顺序？                                               | 中等 | ⭐⭐   |   ✅   |
 | Java 并发应用     | Java 中如何实现生产者消费者模式？                                               | 中等 | ⭐⭐   |   ✅   |
 | Java 容器         | Java 线程安全的集合有哪些?                                                      | 中等 | ⭐⭐   |   ✅   |
@@ -325,7 +325,7 @@ dir:
 | JVM 简介     | 说说 Java 的执行流程？                                             | 中等 | ⭐⭐⭐ |   ✅   |
 | JVM 简介     | JVM 由哪些部分组成？                                               | 中等 | ⭐⭐⭐ |   ✅   |
 | JVM 简介     | Java 是如何实现跨平台的？                                          | 中等 | ⭐⭐   |   ✅   |
-| 类加载       | 什么情况下 Java 类会被加载？                                       | 中等 | ⭐⭐   |        |
+| 类加载       | 什么情况下 Java 类会被加载？                                       | 中等 | ⭐⭐   |   ⚠️   |
 | 类加载       | Java 对象在虚拟机中怎样存储？                                      | 中等 | ⭐⭐   |   ⚠️   |
 | 类加载       | Java 对象的创建过程是怎样的？                                      | 中等 | ⭐⭐⭐ |   ✅   |
 | 类加载       | Java 类的生命周期是怎样的？                                        | 中等 | ⭐⭐⭐ |   ✅   |
@@ -339,7 +339,7 @@ dir:
 | 字节码       | 什么是 Java 字节码？它与机器码有什么区别？                         | 中等 | ⭐⭐   |   ✅   |
 | 字节码       | .class 文件的结构包含哪些主要部分？                                | 中等 | ⭐⭐   |   ⚠️   |
 | 字节码       | 如何查看 Java 字节码？常用工具有哪些？                             | 中等 | ⭐⭐   |   ✅   |
-| 字节码       | Java 字节码有哪些典型应用场景？                                    | 中等 | ⭐⭐   |        |
+| 字节码       | Java 字节码有哪些典型应用场景？                                    | 中等 | ⭐⭐   |   ✅   |
 | 字节码       | 什么是 JIT?                                                        | 中等 | ⭐     |   ✅   |
 | 字节码       | 什么是逃逸分析？                                                   | 困难 | ⭐⭐   |   ⚠️   |
 | 字节码       | 什么是 AOT？                                                       | 困难 | ⭐⭐   |   ⚠️   |
@@ -351,7 +351,7 @@ dir:
 | 垃圾收集 | 如何判断 Java 对象是否可以被回收？                                            | 困难 | ⭐⭐⭐ |   ✅   |
 | 垃圾收集 | 为什么不建议使用 finalize()？                                                 | 中等 | ⭐⭐   |   ⚠️   |
 | 垃圾收集 | 什么是三色标记？如何解决漏标问题？                                            | 困难 | ⭐⭐⭐ |   ❌   |
-| 垃圾收集 | 什么是安全点和安全区域？                                                      | 中等 | ⭐⭐   |        |
+| 垃圾收集 | 什么是安全点和安全区域？                                                      | 中等 | ⭐⭐   |   ❌   |
 | 垃圾收集 | Java 对象有哪些引用类型？                                                     | 中等 | ⭐⭐   |   ✅   |
 | 垃圾收集 | Java 中有哪些垃圾回收算法？                                                   | 中等 | ⭐⭐⭐ |   ✅   |
 | 垃圾收集 | Java 中常见的垃圾收集器有哪些？                                               | 中等 | ⭐⭐⭐ |   ✅   |
