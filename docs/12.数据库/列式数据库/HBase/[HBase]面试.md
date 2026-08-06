@@ -138,7 +138,7 @@ HBase 和 HDFS 的不同之处如下：
 
 :::
 
-### 【简单】行式数据库 vs. 列式数据库？⭐
+### 【简单】行式数据库 vs. 列式数据库？⭐⭐
 
 :::details 要点
 
@@ -169,7 +169,7 @@ HBase 和 HDFS 的不同之处如下：
 
 ## HBase 存储
 
-### 【简单】HBase 表有什么特性？⭐
+### 【简单】HBase 表有什么特性？⭐⭐
 
 :::details 要点
 
@@ -183,7 +183,7 @@ Hbase 的表具有以下特点：
 
 :::
 
-### 【简单】HBase 的逻辑存储模型是怎样的？⭐⭐
+### 【简单】HBase 的逻辑存储模型是怎样的？⭐⭐⭐
 
 :::details 要点
 
@@ -374,7 +374,7 @@ HBase 使用 ZooKeeper 作为分布式协调服务来维护集群中的服务器
 
 ## HBase 高级
 
-### 【困难】HBase 的 RowKey 应该如何设计？⭐⭐⭐
+### 【困难】HBase 的 RowKey 应该如何设计？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -425,9 +425,16 @@ byte[] rowKey = Bytes.add(salt, Bytes.toBytes(dateStr), Bytes.toBytes(userId));
 - ❗ 使用日期字符串作为 RowKey → 导致同一日期数据集中
 - ❗ RowKey 过长 → 增加存储开销，降低索引效率
 
+**L3 进阶——基于查询模式的设计权衡**：
+
+- RowKey 设计的**第一准则是服务于最高频的查询模式**，而不是单纯追求散列。例如“查询某用户最近 N 条记录”：RowKey 应设计为 `userId + 反转时间戳`，这样同一用户数据落在相邻区间（可范围扫描），且时间倒序天然满足“最新在前”。
+- **加盐/哈希与范围扫描是天然矛盾的**：打散后原始顺序丢失，无法再按业务维度 range scan。若既要打散又要范围查询，常用折衷是“确定性散列前缀”（如 `userId % N` 作为桶前缀），扫描时并发查 N 个桶。
+- RowKey 过长会直接侵蚀 BlockCache 效率：HFile 的索引块（Data Index Block）存的是 RowKey，RowKey 越长，单个 16KB 块能容纳的索引项越少，定位一个 HFile 需要的索引层级越多，读放大越严重。
+- **预分区的 splitKey 必须与 RowKey 的分布规律对齐**，否则预分区反而造成数据倾斜（如加盐 RowKey 应按盐值均匀切分，哈希 RowKey 应按哈希前缀的十六进制均匀切分）。
+
 :::
 
-### 【困难】HBase 的 Compaction 机制是什么？⭐⭐⭐
+### 【困难】HBase 的 Compaction 机制是什么？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -475,9 +482,15 @@ graph TB
 - 对于写入量大的表，禁用自动 Major Compaction（设为 0），通过定时任务手动控制
 - 合理设置 `compactionThreshold`，避免频繁 Minor Compaction 造成 IO 压力
 
+**L3 进阶**：
+
+- **文件选择策略**：HBase 默认使用 ExploringCompactionPolicy，在候选文件集合中探索“文件数多、总大小适中”的组合；此外还有 FIFOCompactionPolicy（TTL 表直接删文件）、DateTieredCompactionPolicy（按时间窗口分层合并，**适合时序数据**，能避免新数据与历史数据反复混合重写）。
+- **Major Compaction 是唯一物理删除数据的时机**：Delete Marker、超过 TTL 的数据、超过 `VERSIONS` 限制的旧版本，都只在 Major Compaction 时真正清理。因此“删除后磁盘空间没降”是正常现象，也是依赖 TTL 做数据生命周期管理的表必须保留 Major Compaction 的原因。
+- **Major Compaction 风暴的危害**：全集群同时触发会造成 IO 风暴、读写延迟飙升，甚至引发 RegionServer GC/OOM。生产上除禁用自动触发外，还可通过 `hbase.hstore.compaction.throughput.lower.bound/upper.bound` 限流（HBase 1.2+ 的 PressureAwareCompactionThroughputController）。
+
 :::
 
-### 【困难】HBase 的布隆过滤器有什么作用？⭐⭐⭐
+### 【困难】HBase 的布隆过滤器有什么作用？⭐⭐
 
 ```mermaid
 graph TB
@@ -525,7 +538,7 @@ desc.addFamily(cf);
 
 :::
 
-### 【困难】HBase 的 MemStore 和 StoreFile 如何协作？⭐⭐⭐
+### 【困难】HBase 的 MemStore 和 StoreFile 如何协作？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -557,9 +570,34 @@ HBase 采用 **LSM-Tree（Log-Structured Merge-Tree）** 架构，MemStore 和 S
 
 **关键机制**：
 
-- **Flush 触发条件**：MemStore 大小达到阈值（默认 128MB）、Region 全局 MemStore 超限、WAL 文件数超限
+- **Flush 触发条件**：MemStore 大小达到阈值（默认 128MB）、RegionServer 全局 MemStore 水位超限、WAL 文件数超限
 - **HFile 特点**：一旦写入不可修改，删除操作通过写入**删除标记（Delete Marker）** 实现，在 Major Compaction 时物理删除
 - **多版本读取**：从最新的 HFile 到最旧的 HFile 依次查找，合并返回结果
+
+**L3 进阶——写阻塞与读写一致性**：
+
+- **两级 MemStore 水位阻塞**：RegionServer 全局 MemStore 使用率达到 `hbase.regionserver.global.memstore.size`（默认 0.4）时，强制触发 Flush；达到 `global.memstore.size.lower.limit`（0.95 × 0.4）时开始强制 Flush 最大的 MemStore；再往上会**阻塞写入**，这是写吞吐突降时首先要排查的点。
+- **Flush 时的并发读写**：MemStore 采用 **active + snapshot 双缓冲**结构——Flush 时将 active 切换为 snapshot 落盘，新写入进入新的 active，读写不阻塞。
+- **读写一致性基于 MVCC（ReadPoint）**：每次读写操作会获取一个递增的序列号（sequenceId），读请求只能看到 sequenceId 不大于自己 ReadPoint 的已提交写入，保证并发写入对读不可见、Scan 结果一致。这也是 HBase 单行读写原子性、以及 Get 与并发 Put 语义正确的基础。
+- **持久化级别**：WAL 默认每条写入都 sync（`Durability.SYNC_WAL`）；对丢数容忍的链路可用 `ASYNC_WAL`/`SKIP_WAL` 换吞吐，但要清楚宕机时最多丢失未 sync 的数据。
+
+:::
+
+### 【困难】HBase 如何保证并发读写的一致性？⭐⭐⭐⭐
+
+:::details 要点
+
+HBase 基于 **MVCC + ReadPoint** 机制保证并发读写一致性，核心思想与 MySQL MVCC 类似，但实现更轻量：
+
+1. RegionServer 维护一个全局递增的 **sequenceId**，每次成功写入（MemStore 更新 + WAL 持久化）都会推进 sequenceId。
+2. 读请求（Get/Scan）开始时获取一个 **ReadPoint**（当前 sequenceId 的快照），读取过程中**只返回 sequenceId ≤ ReadPoint 的已提交数据**，尚未完成提交的并发写入对读不可见。
+3. Flush 与读并发时，Flush 产生的 HFile 会带上一个 `maxSequenceId`，读路径合并 MemStore 与 HFile 结果时同样按 sequenceId 过滤，保证不会读到“半提交”状态。
+
+由此 HBase 提供的语义保证：
+
+- **单行读写原子性**：对同一行的任意一次 Get，看到的是完整的某次写入结果。
+- **读己之写、单调读**：客户端顺序请求同一 RegionServer 时，后读不会比先读旧（注意跨 RegionServer 重试场景的边界）。
+- **不支持跨行/跨表事务**（原生 HBase），需要多行原子性时可考虑 Phoenix 事务或上层业务补偿。
 
 :::
 
@@ -613,9 +651,11 @@ graph TB
     F --> G["Region 重新上线服务"]
 ```
 
+**L3 追问——WAL 拆分（Log Splitting）**：宕机 RegionServer 的一个 WAL 文件中混杂着多个 Region 的日志，必须先**按 Region 拆分成多个 recovered.edits 文件**，各 Region 才能并行恢复。HBase 2.x 默认使用 **Procedure 框架驱动的 WAL Splitting**（替代早期单线程拆分与已移除的 Distributed Log Splitting），拆分速度直接影响 Region 恢复时间（RTO），大集群上 WAL 拆分是宕机恢复的主要耗时环节。
+
 :::
 
-### 【困难】HBase Region 分裂是如何工作的？⭐⭐⭐
+### 【困难】HBase Region 分裂是如何工作的？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -636,6 +676,7 @@ Region 分裂是 HBase 实现**自动水平扩展**的核心机制：
 
 - Region 大小达到阈值（`hbase.hregion.max.filesize`，默认 10GB）
 - 也可通过 `SplitRequest` 手动触发
+- 注意：HBase 1.x+ 默认分裂策略为 **IncreasingToUpperBoundSplitStrategy**，分裂阈值随该表在本 RegionServer 上的 Region 数量动态增大（小集群早期分裂更积极，最终收敛到 `max.filesize`），并非固定 10GB
 
 **分裂流程**：
 
@@ -648,6 +689,12 @@ Region 分裂是 HBase 实现**自动水平扩展**的核心机制：
 
 - **预分区（Pre-splitting）**：建表时根据预估数据量预先创建多个 Region，避免后期频繁分裂
 - 分裂阈值不宜过小，否则会产生大量小 Region，增加管理开销
+
+**L3 进阶**：
+
+- **分裂不搬数据**：默认 DisableAndSplit 策略下，子 Region 初始只持有父 HFile 的**引用文件（Reference File）**，父子 Region 快速上线，真正的数据拆分延迟到后续 Compaction 时完成（引用全部消除后删除父文件）。因此分裂本身很快，但引用未消除前会加重读路径的多文件查找。
+- **分裂会造成短暂不可用**：父 Region 下线到子 Region 上线之间存在窗口期（秒级），落在该区间的请求会失败重试；客户端需配置合理的重试策略（`hbase.client.retries.number`、`hbase.client.pause`）。
+- **预分区策略选择**：RowKey 均匀散列时用 `HexStringSplit`/`UniformSplit`；RowKey 有业务前缀时自定义 splitKeys，并确保 splitKeys 的分布与数据写入分布匹配，否则预分区后仍会出现倾斜 Region。
 
 ```java
 // 建表时预分区
@@ -662,7 +709,7 @@ admin.createTable(tableDesc, splitKeys);
 
 ## HBase 性能调优
 
-### 【困难】HBase 有哪些常见的性能调优手段？⭐⭐⭐
+### 【困难】HBase 有哪些常见的性能调优手段？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -706,14 +753,21 @@ graph TB
 
 | 配置项 | 默认值 | 优化建议 |
 | --- | --- | --- |
-| `hbase.regionserver.handler.count` | 10 | 调高至 50\~100，提升并发处理能力 |
+| `hbase.regionserver.handler.count` | 30 | 根据并发量适当调高（如 100），但过大会增加内存和上下文切换开销 |
 | `hbase.hregion.majorcompaction` | 604800000 | 生产环境建议禁用自动触发，手动在低峰期执行 |
 | `hbase.hstore.compactionThreshold` | 3 | 根据写入量调整，避免过于频繁 |
 | `hbase.regionserver.global.memstore.size` | 0.4 | 根据读写比例调整内存分配 |
 
+**L3 进阶——热点与长尾问题**：
+
+- **热点 Region**：某 Region 的读写量远超其他 Region（常见于预分区不均、RowKey 设计缺陷）。治理手段：拆分热点 Region、Balancer 均衡、根治方案是重新设计 RowKey 散列。
+- **客户端超时与重试**：`hbase.client.operation.timeout`、`hbase.client.retries.number` 需与业务 SLA 匹配；重试叠加会放大对集群的压力，雪崩场景下应结合熔断限流。
+- **GC 调优**：RegionServer 堆内存通常 16~32GB，优先使用 G1 并控制停顿目标；MemStore + BlockCache 占用堆内存大，混合负载下需监控 Old GC 频率，避免因 Full GC 导致 ZooKeeper 会话超时、节点被踢的连锁故障。
+- **慢读排查**：区分是 HFile 过多（读放大，需 Compaction）、BlockCache 命中率低、还是 Region 热点，三者治理手段完全不同。
+
 :::
 
-### 【困难】HBase 的 Phoenix 是什么？⭐⭐
+### 【困难】HBase 的 Phoenix 是什么？⭐
 
 :::details 要点
 

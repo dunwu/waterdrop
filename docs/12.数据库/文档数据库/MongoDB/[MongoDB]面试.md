@@ -105,7 +105,7 @@ MongoDB vs.RDBM：
 
 - **1.0（2009 年）**：MongoDB 发布第一版
 - **3.0（2015 年）**：支持 **WiredTiger** 存储引擎
-- **4.0（2019 年）**：支持 ACID 事务
+- **4.0（2018 年）**：支持 ACID 事务
 
 :::
 
@@ -118,10 +118,10 @@ MongoDB 是由 **10gen** 开发的 NoSQL 数据库，该公司由 Dwight Merrima
 - **2.2（2012 年）**：引入了聚合管道（Pipeline）。
 - **2.4（2013 年）**：引入了全文搜索。
 - **3.0（2015 年）**：全面支持 **WiredTiger** 存储引擎，并支持可插拔存储引擎。
-- **4.0（2019 年）**：支持 ACID 事务。
-- **4.2（2020 年）**：支持分布式事务。
+- **4.0（2018 年）**：支持 ACID 事务。
+- **4.2（2019 年）**：支持分布式事务。
 
-### 【简单】BSON 是什么？与 JSON 有何区别？⭐
+### 【简单】BSON 是什么？与 JSON 有何区别？⭐⭐
 
 BSON 的英文全称是 **Binary JSON**，是 [JSON](https://www.mongodb.com/zh-cn/docs/v8.0/reference/glossary/#std-term-JSON) 文档的二进制表示形式，但它包含的数据类型比 JSON 多。
 
@@ -146,7 +146,7 @@ BSON 主要用于在 MongoDB 中存储文档和进行网络传输。
   - 进程 ID：MongoDB 进程的标识
   - 计数器：同一秒内的自增序列（确保同一进程内不重复）
 
-### 【简单】MongoDB 支持哪些数据类型？⭐⭐
+### 【简单】MongoDB 支持哪些数据类型？⭐⭐⭐
 
 ::: important 要点
 
@@ -277,7 +277,7 @@ db.articles.find({
 
 :::
 
-### 【简单】MongoDB 支持哪些聚合方式？⭐⭐
+### 【简单】MongoDB 支持哪些聚合方式？⭐⭐⭐
 
 聚合操作处理多个文档并返回计算结果。可以使用聚合操作来：
 
@@ -308,7 +308,7 @@ db.articles.find({
   - 逻辑表达式：`$and`, `$or`, `$not`, `$cond`
   - 数组表达式：`$arrayElemAt`, `$size`, `$slice`
 
-### 【中等】什么是聚合管道？⭐⭐
+### 【中等】什么是聚合管道？⭐⭐⭐
 
 聚合管道由一个或多个处理文档的 [阶段](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference) 组成：
 
@@ -414,7 +414,7 @@ MongoDB 中的所有 Map-Reduce 函数都是 JavaScript，并在 mongod 进程�
 
 ## MongoDB 存储
 
-### 【简单】MongoDB 的逻辑存储是怎样设计的？⭐⭐⭐
+### 【简单】MongoDB 的逻辑存储是怎样设计的？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -647,6 +647,21 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 如果想要深入研究学习 WiredTiger 存储引擎，推荐阅读 MongoDB 中文社区的 [WiredTiger 存储引擎系列](https://mongoing.com/archives/category/wiredtiger 存储引擎系列)。
 
+### 【困难】WiredTiger 如何保证数据持久性？⭐⭐⭐⭐
+
+WiredTiger 的持久性依赖三个机制：**Cache、Checkpoint、Journal**——可类比 InnoDB 的 buffer pool、脏页刷盘与 redo log。
+
+- **Cache（内存缓存）**：写入先进入内存缓存（默认大小为 (内存 - 1GB) × 50%），读取也优先命中缓存；缓存中的脏页达到水位阈值时由 eviction 机制落盘。
+- **Checkpoint（检查点）**：WiredTiger 默认每 60 秒或 journal 达到 2GB 时创建一个 checkpoint，将内存数据的一致快照持久化到磁盘；checkpoint 是崩溃恢复的基线点。
+- **Journal（WAL）**：所有写入先追加写 journal（类似 redo log）；实例异常宕机后，重启时从最后一个 checkpoint 开始重放 journal，保证已提交写入不丢。
+- **组提交（group commit）**：journal 采用组提交批量刷盘，降低 fsync 频率，提升写入吞吐。
+
+**L3 追问**：
+
+- 为什么官方建议 WT cache 只占内存 50% 左右？（剩余内存留给 OS 文件系统缓存与连接开销，cache 过大反而增加 eviction/GC 压力）
+- checkpoint 期间会阻塞写入吗？（不会，checkpoint 基于 MVCC 获取一致性快照，与并发写入互不阻塞）
+- `journalCompressor` 与 `journal` 禁用（`journal.enabled: false`）的取舍：单节点关闭 journal 可提吞吐但宕机丢数据，副本集场景也不建议关。
+
 ## MongoDB 索引
 
 ::: tip 扩展
@@ -656,7 +671,7 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 :::
 
-### 【简单】MongoDB 索引有什么用？⭐
+### 【简单】MongoDB 索引有什么用？⭐⭐
 
 **MongoDB 在 collection 数据级别上定义索引**。
 
@@ -666,7 +681,7 @@ WiredTiger maintains a table's data in memory using a data structure called a B-
 
 ![MongoDB 索引](https://raw.githubusercontent.com/dunwu/images/master/archive/2020/09/b92b31ce4d7e43298687500238cad1e9.svg)
 
-### 【简单】MongoDB 支持哪些类型的索引？⭐⭐⭐
+### 【简单】MongoDB 支持哪些类型的索引？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -755,7 +770,14 @@ MongoDB 提供两种类型的地理空间索引：
 
 > 要了解详情，请参阅 [哈希索引](https://www.mongodb.com/zh-cn/docs/manual/core/indexes/index-types/index-hashed/#std-label-index-type-hashed)。
 
-### 【简单】复合索引中字段的顺序有影响吗？⭐⭐⭐
+**L3 进阶**：
+
+- **多键索引的限制**：复合索引不能包含多个数组字段（否则组合的笛卡尔积会使索引爆炸）；对数组字段的查询要注意“数组内元素交叉匹配”的语义（类似 ES 的 nested 深坑，需用 `$elemMatch` 约束同元素匹配）。
+- **通配符索引（Wildcard，4.2+）**：为动态字段/未知字段提供索引能力，代价是索引体积大、查询性能低，仅适合字段名不可枚举的场景，慎用。
+- **TTL 索引**：后台线程约每 60 秒扫描一次过期文档并删除，删除非实时；大规模集中过期会造成删除压力，日志类场景也可考虑分集合（按日期建集合）替代。
+- **索引的写放大**：集合的每个索引在写入时都需同步维护，索引过多时先用 `$indexStats` 识别重复/未使用索引再清理。
+
+### 【简单】复合索引中字段的顺序有影响吗？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -805,6 +827,8 @@ db.s2.find().sort({"score": -1, "userid": 1}).explain()
 ```
 
 **MongoDB 的复合索引遵循左前缀原则**：拥有多个键的索引，可以同时得到所有这些键的前缀组成的索引，但不包括除左前缀之外的其他子集。比如说，有一个类似 `{a: 1, b: 1, c: 1, ..., z: 1}` 这样的索引，那么实际上也等于有了 `{a: 1}`、`{a: 1, b: 1}`、`{a: 1, b: 1, c: 1}` 等一系列索引，但是不会有 `{b: 1}` 这样的非左前缀的索引。
+
+**L3 进阶——ESR 索引设计规则**：设计复合索引时遵循 **Equality → Sort → Range** 顺序：等值条件字段放最前，排序字段居中，范围条件字段放最后。这样能同时满足索引命中与避免内存排序（explain 中不出现 SORT_IN_MEMORY），是比最左前缀原则更具操作性的设计总结（该规则同样适用于 MySQL 复合索引设计）。
 
 ### 【中等】什么是覆盖索引查询？⭐⭐
 
@@ -859,7 +883,7 @@ db.users.find({gender:"M"},{user_name:1,_id:0})
 
 :::
 
-### 【简单】MongoDB 中如何使用事务？⭐
+### 【简单】MongoDB 中如何使用事务？⭐⭐
 
 MongoDB 从 4.0 版本开始支持多文档事务。
 
@@ -1008,7 +1032,7 @@ MongoDB 驱动程序提供集合级 API `countDocuments(filter, options)` 作为
 
 ## MongoDB 集群
 
-### 【中等】MongoDB 的副本机制是怎样的？⭐⭐⭐
+### 【中等】MongoDB 的副本机制是怎样的？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -1048,16 +1072,18 @@ MongoDB 的复制集群又称为副本集群，是一组维护相同数据集合
 
 副本集最多有一个主节点。 如果当前主节点不可用，一个选举会抉择出新的主节点。MongoDB 的节点选举规则能够保证在 Primary 挂掉之后选取的新节点一定是集群中数据最全的一个。
 
-当主节点上的一个写操作完成后，会向 oplog 集合写入一条对应的日志，而从节点则通过这个 oplog 不断拉取到新的日志，在本地进行回放以达到数据同步的目的。
-
-副本集最多有一个主节点。 如果当前主节点不可用，一个选举会抉择出新的主节点。MongoDB 的节点选举规则能够保证在 Primary 挂掉之后选取的新节点一定是集群中数据最全的一个。
-
 为什么要用复制集群？
 
 - **实现 failover**：提供自动故障恢复的功能，主节点发生故障时，自动从从节点中选举出一个新的主节点，确保集群的正常使用，这对于客户端来说是无感知的。
 - **实现读写分离**：我们可以设置从节点上可以读取数据，主节点负责写入数据，这样的话就实现了读写分离，减轻了主节点读写压力过大的问题。MongoDB 4.0 之前版本如果主库压力不大，不建议读写分离，因为写会阻塞读，除非业务对响应时间不是非常关注以及读取历史数据接受一定时间延迟。
 
-### 【中等】什么是分片集群？⭐⭐
+**L3 进阶**：
+
+- **oplog 窗口**：oplog 是固定大小的 capped collection，其容量决定了从节点能容忍多长时间的落后（oplog window）。从节点宕机时间超过 oplog 窗口后无法继续增量同步，只能做全量 initial sync（代价很高）；写入量大的集群应调大 oplog 或设置 `oplogMinRetentionHours`（4.4+）保证最小保留时长。
+- **选举机制**：选举需多数派投票（3 节点需 2 票），候选者必须拥有最新的 oplog（保证新主数据最全）；心跳间隔默认 2 秒，`electionTimeoutMillis` 默认 10 秒，主节点故障到新主选出的耗时通常在 12 秒以上，客户端需配置合理的重试。
+- **未提交写入会被回滚**：默认 write concern `w:1` 只代表主节点写成功，若主节点在同步到多数派之前宕机，这部分写入会在选举新主后**被回滚**（回滚数据写入 rollback 目录，上限约 300MB）。这是金融/账务场景必须使用 `w:majority` 的根本原因。
+
+### 【中等】什么是分片集群？⭐⭐⭐
 
 分片集群是 MongoDB 的分布式版本，相较副本集，分片集群数据被均衡的分布在不同分片中， 不仅大幅提升了整个集群的数据容量上限，也将读写的压力分散到不同分片，以解决副本集性能瓶颈的难题。
 
@@ -1083,7 +1109,7 @@ MongoDB 的分片集群由如下三个部分组成（下图来源于 [官方文�
 - 存储容量受单机限制，即磁盘资源遭遇瓶颈。
 - 读写能力受单机限制，可能是 CPU、内存或者网卡等资源遭遇瓶颈，导致读写能力无法扩展。
 
-### 【简单】如何选择分片键？⭐⭐
+### 【简单】如何选择分片键？⭐⭐⭐
 
 选择合适的片键对 sharding 效率影响很大，主要基于如下四个因素（摘自 [分片集群使用注意事项 - - 腾讯云文档](https://cloud.tencent.com/document/product/240/44611)）：
 
@@ -1093,6 +1119,8 @@ MongoDB 的分片集群由如下三个部分组成（下图来源于 [官方文�
 - **避免单调递增或递减** 单调递增的 sharding key，数据文件挪动小，但写入会集中，导致最后一篇的数据量持续增大，不断发生迁移，递减同理。
 
 综上，在选择片键时要考虑以上 4 个条件，尽可能满足更多的条件，才能降低 MoveChunks 对性能的影响，从而获得最优的性能体验。
+
+**L3 重点——分片键近乎不可变**：集合分片后无法更换分片键，文档的分片键字段值也不能被更新（含分片键的更新会报错）；5.0 的 `refineCollectionShardKey` 只支持细化片键粒度，更换片键只能 dump/restore 重建。因此**片键必须在上线前充分评估并做好预分片（预先切分 chunk）**。另外哈希片键无法支持范围查询，范围片键需警惕单调递增导致的写入热点。
 
 ### 【中等】MongoDB 的分片策略有哪些？⭐⭐⭐
 
@@ -1206,9 +1234,38 @@ db.collection.insertOne(
 )
 ```
 
+### 【困难】MongoDB 的 Read Concern 和 Write Concern 是什么？⭐⭐⭐⭐
+
+Read/Write Concern 的组合决定了 MongoDB 的一致性与可用性取舍，是副本集/分片集群场景下调优一致性的核心手段。
+
+**Write Concern（写关注）**：
+
+| 级别 | 含义 | 场景 |
+| --- | --- | --- |
+| `w: 1`（默认） | 主节点写入成功即返回 | 性能最高；主节点宕机可能丢失未同步到多数派的写入 |
+| `w: majority` | 多数节点确认后才返回 | 防止写入被回滚，金融/账务场景必备 |
+| `w: 0` | 发后即忘，不等待确认 | 容忍丢失的埋点类场景 |
+| `j: true` | 要求写入 journal（WiredTiger 日志）落盘后才确认 | 防进程崩溃丢数 |
+
+**Read Concern（读关注）**：
+
+| 级别 | 含义 |
+| --- | --- |
+| `local`（默认） | 读本节点最新数据，可能读到未提交（后续可能被回滚）的数据 |
+| `available` | 类似 local，分片场景下可能读到迁移中的孤儿文档 |
+| `majority` | 只读已被多数派确认的数据，永不回滚；因果一致性会话与事务的必备级别 |
+| `linearizable` | 线性一致性读，会阻塞等待读到多数派确认的最新数据，延迟最高，仅支持读主节点 |
+| `snapshot` | 事务用的快照读 |
+
+**L3 进阶——组合选型**：
+
+- **金融级场景**：`w: majority` + `readConcern: majority` 是标准组合；若用 w:1 写 + local 读，可能出现“读到的数据消失”：读到主节点尚未多数派确认的写入，主节点随后宕机，该写入被回滚。
+- **readConcern majority 依赖 writeConcern majority**：只有以多数派持久化的数据才能在多数派读级别可见。
+- MongoDB 4.0+ 多文档事务要求 readConcern majority；基于 WiredTiger 的文档级锁 + MVCC（majority 读基于 stable timestamp）实现快照隔离。
+
 ## MongoDB 高级
 
-### 【困难】MongoDB 的 Change Streams 是什么？⭐⭐
+### 【困难】MongoDB 的 Change Streams 是什么？⭐⭐⭐
 
 **Change Streams** 是 MongoDB 3.6 引入的实时数据变更通知机制，允许应用程序订阅集合、数据库或整个部署的数据变更事件。
 
@@ -1243,7 +1300,7 @@ const filteredStream = db.collection('orders').watch(pipeline);
 - 事件驱动架构（CDC - Change Data Capture）
 - 实时通知推送
 
-### 【困难】MongoDB 文档建模有哪些设计模式？⭐⭐⭐
+### 【困难】MongoDB 文档建模有哪些设计模式？⭐⭐⭐⭐
 
 ```mermaid
 graph TB
@@ -1299,7 +1356,13 @@ db.orders.insertOne({
 });
 ```
 
-### 【困难】MongoDB 如何进行性能调优？⭐⭐
+**L3 进阶——更新模式对建模的影响**：
+
+- WiredTiger 中文档增长超出原存储空间时需要**重新分配并搬迁**，原位置标记为可复用空闲空间；频繁的“增长型更新”会造成存储碎片与性能下降。
+- 应对手段：嵌入数组使用 `$push` + `$slice` 限制长度；预留字段空间；时序类增长数据用桶模式（文档装满后新建桶），天然避免文档增长。
+- 16MB 文档上限是硬约束，但实践中单文档超过数 MB 就该考虑拆分（网络传输、索引、更新的代价都会随之放大）。
+
+### 【困难】MongoDB 如何进行性能调优？⭐⭐⭐
 
 **1. 查询优化**
 
