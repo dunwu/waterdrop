@@ -5,7 +5,7 @@ order: 03
 categories:
   - Java
   - JavaCore
-  - 基础特性
+  - 基础
 tags:
   - Java
   - JavaCore

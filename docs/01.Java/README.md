@@ -68,33 +68,28 @@ index: false
 - [Java 虚拟机面试一](JavaCore/面试/[JavaCore][面试]虚拟机（一）.md) 💯
 - [Java 虚拟机面试二](JavaCore/面试/[JavaCore][面试]虚拟机（二）.md) 💯
 
-#### [Java 基础特性](JavaCore/基础特性)
+#### [Java 基础](JavaCore/基础)
 
-> 【Java 基础特性】专题涵盖语言核心语法、类型系统、面向对象三大范式、控制流与异常体系，以及泛型、反射、注解等运行时机制。这些是 Java 开发的基石，深入理解有助于编写健壮、可维护的代码，也是面试高频考察点。
+> 【Java 基础】专题涵盖语言核心语法、类型系统、面向对象三大范式、控制流与异常体系，以及泛型、反射、注解等运行时机制。这些是 Java 开发的基石，深入理解有助于编写健壮、可维护的代码，也是面试高频考察点。
 
-- [Java 基础语法特性](JavaCore/基础特性/[JavaCore]基础语法.md) - 关键词：`强类型`、`访问修饰符`、`final`、`操作符`、`序列化`
-- [Java 基本数据类型](JavaCore/基础特性/[JavaCore]数据类型.md) - 关键词：`包装类`、`装箱拆箱`、`缓存机制`、`BigDecimal`、`精度丢失`
-- [Java 面向对象](JavaCore/基础特性/[JavaCore]面向对象.md) - 关键词：`封装`、`继承`、`多态`、`接口`、`抽象类`
-- [Java 方法](JavaCore/基础特性/[JavaCore]方法.md) - 关键词：`值传递`、`重载`、`覆写`、`static`、`可变参数`
-- [Java 数组](JavaCore/基础特性/[JavaCore]数组.md) - 关键词：`引用类型`、`多维数组`、`Arrays`、`长度固定`、`下标`
-- [Java 枚举](JavaCore/基础特性/[JavaCore]枚举.md) - 关键词：`enum`、`EnumSet`、`EnumMap`、`单例模式`、`状态机`
-- [Java 控制语句](JavaCore/基础特性/[JavaCore]控制语句.md) - 关键词：`if`、`switch`、`while`、`for`、`break`
-- [Java 异常](JavaCore/基础特性/[JavaCore]异常.md) - 关键词：`Throwable`、`RuntimeException`、`try-catch-finally`、`Checked Exception`、`异常链`
-- [Java 泛型](JavaCore/基础特性/[JavaCore]泛型.md) - 关键词：`类型擦除`、`通配符`、`PECS`、`泛型类`、`类型边界`
-- [Java 反射](JavaCore/基础特性/[JavaCore]反射.md) - 关键词：`Class`、`invoke`、`动态代理`、`CGLIB`、`InvocationHandler`
-- [Java 注解](JavaCore/基础特性/[JavaCore]注解.md) - 关键词：`元注解`、`@Retention`、`@Target`、`自定义注解`、`反射解析`
-- [Java String 类型](JavaCore/基础特性/[JavaCore]String.md) - 关键词：`不可变`、`字符串常量池`、`intern`、`StringBuilder`、`StringBuffer`
-
-#### [Java 高级特性](JavaCore/高级特性)
-
-> 【Java 高级特性】专题涵盖正则表达式引擎、编解码与密码学、国际化、SPI 服务发现机制、JavaAgent 字节码增强以及 JDK8 函数式编程范式。这些进阶内容为构建高性能、可扩展的企业级应用提供了关键支撑，也是区分初中级与高级工程师的重要知识域。
-
-- [Java 正则](JavaCore/高级特性/[JavaCore]正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`零宽断言`、`贪婪与懒惰`
-- [Java 编码和加密](JavaCore/高级特性/[JavaCore]编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`
-- [Java 国际化](JavaCore/高级特性/[JavaCore]国际化.md) - 关键词：`Locale`、`ResourceBundle`、`NumberFormat`、`DateFormat`、`MessageFormat`
-- [Java SPI](JavaCore/高级特性/[JavaCore]SPI.md) - 关键词：`SPI`、`ServiceLoader`、`ClassLoader`、`扩展点`
-- [JavaAgent](JavaCore/高级特性/[JavaCore]Agent.md) - 关键词：`Instrumentation`、`premain`、`ClassFileTransformer`、`字节码增强`、`JVMTI`
-- [Java JDK8](JavaCore/高级特性/[JavaCore]JDK8.md) - 关键词：`Stream`、`Lambda`、`Optional`、`@FunctionalInterface`
+- [Java 基础语法特性](JavaCore/基础/[JavaCore]基础语法.md) - 关键词：`强类型`、`访问修饰符`、`final`、`操作符`、`序列化`
+- [Java 基本数据类型](JavaCore/基础/[JavaCore]数据类型.md) - 关键词：`包装类`、`装箱拆箱`、`缓存机制`、`BigDecimal`、`精度丢失`
+- [Java 面向对象](JavaCore/基础/[JavaCore]面向对象.md) - 关键词：`封装`、`继承`、`多态`、`接口`、`抽象类`
+- [Java 方法](JavaCore/基础/[JavaCore]方法.md) - 关键词：`值传递`、`重载`、`覆写`、`static`、`可变参数`
+- [Java 数组](JavaCore/基础/[JavaCore]数组.md) - 关键词：`引用类型`、`多维数组`、`Arrays`、`长度固定`、`下标`
+- [Java 枚举](JavaCore/基础/[JavaCore]枚举.md) - 关键词：`enum`、`EnumSet`、`EnumMap`、`单例模式`、`状态机`
+- [Java 控制语句](JavaCore/基础/[JavaCore]控制语句.md) - 关键词：`if`、`switch`、`while`、`for`、`break`
+- [Java 异常](JavaCore/基础/[JavaCore]异常.md) - 关键词：`Throwable`、`RuntimeException`、`try-catch-finally`、`Checked Exception`、`异常链`
+- [Java 泛型](JavaCore/基础/[JavaCore]泛型.md) - 关键词：`类型擦除`、`通配符`、`PECS`、`泛型类`、`类型边界`
+- [Java 反射](JavaCore/基础/[JavaCore]反射.md) - 关键词：`Class`、`invoke`、`动态代理`、`CGLIB`、`InvocationHandler`
+- [Java 注解](JavaCore/基础/[JavaCore]注解.md) - 关键词：`元注解`、`@Retention`、`@Target`、`自定义注解`、`反射解析`
+- [Java String 类型](JavaCore/基础/[JavaCore]String.md) - 关键词：`不可变`、`字符串常量池`、`intern`、`StringBuilder`、`StringBuffer`
+- [Java 正则](JavaCore/基础/[JavaCore]正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`零宽断言`、`贪婪与懒惰`
+- [Java 编码和加密](JavaCore/基础/[JavaCore]编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`
+- [Java 国际化](JavaCore/基础/[JavaCore]国际化.md) - 关键词：`Locale`、`ResourceBundle`、`NumberFormat`、`DateFormat`、`MessageFormat`
+- [Java SPI](JavaCore/基础/[JavaCore]SPI.md) - 关键词：`SPI`、`ServiceLoader`、`ClassLoader`、`扩展点`
+- [Java Agent](JavaCore/基础/[JavaCore]Agent.md) - 关键词：`Instrumentation`、`premain`、`ClassFileTransformer`、`字节码增强`、`JVMTI`
+- [Java JDK8](JavaCore/基础/[JavaCore]JDK8.md) - 关键词：`Stream`、`Lambda`、`Optional`、`@FunctionalInterface`
 
 #### [Java 容器](JavaCore/容器)
 

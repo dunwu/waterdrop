@@ -18,7 +18,7 @@ permalink: /pages/7704a3fb/
 
 ## Java 泛型
 
-### 【中等】Java 泛型的作用是什么？⭐⭐
+### 【中等】Java 泛型的作用是什么？⭐⭐⭐
 
 ::: info Java 泛型是什么？
 
@@ -62,7 +62,7 @@ String value = box.get(); // 无需强制转换
 
 **一句话总结**：泛型让代码更灵活、安全，减少冗余和运行时错误。
 
-### 【中等】什么是 Java 泛型的上下界限定符？⭐⭐
+### 【中等】什么是 Java 泛型的上下界限定符？⭐⭐⭐
 
 Java 泛型的上下界限定符用于**限制泛型类型参数的范围**，确保类型安全，提供更灵活的类型约束。
 
@@ -128,7 +128,7 @@ void addNumbers(List<? super Integer> list) {
   - **生产者（Producer）** 用 `extends`（输出数据）。
   - **消费者（Consumer）** 用 `super`（输入数据）。
 
-### 【中等】泛型擦除的作用是什么？⭐⭐
+### 【中等】泛型擦除的作用是什么？⭐⭐⭐
 
 泛型擦除是 Java 在**编译时检查类型安全**、**运行时丢弃类型信息**的折中设计，平衡了兼容性、性能和类型安全，但牺牲了部分运行时灵活性。
 
@@ -195,7 +195,7 @@ void addNumbers(List<? super Integer> list) {
 
 ## Java 反射
 
-### 【简单】什么是反射？反射有什么作用？⭐⭐
+### 【简单】什么是反射？反射有什么作用？⭐⭐⭐⭐
 
 **反射（Reflection）是 Java 提供的动态机制**，允许程序在**运行时**：
 
@@ -290,7 +290,78 @@ if (clazz.isAnnotationPresent(MyAnnotation.class)) {
 
 :::
 
-### 【简单】反射有什么优缺点？⭐⭐
+#### 🔬 反射为什么慢？——性能开销的定量分析
+
+`Method.invoke()` 比直接调用慢 **10~100 倍**（热点代码 JIT 优化后可缩小到 2~5 倍）。性能开销来自三个层面：
+
+**1. 方法访问检查（Access Check）**
+
+```java
+// Method.invoke() 内部每次调用都需要：
+// ① 检查方法修饰符（public/protected/private）
+// ② 检查调用者是否有权限访问（Reflection.getCallerClass()）
+// ③ 检查参数类型和数量是否匹配
+```
+
+**2. 参数装箱/拆箱（Auto-boxing）**
+
+```java
+// invoke() 的参数和返回值都是 Object 数组，每个基本类型参数都要装箱
+method.invoke(target, 42, true);  // int→Integer, boolean→Boolean
+// 返回 Object，调用方需要拆箱
+int result = (int) method.invoke(target, 42);  // Integer→int
+```
+
+**3. JIT 内联困难**
+
+```java
+// 直接调用：JIT 可以轻松内联
+target.setName("Bob");  // HotSpot 将方法体直接嵌入调用点
+
+// 反射调用：JIT 无法内联（因为 invoke() 的目标在编译时不确定）
+method.invoke(target, "Bob");  // 必须在运行时查找 MethodAccessor
+```
+
+#### 🔬 反射的 Inflation 优化机制
+
+JDK 对反射做了 **Inflation**（膨胀）优化，让频繁调用的反射方法越来越快：
+
+```
+调用次数    →    访问器类型       →    性能
+────────────────────────────────────────────
+0~15 次    →    NativeMethodAccessor（JNI）   慢（每次跨 JNI 边界）
+16+ 次     →    GeneratedMethodAccessor（字节码） 快（接近直接调用）
+            （通过 ASM 动态生成一个 accessor 类，直接用 invokespecial 调用目标方法）
+```
+
+可通过 `-Dsun.reflect.inflationThreshold=0` 跳过 JNI 阶段，直接使用字节码 accessor。
+
+> **📌 面试度量**：⭐⭐⭐⭐ 的原因——"反射慢"人人会说，但能讲出**慢的三个层次（访问检查、装箱、JIT 内联困难）** 和 **Inflation 优化机制**，说明不仅仅是"用过反射"，而是"理解 JVM 如何为反射做优化"。
+
+#### 跨语言视角：反射的三种设计哲学
+
+| 语言       | 反射机制                                              | 核心差异                                                |
+| :--------- | :---------------------------------------------------- | :------------------------------------------------------ |
+| **Java**   | `java.lang.reflect` + `MethodHandle`（JDK 7+）        | 编译期类型擦除 → 反射是恢复类型信息的唯一途径           |
+| **Go**     | `reflect` 包                                          | 无继承/多态，反射主要用于序列化、ORM 等框架层           |
+| **Python** | `getattr`/`setattr`/`hasattr`（内置）+ `inspect` 模块 | 动态类型语言，"反射"概念被弱化为普通操作                |
+| **Rust**   | 无运行时反射                                          | 通过 `#[derive]` + trait + 宏在编译期生成，零运行时开销 |
+
+**Go 的反思**：Go 有 `reflect` 但设计者 Rob Pike 曾公开表示"反射永远不应该是你代码的核心"——因为 Go 没有 Java 的 JIT 优化，每次 `reflect.Value.Call()` 都是纯解释执行，性能差距可达 100 倍以上。Java 的 Inflation 优化（JNI → 字节码 accessor）正是 Go 缺乏的。
+
+**Rust 的零成本替代**：Rust 选择"编译期反射"——通过 `proc macro` 在编译时展开代码，完全消除运行时开销。代价是：任何反射需求必须在编译时声明（`#[derive(Serialize)]` 等）。这是一种哲学取舍：**Java 选择运行时灵活性，Rust 选择编译期安全性**。
+
+#### GraalVM Native Image 对反射的限制
+
+GraalVM 将 Java 编译为**原生可执行文件**时，采用的是 **closed-world assumption**（闭世界假设）——只有通过静态分析可达的代码才会被编译。反射的 `Class.forName("动态类名")` 在编译期无法确定目标类，导致：
+
+1. 默认**不支持运行时反射**（运行时调用 `Class.forName` 会抛出异常）
+2. 必须通过 `reflect-config.json` 预注册所有需要通过反射访问的类、方法、字段
+3. 动态代理、CGLIB 等运行时生成字节码的技术在 Native Image 中**不可用**
+
+这意味着：Spring 应用迁移到 GraalVM Native Image 时，所有 `@Autowired`、AOP 代理、MyBatis Mapper 代理等依赖反射/动态代理的功能，都必须在编译期通过 AOT 处理或配置注册——这是 Java 生态从"动态运行时"向"静态编译"转型的最大挑战。
+
+### 【简单】反射有什么优缺点？⭐⭐⭐
 
 | **优点**                   | **缺点**                 |
 | -------------------------- | ------------------------ |
@@ -315,7 +386,7 @@ if (clazz.isAnnotationPresent(MyAnnotation.class)) {
 
 :::
 
-### 【中等】什么是 Java 中的动态代理？⭐⭐
+### 【中等】什么是 Java 中的动态代理？⭐⭐⭐⭐
 
 动态代理是一种在**运行时**动态创建代理对象的技术，允许在不修改原始类代码的情况下，**增强或拦截**目标对象的方法调用。
 
@@ -393,12 +464,23 @@ public class SimpleProxyDemo {
 - **仅支持接口代理**：不能代理普通类（CGLIB 可弥补此问题）。
 - **性能开销**：反射调用比直接调用略慢（现代 JVM 已优化）。
 
+#### 跨语言视角：代理模式的三种实现
+
+| 语言/环境      | 代理机制                      | 核心差异                                                             |
+| :------------- | :---------------------------- | :------------------------------------------------------------------- |
+| **Java**       | `Proxy` + `InvocationHandler` | 基于接口 + 反射，运行时动态生成                                      |
+| **JavaScript** | `new Proxy(target, handler)`  | 原生语言支持，可拦截任意操作（属性访问、函数调用、构造器），无需接口 |
+| **Python**     | `@decorator` 或 `__getattr__` | 装饰器是语法糖（函数级代理），`__getattr__` 是对象级代理             |
+| **Go**         | 无原生动态代理                | 通过 `interface{}` + type assertion 实现，编译期类型检查强           |
+
+JavaScript 的 `Proxy` 是最强大的实现——它能拦截 13 种操作（get、set、has、construct、apply 等），远超 Java 只能拦截方法调用。Vue 3 的响应式系统就是用 `Proxy` 替代了 Vue 2 的 `Object.defineProperty`。Python 的装饰器则更轻量——它是一个函数，接收函数返回新函数，常用于日志、权限、缓存等场景，比 Java 的代理更直观简洁。
+
 **扩展：CGLIB 动态代理**
 
 - **原理**：通过字节码技术生成目标类的子类代理。
 - **特点**：可代理普通类，但无法代理 `final` 类/方法。
 
-### 【中等】JDK 动态代理和 CGLIB 动态代理有什么区别？⭐⭐
+### 【中等】JDK 动态代理和 CGLIB 动态代理有什么区别？⭐⭐⭐⭐
 
 JDK 动态代理 vs. CGLIB 动态代理：
 
@@ -493,6 +575,23 @@ UserService proxy = (UserService) enhancer.create();  // 生成子类对象
 - **CGLIB**：基于继承，字节码增强，功能强但有 `final` 限制。
 - **选择依据**：目标是否有接口、性能需求、是否允许第三方依赖。
 
+::: info CGLIB 的现状与 ByteBuddy 的崛起
+
+:::
+
+CGLIB 曾是 Java 生态中字节码增强的事实标准，但近年来已被 **ByteBuddy** 逐步取代：
+
+| 对比            | CGLIB                                  | ByteBuddy                                  |
+| :-------------- | :------------------------------------- | :----------------------------------------- |
+| **活跃度**      | 2015 年后几乎停更                      | 持续活跃维护（最新版本 2024+）             |
+| **API 易用性**  | 低（`Enhancer` + `MethodInterceptor`） | 高（流式 API + 类型安全）                  |
+| **JDK 兼容性**  | JDK 17+ 反射限制导致报错               | 完美支持 JDK 8~21+                         |
+| **Spring 选择** | Spring 4.x 之前默认                    | Spring 5+ / Spring Boot 3+ 转向 ByteBuddy  |
+| **Hibernate**   | —                                      | Hibernate 5+ 使用 ByteBuddy 替代 Javassist |
+| **Mockito**     | —                                      | Mockito 2+ 放弃 CGLIB，全面迁移 ByteBuddy  |
+
+面试中如果能说出"Spring Boot 3.x 已经默认使用 ByteBuddy 而非 CGLIB"，表明你关注生态演进，而非停留在历史答案。
+
 ## Java 注解
 
 ### 【中等】Java 中的注解原理是什么？⭐⭐
@@ -528,7 +627,7 @@ UserService proxy = (UserService) enhancer.create();  // 生成子类对象
 - **代码生成**：Lombok 的 `@Data`
 - **静态检查**：`@Nullable`、`@Deprecated`
 
-### 【中等】如何自定义注解并使用注解处理器？⭐
+### 【中等】如何自定义注解并使用注解处理器？⭐⭐
 
 **自定义注解**：
 
@@ -585,7 +684,7 @@ public class MyProcessor extends AbstractProcessor {
 
 ## Java 枚举
 
-### 【中等】Java 枚举的原理是什么？⭐
+### 【中等】Java 枚举的原理是什么？⭐⭐
 
 Java 枚举（`enum`）从 JDK 5 引入，**本质是继承自 `java.lang.Enum` 的 final 类**，每个枚举常量是类的单例实例。
 
@@ -655,7 +754,7 @@ public enum OrderStatus {
 - `Constructor.newInstance()` **禁止创建枚举对象**（源码有强制检查）。
 - `Enum.valueOf()` 是获取枚举实例的安全方式。
 
-### 【中等】为什么说枚举是实现单例的最佳方式？⭐
+### 【中等】为什么说枚举是实现单例的最佳方式？⭐⭐
 
 《Effective Java》Item 3 明确推荐：**单元素的枚举类型是实现 Singleton 的最佳方法**。
 
@@ -735,7 +834,7 @@ EnumSet<Day> all = EnumSet.allOf(Day.class);
 
 ## Java SPI
 
-### 【中等】什么是 SPI，有什么用？⭐⭐
+### 【中等】什么是 SPI，有什么用？⭐⭐⭐
 
 SPI 通过`接口+配置文件`实现**运行时服务发现**，是解耦和扩展的利器，JDBC/日志等经典框架均基于此机制。
 
@@ -789,7 +888,7 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 
 ## Java IO
 
-### 【简单】什么是序列化？什么是反序列化？⭐⭐
+### 【简单】什么是序列化？什么是反序列化？⭐⭐⭐
 
 **基本概念**
 
@@ -845,7 +944,7 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
   - 使用白名单控制反序列化类
   - 替换为 JSON 等文本协议
 
-### 【中等】Java 提供了哪些 IO 方式？⭐⭐
+### 【中等】Java 提供了哪些 IO 方式？⭐⭐⭐
 
 Java 提供了多种 I/O（输入输出）方式，主要分为 **传统 I/O（BIO）、NIO（New I/O）、AIO（异步 I/O）** 三大类，并支持 **文件操作、网络通信、序列化** 等场景。以下是主要 I/O 方式的概述及要点：
 
@@ -961,7 +1060,7 @@ fileChannel.read(buffer, 0, buffer, new CompletionHandler<Integer, ByteBuffer>()
 
 如果需要更高层次的封装，可以考虑 **Apache Commons IO**、**Guava** 等工具库。
 
-### 【困难】NIO 如何实现多路复用？⭐⭐
+### 【困难】NIO 如何实现多路复用？⭐⭐⭐
 
 ::: info Java NIO 的核心组件有哪些？
 
@@ -1339,7 +1438,7 @@ String html = """
 
 ## JDK 8 新特性
 
-### 【中等】Optional 的正确使用方式？⭐⭐
+### 【中等】Optional 的正确使用方式？⭐⭐⭐
 
 `Optional` 是 Java 8 引入的**容器对象**，优雅处理可能为 `null` 的值。
 
@@ -1351,7 +1450,7 @@ String html = """
 | `ofNullable(T)`              | 允许 null                      |
 | `isPresent()` / `isEmpty()`  | 是否有值（Java 11+ `isEmpty`） |
 | `orElse(T)`                  | 无值返回默认                   |
-| `orElseGet(Supplier)`        | 懒加载默认                   |
+| `orElseGet(Supplier)`        | 懒加载默认                     |
 | `orElseThrow()`              | 无值抛异常                     |
 | `map` / `flatMap` / `filter` | 链式转换                       |
 
@@ -1380,7 +1479,7 @@ public void process(Optional<String> input) { ... }
 String s = optional.get();  // 可能 NPE
 ```
 
-### 【中等】Lambda 表达式和函数式接口是什么？⭐⭐⭐
+### 【中等】Lambda 表达式和函数式接口是什么？⭐⭐⭐⭐
 
 **Lambda 表达式**是 Java 8 引入的**匿名函数**，将行为作为参数传递，简化函数式编程。
 
@@ -1398,26 +1497,90 @@ list.sort(Comparator.comparingInt(String::length));
 
 **核心语法**：`(参数列表) -> { 方法体 }`
 
-| 形式 | 示例 |
-| :--- | :--- |
-| 无参 | `() -> System.out.println("hello")` |
-| 单参（可省略括号） | `s -> s.length()` |
-| 多参 | `(a, b) -> a + b` |
-| 方法引用 | `String::valueOf`、`System.out::println` |
+| 形式               | 示例                                     |
+| :----------------- | :--------------------------------------- |
+| 无参               | `() -> System.out.println("hello")`      |
+| 单参（可省略括号） | `s -> s.length()`                        |
+| 多参               | `(a, b) -> a + b`                        |
+| 方法引用           | `String::valueOf`、`System.out::println` |
 
 **函数式接口**：只有**一个抽象方法**的接口，用 `@FunctionalInterface` 注解。Lambda 本质是函数式接口的实例。
 
-| 函数式接口 | 方法 | 用途 |
-| :--- | :--- | :--- |
-| `Function<T,R>` | `R apply(T t)` | 输入 T 输出 R（转换） |
-| `Consumer<T>` | `void accept(T t)` | 消费 T（无返回） |
-| `Supplier<T>` | `T get()` | 生产 T（无输入） |
-| `Predicate<T>` | `boolean test(T t)` | 判断 T（返回布尔） |
-| `BiFunction<T,U,R>` | `R apply(T t, U u)` | 双输入单输出 |
+| 函数式接口          | 方法                | 用途                  |
+| :------------------ | :------------------ | :-------------------- |
+| `Function<T,R>`     | `R apply(T t)`      | 输入 T 输出 R（转换） |
+| `Consumer<T>`       | `void accept(T t)`  | 消费 T（无返回）      |
+| `Supplier<T>`       | `T get()`           | 生产 T（无输入）      |
+| `Predicate<T>`      | `boolean test(T t)` | 判断 T（返回布尔）    |
+| `BiFunction<T,U,R>` | `R apply(T t, U u)` | 双输入单输出          |
 
-**记忆点**：Lambda = “行为参数化”，函数式接口 = “只有一个抽象方法的接口”，两者配合实现简洁的函数式编程。
+#### 🔬 Lambda 的底层实现：invokedynamic（关键区分）
 
-### 【困难】Stream API 的核心操作有哪些？⭐⭐⭐
+**⚠️ 常见误区**：Lambda 是匿名内部类的语法糖。
+
+**真相**：Lambda 和匿名内部类在 JVM 层面**完全不同**。匿名内部类在**编译期**生成 `ClassName$1.class` 文件（每次 `new` 创建一个新对象）；Lambda 在**运行期**通过 `invokedynamic` 指令动态链接，由 `LambdaMetafactory` 生成方法句柄，**不生成 `.class` 文件，也不保证每次创建新对象**。
+
+```asm
+; 匿名内部类字节码：编译期生成独立类
+ 0: new #7       // 编译期确定: new AnonymousClass$1
+ 3: dup
+ 4: invokespecial #9  // 调用 AnonymousClass$1.<init>
+
+; Lambda 字节码：运行时动态链接
+invokedynamic #14  // BootstrapMethod: LambdaMetafactory.metafactory()
+                   // 静态参数: ()V, 函数式接口方法, lambda body 实现
+```
+
+**`invokedynamic` 的工作流程**：
+
+```
+1. JVM 首次遇到 invokedynamic 指令
+   → 调用 Bootstrap Method: LambdaMetafactory.metafactory()
+
+2. LambdaMetafactory 在运行时生成一个实现函数式接口的类
+   → 通过 ASM 直接生成字节码
+   → 通过 Unsafe.defineAnonymousClass 加载（不生成 .class 文件）
+
+3. 返回一个 CallSite（调用点），后续调用直接使用该 CallSite
+   → 返回的可能是一个新对象，也可能是缓存的单例（取决于是否捕获外部变量）
+```
+
+**Lambda 是否每次创建新对象？**
+
+```java
+// 不捕获外部变量 → JVM 可能复用同一个实例（单例）
+Supplier<String> s1 = () -> "hello";
+Supplier<String> s2 = () -> "hello";
+System.out.println(s1 == s2);  // 可能为 true！（JVM 优化为常量）
+
+// 捕获外部变量 → 每次创建新对象
+String prefix = "msg: ";
+Supplier<String> s3 = () -> prefix + "hello";  // 每次 new 一个对象
+
+// 匿名内部类 → 每次一定 new 新对象
+Supplier<String> s4 = new Supplier<>() {  // 每个 new 都是不同对象
+    public String get() { return "hello"; }
+};
+```
+
+> **📌 面试度量**：⭐⭐⭐⭐ 的原因——90% 的人认为 Lambda 就是匿名类的语法糖。能说出 `invokedynamic` 指令、`LambdaMetafactory` Bootstrap Method、以及"不捕获变量时返回单例 vs 捕获变量时返回新对象"的区别，直达到 L3 级别。
+
+**记忆点**：Lambda = "行为参数化"，函数式接口 = "只有一个抽象方法的接口"，底层 = `invokedynamic` + `LambdaMetafactory`（区别于匿名内部类的编译期类生成）。
+
+#### 跨语言视角：Lambda/Closure 的四种实现策略
+
+| 语言       | 实现策略                            | 核心差异                                                      |
+| :--------- | :---------------------------------- | :------------------------------------------------------------ |
+| **Java**   | `invokedynamic` + 运行时生成 SAM 类 | 编译期不产生 `.class`，运行时动态链接                         |
+| **C++**    | 编译期生成匿名仿函数类              | 零运行时开销，但每个 lambda 产生**不同**类型（即使签名相同）  |
+| **Rust**   | 编译期生成匿名结构体 + trait impl   | `Fn`/`FnMut`/`FnOnce` 三种 trait 区分捕获方式，所有权融入闭包 |
+| **Python** | 运行时创建 `function` 对象          | 简单但慢——每次 `def` 或 `lambda` 都是对象创建，无 JIT 优化    |
+
+C++ lambda 的 `[]` 捕获列表（`[=]` 按值、`[&]` 按引用、`[this]` 等）是对**按值捕获 vs 按引用捕获**最精细的控制，而 Java lambda 默认是 **effectively final 变量的隐式按值捕获**。Rust 更进一步，将所有权模型带入闭包——`move` 关键字将变量所有权移入闭包，编译器保证 use-after-move 在编译期捕获。
+
+**一个有趣的事实**：C++ 每个 lambda 产生**不同的类型**（即使签名完全一致），这使得两个签名相同的 lambda 不能互相赋值。Java 采用**目标类型推断**——lambda 的类型取决于赋值的函数式接口，不同 lambda 只要匹配同一接口就可以互换。这是 Java "更灵活"的思路 vs C++ "更静态安全" 思路的典型体现。
+
+### 【困难】Stream API 的核心操作有哪些？⭐⭐⭐⭐
 
 **Stream API（Java 8）**提供对集合的**声明式、链式、并行化**数据处理能力。
 
@@ -1435,10 +1598,10 @@ List<String> names = users.stream()           // 数据源
 
 **中间操作 vs 终端操作**：
 
-| 类型 | 特点 | 常见操作 |
-| :--- | :--- | :--- |
-| **中间操作** | 返回 Stream，**懒执行**，链式调用 | `filter`、`map`、`flatMap`、`sorted`、`distinct`、`limit`、`skip`、`peek` |
-| **终端操作** | 触发实际计算，返回结果或副作用 | `collect`、`forEach`、`reduce`、`count`、`findFirst`、`anyMatch`、`toList` |
+| 类型         | 特点                              | 常见操作                                                                   |
+| :----------- | :-------------------------------- | :------------------------------------------------------------------------- |
+| **中间操作** | 返回 Stream，**懒执行**，链式调用 | `filter`、`map`、`flatMap`、`sorted`、`distinct`、`limit`、`skip`、`peek`  |
+| **终端操作** | 触发实际计算，返回结果或副作用    | `collect`、`forEach`、`reduce`、`count`、`findFirst`、`anyMatch`、`toList` |
 
 **reduce vs collect**：
 
@@ -1460,11 +1623,72 @@ long count = list.parallelStream()  // 利用多核 CPU 并行处理
 ```
 
 **注意事项**：
+
 - 并行流不适用于小数据集（线程开销 > 计算收益）
 - 避免在并行流中使用有副作用的操作
 - `findFirst` 在并行流中代价高（需全局同步），优先用 `findAny`
 
-### 【中等】Java 8 接口的默认方法和静态方法是什么？⭐⭐
+#### 🔬 Stream 的惰性求值机制：Sink 链
+
+Stream 中间操作**不会立即执行**，而是构建一条 **Sink 链**（责任链模式），直到终端操作才触发整条链的执行：
+
+```
+数据源 → filter Sink → map Sink → sorted Sink → 终端 Sink
+         ↑ 每个中间操作返回一个新的 Sink 包装前一个 Sink
+```
+
+```java
+// 这段代码不会执行任何操作（无终端操作）
+users.stream()
+    .filter(u -> { System.out.println("filter"); return true; });  // 不打印！
+
+// 只有加了终端操作，filter 才会被调用
+users.stream()
+    .filter(u -> { System.out.println("filter"); return true; })
+    .collect(Collectors.toList());  // 此时才打印 "filter"
+```
+
+**短路操作**会提前终止遍历——终端操作 `findFirst()` 与中间操作 `limit()` 配合，找到第一个匹配元素后立即停止：
+
+```java
+// 只需找到第一个 > 18 的用户，不会遍历整个集合
+users.stream()
+    .filter(u -> u.getAge() > 18)
+    .findFirst();  // 短路终端操作
+```
+
+> **关键原则**：`filter` 放在 `sorted` 前面（先减数据量再排序），`limit` 放在 `peek` 前面（先截断再调试）。操作顺序直接影响性能。
+
+#### 🔬 并行流的拆分原理：Spliterator
+
+并行流的底层依赖 **Spliterator**（Splittable Iterator），它定义了如何**递归拆分**数据源给多个线程：
+
+```
+原始数据 [1,2,3,4,5,6,7,8]
+    trySplit() → [1,2,3,4] + [5,6,7,8]
+    trySplit() → [1,2] + [3,4] + [5,6] + [7,8]
+    4 个线程并行处理 4 个子流
+```
+
+**拆分效率**：ArrayList 的 `ArrayListSpliterator` 基于数组索引拆分（O(1)），LinkedList 的拆分需要先遍历到中点（O(n)），因此 LinkedList 并行流性能很差——需要 `collect(toList())` 转换为 ArrayList 后再并行。
+
+> **📌 面试度量**：⭐⭐⭐⭐ 的原因——会用 Stream 的人很多，但能讲清楚**惰性求值 Sink 链**和**短路操作的终止时机**，以及**为什么 LinkedList 不适合并行流**（Spliterator 拆分复杂度）的，才说明真正理解了 Stream 的设计哲学。
+
+#### 跨语言视角：惰性集合处理的设计谱系
+
+| 语言/框架       | 惰性集合机制                                     | 核心差异                                                                       |
+| :-------------- | :----------------------------------------------- | :----------------------------------------------------------------------------- |
+| **Java Stream** | Sink 链 + 终端触发                               | push-based，按元素驱动（每个元素走完整条链）                                   |
+| **C# LINQ**     | `IEnumerable<T>` + 迭代器                        | pull-based，按需拉取（类似生成器模式）                                         |
+| **Python**      | 生成器 `yield` / 列表推导式                      | 生成器是 pull-based，边计算边产出；推导式是 eager 的                           |
+| **Rust**        | `Iterator` trait + `map`/`filter`/`collect`      | 编译期单态化，零抽象成本——`map().filter().collect()` 展开后等价于手写 for 循环 |
+| **Kotlin**      | `Sequence`（惰性） vs `Collection` 扩展（eager） | 与 Java Stream 几乎一样的设计：`asSequence()` 开启惰性，终端操作触发           |
+
+**Java Stream 的 push-based 设计**：每个元素"被推入"整条 Sink 链的处理管道。这意味着 `sorted()` 这样的操作必须先收集所有元素才能排序——它是**有状态中间操作**，在管道中形成了一个"屏障"。相比之下，C# LINQ 的 pull-based 迭代器天然是惰性的，不需要显式的"终端操作"概念。
+
+**Rust 的零成本迭代器**：Rust 的迭代器链（`iter().filter().map().sum()`）在编译后展开为等价的手写循环。因为 Rust 没有运行时反射和 GC，编译器可以在编译期完成内联和优化，运行时没有任何虚函数调用开销。这是 Java Stream 做不到的——Java 的每个 filter/map 操作至少经过一次接口方法分派。
+
+### 【中等】Java 8 接口的默认方法和静态方法是什么？⭐⭐⭐
 
 Java 8 允许接口定义**默认方法（`default`）**和**静态方法**，解决了接口演化问题。
 
@@ -1486,11 +1710,11 @@ public interface Logger {
 
 **默认方法的菱形冲突规则**：
 
-| 场景 | 规则 |
-| :--- | :--- |
-| 类方法 vs 接口默认方法 | **类优先**：类的实例方法始终胜出 |
-| 两个接口有同名默认方法 | **编译报错**，必须在子接口/实现类中显式重写 |
-| 子接口重写父接口默认方法 | 子接口的版本生效 |
+| 场景                     | 规则                                        |
+| :----------------------- | :------------------------------------------ |
+| 类方法 vs 接口默认方法   | **类优先**：类的实例方法始终胜出            |
+| 两个接口有同名默认方法   | **编译报错**，必须在子接口/实现类中显式重写 |
+| 子接口重写父接口默认方法 | 子接口的版本生效                            |
 
 ```java
 // 菱形冲突解决
@@ -1502,19 +1726,19 @@ class C implements A, B {
 }
 ```
 
-### 【中等】Java 8 的 java.time API 解决了什么问题？⭐⭐
+### 【中等】Java 8 的 java.time API 解决了什么问题？⭐⭐⭐
 
 `java.time`（JSR-310）解决了 `java.util.Date`/`Calendar` 的三大痛点：**非线程安全、设计混乱、时区处理复杂**。
 
-| 类 | 用途 | 示例 |
-| :--- | :--- | :--- |
-| `LocalDate` | 日期（无时间、无时区） | `LocalDate.of(2024, 1, 1)` |
-| `LocalTime` | 时间（无日期、无时区） | `LocalTime.of(14, 30)` |
-| `LocalDateTime` | 日期 + 时间（无时区） | `LocalDateTime.now()` |
-| `ZonedDateTime` | 日期 + 时间 + 时区 | `ZonedDateTime.now(ZoneId.of("Asia/Shanghai"))` |
-| `Instant` | 时间戳（UTC） | `Instant.now()` |
-| `Duration` | 时间间隔（时分秒） | `Duration.between(t1, t2)` |
-| `Period` | 日期间隔（年月日） | `Period.between(d1, d2)` |
+| 类              | 用途                   | 示例                                            |
+| :-------------- | :--------------------- | :---------------------------------------------- |
+| `LocalDate`     | 日期（无时间、无时区） | `LocalDate.of(2024, 1, 1)`                      |
+| `LocalTime`     | 时间（无日期、无时区） | `LocalTime.of(14, 30)`                          |
+| `LocalDateTime` | 日期 + 时间（无时区）  | `LocalDateTime.now()`                           |
+| `ZonedDateTime` | 日期 + 时间 + 时区     | `ZonedDateTime.now(ZoneId.of("Asia/Shanghai"))` |
+| `Instant`       | 时间戳（UTC）          | `Instant.now()`                                 |
+| `Duration`      | 时间间隔（时分秒）     | `Duration.between(t1, t2)`                      |
+| `Period`        | 日期间隔（年月日）     | `Period.between(d1, d2)`                        |
 
 **核心优势**：
 
@@ -1549,16 +1773,16 @@ list.stream().filter((@NotNull var s) -> s.length() > 5);
 
 **使用限制**：
 
-| 场景 | 是否支持 | 示例 |
-| :--- | :--- | :--- |
-| 局部变量 | ✔️ | `var list = new ArrayList<String>();` |
-| for 循环 | ✔️ | `for (var item : collection)` |
-| try-with-resources | ✔️ | `try (var reader = new BufferedReader(...))` |
-| 方法参数 | ❌ | `void method(var x)` — 不允许 |
-| 返回值 | ❌ | `var method()` — 不允许 |
-| 字段 | ❌ | `private var name;` — 不允许 |
-| 无初始化 | ❌ | `var x;` — 不允许，无法推断 |
-| 赋 null | ❌ | `var x = null;` — 不允许，无法推断 |
+| 场景               | 是否支持 | 示例                                         |
+| :----------------- | :------- | :------------------------------------------- |
+| 局部变量           | ✔️       | `var list = new ArrayList<String>();`        |
+| for 循环           | ✔️       | `for (var item : collection)`                |
+| try-with-resources | ✔️       | `try (var reader = new BufferedReader(...))` |
+| 方法参数           | ❌       | `void method(var x)` — 不允许                |
+| 返回值             | ❌       | `var method()` — 不允许                      |
+| 字段               | ❌       | `private var name;` — 不允许                 |
+| 无初始化           | ❌       | `var x;` — 不允许，无法推断                  |
+| 赋 null            | ❌       | `var x = null;` — 不允许，无法推断           |
 
 **最佳实践**：仅在类型明显时（如构造器右侧）使用 `var`，避免降低代码可读性。
 
@@ -1586,25 +1810,25 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 
 **核心特点**：
 
-| 特性 | 说明 |
-| :--- | :--- |
-| **同步 + 异步** | `send()` 同步、`sendAsync()` 异步（返回 `CompletableFuture`） |
-| **HTTP/2** | 默认支持 HTTP/2（多路复用、头部压缩） |
-| **WebSocket** | 内置 WebSocket 客户端支持 |
+| 特性             | 说明                                                           |
+| :--------------- | :------------------------------------------------------------- |
+| **同步 + 异步**  | `send()` 同步、`sendAsync()` 异步（返回 `CompletableFuture`）  |
+| **HTTP/2**       | 默认支持 HTTP/2（多路复用、头部压缩）                          |
+| **WebSocket**    | 内置 WebSocket 客户端支持                                      |
 | **BodyHandlers** | 灵活处理响应体：`ofString`、`ofFile`、`ofByteArray`、`ofLines` |
 
 ### 【中等】Java 11 的字符串 API 有哪些增强？⭐
 
 Java 11 为 `String` 类新增了多个实用方法：
 
-| 方法 | 说明 | 示例 |
-| :--- | :--- | :--- |
-| `isBlank()` | 是否为空或纯空白字符 | `" ".isBlank()` → `true` |
-| `strip()` | 去除首尾空白（支持 Unicode） | `" hello ".strip()` → `"hello"` |
-| `stripLeading()` | 去除前导空白 | |
-| `stripTrailing()` | 去除尾部空白 | |
-| `lines()` | 按行分割返回 Stream | `"a\nb\nc".lines().count()` → `3` |
-| `repeat(int)` | 重复拼接 | `"ab".repeat(3)` → `"ababab"` |
+| 方法              | 说明                         | 示例                              |
+| :---------------- | :--------------------------- | :-------------------------------- |
+| `isBlank()`       | 是否为空或纯空白字符         | `" ".isBlank()` → `true`          |
+| `strip()`         | 去除首尾空白（支持 Unicode） | `" hello ".strip()` → `"hello"`   |
+| `stripLeading()`  | 去除前导空白                 |                                   |
+| `stripTrailing()` | 去除尾部空白                 |                                   |
+| `lines()`         | 按行分割返回 Stream          | `"a\nb\nc".lines().count()` → `3` |
+| `repeat(int)`     | 重复拼接                     | `"ab".repeat(3)` → `"ababab"`     |
 
 **`strip()` vs `trim()`**：`strip()` 基于 `Character.isWhitespace()`，支持 Unicode 空白字符；`trim()` 仅处理 ASCII ≤ 32 的字符。
 
@@ -1612,12 +1836,13 @@ Java 11 为 `String` 类新增了多个实用方法：
 
 JDK 11 是 GC 领域的重要里程碑，引入了两个新一代垃圾收集器：
 
-| 收集器 | JDK 版本 | 核心特点 |
-| :--- | :--- | :--- |
-| **ZGC**（实验） | JDK 11 | 亚毫秒停顿（<10ms），支持 TB 级堆，基于着色指针 + 读屏障 |
-| **Shenandoah** | JDK 12 | 低延迟（与 ZGC 竞争），基于转发指针，Red Hat 开发 |
+| 收集器          | JDK 版本 | 核心特点                                                 |
+| :-------------- | :------- | :------------------------------------------------------- |
+| **ZGC**（实验） | JDK 11   | 亚毫秒停顿（<10ms），支持 TB 级堆，基于着色指针 + 读屏障 |
+| **Shenandoah**  | JDK 12   | 低延迟（与 ZGC 竞争），基于转发指针，Red Hat 开发        |
 
 **其他 GC 变更**：
+
 - **G1 成为默认 GC**（JDK 9 起）
 - **CMS 被标记为废弃**（JDK 9），JDK 14 正式移除
 - **Epsilon GC**（JDK 11）：不做任何回收，仅用于性能测试基准
@@ -1716,12 +1941,12 @@ String json = """
 
 **特性**：
 
-| 特性 | 说明 |
-| :--- | :--- |
-| **自动缩进** | 以公共缩进为基准，自动去除多余缩进 |
-| **换行符** | 统一为 `\n`（跨平台一致） |
-| **转义字符** | 支持 `\s`（保留尾部空格）、`\\`（行尾不换行） |
-| **String.formatted()** | JDK 15+ 支持 `"""...""".formatted(args)` |
+| 特性                   | 说明                                          |
+| :--------------------- | :-------------------------------------------- |
+| **自动缩进**           | 以公共缩进为基准，自动去除多余缩进            |
+| **换行符**             | 统一为 `\n`（跨平台一致）                     |
+| **转义字符**           | 支持 `\s`（保留尾部空格）、`\\`（行尾不换行） |
+| **String.formatted()** | JDK 15+ 支持 `"""...""".formatted(args)`      |
 
 ```java
 // 格式化文本块
@@ -1732,7 +1957,7 @@ String sql = """
     """.formatted(18, "北京");
 ```
 
-### 【中等】JDK 17 的 instanceof 模式匹配是什么？⭐⭐
+### 【中等】JDK 17 的 instanceof 模式匹配是什么？⭐⭐⭐
 
 **instanceof 模式匹配（JDK 16 正式版）**将类型检查和变量绑定合二为一，消除显式强制转换。
 
@@ -1764,7 +1989,7 @@ if (!(obj instanceof String s)) {
 System.out.println(s.length());
 ```
 
-### 【中等】JDK 17 的 switch 表达式增强是什么？⭐⭐
+### 【中等】JDK 17 的 switch 表达式增强是什么？⭐⭐⭐
 
 **switch 表达式（JDK 14 正式版）**引入了 `->` 箭头语法和 `yield` 返回值，使 switch 可作为表达式使用。
 
@@ -1797,12 +2022,12 @@ String result = switch (code) {
 
 **核心优势**：
 
-| 特性 | 传统 switch | JDK 17 switch 表达式 |
-| :--- | :--- | :--- |
-| **返回值** | 不支持 | 可直接赋值给变量 |
-| **case 穿透** | 需 `break`（易遗漏） | `->` 自动不穿透 |
-| **多值合并** | 每个 case 一行 | `case A, B, C ->` |
-| **穷尽检查** | 无强制 | 表达式必须穷尽所有分支 |
+| 特性          | 传统 switch          | JDK 17 switch 表达式   |
+| :------------ | :------------------- | :--------------------- |
+| **返回值**    | 不支持               | 可直接赋值给变量       |
+| **case 穿透** | 需 `break`（易遗漏） | `->` 自动不穿透        |
+| **多值合并**  | 每个 case 一行       | `case A, B, C ->`      |
+| **穷尽检查**  | 无强制               | 表达式必须穷尽所有分支 |
 
 ## JDK 21 新特性
 
@@ -1878,7 +2103,7 @@ String describe(Object obj) {
 
 **核心价值**：实现了**代数数据类型的完整模式匹配**，使 Java 具备了类似 Scala/Kotlin 的解构能力。
 
-### 【中等】JDK 21 的未命名变量（Unnamed Variables）是什么？⭐⭐
+### 【中等】JDK 21 的未命名变量（Unnamed Variables）是什么？⭐
 
 **未命名变量（Unnamed Variables，JDK 21 预览）**用 `_` 表示“声明但不使用”的变量，提升代码可读性。
 

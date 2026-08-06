@@ -4,7 +4,7 @@ date: 2020-06-04 13:51:01
 categories:
   - Java
   - JavaCore
-  - 基础特性
+  - 基础
 tags:
   - Java
   - JavaCore
@@ -16,9 +16,9 @@ dir:
   link: true
 ---
 
-# Java 基础特性
+# Java 基础
 
-> 【Java 基础特性】专题涵盖语言核心语法、类型系统、面向对象三大范式、控制流与异常体系，以及泛型、反射、注解等运行时机制。这些是 Java 开发的基石，深入理解有助于编写健壮、可维护的代码，也是面试高频考察点。
+> 【Java 基础】专题涵盖语言核心语法、类型系统、面向对象三大范式、控制流与异常体系，以及泛型、反射、注解等运行时机制。这些是 Java 开发的基石，深入理解有助于编写健壮、可维护的代码，也是面试高频考察点。
 
 ## 📖 内容
 
@@ -34,6 +34,12 @@ dir:
 - [Java 反射]([JavaCore]反射.md) - 关键词：`Class`、`invoke`、`动态代理`、`CGLIB`、`InvocationHandler`
 - [Java 注解]([JavaCore]注解.md) - 关键词：`元注解`、`@Retention`、`@Target`、`自定义注解`、`反射解析`
 - [Java String 类型]([JavaCore]String.md) - 关键词：`不可变`、`字符串常量池`、`intern`、`StringBuilder`、`StringBuffer`
+- [Java 正则]([JavaCore]正则.md) - 关键词：`Pattern`、`Matcher`、`捕获与非捕获`、`零宽断言`、`贪婪与懒惰`
+- [Java 编码和加密]([JavaCore]编码和加密.md) - 关键词：`Base64`、`消息摘要`、`数字签名`、`对称加密`、`非对称加密`
+- [Java 国际化]([JavaCore]国际化.md) - 关键词：`Locale`、`ResourceBundle`、`NumberFormat`、`DateFormat`、`MessageFormat`
+- [Java SPI]([JavaCore]SPI.md) - 关键词：`SPI`、`ServiceLoader`、`ClassLoader`、`扩展点`
+- [Java Agent]([JavaCore]Agent.md) - 关键词：`Instrumentation`、`premain`、`ClassFileTransformer`、`字节码增强`、`JVMTI`
+- [Java JDK8]([JavaCore]JDK8.md) - 关键词：`Stream`、`Lambda`、`Optional`、`@FunctionalInterface`
 
 ## 📚 资料
 

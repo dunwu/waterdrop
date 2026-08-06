@@ -18,7 +18,7 @@ permalink: /pages/ed0f8b4b/
 
 ## Stream API
 
-### 【中等】Stream API 的中间操作和终端操作有什么区别？⭐
+### 【中等】Stream API 的中间操作和终端操作有什么区别？⭐⭐⭐
 
 Stream 操作分为**中间操作**（返回 Stream，可链式）和**终端操作**（触发执行，返回结果）。
 
@@ -68,7 +68,7 @@ Stream<String> stream = list.stream()
 stream.forEach(System.out::println);  // 此刻才执行全部流水线
 ```
 
-### 【中等】什么是短路操作？⭐
+### 【中等】什么是短路操作？⭐⭐
 
 **短路操作**指无需处理所有元素即可返回结果，提升性能。
 
@@ -101,7 +101,7 @@ boolean hasLong = list.stream()
     .anyMatch(s -> s.length() > 10);
 ```
 
-### 【中等】并行流（Parallel Stream）的原理和注意事项？⭐
+### 【中等】并行流（Parallel Stream）的原理和注意事项？⭐⭐⭐
 
 并行流利用 **ForkJoinPool.commonPool()** 并行处理数据，适合**数据量大**且**无顺序要求**的场景。
 
@@ -166,7 +166,7 @@ long count = IntStream.range(0, 10_000_000)
     .count();  // 并行更快
 ```
 
-### 【中等】Collectors 工具类有哪些常用方法？⭐
+### 【中等】Collectors 工具类有哪些常用方法？⭐⭐⭐
 
 `Collectors` 提供丰富的收集器，是 Stream API 的核心工具。
 

@@ -18,7 +18,7 @@ permalink: /pages/96684ccf/
 
 ## Java 锁
 
-### 【中等】Java 中，根据不同维度划分，锁有哪些分类？⭐⭐
+### 【中等】Java 中，根据不同维度划分，锁有哪些分类？⭐⭐⭐
 
 在 Java 中，锁可以按照 **多个维度** 进行分类，不同维度的锁适用于不同的并发场景。以下是详细的分类：
 
@@ -95,7 +95,7 @@ permalink: /pages/96684ccf/
 
 这些分类帮助开发者根据业务场景选择最优的锁策略，平衡 **性能、公平性、一致性**。
 
-### 【中等】悲观锁和乐观锁有什么区别？⭐⭐
+### 【中等】悲观锁和乐观锁有什么区别？⭐⭐⭐⭐
 
 **悲观锁假定会冲突，提前加锁阻塞；乐观锁假定不冲突，提交时检测版本，冲突则重试。**
 
@@ -117,7 +117,7 @@ permalink: /pages/96684ccf/
 | **典型应用**   | - 银行转账<br>- 订单支付<br>- 数据库行级锁                         | - 库存扣减<br>- 计数器<br>- 点赞系统                    |
 | **优缺点**     | ✔️ 强一致性<br>❌ 吞吐量低、死锁风险                               | ✔️ 高并发性能好<br>❌ 实现复杂、可能 ABA 问题           |
 
-### 【中等】公平锁和非公平锁有什么区别？⭐⭐
+### 【中等】公平锁和非公平锁有什么区别？⭐⭐⭐
 
 **公平锁按请求顺序分配，非公平锁允许插队，可能让先到的线程等待。**
 
@@ -158,7 +158,7 @@ permalink: /pages/96684ccf/
 - **性能差异**：非公平锁在高并发下吞吐量可提升 **10%~30%**，但可能增加延迟方差。
 - **synchronized 的公平性**：Java 的 `synchronized` **不支持公平锁**，仅 `ReentrantLock` 可配置。
 
-### 【困难】AQS 的实现原理是什么？⭐⭐⭐
+### 【困难】AQS 的实现原理是什么？⭐⭐⭐⭐⭐
 
 AQS（**AbstractQueuedSynchronizer**）是 Java 并发包（`java.util.concurrent.locks`）的核心框架，用于构建锁（如 `ReentrantLock`）和同步器（如 `CountDownLatch`、`Semaphore`）。
 
@@ -213,6 +213,96 @@ graph TD
     K --> F
 ```
 
+**源码锚点（资深面试加分项）**
+
+（1）**head 是 dummy node（哨兵节点）**：CLH 队列的 head 不保存有效线程（`node.thread == null`），它代表「最近一次成功获取锁」的位置占位。这样设计让 `acquireQueued` 的自旋条件统一为「我的前驱是 head 就再试一次 `tryAcquire`」，无需对队首做特判。
+
+（2）**`acquireQueued` 的自旋条件**：
+
+```java
+final boolean acquireQueued(final Node node, int arg) {
+    for (;;) {
+        final Node p = node.predecessor();
+        if (p == head && tryAcquire(arg)) { // 只有前驱是 head 才允许抢锁
+            setHead(node);                  // 自己成为新的 dummy head
+            p.next = null;                  // 帮助 GC
+            return false;
+        }
+        if (shouldParkAfterFailedAcquire(p, node) &&
+            parkAndCheckInterrupt()) {      // 否则 park 挂起
+            ...
+        }
+    }
+}
+```
+
+关键设计：**只有 head 的后继节点才允许 `tryAcquire`**，其余节点直接 park。这把「队列中所有线程都在 CAS 抢锁」退化为「至多一个线程在抢」，将竞争收敛到队首，避免惊群效应。
+
+（3）**`hasQueuedPredecessors` 是公平锁的核心**：`FairSync.tryAcquire` 在 CAS 前先调用它检查队列中是否有等待者，有才放弃抢锁去排队；`NonfairSync` 不检查直接 CAS。一个方法区分了公平与非公平。
+
+（4）**`SIGNAL` 状态的责任转移**：线程 park 前会把前驱节点的 `waitStatus` 置为 `SIGNAL`（「我睡了，你释放锁时记得叫醒我」），把唤醒责任挂到前驱身上；`CANCELLED`（=1，如 `tryLock` 超时）节点在遍历中被跳过并清理。
+
+::: info L4 深度：CLH 队列 vs MCS 队列的设计差异
+
+:::
+
+**CLH 队列 vs MCS 队列：为什么 AQS 选择 CLH 变体？**
+
+CLH（Craig, Landin, and Hagersten）和 MCS（Mellor-Crummey and Scott）是两种经典的 FIFO 自旋锁队列算法，两者的核心差异决定了 AQS 的设计选择：
+
+| 维度             | CLH 队列                                      | MCS 队列                              | AQS 的 CLH 变体                  |
+| :--------------- | :-------------------------------------------- | :------------------------------------ | :------------------------------- |
+| **自旋位置**     | 在前驱节点上自旋（`pred.locked`）             | 在本地节点上自旋（`myNode.locked`）   | 不自旋，`park()` 挂起            |
+| **链表方向**     | 隐式单向链表（通过 `tail` + 前驱指针遍历）    | 显式双向链表（`prev` + `next`）       | 显式双向链表                     |
+| **本地 vs 远程** | 远程自旋：每个线程 watch 前驱节点状态         | 本地自旋：每个线程 watch 自身节点状态 | 本地阻塞：自身 park/unpark       |
+| **适配阻塞**     | 原生不适合阻塞，若挂起则 successor 不知唤醒谁 | 天然适合：本地节点被前驱唤醒          | AQS 采用 MCS 思想 + CLH 队列结构 |
+
+**AQS 为什么用 CLH 变体而非纯 CLH/MCS？**
+
+1. **CLH 的自旋问题**：纯 CLH 每个线程在前驱节点上自旋（`while (pred.locked)`），在 Java 层面，CPU 空转会浪费资源。AQS 将其改为 `park()` 挂起，由前驱释放锁时 `unpark` 后继——这个「唤醒链」本质是将 CLH 的自旋检测替换为 OS 级阻塞。
+
+2. **CLH 的单向链表问题**：纯 CLH 只有隐式单向链表（通过 tail CAS + 前驱引用），无法支持取消操作和条件队列。AQS 将其改造为显式双向链表（`prev` + `next`），以便：取消节点时通过 `next` 快速找到后继、条件队列信号时能反向找到自身在同步队列的位置。
+
+3. **MCS 的冗余开销**：MCS 本身是双向链表 + 本地自旋，更接近 AQS 的最终形态。但 MCS 需要每个节点有 `locked` 标志位，而 AQS 通过 `waitStatus` 中的 `SIGNAL` 状态实现了更丰富的语义（取消、条件、传播），因此 AQS 本质上是「CLH 的队列结构 + MCS 的阻塞思想 + AQS 的状态机」。
+
+> **面试记忆点**：AQS = CLH 的 FIFO 队列骨架 + MCS 的「前驱唤醒后继」阻塞机制 + 双向链表改造（取消/条件队列需求）。
+
+::: info L4 深度：Linux futex 与 park/unpark 的关系
+
+:::
+
+**`LockSupport.park()` / `unpark()` 与 Linux futex 的对应关系**
+
+Java 的 `LockSupport.park()` / `unpark()` 最终依赖操作系统的线程阻塞原语，在 Linux 上通过 `futex`（Fast Userspace muTEX）系统调用实现。
+
+**futex 的核心设计**：futex 是 Linux 内核提供的混合同步原语——低竞争时在用户空间通过 CAS 完成（零系统调用），高竞争时才陷入内核阻塞线程。这正是 AQS 的「先 CAS 抢锁，抢不到再 park 入队」策略的 OS 层基础。
+
+```
+Java 层: LockSupport.park(this)  /  LockSupport.unpark(thread)
+            │
+   JVM 层:  Unsafe_Park / Unsafe_Unpark (HotSpot)
+            │
+   OS  层:  pthread_cond_wait / pthread_cond_signal (POSIX)
+            │ 或
+           futex(FUTEX_WAIT, ...) / futex(FUTEX_WAKE, ...) (Linux)
+```
+
+**关键机制对比**：
+
+| 维度         | `park()`/`unpark()`                                                                               | Linux futex                                     | pthread mutex                  |
+| :----------- | :------------------------------------------------------------------------------------------------ | :---------------------------------------------- | :----------------------------- |
+| **许可机制** | `unpark()` 先于 `park()` 调用时，`permit` 被记录，后续 `park()` 立即返回（类似 binary semaphore） | `FUTEX_WAIT` 严格在值相等时才等待（无许可累积） | 无许可累积，严格互斥           |
+| **唤醒语义** | `unpark()` 针对特定线程（一对一）                                                                 | `FUTEX_WAKE` 可唤醒 N 个等待者（一对多）        | `pthread_cond_signal` 唤醒一个 |
+| **超时支持** | `parkNanos()` / `parkUntil()`                                                                     | `FUTEX_WAIT` 自带 timeout 参数                  | `pthread_cond_timedwait`       |
+
+**为什么 `unpark()` 可以先于 `park()` 调用？**
+
+这是一个面试高频细节：`LockSupport` 内部维护每个线程的 `permit` 标志（boolean）。`unpark(t)` 将 `permit` 设为 1（如果已是 1 则不变），`park()` 将 `permit` 设为 0 并返回（如果已是 0 则阻塞）。因此 `unpark()` → `park()` 的顺序不阻塞，而 `park()` → `unpark()` 的顺序正常唤醒。
+
+这与 futex 的 `FUTEX_WAIT` 行为不同——`FUTEX_WAIT` 要求 `*addr == val`（原子比较），若值已被修改则不等待。AQS 的 `SIGNAL → unpark` 正是利用了这一语义：释放线程 CAS 修改 `state` 后再 `unpark`，被唤醒线程重新 `tryAcquire` 时能立刻感知状态变化。
+
+> **面试记忆点**：`park/unpark` = `permit` 机制（类似信号量）+ futex 内核阻塞；`SIGNAL` 状态是 AQS 层对 futex 的适配，确保「先改 state 再唤醒」的可见性顺序。
+
 ::: info AQS 独占模式工作流程
 
 :::
@@ -266,7 +356,7 @@ AQS 的关键方法采用模板方法设计模式串联起来：
 
 :::
 
-### 【中等】synchronized 和 ReentrantLock 有什么区别？⭐⭐⭐
+### 【中等】synchronized 和 ReentrantLock 有什么区别？⭐⭐⭐⭐⭐
 
 - `ReentrantLock` **更强大**：支持公平锁、可中断、超时、多条件变量。`ReentrantLock` **必须手动释放锁**，否则会导致死锁！
 - `synchronized` **更简单**：自动管理锁，适合基础同步需求。
@@ -360,7 +450,7 @@ public void test () throw Exception {
   - 需要精细控制（如公平性、可中断）。
   - 需要避免死锁（`tryLock`）。
 
-### 【困难】ReentrantLock 的实现原理是什么？⭐⭐⭐
+### 【困难】ReentrantLock 的实现原理是什么？⭐⭐⭐⭐
 
 本质上，**ReentrantLock 是 AQS 在独占模式下的一个经典实现**。
 
@@ -451,7 +541,71 @@ graph TD
 1. **尝试释放**：调用 `tryRelease(1)`，将 `state` 减 1。如果 `state` 减到 0，则清空独占线程标记。
 2. **唤醒后继**：如果锁完全释放（`state == 0`），则唤醒同步队列中下一个符合条件的等待线程。
 
-### 【困难】ReentrantReadWriteLock 的实现原理是什么？⭐⭐
+::: info L4 深度：C++ std::mutex 与 Java ReentrantLock 的跨语言对比
+
+:::
+
+**C++ std::mutex vs Java ReentrantLock：设计哲学的核心分歧**
+
+| 维度                | C++ `std::mutex`                                          | Java `ReentrantLock`                             |
+| :------------------ | :-------------------------------------------------------- | :----------------------------------------------- |
+| **可重入性**        | **不可重入**（同一线程重复 lock 是 UB，通常死锁）         | **可重入**（`state` 累加计数）                   |
+| **公平性**          | 标准不规定（通常实现为非公平，无公平模式 API）            | 构造参数控制公平/非公平                          |
+| **条件变量**        | 分离设计：`std::condition_variable` + `std::unique_lock`  | 内聚设计：`lock.newCondition()` 返回 `Condition` |
+| **超时机制**        | `std::timed_mutex`（独立类型）；`std::unique_lock` 不参与 | `tryLock(long, TimeUnit)` 直接内置               |
+| **RAII 封装**       | `std::lock_guard` / `std::unique_lock`（C++ 核心惯用法）  | 无标准 RAII wrapper（需手动 try-finally）        |
+| **底层实现**        | Linux：`futex`（低竞争用户态 CAS，高竞争内核阻塞）        | 同样基于 futex（通过 `park`/`unpark`）           |
+| **recursive_mutex** | 需显式使用 `std::recursive_mutex`（独立类型）             | 默认即可重入（同类型）                           |
+
+**C++ 为什么把 mutex 和 condition_variable 分开？**
+
+C++ 遵循「单一职责」原则：
+
+- `std::mutex` 只负责互斥（lock/unlock）
+- `std::condition_variable` 只负责等待-通知（wait/notify）
+- `std::unique_lock` 负责 RAII 式的锁生命周期管理
+
+三者组合使用：
+
+```cpp
+std::mutex mtx;
+std::condition_variable cv;
+std::queue<int> queue;
+
+// 生产者
+{
+    std::lock_guard<std::mutex> lock(mtx);   // RAII 自动释放
+    queue.push(data);
+}
+cv.notify_one();  // 通知在锁外，避免「惊群」
+
+// 消费者
+std::unique_lock<std::mutex> lock(mtx);      // 可手动 unlock
+cv.wait(lock, [&]{ return !queue.empty(); }); // 谓词检查防虚假唤醒
+```
+
+**Java ReentrantLock 为什么把 Condition 内聚在锁中？**
+
+Java 的设计哲学是「便利性 + 正确性优先」：
+
+1. **`newCondition()` 绑定锁实例**：避免 C++ 中 `condition_variable` 与错误的 `mutex` 搭配使用。Java 的 `Condition` 在 `await()` 时必须持有关联锁，编译期 + 运行期双重校验，杜绝 C++ 中「condition_variable 用错 mutex」的未定义行为。
+
+2. **`await()` 原子释放锁再阻塞**：Java 的 `await()` 内部自动完成「原子释放锁 → 加入条件队列 → park 阻塞」的三步操作，而 C++ 的 `wait()` 需要外部先 `unique_lock` 再传入——虽然效果等价，但 Java 的内聚设计降低了误用概率。
+
+3. **`signal()` 到 `lock` 的转移链**：被 `signal()` 的线程从条件队列移至 AQS 同步队列，等待重新获取锁——这个转移在 AQS 内部原子完成。C++ 无此机制，被 notify 的线程需重新竞争锁，可能面临优先级反转。
+
+**`std::unique_lock` vs Java ReentrantLock 的设计哲学**
+
+| 维度           | C++ `std::unique_lock`              | Java `ReentrantLock`                                               |
+| :------------- | :---------------------------------- | :----------------------------------------------------------------- |
+| **所有权模型** | move-only（所有权可转移）           | 无所有权转移概念（任意线程可 unlock，但语义上只有持有者应 unlock） |
+| **生命周期**   | RAII 自动管理（构造加锁，析构释放） | 手动 try-finally（无析构保证）                                     |
+| **灵活性**     | 可延迟加锁、提前解锁、转移所有权    | `tryLock` 支持超时/非阻塞，但无所有权转移                          |
+| **性能**       | 零开销抽象（编译期内联，无虚函数）  | JIT 优化 + 偏向锁消除，热点路径可达 native                         |
+
+> **面试记忆点**：C++ 是「积木式组合」——mutex + condition_variable + unique_lock 三者松耦合换取最大灵活性；Java 是「一体化工具」——ReentrantLock 内置公平性、可重入、Condition、超时，牺牲部分灵活性换取开箱即用的正确性。C++ 的 `recursive_mutex` 独立成类型说明可重入是有代价的（通常暗示设计问题），而 Java 默认支持可重入反映了「方便优先」的实用主义。
+
+### 【困难】ReentrantReadWriteLock 的实现原理是什么？⭐⭐⭐
 
 ::: info ReentrantReadWriteLock 的特性
 
@@ -549,7 +703,7 @@ try {
 - **cachedHoldCounter**：缓存最近一个获取读锁的线程计数器
 - **读锁计数存储**：使用 ThreadLocal 保存每个线程的重入次数，避免竞争
 
-### 【困难】StampedLock 的实现原理是什么？⭐
+### 【困难】StampedLock 的实现原理是什么？⭐⭐
 
 `StampedLock`是 JDK8 引入的高性能锁，**适合读多写少且追求极致吞吐的场景**，但需谨慎处理乐观读失败和死锁风险。
 
@@ -663,7 +817,7 @@ try {
 }
 ```
 
-### 【中等】Condition 的原理是什么？与 Object.wait/notify 有什么区别？⭐
+### 【中等】Condition 的原理是什么？与 Object.wait/notify 有什么区别？⭐⭐⭐
 
 **Condition 是 Lock 接口的条件变量，提供比 Object.wait/notify 更灵活的线程等待/通知机制**。一个 Lock 可以创建多个 Condition，实现精确唤醒。
 
@@ -696,13 +850,13 @@ graph TD
 
 **（3）与 Object.wait/notify 的对比**
 
-| 特性            | `Condition`                          | `Object.wait/notify`               |
-| --------------- | ------------------------------------ | ---------------------------------- |
-| **依赖**        | `Lock`（如 ReentrantLock）           | `synchronized`                     |
-| **等待队列数量**| 可创建多个，支持精确唤醒             | 仅一个，notifyAll 唤醒所有         |
-| **中断响应**    | `awaitUninterruptibly()` 不响应中断   | `wait()` 必响应中断                 |
-| **超时**        | `awaitUntil(date)` 支持截止时间      | `wait(timeout)` 支持超时           |
-| **不释放锁场景**| 无（await 必释放锁）                 | 无（wait 必释放锁）                |
+| 特性             | `Condition`                         | `Object.wait/notify`       |
+| ---------------- | ----------------------------------- | -------------------------- |
+| **依赖**         | `Lock`（如 ReentrantLock）          | `synchronized`             |
+| **等待队列数量** | 可创建多个，支持精确唤醒            | 仅一个，notifyAll 唤醒所有 |
+| **中断响应**     | `awaitUninterruptibly()` 不响应中断 | `wait()` 必响应中断        |
+| **超时**         | `awaitUntil(date)` 支持截止时间     | `wait(timeout)` 支持超时   |
+| **不释放锁场景** | 无（await 必释放锁）                | 无（wait 必释放锁）        |
 
 **（4）典型应用：生产者-消费者精确唤醒**
 
@@ -715,7 +869,7 @@ Condition notEmpty = lock.newCondition();  // 队列非空条件
 // 消费者：队列空时等待 notEmpty，消费后唤醒 notFull
 ```
 
-### 【困难】AQS 的 CLH 队列与原始 CLH 队列有什么区别？⭐
+### 【困难】AQS 的 CLH 队列与原始 CLH 队列有什么区别？⭐⭐
 
 AQS 的等待队列是 **CLH（Craig, Landin, and Hagersten）队列的变体**，并非原始 CLH 队列。
 
@@ -727,14 +881,14 @@ AQS 的等待队列是 **CLH（Craig, Landin, and Hagersten）队列的变体**�
 
 **（2）AQS 的 CLH 变体**
 
-| 特性          | 原始 CLH             | AQS CLH 变体                      |
-| ------------- | -------------------- | --------------------------------- |
-| **队列结构**  | 隐式链表（仅前驱）   | 显式双向链表（prev + next）       |
-| **等待方式**  | 自旋                 | park 阻塞（避免 CPU 浪费）        |
-| **模式**      | 仅独占               | 独占 + 共享                        |
-| **状态判断**  | 前驱节点的状态       | 前驱节点的 waitStatus             |
-| **取消处理**  | 无                   | 支持 CANCELLED 状态，节点可被清理 |
-| **条件队列**  | 无                   | ConditionObject 独立的条件队列    |
+| 特性         | 原始 CLH           | AQS CLH 变体                      |
+| ------------ | ------------------ | --------------------------------- |
+| **队列结构** | 隐式链表（仅前驱） | 显式双向链表（prev + next）       |
+| **等待方式** | 自旋               | park 阻塞（避免 CPU 浪费）        |
+| **模式**     | 仅独占             | 独占 + 共享                       |
+| **状态判断** | 前驱节点的状态     | 前驱节点的 waitStatus             |
+| **取消处理** | 无                 | 支持 CANCELLED 状态，节点可被清理 |
+| **条件队列** | 无                 | ConditionObject 独立的条件队列    |
 
 **（3）为什么选择阻塞而非自旋？**
 
@@ -766,7 +920,7 @@ node.prev = null;
 
 ## Java 无锁
 
-### 【中等】什么是 CAS？CAS 的实现原理是什么？⭐⭐⭐
+### 【中等】什么是 CAS？CAS 的实现原理是什么？⭐⭐⭐⭐⭐
 
 ::: info 什么是 CAS？
 
@@ -827,6 +981,12 @@ public final native boolean compareAndSwapInt(Object o, long offset, int expecte
 
 更底层（CPU 层面），CAS 实现依赖于 CPU 提供的原子指令（如 x86 的 `cmpxchg` 指令）。
 
+**从 native 到硬件的完整链路**：
+
+- HotSpot 为 `compareAndSwapInt` 生成的机器码是 `lock cmpxchg`（x86）：`cmpxchg` 本身只保证单次比较交换的语义，**`lock` 前缀锁总线/锁缓存行**，保证多核下的原子性。
+- `lock` 前缀同时带来两个副作用：将当前核心缓存行写回主内存并使其他核心的缓存行失效（可见性）；充当全量内存屏障，禁止指令重排序（有序性）。这就是为什么 CAS 变量不需要再叠加 `volatile` 做读写同步——但 Atomic 类的 `value` 字段本身仍是 `volatile`，保证普通 `get()` 的可见性。
+- 高竞争下 `lock cmpxchg` 的缓存行乒乓（cache line bouncing）是性能瓶颈根源，`LongAdder` 的分段 Cell 正是为此而生（见下文 LongAdder 题）。
+
 ::: info CAS 典型应用
 
 :::
@@ -859,7 +1019,139 @@ while (!CAS(lock, 0, 1)) {  // 尝试获取锁
 - `ConcurrentHashMap`（JDK 8 使用 CAS + `synchronized` 替代分段锁）。
 - `CopyOnWriteArrayList`（CAS 保证写入原子性）。
 
-### 【中等】CAS 算法存在哪些问题？⭐⭐⭐
+::: info L4 深度：x86 CMPXCHG 指令 + LOCK 前缀详解
+
+:::
+
+**x86 `CMPXCHG` 指令的微架构执行流程**
+
+`CMPXCHG` 是 x86 架构的核心原子指令，其语义是：比较 `EAX`（累加器）与目标内存操作数，若相等则将源操作数写入目标，否则将目标值加载到 `EAX`。
+
+```asm
+; CMPXCHG [mem], r  （Intel 语法）
+; 伪代码：
+TEMP = [mem]
+IF EAX == TEMP:
+    ZF = 1          ; 设置零标志
+    [mem] = r       ; 写入新值
+ELSE:
+    ZF = 0          ; 清除零标志
+    EAX = TEMP      ; 将旧值加载到 EAX
+```
+
+**`LOCK` 前缀的硬件行为**（多核原子性保证）：
+
+`CMPXCHG` 本身不是原子的！在多核环境下，若无 `LOCK` 前缀，两个核心可能同时执行 `CMPXCHG` 并都认为自己成功。`LOCK` 前缀通过以下机制保证原子性：
+
+1. **锁缓存行（Cache Lock）**：现代 CPU（P6 之后）通过 MESI 协议锁定目标地址所在的缓存行（断言 `#LOCK` 信号），而非锁整个总线。锁期间该缓存行在其它核心处于 `Invalid` 状态。
+
+2. **总线锁兜底**：当操作数跨缓存行边界（非对齐）或无法锁缓存行时，回退到锁整个前端总线（bus lock），代价极高（~100 cycles+ vs ~20-40 cycles）。
+
+3. **内存屏障效应**：`LOCK` 前缀隐式充当全量内存屏障（full fence）——所有之前的 load/store 对之后可见，禁止 StoreLoad 重排序。这是 CAS 提供 `volatile`-like 可见性的硬件根源。
+
+**`lock cmpxchg` 的完整时序**（x86 多核视角）：
+
+```
+Core-0                                Core-1
+  │                                     │
+  ├─ lock cmpxchg [addr], r            │
+  ├─ 发出 RFO（Read-For-Ownership）     │
+  ├─ 获取 addr 所在缓存行的独占权        │
+  ├─ MESI: E → M（Modified）           │ 缓存行被 Invalidate
+  ├─ EAX vs [addr] 比较并写入           │
+  ├─ 缓存行写回（或保持 M 状态）         │
+  └─ 释放 lock 信号                     ├─ 下次访问 addr 时 Cache Miss
+                                        └─ 重新从 Core-0 获取最新值
+```
+
+**x86 vs ARM（LDREX/STREX / LL/SC）的 CAS 实现差异**
+
+| 维度           | x86（CMPXCHG）                               | ARM（LDREX/STREX）                                                           |
+| :------------- | :------------------------------------------- | :--------------------------------------------------------------------------- |
+| **指令模式**   | 单指令（CMPXCHG 一条完成比较+交换）          | 双指令：`LDREX`（加载+标记）→ `STREX`（条件存储）                            |
+| **原子性保证** | `LOCK` 前缀锁总线/缓存行                     | **Exclusive Monitor**（硬件监视器）检测 LDREX→STREX 之间是否有其他写入       |
+| **ABA 敏感性** | 值与预期相同即成功（ABA 不感知）             | `STREX` 失败即表示有他人写入（中间状态变化感知）                             |
+| **限制**       | 操作数必须对齐，跨缓存行退化为总线锁         | `LDREX/STREX` 之间不能有复杂操作（通常几十条指令内），否则硬件监视器可能超时 |
+| **Java 适配**  | `Unsafe::compareAndSwapInt` → `lock cmpxchg` | `Unsafe::compareAndSwapInt` → `ldrex/strex` 循环（LL/SC 循环）               |
+
+**ARM LL/SC 的 CAS 模拟**：由于 ARM 没有单指令 CAS，HotSpot 用 LL/SC 循环模拟：
+
+```asm
+// ARM 上的 CAS 伪汇编
+retry:
+    LDREX  r1, [r0]         // Load-Link: 加载值并标记地址
+    CMP    r1, r2           // 比较期望值
+    BNE    fail             // 不相等则失败
+    STREX  r3, r3, [r0]    // Store-Conditional: 条件存储
+    CMP    r3, #0           // 检查 STREX 是否成功
+    BNE    retry            // 失败则重试（被其他核心打断）
+fail:
+    // 返回结果
+```
+
+`STREX` 的返回值（r3）为 0 表示成功；非 0 表示 Exclusive Monitor 检测到地址被修改（其他核心写入、中断、上下文切换都可能导致 Monitor 清除），需重试整个 LL/SC 序列。
+
+::: info L4 深度：ABA 问题在 C++ shared_ptr 中的表现
+
+:::
+
+**ABA 问题的跨语言视角：C++ `std::shared_ptr` 的 ABA 陷阱**
+
+`std::shared_ptr` 是 C++ 的引用计数智能指针，当它与无锁数据结构结合时，ABA 问题会以更危险的形式出现。
+
+**场景：lock-free stack 的 ABA 致危代码**
+
+```cpp
+template<typename T>
+class LockFreeStack {
+    struct Node { T data; Node* next; };
+    std::atomic<Node*> head;
+
+    void push(T val) {
+        Node* n = new Node{val};
+        do {
+            n->next = head.load();
+        } while (!head.compare_exchange_weak(n->next, n));
+    }
+
+    std::shared_ptr<T> pop() {                              // ← 危险！
+        Node* old_head;
+        do {
+            old_head = head.load();
+            if (!old_head) return nullptr;
+        } while (!head.compare_exchange_weak(old_head, old_head->next));
+
+        auto res = std::make_shared<T>(old_head->data);
+        delete old_head;  // ← 问题核心：直接 delete
+        return res;
+    }
+};
+```
+
+**ABA 攻击时序**：
+
+```
+时刻 T1: Thread-A 读到 head = Node-A（next = Node-B）
+时刻 T2: Thread-A 被挂起（操作系统调度）
+时刻 T3: Thread-B pop 了 Node-A，delete Node-A，再 pop 了 Node-B
+时刻 T4: Thread-B push 新节点，恰好分配到已释放 Node-A 的内存地址 → head = Node-C(address==&Node-A)
+时刻 T5: Thread-A 恢复，CAS(head, Node-A, Node-B) → 成功！但 head 应指向 Node-C...
+         结果：Node-C 丢失，内存泄漏 + 数据丢失
+```
+
+**C++ 的解法**：`hazard pointer`（危险指针）或 `epoch-based reclamation`（基于 epoch 的回收）。核心思想：延迟释放内存直到确认没有线程持有该指针。
+
+**Java 的 `AtomicStampedReference` vs C++ `shared_ptr` 思路对比**：
+
+| 维度                | Java `AtomicStampedReference`              | C++ `std::shared_ptr`                                          |
+| :------------------ | :----------------------------------------- | :------------------------------------------------------------- |
+| **解决 ABA 的方式** | 版本号/时间戳（显式 stamp，每次 CAS 校验） | 引用计数（内存不被释放就不会被复用）                           |
+| **额外开销**        | stamp 需要额外 4/8 字节 + CAS 双字操作     | 引用计数原子操作（inc/dec）                                    |
+| **局限性**          | 只防值层面的 ABA，不防指针复用             | 性能开销大（atomic inc/dec + 内存分配），不适用于高频 CAS 路径 |
+
+> **面试记忆点**：ABA 问题分两层面——「值 ABA」（值从 A→B→A，如 `AtomicInteger`，用版本号解决）和「指针 ABA」（指针地址被释放后重用，如 `shared_ptr` lock-free 场景，用延迟回收/引用计数解决）。Java 的 `AtomicStampedReference` 解决值 ABA，C++ 的 `shared_ptr` 通过保证内存不被释放来间接解决指针 ABA，但代价是引用计数的原子操作开销。
+
+### 【中等】CAS 算法存在哪些问题？⭐⭐⭐⭐
 
 CAS（Compare-And-Swap）是一种无锁并发编程技术，广泛用于 Java 的 `Atomic` 类、AQS、`ConcurrentHashMap` 等并发工具中。但它也存在一些问题和限制：
 
@@ -926,7 +1218,7 @@ CAS（Compare-And-Swap）是一种无锁并发编程技术，广泛用于 Java �
 
 CAS 在无锁编程中非常高效，但需结合场景权衡利弊。在高竞争环境下，可能需要改用锁或其他并发策略。
 
-### 【困难】LongAdder 的原理是什么？为什么高并发下比 AtomicLong 快？⭐⭐
+### 【困难】LongAdder 的原理是什么？为什么高并发下比 AtomicLong 快？⭐⭐⭐
 
 `LongAdder` 是 JDK8 引入的高性能累加器，**在超高并发场景下性能比 `AtomicLong` 高数倍**，核心思想是**分段累加（Cell）+ 合并求和**。
 
@@ -988,11 +1280,11 @@ public long sum() {
 
 **（5）性能对比**
 
-| 并发度       | AtomicLong | LongAdder | 提升倍数 |
-| ------------ | ---------- | --------- | -------- |
-| 低（1 线程） | 基准       | 略慢      | 0.9x     |
-| 中（8 线程） | 基准       | 2-3x      | 2-3x     |
-| 高（64 线程）| 基准       | 5-10x     | 5-10x    |
+| 并发度        | AtomicLong | LongAdder | 提升倍数 |
+| ------------- | ---------- | --------- | -------- |
+| 低（1 线程）  | 基准       | 略慢      | 0.9x     |
+| 中（8 线程）  | 基准       | 2-3x      | 2-3x     |
+| 高（64 线程） | 基准       | 5-10x     | 5-10x    |
 
 **（6）选型建议**
 
@@ -1000,7 +1292,7 @@ public long sum() {
 - **统计场景**（如 QPS、PV 计数）→ `LongAdder`
 - **自定义累加规则**（如求最大值）→ `LongAccumulator`
 
-### 【中等】Java 中支持哪些原子类？⭐
+### 【中等】Java 中支持哪些原子类？⭐⭐
 
 Java 原子类底层基于 **CAS 指令（CPU 级原子操作）+ 自旋重试** 实现无锁原子操作。部分高性能原子类（如 LongAdder）采用**分段累加**优化高并发性能。
 
@@ -1061,7 +1353,7 @@ Java 原子类底层基于 **CAS 指令（CPU 级原子操作）+ 自旋重试**
 - **操作对象的普通字段** → 字段更新器（AtomicIntegerFieldUpdater 等）
 - **操作数组元素** → 数组类型原子类（AtomicIntegerArray 等）
 
-### 【中等】什么是 ThreadLocal？⭐⭐
+### 【中等】什么是 ThreadLocal？⭐⭐⭐⭐⭐
 
 ::: info 什么是 ThreadLocal？
 
@@ -1146,7 +1438,7 @@ ThreadLocal<User> userHolder = ThreadLocal.withInitial(() -> new User());
 
 `ThreadLocal` 不能自动继承，需手动处理（可用 `InheritableThreadLocal`）。
 
-### 【中等】`ThreadLocal` 的原理是什么？⭐⭐⭐
+### 【中等】`ThreadLocal` 的原理是什么？⭐⭐⭐⭐⭐
 
 ThreadLocal 是**线程本地变量**，核心作用是为每个线程创建独立的变量副本，实现线程间数据隔离。
 
@@ -1173,6 +1465,99 @@ ThreadLocal 是**线程本地变量**，核心作用是为每个线程创建独�
 2. 线程隔离本质：变量副本存在 Thread 自身的 Map 中，而非 ThreadLocal 里，ThreadLocal 仅作为 “索引”；
 3. 初始化机制：重写 `initialValue()` 可指定初始值，也可通过 `setInitialValue()` 手动初始化。
 
+::: info 源码锚点
+
+:::
+
+（1）**Entry 的弱引用设计**：
+
+```java
+static class Entry extends WeakReference<ThreadLocal<?>> {
+    Object value;
+    Entry(ThreadLocal<?> k, Object v) {
+        super(k);      // key 是弱引用
+        value = v;     // value 是强引用
+    }
+}
+```
+
+（2）**散列与寻址**：`ThreadLocal.threadLocalHashCode` 由 `AtomicInteger` 按 **斐波那契散列（黄金分割数 0x61c88647）** 递增生成，让 key 在 2 的幂次数组中均匀分布；冲突时采用**线性探测**（`nextIndex` 顺移），而非 HashMap 的链地址法。
+
+（3）**泄漏因果链（面试必背）**：
+
+`ThreadLocal 实例失去强引用` → GC 回收弱引用 key（Entry.key 变 null）→ **value 仍是强引用**，被 `Thread → threadLocals → table[i].value` 这条引用链牢牢拽住 → 线程不死（线程池复用），value 永远无法回收 → 内存泄漏。
+
+（4）**JDK 的三道防线**：
+
+- `set()`：线性探测途中遇到 key==null 的 Entry 时触发 `replaceStaleEntry` 清理；
+- `get()`：未命中时触发 `expungeStaleEntry` 清理；
+- `remove()`：直接清理（唯一治本手段）。
+- 前两道是「顺路清理」，线程池空闲线程长期不操作 Map 时完全失效，所以**必须 finally 中 remove()**。
+
+::: info L4 深度：Go context.Context 替代 ThreadLocal 的设计哲学
+
+:::
+
+**隐式线程局部存储 vs 显式上下文传递：两种范式的根本分歧**
+
+Go 语言从设计之初就**刻意不提供** goroutine-local storage（类似 `ThreadLocal` 的机制），而是通过 `context.Context` 显式传递请求级上下文。这体现了两种截然不同的并发编程哲学。
+
+| 维度              | Java `ThreadLocal`                            | Go `context.Context`                                      |
+| :---------------- | :-------------------------------------------- | :-------------------------------------------------------- |
+| **传递方式**      | 隐式获取：任意深层方法直接 `get()`，无需参数  | 显式传递：每个函数签名需 `ctx context.Context` 参数       |
+| **线程/协程模型** | 1:1 内核线程绑定，`ThreadLocal` 随线程存活    | M:N 协程调度，goroutine 频繁创建/切换，线程局部存储无意义 |
+| **耦合度**        | 隐式依赖全局状态（测试需 mock `ThreadLocal`） | 显式依赖参数（测试直接传 ctx）                            |
+| **内存管理**      | 线程池场景需手动 `remove()` 防泄漏            | GC 自动回收（ctx 随请求结束释放）                         |
+| **超时/取消**     | 无内置传播（需自行实现）                      | `context.WithTimeout`/`WithCancel` 沿调用链自动传播       |
+| **可追溯性**      | 隐式上下文难以从代码推断数据流                | 显式 ctx 让依赖链一目了然                                 |
+
+**Go 为什么不提供 goroutine-local storage？**
+
+1. **goroutine 的轻量性**：goroutine 创建成本极低（~2KB 栈空间），生命周期短暂，随请求结束即销毁。`ThreadLocal` 依赖线程长期存活才有意义，而 Go 中一个请求可能横跨多个 goroutine（如 `go func()` 子协程），线程局部存储无法随协程迁移。
+
+2. **M:N 调度的复杂性**：goroutine 在 OS 线程间动态迁移（work-stealing），若存在 goroutine-local storage，调度器每次迁移都需搬运上下文，与 Go 的「轻量调度」理念冲突。
+
+3. **显式优于隐式**（Go 的哲学口号 "Explicit is better than implicit"）：`context.Context` 强制将追踪信息（trace_id、超时、取消信号）写入函数签名，代码审查时能一眼看到依赖链。Java 中 `ThreadLocal` 的隐式获取可能导致「远距离幽灵操作」——一个深层方法偷偷读取了 10 层调用前的 `traceId`，却不在任何函数签名中体现。
+
+**Go context.Context 的实现机制**
+
+```go
+type Context interface {
+    Deadline() (deadline time.Time, ok bool)
+    Done() <-chan struct{}
+    Err() error
+    Value(key any) any
+}
+
+// 典型用法：沿调用链传递 traceId
+func HandleRequest(ctx context.Context, req *Request) {
+    ctx = context.WithValue(ctx, "traceId", uuid.New())
+    processOrder(ctx, req.Order)
+}
+
+func processOrder(ctx context.Context, order Order) {
+    traceId := ctx.Value("traceId").(string)  // 显式取，但仍需参数传递
+    // ...
+}
+```
+
+**各自的优缺点**
+
+|          | Java `ThreadLocal`                                   | Go `context.Context`                                           |
+| :------- | :--------------------------------------------------- | :------------------------------------------------------------- |
+| **优点** | 无需改函数签名，深度调用链方便；线程绑定天然隔离     | 显式依赖，可测试性强；支持超时/取消传播；无泄漏风险            |
+| **缺点** | 隐式耦合，测试困难；线程池需手动清理；不支持取消传播 | 函数签名污染（每个函数都要 ctx）；性能略低（值查找是链表遍历） |
+
+**设计权衡总结**：
+
+| 维度             | 选择 ThreadLocal          | 选择 context.Context       |
+| :--------------- | :------------------------ | :------------------------- |
+| **并发模型**     | 1:1 线程模型（Java）      | M:N 协程模型（Go）         |
+| **请求生命周期** | 长生命周期（线程池复用）  | 短生命周期（请求即来即走） |
+| **架构哲学**     | 框架/中间件拦截，隐式注入 | 显式传参，依赖清晰         |
+
+> **面试记忆点**：Java 的 `ThreadLocal` 本质是「用空间换方便」——把上下文绑定到 OS 线程上，隐式获取，代价是内存管理复杂度；Go 的 `context.Context` 是「用签名换清晰」——强制显式传递，代价是每个函数多一个参数。选择取决于并发模型（线程 vs 协程）和团队对「隐式魔法 vs 显式啰嗦」的偏好。当你看到 `ThreadLocal` 的内存泄漏问题时，Go 的方式天然免疫——因为 ctx 的生命周期与请求绑定，请求结束即 GC。
+
 ::: info 应用场景
 
 :::
@@ -1183,7 +1568,7 @@ ThreadLocal 是**线程本地变量**，核心作用是为每个线程创建独�
 | **性能优化** | 替代方法传参，减少多线程下锁的使用（如 SimpleDateFormat 隔离） |
 | **链路追踪** | 存储线程专属的追踪 ID（TraceID），全链路日志关联               |
 
-### 【中等】如何解决 `ThreadLocal` 内存泄漏问题？⭐⭐
+### 【中等】如何解决 `ThreadLocal` 内存泄漏问题？⭐⭐⭐⭐⭐
 
 **ThreadLocal 的内存泄漏问题源于其特殊的 "弱引用 Key + 强引用 Value" 存储结构**。
 
@@ -1191,6 +1576,17 @@ ThreadLocal 是**线程本地变量**，核心作用是为每个线程创建独�
 | :------- | :----------------------------------------------------------------------------------------------------------------------- |
 | 核心矛盾 | ThreadLocalMap 的 Key 是弱引用（GC 回收），Value 是强引用（绑定线程），导致 Key 回收后 Value 成 “僵尸值”，随线程长期存活 |
 | 高危场景 | 线程池（线程复用）+ 未手动清理 → 僵尸值累积，内存持续泄漏                                                                |
+
+**泄漏的完整因果链**：
+
+```
+ThreadLocal 失去强引用（如局部变量出作用域）
+  → GC 回收弱引用 key（Entry.key == null）
+  → value 仍被引用链 Thread → threadLocals → Entry.value 强引用
+  → 线程池线程复用不死 → value 永远无法回收 → 泄漏
+```
+
+**为什么线程池场景「必现」**：普通线程执行完即销毁，`threadLocals` 随线程对象一起被 GC，泄漏窗口很短；线程池的核心线程**与 JVM 同生命周期**，一个未 remove 的 value 会随线程无限期存活，且每次任务叠加新的 value，泄漏持续累积。线上典型症状：老年代缓慢爬升、Full GC 后回落不明显，MAT 分析可见 `ThreadLocalMap$Entry` retained 大对象。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/c2f30f54363ae780b9297fc0b5939f59.jpg)
 
@@ -1277,7 +1673,66 @@ try {
 | 线程池只初始化一次 ThreadLocal |     每次任务执行完都要 remove，而非仅初始化      |
 | 认为 ThreadLocal 静态化会泄漏  | 静态化本身不泄漏，泄漏根源是未 remove + 线程复用 |
 
-### 【中等】InheritableThreadLocal 的实现原理是什么？⭐⭐
+### 【中等】虚拟线程环境下 ThreadLocal 有什么问题？ScopedValue 如何解决？⭐⭐⭐
+
+**核心结论**：虚拟线程把线程数量从数千放大到百万级，ThreadLocal 的三大旧疾被同时放大——**内存开销**（百万线程 × 每线程副本 = 内存爆炸）、**线程池污染**（`Executors.newVirtualThreadPerTaskExecutor()` 每任务新线程，Inherited 语义失效）、**不可变上下文传递**（TraceID 这类「传下去不许改」的场景，ThreadLocal 全靠约定）。JDK 21 引入的 **ScopedValue（JEP 446，JDK 21 预览 / JDK 25 转正）** 就是为虚拟线程时代设计的替代品。
+
+**（1）ThreadLocal 在虚拟线程下的三个致命问题**
+
+| 问题             | 平台线程时代                                           | 虚拟线程时代                                       |
+| :--------------- | :----------------------------------------------------- | :------------------------------------------------- |
+| **内存占用**     | 数千线程 × 副本，可接受                                | 百万线程 × 副本，可能直接 OOM                      |
+| **生命周期管理** | 线程池复用，忘记 remove 会脏读                         | 每任务新线程，无脏读但创建/销毁副本的开销被放大    |
+| **上下文传递**   | InheritableThreadLocal 在线程池失效，靠 TTL 等第三方库 | 任务即线程，需要一等公民的「作用域内只读共享」机制 |
+
+**（2）ScopedValue 的设计思想**
+
+`ScopedValue` 与 ThreadLocal 的根本差异是**绑定模型**：ThreadLocal 把值绑定到**线程的整个生命周期**（可随时 set/remove，可写）；ScopedValue 把值绑定到**一段代码的作用域**（作用域内可读、不可变，作用域结束自动失效，无需手动 remove）：
+
+```java
+// ScopedValue（JDK 21 预览引入，JDK 22 起使用 Carrier 链式 API，JDK 25 转正）
+private static final ScopedValue<String> TRACE_ID = ScopedValue.newInstance();
+
+void handleRequest() {
+    ScopedValue.where(TRACE_ID, "req-123")   // 绑定值
+               .run(() -> {                   // 在作用域内执行
+                   service();                 // 任意深层调用都能读到
+               });                            // 作用域结束自动解绑，无需 remove
+}
+
+void service() {
+    String id = TRACE_ID.get();               // "req-123"
+}
+```
+
+**（3）与虚拟线程的协同：结构化并发下自动继承**
+
+配合 `StructuredTaskScope` 时，**子虚拟线程自动继承父线程作用域内绑定的 ScopedValue**——这正是 ThreadLocal/InheritableThreadLocal 在线程池场景一直没能干净解决的问题：
+
+```java
+ScopedValue.where(TRACE_ID, "req-123").run(() -> {
+    try (var scope = new StructuredTaskScope<>()) {
+        var user  = scope.fork(() -> loadUser());   // 子虚拟线程内 TRACE_ID 可读
+        var order = scope.fork(() -> loadOrder());  // 同样继承
+        scope.join();
+    }
+});
+```
+
+**（4）选型对比**
+
+| 维度         | ThreadLocal                   | ScopedValue               |
+| :----------- | :---------------------------- | :------------------------ |
+| 绑定目标     | 线程整个生命周期              | 一段代码作用域            |
+| 可变性       | 随时 set/remove               | 作用域内只读（不可变）    |
+| 清理方式     | 手动 remove（易遗漏）         | 作用域结束自动解绑        |
+| 子线程继承   | 需 InheritableThreadLocal/TTL | 结构化并发下自动继承      |
+| 虚拟线程适配 | 不推荐（内存与开销）          | 官方推荐                  |
+| 版本         | JDK 1.2+                      | JDK 21 预览 / JDK 25 转正 |
+
+**面试回答要点**：先点明「ThreadLocal 的问题不是新 bug，而是设计模型与虚拟线程的规模不匹配」，再给出 ScopedValue 的「作用域绑定 + 不可变 + 自动解绑 + 结构化继承」四个关键词，最后落到「新项目用虚拟线程时应优先 ScopedValue，存量 ThreadLocal 代码不必强迁」。
+
+### 【中等】InheritableThreadLocal 的实现原理是什么？⭐⭐⭐
 
 **核心设计目标**
 
@@ -1340,17 +1795,17 @@ new Thread(() -> {
 - **不支持动态更新**：子线程启动后父线程的修改不可见
 - **无回调机制**：无法像`ThreadLocal`的`initialValue()`那样自定义子线程初始值
 
-### 【中等】TransmittableThreadLocal 是什么？解决了什么问题？⭐
+### 【中等】TransmittableThreadLocal 是什么？解决了什么问题？⭐⭐⭐
 
 **`TransmittableThreadLocal`（TTL）** 是阿里巴巴开源的 [transmittable-thread-local](https://github.com/alibaba/transmittable-thread-local) 项目，**解决线程池场景下 ThreadLocal 值传递的问题**。
 
 **（1）问题背景**
 
-| 场景                | `ThreadLocal` | `InheritableThreadLocal` | TTL          |
-| ------------------- | ------------- | ------------------------ | ------------ |
-| 子线程继承父线程值  | ❌            | ✔️                        | ✔️            |
-| 线程池复用线程传递  | ❌            | ❌（仅创建时拷贝一次）   | ✔️            |
-| 提交任务时动态传递  | ❌            | ❌                        | ✔️            |
+| 场景               | `ThreadLocal` | `InheritableThreadLocal` | TTL |
+| ------------------ | ------------- | ------------------------ | --- |
+| 子线程继承父线程值 | ❌            | ✔️                       | ✔️  |
+| 线程池复用线程传递 | ❌            | ❌（仅创建时拷贝一次）   | ✔️  |
+| 提交任务时动态传递 | ❌            | ❌                       | ✔️  |
 
 `InheritableThreadLocal` 只在**线程创建时**拷贝父线程的值，线程池复用线程时，后续提交的任务无法获取提交者的上下文。
 

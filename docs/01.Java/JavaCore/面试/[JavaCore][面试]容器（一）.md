@@ -18,7 +18,7 @@ permalink: /pages/640f919f/
 
 ## Java 容器简介
 
-### 【简单】Java 中有哪些集合类？⭐⭐
+### 【简单】Java 中有哪些集合类？⭐⭐⭐
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/java/javacore/container/java-container-structure.png)
 
@@ -62,7 +62,7 @@ Java 容器类主要位于 `java.util` 包，分为 **Collection** 和 **Map** �
 - 单线程：`ArrayList`、`HashMap`
 - 多线程：`ConcurrentHashMap`、`CopyOnWriteArrayList`
 
-### 【中等】什么是序列集合（Sequenced Collections）？⭐⭐⭐
+### 【中等】什么是序列集合（Sequenced Collections）？⭐⭐
 
 **序列集合（Sequenced Collections）**是 JDK 21 引入的新集合接口体系，为所有**有明确遇顺序的集合**提供统一的首尾访问能力。
 
@@ -78,11 +78,11 @@ deque.getLast();                      // Deque
 
 **JDK 21 新增接口**：
 
-| 接口 | 继承关系 | 说明 |
-| :--- | :--- | :--- |
-| `SequencedCollection<E>` | `Collection<E>` | 有序集合基类，提供首尾访问 |
-| `SequencedSet<E>` | `Set<E>`, `SequencedCollection<E>` | 有序集合（不重复） |
-| `SequencedMap<K,V>` | `Map<K,V>` | 有序 Map |
+| 接口                     | 继承关系                           | 说明                       |
+| :----------------------- | :--------------------------------- | :------------------------- |
+| `SequencedCollection<E>` | `Collection<E>`                    | 有序集合基类，提供首尾访问 |
+| `SequencedSet<E>`        | `Set<E>`, `SequencedCollection<E>` | 有序集合（不重复）         |
+| `SequencedMap<K,V>`      | `Map<K,V>`                         | 有序 Map                   |
 
 **核心统一方法**：
 
@@ -105,16 +105,16 @@ list.reversed(); // ["C", "B", "A"]（逆序视图，非拷贝）
 
 **实现类支持**：
 
-| 集合类型 | 实现接口 |
-| :--- | :--- |
-| `ArrayList`、`LinkedList` | `SequencedCollection` |
-| `LinkedHashSet`、`TreeSet` | `SequencedSet` |
-| `LinkedHashMap`、`TreeMap` | `SequencedMap` |
-| `ArrayDeque` | `SequencedCollection` |
+| 集合类型                   | 实现接口              |
+| :------------------------- | :-------------------- |
+| `ArrayList`、`LinkedList`  | `SequencedCollection` |
+| `LinkedHashSet`、`TreeSet` | `SequencedSet`        |
+| `LinkedHashMap`、`TreeMap` | `SequencedMap`        |
+| `ArrayDeque`               | `SequencedCollection` |
 
 **设计意义**：统一了 `List`、`Set`、`Deque`、`Map` 等有序集合的首尾访问 API，消除了因集合类型不同而导致的 API 不一致问题。
 
-### 【简单】Comparable 和 Comparator 有什么区别？⭐⭐
+### 【简单】Comparable 和 Comparator 有什么区别？⭐⭐⭐
 
 `Comparable` 接口和 `Comparator` 接口都是 Java 中用于排序的接口，它们在实现类对象之间比较大小、排序等方面发挥了重要作用。
 
@@ -275,7 +275,7 @@ list.removeIf(item -> item.startsWith("B") || item.equals("C")); // ✔️
 - 明确是否需要 `null`，避免滥用导致代码健壮性问题。
 - 必要时用 `Optional` 或默认值替代 `null`。
 
-### 【简单】ArrayList 如何扩容？⭐⭐⭐
+### 【简单】ArrayList 如何扩容？⭐⭐⭐⭐
 
 ArrayList 默认初始大小为 10，当元素数达到容量时，触发扩容，每次扩容 1.5 倍。
 
@@ -298,6 +298,55 @@ private void grow(int minCapacity) { // minCapacity = 当前size + 1
     elementData = Arrays.copyOf(elementData, newCapacity);
 }
 ```
+
+::: info 为什么扩容因子是 1.5 倍？—— 空间与时间的博弈
+
+:::
+
+**（1）摊还分析：`add()` 为什么是 O(1）？**
+
+单次 `add(E)` 最坏情况下触发扩容，需要 `Arrays.copyOf` 拷贝整个数组（O(n)），但**摊还（amortized）**复杂度是 O(1)：
+
+- 假设初始容量为 1，每次扩容 k 倍（k > 1），连续添加 n 个元素
+- 扩容次数 ≈ logₖ(n)，第 i 次扩容拷贝元素数 ≈ kⁱ
+- 总拷贝次数：\(1 + k + k^2 + \dots + n = \frac{k \cdot n - 1}{k - 1} \approx O(n)\)
+- 摊还到每个元素：\(O(1)\)
+
+所以面试中「ArrayList add 时间复杂度」的标准答案是：**最坏 O(n），摊还 O(1）**。
+
+**（2）1.5 倍 vs 2 倍：空间浪费的定量分析**
+
+| 扩容因子 | 最坏空间浪费 | 典型实现    | 扩容次数（n=100 万） |
+| :------- | :----------- | :---------- | :------------------- |
+| 2.0×     | 50%          | Vector      | ≈ 20 次              |
+| 1.5×     | ~33%         | ArrayList   | ≈ 34 次              |
+| 1.2×     | ~17%         | Python list | ≈ 76 次              |
+
+**Vector 用 2× 的问题**：等比数列 `1 + 2 + 4 + ... + n/2 ≈ n`，意味着之前所有已释放的旧数组空间之和 ≈ 刚扩容的大小，旧空间无法被新数组复用以容纳新容量——对内存分配器压力大，容易产生碎片。
+
+**ArrayList 用 1.5× 的优势**：旧数组释放后可以被复用（\(1 + 1.5 + 1.5^2 + 1.5^3 \approx 8.1\)，下一次扩容需要 \(1.5^4 \approx 5.1\)，可以 fit 进之前释放的总空间），更有利于内存分配器重用堆空间，减少碎片。
+
+**（3）经验权衡的本质**
+
+- **2×**：扩容次数少，但单次拷贝量大 + 空间利用率低（最坏浪费 50%）
+- **1.2×**：空间利用率高，但扩容频繁（log₁.₂(100 万) ≈ 76 次拷贝，对 GC 不友好）
+- **1.5×**：类比 HashMap 的 0.75 load factor 设计哲学——空间浪费控制在 33% 以内，扩容次数在可接受范围，是经验上 Pareto 最优的折中
+
+::: info 跨语言对比：Go slice 扩容策略的演变
+
+:::
+
+Go 的 slice 扩容策略与 Java ArrayList 形成了有趣的对比：
+
+| 版本               | 扩容策略                                                                 | 设计考量                                                   |
+| :----------------- | :----------------------------------------------------------------------- | :--------------------------------------------------------- |
+| **Go 1.17 及之前** | 容量 < 1024 → 2×；≥ 1024 → 1.25×                                         | 小容量激进扩展减少拷贝，大容量保守扩展控制浪费             |
+| **Go 1.18+**       | 容量 < 256 → 2×；≥ 256 → (oldCap + 3×256) / 4（≈ 1.25×~1.63×，平滑过渡） | 新公式在过渡区（256~512）更平滑，避免从 2× 到 1.25× 的陡降 |
+| **Java ArrayList** | 始终 1.5×                                                                | 简单恒定，无容量阈值切换                                   |
+
+**Go 的策略比 Java 更激进**：小容量时用 2×（快速逼近目标，减少拷贝次数），大容量时用约 1.25×~1.63×（更保守控制内存）。Java 的 1.5× 恒定策略更简单，但在小容量场景（如默认容量 10 到元素数 100）扩容次数更多。
+
+**差异根因**：Go 的 slice 本质上是一个 **(ptr, len, cap)** 三元组，扩容时需要新分配内存 + `memmove` 拷贝底层数组。Go 没有 JVM 的 GC 优化（TLAB、对象池），每次 `make` 都是直接的 `mallocgc` 调用，所以**减少拷贝次数对 Go 的收益比 Java 更大**——Java 的 `Arrays.copyOf` 可以受益于 JIT 生成的高效 memcpy 实现。
 
 因此，为了避免频繁扩容，推荐根据实际情况预分配容量。
 
@@ -335,7 +384,7 @@ ArrayList<String> list = new ArrayList<>(10000);
 - **选数组**：需极致性能、固定长度或存储基本类型时（如数学计算）。
 - **选 ArrayList**：需要动态大小、便捷操作或泛型安全时（大多数业务场景）。
 
-### 【简单】ArrayList 和 LinkedList 有什么区别？⭐⭐
+### 【简单】ArrayList 和 LinkedList 有什么区别？⭐⭐⭐⭐⭐
 
 **`ArrayList` vs. `LinkedList`**
 
@@ -361,12 +410,48 @@ ArrayList<String> list = new ArrayList<>(10000);
 - 优先用 **`ArrayList`**（大多数场景性能更优）。
 - 仅当需要频繁在 **头部/中间插入删除**，或需要 **队列/栈功能** 时选 `LinkedList`。
 
+::: info 硬件视角：CPU Cache Line 如何让 ArrayList 比 LinkedList 快一个数量级
+
+:::
+
+**（1）Cache Line 与空间局部性**
+
+现代 x86 CPU 的 Cache Line 为 **64 字节**。CPU 预取器（Prefetcher）在访问一个内存地址时，会将包含该地址的整个 Cache Line 加载到 L1/L2 缓存中。
+
+```
+ArrayList 内存布局（连续数组）：
+[obj0][obj1][obj2][obj3][obj4][obj5][obj6][obj7]...
+← 一次 Cache Line 加载 64 字节 →
+  一次加载可以预取 4~8 个引用（取决于是否压缩指针）
+
+LinkedList 内存布局（分散节点）：
+[Node0 @ 0x1000]  [Node1 @ 0x8000]  [Node2 @ 0x3500]...
+每个 Node 包含 item(引用) + prev(引用) + next(引用) = 24 字节（压缩指针）/ 40 字节（非压缩）
+每个 Node 访问都可能触发 Cache Miss（L1 miss ≈ 10 cycles, L3 miss ≈ 40 cycles, RAM ≈ 100+ cycles）
+```
+
+**（2）量化性能差异**
+
+| 操作         | ArrayList                                | LinkedList                                    | 性能比                          |
+| :----------- | :--------------------------------------- | :-------------------------------------------- | :------------------------------ |
+| **顺序遍历** | 每个元素约 0.5 ns（Cache Line 预取命中） | 每个元素 5~20 ns（节点分散，Cache Miss 频繁） | **10~40×**                      |
+| **随机访问** | O(1)，约 0.5 ns                          | O(n)，约 n × (5~20) ns                        | **n × 10~40×**                  |
+| **中间插入** | O(n)，批量 memmove                       | O(n)，逐个节点遍历                            | **1~3×**（memmove 受益于 SIMD） |
+
+> **关键洞察**：顺序遍历 ArrayList 比 LinkedList 快 10~50 倍，这不是 Java 的问题，而是**所有语言的数组 vs 链表都遵循的硬件定律**。即使是 C++ 中精心实现的 `std::list`，在顺序遍历场景下性能也被 `std::vector` 碾压。这就是为什么 Java 面试中"LinkedList 增删快"的说法在大多数场景下是**错误**的——定位到插入位置需要 O(n) 遍历，而遍历本身就是瓶颈。
+
+**（3）Memory Bandwidth 饱和度**
+
+ArrayList 的连续内存访问能充分利用 CPU 的 Memory Bandwidth（现代 DDR5 约 50 GB/s），一次 Cache Line 加载可预取多个元素。LinkedList 的随机跳转使得 CPU 预取器失效，Memory Bandwidth 利用率极低（大量带宽浪费在只加载一个 Node 就丢弃整个 Cache Line 上）。
+
+**一句话总结**：`ArrayList` vs `LinkedList` 的选择不是"差不多"，而是**数量级的性能差异**。只有当你确实需要在头部频繁插入/删除且不需要随机访问时，才考虑 LinkedList。
+
 > 💡 **Java 实践提示**：
 >
 > - 默认情况下，`Collections.synchronizedList` 包装的 `ArrayList` 比 `LinkedList` 线程安全开销更低。
 > - Java 8+ 的 `Stream` 操作在 `ArrayList` 上效率更高。
 
-### 【中等】CopyOnWriteArrayList 的原理是什么？⭐⭐
+### 【中等】CopyOnWriteArrayList 的原理是什么？⭐⭐⭐
 
 `CopyOnWriteArrayList` 核心思想是 "写时复制"（Copy-On-Write，CoW），**适用于【读多写少】的高并发场景**。
 
@@ -390,10 +475,10 @@ ArrayList<String> list = new ArrayList<>(10000);
 
 **常见实现类**：
 
-| **实现 RandomAccess** | **未实现** |
-| --------------------- | ---------- |
-| `ArrayList` | `LinkedList` |
-| `Vector` | `LinkedList`（链表） |
+| **实现 RandomAccess**                     | **未实现**                                       |
+| ----------------------------------------- | ------------------------------------------------ |
+| `ArrayList`                               | `LinkedList`                                     |
+| `Vector`                                  | `LinkedList`（链表）                             |
 | `Arrays.asList` 返回的 `Arrays$ArrayList` | `CopyOnWriteArrayList`（实际上是数组，但未标记） |
 
 **最佳实践**：
@@ -425,7 +510,7 @@ for (int i = 0; i < arrayList.size(); i++) { arrayList.get(i); }  // 快
 for (int i = 0; i < linkedList.size(); i++) { linkedList.get(i); }  // O(n²)，慢 100 倍
 ```
 
-### 【中等】Iterator 和 Iterable 有什么区别？⭐
+### 【中等】Iterator 和 Iterable 有什么区别？⭐⭐
 
 `Iterable` 和 `Iterator` 是 Java 集合遍历的核心接口，关系密切但职责不同。
 
@@ -450,13 +535,13 @@ public interface Iterator<E> {
 
 **核心区别**：
 
-| **维度** | **Iterable** | **Iterator** |
-| -------- | ------------ | ------------ |
-| **职责** | 可迭代的容器 | 迭代器（遍历工具） |
-| **方法** | `iterator()` 返回迭代器 | `hasNext()`/`next()`/`remove()` |
-| **关系** | 依赖 Iterator | 被 Iterable 创建 |
-| **foreach** | 实现此接口才能用 foreach | 不能直接用于 foreach |
-| **状态** | 无状态（每次调用产生新 Iterator） | 有状态（记录当前位置） |
+| **维度**    | **Iterable**                      | **Iterator**                    |
+| ----------- | --------------------------------- | ------------------------------- |
+| **职责**    | 可迭代的容器                      | 迭代器（遍历工具）              |
+| **方法**    | `iterator()` 返回迭代器           | `hasNext()`/`next()`/`remove()` |
+| **关系**    | 依赖 Iterator                     | 被 Iterable 创建                |
+| **foreach** | 实现此接口才能用 foreach          | 不能直接用于 foreach            |
+| **状态**    | 无状态（每次调用产生新 Iterator） | 有状态（记录当前位置）          |
 
 **foreach 语法糖**：
 
@@ -490,7 +575,7 @@ public class MyCollection<T> implements Iterable<T> {
 }
 ```
 
-### 【中等】fail-fast 和 fail-safe 机制有什么区别？⭐
+### 【中等】fail-fast 和 fail-safe 机制有什么区别？⭐⭐⭐
 
 **fail-fast（快速失败）**：遍历集合时，若检测到**结构性修改**（增删），立即抛出 `ConcurrentModificationException`。
 
@@ -498,13 +583,13 @@ public class MyCollection<T> implements Iterable<T> {
 
 **机制对比**：
 
-| **维度** | **fail-fast** | **fail-safe** |
-| -------- | ------------- | ------------- |
-| **实现原理** | 比对 `modCount` 与 `expectedModCount` | 遍历副本/快照 |
-| **异常** | 抛 `ConcurrentModificationException` | 不抛异常 |
-| **数据一致性** | 强一致（但抛异常） | 弱一致（可能看到旧数据） |
-| **内存开销** | 无额外开销 | 需复制副本 |
-| **典型容器** | `ArrayList`、`HashMap` 等 `java.util` 下 | `CopyOnWriteArrayList`、`ConcurrentHashMap` 等 `java.util.concurrent` 下 |
+| **维度**       | **fail-fast**                            | **fail-safe**                                                            |
+| -------------- | ---------------------------------------- | ------------------------------------------------------------------------ |
+| **实现原理**   | 比对 `modCount` 与 `expectedModCount`    | 遍历副本/快照                                                            |
+| **异常**       | 抛 `ConcurrentModificationException`     | 不抛异常                                                                 |
+| **数据一致性** | 强一致（但抛异常）                       | 弱一致（可能看到旧数据）                                                 |
+| **内存开销**   | 无额外开销                               | 需复制副本                                                               |
+| **典型容器**   | `ArrayList`、`HashMap` 等 `java.util` 下 | `CopyOnWriteArrayList`、`ConcurrentHashMap` 等 `java.util.concurrent` 下 |
 
 **fail-fast 原理**：
 
@@ -545,7 +630,7 @@ while (it.hasNext()) {
 
 ## Set
 
-### 【简单】HashSet、LinkedHashSet 和 TreeSet 有什么区别？⭐⭐
+### 【简单】HashSet、LinkedHashSet 和 TreeSet 有什么区别？⭐⭐⭐
 
 | 特性               | HashSet              | LinkedHashSet             | TreeSet                              |
 | ------------------ | -------------------- | ------------------------- | ------------------------------------ |
@@ -737,13 +822,14 @@ PriorityQueue 是自动排序的堆结构队列，默认小顶堆，适用优先
 - **无界队列**（自动扩容），但初始容量为 `11`。
 - **不允许 `null`**，且元素需实现 `Comparable` 或提供 `Comparator`。
 
-**关键操作**  
-| 方法 | 时间复杂度 | 说明 |
+**关键操作**
+
+| 方法                      | 时间复杂度 | 说明                           |
 | ------------------------- | ---------- | ------------------------------ |
-| `add(E e)` / `offer(E e)` | O(log n) | 插入元素，触发堆调整。 |
-| `poll()` | O(log n) | 移除并返回队首（优先级最高）。 |
-| `peek()` | O(1) | 查看队首但不移除。 |
-| `remove(Object o)` | O(n) | 删除指定元素（需遍历堆）。 |
+| `add(E e)` / `offer(E e)` | O(log n)   | 插入元素，触发堆调整。         |
+| `poll()`                  | O(log n)   | 移除并返回队首（优先级最高）。 |
+| `peek()`                  | O(1)       | 查看队首但不移除。             |
+| `remove(Object o)`        | O(n)       | 删除指定元素（需遍历堆）。     |
 
 **排序规则**
 
@@ -765,7 +851,7 @@ PriorityQueue 是自动排序的堆结构队列，默认小顶堆，适用优先
 - **迭代无序**：遍历顺序不等于优先级顺序。
 - **性能权衡**：插入/删除 O(log n)，但查找 O(n)。
 
-### 【简单】BlockingQueue 有什么用？⭐⭐
+### 【简单】BlockingQueue 有什么用？⭐⭐⭐
 
 **BlockingQueue 是线程安全的队列**，支持阻塞操作（队列满时阻塞插入，空时阻塞取出）。主要用于**生产者-消费者模型**，协调多线程数据交换。
 
@@ -800,7 +886,7 @@ PriorityQueue 是自动排序的堆结构队列，默认小顶堆，适用优先
 
 **一句话总结**： 多线程间安全传递数据的阻塞队列，核心方法是 `put()`（阻塞插入）和 `take()`（阻塞取出），按场景选实现类。
 
-### 【中等】ArrayBlockingQueue 和 LinkedBlockingQueue 有什么区别？⭐⭐
+### 【中等】ArrayBlockingQueue 和 LinkedBlockingQueue 有什么区别？⭐⭐⭐
 
 `ArrayBlockingQueue` 和 `LinkedBlockingQueue` 都是 Java 并发包（`java.util.concurrent`）中的**线程安全阻塞队列**，但它们在底层实现、性能和适用场景上有显著区别。
 
@@ -862,17 +948,17 @@ PriorityQueue 是自动排序的堆结构队列，默认小顶堆，适用优先
 - ✔️ **队列大小不固定**（默认几乎无界，但可手动指定容量）。
 - ✔️ **需要更高的吞吐量**（双锁机制减少竞争）。
 
-### 【中等】Vector 和 Stack 为什么被弃用？⭐
+### 【中等】Vector 和 Stack 为什么被弃用？⭐⭐
 
 `Vector` 和 `Stack` 是 Java 早期提供的**线程安全**容器，但现代 Java 开发中已不推荐使用。
 
 **Vector 弃用原因**：
 
-| **问题** | **说明** |
-| -------- | -------- |
-| **锁粒度过粗** | 每个方法都用 `synchronized` 修饰，锁住整个对象，并发性能差 |
-| **设计过时** | JDK 1.0 产物，早于集合框架（JDK 1.2） |
-| **扩容低效** | 默认扩容 2 倍（ArrayList 扩 1.5 倍，更省内存） |
+| **问题**         | **说明**                                                                 |
+| ---------------- | ------------------------------------------------------------------------ |
+| **锁粒度过粗**   | 每个方法都用 `synchronized` 修饰，锁住整个对象，并发性能差               |
+| **设计过时**     | JDK 1.0 产物，早于集合框架（JDK 1.2）                                    |
+| **扩容低效**     | 默认扩容 2 倍（ArrayList 扩 1.5 倍，更省内存）                           |
 | **替代方案完善** | `ArrayList` + `Collections.synchronizedList()` 或 `CopyOnWriteArrayList` |
 
 **Stack 弃用原因**：
@@ -898,12 +984,12 @@ Deque<String> stack = new ConcurrentLinkedDeque<>();
 
 **线程安全容器选型指南**：
 
-| **场景** | **推荐** |
-| -------- | -------- |
-| 单线程 List | `ArrayList` |
-| 多线程 List（读多写少） | `CopyOnWriteArrayList` |
+| **场景**                | **推荐**                                          |
+| ----------------------- | ------------------------------------------------- |
+| 单线程 List             | `ArrayList`                                       |
+| 多线程 List（读多写少） | `CopyOnWriteArrayList`                            |
 | 多线程 List（读写均衡） | `Collections.synchronizedList(new ArrayList<>())` |
-| 单线程 Map | `HashMap` |
-| 多线程 Map | `ConcurrentHashMap` |
-| 单线程栈/队列 | `ArrayDeque` |
-| 多线程队列 | `ConcurrentLinkedQueue` / `LinkedBlockingQueue` |
+| 单线程 Map              | `HashMap`                                         |
+| 多线程 Map              | `ConcurrentHashMap`                               |
+| 单线程栈/队列           | `ArrayDeque`                                      |
+| 多线程队列              | `ConcurrentLinkedQueue` / `LinkedBlockingQueue`   |

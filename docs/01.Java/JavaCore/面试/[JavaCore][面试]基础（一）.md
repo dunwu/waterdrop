@@ -12,14 +12,13 @@ tags:
   - JavaCore
   - 面试
 permalink: /pages/6ca01ab7/
-
 ---
 
 # Java 基础面试一
 
 ## Java 常识
 
-### 【简单】Java 语言有什么优势？⭐⭐
+### 【简单】Java 语言有什么优势？⭐⭐⭐
 
 - **跨平台**：【**一次编写，到处执行（Write Once, Run Anywhere）**】——JVM 执行字节码。
 - **自动垃圾回收**：垃圾回收（GC）减少内存泄漏风险。
@@ -28,7 +27,7 @@ permalink: /pages/6ca01ab7/
 - **高性能**：JIT 编译优化，多线程支持高并发。
 - **健壮安全**：强类型检查、异常处理、JVM 安全机制。
 
-### 【简单】Oracle JDK 和 Open JDK 有什么区别？⭐⭐
+### 【简单】Oracle JDK 和 Open JDK 有什么区别？⭐
 
 |          | OpenJDK                                           | Oracle JDK                                             |
 | -------- | ------------------------------------------------- | ------------------------------------------------------ |
@@ -40,7 +39,7 @@ permalink: /pages/6ca01ab7/
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/d1f144f5b1bd4d46a526fb4f2a889e26.png)
 
-### 【简单】Java SE 和 Java EE 有什么区别？⭐⭐
+### 【简单】Java SE 和 Java EE 有什么区别？⭐
 
 Java 技术既是一种编程语言，又是一种平台。Java 编程语言是一种具有特定语法和风格的高级面向对象语言。Java 平台是 Java 编程语言应用程序运行的特定环境。
 
@@ -77,7 +76,7 @@ JVM = 类加载系统 + 运行时内存区域 + 执行引擎
 
 :::
 
-### 【中等】Java 如何调用外部可执行程序或系统命令？⭐⭐
+### 【中等】Java 如何调用外部可执行程序或系统命令？⭐
 
 Java 提供了两种调用外部可执行程序或系统命令的方式：
 
@@ -141,7 +140,7 @@ https://blog.csdn.net/m0_46487331/article/details/128827908
 
 ## Java 基础语法
 
-### 【简单】Java 有几种注释形式？⭐⭐
+### 【简单】Java 有几种注释形式？⭐
 
 注释用于在源代码中解释代码的作用，可以增强程序的可读性，可维护性。 空白行，或者注释的内容，都会被 Java 编译器忽略掉。
 
@@ -167,7 +166,7 @@ public class HelloWorld {
 }
 ```
 
-### 【简单】Java 有哪些标识符命名规则？⭐⭐
+### 【简单】Java 有哪些标识符命名规则？⭐
 
 Java 所有的组成部分都需要名字。类名、变量名以及方法名都被称为标识符。
 
@@ -195,7 +194,7 @@ Java 所有的组成部分都需要名字。类名、变量名以及方法名都
 - **无长度限制**：但应保持简洁且语义明确（如用 `count` 而非 `c`）
 - **Unicode 支持**：可使用中文等字符（但不推荐）
 
-### 【简单】Java 中有哪些关键字？⭐⭐
+### 【简单】Java 中有哪些关键字？⭐
 
 下面列出了 Java 保留字，这些保留字不能用于常量、变量、和任何标识符的名称。
 
@@ -218,7 +217,7 @@ Java 的 `null` 不是关键字，类似于 `true` 和 `false`，它是一个字
 
 :::
 
-### 【简单】Java 中 `static` 关键字有什么用？⭐
+### 【简单】Java 中 `static` 关键字有什么用？⭐⭐
 
 `static` 关键字用于声明**类级别的成员**，**不属于任何实例**，在类加载时初始化，所有实例共享。
 
@@ -258,63 +257,7 @@ public class Counter {
 }
 ```
 
-### 【中等】`volatile` 关键字的作用和原理？⭐
-
-`volatile` 是 Java 的**轻量级同步机制**，主要解决**可见性**和**有序性**问题，但**不保证原子性**。
-
-**三大特性**：
-
-| **特性**   | **说明**                                       | **实现机制**                       |
-| ---------- | ---------------------------------------------- | ---------------------------------- |
-| **可见性** | 写入后立即刷新到主内存，读取时强制从主内存加载 | 基于 CPU 缓存一致性协议（如 MESI） |
-| **有序性** | 禁止指令重排序                                 | 插入**内存屏障**（Memory Barrier） |
-| **原子性** | **不保证**（`i++` 仍不安全）                   | 仅保证单次读/写原子性              |
-
-**典型应用场景**：
-
-```java
-// 场景1：状态标志位（DCL 单例）
-public class Singleton {
-    private static volatile Singleton instance;  // volatile 防止指令重排
-
-    public static Singleton getInstance() {
-        if (instance == null) {
-            synchronized (Singleton.class) {
-                if (instance == null) {
-                    instance = new Singleton();  // 避免"半初始化"对象泄露
-                }
-            }
-        }
-        return instance;
-    }
-}
-
-// 场景2：轻量级状态标志
-private volatile boolean running = true;
-public void stop() { running = false; }  // 其他线程立即可见
-```
-
-**为什么 DCL 需要 volatile？**
-
-`instance = new Singleton()` 在字节码层面分三步：
-
-1. 分配内存空间
-2. 初始化对象
-3. 将引用指向内存地址
-
-若无 `volatile`，JVM 可能重排为 **1 → 3 → 2**，此时其他线程在 step 3 后访问到**未初始化完成**的对象。
-
-**volatile vs synchronized**：
-
-| **维度**     | **volatile**        | **synchronized**    |
-| ------------ | ------------------- | ------------------- |
-| **原子性**   | ❌ 不保证           | ✔️ 保证             |
-| **可见性**   | ✔️ 保证             | ✔️ 保证             |
-| **有序性**   | ✔️ 保证（禁止重排） | ✔️ 保证（加锁串行） |
-| **性能**     | 高（无锁）          | 低（涉及加锁/解锁） |
-| **适用场景** | 状态标志、DCL       | 复合操作、临界区    |
-
-### 【中等】`transient` 关键字有什么用？⭐
+### 【中等】`transient` 关键字有什么用？⭐⭐
 
 `transient` 用于**修饰不应被序列化的字段**，常用于敏感数据或可派生的字段。
 
@@ -343,7 +286,7 @@ public class User implements Serializable {
 
 ### 【简单】`native` 关键字有什么用？⭐
 
-`native` 修饰的方法称为**本地方法**，表示该方法由**非 Java 语言（如 C/C++）**实现，通过 JNI（Java Native Interface）调用。
+`native` 修饰的方法称为**本地方法**，表示该方法由**非 Java 语言（如 C/C++）** 实现，通过 JNI（Java Native Interface）调用。
 
 **特点**：
 
@@ -407,7 +350,7 @@ System.out.println(l << 70);  // 等效左移 6 位（70%64=6），输出 -64
 
 ## Java 数据类型
 
-### 【简单】Java 是否只支持值传递？⭐⭐
+### 【简单】Java 是否只支持值传递？⭐⭐⭐
 
 **Java 只支持值传递**。
 
@@ -440,7 +383,7 @@ Java 语言提供了 **8** 种基本类型，大致分为 **4** 类：布尔型�
 
 :::
 
-### 【简单】什么是装箱、拆箱？⭐⭐
+### 【简单】什么是装箱、拆箱？⭐⭐⭐
 
 ::: info 什么是装箱、拆箱？
 :::
@@ -523,13 +466,75 @@ int b = a;   //拆箱
 
 :::
 
-### 【中等】包装类型的缓存机制了解么？⭐⭐
+### 【中等】包装类型的缓存机制了解么？⭐⭐⭐
 
 Java 基本数据类型的包装类型的大部分都用到了缓存机制来提升性能。
 
 `Byte`,`Short`,`Integer`,`Long` 这 4 种包装类默认创建了数值 **[-128，127]** 的相应类型的缓存数据，`Character` 创建了数值在 **[0,127]** 范围的缓存数据，`Boolean` 直接返回 `True` or `False`。
 
 如果超出对应范围仍然会去创建新的对象，缓存的范围区间的大小只是在性能和资源之间的权衡。
+
+**（1）Integer 缓存上限可调**
+
+`Integer` 的缓存上限可通过 JVM 参数 `-XX:AutoBoxCacheMax=<size>` 调整（仅影响 `Integer`，不影响 `Long` 等其他包装类）。该参数在 `IntegerCache` 静态初始化时读取：
+
+```java
+// Integer.IntegerCache 源码（JDK 8+）
+private static class IntegerCache {
+    static final int low = -128;
+    static final int high;
+    static final Integer cache[];
+    static {
+        int h = 127;
+        String integerCacheHighPropValue =
+            sun.misc.VM.getSavedProperty("java.lang.Integer.IntegerCache.high");
+        if (integerCacheHighPropValue != null) {
+            int i = parseInt(integerCacheHighPropValue);
+            i = Math.max(i, 127);
+            h = Math.min(i, Integer.MAX_VALUE - (-low) -1);
+        }
+        high = h;
+        cache = new Integer[(high - low) + 1];
+        // 初始化 cache[] 数组...
+    }
+}
+```
+
+关键细节：
+
+- 参数名是 `-XX:AutoBoxCacheMax`，但实际读取的系统属性是 `java.lang.Integer.IntegerCache.high`。
+- 仅影响 `Integer` 的缓存上限，`Long`/`Short`/`Byte` 的上限 **固定为 127 不可调**。
+
+**（2）高并发场景的内存影响（定量分析）**
+
+频繁装箱在并发场景下会产生大量临时对象，引发 GC 压力：
+
+```
+假设 QPS = 10,000，每次装箱 Long 对象（24 字节对象头 + 8 字节数据 = 32 字节）：
+- 每秒产生 10,000 × 32 = 320 KB 临时对象
+- 每分钟 = 19.2 MB，每小时 ≈ 1.15 GB 对象分配
+- 若未命中缓存（Long 缓存仅 -128~127），所有装箱都是 new Long()
+- 年轻代频繁 Minor GC → 晋升老年代 → 可能触发 Full GC
+```
+
+**优化策略**：
+
+- 高并发路径上避免装箱，优先用基本类型。
+- 若必须用包装类型，确保数值在缓存范围内。
+- 使用 `-XX:AutoBoxCacheMax=4096` 扩大 Integer 缓存（按需，注意堆内存开销）。
+
+**（3）缓存数据结构**
+
+包装类缓存在堆中的结构是一个**静态 final 数组**，在类加载的 `<clinit>` 阶段一次性分配：
+
+```java
+// IntegerCache 初始化时在堆中分配一个 Integer[high - low + 1]
+// 例如默认 high=127, low=-128 → 分配 256 个 Integer 对象
+// 每个 Integer（开启指针压缩时）：16 字节对象头 + 4 字节 int = 20 字节
+// 256 × 20 ≈ 5 KB 内存，对堆几乎无感知
+```
+
+`Float` 和 `Double` 没有缓存，因为浮点数在任意区间都有无穷多个值，缓存命中率极低，设计上放弃了缓存。
 
 ::: tabs
 
@@ -616,7 +621,7 @@ System.out.println(i1==i2);
 
 记住：**所有整型包装类对象之间值的比较，全部使用 equals 方法比较**。
 
-### 【简单】比较包装类型为什么不能用 ==？⭐⭐
+### 【简单】比较包装类型为什么不能用 ==？⭐⭐⭐
 
 Java 值类型的包装类大部分都使用了缓存机制来提升性能：
 
@@ -638,61 +643,141 @@ public static Long valueOf(long l) {
 }
 ```
 
-### 【中等】为什么浮点数运算的时候会有精度丢失的风险？⭐⭐
+### 【中等】为什么浮点数运算的时候会有精度丢失的风险？⭐⭐⭐
 
-浮点数运算精度丢失代码演示：
+浮点数运算精度丢失的根本原因是 **IEEE 754 标准用有限的二进制位表示实数**，很多十进制小数无法精确转换为二进制小数（就像 1/3 无法精确表示为十进制小数 0.333...）。
+
+**（1）IEEE 754 浮点数结构**
+
+Java 的 `float`（32 位）和 `double`（64 位）遵循 IEEE 754 标准，格式为：
+
+```
+float (32位):  | 符号 S (1bit) | 指数 E (8bit) | 尾数 M (23bit) |
+double (64位): | 符号 S (1bit) | 指数 E (11bit) | 尾数 M (52bit) |
+
+数值 = (-1)^S × (1.M) × 2^(E - bias)
+- float 的 bias = 127，double 的 bias = 1023
+- 尾数隐含 1，实际精度为 24bit (float) / 53bit (double)
+```
+
+以 0.1 为例，它无法用二进制精确表示，转换成二进制是一个无限循环小数：
+
+```
+0.1 × 2 = 0.2 → 0
+0.2 × 2 = 0.4 → 0
+0.4 × 2 = 0.8 → 0
+0.8 × 2 = 1.6 → 1
+0.6 × 2 = 1.2 → 1
+0.2 × 2 = 0.4 → 0（开始循环）
+...
+0.1₁₀ = 0.0001100110011...₂（无限循环）
+```
+
+由于尾数位数有限（float 23bit，double 52bit），超出部分被**舍入（rounding）**，造成精度损失。
+
+**（2）精度丢失的三种典型场景**
+
+**场景一：十进制小数无法精确表示**
 
 ```java
 float a = 2.0f - 1.9f;
 float b = 1.8f - 1.7f;
-System.out.println(a); // 0.100000024
-System.out.println(b); // 0.099999905
+System.out.println(a);      // 0.100000024（非 0.1）
+System.out.println(b);      // 0.099999905（非 0.1）
 System.out.println(a == b); // false
 ```
 
-为什么会出现这个问题呢？
-
-这个和计算机保存浮点数的机制有很大关系。我们知道计算机是二进制的，而且计算机在表示一个数字时，宽度是有限的，无限循环的小数存储在计算机时，只能被截断，所以就会导致小数精度发生损失的情况。这也就是解释了为什么浮点数没有办法用二进制精确表示。
-
-就比如说十进制下的 0.2 就没办法精确转换成二进制小数：
+**场景二：大数吃小数** — 数量级差距过大时，加法可能被忽略：
 
 ```java
-// 0.2 转换为二进制数的过程为，不断乘以 2，直到不存在小数为止，
-// 在这个计算过程中，得到的整数部分从上到下排列就是二进制的结果。
-0.2 * 2 = 0.4 -> 0
-0.4 * 2 = 0.8 -> 0
-0.8 * 2 = 1.6 -> 1
-0.6 * 2 = 1.2 -> 1
-0.2 * 2 = 0.4 -> 0（发生循环）
-...
+double big = 1.0e16;
+double small = 1.0;
+System.out.println(big + small == big);  // true！small 被"吃掉"
+// 原因：big 和 small 数量级差 10^16，small 的尾数在对阶时全部移出，变成 0
 ```
 
-### 【简单】如何解决浮点数运算的精度丢失问题？⭐⭐
+**场景三：累加误差放大** — 大量浮点数累加时误差逐步累积：
 
-**首选 BigDecimal **表示需要保证精度的场景，如：金融数值。
+```java
+double sum = 0.0;
+for (int i = 0; i < 100000; i++) {
+    sum += 0.1;  // 每次加 0.1 都有微小误差
+}
+System.out.println(sum);  // 10000.000000018848（非精确 10000.0）
+```
 
-- 构造必用字符串 / 整数，禁用 double；
-- 运算用`add/subtract/multiply/divide`方法；
-- 除法必须指定精度和舍入模式（避免除不尽报错）。
+**（3）为什么这个问题在 Java 中无法避免？**
 
-`BigDecimal` 直接使用字符串初始化（如 `new BigDecimal("0.1")`）可完全避免二进制浮点误差。通常情况下，大部分需要浮点数精确运算结果的业务场景（比如涉及到钱的场景）可以通过 `BigDecimal` 来处理。
+- Java 没有内置的 decimal 类型（MySQL 有 DECIMAL，C# 有 decimal），`float`/`double` 就是 IEEE 754 二进制浮点数。
+- `BigDecimal` 是类库方案，语言层面不做特殊处理。
+- JVM 字节码 `fadd`/`dadd` 直接映射到 CPU 浮点指令，CPU 本身就是按 IEEE 754 运算的。
+
+### 【简单】如何解决浮点数运算的精度丢失问题？⭐⭐⭐
+
+**方案一：`BigDecimal`（推荐，金融计算首选）**
+
+`BigDecimal` 内部结构是一个 `BigInteger`（无精度损失的整数）加上一个 `scale`（小数位数），本质是用整数运算替代浮点运算：
+
+```java
+// BigDecimal 内部表示：unscaledValue × 10^(-scale)
+// new BigDecimal("0.1") → unscaledValue=1, scale=1
+// new BigDecimal("1.5")  → unscaledValue=15, scale=1
+```
+
+**三条铁律**：
+
+- 构造必用字符串或整数：`new BigDecimal("0.1")` 而非 `new BigDecimal(0.1)`（后者先转 double，误差已产生）。
+- 运算用 `add/subtract/multiply/divide` 方法。
+- 除法必须指定精度和舍入模式（`RoundingMode`），否则遇除不尽抛 `ArithmeticException`。
 
 ```java
 BigDecimal a = new BigDecimal("1.0");
 BigDecimal b = new BigDecimal("0.9");
 BigDecimal c = new BigDecimal("0.8");
 
-BigDecimal x = a.subtract(b);
-BigDecimal y = b.subtract(c);
+BigDecimal x = a.subtract(b);   // 0.1（精确）
+BigDecimal y = b.subtract(c);   // 0.1（精确）
+x.compareTo(y) == 0;             // true（精确比较，用 compareTo 不用 equals）
 
-System.out.println(x); /* 0.1 */
-System.out.println(y); /* 0.1 */
-System.out.println(Objects.equals(x, y)); /* true */
+// 除法必须指定精度和舍入模式
+BigDecimal d = new BigDecimal("1");
+BigDecimal e = new BigDecimal("3");
+d.divide(e, 4, RoundingMode.HALF_UP);  // 0.3333
 ```
 
-简单场景，可用**放大整数运算**：将小数放大为整数，如使用 long 表示金钱，单位为分
+**常用舍入模式**：
 
-### 【简单】超过 long 整型的数据应该如何表示？⭐⭐
+| 模式        | 规则                   |      示例 (保留 2 位)      |
+| ----------- | ---------------------- | :------------------------: |
+| `HALF_UP`   | 四舍五入               |        2.345 → 2.35        |
+| `HALF_EVEN` | 银行家舍入（统计更准） | 2.345 → 2.34, 2.355 → 2.36 |
+| `CEILING`   | 向正无穷取整           |        2.341 → 2.35        |
+| `FLOOR`     | 向负无穷取整           |        2.349 → 2.34        |
+
+::: warning BigDecimal 的性能代价
+
+- `BigDecimal` 运算比基本类型 `double` 慢 **100-300 倍**（对象分配 + 高精度运算）。
+- 高并发场景避免大量创建 `BigDecimal`，考虑用 `long` 放大单位（如金额用"分"表示）。
+- 比较时用 `compareTo()`，不用 `equals()`：`equals()` 同时比较值和 scale（`2.0` ≠ `2.00`），而 `compareTo()` 只比较值。
+
+:::
+
+**方案二：放大整数运算（高并发 + 精度敏感场景）**
+
+```java
+// 金融场景：金额用 long 表示"分"，避免浮点和 BigDecimal 开销
+long price1 = 199;  // 1.99 元
+long price2 = 299;  // 2.99 元
+long total = price1 + price2;  // 498 分 = 4.98 元，精确不丢精度
+```
+
+**方案选择决策树**：
+
+- 科学计算 / 允许微小误差 → `double`（性能最好）
+- 金融 / 需要精确小数 → `BigDecimal`（精度最高）
+- 高并发 + 固定精度（如金额）→ `long` 放大单位（性能最好 + 精度不丢）
+
+### 【简单】超过 long 整型的数据应该如何表示？⭐
 
 基本数值类型都有一个表达范围，如果超过这个范围就会有数值溢出的风险。
 
@@ -708,7 +793,7 @@ System.out.println(l + 1 == Long.MIN_VALUE); // true
 
 相对于常规整数类型的运算来说，`BigInteger` 运算的效率会相对较低。
 
-### 【中等】自动装箱拆箱有哪些陷阱？⭐
+### 【中等】自动装箱拆箱有哪些陷阱？⭐⭐
 
 自动装箱/拆箱看似优雅，实则隐藏多个易踩的坑：
 
@@ -763,7 +848,7 @@ test(1);      // 输出 "int"（更精确匹配，优先选基本类型）
 test(null);   // 编译错误：null 无法匹配 int，但匹配 Integer（需显式指定类型）
 ```
 
-### 【中等】Java 是如何处理整数溢出的？⭐
+### 【中等】Java 是如何处理整数溢出的？⭐⭐
 
 Java **不会自动检测整数溢出**，溢出后结果按二进制补码**回绕（wrap-around）**，不抛异常。
 
@@ -837,7 +922,7 @@ try {
   - 作用域限于方法内，编译器可严格检查是否赋值。
   - 强制手动初始化以规避潜在风险。
 
-### 【简单】字符型常量和字符串常量的区别？⭐⭐
+### 【简单】字符型常量和字符串常量的区别？⭐
 
 | **场景**     | **字符常量**                              | **字符串常量**                      |
 | :----------- | :---------------------------------------- | :---------------------------------- |
@@ -850,7 +935,7 @@ try {
 
 ## Java 方法
 
-### 【简单】Java 方法有哪些类型？⭐⭐
+### 【简单】Java 方法有哪些类型？⭐
 
 Java 方法的类型可以从不同维度分类。
 
@@ -993,7 +1078,7 @@ public class Main {
 }
 ```
 
-### 【简单】重载和重写有什么区别？⭐⭐
+### 【简单】重载和重写有什么区别？⭐⭐⭐
 
 **Java 重载（Overload）与重写（Override）的核心区别**：
 
@@ -1132,12 +1217,89 @@ public class VariableLengthArgument {
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/04/211503dd66164d2d94ba14bd5ed56c26.webp)
 
-### 【简单】Exception 和 Error 有什么区别？⭐⭐
+### 【简单】Exception 和 Error 有什么区别？⭐⭐⭐
 
 在 Java 中，所有的异常都有一个共同的祖先 `java.lang` 包中的 `Throwable` 类。`Throwable` 类有两个重要的子类：
 
 - **`Exception`** - 程序本身可以处理的异常，可以通过 `catch` 来进行捕获。`Exception` 又分为**检查**（checked）异常和**非检查**（unchecked）异常，检查异常在源代码里必须显式地进行捕获处理，这是编译期检查的一部分。
-- **`Error`** - `Error` 属于程序无法处理的错误。例如 Java 虚拟机运行错误（`Virtual MachineError`）、虚拟机内存不够错误（`OutOfMemoryError`）、类定义错误（`NoClassDefFoundError`）等 。这些异常发生时，Java 虚拟机（JVM）一般会选择线程终止。
+- **`Error`** - `Error` 属于程序无法处理的错误。例如 Java 虚拟机运行错误（`VirtualMachineError`）、虚拟机内存不够错误（`OutOfMemoryError`）、类定义错误（`NoClassDefFoundError`）等 。这些异常发生时，Java 虚拟机（JVM）一般会选择线程终止。
+
+**（1）Throwable 异常体系全景**
+
+```
+Throwable
+├── Error（程序无法处理，不应 catch）
+│   ├── VirtualMachineError
+│   │   ├── OutOfMemoryError（堆/元空间/直接内存耗尽）
+│   │   └── StackOverflowError（递归过深或栈空间不足）
+│   ├── NoClassDefFoundError（运行时找不到类定义）
+│   └── AssertionError（断言失败）
+└── Exception（程序可处理）
+    ├── RuntimeException（非检查异常，编译期不强制处理）
+    │   ├── NullPointerException
+    │   ├── IllegalArgumentException
+    │   ├── IndexOutOfBoundsException
+    │   └── ConcurrentModificationException
+    └── 其他 Exception（检查异常，编译期强制处理）
+        ├── IOException
+        ├── SQLException
+        └── InterruptedException
+```
+
+**（2）JVM 层面：异常表（Exception Table）**
+
+每个方法的字节码中都包含一个**异常表**，记录了 `try-catch` 块的范围映射：
+
+```java
+// 源码
+try { a = 1; } catch (Exception e) { a = 2; }
+
+// 字节码异常表（Code 属性中的 exception_table）
+// from   to   target   type
+//   0     4      7     java/lang/Exception
+// 含义：字节码偏移 0~3 之间若抛出 Exception，跳转到偏移 7 执行 catch 块
+```
+
+这体现了 JVM 的**"零成本异常"哲学**：无异常时不产生任何额外开销（不像 C++ 需要维护异常处理数据结构）。但一旦抛出异常，JVM 需要遍历调用栈构建 `StackTraceElement[]`，成本极高。
+
+**（3）异常的性能代价（L3 标准：能量化分析）**
+
+`Throwable.fillInStackTrace()` 是核心瓶颈——需要遍历当前线程的调用栈帧，逐帧构建 `StackTraceElement[]` 数组：
+
+```
+正常流程：约 0.001 μs
+抛异常并捕获：约 50-100 μs（慢 5 万-10 万倍）
+核心开销 = fillInStackTrace() 遍历调用栈 + 创建 StackTraceElement[] 数组
+```
+
+**优化策略**：
+
+- 不要用异常做流程控制（如用返回值而非抛异常表示"未找到"）。
+- 高频异常可重写 `fillInStackTrace()` 为空方法（不记录栈，但定位困难）。
+- 复用静态异常实例（如 Spring 的 `NestedRuntimeException` 模式），但注意栈信息会错乱。
+
+**（4）异常风暴 → Full GC 因果链**
+
+```
+高频异常 → 大量 StackTraceElement[] 数组分配 → 年轻代快速填满
+→ 对象晋升老年代 → 老年代达到阈值 → CMS Concurrent Mode Failure / G1 Full GC
+```
+
+生产案例：某系统日志框架 Bug 导致每秒 10 万次 NPE，每次 NPE 的 `fillInStackTrace()` 分配约 2KB 的 `StackTraceElement[]`，每秒 200MB 对象分配，3 秒一次 Full GC，CPU 打满。
+
+**（5）JEP 358 Helpful NPE（JDK 14+）**
+
+JDK 14 引入 Helpful NullPointerExceptions，在 NPE message 中嵌入具体变量名：
+
+```java
+// JDK 14 前
+a.b.c.d();  // NullPointerException（不知道哪个是 null）
+
+// JDK 14 后（-XX:+ShowCodeDetailsInExceptionMessages，默认开启）
+a.b.c.d();  // NullPointerException: Cannot invoke "X.c" because "a.b" is null
+```
+
+JVM 通过字节码分析定位 null 变量，无需修改代码即可获得精确信息。
 
 ### 【简单】Checked Exception 和 Unchecked Exception 有什么区别？⭐⭐
 
@@ -1199,7 +1361,7 @@ System.out.println(str.length());  // 运行时抛出 NullPointerException
 - `String getLocalizedMessage()`: 返回异常对象的本地化信息。使用 `Throwable` 的子类覆盖这个方法，可以生成本地化信息。如果子类没有覆盖该方法，则该方法返回的信息与 `getMessage()`返回的结果相同
 - `void printStackTrace()`: 在控制台上打印 `Throwable` 对象封装的异常信息
 
-### 【简单】try-catch-finally 如何使用？⭐⭐
+### 【简单】try-catch-finally 如何使用？⭐⭐⭐
 
 - `try`块：用于捕获异常。其后可接零个或多个 `catch` 块，如果没有 `catch` 块，则必须跟一个 `finally` 块。
 - `catch`块：用于处理 try 捕获到的异常。
@@ -1291,7 +1453,7 @@ Catch Exception -> RuntimeException
 1. 程序所在的线程死亡。
 2. 关闭 CPU。
 
-### 【简单】如何使用 `try-with-resources` 代替`try-catch-finally`？⭐⭐
+### 【简单】如何使用 `try-with-resources` 代替`try-catch-finally`？⭐⭐⭐
 
 1. **适用范围（资源的定义）：** 任何实现 `java.lang.AutoCloseable`或者 `java.io.Closeable` 的对象
 2. **关闭资源和 finally 块的执行顺序：** 在 `try-with-resources` 语句中，任何 catch 或 finally 块在声明的资源关闭后运行
@@ -1367,7 +1529,7 @@ catch (IOException e) {
 - 避免重复记录日志：如果在捕获异常的地方已经记录了足够的信息（包括异常类型、错误信息和堆栈跟踪等），那么在业务代码中再次抛出这个异常时，就不应该再次记录相同的错误信息。重复记录日志会使得日志文件膨胀，并且可能会掩盖问题的实际原因，使得问题更难以追踪和解决。
 - ……
 
-### 【中等】Java 中 final、finally 和 finalize 有什么区别？⭐⭐
+### 【中等】Java 中 final、finally 和 finalize 有什么区别？⭐⭐⭐
 
 | 特性         | final                                                | finally                                          | finalize                   |
 | :----------- | :--------------------------------------------------- | :----------------------------------------------- | :------------------------- |
@@ -1379,9 +1541,51 @@ catch (IOException e) {
 
 **一句话总结**：`final`管**不变性**，`finally`管**必执行**，`finalize`是**过时的清理机制**。
 
-（注：现代 Java 开发用`try-with-resources`替代`finalize`）
+**（1）finalize 为什么被废弃？**
 
-### 【简单】`instanceof` 关键字的作用？⭐
+JDK 9 标记 `finalize()` 为 `@Deprecated`，JDK 18 标记为 `@Deprecated(forRemoval=true)`。原因：
+
+- **执行时机不可控**：对象从"可回收"到 `finalize()` 实际执行可能间隔数秒甚至更久，GC 不会为执行 `finalize()` 而等待。
+- **性能代价巨大**：覆盖了 `finalize()` 的对象，GC 需要两次回收才能清除（第一次进入 `Finalizer` 队列，第二次才能真正回收）。
+- **可能导致 OOM**：`Finalizer` 线程优先级低，若队列积压过多，未回收对象持续占用内存。
+- **安全风险**：`finalize()` 中可能"复活"对象（重新赋值给静态变量），导致安全漏洞。
+
+**（2）替代方案：Cleaner API（JDK 9+）**
+
+```java
+// 旧方案：覆盖 finalize()
+class LegacyResource {
+    @Override
+    protected void finalize() { /* 清理 */ }
+}
+
+// 新方案：Cleaner + PhantomReference
+class ModernResource implements AutoCloseable {
+    private static final Cleaner cleaner = Cleaner.create();
+    private final Cleaner.Cleanable cleanable;
+
+    public ModernResource() {
+        this.cleanable = cleaner.register(this, () -> {
+            // 清理逻辑（不持有 this 引用，避免复活）
+            System.out.println("资源已清理");
+        });
+    }
+
+    @Override
+    public void close() {
+        cleanable.clean();  // 显式清理
+    }
+}
+```
+
+**（3）实际开发建议**
+
+- 永远不要重写 `finalize()`。
+- 资源清理用 `try-with-resources`（实现 `AutoCloseable`）+ 显式 `close()`。
+- 堆外内存清理用 `Cleaner` + `PhantomReference`（如 Netty 的 `ByteBuf`）。
+- 如果维护老代码遇到 `finalize()`，逐步迁移到 Cleaner。
+
+### 【简单】`instanceof` 关键字的作用？⭐⭐
 
 `instanceof` 用于**运行时类型检查**，判断对象是否是某个类、子类或接口的实例。
 
@@ -1423,7 +1627,7 @@ if (obj instanceof String s && s.length() > 5) {
 - `instanceof` 比 `getClass() == X.class` 更宽松（前者考虑继承关系，后者要求精确匹配）。
 - 现代 JVM 已优化 `instanceof` 性能，无需过度担心开销。
 
-### 【中等】Java 的 switch 语句在 JDK 14+ 有哪些增强？⭐
+### 【中等】Java 的 switch 语句在 JDK 14+ 有哪些增强？⭐⭐
 
 JDK 14 引入**标准化的 switch 表达式**，支持**箭头语法**、**多值标签**、**yield 返回值**，大幅提升表达力。
 
@@ -1512,7 +1716,7 @@ module com.example.app {
 - **应用开发者**：依赖更清晰，但升级到 Java 9+ 时需处理未命名模块兼容性问题。
 - **JDK 自身**：JDK 本身被拆分为约 90 个模块（`java.base`、`java.sql` 等）。
 
-### 【中等】Java 中的 Record（JDK 16+）有什么用？⭐
+### 【中等】Java 中的 Record（JDK 16+）有什么用？⭐⭐
 
 `Record` 是 Java 16 引入的**不可变数据载体**，自动生成样板代码，是 Lombok `@Data` 的官方替代品。
 
@@ -1565,7 +1769,7 @@ public record Range(int start, int end) {
 
 **适用场景**：DTO、值对象、配置项、API 响应等"纯数据"场景。不适合需要可变状态或复杂继承的领域模型。
 
-### 【中等】Sealed Classes（JDK 17+）有什么用？⭐
+### 【中等】Sealed Classes（JDK 17+）有什么用？⭐⭐
 
 **密封类**通过 `sealed` + `permits` 显式声明允许的子类，**精确控制继承层级**。
 
