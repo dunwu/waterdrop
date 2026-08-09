@@ -28,13 +28,13 @@ permalink: /pages/26adfe49/
 
 ### 【中等】什么是 BIO、NIO、AIO？三者有什么区别？⭐⭐⭐
 
-| 对比维度 | BIO（同步阻塞） | NIO（同步非阻塞） | AIO（异步非阻塞） |
-| :--- | :--- | :--- | :--- |
-| **模型** | 一个连接一个线程 | 多路复用（I/O 多路复用） | 异步回调 |
-| **阻塞行为** | 读写时线程阻塞 | 读写时不阻塞，但需轮询 | 完全不阻塞，内核完成后回调通知 |
-| **适用场景** | 连接数少且固定 | **高并发、连接数多**（主流方案） | 重 I/O、连接数极多 |
-| **Java 支持** | `java.io` 包 | `java.nio` 包 | JDK 7 `AsynchronousChannel`（不成熟） |
-| **代表框架** | Tomcat（早期） | **Netty**、Mina | 较少使用 |
+| 对比维度      | BIO（同步阻塞）  | NIO（同步非阻塞）                | AIO（异步非阻塞）                     |
+| :------------ | :--------------- | :------------------------------- | :------------------------------------ |
+| **模型**      | 一个连接一个线程 | 多路复用（I/O 多路复用）         | 异步回调                              |
+| **阻塞行为**  | 读写时线程阻塞   | 读写时不阻塞，但需轮询           | 完全不阻塞，内核完成后回调通知        |
+| **适用场景**  | 连接数少且固定   | **高并发、连接数多**（主流方案） | 重 I/O、连接数极多                    |
+| **Java 支持** | `java.io` 包     | `java.nio` 包                    | JDK 7 `AsynchronousChannel`（不成熟） |
+| **代表框架**  | Tomcat（早期）   | **Netty**、Mina                  | 较少使用                              |
 
 **总结**：NIO 是当前 Java 网络编程的主流模型，Netty 基于 NIO 构建，提供了更完善的 API 和更高的可靠性。AIO 在 Java 生态中应用较少，Linux 上推荐使用 `epoll` + NIO 的组合（即 Netty 方案）。
 
@@ -52,13 +52,13 @@ Netty 的核心定位：
 
 **核心能力**：
 
-| 能力          | 说明                                                              |
-| :------------ | :---------------------------------------------------------------- |
-| **高性能**    | 基于多路复用、零拷贝、内存池化，吞吐量高、延迟低                  |
-| **高可靠**    | 解决 NIO 空轮询 Bug，提供心跳检测、重连机制                       |
-| **易用性**    | 简洁 API，屏蔽 Selector/Channel 复杂细节                          |
-| **可扩展**    | 责任链式 Pipeline，编解码、业务逻辑可插拔                         |
-| **协议支持**  | 内置 HTTP、WebSocket、SSL、Google Protocol Buffers 等            |
+| 能力         | 说明                                                  |
+| :----------- | :---------------------------------------------------- |
+| **高性能**   | 基于多路复用、零拷贝、内存池化，吞吐量高、延迟低      |
+| **高可靠**   | 解决 NIO 空轮询 Bug，提供心跳检测、重连机制           |
+| **易用性**   | 简洁 API，屏蔽 Selector/Channel 复杂细节              |
+| **可扩展**   | 责任链式 Pipeline，编解码、业务逻辑可插拔             |
+| **协议支持** | 内置 HTTP、WebSocket、SSL、Google Protocol Buffers 等 |
 
 ### 【中等】Netty 有哪些应用场景？⭐
 
@@ -99,15 +99,15 @@ Netty 在 NIO 的基础上，通过封装和优化，**提供了一个全面增�
 
 Netty 的核心组件共同构成了其高性能网络通信框架的基础：
 
-| 组件                     | 职责                                           | 生命周期                           |
-| :----------------------- | :--------------------------------------------- | :--------------------------------- |
-| **Channel**              | 网络 I/O 操作的载体（连接、读、写、绑定、关闭） | 对应一个底层 socket                |
-| **EventLoop**            | 处理 Channel 的所有 I/O 事件，单线程串行执行    | 一个 EventLoop 可绑多个 Channel    |
-| **EventLoopGroup**       | EventLoop 的集合，管理线程池                    | 应用级                             |
-| **ChannelHandler**       | 处理 I/O 事件或拦截 I/O 操作的业务逻辑          | 可共享（`@Sharable`）或每连接新建  |
-| **ChannelPipeline**      | ChannelHandler 的责任链容器                     | 每 Channel 一个                     |
-| **ChannelHandlerContext**| ChannelHandler 与 Pipeline 交互的上下文         | 处理器注册时创建                    |
-| **ByteBuf**              | Netty 自研的字节缓冲区，替代 NIO ByteBuffer     | 引用计数管理                        |
+| 组件                      | 职责                                            | 生命周期                          |
+| :------------------------ | :---------------------------------------------- | :-------------------------------- |
+| **Channel**               | 网络 I/O 操作的载体（连接、读、写、绑定、关闭） | 对应一个底层 socket               |
+| **EventLoop**             | 处理 Channel 的所有 I/O 事件，单线程串行执行    | 一个 EventLoop 可绑多个 Channel   |
+| **EventLoopGroup**        | EventLoop 的集合，管理线程池                    | 应用级                            |
+| **ChannelHandler**        | 处理 I/O 事件或拦截 I/O 操作的业务逻辑          | 可共享（`@Sharable`）或每连接新建 |
+| **ChannelPipeline**       | ChannelHandler 的责任链容器                     | 每 Channel 一个                   |
+| **ChannelHandlerContext** | ChannelHandler 与 Pipeline 交互的上下文         | 处理器注册时创建                  |
+| **ByteBuf**               | Netty 自研的字节缓冲区，替代 NIO ByteBuffer     | 引用计数管理                      |
 
 **组件协作关系**：
 
@@ -161,11 +161,11 @@ serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
 
 Reactor 模式有三种经典形态：
 
-| 模型             | 结构                                          | 特点                                             | 适用场景           |
-| :--------------- | :-------------------------------------------- | :----------------------------------------------- | :----------------- |
-| **单线程 Reactor** | 1 个线程处理所有 I/O（接收+读写+业务）        | 简单但无法利用多核，业务慢会阻塞 I/O             | 客户端、低并发     |
-| **多线程 Reactor** | 1 个线程接收连接，N 个线程处理 I/O+业务       | 利用多核，但单 Reactor 可能成为接收瓶颈          | 中等并发           |
-| **主从 Reactor**  | 主 Reactor 接收连接，从 Reactor 处理 I/O+业务 | 接收与处理分离，性能最优                         | 高并发服务端       |
+| 模型               | 结构                                          | 特点                                    | 适用场景       |
+| :----------------- | :-------------------------------------------- | :-------------------------------------- | :------------- |
+| **单线程 Reactor** | 1 个线程处理所有 I/O（接收+读写+业务）        | 简单但无法利用多核，业务慢会阻塞 I/O    | 客户端、低并发 |
+| **多线程 Reactor** | 1 个线程接收连接，N 个线程处理 I/O+业务       | 利用多核，但单 Reactor 可能成为接收瓶颈 | 中等并发       |
+| **主从 Reactor**   | 主 Reactor 接收连接，从 Reactor 处理 I/O+业务 | 接收与处理分离，性能最优                | 高并发服务端   |
 
 **Netty 的实现**：
 
@@ -187,6 +187,24 @@ b.group(bossGroup, workerGroup)
 - 连接建立后，BossGroup 将 Channel 注册到 WorkerGroup 的某个 EventLoop 上，后续所有 I/O 由该线程处理。
 
 > Netty 也可通过 `group(group)` 单参数配置退化为单线程模型，或通过业务线程池将耗时业务与 I/O 线程隔离。
+
+### 【中等】Netty 的 EventLoop 是如何工作的？⭐⭐⭐
+
+`EventLoop` 是 Netty 的核心调度单元，本质是**一个绑定 Selector 的单线程，串行处理其绑定的多个 Channel 的 I/O 事件和任务**。
+
+**主循环流程（run 方法）**
+
+1. **select()**：调用 `Selector.select(timeout)` 阻塞等待 I/O 事件（多路复用）。
+2. **处理 I/O 事件**：遍历 `selectedKeys`，按事件类型（ACCEPT/READ/WRITE）触发对应 Channel 的 `ChannelHandler`。
+3. **执行任务**：执行任务队列中的任务（runAllTasks），包括用户提交的任务、定时任务和异步操作回调。
+4. 循环往复。通过 `ioRatio`（默认 50）限制 I/O 处理与任务执行的时间占比，防止 I/O 独占线程饿死任务。
+
+**任务提交机制**
+
+- `channel.eventLoop().execute()/schedule()` 把任务提交到 EventLoop 的 MPSC 任务队列；若当前线程不是该 EventLoop 线程，提交后会唤醒它。
+- Channel 的所有操作都汇聚到其绑定的 EventLoop 线程串行执行，**天然线程安全，无需加锁**。
+
+一句话总结：EventLoop = “select 多路复用 + 串行事件处理 + 任务队列”，一个线程管一批连接，无锁是高性能的关键。
 
 ### 【中等】ByteBuf 与 NIO ByteBuffer 有什么区别？⭐⭐
 
@@ -237,17 +255,44 @@ buf.readBytes(5);                    // 读，readerIndex 前移
 
 **内存泄漏检测**：Netty 提供 `ResourceLeakDetector`，通过弱引用 + 引用队列跟踪 ByteBuf 的 release 情况：
 
-| 检测级别       | 采样比例 | 性能开销 | 适用场景           |
-| :------------- | :------- | :------- | :----------------- |
-| `DISABLED`     | 0        | 无       | 生产环境关闭检测    |
-| `SIMPLE`（默认）| 1%       | 极低     | 生产环境默认        |
-| `ADVANCED`     | 1%       | 中       | 测试环境排查        |
-| `PARANOID`     | 100%     | 高       | 开发调试阶段        |
+| 检测级别         | 采样比例 | 性能开销 | 适用场景         |
+| :--------------- | :------- | :------- | :--------------- |
+| `DISABLED`       | 0        | 无       | 生产环境关闭检测 |
+| `SIMPLE`（默认） | 1%       | 极低     | 生产环境默认     |
+| `ADVANCED`       | 1%       | 中       | 测试环境排查     |
+| `PARANOID`       | 100%     | 高       | 开发调试阶段     |
 
 ```java
 // 开启最高级别检测（仅调试用）
 -Dio.netty.leakDetection.level=PARANOID
 ```
+
+### 【困难】ByteBuf 的内存池化原理是什么？⭐⭐⭐
+
+池化的 `ByteBuf` 由 **PooledByteBufAllocator** 分配，避免频繁申请/释放内存的开销和 GC 压力，其设计借鉴了 jemalloc 算法的思想。
+
+**分层内存结构**
+
+- **Arena（内存区域）**：维护多个 Arena，线程分配时选择其中一个，降低锁竞争；每个 Arena 管理一串 ChunkList。
+- **ChunkList → Chunk**：ChunkList 按内存使用率组织多个 Chunk（默认 16MB）。每个 Chunk 用一棵完全二叉树管理 **Page**（默认 8KB）的分配，通过 `memoryMap` 快速定位连续空闲空间。
+- **Page → Subpage**：小于 8KB 的小内存申请会将 Page 细分为等大的 **Subpage** 块（最小 16B），用位图管理，减少内部碎片。
+
+**线程本地缓存（ThreadCache）**
+
+每个线程缓存小规格的内存块，分配时优先命中本地缓存，全程无锁，大幅降低高并发下的分配竞争。
+
+**使用与效果**
+
+```java
+ByteBuf buf = PooledByteBufAllocator.DEFAULT.directBuffer(1024);
+// 使用完毕后释放，归还内存池
+buf.release();
+```
+
+- 池化 + 堆外内存可显著减少 GC 停顿和系统调用，吞吐提升可达 10%~30%。
+- Netty 4.1 默认使用池化分配器；需配合引用计数正确 release，否则泄漏的内存无法归还池中。
+
+一句话总结：ByteBuf 池化用 “Arena 分片 + Chunk 二叉树 + Subpage 细分 + 线程本地缓存” 实现无锁高效的内存复用。
 
 ## Netty 架构
 
@@ -360,13 +405,13 @@ Netty 内置解码器：
 
 **LengthFieldBasedFrameDecoder 核心参数**：
 
-| 参数                | 说明                          | 示例值            |
-| :------------------ | :---------------------------- | :---------------- |
-| maxFrameLength      | 最大帧长度，超出抛异常         | 1024 × 1024       |
-| lengthFieldOffset   | 长度字段的偏移量              | 0（长度字段在最前）|
-| lengthFieldLength   | 长度字段本身的字节数          | 4（int）          |
-| lengthAdjustment    | 长度字段值与实际内容的补偿值  | 0                 |
-| initialBytesToStrip | 解码后跳过的字节数（去协议头）| 4（去掉长度字段） |
+| 参数                | 说明                           | 示例值              |
+| :------------------ | :----------------------------- | :------------------ |
+| maxFrameLength      | 最大帧长度，超出抛异常         | 1024 × 1024         |
+| lengthFieldOffset   | 长度字段的偏移量               | 0（长度字段在最前） |
+| lengthFieldLength   | 长度字段本身的字节数           | 4（int）            |
+| lengthAdjustment    | 长度字段值与实际内容的补偿值   | 0                   |
+| initialBytesToStrip | 解码后跳过的字节数（去协议头） | 4（去掉长度字段）   |
 
 ```java
 // 协议：[4字节长度][消息体]

@@ -17,8 +17,8 @@ index: false
 
 ### 综合
 
-[DevOps 简介](DevOps_简介.md)
-[DevOps 面试](DevOps_面试.md) 💯
+[DevOps 简介]([DevOps]简介.md)
+[DevOps 面试]([DevOps]面试.md) 💯
 
 ### 工具
 
@@ -32,7 +32,7 @@ index: false
   - [Docker 面试](工具/Docker/[Docker]面试.md) 💯
 - [Kubernetes](工具/Kubernetes)
   - [Kubernetes 快速入门](工具/Kubernetes/K8S.md)
-  - [Kubernetes 面试](工具/Kubernetes/K8S_面试.md) 💯
+  - [Kubernetes 面试](工具/Kubernetes/[K8S]面试.md) 💯
 - [Nginx](工具/Nginx)
   - [Nginx 快速入门](工具/Nginx/[Nginx]快速入门.md)
   - [Nginx 简介](工具/Nginx/[Nginx]简介.md)

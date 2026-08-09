@@ -103,6 +103,11 @@ export default hopeTheme({
     vPre: true
   },
 
+  // toc
+  toc: {
+    levels: [2, 3]
+  },
+
   // page meta
   metaLocales: {
     editLink: '在 GitHub 上编辑此页'

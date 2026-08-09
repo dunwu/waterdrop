@@ -69,8 +69,8 @@ Hive 表中的列支持以下基本数据类型：
 
 此外，Hive 还支持以下复杂类型：
 
-| 类型       | 描述                                                                              | 示例                                   |
-| ---------- | --------------------------------------------------------------------------------- | -------------------------------------- |
+| 类型       | 描述                                                                               | 示例                                   |
+| ---------- | ---------------------------------------------------------------------------------- | -------------------------------------- |
 | **STRUCT** | 类似于对象，是字段的集合，字段的类型可以不同，可以使用 `名称。字段名` 方式进行访问 | STRUCT ('xiaoming', 12 , '2018-12-12') |
 | **MAP**    | 键值对的集合，可以使用 `名称 [key]` 的方式访问对应的值                             | map('a', 1, 'b', 2)                    |
 | **ARRAY**  | 数组是一组具有相同类型和名称的变量的集合，可以使用 `名称 [index]` 访问对应的值     | ARRAY('a', 'b', 'c', 'd')              |
@@ -83,14 +83,14 @@ Hive 表中的列支持以下基本数据类型：
 
 Hive 会在 HDFS 为每个数据库上创建一个目录，数据库中的表是该目录的子目录，表中的数据会以文件的形式存储在对应的表目录下。Hive 支持以下几种文件存储格式：
 
-| 格式             | 说明                                                         |
-| ---------------- | ------------------------------------------------------------ |
-| **TextFile**     | 存储为纯文本文件。 这是 Hive 默认的文件存储格式。这种存储方式数据不做压缩，磁盘开销大，数据解析开销大。 |
+| 格式             | 说明                                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **TextFile**     | 存储为纯文本文件。 这是 Hive 默认的文件存储格式。这种存储方式数据不做压缩，磁盘开销大，数据解析开销大。                                                                                                                                                                                                                                                                      |
 | **SequenceFile** | SequenceFile 是 Hadoop API 提供的一种二进制文件，它将数据以<key,value>的形式序列化到文件中。这种二进制文件内部使用 Hadoop 的标准的 Writable 接口实现序列化和反序列化。它与 Hadoop API 中的 MapFile 是互相兼容的。Hive 中的 SequenceFile 继承自 Hadoop API 的 SequenceFile，不过它的 key 为空，使用 value 存放实际的值，这样是为了避免 MR 在运行 map 阶段进行额外的排序操作。 |
-| **RCFile**       | RCFile 文件格式是 FaceBook 开源的一种 Hive 的文件存储格式，首先将表分为几个行组，对每个行组内的数据按列存储，每一列的数据都是分开存储。 |
-| **ORC Files**    | ORC 是在一定程度上扩展了 RCFile，是对 RCFile 的优化。        |
-| **Avro Files**   | Avro 是一个数据序列化系统，设计用于支持大批量数据交换的应用。它的主要特点有：支持二进制序列化方式，可以便捷，快速地处理大量数据；动态语言友好，Avro 提供的机制使动态语言可以方便地处理 Avro 数据。 |
-| **Parquet**      | Parquet 是基于 Dremel 的数据模型和算法实现的，面向分析型业务的列式存储格式。它通过按列进行高效压缩和特殊的编码技术，从而在降低存储空间的同时提高了 IO 效率。 |
+| **RCFile**       | RCFile 文件格式是 FaceBook 开源的一种 Hive 的文件存储格式，首先将表分为几个行组，对每个行组内的数据按列存储，每一列的数据都是分开存储。                                                                                                                                                                                                                                      |
+| **ORC Files**    | ORC 是在一定程度上扩展了 RCFile，是对 RCFile 的优化。                                                                                                                                                                                                                                                                                                                        |
+| **Avro Files**   | Avro 是一个数据序列化系统，设计用于支持大批量数据交换的应用。它的主要特点有：支持二进制序列化方式，可以便捷，快速地处理大量数据；动态语言友好，Avro 提供的机制使动态语言可以方便地处理 Avro 数据。                                                                                                                                                                           |
+| **Parquet**      | Parquet 是基于 Dremel 的数据模型和算法实现的，面向分析型业务的列式存储格式。它通过按列进行高效压缩和特殊的编码技术，从而在降低存储空间的同时提高了 IO 效率。                                                                                                                                                                                                                 |
 
 > 以上压缩格式中 ORC 和 Parquet 的综合性能突出，使用较为广泛，推荐使用这两种格式。
 
@@ -122,11 +122,38 @@ CREATE TABLE page_view(viewTime INT, userid BIGINT)
 
 内部表又叫做管理表 (Managed/Internal Table)，创建表时不做任何指定，默认创建的就是内部表。想要创建外部表 (External Table)，则需要使用 External 进行修饰。 内部表和外部表主要区别如下：
 
-|              | 内部表                                                       | 外部表                                                       |
-| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 数据存储位置 | 内部表数据存储的位置由 hive.metastore.warehouse.dir 参数指定，默认情况下表的数据存储在 HDFS 的 `/user/hive/warehouse/数据库名。db/表名/` 目录下 | 外部表数据的存储位置创建表时由 `Location` 参数指定；         |
-| 导入数据     | 在导入数据到内部表，内部表将数据移动到自己的数据仓库目录下，数据的生命周期由 Hive 来进行管理 | 外部表不会将数据移动到自己的数据仓库目录下，只是在元数据中存储了数据的位置 |
-| 删除表       | 删除元数据（metadata）和文件                                 | 只删除元数据（metadata）                                     |
+|              | 内部表                                                                                                                                          | 外部表                                                                     |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 数据存储位置 | 内部表数据存储的位置由 hive.metastore.warehouse.dir 参数指定，默认情况下表的数据存储在 HDFS 的 `/user/hive/warehouse/数据库名。db/表名/` 目录下 | 外部表数据的存储位置创建表时由 `Location` 参数指定；                       |
+| 导入数据     | 在导入数据到内部表，内部表将数据移动到自己的数据仓库目录下，数据的生命周期由 Hive 来进行管理                                                    | 外部表不会将数据移动到自己的数据仓库目录下，只是在元数据中存储了数据的位置 |
+| 删除表       | 删除元数据（metadata）和文件                                                                                                                    | 只删除元数据（metadata）                                                   |
+
+**方案权衡**：
+
+- **ODS 层（贴源层）**：选外部表。原始数据由上游采集任务管理，Hive 只读不删，误执行 DROP TABLE 不会冲掉 HDFS 数据，且方便重跑与多引擎（Spark/Presto）共享同一份数据。
+- **DWD/DWS/ADS 层（加工层与结果层）**：优先内部表，生命周期交给 Hive 统一管理，INSERT OVERWRITE 重跑时不会产生无人认领的脏目录；对需要跨引擎只读共享的结果表，再退回外部表。
+
+**踩坑案例**：某团队把 ODS 日志表误建成内部表（建表时漏写 `EXTERNAL`），一次需求变更执行 `DROP TABLE`，连带删掉了 HDFS 上 3TB 原始数据，幸好 HDFS Trash 回收站未过期（默认保留 24 小时）才找回。事后规范：ODS 层建表必须带 `EXTERNAL` 关键字，并在 code review 中强制检查；内部表的 DROP 操作一律走审批。
+
+**失效场景**：`LOAD DATA INPATH` 对外部表同样是"移动"语义（文件会被挪到表 LOCATION 下），只有 `LOAD DATA LOCAL INPATH` 才是复制。很多人以为"外部表怎么操作都不动数据"，LOAD 之后源目录文件消失就是这个误区。此外建表时忘写 `EXTERNAL` 只写了 `LOCATION`，建出来的仍是内部表，DROP 照样删数据，需用 `DESC FORMATTED` 确认 `Table Type`。
+
+#### 拓展追问
+
+1. Hive 3.x 中内部表/外部表的语义有什么变化？
+   Hive 3.x 引入了 managed 与 external 的细化区分：managed 表 DROP 时数据被删除；external 表 DROP 只删元数据。若建表时指定了 `EXTERNAL 'TRUE'` 之外的 `tblproperties("external.table.purge"="true")`，DROP 外部表也会删数据。升级 Hive 3 后存量表的类型语义要用 `DESC FORMATTED` 逐一核对，避免删表行为与预期不符。
+2. 为什么数仓分层中 ODS 层几乎都用外部表？
+   ODS 是贴源层，数据所有权在采集链路（Flume/DataX/Kafka Connect），Hive 只做注册。用外部表可以避免 ETL 任务误删原始数据，支持同一路径被多个引擎/多套表定义共享，重跑任务时直接覆盖分区文件即可，不需要重新导数。
+3. TRUNCATE 和 DROP PARTITION 在两种表上行为有区别吗？
+   有。TRUNCATE 仅支持内部表（外部表执行会报错）；DROP PARTITION 对内部表会删除分区数据，对外部表默认只删元数据，需加 PURGE 或表级属性才会删文件。做分区级数据清理时要先确认表类型，否则会出现"删了元数据、文件还在"的脏分区。
+
+#### 场景题
+
+凌晨告警：下游报表全部空跑，排查发现昨天有实习生在测试库执行了 `DROP TABLE ods_user_log`，而这张表被三个下游任务依赖。你如何确认损失范围、恢复数据，并给出防复发方案？
+
+1. **应急**：先 `DESC FORMATTED` / HMS 审计日志确认表类型——若是外部表，HDFS 数据还在原 LOCATION，直接重建表结构并 `MSCK REPAIR TABLE`（或按备份的 DDL 重建）即可秒级恢复；若是内部表，立即检查 HDFS Trash（`/user/hive/warehouse/.Trash`，默认保留 24 小时），用 `hdfs dfs -mv` 从回收站移回原路径再重建元数据。
+2. **根因**：生产表建在了测试库且无权限管控；建表时未加 EXTERNAL，数据生命周期完全绑定在表元数据上。
+3. **长期方案**：生产表统一外部表 + 独立目录规范；Ranger 收回 DROP/TRUNCATE 权限，生产操作走审批工单；开启 HDFS Trash 并延长到 72 小时；关键表配置 HMS 元数据定期备份。
+4. **权衡**：外部表恢复了安全性，但 DROP 后残留文件需要定期巡检清理，否则 HDFS 上会堆积大量孤儿目录，需配套生命周期巡检脚本。
 
 :::
 
@@ -173,6 +200,35 @@ LOAD DATA LOCAL INPATH "/usr/file/emp30.txt" OVERWRITE INTO TABLE emp_partition 
 ```
 
 这时候当你的查询语句的 `where` 包含 `deptno=20`，则就去对应的分区目录下进行查找，而不用扫描全表。
+
+**分区裁剪（Partition Pruning）**：这是分区表性能收益的核心。查询谓词中的分区列能以常量形式下推时，编译期就只枚举命中的分区目录，其余分区完全不读。注意失效条件：分区列被函数包裹时无法裁剪，如 `WHERE date_format(dt, 'yyyy-MM') = '2026-08'` 会退化为全表扫描，应改写为 `dt BETWEEN '2026-08-01' AND '2026-08-31'`。`hive.optimize.ppd=true`（默认开启）控制谓词下推；strict 模式（`hive.mapred.mode=strict`）下分区表查询不带分区过滤会直接报错拦截。
+
+**动态分区参数**：`INSERT ... PARTITION (dt)` 不写死分区值即为动态分区，必须配套以下参数，否则会直接报错：
+
+- `hive.exec.dynamic.partition=true`、`hive.exec.dynamic.partition.mode=nonstrict`（默认 strict，要求至少一个静态分区）；
+- `hive.exec.max.dynamic.partitions.pernode=100`（单节点上限）、`hive.exec.max.dynamic.partitions=1000`（全局上限），超限任务直接失败——这是防止一次写歪出几万个分区的保险丝。
+
+**小分区过多的代价**：每个分区在 Metastore 中是一条记录、在 HDFS 上是一个目录。分区过碎（如按小时分区累积数年）会导致 SHOW PARTITIONS、DDL 和调度变慢，并产生海量小文件。
+
+**踩坑案例**：某行为日志表按小时分区，两年累积约 1.7 万个分区（24 × 730），结果 `SHOW PARTITIONS` 要跑 10 分钟，调度系统拉元数据直接超时，夜间任务全线延迟。最终重建为按天分区、小时下沉为普通列（一天 24 个文件远比 24 个分区划算），才解决问题。
+
+#### 拓展追问
+
+1. 分区裁剪到底发生在哪个阶段？explain 里怎么看？
+   发生在编译期生成 Task 之前：优化器根据常量谓词枚举分区，物理计划里 TableScan 的 `filterExpr` 与 partition pruning 信息会体现裁剪结果。用 `EXPLAIN` 查看 partition 信息，或用 `EXPLAIN DEPENDENCY` 确认实际读取的分区列表；如果谓词对分区列做了函数运算，裁剪会静默失效，这是最常见的"分区表反而更慢"的原因。
+2. 动态分区写入为什么容易产生小文件？怎么治理？
+   每个 mapper/reducer 对每个分区各写一个文件，reducer 数 × 分区数 = 文件数。治理手段：写入侧控制 reducer 数；写入后定期执行 `CONCATENATE`（ORC 专属，合并 stripe 无需重排数据）或 INSERT OVERWRITE 自身分区重写合并；调度上把"合并小文件"做成下游前置节点。
+3. 分区列能不能是表中的普通业务列？分区列会不会出现在数据文件里？
+   分区列是逻辑列，不落在数据文件中，其值由目录名（如 `dt=2026-08-08`）承载，SELECT \* 时 Hive 从路径回填。因此分区列必须出现在 PARTITIONED BY 子句且不能与普通列重名；查询时分区列的取值类型与目录字符串一致，隐式类型转换可能导致裁剪失效（如对字符串分区列传 int 常量）。
+
+#### 场景题
+
+一张按天分区的用户行为表，近 7 天的查询突然从 2 分钟劣化到 40 分钟，且只有最近 3 天的分区慢，历史分区查询依然很快。你如何定位并解决？
+
+1. **应急**：对慢分区 `hdfs dfs -ls` 看文件数和大小——大概率是上游写入并行度失控，单个分区出现上千个几 MB 的小文件，NameNode 寻址与 split 调度开销暴增。临时可对目标分区 INSERT OVERWRITE 自身重写合并。
+2. **根因**：近 3 天上游任务改了 reducer 数（或换成流式 append 写入），单分区文件数从十几个涨到数千个；历史分区文件数正常所以不受影响。
+3. **长期方案**：写入侧固定并行度；分区落地后自动触发小文件合并节点（`CONCATENATE` 或重写）；监控加上"单分区文件数 > 500 告警"。
+4. **权衡**：合并任务本身消耗集群资源，通常放低峰期执行；若查询模式是多分区大范围扫描，还可评估改为 ORC + 更大分区粒度（如按周）减少目录数。
 
 :::
 
@@ -247,9 +303,9 @@ bucket（桶） 本质上就是表目录下的具体文件：
 
 ```sql
 CREATE TABLE page_view_bucketed(
-	viewTime INT, 
+	viewTime INT,
     userid BIGINT,
-    page_url STRING, 
+    page_url STRING,
     referrer_url STRING,
     ip STRING )
  PARTITIONED BY(dt STRING)
@@ -271,6 +327,67 @@ SELECT * FROM page_view WHERE dt='2009-02-25';
 
 :::
 
+### 【中等】ORC 与 Parquet 列式存储的原理是什么？⭐⭐⭐⭐
+
+:::details 要点
+
+**为什么列存**：分析型查询通常只读少数列，行存必须读取整行，列存将同一列的数据连续存放，**只读需要的列**，大幅减少 IO；且同列数据类型相同、取值相似，**压缩率高**（可达行存的 1/5～1/10）。
+
+**ORC（Optimized Row Columnar）**：
+
+- 数据按 **Stripe**（默认 250MB）组织，每个 Stripe 内按列存储（Stream），是并行读取的最小单元。
+- 每 10000 行一个 **Row Group**，记录 min/max/count 等统计信息（行组索引），配合谓词下推可跳过不匹配的行组。
+- 文件尾部 Footer 记录每列的类型、行数、统计值，支持快速裁剪；还支持 **Bloom Filter** 加速等值过滤。
+
+**Parquet**：
+
+- 文件按 **Row Group → Column Chunk → Page** 三层组织，Page 是压缩和编码（字典编码、RLE、位打包）的基本单元。
+- 基于 Google Dremel 的嵌套模型，用 repetition level / definition level 支持复杂嵌套结构。
+- 生态中立，Spark、Impala、Flink、Presto 等引擎均原生支持。
+
+**选型**：ORC 与 Hive 生态融合更深（支持 ACID、轻量索引）；Parquet 生态兼容性更广。两者均支持谓词下推与列裁剪，是生产首选。
+
+一句话总结：列存用“只读所需列 + 同列高压缩 + 索引跳过”三招，把分析查询的 IO 成本打到最低。
+
+**ORC vs Parquet 选型权衡**：
+
+| 维度           | ORC                                               | Parquet                                      |
+| -------------- | ------------------------------------------------- | -------------------------------------------- |
+| **ACID 事务**  | Hive 原生支持（事务表必须 ORC + 分桶）            | 不支持                                       |
+| **轻量索引**   | Stripe 统计 + Row Group 索引 + Bloom Filter，更细 | Page 级统计，依赖引擎实现                    |
+| **生态**       | Hive 系绑定深；Impala 对 ORC 支持长期较弱         | Spark/Impala/Flink/Presto 全生态中立         |
+| **嵌套结构**   | 支持一般                                          | Dremel 模型（rep/def level）对深层嵌套更友好 |
+| **默认块粒度** | Stripe 默认 250MB                                 | Row Group 默认 128MB                         |
+
+选型结论：纯 Hive 数仓、需要 ACID 更新（CDC 入仓）选 ORC；多引擎混读、数据要出 Hive 生态（Spark/Iceberg/Hudi）选 Parquet。压缩率两者同量级（实测互有胜负，通常相差 10% 以内），不构成决定性因素。
+
+**失效场景**：
+
+- **谓词下推/行组索引依赖数据有序**：ORC 的 min/max 统计要发挥作用，前提是文件内数据按谓词列大致有序。上游乱序写入时，每个 Row Group 的 min/max 都覆盖全值域，索引退化为全扫描——同样的 SQL，有序表能跳过 95% 的行组，乱序表一个都跳不过。
+- **Parquet 字典编码对高基数列失效**：Page 内 distinct 值过多时字典膨胀，触发 fallback 反而多一次编码开销；uuid、trace_id 这类列应显式关闭字典编码。
+
+**踩坑案例**：选型返工事故——某团队跟风全量采用 Parquet，上线后发现同等数据量下文件比隔壁 ORC 表大 30%。排查后定位根因：表里 70% 的列是高基数字符串（user_id 为 UUID），字典编码失效后 Parquet 退回普通编码，而 ORC 的 RLE + ZLIB 组合在低基数列上压缩更狠。最终对高基数明细列关闭 Parquet 字典编码、对需要 ACID 的表迁回 ORC，存储空间才回落正常。
+
+#### 拓展追问
+
+1. 为什么 ORC 的 ACID 必须依赖分桶表？
+   Hive 事务的锁粒度、delta 合并与 compaction 调度都按 bucket 文件组织：UPDATE/DELETE 只需重写受影响分桶内的文件，读时 merge 也按桶对齐 base 与 delta。不分桶则无法定位"受影响的数据块"，只能整分区重写，成本不可接受，所以事务表强制 CLUSTERED BY。
+2. 列存为什么不适合高频点查和频繁更新？
+   列存一次 IO 读一列的连续块，单行点查也要加载整个 stripe/row group 的相关 page，放大严重；更新则需要重写整列数据块，ORC ACID 也是靠 delta + 读时合并绕开原地修改。高频点查请用 HBase/Redis，频繁更新请评估 Kudu 或 Iceberg。
+3. Stripe 和 Row Group 的大小怎么权衡？
+   块越大顺序读吞吐越高、footer 索引越省，但单块内过滤跳过的粒度变粗，且失败重算成本更高；块太小则索引膨胀、列裁剪收益下降。生产上 ORC Stripe 保持默认 250MB 即可，Parquet Row Group 常对齐 HDFS Block（128MB）减少跨块读。
+
+#### 场景题
+
+一张 5 亿行的订单明细表（ORC 存储），`WHERE order_status = 'PAID'` 的查询依然扫描了 80% 的文件，耗时 15 分钟；而另一张同规模的表同样谓词只要 1 分钟。你如何排查？
+
+1. **应急**：`EXPLAIN` 确认谓词下推是否生效（看 TableScan 的 filterExpr），对比两张表的文件数和单文件大小——慢表大概率是几千个几 MB 的小文件，stripe 内索引形同虚设。
+2. **根因**：慢表由 append 流式写入产生，文件碎且未按 order_status 有序；快表由批量任务写入且写入前 CLUSTER BY order_status，min/max 统计有效。同时 order_status 基数仅 4，本可建 Bloom Filter 加速等值过滤。
+3. **长期方案**：写入侧合并小文件 + 按高频过滤列排序写入；对等值过滤列开启 `orc.bloom.filter.columns`；历史分区定期 CONCATENATE。
+4. **权衡**：排序写入会增加写入阶段的 shuffle 成本；Bloom Filter 增加约 1%-5% 存储开销，只对等值过滤有效，范围查询无收益。
+
+:::
+
 ## Hive 索引
 
 ### 【中等】Hive 的索引是如何工作的？⭐⭐
@@ -285,7 +402,7 @@ Hive 在 0.7.0 引入了索引的功能，索引的设计目标是提高表某�
 +--------------+----------------+----------+--+
 |   col_name   |   data_type    | comment     |
 +--------------+----------------+----------+--+
-| empno        | int            |  建立索引的列  |   
+| empno        | int            |  建立索引的列  |
 | _bucketname  | string         |  HDFS 文件路径  |
 | _offsets     | array<bigint>  |  偏移量       |
 +--------------+----------------+----------+--+
@@ -301,7 +418,7 @@ CREATE INDEX index_name     --索引名称
   [IDXPROPERTIES (property_name=property_value, ...)]  --索引额外属性
   [IN TABLE index_table_name]    --索引表的名字
   [
-     [ ROW FORMAT ...] STORED AS ...  
+     [ ROW FORMAT ...] STORED AS ...
      | STORED BY ...
   ]   --索引表行分隔符 、 存储格式
   [LOCATION hdfs_path]  --索引表存储位置
@@ -351,6 +468,169 @@ ALTER INDEX index_name ON table_name [PARTITION partition_spec] REBUILD;
 
 :::
 
+### 【中等】Hive 有哪些高频窗口函数？如何使用？⭐⭐⭐⭐⭐
+
+:::details 要点
+
+窗口函数语法为 `函数() OVER (PARTITION BY ... ORDER BY ... [ROWS BETWEEN ...])`，在保留明细行的前提下对分组内数据做计算。
+
+**排名函数**：
+
+| 函数           | 行为           | 示例（分数 90,90,80） |
+| -------------- | -------------- | --------------------- |
+| `ROW_NUMBER()` | 连续不重复编号 | 1,2,3                 |
+| `RANK()`       | 并列后跳号     | 1,1,3                 |
+| `DENSE_RANK()` | 并列不跳号     | 1,1,2                 |
+| `NTILE(n)`     | 均分为 n 组    | 按组分桶              |
+
+**偏移函数**：
+
+- `LAG(col, n, default)` - 取当前行**前** n 行的值；`LEAD(col, n, default)` - 取**后** n 行的值。常用于计算环比/同比。
+- `FIRST_VALUE()` / `LAST_VALUE()` - 取窗口内首/末行的值。
+
+**聚合窗口**：`SUM/AVG/COUNT/MAX/MIN() OVER (...)`，配合 `ROWS BETWEEN ... PRECEDING AND ... FOLLOWING` 可做滑动窗口（如近 7 日累计）。
+
+**典型应用**：
+
+```sql
+-- 每个部门工资 Top 3
+SELECT * FROM (
+  SELECT empno, deptno, sal,
+         ROW_NUMBER() OVER (PARTITION BY deptno ORDER BY sal DESC) AS rn
+  FROM emp) t WHERE rn <= 3;
+```
+
+**可运行完整示例**（salary 取值：90,90,80，用于辨析 rank 三者差异）：
+
+```sql
+-- 1. 三个排名函数对并列值的差异
+SELECT empno, sal,
+  ROW_NUMBER() OVER (ORDER BY sal DESC) AS rn,    -- 1,2,3（并列也不重复）
+  RANK()       OVER (ORDER BY sal DESC) AS rk,    -- 1,1,3（并列后跳号）
+  DENSE_RANK() OVER (ORDER BY sal DESC) AS dr     -- 1,1,2（并列不跳号）
+FROM emp;
+
+-- 2. lag/lead 计算工资环比涨幅（上一行/下一行对比）
+SELECT empno, sal,
+  LAG(sal, 1, 0)  OVER (ORDER BY hiredate) AS prev_sal,
+  LEAD(sal, 1, 0) OVER (ORDER BY hiredate) AS next_sal
+FROM emp;
+
+-- 3. sum over 滑动窗口：按入职序的累计工资与近 3 人滚动均值
+SELECT empno, sal,
+  SUM(sal) OVER (ORDER BY hiredate
+                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cum_sal,
+  AVG(sal) OVER (ORDER BY hiredate
+                 ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)         AS avg3_sal
+FROM emp;
+```
+
+**方案权衡**：分组 TopN 用 row_number（并列时结果确定、行数可控）；需要保留并列名次用 dense_rank；连续分段（如分位数分档）用 NTILE。环比计算用 lag/lead 比自关联（self join）少一次 shuffle，数据量大时快一个量级。
+
+**失效场景**：
+
+- **窗口帧默认是 RANGE 不是 ROWS**：`SUM(sal) OVER (ORDER BY hiredate)` 不写 ROWS 子句时默认 `RANGE UNBOUNDED PRECEDING`，ORDER BY 字段有重复值时并列行会算出相同的累计值，导致"累计金额"出现平台期，必须显式 `ROWS BETWEEN ... PRECEDING AND CURRENT ROW`。
+- **PARTITION BY 键含 NULL**：所有 NULL 行被划进同一个分区参与计算，产生意外的超大分组。
+- **ORDER BY 字段含 NULL**：升序时 NULL 默认排在最前，LAG/LEAD 与 ROW_NUMBER 结果与业务预期不符。
+
+**踩坑案例**：生产上计算"用户复购间隔"，LAG 结果大面积为 NULL。排查发现上游日志表约 12% 的订单 time 字段缺失，NULL 在 ORDER BY 升序中全部排在最前，LAG 取到的是 NULL 行而非上一笔真实订单。修复：窗口计算前先过滤或 COALESCE 补默认时间，并在接入层加非空校验，指标当天恢复正常。
+
+一句话总结：窗口函数是 Hive SQL 的灵魂，排名用 row_number，环比用 lag，分组 TopN 是面试必考题。
+
+#### 拓展追问
+
+1. 窗口函数会不会改变结果集的行数？与 LATERAL VIEW explode 有何本质区别？
+   不会。窗口函数只在原明细行上附加一列计算结果，行数与输入完全一致；它属于"行内开窗"，与 GROUP BY 的压缩聚合互为对照。真正炸开行数的是 LATERAL VIEW explode。因此 TopN 取数必须外层包一层子查询用 `WHERE rn <= N` 裁剪，不能指望窗口函数自己减少行数。
+2. PARTITION BY 键基数极高时（如按 user_id 开窗但全表只有 1 万行）会发生什么？
+   每个分组只有极少行，窗口计算退化为逐行计算，性能没有问题但语义上容易踩坑（LAG 永远取不到值）。反过来，若某分区键对应数据量极大（典型如 NULL 聚成一个超大分区），单 task 处理该分区会形成窗口计算倾斜，需要先过滤异常键或先聚合到合适粒度再开窗。
+3. ROWS 与 RANGE 两种窗口帧的语义差异是什么？
+   ROWS 按物理行偏移计数（`2 PRECEDING` 就是往前数 2 行）；RANGE 按 ORDER BY 值的逻辑区间匹配，并列值会被一起纳入。默认帧是 RANGE UNBOUNDED PRECEDING，所以 ORDER BY 有重复值时累计类指标必须显式指定 ROWS 帧，否则同值行结果相同，报表出现"平台期"假象。
+
+#### 场景题
+
+运营需求："统计每个用户连续登录的最大天数"（登录明细表 user_login：user_id, login_date，同一天可能有多条记录）。请给出 SQL 并说明关键陷阱。
+
+```sql
+SELECT user_id, MAX(cont_days) AS max_cont_days FROM (
+  SELECT user_id, grp, COUNT(*) AS cont_days FROM (
+    SELECT user_id, login_date,
+      DATE_SUB(login_date,
+        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY login_date)) AS grp
+    FROM (SELECT DISTINCT user_id, login_date FROM user_login) t1
+  ) t2 GROUP BY user_id, grp
+) t3 GROUP BY user_id;
+```
+
+1. **思路**：先 DISTINCT 去掉一天多条；再用"日期 - 序号"恒等式（连续日期相减得到相同 grp）识别连续段；两层 GROUP BY 得到最长连续段。
+2. **陷阱**：不去重会导致 ROW_NUMBER 序号错乱，grp 断裂、连续天数被低估；login_date 若为带时间的 timestamp，需先 to_date 归一，否则序号等式失效。
+3. **权衡**：该写法只有一次 shuffle + 两次聚合，比自关联比较相邻日期（O(n²) 级别 join）高效得多；数据量上亿时注意 user_id 倾斜，可对 NULL 用户先过滤。
+
+:::
+
+### 【中等】Hive 如何实现行转列和列转行？⭐⭐⭐⭐
+
+:::details 要点
+
+**行转列**（多行聚合为一行多列）：
+
+- `collect_set(col)` - 聚合为去重数组；`collect_list(col)` - 聚合为不去重数组。
+- `concat_ws(sep, array)` - 用分隔符将数组拼接为字符串。
+
+```sql
+-- 将多个城市的行合并为一行逗号分隔的字符串
+SELECT id, concat_ws(',', collect_set(city)) AS cities
+FROM user_city GROUP BY id;
+```
+
+条件行列转换可配合 `IF/CASE WHEN + SUM` 实现（如将性别行转为男/女两列计数）。
+
+**列转行**（一行拆为多行）：
+
+- `explode(array)` - UDTF，将数组/Map 展开为多行。
+- `LATERAL VIEW` - 将 explode 的结果与原表每行做侧向连接，保留原列。
+
+```sql
+-- 将逗号分隔的城市字符串拆成多行
+SELECT id, city
+FROM user_city
+LATERAL VIEW explode(split(cities, ',')) t AS city;
+```
+
+一句话总结：行转列靠 collect + concat_ws，列转行靠 explode + LATERAL VIEW，二者互为逆操作。
+
+**方案权衡**：
+
+- **行转列**：collect_set/collect_list + concat_ws 适合"明细合并为分隔串"（如用户标签拼接）；CASE WHEN + SUM 适合"枚举值转固定列"的聚合透视（如按性别计数）。前者输出仍是单列字符串，下游需再解析；后者直接产出结构化多列，但枚举值多时会列爆炸。
+- **列转行**：explode + LATERAL VIEW 是标准方案；需要保留展开前原行（数组为空或 NULL 的行）时，必须用 `LATERAL VIEW OUTER explode`，否则这些行会被静默丢弃。
+
+**失效场景**：
+
+- `collect_set` 默认过滤 NULL 且**不保证顺序**，需要顺序输出必须套 `sort_array`；
+- `explode` 遇到空数组/NULL 直接丢弃原行，丢行事故多源于此；
+- CASE WHEN 透视在枚举值成百上千时产生几百列且每次新增取值都要改 SQL，此时应改用 collect 拼串方案。
+
+**踩坑案例**：某用户标签拼接任务每次跑出的标签顺序都不一致，下游按字符串做等值比对导致告警风暴。根因是 collect_set 无序，修复为 `concat_ws(',', sort_array(collect_set(tag)))` 后结果稳定。另一次列转行后日报用户数比前一天少了 8%，排查发现 explode 把 cities 为 NULL 和空串的用户全部丢掉了，改用 `LATERAL VIEW OUTER explode` 才恢复行数对齐。
+
+#### 拓展追问
+
+1. collect_set、collect_list 与 wm_concat 类写法在倾斜场景下有什么区别？
+   collect_set/collect_list 是聚合函数，热点 key（如某大 V 用户关联百万条记录）会让单个 reducer 内存暴涨甚至 OOM，需要先过滤异常 key 或对 key 加盐两阶段聚合；拼接字符串本身不解决倾斜。若只需要 TopN 标签，应先用窗口函数截断再 collect，避免把超大数组拖进内存。
+2. 多个 LATERAL VIEW 叠加使用时语义是什么？会不会行数爆炸？
+   多个 LATERAL VIEW 是逐行做笛卡尔式展开：一行原文先被第一个 explode 拆成 m 行，每行再被第二个拆成 n 行，最终 m × n 行。标签、城市、渠道三个数组同时展开时行数相乘，务必先评估基数，必要时拆成多个任务分别展开。
+3. posexplode 相比 explode 多了什么能力？
+   posexplode 同时输出元素下标 pos 和值，用于需要保留原始顺序/位置的场景（如还原数组下标、按位置对齐两个数组）。代价与普通 explode 相同，但下游可利用 pos 做精确匹配，避免再用 row_number 重新编号。
+
+#### 场景题
+
+用户画像表 `user_tags`（`user_id`, `tags array<string>`，均值 5 个标签，但头部 KOL 有 5000+ 标签）需要列转行后 join 标签维表统计各标签人数，任务跑 6 小时且单个 reducer OOM。你如何处理？
+
+1. **应急**：把 explode 后的中间结果先落临时表并限制 join 范围；对 tags 数组长度 > 1000 的异常用户先过滤（画像统计场景通常可接受），任务即可在 30 分钟内跑完。
+2. **根因**：collect/explode 本身不产生倾斜，但 explode 后按 tag GROUP BY 时，热门标签（如"美食"）占全量 30%，单个 reducer 承载数亿行导致 OOM。
+3. **长期方案**：开启 `hive.groupby.skewindata=true` 两阶段聚合兜底；或对热门标签加盐打散；画像链路限制单用户标签数上限（写入侧截断到 200）。
+4. **权衡**：截断标签会丢失长尾画像精度，需与业务确认；两阶段聚合多一次 shuffle，常规任务耗时增加约 20%，仅在倾斜时开启。
+
+:::
+
 ## Hive 架构
 
 ### 【困难】Hive SQL 如何执行的？⭐⭐⭐
@@ -367,6 +647,126 @@ Hive 在执行一条 HQL 的时候，会经过以下步骤：
 6. 优化物理执行计划：物理层优化器进行 MapReduce 任务的变换，生成最终的执行计划。
 
 > 关于 Hive SQL 的详细执行流程可以参考美团技术团队的文章：[Hive SQL 的编译过程](https://tech.meituan.com/2014/02/12/hive-sql-to-mapreduce.html)
+
+**两阶段拆解（编译期 + 运行期）**：
+
+- **编译期**：Antlr 词法/语法解析生成 AST → 遍历 AST 提炼 QueryBlock → 翻译为 OperatorTree（逻辑计划）→ 逻辑优化（谓词下推、列裁剪、Join 重排序、合并 ReduceSinkOperator）。
+- **运行期**：OperatorTree 转 Task（MapReduce/Tez/Spark）→ 物理优化器结合 CBO（`hive.cbo.enable=true`，默认开启）与表/列统计信息做代价估算，自动决定 Join 顺序与 Join 方式 → 提交执行引擎。
+
+**调试与验证手段**：`EXPLAIN` 查看 Stage 数、Join 类型（Map Join 会标注 mapjoin）、TableScan 的过滤与分区裁剪信息；`EXPLAIN EXTENDED` 看更多元数据细节。小数据量调试可设 `hive.exec.mode.local.auto=true`，让查询跳过 YARN 排队在本地运行。
+
+**踩坑案例**：某报表任务平时 20 分钟，某天突然跑了 3 小时。`EXPLAIN` 一看，整个作业只有 1 个 Reducer——SQL 里用了 `COUNT(DISTINCT user_id)` 全局去重，单 Reducer 扛全量数据。改写为两阶段：先 `GROUP BY user_id` 去重（并行），再外层 `COUNT(*)`，任务回到 15 分钟。这是执行计划视角最经典的收益案例。
+
+**失效场景**：CBO 依赖统计信息，表没做过 `ANALYZE TABLE ... COMPUTE STATISTICS` 或统计过期时，CBO 退化为基于规则（RBO），Join 顺序可能完全反掉；另外 `count distinct` 在 MR 引擎下全局去重只落 1 个 Reducer，属于计划层面的结构性瓶颈，参数调优救不了，只能改写 SQL。
+
+#### 拓展追问
+
+1. explain 输出中哪些信息最值得在性能排查时关注？
+   三个关键点：Stage 数量变化（多一个 Stage 意味着多一次 shuffle 与落盘）、Join 算子类型（Map Join 退化成 Sort Merge Join 通常是小表变大超过了 `hive.mapjoin.smalltable.filesize` 默认 25MB 阈值）、TableScan 的 partition/filterExpr（分区裁剪和谓词下推是否生效）。对比"昨天快、今天慢"两天的执行计划差异，往往一眼定位。
+2. 谓词下推在什么条件下不生效？
+   谓词作用在被函数/表达式包裹的列上（如 `WHERE substr(name,1,3)='abc'`）无法下推到存储层；TextFile 没有统计信息，下推收益为零，只有 ORC/Parquet 这类带索引的格式才能跳过 stripe/row group；跨表的 OR 条件、NOT 包裹的复杂谓词也可能放弃下推。用 `hive.optimize.ppd` 控制开关，用 explain 验证。
+3. Join 条件写在 ON 还是 WHERE，对执行计划和结果有什么影响？
+   内连接下两者语义等价，优化器都会尝试下推过滤以减少 shuffle；但 LEFT JOIN 下右表条件放 WHERE 会把 NULL 行过滤掉，实质退化为 INNER JOIN（结果错误），放 ON 才保持左表全量。这既是语义陷阱也是计划陷阱：谓词位置决定了它能否在 join 之前生效。
+
+#### 场景题
+
+同一段 Hive SQL 昨天 30 分钟跑完，今天突然跑了 4 小时，期间没有改代码、没有改调度参数。你的排查路径是什么？
+
+1. **应急**：先对比两天的执行计划（`EXPLAIN`）与 YARN 资源视图：Stage 数是否变多、是否出现单 Reducer 长尾、集群是否资源抢占（队列排队）。若确认是数据问题，可先 kill 重跑历史分区保下游。
+2. **根因**：三类典型原因——① 数据量突增（今天数据翻倍）；② 上游数据分布变化产生倾斜 key（如新接入渠道带来大量 NULL user_id）；③ 统计信息过期导致 CBO 选错 Join 顺序。用 explain 对比 + 源表 count/group by 采样逐一验证。
+3. **长期方案**：关键任务接入执行计划基线对比（Stage 数/Join 类型变化告警）；统计信息随数据更新自动 ANALYZE；大表 join 统一评估 mapjoin 与分区裁剪。
+4. **权衡**：自动 ANALYZE 有额外计算成本，只对核心表开启；执行计划基线告警有误报率，需人工确认后逐步收紧阈值。
+
+:::
+
+### 【中等】Hive 的执行引擎有哪些？有什么区别？⭐⭐⭐
+
+:::details 要点
+
+Hive 本身只是“SQL 转执行计划”的翻译器，实际计算交给执行引擎，通过 `hive.execution.engine` 指定：
+
+| 维度           | MapReduce            | Tez                    | Spark    |
+| -------------- | -------------------- | ---------------------- | -------- |
+| **执行模型**   | 每个阶段一个 MR 作业 | DAG 一次执行多阶段     | 内存 DAG |
+| **中间数据**   | 每阶段落盘 HDFS      | 管道化传输，尽量不落盘 | 内存缓存 |
+| **启动开销**   | 高（每阶段启动 JVM） | 低（容器复用）         | 低       |
+| **交互式查询** | 不支持               | 支持（配合 LLAP）      | 较好     |
+
+- **MapReduce** - 早期默认引擎，胜在稳定可靠，但复杂 SQL 会被拆成多个 MR 作业，阶段间反复落盘，延迟高。
+- **Tez** - 将多个 MR 阶段合并为一个 DAG 作业，减少落盘和启动开销，配合 **LLAP**（Live Long And Process）提供常驻服务和数据缓存，支持秒级交互查询。Hive 3.x 的默认引擎。
+- **Spark** - Hive on Spark，利用 Spark 内存计算加速，需单独部署 Spark，维护成本略高。
+
+一句话总结：MR 赢在稳定，Tez 赢在 DAG 与交互，Spark 赢在内存——生产上 Hive 3 + Tez 是主流组合。
+
+:::
+
+### 【困难】Hive 支持事务吗？ACID 是如何实现的？⭐⭐⭐
+
+:::details 要点
+
+Hive 从 0.13 开始支持 ACID 事务（INSERT/UPDATE/DELETE），但**必须满足：ORC 格式 + 分桶表 + 事务专用 SerDe/IO 接口**。
+
+**实现机制（MVCC + 基线增量）**：
+
+- 每个事务表目录由 **base 目录 + 若干 delta 目录**组成。首次写入生成 base，后续 INSERT 生成 delta 目录，UPDATE/DELETE 也会生成 delta（记录变更）。
+- 查询时通过 **Merge** 将 base 与可见 delta 合并成最终视图，实现快照隔离（读不阻塞写）。
+- 事务由 **TxnManager** 管理，锁信息和事务状态存储在 **HiveMetastore** 中，支持表级/分区级锁。
+- **Compaction（压实）** - minor compaction 将多个 delta 合并为一个，major compaction 将 base 与 delta 合并为新的 base。Hive 2.x 的 UPDATE/DELETE 需全量重写文件，3.0（ACID 2.0）改为只重写受影响的 Stripe，大幅提升更新性能。
+
+**局限性**：不支持跨表分布式事务、不支持 SELECT FOR UPDATE、事务表读写性能低于普通表，适合低频小批量变更（如 CDC 入仓），不适合高频 OLTP 式写入。
+
+一句话总结：Hive ACID 用“base + delta + compaction”的 MVCC 模型实现，能支撑数仓级小批量更新，但绝非 OLTP 数据库的替代品。
+
+:::
+
+## Hive 调优
+
+### 【困难】Hive 中如何定位和调优数据倾斜？⭐⭐⭐⭐⭐
+
+:::details 要点
+
+**定位手段（先找到倾斜点再谈优化）**：
+
+1. 任务长期卡在 99%，YARN 页面显示个别 Reducer 处理数据量远超其他（如平均 200MB、个别 40GB），其余 task 早已完成。
+2. `EXPLAIN` 看执行计划，确认倾斜发生在 Join、Group By 还是 Count Distinct 环节，锁定具体 Stage。
+3. 看运行日志中该 Reducer 的 key 分布；或直接对源表采样统计：`SELECT join_key, COUNT(*) FROM big_table WHERE dt='...' GROUP BY join_key ORDER BY 2 DESC LIMIT 100`，找出 Top 热 key。
+4. 检查异常 key：`SELECT COUNT(*) FROM big_table WHERE join_key IS NULL OR join_key = ''`——生产中大量倾斜的根因是 NULL/空串脏数据而非业务热点。
+5. count distinct 检查：全局 `COUNT(DISTINCT x)` 在 MR 引擎下只落 1 个 Reducer，属于结构性单点，与数据分布无关。
+
+**SQL 层优化手段（含代价对比）**：
+
+- **MapJoin**：`hive.auto.convert.join=true` + `hive.mapjoin.smalltable.filesize`（默认 25MB），小表广播到所有 mapper，join 在 map 端完成、无 shuffle。适用边界：一侧表能装进内存；小表超阈值自动转换失效，join 退回 shuffle。代价：占用 mapper 堆内存，多张小表同时广播会挤爆内存。
+- **倾斜 Join**：`hive.optimize.skewjoin=true` + `hive.skewjoin.key`（默认 100000），运行时把超过阈值的倾斜 key 拆出单独 join 后与普通数据 UNION。适用边界：join 倾斜且无法 mapjoin；代价是拆分 Stage 逻辑复杂，小表 join 场景无效。
+- **Salting 加盐两阶段聚合**：group by 倾斜时给热 key 拼接随机后缀（如 `CONCAT(key, '_', CAST(RAND()*10 AS INT))`）先做局部聚合，再去盐全局聚合。适用边界：聚合类倾斜（sum/count/group by）；代价是多一个 Stage、SQL 复杂度上升。注意：加盐破坏行级明细，join 后需要 row_number 等明细计算时不能直接用。
+- **过滤异常 key**：join 前把 NULL/空串 key 过滤掉或赋随机值打散（`COALESCE(key, CONCAT('null_', RAND()))`），单独处理后再 UNION。适用边界：脏数据型倾斜（最常见，修复最快）。
+- **sum case when 替代 count distinct**：`COUNT(DISTINCT user_id)` 改写为两阶段（先 group by user_id，再 count(\*)）或 `SUM(CASE WHEN ... THEN 1 ELSE 0 END)`，把单 Reducer 瓶颈打散为并行聚合。
+
+> MapReduce 层的 Combiner、自定义 Partitioner 等引擎级手段属于 Hadoop 计算框架范畴，此处不展开，参见 Hadoop 相关文档。
+
+**踩坑案例**：每日用户行为大表 join 商品表的任务稳定跑 3 小时，某天突然跑到 8 小时仍未结束。看日志发现某 Reducer 处理 40GB 而其余只有 200MB；采样 key 分布发现 `user_id IS NULL` 占当天数据 60%——上游新接入渠道把 user_id 写成了 NULL。止血：NULL 行单独过滤后与主链路 UNION，任务回到 25 分钟；长期：接入层加非空校验 + 数据质量监控。
+
+**参数级兜底**：`hive.map.aggr=true`（Map 端预聚合，默认开启）；`hive.groupby.skewindata=true`（Group By 倾斜自动两阶段：第一阶段随机分发局部聚合，第二阶段按 key 全局聚合）。
+
+一句话总结：Hive 倾斜调优的口诀是——小表用 MapJoin、热 key 先打散、脏数据先过滤、参数再兜底。
+
+#### 拓展追问
+
+1. 如何决策一个倾斜 join 该用 mapjoin 还是 salting？
+   先看 join 另一侧表的大小：能装进内存（默认阈值 25MB，可调大但受 mapper 堆限制）直接 mapjoin，从根源上消灭 shuffle，代价最低；装不下再看热 key 成因——NULL/空串等脏数据直接过滤或打散最划算；真实业务热点 key（如头部大 V）才上 salting 两阶段或 skewjoin 参数兜底。决策顺序：mapjoin → 过滤脏数据 → 加盐/skewjoin。
+2. 为什么 sum case when 能替代 count distinct？两者的执行计划差在哪？
+   count distinct 全局去重只能把所有数据 shuffle 到 1 个 Reducer 去重计数，单点瓶颈；sum case when 是普通聚合，按 group key 并行分发到多个 Reducer，天然无单点。典型改写：`SUM(CASE WHEN gender='M' THEN 1 ELSE 0 END)` 分性别计数，或先 `GROUP BY user_id` 去重再 `COUNT(*)`，把去重压力打散。
+3. salting 加盐为什么不能用于需要保留明细的场景？
+   加盐的本质是把同一个 key 的数据人为拆到多个 Reducer 做局部聚合，聚合结果（sum/count）可以再合并，但行级明细（如 join 后按 user_id 做 row_number 排序取 TopN）在拆散后已失去全局视图，排序结果必然错误。此类场景应先解决 join 倾斜（mapjoin/过滤脏数据）保住明细，再开窗计算。
+
+#### 场景题
+
+每日用户行为大表（20 亿行）join 商品表的任务稳定跑 3 小时，某天突然跑到 8 小时仍未结束，下游报表全部延迟。你如何一步步定位倾斜并给出止血方案？
+
+1. **应急止血（0-10 分钟）**：不盲目 kill——先看 YARN 确认是否卡在单个 Reducer；若下游 SLA 即将击穿，kill 后按昨日分区数据临时产出兜底报表，同时开排查。
+2. **定位（10-30 分钟）**：`EXPLAIN` 定位倾斜 Stage 是 join 还是聚合；对源表当天分区采样 group by join_key 看 Top 100 key 分布；同时统计 `join_key IS NULL OR join_key = ''` 的占比。
+3. **根因**：本例中上游新接入渠道把 user_id 写成 NULL，占比 60%，NULL key 全部打到同一个 Reducer（40GB vs 平均 200MB）。
+4. **修复**：NULL 行先过滤（或 COALESCE 赋随机值打散）单独处理再 UNION，任务 25 分钟跑完——从 8 小时到 25 分钟，量级差 19 倍；若是真实热 key 则用 salting 两阶段或开 skewjoin。
+5. **长期与权衡**：接入层加非空校验和数据质量监控防脏数据入仓；`hive.optimize.skewjoin=true` 作兜底但会增加计划复杂度；大小表 join 统一评估 mapjoin（注意 25MB 默认阈值）。salting 多一个 Stage 约增 20% 耗时，mapjoin 吃 mapper 内存，过滤 NULL 改变语义需下游确认——按"代价从小到大"的顺序依次尝试。
 
 :::
 

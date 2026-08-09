@@ -1,4 +1,4 @@
-﻿---
+---
 title: Java 基础面试一
 cover: https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/020ab2bf4af8401590e0291a34f873f8.jpg
 date: 2024-06-18 22:46:20
@@ -105,7 +105,7 @@ https://blog.csdn.net/m0_46487331/article/details/128827908
   - **Optional**：优雅处理 `null`（`Optional.ofNullable(x)`）
   - **默认 GC 设为 G1**
 - **Java 9（2017）**
-  - **模块化系统（JPMS / Project Jigsaw）**：通过 `module-info.java` 声明模块依赖，实现类库级别的封装
+  - **JPMS 模块化系统**：通过 `module-info.java` 声明模块依赖，实现类库级别的封装
   - **Reactive Streams**：`java.util.concurrent.Flow` 定义响应式编程标准接口
   - **接口私有方法**：接口中可定义 `private` 方法，复用默认方法中的逻辑
   - **集合工厂方法**：`List.of()`、`Map.of()` 快速创建不可变集合
@@ -366,16 +366,16 @@ Java 中的数据类型有两类：
 
 Java 语言提供了 **8** 种基本类型，大致分为 **4** 类：布尔型、字符型、整数型、浮点型。
 
-| 基本数据类型 | 分类       | 大小   | 默认值    | 取值范围                | 包装类    | 说明                                          |
-| ------------ | ---------- | ------ | --------- | ----------------------- | --------- | --------------------------------------------- |
-| `boolean`    | **布尔型** | -      | `false`   | `false, true`           | Boolean   | `boolean` 的大小，是由具体的 JVM 实现来决定的 |
-| `char`       | **字符型** | 16 bit | `'u0000'` | `[0, 2^16 - 1]`         | Character | 存储 Unicode 码，用单引号赋值                 |
-| `byte`       | **整数型** | 8 bit  | `0`       | `[-2^7, 2^7 - 1]`       | Byte      |                                               |
-| `short`      | **整数型** | 16 bit | `0`       | `[-2^15, 2^15 - 1]`     | Short     |                                               |
-| `int`        | **整数型** | 32 bit | `0`       | `[-2^31, 2^31 - 1]`     | Integer   |                                               |
-| `long`       | **整数型** | 64 bit | `0L`      | `[-2^63, 2^63 - 1]`     | Long      | 赋值时一般在数字后加上 `l` 或 `L`             |
-| `float`      | **浮点型** | 32 bit | `0.0f`    | `[2^-149, 2^128 - 1]`   | Float     | 赋值时必须在数字后加上 `f` 或 `F`             |
-| `double`     | **浮点型** | 64 bit | `0.0d`    | `[2^-1074, 2^1024 - 1]` | Double    | 赋值时一般在数字后加 `d` 或 `D`               |
+| 基本数据类型 | 分类       | 大小   | 默认值     | 取值范围                | 包装类    | 说明                                          |
+| ------------ | ---------- | ------ | ---------- | ----------------------- | --------- | --------------------------------------------- |
+| `boolean`    | **布尔型** | -      | `false`    | `false, true`           | Boolean   | `boolean` 的大小，是由具体的 JVM 实现来决定的 |
+| `char`       | **字符型** | 16 bit | `'\u0000'` | `[0, 2^16 - 1]`         | Character | 存储 Unicode 码，用单引号赋值                 |
+| `byte`       | **整数型** | 8 bit  | `0`        | `[-2^7, 2^7 - 1]`       | Byte      |                                               |
+| `short`      | **整数型** | 16 bit | `0`        | `[-2^15, 2^15 - 1]`     | Short     |                                               |
+| `int`        | **整数型** | 32 bit | `0`        | `[-2^31, 2^31 - 1]`     | Integer   |                                               |
+| `long`       | **整数型** | 64 bit | `0L`       | `[-2^63, 2^63 - 1]`     | Long      | 赋值时一般在数字后加上 `l` 或 `L`             |
+| `float`      | **浮点型** | 32 bit | `0.0f`     | `[2^-149, 2^128 - 1]`   | Float     | 赋值时必须在数字后加上 `f` 或 `F`             |
+| `double`     | **浮点型** | 64 bit | `0.0d`     | `[2^-1074, 2^1024 - 1]` | Double    | 赋值时一般在数字后加 `d` 或 `D`               |
 
 ::: tip 扩展
 
@@ -470,7 +470,7 @@ int b = a;   //拆箱
 
 Java 基本数据类型的包装类型的大部分都用到了缓存机制来提升性能。
 
-`Byte`,`Short`,`Integer`,`Long` 这 4 种包装类默认创建了数值 **[-128，127]** 的相应类型的缓存数据，`Character` 创建了数值在 **[0,127]** 范围的缓存数据，`Boolean` 直接返回 `True` or `False`。
+`Byte`、`Short`、`Integer`、`Long` 这 4 种包装类默认创建了数值 **[-128，127]** 的相应类型的缓存数据，`Character` 创建了数值在 **[0, 127]** 范围的缓存数据，`Boolean` 直接返回 `True` or `False`。
 
 如果超出对应范围仍然会去创建新的对象，缓存的范围区间的大小只是在性能和资源之间的权衡。
 
@@ -587,7 +587,7 @@ public static Boolean valueOf(boolean b) {
 
 @tab `Float` 和 `Double` 无缓存
 
-两种浮点数类型的包装类 `Float`,`Double` 并没有实现缓存机制。
+两种浮点数类型的包装类 `Float`、`Double` 并没有实现缓存机制。
 
 ```java
 Integer i1 = 33;
@@ -850,7 +850,7 @@ test(null);   // 编译错误：null 无法匹配 int，但匹配 Integer（需�
 
 ### 【中等】Java 是如何处理整数溢出的？⭐⭐
 
-Java **不会自动检测整数溢出**，溢出后结果按二进制补码**回绕（wrap-around）**，不抛异常。
+Java **不会自动检测整数溢出**，溢出后结果按二进制**静默回绕（wrap-around）**，不抛异常。
 
 **溢出示例**：
 
@@ -1194,7 +1194,7 @@ c
 d
 ```
 
-另外，Java 的可变参数编译后实际会被转换成一个数组，我们看编译后生成的 `class`文件就可以看出来了。
+另外，Java 的可变参数编译后实际会被转换成一个数组，我们看编译后生成的 `class` 文件就可以看出来了。
 
 ```java
 public class VariableLengthArgument {
@@ -1358,7 +1358,7 @@ System.out.println(str.length());  // 运行时抛出 NullPointerException
 
 - `String getMessage()`: 返回异常发生时的简要描述
 - `String toString()`: 返回异常发生时的详细信息
-- `String getLocalizedMessage()`: 返回异常对象的本地化信息。使用 `Throwable` 的子类覆盖这个方法，可以生成本地化信息。如果子类没有覆盖该方法，则该方法返回的信息与 `getMessage()`返回的结果相同
+- `String getLocalizedMessage()`: 返回异常对象的本地化信息。使用 `Throwable` 的子类覆盖这个方法，可以生成本地化信息。如果子类没有覆盖该方法，则该方法返回的信息与 `getMessage()` 返回的结果相同
 - `void printStackTrace()`: 在控制台上打印 `Throwable` 对象封装的异常信息
 
 ### 【简单】try-catch-finally 如何使用？⭐⭐⭐
@@ -1382,7 +1382,7 @@ try {
 
 输出：
 
-```java
+```
 Try to do something
 Catch Exception -> RuntimeException
 Finally
@@ -1456,10 +1456,10 @@ Catch Exception -> RuntimeException
 ### 【简单】如何使用 `try-with-resources` 代替`try-catch-finally`？⭐⭐⭐
 
 1. **适用范围（资源的定义）：** 任何实现 `java.lang.AutoCloseable`或者 `java.io.Closeable` 的对象
-2. **关闭资源和 finally 块的执行顺序：** 在 `try-with-resources` 语句中，任何 catch 或 finally 块在声明的资源关闭后运行
+2. **关闭资源和 finally 块的执行顺序：** 在 `try-with-resources` 语句中，任何 `catch` 或 `finally` 块在声明的资源关闭后运行
 
-《Effective Java》中明确指出：
-
+> 《Effective Java》中明确指出：
+>
 > 面对必须要关闭的资源，我们总是应该优先使用 `try-with-resources` 而不是`try-finally`。随之产生的代码更简短，更清晰，产生的异常对我们也更有用。`try-with-resources`语句让我们更容易编写必须要关闭的资源的代码，若采用`try-finally`则几乎做不到这点。
 
 Java 中类似于`InputStream`、`OutputStream`、`Scanner`、`PrintWriter`等的资源都需要我们调用`close()`方法来手动关闭，一般情况下我们都是通过`try-catch-finally`语句来实现这个需求，如下：
@@ -1583,7 +1583,7 @@ class ModernResource implements AutoCloseable {
 - 永远不要重写 `finalize()`。
 - 资源清理用 `try-with-resources`（实现 `AutoCloseable`）+ 显式 `close()`。
 - 堆外内存清理用 `Cleaner` + `PhantomReference`（如 Netty 的 `ByteBuf`）。
-- 如果维护老代码遇到 `finalize()`，逐步迁移到 Cleaner。
+- 如果维护老代码遇到 `finalize()`，逐步迁移到 `Cleaner`。
 
 ### 【简单】`instanceof` 关键字的作用？⭐⭐
 
@@ -1626,181 +1626,3 @@ if (obj instanceof String s && s.length() > 5) {
 
 - `instanceof` 比 `getClass() == X.class` 更宽松（前者考虑继承关系，后者要求精确匹配）。
 - 现代 JVM 已优化 `instanceof` 性能，无需过度担心开销。
-
-### 【中等】Java 的 switch 语句在 JDK 14+ 有哪些增强？⭐⭐
-
-JDK 14 引入**标准化的 switch 表达式**，支持**箭头语法**、**多值标签**、**yield 返回值**，大幅提升表达力。
-
-**传统 switch 痛点**：
-
-- 容易遗忘 `break` 导致**穿透（fall-through）**。
-- 无法直接返回值（需借助中间变量）。
-- 重复的 `case` 标签冗长。
-
-**新特性对比**：
-
-```java
-// 旧写法
-String result;
-switch (day) {
-    case MONDAY:
-    case FRIDAY:
-    case SUNDAY:
-        result = "休息日";
-        break;
-    case TUESDAY:
-        result = "工作日";
-        break;
-    default:
-        result = "未知";
-}
-```
-
-```java
-// JDK 14+ 新写法（箭头语法 + 多值 + 直接返回）
-String result = switch (day) {
-    case MONDAY, FRIDAY, SUNDAY -> "休息日";  // 多值，无穿透
-    case TUESDAY -> "工作日";
-    default -> {
-        // 复杂逻辑用 yield 返回
-        log("未知日期: " + day);
-        yield "未知";
-    }
-};
-```
-
-**核心改进**：
-
-| **特性**     | **传统 switch**           | **JDK 14+ switch 表达式**              |
-| ------------ | ------------------------- | -------------------------------------- |
-| **穿透**     | 默认穿透，需 `break` 阻止 | 默认**无穿透**，每个分支独立           |
-| **返回值**   | 不支持                    | 支持（`yield` 或箭头返回）             |
-| **多值标签** | 需多个 `case`             | `case A, B, C ->` 一行搞定             |
-| **default**  | 可选                      | 表达式形式**必须**穷尽（强制 default） |
-
-### 【中等】Java 9 引入的模块化系统（JPMS）有什么用？⭐
-
-Java 9 引入**Java 平台模块系统（JPMS，Project Jigsaw）**，解决长期以来的**JAR 地狱**和**封装不足**问题。
-
-**核心目标**：
-
-- **强封装**：模块可显式声明哪些包对外暴露，**非导出包无法被反射访问**（即使 `setAccessible(true)`）。
-- **可靠配置**：编译期和启动期检查模块依赖，提前发现缺失。
-- **精简 JRE**：`jlink` 可打包**仅含所需模块**的定制 JRE，体积大幅缩小。
-
-**模块定义示例**（`module-info.java`）：
-
-```java
-module com.example.app {
-    requires java.sql;              // 依赖 java.sql 模块
-    requires transitive java.base;  // 传递依赖
-    exports com.example.api;        // 导出包，对外可见
-    // com.example.internal 不导出，外部无法访问
-    opens com.example.pojo to jackson;  // 仅对 jackson 反射开放
-}
-```
-
-**关键关键字**：
-
-| **关键字**            | **作用**                                    |
-| --------------------- | ------------------------------------------- |
-| `requires`            | 声明依赖                                    |
-| `requires transitive` | 传递依赖（下游模块自动可用）                |
-| `exports`             | 导出包（编译期+运行时可见）                 |
-| `opens`               | 仅运行时反射开放（给框架如 Spring/Jackson） |
-| `uses` / `provides`   | 服务接口与实现（SPI）                       |
-
-**实际影响**：
-
-- **库开发者**：可真正隐藏内部实现，反射也访问不了。
-- **应用开发者**：依赖更清晰，但升级到 Java 9+ 时需处理未命名模块兼容性问题。
-- **JDK 自身**：JDK 本身被拆分为约 90 个模块（`java.base`、`java.sql` 等）。
-
-### 【中等】Java 中的 Record（JDK 16+）有什么用？⭐⭐
-
-`Record` 是 Java 16 引入的**不可变数据载体**，自动生成样板代码，是 Lombok `@Data` 的官方替代品。
-
-**核心特点**：
-
-- **不可变**：所有字段 `final`，无 setter。
-- **自动生成**：构造方法、`getter`（无 `get` 前缀）、`equals()`、`hashCode()`、`toString()`。
-- **可扩展**：可添加方法、实现接口、添加静态成员。
-
-**定义与使用**：
-
-```java
-// 一行定义
-public record Point(int x, int y) {}
-
-// 等价的传统 Java 类需 60+ 行
-public final class Point {
-    private final int x;
-    private final int y;
-    public Point(int x, int y) { this.x = x; this.y = y; }
-    public int x() { return x; }   // 注意：无 get 前缀
-    public int y() { return y; }
-    // equals, hashCode, toString 省略...
-}
-
-// 使用
-Point p = new Point(3, 4);
-System.out.println(p.x());          // 3
-System.out.println(p);              // Point[x=3, y=4]
-System.out.println(p.equals(new Point(3, 4)));  // true
-```
-
-**紧凑构造器（Compact Constructor）**：用于参数校验
-
-```java
-public record Range(int start, int end) {
-    public Range {  // 紧凑构造器
-        if (start > end) {
-            throw new IllegalArgumentException("start 不能大于 end");
-        }
-    }
-}
-```
-
-**Record 的限制**：
-
-- **不能继承**其他类（隐式继承 `java.lang.Record`）。
-- 字段**不可变**（无法修改）。
-- 不能声明 `native` 方法。
-
-**适用场景**：DTO、值对象、配置项、API 响应等"纯数据"场景。不适合需要可变状态或复杂继承的领域模型。
-
-### 【中等】Sealed Classes（JDK 17+）有什么用？⭐⭐
-
-**密封类**通过 `sealed` + `permits` 显式声明允许的子类，**精确控制继承层级**。
-
-**核心价值**：在开放继承（普通类）和禁止继承（`final`）之间提供**第三种选择**——**有界继承**。
-
-**定义示例**：
-
-```java
-// 密封类：明确指定允许的子类
-public sealed class Shape permits Circle, Square, Triangle {}
-
-// 子类必须是 final、sealed 或 non-sealed 之一
-public final class Circle extends Shape { ... }       // 不再可继承
-public final class Square extends Shape { ... }       // 不再可继承
-public non-sealed class Triangle extends Shape { ... }  // 恢复开放继承
-```
-
-**与 Pattern Matching 结合（领域建模利器）**：
-
-```java
-public double area(Shape shape) {
-    return switch (shape) {  // 编译器检查所有子类，无需 default
-        case Circle c -> Math.PI * c.r() * c.r();
-        case Square s -> s.side() * s.side();
-        case Triangle t -> 0.5 * t.base() * t.height();
-    };
-}
-```
-
-**适用场景**：
-
-- **领域建模**：限定业务概念的取值范围（如订单状态、支付方式）。
-- **类型安全的代数数据类型（ADT）**：函数式编程中的和类型。
-- **API 设计**：明确告知调用方“我有这几个实现”，配合 switch 穷尽检查。

@@ -1,5 +1,6 @@
 ﻿---
 icon: circle-info
+title: 介绍页
 cover: /assets/images/cover3.jpg
 date: 2023-09-08 23:25:20
 permalink: /pages/4d157c1e/

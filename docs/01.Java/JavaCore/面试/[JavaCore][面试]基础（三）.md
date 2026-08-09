@@ -1436,9 +1436,9 @@ String html = """
     """;
 ```
 
-## JDK 8 新特性
+## Java 新特性
 
-### 【中等】Optional 的正确使用方式？⭐⭐⭐
+### 【中等】Java 8 的 Optional 的正确使用方式？⭐⭐⭐
 
 `Optional` 是 Java 8 引入的**容器对象**，优雅处理可能为 `null` 的值。
 
@@ -1479,7 +1479,7 @@ public void process(Optional<String> input) { ... }
 String s = optional.get();  // 可能 NPE
 ```
 
-### 【中等】Lambda 表达式和函数式接口是什么？⭐⭐⭐⭐
+### 【中等】Java 8 的 Lambda 表达式和函数式接口是什么？⭐⭐⭐⭐
 
 **Lambda 表达式**是 Java 8 引入的**匿名函数**，将行为作为参数传递，简化函数式编程。
 
@@ -1580,7 +1580,7 @@ C++ lambda 的 `[]` 捕获列表（`[=]` 按值、`[&]` 按引用、`[this]` 等
 
 **一个有趣的事实**：C++ 每个 lambda 产生**不同的类型**（即使签名完全一致），这使得两个签名相同的 lambda 不能互相赋值。Java 采用**目标类型推断**——lambda 的类型取决于赋值的函数式接口，不同 lambda 只要匹配同一接口就可以互换。这是 Java "更灵活"的思路 vs C++ "更静态安全" 思路的典型体现。
 
-### 【困难】Stream API 的核心操作有哪些？⭐⭐⭐⭐
+### 【困难】Java 8 的 Stream API 的核心操作有哪些？⭐⭐⭐⭐
 
 **Stream API（Java 8）**提供对集合的**声明式、链式、并行化**数据处理能力。
 
@@ -1688,7 +1688,7 @@ users.stream()
 
 **Rust 的零成本迭代器**：Rust 的迭代器链（`iter().filter().map().sum()`）在编译后展开为等价的手写循环。因为 Rust 没有运行时反射和 GC，编译器可以在编译期完成内联和优化，运行时没有任何虚函数调用开销。这是 Java Stream 做不到的——Java 的每个 filter/map 操作至少经过一次接口方法分派。
 
-### 【中等】Java 8 接口的默认方法和静态方法是什么？⭐⭐⭐
+### 【中等】Java 8 的接口的默认方法和静态方法是什么？⭐⭐⭐
 
 Java 8 允许接口定义**默认方法（`default`）**和**静态方法**，解决了接口演化问题。
 
@@ -1754,7 +1754,43 @@ long days = ChronoUnit.DAYS.between(startDate, endDate);
 String formatted = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 ```
 
-## JDK 11 新特性
+### 【中等】Java 9 引入的模块化系统（JPMS）有什么用？⭐
+
+Java 9 引入**Java 平台模块系统（JPMS，Project Jigsaw）**，解决长期以来的**JAR 地狱**和**封装不足**问题。
+
+**核心目标**：
+
+- **强封装**：模块可显式声明哪些包对外暴露，**非导出包无法被反射访问**（即使 `setAccessible(true)`）。
+- **可靠配置**：编译期和启动期检查模块依赖，提前发现缺失。
+- **精简 JRE**：`jlink` 可打包**仅含所需模块**的定制 JRE，体积大幅缩小。
+
+**模块定义示例**（`module-info.java`）：
+
+```java
+module com.example.app {
+    requires java.sql;              // 依赖 java.sql 模块
+    requires transitive java.base;  // 传递依赖
+    exports com.example.api;        // 导出包，对外可见
+    // com.example.internal 不导出，外部无法访问
+    opens com.example.pojo to jackson;  // 仅对 jackson 反射开放
+}
+```
+
+**关键关键字**：
+
+| **关键字**            | **作用**                                    |
+| --------------------- | ------------------------------------------- |
+| `requires`            | 声明依赖                                    |
+| `requires transitive` | 传递依赖（下游模块自动可用）                |
+| `exports`             | 导出包（编译期+运行时可见）                 |
+| `opens`               | 仅运行时反射开放（给框架如 Spring/Jackson） |
+| `uses` / `provides`   | 服务接口与实现（SPI）                       |
+
+**实际影响**：
+
+- **库开发者**：可真正隐藏内部实现，反射也访问不了。
+- **应用开发者**：依赖更清晰，但升级到 Java 9+ 时需处理未命名模块兼容性问题。
+- **JDK 自身**：JDK 本身被拆分为约 90 个模块（`java.base`、`java.sql` 等）。
 
 ### 【中等】Java 11 的 var 局部变量类型推断怎么用？有什么限制？⭐⭐
 
@@ -1857,11 +1893,117 @@ java -XX:+UseZGC -Xmx4g YourApplication
 java -XX:+UseEpsilonGC -Xmx256m YourApplication
 ```
 
-## JDK 17 新特性
+### 【中等】Java 14 对 switch 有哪些增强？⭐⭐
 
-### 【中等】JDK 17 的 Sealed Classes（密封类）是什么？⭐⭐⭐
+JDK 14 引入**标准化的 switch 表达式**，支持**箭头语法**、**多值标签**、**yield 返回值**，大幅提升表达力。
 
-**密封类（Sealed Classes，JDK 17 正式版）**通过 `sealed` + `permits` 显式声明允许的子类，**精确控制继承层级**。
+**传统 switch 痛点**：
+
+- 容易遗忘 `break` 导致**穿透（fall-through）**。
+- 无法直接返回值（需借助中间变量）。
+- 重复的 `case` 标签冗长。
+
+**新特性对比**：
+
+```java
+// 旧写法
+String result;
+switch (day) {
+    case MONDAY:
+    case FRIDAY:
+    case SUNDAY:
+        result = "休息日";
+        break;
+    case TUESDAY:
+        result = "工作日";
+        break;
+    default:
+        result = "未知";
+}
+```
+
+```java
+// JDK 14+ 新写法（箭头语法 + 多值 + 直接返回）
+String result = switch (day) {
+    case MONDAY, FRIDAY, SUNDAY -> "休息日";  // 多值，无穿透
+    case TUESDAY -> "工作日";
+    default -> {
+        // 复杂逻辑用 yield 返回
+        log("未知日期: " + day);
+        yield "未知";
+    }
+};
+```
+
+**核心改进**：
+
+| **特性**     | **传统 switch**           | **JDK 14+ switch 表达式**              |
+| ------------ | ------------------------- | -------------------------------------- |
+| **穿透**     | 默认穿透，需 `break` 阻止 | 默认**无穿透**，每个分支独立           |
+| **返回值**   | 不支持                    | 支持（`yield` 或箭头返回）             |
+| **多值标签** | 需多个 `case`             | `case A, B, C ->` 一行搞定             |
+| **default**  | 可选                      | 表达式形式**必须**穷尽（强制 default） |
+
+### 【中等】Java 16 的 Record（记录类）有什么用？⭐⭐
+
+`Record` 是 Java 16 引入的**不可变数据载体**，自动生成样板代码，是 Lombok `@Data` 的官方替代品。
+
+**核心特点**：
+
+- **不可变**：所有字段 `final`，无 setter。
+- **自动生成**：构造方法、`getter`（无 `get` 前缀）、`equals()`、`hashCode()`、`toString()`。
+- **可扩展**：可添加方法、实现接口、添加静态成员。
+
+**定义与使用**：
+
+```java
+// 一行定义
+public record Point(int x, int y) {}
+
+// 等价的传统 Java 类需 60+ 行
+public final class Point {
+    private final int x;
+    private final int y;
+    public Point(int x, int y) { this.x = x; this.y = y; }
+    public int x() { return x; }   // 注意：无 get 前缀
+    public int y() { return y; }
+    // equals, hashCode, toString 省略...
+}
+
+// 使用
+Point p = new Point(3, 4);
+System.out.println(p.x());          // 3
+System.out.println(p);              // Point[x=3, y=4]
+System.out.println(p.equals(new Point(3, 4)));  // true
+```
+
+**紧凑构造器（Compact Constructor）**：用于参数校验
+
+```java
+public record Range(int start, int end) {
+    public Range {  // 紧凑构造器
+        if (start > end) {
+            throw new IllegalArgumentException("start 不能大于 end");
+        }
+    }
+}
+```
+
+**Record 的限制**：
+
+- **不能继承**其他类（隐式继承 `java.lang.Record`）。
+- 字段**不可变**（无法修改）。
+- 不能声明 `native` 方法。
+
+**适用场景**：DTO、值对象、配置项、API 响应等"纯数据"场景。不适合需要可变状态或复杂继承的领域模型。
+
+### 【中等】Java 17 的 Sealed Classes（密封类）是什么？⭐⭐⭐
+
+**密封类**通过 `sealed` + `permits` 显式声明允许的子类，**精确控制继承层级**。
+
+**核心价值**：在开放继承（普通类）和禁止继承（`final`）之间提供**第三种选择**——**有界继承**。
+
+**定义示例**：
 
 ```java
 // 密封类：明确指定允许的子类
@@ -1885,9 +2027,13 @@ public double area(Shape shape) {
 }
 ```
 
-**适用场景**：领域建模（限定业务概念取值范围）、类型安全的代数数据类型（ADT）、API 设计（配合 switch 穷尽检查）。
+**适用场景**：
 
-### 【中等】JDK 17 的 Record（记录类）是什么？⭐⭐⭐
+- **领域建模**：限定业务概念的取值范围（如订单状态、支付方式）。
+- **类型安全的代数数据类型（ADT）**：函数式编程中的和类型。
+- **API 设计**：明确告知调用方“我有这几个实现”，配合 switch 穷尽检查。
+
+### 【中等】Java 17 的 Record（记录类）是什么？⭐⭐⭐
 
 **Record（JDK 16 正式版）**是 Java 的**不可变数据载体**，自动生成样板代码，是 Lombok `@Data` 的官方替代品。
 
@@ -1919,7 +2065,7 @@ public record Range(int start, int end) {
 - 字段**不可变**（`final`）
 - 不能声明 `native` 方法
 
-### 【中等】JDK 17 的文本块（Text Blocks）是什么？⭐⭐
+### 【中等】Java 17 的文本块（Text Blocks）是什么？⭐⭐
 
 **文本块（Text Blocks，JDK 15 正式版）**用 `"""` 定义多行字符串，解决传统字符串拼接的可读性问题。
 
@@ -1957,7 +2103,7 @@ String sql = """
     """.formatted(18, "北京");
 ```
 
-### 【中等】JDK 17 的 instanceof 模式匹配是什么？⭐⭐⭐
+### 【中等】Java 17 的 instanceof 模式匹配是什么？⭐⭐⭐
 
 **instanceof 模式匹配（JDK 16 正式版）**将类型检查和变量绑定合二为一，消除显式强制转换。
 
@@ -1968,7 +2114,7 @@ if (obj instanceof String) {
     System.out.println(s.length());
 }
 
-// JDK 17：模式匹配，直接绑定变量
+// Java 17：模式匹配，直接绑定变量
 if (obj instanceof String s) {
     System.out.println(s.length());  // 无需转换
 }
@@ -1989,7 +2135,7 @@ if (!(obj instanceof String s)) {
 System.out.println(s.length());
 ```
 
-### 【中等】JDK 17 的 switch 表达式增强是什么？⭐⭐⭐
+### 【中等】Java 17 的 switch 表达式增强是什么？⭐⭐⭐
 
 **switch 表达式（JDK 14 正式版）**引入了 `->` 箭头语法和 `yield` 返回值，使 switch 可作为表达式使用。
 
@@ -2002,7 +2148,7 @@ switch (month) {
     default: days = 30;
 }
 
-// JDK 17：switch 表达式（箭头语法，无需 break）
+// Java 17：switch 表达式（箭头语法，无需 break）
 int days = switch (month) {
     case JANUARY, MARCH, MAY -> 31;
     case FEBRUARY -> 28;
@@ -2022,18 +2168,16 @@ String result = switch (code) {
 
 **核心优势**：
 
-| 特性          | 传统 switch          | JDK 17 switch 表达式   |
+| 特性          | 传统 switch          | Java 17 switch 表达式  |
 | :------------ | :------------------- | :--------------------- |
 | **返回值**    | 不支持               | 可直接赋值给变量       |
 | **case 穿透** | 需 `break`（易遗漏） | `->` 自动不穿透        |
 | **多值合并**  | 每个 case 一行       | `case A, B, C ->`      |
 | **穷尽检查**  | 无强制               | 表达式必须穷尽所有分支 |
 
-## JDK 21 新特性
+### 【中等】Java 21 的 switch 模式匹配有什么增强？⭐⭐⭐
 
-### 【中等】JDK 21 的 switch 模式匹配有什么增强？⭐⭐⭐
-
-**switch 模式匹配（JDK 21 正式版）**将 `switch` 从“值匹配”升级为“类型匹配 + 守卫条件 + null 处理”的强大模式匹配工具。
+**switch 模式匹配（Java 21 正式版）**将 `switch` 从“值匹配”升级为“类型匹配 + 守卫条件 + null 处理”的强大模式匹配工具。
 
 **核心增强**：
 
@@ -2063,16 +2207,16 @@ double area(Shape shape) {
 
 **与传统 switch 的区别**：
 
-| 特性          | 传统 switch                     | JDK 21 switch 模式匹配  |
+| 特性          | 传统 switch                     | Java 21 switch 模式匹配 |
 | :------------ | :------------------------------ | :---------------------- |
 | **匹配对象**  | 仅值（`int`、`String`、`enum`） | 任意类型 + 模式         |
 | **null 处理** | 抛 NPE                          | `case null` 显式处理    |
 | **守卫条件**  | 不支持                          | `when` 子句添加额外条件 |
 | **穷尽检查**  | 仅 enum                         | 密封类 + enum 均可      |
 
-### 【中等】JDK 21 的记录模式（Record Patterns）是什么？⭐⭐
+### 【中等】Java 21 的记录模式（Record Patterns）是什么？⭐⭐
 
-**记录模式（Record Patterns，JDK 21 正式版）**允许在 `instanceof` 和 `switch` 中**解构 Record 的字段**，实现模式组合。
+**记录模式（Record Patterns，Java 21 正式版）**允许在 `instanceof` 和 `switch` 中**解构 Record 的字段**，实现模式组合。
 
 ```java
 record Point(int x, int y) {}
@@ -2103,9 +2247,9 @@ String describe(Object obj) {
 
 **核心价值**：实现了**代数数据类型的完整模式匹配**，使 Java 具备了类似 Scala/Kotlin 的解构能力。
 
-### 【中等】JDK 21 的未命名变量（Unnamed Variables）是什么？⭐
+### 【中等】Java 21 的未命名变量（Unnamed Variables）是什么？⭐
 
-**未命名变量（Unnamed Variables，JDK 21 预览）**用 `_` 表示“声明但不使用”的变量，提升代码可读性。
+**未命名变量（Unnamed Variables，Java 21 预览）**用 `_` 表示“声明但不使用”的变量，提升代码可读性。
 
 ```java
 // 1. 忽略不需要的变量
@@ -2138,9 +2282,9 @@ switch (shape) {
 
 **核心价值**：明确表示“这个变量是故意不用的”，避免 IDE 警告，提升代码意图表达。
 
-### 【中等】JDK 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？⭐⭐
+### 【中等】Java 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？⭐⭐
 
-**Scoped Values（JDK 21 预览，JEP 446）** 是比 `ThreadLocal` 更安全、更高效的线程上下文传递方案，专为**虚拟线程**设计。
+**Scoped Values（Java 21 预览，JEP 446）** 是比 `ThreadLocal` 更安全、更高效的线程上下文传递方案，专为**虚拟线程**设计。
 
 | 维度             | ThreadLocal                       | Scoped Values                  |
 | :--------------- | :-------------------------------- | :----------------------------- |
