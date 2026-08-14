@@ -38,123 +38,160 @@ permalink: /pages/447cbc4f/
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/f769820186fe432da503bb095aec7817.png)
 
-[**Elasticsearch**](https://github.com/elastic/elasticsearch) 是一个开源的分布式**搜索和分析引擎**。
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 概述
 
-[Elasticsearch](https://github.com/elastic/elasticsearch) **基于搜索库 [Lucene](https://github.com/apache/lucene-solr) 开发**。Elasticsearch 隐藏了 Lucene 的复杂性，提供了简单易用的 REST API / Java API 接口（另外还有其他语言的 API 接口）。
+#### 💎 关键结论
 
-Elasticsearch 是**面向文档**的，它将复杂数据结构序列化为 **JSON** 形式存储。
+ES 是基于 Lucene 的分布式搜索与分析引擎，面向文档、JSON 存储，提供近实时全文搜索能力，延迟约 1 秒。
 
-Elasticsearch 提供**近实时**（Near Realtime，缩写 NRT）的**全文搜索**。近实时是指：
+#### ⚡记忆卡片
 
-- 从写入数据到数据可以被搜索，存在较小的延迟（大概是 1s）。
-- 基于 Elasticsearch 执行搜索和分析可以达到秒级。
+- **口诀**：Lucene 加壳、文档 JSON、近实时搜索
+- **关键词**：Lucene ／ REST API ／ NRT ／ 分布式
+- **链路**：Lucene → ES 封装 → REST API → 近实时搜索
+
+#### 📖 核心知识
+
+1. [**Elasticsearch**](https://github.com/elastic/elasticsearch) 是基于 [Lucene](https://github.com/apache/lucene-solr) 开发的开源分布式搜索和分析引擎，隐藏了 Lucene 的复杂性，提供 REST API / Java API 等多语言接口。
+2. **面向文档**：将复杂数据结构序列化为 JSON 形式存储。
+3. **近实时（NRT）**：写入到可搜索延迟约 1 秒；搜索和分析可达秒级响应。
+4. 核心能力：**分布式存储**、**全文搜索**、**聚合分析**。
+
+#### 🔀 发散问题
+
+- **Q：ES 和 Solr 有什么区别？** → 二者都基于 Lucene，但 ES 天然支持分布式、近实时、RESTful API 更友好，社区生态更活跃；Solr 在传统企业搜索场景更成熟。
+- **Q：什么是近实时（NRT）？** → 数据写入后约 1 秒（refresh 间隔）才可被搜索，不是真正的实时，见本文档「ES 存储数据的流程是怎样的？」。
 
 ### 【简单】ES 有哪些应用场景？⭐⭐⭐
 
-Elasticsearch 的主要功能如下：
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 概述
 
-- **海量数据的分布式存储及集群管理**
-- **提供丰富的近实时搜索能力**
-- **海量数据的近实时分析（聚合）**
+#### 💎 关键结论
 
-Elasticsearch 被广泛应用于以下场景：
+ES 主要用于三大场景：搜索（全文检索、自动补全）、可观测性（日志/指标/追踪）、安全分析，底层支撑是分布式存储与近实时分析能力。
 
-- **搜索**
-  - **全文检索**：Elasticsearch 通过快速搜索大型数据集，使复杂的搜索查询变得更加容易。它对于需要即时和相关搜索结果的网站、应用程序或企业特别有用。
-  - **自动补全和拼写纠正**：可以在用户输入内容时，实时提供自动补全和拼写纠正，以增加用户体验并提高搜索效率。
-  - **地理空间搜索**：使用地理空间查询搜索位置并计算空间关系。
-  - **近实时分析**：Elasticsearch 能够进行实时分析，使其适用于追踪实时数据的仪表板，例如用户活动、用户画像等，分析后进行推送。
-- **可观测性**
-  - **日志、指标和链路追踪**：收集、存储和分析来自应用程序、系统和服务的日志、指标和追踪。
-  - **性能监控**：监控和分析业务关键性能指标。
-  - **OpenTelemetry**：使用 OpenTelemetry 标准，将遥测数据采集到 Elastic Stack。
+#### ⚡记忆卡片
+
+- **口诀**：搜、观、安三大场景
+- **关键词**：全文检索 ／ 可观测性 ／ 日志分析 ／ 地理空间
+- **链路**：数据写入 → 近实时索引 → 搜索/聚合/分析
+
+#### 📖 核心知识
+
+Elasticsearch 的主要功能：**海量数据的分布式存储及集群管理**、**丰富的近实时搜索能力**、**海量数据的近实时分析（聚合）**。
+
+1. **搜索**：全文检索、自动补全和拼写纠正、地理空间搜索、近实时分析推送。
+2. **可观测性**：日志/指标/链路追踪采集分析、性能监控、OpenTelemetry 集成。
+3. **安全分析**：安全事件检测与告警。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/03/54ccece33273484fbdf3afe97eb56826.png)
 
+#### 🔀 发散问题
+
+- **Q：ES 和传统数据库有什么区别？** → ES 面向文档（JSON）、Schema-free、擅长大规模全文搜索和聚合；RDBMS 擅长事务和复杂关联查询，见本文档「ES 有哪些基本概念？」。
+
 ### 【简单】ES 有哪些里程碑版本？⭐
 
-Elasticsearch 里程碑版本：
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Elasticsearch 概述
 
-- 1.0（2014 年）
-- 5.0（2016 年）
-  - Lucene 6.x
-  - 默认打分机制从 TD-IDF 改为 BM25
-  - 增加 Keyword 类型
-- 6.0（2017 年）
-  - Lucene 7.x
-  - 跨集群复制
-  - 索引生命周期管理
-  - SQL 的支持
-- 7.0（2019 年）
-  - Lucene 8.0
-  - 移除 Type
-  - ECK （用于支持 K8S）
-  - 集群协调
-  - High Level Rest Client
-  - Script Score 查询
-- 8.0（2022 年）
-  - Lucene 9.0
-  - 向量搜索
-  - 支持 OpenTelemetry
+#### 💎 关键结论
+
+ES 经历了 1.0→5.0→6.0→7.0→8.0 五个里程碑版本，关键变化是 5.0 引入 BM25、7.0 移除 Type、8.0 支持向量搜索。
+
+#### ⚡记忆卡片
+
+- **口诀**：五 BM 二五，七去 type，八向量
+- **关键词**：BM25 ／ Type 移除 ／ 向量搜索 ／ Lucene
+- **链路**：1.0 基础 → 5.0 BM25 → 7.0 去 Type → 8.0 向量
+
+#### 📖 核心知识
+
+1. **1.0（2014）**：首个正式发布。
+2. **5.0（2016）**：Lucene 6.x，默认打分从 TF-IDF 改为 BM25，增加 Keyword 类型。
+3. **6.0（2017）**：Lucene 7.x，跨集群复制、索引生命周期管理、SQL 支持。
+4. **7.0（2019）**：Lucene 8.0，移除 Type、引入 ECK（K8S 支持）、集群协调重写、High Level Rest Client。
+5. **8.0（2022）**：Lucene 9.0，原生向量搜索、支持 OpenTelemetry。
 
 ### 【简单】什么是 Elasic Stack(ELK)？⭐⭐⭐
+
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 概述
+
+#### 💎 关键结论
+
+Elastic Stack（ELK）是 Elasticsearch + Logstash + Kibana 的组合，常用于日志采集、检索、可视化，后加入 Beats 轻量采集器。
+
+#### ⚡记忆卡片
+
+- **口诀**：ES 存、Logstash 传、Kibana 看、Beats 采
+- **关键词**：Elasticsearch ／ Logstash ／ Kibana ／ Beats
+- **链路**：Beats 采集 → Logstash 处理 → ES 存储检索 → Kibana 可视化
+
+#### 📖 核心知识
 
 Elastic Stack 通常被用来作为日志采集、检索、可视化的解决方案。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/ec41500c0b614c4db5245a202c266967.png)
 
-Elastic Stack 也常被称为 ELK，这是 Elastic 公司旗下三款产品 [Elasticsearch](https://www.elastic.co/elasticsearch) 、[Logstash](https://www.elastic.co/products/logstash) 、[Kibana](https://www.elastic.co/kibana) 的首字母组合。
-
-- [Elasticsearch](https://www.elastic.co/elasticsearch) 负责存储数据，并提供对数据的检索和分析。
-- [Logstash](https://www.elastic.co/logstash) 传输和处理你的日志、事务或其他数据。
-- [Kibana](https://www.elastic.co/kibana) 将 Elasticsearch 的数据分析并渲染为可视化的报表。
-
-Elastic Stack，在 ELK 的基础上扩展了一些新的产品。如：[Beats](https://www.elastic.co/beats)，这是针对不同类型数据的轻量级采集器套件。
-
-此外，基于 Elastic Stack，其技术生态还可以和一些主流的分布式中间件进行集成，以应对各种不同的场景。
+1. [Elasticsearch](https://www.elastic.co/elasticsearch)：存储数据，提供检索和分析。
+2. [Logstash](https://www.elastic.co/logstash)：传输和处理日志、事务等数据。
+3. [Kibana](https://www.elastic.co/kibana)：分析并渲染可视化报表。
+4. [Beats](https://www.elastic.co/beats)：轻量级数据采集器套件（ELK 基础上新增）。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/afa56f3c9bcf4f23b6c77dfd65c4eff8.png)
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】Beats 家族包括 Filebeat（日志文件）、Metricbeat（系统指标）、Packetbeat（网络数据）、Heartbeat（健康检查）等，可直接写入 ES 或经 Logstash 处理。
+- 【L4】Elastic Agent（8.x）整合了多种 Beats 能力，支持 Fleet 集中管理，是未来采集层的统一方案。
+
+> 📚 延伸阅读：[Elastic 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：ELK 和 EFK 有什么区别？** → EFK 用 Fluentd 替代 Logstash 做数据采集处理，资源占用更低，常见于 Kubernetes 场景。
+
 ### 【简单】ES 有哪些基本概念？⭐⭐
 
-::: info Elasticsearch 集群维度核心概念
-:::
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 概述
 
-Elasticsearch 集群维度核心概念如下：
+#### 💎 关键结论
 
-- **Cluster（集群）**：**由多个协同工作的 ES 实例组合成的集合称为集群**。集群架构使得 ES 具备了高可用性和可扩展性。
-- **Node（节点）**：**单个 ES 服务实例称为 Node，本质上就是一个 Java 进程**。每个节点都有各自的名字，默认是随机分配的，也可以通过 `node.name` 指定。
-- **Shard（分片）**：当单台机器不足以存储大量数据时，Elasticsearch 可以将一个索引中的数据切分为多个 **`分片（shard）`** 。 **`分片（shard）`** 分布在多台服务器上存储。有了 shard 就可以横向扩展，存储更多数据，让搜索和分析等操作分布到多台服务器上去执行，提升吞吐量和性能。每个 shard 都是一个 lucene index。
-- **Replica（副本）**：任何一个服务器随时可能故障或宕机，此时 shard 可能就会丢失，因此可以为每个 shard 创建多个 **`副本（replica）`**。replica 可以在 shard 故障时提供备用服务，保证数据不丢失，多个 replica 还可以提升搜索操作的吞吐量和性能。primary shard（建立索引时一次设置，不能修改，7.0 之前默认 5 个，7.0 起默认 1 个），replica shard（随时修改数量，默认 1 个）。以默认 5 主 5 副为例，最小的高可用配置是 2 台服务器。
+ES 核心概念分两层：集群层（Cluster、Node、Shard、Replica）和数据层（Index、Document、Field、Mapping），Type 在 7.x 已移除。
 
-::: info Elasticsearch 数据维度核心概念
-:::
+#### ⚡记忆卡片
 
-Elasticsearch 数据维度核心概念如下：
+- **口诀**：集群节点分片副本，索引文档字段映射
+- **关键词**：Cluster ／ Node ／ Shard ／ Index ／ Document
+- **链路**：Cluster → Node → Shard → Index → Document → Field
 
-- **Index（索引）**：在 ES 中，**可以将索引视为文档（document）的集合**。
-  - ES 会为所有字段建立索引，经过处理后写入一个倒排索引（Inverted Index）。查找数据的时候，直接查找该索引。
-  - 所以，ES 数据管理的顶层单位就叫做 Index（索引）。它是单个数据库的同义词。每个 Index （即数据库）的名字必须是小写。
-- **Type（类型）**：每个索引里可以有一个或者多个类型（type）。`类型（type）` 是 Index 的一个逻辑分类。
-  - 不同的 Type 应该有相似的结构（schema），举例来说，`id`字段不能在这个组是字符串，在另一个组是数值。这是与关系型数据库的表的 [一个区别](https://www.elastic.co/guide/en/Elasticsearch/guide/current/mapping.html)。性质完全不同的数据（比如`products`和`logs`）应该存成两个 Index，而不是一个 Index 里面的两个 Type（虽然可以做到）。
-  - 注意：ES 7.x 版已彻底移除 Type。
-- **Document（文档）**：Index 里面单条的记录称为 Document。文档是一组字段。每个文档都有一个唯一的 ID。
-- **Field（字段）**：包含数据的键值对。默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
-- [**Metadata Field（元数据字段）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html)：存储有关文档的信息的系统字段。元数据字段都以 `_` 开头。常见元数据字段：
-  - [`_index`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index-field.html)：文档所属的索引
-  - [`_id`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html)：文档的 ID
-  - [`_source`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html)：表示文档原文的 JSON
+#### 📖 核心知识
 
-::: info ES 核心概念 vs. DB 核心概念
-:::
+**集群维度**：
 
-| ES                                   | DB                     |
-| ------------------------------------ | ---------------------- |
-| **索引（index）**                    | **数据库（database）** |
-| **类型（type，6.0 废弃，7.0 移除）** | **数据表（table）**    |
-| **文档（document）**                 | **行（row）**          |
-| **字符（field）**                    | **列（column）**       |
-| **映射（mapping）**                  | **表结构（schema）**   |
+1. **Cluster（集群）**：多个协同工作的 ES 实例组合，具备高可用性和可扩展性。
+2. **Node（节点）**：单个 ES 服务实例，本质是一个 Java 进程。
+3. **Shard（分片）**：索引数据的切分单元，分布在多节点上实现水平扩展，每个 shard 都是一个 Lucene index。
+4. **Replica（副本）**：shard 的备份，提供高可用和读性能提升。primary shard 数创建后不可修改（7.0 前默认 5 个，7.0 起默认 1 个），replica 默认 1 个。
+
+**数据维度**：
+
+1. **Index（索引）**：文档的集合，类似数据库。ES 会为所有字段建立倒排索引。
+2. **Type（类型）**：索引的逻辑分类，ES 7.x 已彻底移除。
+3. **Document（文档）**：索引中的单条记录，JSON 格式，有唯一 ID。
+4. **Field（字段）**：文档中的键值对，每个字段都有专用的优化数据结构。
+5. **Metadata Field**：以 `_` 开头的系统字段，如 `_index`、`_id`、`_source`。
+
+| ES | DB |
+|:---|:---|
+| **索引（index）** | **数据库（database）** |
+| **类型（type，6.0 废弃，7.0 移除）** | **数据表（table）** |
+| **文档（document）** | **行（row）** |
+| **字段（field）** | **列（column）** |
+| **映射（mapping）** | **表结构（schema）** |
 
 ## Elasticsearch 建模
 
@@ -168,48 +205,56 @@ Elasticsearch 数据维度核心概念如下：
 
 ### 【简单】ES 支持哪些数据类型？⭐
 
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Elasticsearch 建模
+
+#### 💎 关键结论
+
+ES 支持文本、数值、日期、布尔、二进制、对象、嵌套、地理空间、向量等丰富数据类型，通过 Mapping 定义字段类型。
+
+#### ⚡记忆卡片
+
+- **口诀**：文数日布二，对嵌地向
+- **关键词**：text ／ keyword ／ nested ／ dense_vector
+- **链路**：字段定义 → Mapping 指定类型 → 倒排索引存储
+
+#### 📖 核心知识
+
 Elasticsearch 支持丰富的数据类型，常见的有：
 
-- **文本类型**：[`text`](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html)、[`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#keyword-field-type)、[`constant_keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#constant-keyword-field-type)、 [`wildcard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#wildcard-field-type)
+- **文本类型**：[`text`](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html)、[`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#keyword-field-type)、[`constant_keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#constant-keyword-field-type)、[`wildcard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#wildcard-field-type)
 - **二进制类型**：[`binary`](https://www.elastic.co/guide/en/elasticsearch/reference/current/binary.html)
-- **数值类型**：`long`、`float` 等
+- **数值类型**：`long`、`integer`、`float`、`double` 等
 - **日期类型**：[`date`](https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html)
 - **布尔类型**：[`boolean`](https://www.elastic.co/guide/en/elasticsearch/reference/current/boolean.html)
 - **对象类型**：[`object`](https://www.elastic.co/guide/en/elasticsearch/reference/current/object.html)、[`nested`](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html)
+- **地理空间类型**：`geo_point`、`geo_shape`
+- **向量类型**：[`dense_vector`](https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html)（8.0+）
 
 ### 【简单】ES 如何识别字段的数据类型？⭐⭐⭐
 
-在 Elasticsearch 中，`Mapping`（映射）用来定义一个文档以及其所包含的字段如何被存储和索引，可以在映射中事先定义字段的数据类型、字段的权重、分词器等属性，就如同在关系型数据库中创建数据表时会设置字段的类型。简言之，**Mapping 定义了索引中的文档有哪些字段及其类型、这些字段是如何存储和检索的，就好像数据库的表定义一样。**
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 建模 / Mapping
 
-Mapping 会把 json 文档映射成 Lucene 所需要的扁平格式
+#### 💎 关键结论
 
-一个 Mapping 属于一个索引的 Type
+Mapping 定义字段类型和存储规则，分静态映射（手工指定）和动态映射（自动识别）两种方式，类似数据库建表。
 
-- 每个文档都属于一个 Type
-- 一个 Type 有一个 Mapping 定义
-- 7.0 开始，不需要在 Mapping 定义中指定 type 信息
+#### ⚡记忆卡片
 
-每个 `document` 都是 `field` 的集合，每个 `field` 都有自己的数据类型。映射数据时，可以创建一个 `mapping`，其中包含与 `document` 相关的 `field` 列表。映射定义还包括元数据 `field`，例如 `_source` ，它自定义如何处理 `document` 的关联元数据。
+- **口诀**：静态手工建表，动态自动识别
+- **关键词**：Mapping ／ 静态映射 ／ 动态映射 ／ properties
+- **链路**：创建索引 → 定义 Mapping → 字段类型确定 → 倒排索引构建
 
-在 Elasticsearch 中，映射可分为**静态映射**和**动态映射**。在关系型数据库中写入数据之前首先要建表，在建表语句中声明字段的属性，在 Elasticsearch 中，则不必如此，Elasticsearch 最重要的功能之一就是让你尽可能快地开始探索数据，文档写入 Elasticsearch 中，它会根据字段的类型自动识别，这种机制称为**动态映射**，而**静态映射**则是写入数据之前对字段的属性进行手工设置。
+#### 📖 核心知识
 
-::: info 静态映射
-:::
+**Mapping** 定义索引中文档的字段如何被存储和索引，类似数据库的表定义。
 
-Elasticsearch 官方将静态映射称为**显式映射（[Explicit mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html)）**。**静态映射**是在创建索引时手工指定索引映射。静态映射和 SQL 中在建表语句中指定字段属性类似。相比动态映射，通过静态映射可以添加更详细、更精准的配置信息。
+1. **静态映射（Explicit Mapping）**：创建索引时手工指定字段类型，可以配置分词器、权重、是否索引等详细属性。
+2. **动态映射（Dynamic Mapping）**：写入文档时 ES 自动识别字段类型，适合探索性数据，但可能产生不准确的类型推断。
+3. ES 7.0 起，Mapping 不再需要指定 type 信息。
 
-例如：
+::: details 静态映射示例
 
-- 哪些字符串字段应被视为全文字段。
-- 哪些字段包含数字、日期或地理位置。
-- 日期值的格式。
-- 用于控制动态添加字段的自定义规则。
-
-::: tabs#mapping 使用示例
-
-@tab 显示指定 mapping
-
-【示例】创建索引时，显示指定 mapping
+创建索引时显式指定 mapping：
 
 ```javascript
 PUT /my-index-000001
@@ -224,9 +269,7 @@ PUT /my-index-000001
 }
 ```
 
-@tab 指定 field 的属性
-
-【示例】在已存在的索引中，指定一个 field 的属性
+在已存在的索引中指定 field 属性：
 
 ```javascript
 PUT /my-index-000001/_mapping
@@ -240,45 +283,102 @@ PUT /my-index-000001/_mapping
 }
 ```
 
-@tab 查看 mapping
-
-【示例】查看 mapping
-
-```
-GET /my-index-000001/_mapping
-```
-
-【示例】查看指定 field 的 mapping
-
-```
-GET /my-index-000001/_mapping/field/employee-id
-```
+查看 mapping：`GET /my-index-000001/_mapping`
 
 :::
 
-::: info 动态映射
-:::
+::: details 动态映射示例
 
-动态映射机制，允许用户不手动定义映射，Elasticsearch 会自动识别字段类型。在实际项目中，如果遇到的业务在导入数据之前不确定有哪些字段，也不清楚字段的类型是什么，使用动态映射非常合适。当 Elasticsearch 在文档中碰到一个以前没见过的字段时，它会利用动态映射来决定该字段的类型，并自动把该字段添加到映射中。
-
-示例：创建一个名为 `data` 的索引、其 `mapping` 类型为 `_doc`，并且有一个类型为 `long` 的字段 `count`。
+写入文档时 ES 自动识别字段类型：
 
 ```bash
 PUT data/_doc/1
 { "count": 5 }
 ```
 
-### 【简单】ES 索引别名有什么用？⭐⭐⭐
-
-Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允许同时对多个索引执行操作，或者通过隐藏底层索引结构的复杂性来简化索引管理。
-
-::: tip 扩展
-
-[Elasticsearch 官方文档之别名](https://www.elastic.co/guide/en/elasticsearch/reference/current/aliases.html)
+ES 自动推断 `count` 字段类型为 `long`。
 
 :::
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】动态映射可通过 `dynamic_templates` 自定义规则，例如将所有字符串字段默认映射为 keyword，避免 text 类型的额外开销。
+- 【L4】动态映射可设置为 `strict`，遇到未定义字段时直接拒绝写入，防止 mapping 爆炸（mapping explosion）。
+
+> 📚 延伸阅读：[Elasticsearch 官方文档之 Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "动态映射可以替代静态映射" → 动态映射可能推断出错误类型（如将数字字符串推断为 text），生产环境建议静态映射优先。
+- ❌ "Mapping 可以修改已有字段类型" → 已有字段的类型不可修改，只能重新创建索引（reindex）。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：text 和 keyword 有什么区别？** → text 会分词，适合全文搜索；keyword 不分词，适合精确匹配、聚合和排序。
+- **Q：动态映射可能导致什么问题？** → 可能产生 mapping explosion（字段数爆炸）或类型推断错误，见本文档「使用 ES 有哪些最佳实践？」。
+
+### 【简单】ES 索引别名有什么用？⭐⭐⭐
+
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 建模
+
+#### 💎 关键结论
+
+索引别名用于隐藏底层索引复杂性，支持多索引聚合查询、索引重建时的零停机切换，是生产环境的必备实践。
+
+#### ⚡记忆卡片
+
+- **口诀**：别名挂载多索引，切换无感知
+- **关键词**：Alias ／ 零停机 ／ 多索引聚合 ／ reindex
+- **链路**：创建新索引 → 别名指向新索引 → 应用无感知切换
+
+#### 📖 核心知识
+
+Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允许同时对多个索引执行操作，或者通过隐藏底层索引结构的复杂性来简化索引管理。
+
+1. **多索引聚合**：一个别名可挂载多个索引，查询别名即可同时搜索所有关联索引。
+2. **零停机重建**：reindex 后将别名从旧索引切换到新索引，应用端无需修改。
+3. **视图抽象**：通过别名隐藏索引命名细节（如日期后缀），对外提供统一入口。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】别名支持 `filter` 和 `routing` 参数，可创建带过滤条件的别名（类似视图），或指定路由以缩小查询范围。
+- 【L4】别名下挂 50 个索引、每个 5 分片时，一次查询会产生 250 次 query+fetch，需警惕读放大。
+
+> 📚 延伸阅读：[Elasticsearch 官方文档之别名](https://www.elastic.co/guide/en/elasticsearch/reference/current/aliases.html)
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：别名和索引模板有什么关系？** → 索引模板自动为新索引应用 mapping/settings，别名可将多个模板创建的索引统一起来，常见于按日期滚动的索引场景。
+
 ### 【中等】object 和 nested 类型有什么区别？⭐⭐⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 建模 / 数据类型
+
+#### 💎 关键结论
+
+object 打平存储会丢失对象边界，导致跨对象误匹配；nested 每个对象独立存储为隐藏文档，保证同对象内精确匹配，但开销更高。
+
+#### ⚡记忆卡片
+
+- **口诀**：object 打平会串，nested 独立不串
+- **关键词**：打平（flatten） ／ 跨对象误匹配 ／ 隐藏文档 ／ nested 查询
+- **链路**：对象数组 → object 打平 / nested 独立文档 → 查询方式不同
+
+#### 📖 核心知识
 
 存储对象数组时，ES 默认使用 `object` 类型，其存储方式是**打平（flatten）**的——数组内对象之间的内部结构会丢失：
 
@@ -290,18 +390,40 @@ Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允
 { "users.name": ["Alice", "Bob"], "users.age": [20, 30] }
 ```
 
-**深坑**：查询 `users.name = Alice AND users.age = 30` 会命中这篇文档——但实际上并不存在这样一个叫 Alice 且 30 岁的人！这是**跨对象字段组合导致的误匹配（false positive）**。
-
-**解决方案——`nested` 类型**：每个嵌套对象作为独立的隐藏文档存储（一个嵌套对象对应一个独立的 Lucene 文档），查询时必须使用 `nested` 查询，保证条件在同一个对象内匹配。
+1. **object**：打平存储，查询 `users.name=Alice AND users.age=30` 会命中（跨对象误匹配）。
+2. **nested**：每个嵌套对象作为独立的隐藏文档存储，查询时必须使用 `nested` 查询，保证条件在同一个对象内匹配。
 
 | 方面 | object | nested |
-| --- | --- | --- |
+|:---|:---|:---|
 | 存储 | 打平，字段混合 | 每个嵌套对象独立文档 |
 | 查询 | 存在跨对象误匹配 | 同对象内独立匹配 |
 | 开销 | 低 | 每个嵌套对象占一个文档，写入/查询开销更高 |
 | 更新 | 直接更新 | 嵌套数组需整体重写 |
 
-**实践建议**：只有当需要精确匹配“数组内对象之间的组合关系”时才用 nested，否则 object 即可。nested 对象数量默认上限为 10000（`index.mapping.nested_objects.limit`），滥用 nested 会导致文档数膨胀、聚合性能下降。
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】nested 对象数量默认上限为 10000（`index.mapping.nested_objects.limit`），滥用 nested 会导致文档数膨胀、聚合性能下降。
+- 【L4】对于只需精确匹配“数组内对象组合关系”的场景才用 nested，否则 object 即可。大量嵌套对象可考虑 flatten 或 parent-child 关系替代。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "object 类型可以精确匹配数组内的对象组合" → object 打平后会丢失对象边界，必须用 nested 才能保证同对象内匹配。
+- ❌ "nested 没有性能代价" → 每个嵌套对象占一个独立 Lucene 文档，写入和查询开销显著增加。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：nested 和 parent-child 有什么区别？** → nested 在同一文档内存储隐藏子文档，查询快但更新需整体重写；parent-child 父子文档独立存储，更新灵活但查询开销更高。
+- **Q：实践建议？** → 只有当需要精确匹配“数组内对象之间的组合关系”时才用 nested，否则 object 即可。
 
 ## Elasticsearch CRUD
 
@@ -313,22 +435,32 @@ Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允
 
 ### 【简单】如何在 ES 中 CRUD？⭐⭐
 
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch CRUD
+
+#### 💎 关键结论
+
+ES 通过 REST API 实现 CRUD，支持单文档操作和 bulk 批量操作，写入时需考虑 ID 策略和幂等性。
+
+#### ⚡记忆卡片
+
+- **口诀**：PUT 建、POST 增、DELETE 删、GET 查、bulk 批
+- **关键词**：PUT ／ POST ／ DELETE ／ GET ／ bulk ／ _mget
+- **链路**：REST 请求 → 路由分片 → 写入/读取 → 响应
+
+#### 📖 核心知识
+
 Elasticsearch 的基本 CRUD 方式如下：
 
-- **添加索引**
-  - `PUT <index>/_create/<id>`：指定 id，如果 id 已存在，报错
+- **创建文档**
+  - `PUT <index>/_create/<id>`：指定 id，已存在则报错
   - `POST <index>/_doc`：自动生成 `_id`
-- **删除索引**：`DELETE /<index>?pretty`
-- **更新索引**：`POST <index>/_update/<id>`
-- **查询索引**：`GET <index>/_doc/<id>`
-- **批量更新**：`bulk` API 支持 `index/create/update/delete`
-- **批量查询**：`_mget` 和 `_msearch` 可以用于批量查询
+- **删除文档**：`DELETE <index>/_doc/<id>`
+- **更新文档**：`POST <index>/_update/<id>`
+- **查询文档**：`GET <index>/_doc/<id>`
+- **批量操作**：`bulk` API 支持 `index/create/update/delete`
+- **批量查询**：`_mget` 和 `_msearch` 用于批量获取文档
 
-::: tip 扩展
-
-[Quick starts](https://www.elastic.co/guide/en/elasticsearch/reference/current/quickstart.html)
-
-:::
+> 📚 延伸阅读：[Quick starts](https://www.elastic.co/guide/en/elasticsearch/reference/current/quickstart.html)
 
 ## Elasticsearch 检索
 
@@ -348,98 +480,182 @@ Elasticsearch 的基本 CRUD 方式如下：
 
 ### 【简单】ES 中有哪些全文搜索 API？⭐
 
-ES 支持全文搜索的 API 主要有以下几个：
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Elasticsearch 检索 / 全文搜索
 
-- [intervals](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-intervals-query.html)：根据匹配词的顺序和近似度返回文档。
-- [match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html)：**匹配查询**，用于执行全文搜索的标准查询，包括模糊匹配和短语或邻近查询。
-- [match_bool_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-bool-prefix-query.html)：对检索文本分词，并根据这些分词构造一个布尔查询。除了最后一个分词之外的每个分词都进行 term 查询。最后一个分词用于 `prefix` 查询；其他分词都进行 `term` 查询。
-- [match_phrase](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html)：**短语匹配查询**，短语匹配会将检索内容分词，这些词语必须全部出现在被检索内容中，并且顺序必须一致，默认情况下这些词都必须连续。
-- [match_phrase_prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html)：与 `match_phrase` 查询类似，但对最后一个单词执行通配符搜索。
-- [multi_match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html) 支持多字段 match 查询。
-- [combined_fields](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-combined-fields-query.html)：匹配多个字段，就像它们已索引到一个组合字段中一样。
-- [query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)：支持紧凑的 Lucene [query string（查询字符串）语法](https://www.elastic.co/guide/en/elasticsearch/reference/8.16/query-dsl-query-string-query.html#query-string-syntax)，允许指定 `AND|OR|NOT` 条件和单个查询字符串中的多字段搜索。仅适用于专家用户。
-- [simple_query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html)：更简单、更健壮的 `query_string` 语法版本，适合直接向用户公开。
+#### 💎 关键结论
 
-::: tip 扩展
+ES 全文搜索 API 以 match 系列为核心，查询前会对查询字符串进行分词分析，支持模糊匹配、短语匹配、多字段搜索等。
 
-[Elasticsearch 官方文档之全文查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
+#### ⚡记忆卡片
 
-:::
+- **口诀**：match 分词搜，phrase 短语配，multi 多字段
+- **关键词**：match ／ match_phrase ／ multi_match ／ intervals
+- **链路**：查询字符串 → 分析器分词 → 倒排索引查找 → 相关性打分
+
+#### 📖 核心知识
+
+ES 支持全文搜索的 API 主要有：
+
+- [**match**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html)：标准匹配查询，支持模糊匹配和短语查询。
+- [**match_phrase**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html)：短语匹配，分词后词语必须按顺序连续出现。
+- [**match_bool_prefix**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-bool-prefix-query.html)：对最后一个分词执行 prefix 查询，其余执行 term 查询。
+- [**match_phrase_prefix**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html)：对最后一个单词执行通配符搜索。
+- [**multi_match**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html)：多字段 match 查询。
+- [**combined_fields**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-combined-fields-query.html)：多字段合并为一个组合字段搜索。
+- [**intervals**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-intervals-query.html)：根据匹配词的顺序和近似度返回文档。
+- [**query_string**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)：Lucene 查询字符串语法，支持 `AND|OR|NOT`，仅适合专家用户。
+- [**simple_query_string**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html)：更简单健壮的 query_string 版本，适合直接暴露给用户。
+
+> 📚 延伸阅读：[Elasticsearch 官方文档之全文查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
 
 ### 【简单】ES 中有哪些词项搜索 API？⭐
 
-**`Term`（词项）是表达语意的最小单位**。搜索和利用统计语言模型进行自然语言处理都需要处理 Term。
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Elasticsearch 检索 / 词项搜索
 
-全文查询在执行查询之前会分析查询字符串。与全文查询不同，**词项级别查询不会分词**，而是将输入作为一个整体，在倒排索引中查找准确的词项。并且使用相关度计算公式为每个包含该词项的文档进行相关度计算。一言以概之：**词项查询是对词项进行精确匹配**。词项查询通常用于结构化数据，如数字、日期和枚举类型。
+#### 💎 关键结论
 
-ES 支持词项搜索的 API 主要有以下几个：
+词项查询不分词，将输入作为整体在倒排索引中精确匹配词项，通常用于结构化数据（数字、日期、枚举）。
 
-- **[exists](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)**：返回在指定字段上有值的文档。
-- **[fuzzy](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)**：模糊查询，返回包含与搜索词相似的词的文档。
-- **[ids](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html)**：根据 ID 返回文档。此查询使用存储在 `_id` 字段中的文档 ID。
-- **[prefix](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)**：前缀查询，用于查询某个字段中包含指定前缀的文档。
-- **[range](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)**：范围查询，用于匹配在某一范围内的数值型、日期类型或者字符串型字段的文档。
-- **[regexp](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)**：正则匹配查询，返回与正则表达式相匹配的词项所属的文档。
-- **[term](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)**：用来查找指定字段中包含给定单词的文档。
-- **[terms](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)**：与 [**`term`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html) 相似，但可以搜索多个值。
-- **[terms set](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-set-query.html)**：与 [**`term`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html) 相似，但可以定义返回文档所需的匹配词数。
-- **[wildcard](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html)**：通配符查询，返回与通配符模式匹配的文档。
+#### ⚡记忆卡片
 
-::: tip 扩展
+- **口诀**：词项不分词，精确匹配倒排索引
+- **关键词**：term ／ terms ／ range ／ prefix ／ wildcard ／ fuzzy
+- **链路**：查询输入 → 不分词 → 倒排索引精确查找 → 相关度计算
 
-[Elasticsearch 官方文档之词项查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html)
+#### 📖 核心知识
 
-:::
+**Term（词项）是表达语意的最小单位**。与全文查询不同，词项查询**不分词**，将输入作为整体在倒排索引中查找精确词项。
+
+- [**term**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)：精确匹配指定词项。
+- [**terms**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)：多值精确匹配。
+- [**range**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)：范围查询（数值、日期、字符串）。
+- [**prefix**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)：前缀查询。
+- [**wildcard**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html)：通配符查询。
+- [**fuzzy**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)：模糊查询，匹配相似词项。
+- [**regexp**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)：正则表达式匹配。
+- [**exists**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)：字段有值的文档。
+- [**ids**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html)：按文档 ID 查询。
+- [**terms set**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-set-query.html)：指定最少匹配词项数。
+
+> 📚 延伸阅读：[Elasticsearch 官方文档之词项查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html)
 
 ### 【简单】ES 支持哪些组合查询？⭐
 
-复合查询就是把一些简单查询组合在一起实现更复杂的查询需求，除此之外，复合查询还可以控制另外一个查询的行为。
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Elasticsearch 检索 / 组合查询
 
-复合查询有以下类型：
+#### 💎 关键结论
 
-- [`bool`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html)：布尔查询，可以组合多个过滤语句来过滤文档。
-- [`boosting`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-boosting-query.html)：提供调整相关性打分的能力，在 `positive` 块中指定匹配文档的语句，同时降低在 `negative` 块中也匹配的文档的得分。
-- [`constant_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html)：使用 `constant_score` 可以将 `query` 转化为 `filter`，filter 可以忽略相关性算分的环节，并且 filter 可以有效利用缓存，从而提高查询的性能。
-- [`dis_max`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html)：返回匹配了一个或者多个查询语句的文档，但只将最佳匹配的评分作为相关性算分返回。
-- [`function_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html)：支持使用函数来修改查询返回的分数。
+组合查询将简单查询组合为复杂查询，bool 是最常用的组合器，支持 must/should/must_not/filter 多条件组合。
 
-::: tip 扩展
+#### ⚡记忆卡片
 
-[Elasticsearch 官方文档之组合查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)
+- **口诀**：bool 组合一切，must/should/must_not/filter
+- **关键词**：bool ／ boosting ／ constant_score ／ dis_max ／ function_score
+- **链路**：简单查询 → bool 组合 → 相关性算分 → 结果返回
 
-:::
+#### 📖 核心知识
+
+复合查询把简单查询组合在一起实现更复杂的查询需求：
+
+- [**bool**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html)：布尔查询，组合多个过滤语句（must/should/must_not/filter）。
+- [**boosting**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-boosting-query.html)：调整相关性打分，positive 块匹配 + negative 块降分。
+- [**constant_score**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html)：将 query 转化为 filter，忽略算分、利用缓存。
+- [**dis_max**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html)：多查询取最佳匹配分数。
+- [**function_score**](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html)：自定义函数修改查询分数。
+
+> 📚 延伸阅读：[Elasticsearch 官方文档之组合查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)
 
 ### 【简单】ES 中的 query 和 filter 有什么区别？⭐⭐⭐
 
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 检索 / 查询上下文
+
+#### 💎 关键结论
+
+query 上下文会计算相关性评分，filter 上下文不评分、可缓存，性能更好。生产环境应优先用 filter 处理不需要算分的条件。
+
+#### ⚡记忆卡片
+
+- **口诀**：query 算分，filter 不算分走缓存
+- **关键词**：query context ／ filter context ／ _score ／ 缓存
+- **链路**：请求 → query context 算分 / filter context 过滤 → 结果交集
+
+#### 📖 核心知识
+
 在 Elasticsearch 中，可以在两个不同的上下文中执行查询：
 
-- **`query` context**：**有相关性计算**，采用相关性算法，计算文档与查询关键词之间的相关度，并根据评分（`_score`）大小排序。
-- **`filter` context**：**无相关性计算**，可以利用缓存，性能更好。
+1. **query context**：**有相关性计算**，采用相关性算法计算文档与查询关键词之间的相关度，根据 `_score` 大小排序。
+2. **filter context**：**无相关性计算**，可利用缓存（node query cache），性能更好。
 
-::: tip 扩展
+最佳实践：不需要相关性算分的条件（如状态字段、时间范围）放在 filter 中，需要算分的条件放在 query 中。
 
-[Elasticsearch 官方文档之查询和过滤上下文](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html)
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】bool 查询中的 `filter` 子句就是 filter context，而 `must` 子句是 query context。filter 结果会被缓存在 node query cache 中，重复查询时直接命中缓存。
+- 【L4】`constant_score` 可将任意 query 包装为 filter context，统一返回固定分数，适用于纯过滤场景。
+
+> 📚 延伸阅读：[Elasticsearch 官方文档之查询和过滤上下文](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html)
 
 :::
+
+#### 🔀 发散问题
+
+- **Q：什么时候用 filter 而不是 query？** → 当条件不需要相关性评分时（如枚举值、时间范围），使用 filter 可以利用缓存提升性能，见本文档「ES 支持哪些组合查询？」。
 
 ### 【中等】ES 支持哪些推荐查询？⭐
 
-ES 通过 [**`Suggester`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html) 提供了推荐搜索能力，可以用于文本纠错，文本自动补全等场景。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 检索 / Suggester
 
-根据使用场景的不同，ES 提供了以下 4 种 Suggester：
+#### 💎 关键结论
 
-- **Term Suggester**：基于词项的纠错补全。
-- **Phrase Suggester**：基于短语的纠错补全。
-- **Completion Suggester**：自动补全单词，输入词语的前半部分，自动补全单词。
-- **Context Suggester**：基于上下文的补全提示，可以实现上下文感知推荐。
+ES 通过 Suggester 提供推荐能力，包括词项纠错、短语纠错、自动补全、上下文感知四种类型。
 
-::: tip 扩展
+#### ⚡记忆卡片
 
-[Elasticsearch 官方文档之推荐查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
+- **口诀**：Term 纠错、Phrase 纠短语、Completion 补全、Context 上下文
+- **关键词**：Term Suggester ／ Phrase Suggester ／ Completion Suggester ／ Context Suggester
+- **链路**：用户输入 → Suggester 分析 → 推荐候选项 → 返回建议
+
+#### 📖 核心知识
+
+ES 通过 [**Suggester**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html) 提供推荐搜索能力，用于文本纠错、自动补全等场景：
+
+1. **Term Suggester**：基于词项的纠错补全。
+2. **Phrase Suggester**：基于短语的纠错补全。
+3. **Completion Suggester**：自动补全，输入前半部分自动补全单词，基于 FST 实现，性能极高。
+4. **Context Suggester**：基于上下文的补全提示，实现上下文感知推荐。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】Completion Suggester 基于 FST 数据结构，全量加载到内存，查询延迟在毫秒级，是生产环境自动补全的首选方案。
+- 【L4】Search as You Type（8.x）是新的字段类型，原生支持前缀、中缀和子词匹配，无需单独配置 Completion Suggester。
+
+> 📚 延伸阅读：[Elasticsearch 官方文档之推荐查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
 
 :::
 
+#### 🔀 发散问题
+
+- **Q：Completion Suggester 和普通 prefix 查询有什么区别？** → Completion Suggester 基于 FST 内存索引，延迟极低；prefix 查询需扫描倒排索引，性能较差。
+
 ### 【困难】ES 为什么会有深分页问题？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Elasticsearch 检索 / 深分页
+
+#### 💎 关键结论
+
+深分页问题源于 ES 两阶段搜索流程，每个分片需扫描 from+size 条，协调节点需汇总 (from+size)*分片数 条，代价随页深线性增长。
+
+#### ⚡记忆卡片
+
+- **口诀**：from 越大扫越多，协调节点压力爆
+- **关键词**：from+size ／ 两阶段搜索 ／ search_after ／ PIT
+- **链路**：深分页 → 每分片扫 from+size → 协调节点汇总 → 内存/CPU 爆炸
+
+#### 📖 核心知识
 
 ```mermaid
 graph LR
@@ -453,28 +669,46 @@ graph LR
     F --> G["全局排序取前 10 条"]
 ```
 
-在 Elasticsearch 中，支持三种分页查询方式：
+ES 支持三种分页查询方式：
 
-- **`from + size`**：可以使用 `from` 和 `size` 参数分别指定查询的起始页和每页记录数。
-- [**`search_after`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after)：不支持指定页数，只能向下翻页；并且需要指定 sort，并保证值是唯一的。然后，可以反复使用上次结果中最后一个文档的 sort 值进行查询。
-- [**`scroll`**](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#scroll-search-results)：类似于 RDBMS 中的游标，只允许向下翻页。每次下一页查询后，使用返回结果的 scroll id 来作为下一次翻页的标记。scroll 查询会在搜索初始化阶段会生成快照，后续数据的变化无法及时体现在查询结果，因此更加适合一次性批量查询或非实时数据的分页查询。
+1. **from + size**：指定起始页和每页记录数，但深分页代价高。每个 shard 扫描 `from + size` 条，协调节点接收 `(from + size) * 分片数` 条。
+2. [**search_after**](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after)：利用上一页最后一条的排序值作为起点，每个分片只扫 size 条，代价与页深无关。只能向后翻页，必须指定全局唯一排序。
+3. [**scroll**](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#scroll-search-results)：游标式翻页，生成快照后不允许实时查询，官方已不推荐。
 
-前文中，我们已经了解了 ES 两阶段搜索流程（Query 和 Fetch）。从中不难发现，这种搜索方式在分页查询时会出现以下情况：
+ES 默认限制 `from + size` 不超过 10000（`index.max_result_window`）。
 
-- **每个 shard 要扫描 `from + size` 条数据**；
-- **coordinate node 需要接收并处理 `(from + size) * primary_shard_num` 条数据**。
+#### 🔬 扩展知识
 
-**如果 from 或 size 很大，需要处理的数据量也会很大，代价很高，这就是深分页产生的原因**。为了避免深分页，ES 默认限制 `from + size` 不能超过 10000，可以通过 `index.max_result_window` 设置。
+::: details
 
-如何解决 Elasticsearch 深分页问题？
+- 【L3】**search_after 免疫深分页的原因**：利用上一页最后一条的排序值作为下次查询起点，每个分片只需扫描 size 条，代价与页深无关；代价是只能向后翻页、必须指定全局排序。
+- 【L4】**PIT（Point in Time，7.10+）**：为 search_after 提供一致性快照视图，解决翻页期间数据变更导致的结果不一致/重复/丢失问题；scroll 同样基于快照但已弃用，新方案一律用 search_after + PIT。
 
-ES 官方提供了另外两种分页查询方式 [`search_after`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after) + PIT 和 [scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#scroll-search-results)（注意：官方已不再推荐） 来避免深分页问题。
+:::
 
-**L3/L4 追问**：
+#### 🏭 实战场景
 
-- **`search_after` 为什么免疫深分页**：它利用上一页最后一条文档的排序值作为下次查询的起点，每个分片只需扫描 size 条，代价与页深无关；代价是只能向后翻页、必须指定全局排序。
-- **PIT（Point in Time，7.10 引入）**：为 `search_after` 提供一致性快照视图，解决翻页期间数据变更导致的结果不一致/重复/丢失问题；scroll 同样基于快照，但会长期占用上下文资源且不适合实时请求，已被官方弃用，新方案一律用 `search_after + PIT`。
-- 调大 `index.max_result_window` 不是解决深分页的方案，只是把问题延后，查询内存和 CPU 开销会线性增长；正确做法是业务上限制可访问的页深，或改用 `search_after` 游标式翻页。
+::: details
+
+某电商平台商品搜索结果页，运营要求支持跳到第 10000 页（每页 20 条）。5 个分片下 from=200000 时，协调节点需汇总 100 万条数据，内存和 GC 压力极大。改为 search_after + PIT 后，每页查询耗时稳定在 50ms 以内，且结果一致性得到保证。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "调大 index.max_result_window 就能解决深分页" → 只是把问题延后，查询内存和 CPU 开销线性增长，正确做法是用 search_after 游标式翻页。
+- ❌ "scroll 和 search_after 一样" → scroll 基于快照，不适合实时请求且长期占用上下文资源，已被官方弃用。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：search_after 翻页期间数据变更怎么办？** → 配合 PIT（Point in Time）使用，PIT 提供一致性快照视图，保证翻页期间结果不重复不丢失。
+- **Q：深分页对集群有什么影响？** → 大量深分页请求会导致协调节点内存溢出和 GC 停顿，严重影响集群稳定性。
 
 ## Elasticsearch 聚合
 
@@ -488,37 +722,118 @@ ES 官方提供了另外两种分页查询方式 [`search_after`](https://www.el
 
 ### 【简单】什么是聚合？ES 中有哪些聚合？⭐⭐
 
-在数据库中，聚合是指将数据进行分组统计，得到一个汇总的结果。例如，计算总和、平均值、最大值或最小值等操作。
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 聚合
 
-Elasticsearch 将聚合分为三类：
+#### 💎 关键结论
 
-| 类型                                                                                                                          | 说明                                   |
-| ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| [**Metric（指标聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics.html)    | 根据字段值进行**统计**计算             |
-| [**Bucket（桶聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket.html)       | 根据字段值、范围或其他条件进行**分组** |
-| [**Pipeline（管道聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html) | 对其他聚合输出的结果进行**再次聚合**   |
+ES 聚合分为 Metric（统计计算）、Bucket（分组）、Pipeline（二次聚合）三类，用于对数据进行汇总分析。
+
+#### ⚡记忆卡片
+
+- **口诀**：Metric 算、Bucket 分、Pipeline 再聚合
+- **关键词**：Metric ／ Bucket ／ Pipeline ／ cardinality
+- **链路**：查询结果 → Bucket 分组 → Metric 统计 → Pipeline 二次聚合
+
+#### 📖 核心知识
+
+聚合是将数据进行分组统计，得到汇总结果的操作（类似 SQL 的 GROUP BY + 聚合函数）。
+
+| 类型 | 说明 |
+|:---|:---|
+| [**Metric（指标聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics.html) | 根据字段值进行**统计**计算（avg、sum、max、min、cardinality 等） |
+| [**Bucket（桶聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket.html) | 根据字段值、范围或其他条件进行**分组**（terms、histogram、date_histogram 等） |
+| [**Pipeline（管道聚合）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html) | 对其他聚合输出的结果进行**再次聚合** |
 
 ### 【中等】ES 如何对海量数据（过亿）进行聚合计算？⭐
 
-Elasticsearch 支持 [`cardinality`（近似计算非重复值）](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html) 。它提供一个字段的基数，即该字段的 distinct 或者 unique 值的数目。它是基于 HLL 算法的。HLL 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 bits 做概率估算从而得到基数。其特点是：可配置的精度，用来控制内存的使用（更精确 ＝ 更多内存）；小的数据集精度是非常高的；我们可以通过配置参数，来设置去重需要的固定内存使用量。无论数千还是数十亿的唯一值，内存使用量只与你配置的精确度相关。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 聚合 / 近似计算
+
+#### 💎 关键结论
+
+ES 通过 cardinality 聚合实现近似去重计数，基于 HLL 算法，内存使用仅与精度配置相关，与数据量无关，可处理数十亿级唯一值。
+
+#### ⚡记忆卡片
+
+- **口诀**：HLL 哈希估算，内存只跟精度走
+- **关键词**：cardinality ／ HLL ／ 近似计算 ／ precision_threshold
+- **链路**：海量数据 → cardinality 聚合 → HLL 哈希估算 → 近似去重数
+
+#### 📖 核心知识
+
+Elasticsearch 支持 [`cardinality`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html) 聚合（近似计算非重复值）：
+
+1. 基于 **HLL（HyperLogLog）** 算法，对输入做哈希运算，根据哈希结果的 bits 做概率估算。
+2. **可配置精度**：通过 `precision_threshold` 控制内存使用（更精确 = 更多内存）。
+3. 无论数千还是数十亿的唯一值，内存使用量只与配置的精确度相关。
+4. 小数据集精度非常高，大数据集可接受微小误差换取性能。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】对于 terms 聚合的海量数据场景，可设置 `shard_size` 参数扩大每个分片的计算范围，牺牲性能提高精准度。
+- 【L4】对于日志场景的近似去重，可结合 rollup 预处理或 data stream + ILM 分层汇总，避免实时对原始数据做全量聚合。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：cardinality 和精确去重有什么区别？** → cardinality 是近似值（误差约 1-6%），精确去重需要对所有唯一值排序，内存和计算代价极高。
 
 ## Elasticsearch 分析
 
 ### 【简单】什么是文本分析？为什么需要文本分析？⭐⭐⭐
 
-Elasticsearch 中存储的数据可以粗略分为：
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 分析
 
-- **词项数据**：采用**精确查询**。比较两条词项数据是否相对，实际是比较二者的二进制数据，结果只有相等或不相等。
-- **文本数据**：采用**全文搜索**。比较两个文本数据是否相等，没有太大意义，一般只会比较二者是否相似。相似性比较，是通过相关性评分来评估的。而计算相关性评分，需要对全文先分词处理，然后对分词后的词项进行统计才能进行相似性评估。
+#### 💎 关键结论
+
+文本分析是将非结构化文本转换为词项（term）的过程，包含分词化和标准化两个步骤，是全文搜索的基础。
+
+#### ⚡记忆卡片
+
+- **口诀**：分词 + 标准化 = 词项流
+- **关键词**：Tokenization ／ Normalization ／ term ／ 分词器
+- **链路**：原始文本 → 分词化 → 标准化 → 词项流 → 倒排索引
+
+#### 📖 核心知识
 
 **Elasticsearch 文本分析是将非结构化文本转换为一组词项（term）的过程**。
 
-文本分析可以分为两个方面：
+文本分析分两个方面：
 
-- **Tokenization（分词化）**：分词化将文本分解成更小的块，称为分词。在大多数情况下，这些分词是单独的 term（词项）。
-- **Normalization（标准化）**：经过分词后的文本只能进行词项匹配，但是无法进行同义词匹配。为解决这个问题，可以将文本进行标准化处理。例如：将 `foxes` 标准化为 `fox`。
+1. **Tokenization（分词化）**：将文本分解成更小的块（分词/词项）。
+2. **Normalization（标准化）**：对分词进行标准化处理，如同义词匹配、小写转换、词干提取等。例如将 `foxes` 标准化为 `fox`。
+
+文本数据采用**全文搜索**（通过相关性评分评估相似性），词项数据采用**精确查询**（比较二进制是否相等）。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】分析在索引和搜索时都会执行：索引时对文档文本分析后写入倒排索引，搜索时对查询字符串分析后查找倒排索引。两次分析必须使用相同的分析器才能匹配。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：text 字段和 keyword 字段的分析区别？** → text 字段会经过分析器分词处理，keyword 字段不分析，直接作为整体索引，见本文档「ES 中的分析器是什么？」。
 
 ### 【中等】ES 中的分析器是什么？⭐⭐⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Elasticsearch 分析 / Analyzer
+
+#### 💎 关键结论
+
+分析器由字符过滤器、分词器、分词过滤器三个组件组成，执行顺序为 character filters → tokenizer → token filters，将原始文本转换为最终的词项流。
+
+#### ⚡记忆卡片
+
+- **口诀**：字符过滤、分词、词项过滤三步走
+- **关键词**：Character Filters ／ Tokenizer ／ Token Filters ／ analyzer
+- **链路**：原始文本 → Character Filters → Tokenizer → Token Filters → 词项流 → 倒排索引
+
+#### 📖 核心知识
 
 ```mermaid
 graph LR
@@ -532,89 +847,127 @@ graph LR
     H --> I["倒排索引"]
 ```
 
-文本分析由 [**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 执行，分析器是一组控制整个过程的规则。无论是索引还是搜索，都需要使用分析器。
+[**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 由三个组件组成：
 
-[**analyzer（分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html) 由三个组件组成：零个或多个 [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)、有且仅有一个 [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)、零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)。分析的执行顺序为：`character filters -> tokenizer -> token filters`。
+1. 零个或多个 [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)：接收原始文本，添加、删除或更改字符。
+2. 有且仅有一个 [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)：将字符流分解为分词。
+3. 零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)：接收分词流，添加、删除或更改分词。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/bcb1956f433042a0aeab132ad6d39f91.png)
 
-Elasticsearch 内置的分析器：
+**ES 内置分析器**：
 
-- [`standard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-standard-analyzer.html)：根据单词边界将文本划分为多个 term，如 Unicode 文本分割算法所定义。它删除了大多数标点符号、小写 term，并支持删除停用词。
-- [`simple`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-simple-analyzer.html)：遇到非字母字符时将文本划分为多个 term，并将其转为小写。
-- [`whitespace`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-whitespace-analyzer.html)：遇到任何空格时将文本划分为多个 term，不转换为小写。
-- [`stop`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-analyzer.html)：与 [`simple`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-simple-analyzer.html) 相似，同时支持删除停用词（如：the、a、is）。
-- [`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-keyword-analyzer.html)：部分词，直接将输入当做输出。
-- [`pattern`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-analyzer.html)：使用正则表达式将文本拆分为 term。它支持小写和非索引字。
-- [`fingerprint`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-fingerprint-analyzer.html)：可创建用于重复检测的指纹。
-- [语言分析器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lang-analyzer.html)：提供了 30 多种常见语言的分词器。
+- [`standard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-standard-analyzer.html)：默认分析器，按单词边界分词，转小写。
+- [`simple`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-simple-analyzer.html)：遇非字母分词，转小写。
+- [`whitespace`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-whitespace-analyzer.html)：遇空格分词，不转小写。
+- [`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-keyword-analyzer.html)：不分词，输入即输出。
+- [`pattern`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-analyzer.html)：正则分词。
+- [语言分析器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lang-analyzer.html)：30 多种语言的分词器。
 
-默认情况下，Elasticsearch 使用 [**standard analyzer（标准分析器）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-standard-analyzer.html)，它开箱即用，适用于大多数使用场景。Elasticsearch 也允许定制分析器。
+::: details Character Filters（字符过滤器）
 
-::: info Character Filters（字符过滤器）
+将原始文本作为字符流接收，可以添加、删除或更改字符。分析器可以有零个或多个字符过滤器，按配置顺序执行。
+
+内置字符过滤器：
+- [`html_strip`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-htmlstrip-charfilter.html)：去除 HTML 元素。
+- [`mapping`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-mapping-charfilter.html)：字符串替换。
+- [`pattern_replace`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-replace-charfilter.html)：正则替换。
+
 :::
 
-[Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html) 将原始文本作为字符流接收，并可以通过添加、删除或更改字符来转换文本。分析器可以有**零个或多个** [Character Filters（字符过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html)，如果配置了多个，它会按照配置的顺序执行。
+::: details Tokenizer（分词器）
 
-Elasticsearch 内置的字符过滤器：
+接收字符流，将其分解为分词。分析器有且仅有一个分词器。
 
-- [`html_strip`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-htmlstrip-charfilter.html)：`html_strip`字符过滤器用于去除 HTML 元素（如 `<b>`）并转义 HTML 实体（如 `&amp;`）。
-- [`mapping`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-mapping-charfilter.html)：`mapping` 字符过滤器用于将指定字符串的任何匹配项替换为指定的替换项。
-- [`pattern_replace`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-replace-charfilter.html)：`pattern_replace` 字符筛选器将匹配正则表达式的任何字符替换为指定的替换。
+常用内置分词器：
+- [`standard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-standard-tokenizer.html)：按单词边界分词，大多数语言的最佳选择。
+- [`letter`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-letter-tokenizer.html)：遇非字母分词。
+- [`whitespace`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-whitespace-tokenizer.html)：遇空格分词。
+- [`n-gram`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-ngram-tokenizer.html)：返回 n-gram 滑动窗口。
+- [`edge_n-gram`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-edgengram-tokenizer.html)：锚定开头的 n-gram。
+- [`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-keyword-tokenizer.html)：输入即输出。
+- [`path_hierarchy`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pathhierarchy-tokenizer.html)：按路径分隔符拆分。
 
-::: info Tokenizer（分词器）
 :::
 
-[Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html) 接收字符流，将其分解为分词（通常是单个单词），并输出一个分词流。分词器还负责记录每个 term 的顺序或位置，以及该 term 所代表的原始单词的开始和结束字符偏移量。分析器**有且仅有一个** [Tokenizer（分词器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)。
+::: details Token Filters（分词过滤器）
 
-Elasticsearch 内置的分词器：
+接收分词流，可以添加、删除或更改分词。分析器可以有零个或多个分词过滤器，按配置顺序执行。
 
-- 面向单词的分词器
-  - [`standard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-standard-tokenizer.html)：将文本划分为单词边界上的 term，如 Unicode 文本分割算法所定义。它会删除大多数标点符号。它是大多数语言的最佳选择。
-  - [`letter`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-letter-tokenizer.html)：遇到非字母字符时将文本划分为多个 term。
-  - [`lowercase`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lowercase-tokenizer.html)：到非字母字符时将文本划分为多个 term，并将其转为小写。
-  - [`whitespace`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-whitespace-tokenizer.html)：遇到任何空格时将文本划分为多个 term。
-  - [`uax_url_email`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-uaxurlemail-tokenizer.html)：与 [`standard`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-standard-tokenizer.html) 相似，不同之处在于它将 URL 和电子邮件地址识别为单个分词。
-  - [`classic`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-classic-tokenizer.html)：基于语法的英语分词器。
-  - [`thai`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-thai-tokenizer.html)：将泰语文本分割为单词。
-- 部分单词分词器
-  - [`n-gram`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-ngram-tokenizer.html)：遇到指定字符列表（例如空格或标点符号）中的任何一个时，将文本分解为单词，然后返回每个单词的 n-gram：一个连续字母的滑动窗口，例如 `quick`→ `[qu， ui， ic， ck]`。
-  - [`edge_n-gram`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-edgengram-tokenizer.html)：遇到指定字符列表（例如空格或标点符号）中的任何一个时，将文本分解为单词，然后返回锚定到单词开头的每个单词的 n 元语法，例如 `quick` → `[q， qu， qui， quic， quick]`。
-- 结构化文本分词器
-  - [`keyword`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-keyword-tokenizer.html)：接受给定的任何文本，并输出与单个 term 完全相同的文本。它可以与 [`lowercase`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lowercase-tokenfilter.html) 等分词过滤器结合使用，以规范化分析的 term。
-  - [`pattern`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-tokenizer.html)：使用正则表达式在文本与单词分隔符匹配时将文本拆分为 term，或者将匹配的文本捕获为 term。
-  - [`simple_pattern`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-simplepattern-tokenizer.html)：使用正则表达式将匹配的文本捕获为 term。它使用正则表达式特征的受限子集，并且通常比 [`pattern`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-tokenizer.html) 更快。
-  - [`char_group`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-chargroup-tokenizer.html)：可以通过要拆分的字符集进行配置，这通常比运行正则表达式代价更小。
-  - [`simple_pattern_split`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-simplepatternsplit-tokenizer.html)：使用与 [`simple_pattern`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-simplepattern-tokenizer.html) 分词器相同的受限正则表达式子集，但在匹配项处拆分输入，而不是将匹配项作为 term 返回。
-  - [`path_hierarchy`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pathhierarchy-tokenizer.html)：基于文件系统的路径分隔符，进行拆分，例如 `/foo/bar/baz` → `[/foo, /foo/bar, /foo/bar/baz ]` 。
+常用内置分词过滤器：
+- [`lowercase`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lowercase-tokenfilter.html)：小写转换。
+- [`stop`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-tokenfilter.html)：删除停用词。
+- [`synonym`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-synonym-tokenfilter.html)：同义词处理。
+- [`classic`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-classic-tokenfilter.html)：英语所有格处理。
 
-::: info Token Filters（分词过滤器）
 :::
 
-[Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html) 接收分词流，并可以添加、删除或更改分词。常用的分词过滤器有： [`lowercase`（小写转换）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lowercase-tokenfilter.html)、[`stop`（停用词处理）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-tokenfilter.html)、[`synonym`（同义词处理）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-synonym-tokenfilter.html) 等等。分析器可以有零个或多个 [Token Filters（分词过滤器）](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)，如果配置了多个，它会按照配置的顺序执行。
+#### 🔬 扩展知识
 
-Elasticsearch 内置了很多分词过滤器，这里列举几个常见的：
+::: details
 
-- [`classic`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-classic-tokenfilter.html)：从单词末尾删除英语所有格 （`'s`），并删除首字母缩略词中的点。它使用 Lucene 的 [ClassicFilter](https://lucene.apache.org/core/9_12_0/analysis/common/org/apache/lucene/analysis/standard/ClassicFilter.html)。
-- [`lowercase`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lowercase-tokenfilter.html)：将分词转为小写。
-- [`stop`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-tokenfilter.html)：从分词中删除 [stop word（停用词）](https://en.wikipedia.org/wiki/Stop_word)。
-- [`synonym`](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-synonym-tokenfilter.html)：允许在分析过程中轻松处理 [近义词](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-with-synonyms.html)。
+- 【L3】自定义分析器可以组合内置的 Character Filters + Tokenizer + Token Filters，例如中文分词场景常用 IK 分词器 + synonym + lowercase。
+- 【L4】分析器可以在索引级别和字段级别分别配置。索引时和搜索时可以使用不同的分析器（search_analyzer），例如搜索时用同义词分析器提升召回率。
+
+> 📚 延伸阅读：[Elasticsearch 官方文档之分析器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html)
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "standard 分析器适合中文" → standard 按 Unicode 文本分割，对中文是单字分词，效果很差，需要专用中文分词器。
+- ❌ "分析器只在索引时执行" → 索引和搜索时都会执行分析，两次分析必须一致才能匹配。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：如何自定义分析器？** → 在 settings 中定义 analysis，组合 char_filter + tokenizer + filter，然后在 mapping 中引用，见本文档「如果需要中文分词怎么办？」。
 
 ### 【中等】如果需要中文分词怎么办？⭐⭐⭐
 
-在英文中，单词有自然的空格作为分隔。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 分析 / 中文分词
 
-在中文中，分词有以下难点：
+#### 💎 关键结论
 
-- 中文不能根据一个个汉字进行分词
-- 不同于英文可以根据自然的空格进行分词；中文中一般不会有空格。
-- 同一句话，在不同的上下文中，有不同个理解。例如：这个苹果，不大好吃；这个苹果，不大，好吃！
+中文无自然空格分隔，ES 默认分析器对中文单字分词效果差，需安装 IK、ICU 等分词插件获取更好的中文分析能力。
 
-可以使用一些插件来获得对中文更好的分析能力：
+#### ⚡记忆卡片
 
-- [analysis-icu](https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html)：添加了扩展的 Unicode 支持，包括更好地分析亚洲语言、Unicode 规范化、Unicode 感知大小写折叠、排序规则支持和音译。
-- [elasticsearch-analysis-ik](https://github.com/infinilabs/analysis-ik)：支持自定义词库，支持热更新分词字典
-- [elasticsearch-thulac-plugin](https://github.com/microbun/elasticsearch-thulac-plugin)：清华大学自然语言处理和社会人文计算实验室的一套中文分词器。
+- **口诀**：IK 词库热更新，ICU 亚语全能用
+- **关键词**：IK 分词器 ／ ICU 插件 ／ 自定义词库 ／ 热更新
+- **链路**：中文文本 → IK/ICU 分词插件 → 词项流 → 倒排索引
+
+#### 📖 核心知识
+
+中文分词的难点：
+
+1. 中文不能根据单个汉字分词。
+2. 中文一般不会有空格作为分隔。
+3. 同一句话在不同上下文有不同理解，如：「这个苹果，不大好吃」vs「这个苹果，不大，好吃！」。
+
+解决方案——安装分词插件：
+
+- [**elasticsearch-analysis-ik**](https://github.com/infinilabs/analysis-ik)：最主流的中文分词插件，支持自定义词库、热更新分词字典。
+- [**analysis-icu**](https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html)：扩展 Unicode 支持，包括亚洲语言分析、Unicode 规范化、音译等。
+- [**elasticsearch-thulac-plugin**](https://github.com/microbun/elasticsearch-thulac-plugin)：清华大学中文分词器。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】IK 分词器提供 `ik_smart`（粗粒度）和 `ik_max_word`（细粒度）两种模式。建议索引时用 `ik_max_word`，搜索时用 `ik_smart`，提高召回率和精确度的平衡。
+- 【L4】IK 支持热更新词库，通过 HTTP 接口加载自定义词典，无需重启 ES。适合需要频繁更新业务词的场景。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：IK 和 ICU 分词器有什么区别？** → IK 是中文专用分词器，支持自定义词库；ICU 是 ES 官方的国际化插件，支持多种亚洲语言但中文分词能力不如 IK。
 
 ## Elasticsearch 存储
 
@@ -628,91 +981,78 @@ Elasticsearch 内置了很多分词过滤器，这里列举几个常见的：
 
 ### 【简单】ES 的逻辑存储是怎样设计的？⭐⭐
 
-Elasticsearch 的逻辑存储被设计为层级结构，自上而下依次为：
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 存储 / 逻辑存储
+
+#### 💎 关键结论
+
+ES 逻辑存储自上而下为 Index → Type（已移除） → Document → Field，面向文档存储，每个字段都会建立倒排索引。
+
+#### ⚡记忆卡片
+
+- **口诀**：索引包文档，文档含字段，字段建倒排
+- **关键词**：Index ／ Document ／ Field ／ Mapping ／ 倒排索引
+- **链路**：Index → Document → Field → 倒排索引
+
+#### 📖 核心知识
+
+Elasticsearch 的逻辑存储被设计为层级结构：
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/0fa7dbbd361c4dcd816f0c29737b6996.png)
 
-各层级结构的说明如下：
+1. **Index（索引）**：文档的集合，类似数据库。ES 会为所有字段建立倒排索引。
+2. **Type（类型）**：文档的逻辑分类，ES 7.x 已彻底移除。
+3. **Document（文档）**：索引中的单条记录，JSON 格式，有唯一 ID。无模式限制。
+4. **Field（字段）**：文档中的键值对，每个字段都有专用的优化数据结构。
+5. **Metadata Field**：以 `_` 开头的系统字段，如 `_index`、`_id`、`_source`。
 
-（1）**Document（文档）**
-
-Elasticsearch 是面向文档的，这意味着读写数据的最小单位是文档。Elasticsearch 以 JSON 文档的形式序列化和存储数据。文档是一组字段，这些字段是包含数据的键值对。每个文档都有一个唯一的 ID。
-
-一个简单的 Elasticsearch 文档可能如下所示：
-
-```json
-{
-  "_index": "my-first-Elasticsearch-index",
-  "_id": "DyFpo5EBxE8fzbb95DOa",
-  "_version": 1,
-  "_seq_no": 0,
-  "_primary_term": 1,
-  "found": true,
-  "_source": {
-    "email": "john@smith.com",
-    "first_name": "John",
-    "last_name": "Smith",
-    "info": {
-      "bio": "Eco-warrior and defender of the weak",
-      "age": 25,
-      "interests": ["dolphins", "whales"]
-    },
-    "join_date": "2024/05/01"
-  }
-}
-```
-
-Elasticsearch 中的 document 是无模式的，也就是并非所有 document 都必须拥有完全相同的字段，它们不受限于同一个模式。
-
-（2）**Field（字段）**
-
-field 包含数据的键值对。默认情况下，Elasticsearch 对每个字段中的所有数据建立索引，并且每个索引字段都具有专用的优化数据结构。
-
-`document` 包含数据和元数据。[**Metadata Field（元数据字段）**](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html) 是存储有关文档信息的系统字段。在 Elasticsearch 中，元数据字段都以 `_` 开头。常见的元数据字段有：
-
-- [`_index`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index-field.html)：文档所属的索引
-- [`_id`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html)：文档的 ID
-- [`_source`](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html)：表示文档原文的 JSON
-
-（3）**Type（类型）**
-
-在 Elasticsearch 中，**type 是 document 的逻辑分类**。每个 index 里可以有一个或多个 type。
-
-不同的 type 应该有相似的结构（schema）。举例来说，`id`字段不能在这个组是字符串，在另一个组是数值。
-
-> 注意：Elasticsearch 7.x 版已彻底移除 type。
-
-（4）**Index（索引）**
-
-在 Elasticsearch 中，**可以将 index 视为 document 的集合**。
-
-Elasticsearch 会为所有字段建立索引，经过处理后写入一个倒排索引（Inverted Index）。查找数据的时候，直接查找该索引。
-
-所以，Elasticsearch 数据管理的顶层单位就叫做 Index。它是单个数据库的同义词。每个 Index 的名字必须是小写。
-
-（5）Elasticsearch 概念和 RDBM 概念
-
-| Elasticsearch                    | DB                 |
-| -------------------------------- | ------------------ |
-| 索引（index）                    | 数据库（database） |
-| 类型（type，6.0 废弃，7.0 移除） | 数据表（table）    |
-| 文档（document）                 | 行（row）          |
-| 字符（field）                    | 列（column）       |
-| 映射（mapping）                  | 表结构（schema）   |
+| ES | DB |
+|:---|:---|
+| 索引（index） | 数据库（database） |
+| 类型（type，6.0 废弃，7.0 移除） | 数据表（table） |
+| 文档（document） | 行（row） |
+| 字段（field） | 列（column） |
+| 映射（mapping） | 表结构（schema） |
 
 ### 【简单】ES 的物理存储是怎样设计的？⭐⭐
 
-Elasticsearch 的物理存储，天然使用了分布式设计。
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 存储 / 物理存储
 
-每个 Elasticsearch 进程都从属于一个 cluster，一个 cluster 可以有一个或多个 node（即 Elasticsearch 进程）。
+#### 💎 关键结论
 
-Elasticsearch 存储会将每个 index 分为多个 shard，而 shard 可以分布在集群中不同节点上。正是由于这个机制，使得 Elasticsearch 有了水平扩展的能力。shard 也是 Elasticsearch 将数据从一个节点迁移到另一个节点的最小单位。
+ES 物理存储天然分布式：Index → Shard → Lucene Index → Segment，Segment 不可变且定期合并，是分片内最小存储单元。
 
-Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。简单来说，Lucene 就是一个 jar 包，里面包含了封装好的构建、管理倒排索引的算法代码。
+#### ⚡记忆卡片
+
+- **口诀**：分片分布多节点，Segment 不可变
+- **关键词**：Shard ／ Lucene Index ／ Segment ／ 不可变
+- **链路**：Index → Shard → Lucene Index → Segment
+
+#### 📖 核心知识
+
+Elasticsearch 的物理存储天然使用分布式设计：
+
+1. 每个 ES 进程属于一个 Cluster，一个 Cluster 有一个或多个 Node。
+2. 每个 Index 分为多个 **Shard**，分布在集群中不同节点上，是数据迁移的最小单位。
+3. 每个 Shard 对应一个 **Lucene Index**（包含倒排索引的文件目录）。
+4. Lucene Index 分解为多个 **Segment**，Segment 不可变，定期合并以保持索引大小。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/7fa4076e4ae24f63a6b8273c5cc10923.png)
 
 ### 【中等】什么是倒排索引？⭐⭐⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 存储 / 倒排索引
+
+#### 💎 关键结论
+
+倒排索引将文本分词后保存词项到文档 ID 的映射，配合词项字典和词频/位置信息，实现高效全文搜索，是 ES 的核心数据结构。
+
+#### ⚡记忆卡片
+
+- **口诀**：正排 ID 找数据，倒排词项找 ID
+- **关键词**：倒排索引 ／ 正排索引 ／ 词项 ／ 文档 ID ／ 词频
+- **链路**：文本 → 分词 → 词项列表 → 词项到 ID 映射 → 倒排索引
+
+#### 📖 核心知识
 
 ```mermaid
 graph TB
@@ -728,87 +1068,199 @@ graph TB
     K --> L["返回相关文档"]
 ```
 
-既然有倒排索引，顾名思义，有与之相对的正排索引。这里，以实现一个诗词检索器为例，来说明一下正排索引和倒排索引的区别。
+**正排索引**是 ID 到数据的映射，查找内容需遍历文档，效率低。
 
-**正排索引是 ID 到数据的映射关系**。如下所示，每首诗词用一个 ID 唯一识别。如果，我们要查找诗歌内容中是否包含某个关键字，就不得不在内容的完整文本中进行检索，效率很低。即使针对文档内容创建传统 RDBM 的索引（通常为 B+ 树结构），查找效率依然低下，并且会产生较大的额外存储空间开销。
+**倒排索引**将文本分词后保存词项到文档 ID 的映射：
 
-| ID  | 文档标题   | 文档内容                                         |
-| --- | ---------- | ------------------------------------------------ |
-| 1   | 望月怀远   | 海上生明月，天涯共此时…                          |
-| 2   | 春江花月夜 | 春江潮水连海平，海上明月共潮生…                  |
-| 3   | 静夜思     | 床前明月光，疑是地上霜。举头望明月，低头思故乡。 |
-| 4   | 锦瑟       | 沧海月明珠有泪，蓝田日暖玉生烟…                  |
+| 词项 | ID | 词频 |
+|:---|:---|:---|
+| 月 | 1, 2, 3, 4 | 1：1 次、2：1 次、3：2 次、4：1 次 |
+| 明月 | 1, 2, 3 | 1：1 次、2：1 次、3：2 次 |
+| 海 | 1, 2, 4 | 1：1 次、2：1 次、4：1 次 |
 
-倒排索引的实现与正排索引相反。**将文本分词后保存为多个词项，词项到 ID 的映射关系称为倒排索引（Inverted index）**。
-
-| 词项 | ID         | 词频                               |
-| ---- | ---------- | ---------------------------------- |
-| 月   | 1, 2, 3, 4 | 1：1 次、2：1 次、3：2 次、4：1 次 |
-| 明月 | 1, 2, 3    | 1：1 次、2：1 次、3：2 次          |
-| 海   | 1, 2, 4    | 1：1 次、2：1 次、4：1 次          |
-
-除了要保存词项与 ID 的关系外，还需要保存这个词项在对应文档出现的位置、偏移量等信息，这是因为很多检索的场景中还需要判断关键词前后的内容是否符合搜索要求。
+倒排索引还需保存词项在文档中的位置和偏移量，用于短语搜索和高亮。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/b3880af0bf2e4b29a35afb04c43ec5c9.png)
 
-有了倒排索引，搜索引擎可以很方便地响应用户的查询。比如用户输入查询 `明月`，搜索系统查找倒排索引，从中读出包含这个单词的文档，这些文档就是提供给用户的搜索结果。
+两个重要细节：
+1. 倒排索引中的所有词项对应一个或多个文档。
+2. 倒排索引中的词项**根据字典顺序升序排列**。
 
-要注意倒排索引的两个重要细节：
+#### 🔬 扩展知识
 
-- 倒排索引中的所有词项对应一个或多个文档；
-- 倒排索引中的词项**根据字典顺序升序排列**
+::: details
+
+- 【L3】倒排索引由 Term Dictionary、Term Index（FST）、Posting List 三部分组成，详见本文档「ES 如何实现倒排索引？」。
+- 【L4】正排索引在 ES 中以 Doc Values 形式存在，用于聚合和排序，与倒排索引互补。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "倒排索引和 B+ 树索引一样" → 倒排索引基于词项字典序 + FST 前缀压缩，B+ 树基于有序键值，适用场景不同。
+- ❌ "倒排索引只能做精确匹配" → 配合分析器分词和模糊查询，可实现全文搜索、短语搜索、模糊匹配等。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：倒排索引和正排索引分别适用什么场景？** → 倒排索引适合全文搜索，正排索引（Doc Values）适合聚合和排序，见本文档「Doc Values 和 Fielddata 有什么区别？」。
 
 ### 【中等】什么是字典树？⭐⭐
 
-Trie（字典树），也被称为前缀树，是一种树状数据结构，用于有效检索键值对。它通常用于实现字典和自动补全功能，使其成为许多搜索算法的基本组件。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 存储 / 字典树
 
-Trie 遵循一个规则：如果两个字符串有共同的前缀，那么它们在 Trie 中将具有相同的祖先。
+#### 💎 关键结论
 
-Trie 的检索能力也可以使用 Hash 替代，但是 Trie 比 Hash 更高效。此外，Trie 有 Hash 不具备的**优点**：Trie 支持前缀搜索和排序。Trie 的主要**缺点**是：存储词项需要额外的空间，对于长文本，空间可能会变得很大。
+字典树（Trie）是前缀树结构，支持前缀搜索和排序，比 Hash 更高效但占用更多空间，是 ES Term Index 的基础思想。
+
+#### ⚡记忆卡片
+
+- **口诀**：公共前缀共享祖先，前缀搜索 Hash 不行
+- **关键词**：Trie ／ 前缀树 ／ 公共前缀 ／ FST
+- **链路**：词项插入 → 公共前缀共享节点 → 前缀查询遍历子树
+
+#### 📖 核心知识
+
+Trie（字典树/前缀树）是一种树状数据结构，用于有效检索键值对。
+
+- 规则：两个字符串有共同前缀，则在 Trie 中共享相同祖先节点。
+- 比 Hash 更高效：支持**前缀搜索**和**排序**，Hash 不支持。
+- 缺点：存储词项需要额外空间，长文本时空间可能很大。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/81835bcf7ac2463780b0e22973a2caad.png)
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】Lucene 的 Term Index 使用 FST（Finite State Transducer）而非纯 Trie，FST 复用前缀和后缀压缩空间，查询复杂度 O(len(prefix))。
+- 【L4】FST 构建后不可修改，这也是 Lucene Segment 不允许修改的根本原因。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：Trie 和 FST 有什么区别？** → FST 在 Trie 基础上复用后缀，压缩空间更优，是 Lucene Term Index 的核心数据结构，见本文档「ES 如何实现倒排索引？」。
+
 ### 【困难】ES 如何实现倒排索引？⭐⭐⭐⭐
 
-在 Elasticsearch 中，数据存储、检索实际上是基于 Lucene 实现。
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Elasticsearch 存储 / 倒排索引实现
 
-一个 Elasticsearch shard 对应一个 Lucene index，
+#### 💎 关键结论
 
-Elasticsearch 的每个 shard 对应一个 Lucene index（一个包含倒排索引的文件目录）。Lucene index 又会被分解为多个 segment。segment 是索引中的内部存储元素，由于写入效率的考虑，所以被设计为不可变更的。segment 会定期 [合并](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html) 较大的 segment，以保持索引大小。
+ES 倒排索引由 Term Dictionary（词项字典）、Term Index（FST 索引）、Posting List（文档映射）三部分组成，FST 常驻内存实现高效查询。
+
+#### ⚡记忆卡片
+
+- **口诀**：FST 找前缀，字典查词项，Posting 取文档
+- **关键词**：Term Dictionary ／ Term Index（FST） ／ Posting List ／ FOR 编码 ／ Roaring Bitmap
+- **链路**：查询 → FST 定位块 → Term Dictionary 查词项 → Posting List 取文档 ID
+
+#### 📖 核心知识
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/06025626fc6148708b30ba20e7b157f3.png)
 
-倒排索引的组成主要有 3 个部分：
+ES 每个 Shard 对应一个 Lucene Index，Lucene Index 分解为多个 Segment（不可变）。
 
-- **Term Dictionary**：**Term Dictionary 用于保存 term（词项）**。由于 ES 会对 document 中的每个 field 都进行分词，所以数据量可能会非常大。
-  - Term Dictionary 存储数据时，先将所有的 term 进行排序，然后将 Term Dictionary 中有共同前缀的 term 抽取出来进行分块存储；再对共同前缀做索引，最后通过索引就可以找到公共前缀对应的块在 Term Dictionary 文件中的偏移地址。
-  - 由于每个块中都有共同前缀，所以不需要再保存每个 Term 的全部内容，只需要保存其后缀即可，而且这些后缀都是排好序的。
-- **Term Index**：**Term Index 是 Term Dictionary 的索引**。由于 Term Dictionary 存储的 term 可能会非常多，为了提高查询效率，从而设计了 Term Index。
-  - 为了提高检索效率以及节省空间，Term Index 只使用公共前缀做索引。
-  - **Lucene 中实现 Term Index 采用了 FST 算法**。FST 是一种非常复杂的结构，可以把它简单理解为一个**占用空间小且高效的 KV 数据结构**，有点类似于 Trie（字典树）。FST 有以下的特点：
-    - 通过对 Term Dictionary 数据的前缀复用，压缩了存储空间；
-    - 高效的查询性能，`O(len(prefix))` 的复杂度；
-    - 构建后不可修改，因此 Lucene segment 也不允许修改。
-- **Posting List**：**Posting List 保存着每个 term 的映射信息**。如文档 ID、词频、位置等。Lucene 把这些数据分成 3 个文件进行存储：
-  - `.doc` 文件，记录了文档 ID 信息和 term 的词频，还额外记录了跳表的信息，用来加速文档 ID 的查询；并且还记录了 term 在 `.pos` 和 `.pay` 文件中的位置，有助于进行快速读取。
-  - `.pay` 文件，记录了 payload 信息和 term 在 doc 中的偏移信息；
-  - `.pos` 文件，记录了 term 在 doc 中的位置信息。
+倒排索引由 3 部分组成：
 
-**L3/L4 追问——Posting List 压缩与求交加速**：
+1. **Term Dictionary**：保存所有词项，按字典序排列，公共前缀分块存储，块内只保存后缀。
+2. **Term Index（FST）**：Term Dictionary 的索引，使用 FST 算法，复用前缀压缩空间，查询复杂度 O(len(prefix))，常驻内存。
+3. **Posting List**：保存每个词项的文档 ID、词频、位置等信息，存储在 `.doc`、`.pos`、`.pay` 三个文件中。
 
-- **FOR（Frame of Reference）编码**：文档 ID 单调递增，Lucene 将 Posting List 分块后存储相邻 ID 的**增量（delta）**，大幅降低空间占用，解码时只需累加还原。
-- **Roaring Bitmap**：多条件查询需要对多个 Posting List 求交/求并，Lucene 使用 RoaringBitmap 加速位图运算，它能根据数据密度自动在数组、位图、RLE 三种存储结构间切换，兼顾内存与计算性能。
-- Term Index（FST）常驻内存 + Posting List 压缩，使得绝大多数查询不必全量读取磁盘上的 Term Dictionary，这是 ES 查询快于直接扫描磁盘的关键。
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】**Posting List 压缩与求交加速**：
+  - **FOR（Frame of Reference）编码**：文档 ID 单调递增，分块后存储相邻 ID 的增量（delta），大幅降低空间占用。
+  - **Roaring Bitmap**：多条件查询时对多个 Posting List 求交/求并，自动在数组、位图、RLE 三种存储结构间切换，兼顾内存与计算性能。
+- 【L4】Term Index（FST）常驻内存 + Posting List 压缩，使得绝大多数查询不必全量读取磁盘上的 Term Dictionary，这是 ES 查询快于直接扫描磁盘的关键。
+
+:::
+
+#### 🏭 实战场景
+
+::: details
+
+某日志索引含 10 亿文档、5000 万唯一词项。Term Index（FST）约 200MB 常驻内存，Term Dictionary 在磁盘上按块存储。典型 term 查询只需读取 FST + 1-2 个磁盘块，延迟 < 1ms。多条件 AND 查询时，Roaring Bitmap 将多个 Posting List 的求交运算从 O(N) 降到 O(N/64)，整体查询耗时 < 10ms。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "Term Dictionary 全量加载到内存" → 只有 Term Index（FST）常驻内存，Term Dictionary 在磁盘上按需读取。
+- ❌ "Posting List 未压缩" → 使用 FOR 编码压缩文档 ID，Roaring Bitmap 加速位图运算，实际存储远小于原始数据。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：FST 和 Trie 的区别？** → FST 同时复用前缀和后缀，空间压缩更优，见本文档「什么是字典树？」。
+- **Q：Segment 为什么不可变？** → FST 构建后不可修改，Segment 不可变保证了一致性和查询性能。
 
 ### 【中等】ES 如何处理删除操作？⭐⭐
 
-ES 处理删除请求时，不会立即从磁盘物理删除文件。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 存储 / 删除机制
 
-ES 会将文件标记为删除，然后在后台通过段合并操作时，再彻底删除文件。
+#### 💎 关键结论
+
+ES 删除是标记删除而非物理删除，文档在 Segment 合并时才被彻底清除，可通过 force_merge 主动触发清理。
+
+#### ⚡记忆卡片
+
+- **口诀**：删除只打标，合并才真删
+- **关键词**：标记删除 ／ Segment 合并 ／ .del 文件 ／ force_merge
+- **链路**：删除请求 → 标记 .del → Segment 合并 → 物理删除
+
+#### 📖 核心知识
+
+ES 处理删除请求时，不会立即从磁盘物理删除文件：
+
+1. 在 `.del` 文件中标记文档为已删除。
+2. 搜索时过滤已删除文档，但磁盘空间不会立即释放。
+3. 后台 Segment 合并时，彻底删除已标记的文档并回收空间。
+4. 可通过 `POST /<index>/_forcemerge` 主动触发合并以回收空间。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】更新操作实际上是“删除旧文档 + 写入新文档”，两者都在 Segment 合并时才真正执行物理操作。
+- 【L4】频繁 force_merge 会影响写入性能，建议在低峰期执行。对于日志场景，可结合 ILM 策略在 warm 阶段自动执行 force_merge。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：删除后磁盘空间什么时候释放？** → 等到 Segment 合并时才会物理删除并回收空间，手动 force_merge 可立即触发。
 
 ## Elasticsearch 集群
 
 ### 【中等】ES 如何保证高可用？⭐⭐⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 集群 / 高可用
+
+#### 💎 关键结论
+
+ES 通过副本机制实现高可用，主分片故障时副本提升为新主，参考 PacificA 算法，写入默认只需主分片确认（可用性优先）。
+
+#### ⚡记忆卡片
+
+- **口诀**：主写副复制，故障副本顶
+- **关键词**：Primary Shard ／ Replica ／ PacificA ／ 副本提升
+- **链路**：写入主分片 → 复制到副本 → 主故障副本提升 → 自动重建副本
+
+#### 📖 核心知识
 
 ```mermaid
 graph TB
@@ -823,27 +1275,55 @@ graph TB
     J --> K["集群恢复健康"]
 ```
 
-**ES 通过副本机制实现高可用**。ES 的数据副本模型参考了 [PacificA 算法](https://www.microsoft.com/en-us/research/wp-content/uploads/2008/02/tr-2008-25.pdf)。
+ES 通过副本机制实现高可用，参考 [PacificA 算法](https://www.microsoft.com/en-us/research/wp-content/uploads/2008/02/tr-2008-25.pdf)。
 
-ES 必须满足以下条件才能运行：
+运行条件：
+1. 至少选举一个主节点。
+2. 每个角色至少一个节点。
+3. 每个分片至少一个副本（主副本）。
 
-- 至少需要 [选举一个主节点](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery-quorums.html)
-- 每个 [角色](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html) 至少一个节点
-- 每个 [分片](https://www.elastic.co/guide/en/elasticsearch/reference/current/scalability.html) 至少有一个副本（主副本）
+写入默认只需主副本确认（可用性优先），读取可能读到未 commit 数据（不一致窗口）。数据恢复借助 GlobalCheckpoint 和 LocalCheckpoint 加速。
 
-默认的情况下，ES 的数据写入只需要保证主副本写入了即可，ES 在写上选择的是**可用性优先**，而并不是像 PacificA 协议那样的强一致性。而数据读取方面，ES 可能会读取到没有 commit 的数据，所以 ES 的数据读取可能产生不一致的情况。
+#### 🔬 扩展知识
 
-在数据恢复方面，系统可以借助 GlobalCheckpoint 和 LocalCheckpoint 来加速数据恢复的过程。如果集群中只有旧的副本可用，那么可以使用 **allocate_stale_primary 将一个指定的旧分片分配为主分片，但会造成数据丢失，慎用！**
+::: details
 
-::: tip 扩展
+- 【L3】`allocate_stale_primary` 可将旧副本提升为主分片，但会造成数据丢失，仅在紧急恢复时慎用。
+- 【L4】写一致性通过 `wait_for_active_shards` 控制，默认 1（主分片可用即可），对丢数敏感的场景可调高。
 
-- https://www.elastic.co/guide/en/elasticsearch/reference/current/high-availability.html
-- [Elasticsearch 从入门到实践之副本策略](https://www.itshujia.com/read/elasticsearch/362.html)
-- [Elasticsearch 从入门到实践之 ES 的数据副本模型](https://www.itshujia.com/read/elasticsearch/363.html)
+> 📚 延伸阅读：[ES 官方文档之高可用](https://www.elastic.co/guide/en/elasticsearch/reference/current/high-availability.html)
 
 :::
 
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "ES 写入保证强一致性" → ES 默认可用性优先，写入只确认主分片，副本异步复制，存在不一致窗口。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：ES 写入会丢数据吗？** → 默认配置下极端场景可能丢数，调高 `wait_for_active_shards` 和 `translog.durability: request` 可避免，见本文档「ES 如何保证读写一致？」。
+
 ### 【中等】ES 是如何实现选主的？⭐⭐⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 集群 / 选主
+
+#### 💎 关键结论
+
+ES 选主经历 ZenDiscovery（6.x 及之前）→ 借鉴 Raft 的集群协调（7.0+）两代演进，7.0+ 移除了手动 quorum 配置，自动维护法定人数，消除脑裂风险。
+
+#### ⚡记忆卡片
+
+- **口诀**：旧版 nodeId 排序投票，新版 Raft 任期自动 quorum
+- **关键词**：ZenDiscovery ／ Raft ／ term ／ voting configuration ／ minimum_master_nodes
+- **链路**：节点失联 → 发起选举 → 投票 → 多数确认 → 当选 Master
+
+#### 📖 核心知识
 
 ```mermaid
 graph TB
@@ -857,63 +1337,129 @@ graph TB
     G --> I["Master 负责集群管理"]
 ```
 
-> 上图描述的是 6.x 及之前 ZenDiscovery 的选主流程。ES 的选主机制经历两代演进：**ZenDiscovery（6.x 及之前）** → **借鉴 Raft 的集群协调子系统（7.0+）**。
-
 **6.x 及之前：ZenDiscovery**
-
-- 只有 master-eligible 节点（`node.master: true`）才能发起选主；节点通过 ping 发现自己未连接 master、且失联节点数超过 `discovery.zen.minimum_master_nodes` 时发起选举。
-- 每个节点把已知的 master-eligible 节点按 nodeId 字典排序，投票给 id 最小的节点；得票达到 `N / 2 + 1` 且自己投自己，则当选 master。
-- **缺陷**：选举依赖 nodeId 排序 + ping 探测，耗时不可控；`minimum_master_nodes` 需要人工配置，配错就脑裂，是早期生产事故的高频来源。
+- master-eligible 节点通过 ping 发现无 master 时发起选举。
+- 按 nodeId 字典排序，投票给最小的节点，得票 N/2+1 当选。
+- 缺陷：`discovery.zen.minimum_master_nodes` 需人工配置，配错就脑裂。
 
 **7.0+：借鉴 Raft 的集群协调子系统**
+- 引入 term（任期）、voting configuration 等概念。
+- 移除 `discovery.zen.minimum_master_nodes`，quorum 自动维护。
+- 候选节点以 term+1 发起选举，同一 term 内每个节点最多投一票，多数票当选。
+- 首次启动需 `cluster.initial_master_nodes` 显式引导。
 
-- 7.0 重写了集群协调层，引入 **term（任期）、投票配置（voting configuration）** 等 Raft 概念；**移除了 `discovery.zen.minimum_master_nodes`**，quorum 由集群根据投票配置自动维护，从根本上消除了人工配错导致的脑裂。
-- 选举流程：候选节点以自身 term + 1 发起选举，向其他 master-eligible 节点拉票；同一 term 内每个节点最多投一票；获得多数票者当选。
-- 集群状态（元数据）变更也需要多数 master-eligible 节点确认后才算提交，保证 master 切换时元数据不丢。
-- 首次启动集群需通过 `cluster.initial_master_nodes` 显式引导（仅首次需要）。
+#### 🔬 扩展知识
 
-**L3 追问——为什么 ES 没有直接照搬 Raft？**：Raft 的日志复制模型适合小量状态同步，而 ES 集群状态（全量 mapping、分片分配表）体积大，不适合逐条日志复制。ES 只借鉴了 Raft 的**选主与 quorum 提交**思想，集群状态的分发仍采用 master 向各节点发布 + 确认的机制。
+::: details
+
+- 【L3】为什么 ES 没有直接照搬 Raft？ Raft 的日志复制模型适合小量状态同步，而 ES 集群状态（全量 mapping、分片分配表）体积大，不适合逐条日志复制。ES 只借鉴了选主与 quorum 提交思想，集群状态分发仍采用 master 发布 + 确认机制。
+- 【L4】7.0+ 集群状态变更需多数 master-eligible 节点确认后才算提交，保证 master 切换时元数据不丢。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "ES 7.0+ 仍然需要配置 minimum_master_nodes" → 7.0+ 已移除该配置，quorum 由集群自动维护。
+- ❌ "任何节点都可以发起选主" → 只有 master-eligible 节点才能参与选主。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：ES 7.0+ 和 6.x 选主的本质区别？** → 6.x 依赖人工 quorum 配置，7.0+ 借鉴 Raft 自动维护，从根本上消除脑裂风险，见本文档「ES 如何避免脑裂问题？」。
 
 ### 【中等】ES 如何避免脑裂问题？⭐⭐
 
-ES 集群采用主从架构模式，集群中有且只能有一个 Master 存在。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 集群 / 脑裂
 
-现在假设这样一种场景，ES 集群部署在 2 个不同的机房。若两个机房网络断连，其中没有主节点的机房进行选主，产生了一个新的主节点。这时，就同时存在了两个主节点，它们各自负责处理接收的请求，会存在数据不一致。一旦，两个机房恢复通信，又将以哪个主节点为主，数据不一致问题怎么办，这就是**脑裂**问题。
+#### 💎 关键结论
 
-那如何避免产生脑裂呢？**ES 使用了 Quorum 机制来避免脑裂，在进行选主的时候，需要超过半数 Master 候选节点参与选主才行**。假如有 5 个 Master 候选节点，如果要成功选举出 Master，必须有 (5 / 2) + 1 = 3 个 Master 候选节点参与选主才行。
+脑裂是网络分区导致出现多个 Master 的问题。ES 通过 Quorum 机制（多数派投票）避免脑裂，7.0+ 自动维护 quorum 彻底消除了人工配错风险。
 
-在 6.x 及之前的版本使用 Zen Discovery 的集群协调子系统，Zen Discovery 允许用户通过使用 `discovery.zen.minimum_master_nodes` 设置来决定多少个符合主节点条件的节点可以选举出主节点。通常，只有 Master Eligible 节点（Master 候选节点）数大于 Quorum 的时候才能进行选主。计算公式如下：
+#### ⚡记忆卡片
 
-```
-Quorum = (Master 候选节点数 / 2) + 1
-```
+- **口诀**：Quorum 多数派，脑裂自然消
+- **关键词**：Quorum ／ 多数派 ／ 网络分区 ／ minimum_master_nodes
+- **链路**：网络分区 → 各自选主 → Quorum 不足 → 只有多数派能选主 → 避免脑裂
 
-Elasticsearch 7.0 中，重新设计并重建了集群协调子系统：
+#### 📖 核心知识
 
-- 移除了 `discovery.zen.minimum_master_nodes` 设置，让 Elasticsearch 自己选择可以形成法定数量的节点。
-- 典型的主节点选举只需很短时间就能完成。
-- 集群的扩充和缩减变得更加安全和简单，并且大幅降低了因系统配置不当而可能造成数据丢失的风险。
-- 节点状态记录比以往清晰很多，有助于诊断它们不能加入集群的原因，或者为何不能选举出主节点。
+脑裂场景：ES 集群部署在 2 个机房，网络断连后各自选主，产生 2 个 Master，数据不一致。
+
+**Quorum 机制**：选主时需超过半数 Master 候选节点参与。公式：`Quorum = (Master 候选节点数 / 2) + 1`
+
+- **6.x 及之前**：通过 `discovery.zen.minimum_master_nodes` 手动配置 Quorum。
+- **7.0+**：移除手动配置，ES 自动维护 Quorum，集群扩充和缩减更安全。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】脑裂恢复后，以多数派的 Master 为准，少数派的数据可能丢失。7.0+ 的 voting configuration 机制进一步保证了元数据一致性。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：为什么 5 个候选节点需要 3 个参与选主？** → 确保只有多数派能选出 Master，避免网络分区时双方都选主，见本文档「ES 是如何实现选主的？」。
 
 ### 【中等】Elasticsearch 集群中有哪些不同类型的节点？⭐⭐
 
-Elasticsearch 中的节点是指集群中的单个 Elasticsearch 进程实例。节点用于存储数据并参与集群的索引和搜索功能。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 集群 / 节点类型
 
-节点间会相互通信以分配数据和工作负载，从而确保集群的平衡和高性能。节点可以配置不同的角色，这些角色决定了它们在集群中的职责。
+#### 💎 关键结论
 
-可以通过在 `elasticsearch.yml` 中设置 `node.roles` 来为节点分配角色。
+ES 节点可配置不同角色：Master Eligible（集群管理）、Data（数据存储）、Coordinating（请求路由）、Ingest（数据预处理）、Warm/Hot（冷热分离）。
 
-ES 中主要有以下节点类型：
+#### ⚡记忆卡片
 
-| 节点类型                 | 说明                                                                                                     | 配置                                              |
-| :----------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------ |
-| **master eligible node** | **候选主节点**。一旦成为主节点，可以管理整个集群：创建、更新、删除索引；添加或删除节点；为节点分配分片。 | 低配置的 CPU、内存、磁盘                          |
-| **data node**            | **数据节点**。负责数据的存储和读取。                                                                     | 高配置的 CPU、内存、磁盘                          |
-| **coordinating node**    | **协调节点**。负责请求的分发，结果的汇总。                                                               | 高配置的 CPU、中等配置的内存、低配置的磁盘        |
-| ingest node              | **预处理节点**。负责处理数据、数据转换。                                                                 | 高配置的 CPU、中等配置的内存、低配置的磁盘        |
-| warm & hot node          | 存储冷、热数据的数据节点。                                                                               | Hot 类型的节点，都是高配配置，Warm 都是中低配即可 |
+- **口诀**：主管、数存、协调、摄入、冷热
+- **关键词**：Master Eligible ／ Data Node ／ Coordinating Node ／ Ingest Node
+- **链路**：请求 → Coordinating 路由 → Data 存储检索 → Master 集群管理
+
+#### 📖 核心知识
+
+节点是集群中的单个 ES 进程实例，通过 `node.roles` 配置角色：
+
+| 节点类型 | 说明 | 配置建议 |
+|:---|:---|:---|
+| **Master Eligible** | 候选主节点，可管理索引、节点、分片分配 | 低配 CPU/内存/磁盘 |
+| **Data** | 数据存储和读取 | 高配 CPU/内存/磁盘 |
+| **Coordinating** | 请求分发和结果汇总 | 高配 CPU、中内存、低磁盘 |
+| **Ingest** | 数据预处理和转换 | 高配 CPU、中内存、低磁盘 |
+| **Warm/Hot** | 冷/热数据分离存储 | Hot 高配，Warm 中低配 |
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】生产环境建议将 Master Eligible 节点独立部署（3 个专用 Master 节点），避免与 Data 节点资源竞争，提高集群稳定性。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：Coordinating Node 和 Master Node 有什么区别？** → Coordinating Node 负责客户端请求路由和结果汇总，每个节点默认都是 Coordinating Node；Master Node 负责集群元数据管理。
 
 ### 【中等】ES 是如何实现水平扩展的？⭐⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 集群 / 水平扩展
+
+#### 💎 关键结论
+
+ES 通过分片机制实现水平扩展，将索引数据切分为多个 Shard 分布在不同节点上，增加节点即可提升存储容量和查询吞吐。
+
+#### ⚡记忆卡片
+
+- **口诀**：分片分布多节点，加节点就扩展
+- **关键词**：Primary Shard ／ Replica Shard ／ 分片分布 ／ 再均衡
+- **链路**：Index → 多个 Shard → 分布多节点 → 并行查询 / 负载均衡
+
+#### 📖 核心知识
 
 ```mermaid
 graph TB
@@ -923,44 +1469,51 @@ graph TB
     B --> E["Replica 1"]
     C --> F["Replica 1"]
     D --> G["Replica 1"]
-    B --> H["Node 1"]
-    C --> I["Node 2"]
-    D --> J["Node 3"]
-    E --> I
-    F --> J
-    G --> H
 ```
 
-**Elasticsearch 通过分片来实现水平扩展**。在 Elasticsearch 中，分片是索引的逻辑划分。索引可以有一个或多个分片，并且每个分片可以存储在集群中的不同节点上。分片用于在多个节点之间分配数据，从而提高性能和可扩展性。
+ES 通过分片实现水平扩展：
 
-Elasticsearch 中有两种类型的分片：
+1. **Primary Shard**：存储原始数据，增加主分片数可提升吞吐量和容量。
+2. **Replica Shard**：数据备份，提升读性能和可用性。
+3. 分片分布在不同节点上，查询可并行执行。
+4. 新增节点时，ES 自动再均衡分片分布。
 
-- **primary shard（主分片）**：用于存储原始数据。适当增加主分片数，可以提升 Elasticsearch 集群的吞吐量和整体容量。
-- **replica shard（副本分片）**：用于存储数据备份。
-
-默认情况下，每个索引都有 1 个主分片（早期版本，默认每个索引有 5 个主分片）。
+默认每个索引 1 个主分片（早期版本默认 5 个）。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/11/e9fd078433d445a597b75efcbc3ab044.png)
 
+#### 🔀 发散问题
+
+- **Q：主分片数可以修改吗？** → 不可修改，需 reindex 重建索引，见本文档「ES 如何选择读写数据映射到哪个分片上？」。
+
 ### 【中等】ES 如何选择读写数据映射到哪个分片上？⭐⭐⭐
 
-为了避免出现数据倾斜，系统需要一种高效的方式把数据均匀分散到各个节点上**存储**，并且**在检索的时候可以快速找到**文档所在的节点与分片。这就需要确立路由算法，使得数据可以映射到指定的节点上。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 集群 / 数据路由
 
-常见的路由方式如下：
+#### 💎 关键结论
 
-| **算法**     | **描述**                                                                                                                                         |
-| :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **随机算法** | 写数据时，随机写入到一个节点中；读数据时，由于不知道查询数据存在于哪个节点，所以需要遍历所有节点。                                               |
-| **哈希取模** | 对 key 值进行哈希计算，然后根据节点数取模，以确定节点。                                                                                          |
-| **路由表**   | 由中心节点统一维护数据的路由表，以保证唯一性；但是，中心化产生了新的问题：单点故障、数据越大，路由表越大、单点容易称为性能瓶颈、数据迁移复杂等。 |
+ES 通过哈希取模路由确定分片：`shard = hash(_routing) % primary_shards`，默认 routing key 是文档 ID，主分片数一旦设置不可修改。
 
-ES 的数据路由算法是根据文档 ID 和 routing key 来确定 Shard ID 的过程。**默认的情况下 routing key 为文档 ID**，路由算法一般情况下的计算公式如下：
+#### ⚡记忆卡片
+
+- **口诀**：哈希取模定分片，主分片数不可改
+- **关键词**：hash ／ _routing ／ primary_shards ／ 路由算法
+- **链路**：文档 ID → hash → 取模主分片数 → 确定目标分片
+
+#### 📖 核心知识
+
+ES 通过路由算法确定数据写入和读取的分片位置：
 
 ```
- shard_number = hash(_routing) % numer_of_primary_shards
+shard_number = hash(_routing) % number_of_primary_shards
 ```
 
-也可以在请求中指定 routing key，下面是新增数据的时候指定 routing 的方式：
+1. **默认路由**：`_routing` 默认是文档 ID，哈希后取模确定目标分片。
+2. **自定义路由**：可指定 routing key，让相关数据写入同一分片，提升查询性能。
+3. **主分片数不可修改**：一旦设置，修改需 reindex（数据迁移），因为主分片数是哈希计算的变量。
+4. 自动生成 ID 时数据均匀分布；指定 ID 或 routing key 可能导致数据倾斜。
+
+::: details 自定义路由示例
 
 ```bash
 PUT <index>/_doc/<id>?routing=routing_key
@@ -970,49 +1523,91 @@ PUT <index>/_doc/<id>?routing=routing_key
 }
 ```
 
-添加数据时，如果不指定文档 ID，ES 会自动分片一个随机 ID。这种情况下，结合 Hash 算法，可以保证数据被均匀分布到各个分片中。如果指定文档 ID，或指定 routing key，Hash 计算得出的值可能会不够随机，从而导致数据倾斜。
+:::
 
-**index 一旦设置了主分片数就不能修改，如果要修改就需要 reindex（即数据迁移）**。之所以如此，就是因为：一旦修改了主分片数，即等于修改了原 Hash 计算中的变量，无法再通过 Hash 计算正确路由到数据存储的分片。
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】自定义 routing 可用于数据亲和性场景（如用户数据写入同一分片），但需注意热点分片问题。
+- 【L4】Split API（7.0+）支持将索引拆分为更多分片，解决了主分片数不可增加的问题（但需提前在 settings 中预留 split 数）。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：为什么主分片数不可修改？** → 因为路由公式依赖主分片数，修改后无法正确路由到原有数据，见本文档「如何合理设置 ES 分片？」。
 
 ### 【中等】如何合理设置 ES 分片？⭐⭐⭐
 
-ES 索引设置多分片有以下好处：
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 集群 / 分片设置
 
-- 多分片如果分布在不同的节点，查询可以在不同分片上并行执行，提升查询速度；
-- 数据写入时，会分散在不同节点存储，避免数据倾斜。
+#### 💎 关键结论
 
-设置多少分片合适：
+分片数应大于节点数以便扩展，但不宜过多（总分片 < 10w）；单分片容量：搜索型 10-30GB，日志型 30-50GB；文档数不超 2 亿。
 
-一般，**分片数要大于节点数**，这样可以保证：一旦集群中有新的数据节点加入，ES 会自动对分片数进行再均衡，使得分片尽量在集群中分布均匀。
+#### ⚡记忆卡片
 
-**分片数也不宜设置过多**，这会带来一些问题：
+- **口诀**：分片大于节点，不超 10 万，单片 30-50G
+- **关键词**：分片数 ／ 节点数 ／ 单分片容量 ／ 文档上限
+- **链路**：预估数据量 → 确定分片数和大小 → 创建索引 → 监控调整
 
-- 每一个 ES 分片对应一个 Lucene 索引，Lucene 索引存储在一个文件系统的目录中，它又可以分为多个 Segment，每个存储在一个文件中。因此，过多的分片意味着过多的文件，这会导致较大的读写性能开销。
-- 此外，分片的元数据信息由 Master 节点维护，分片过多，会增加管理负担。建议，**集群的总分片数控制在 10w 以内**。
+#### 📖 核心知识
 
-单数据节点分片限制：
+多分片的好处：查询并行执行、数据均匀分布、避免数据倾斜。
 
-- **每个非冻结数据节点 1000 个分片**，通过 `cluster.max_shards_per_node` 控制
-- **每个冻结数据节点 3000 个分片**，通过 `cluster.max_shards_per_node.frozen` 控制
+分片设置原则：
 
-此外，分片大小也要有所限制：
+1. **分片数 > 节点数**：新节点加入时可自动再均衡。
+2. **总分片 < 10w**：分片元数据由 Master 维护，过多增加管理负担。
+3. **单节点分片上限**：非冻结节点 1000 个（`cluster.max_shards_per_node`），冻结节点 3000 个。
+4. **单分片文档上限**：理论约 20 亿（`Integer.MAX_VALUE - 128`），建议保持 2 亿以下。
+5. **单分片容量**：搜索型 10-30GB，日志型 30-50GB。
+6. 可通过 `max_primary_shard_size` 和 `min_primary_shard_size` 控制分片大小上下限。
 
-- 理论上，**一个分片最多包含约 20 亿个文档（`Integer.MAX_VALUE - 128`）**。但是，经验表明，**每个分片的文档数量最好保持在 2 亿以下**。
-- **非日志型（搜索型、线上业务型） ES 的单分片容量最好在 [10GB, 30GB] 范围内**；
-- **日志型 ES 的单分片容量最好在 [30GB, 50GB] 范围内**；
+#### 🔬 扩展知识
 
-分片大小的上下限可以分别通过 `max_primary_shard_size` 和 `min_primary_shard_size` 来控制。
+::: details
 
-::: tip 扩展
+- 【L3】分片过多会导致 Master 压力增大、查询延迟增加（协调节点需汇总更多分片结果）；分片过少则无法充分利用集群资源。
+- 【L4】对于时间序列数据（日志），可结合 ILM 策略和 Rollover 机制自动管理分片大小，见本文档「ES 如何实现索引生命周期管理（ILM）？」。
 
-- https://www.elastic.co/cn/blog/how-many-shards-should-i-have-in-my-elasticsearch-cluster
-- https://elastic.ac.cn/guide/en/elasticsearch/reference/current/size-your-shards.html
+> 📚 延伸阅读：[ES 官方博客 - 分片数指南](https://www.elastic.co/cn/blog/how-many-shards-should-i-have-in-my-elasticsearch-cluster)
 
 :::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "分片越多越好" → 分片过多增加 Master 管理负担、查询延迟和文件句柄开销。
+- ❌ "分片大小无所谓" → 单分片超过 50GB 会导致恢复和 Merge 性能下降。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：分片数可以后期修改吗？** → 主分片数不可修改，需 reindex；副本数可随时调整，见本文档「ES 如何选择读写数据映射到哪个分片上？」。
 
 ## Elasticsearch 架构
 
 ### 【困难】ES 搜索数据的流程是怎样的？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Elasticsearch 架构 / 搜索流程
+
+#### 💎 关键结论
+
+ES 搜索分 Query 和 Fetch 两阶段：Query 阶段各分片本地搜索+打分，协调节点全局排序；Fetch 阶段取回完整文档。
+
+#### ⚡记忆卡片
+
+- **口诀**：Query 定哪些，Fetch 取具体
+- **关键词**：Query 阶段 ／ Fetch 阶段 ／ 协调节点 ／ 两阶段搜索
+- **链路**：客户端 → 协调节点 → Query 各分片搜索 → 全局排序 → Fetch 取文档 → 返回
+
+#### 📖 核心知识
 
 ```mermaid
 graph TB
@@ -1028,28 +1623,66 @@ graph TB
     J --> K["返回最终结果给客户端"]
 ```
 
-在 Elasticsearch 中，搜索一般分为两个阶段，query 和 fetch 阶段。可以简单的理解，query 阶段确定要取哪些 doc，fetch 阶段取出具体的 doc。
+**Query 阶段**：
+1. 协调节点创建 from+size 的优先级队列。
+2. 请求转发到各分片（主/副随机选，round-robin 负载均衡）。
+3. 每个分片本地搜索、打分、排序，返回 from+size 条结果。
+4. 协调节点汇总、合并、排序，得到全局前 N 条。
 
-Query 阶段会根据搜索条件遍历每个分片（主分片或者副分片中的其一）中的数据，返回符合条件的前 N 条数据的 ID 和排序值，然后在协调节点中对所有分片的数据进行排序，获取前 N 条数据的 ID。
+**Fetch 阶段**：
+1. 协调节点确定需要取回的文档 ID，向相关节点发起 multi-get。
+2. 分片节点读取文档，进行 `_source` 过滤、高亮处理，返回数据。
+3. 协调节点汇总返回给客户端。
 
-**Query 阶段的流程**如下：
+注意：同一节点的 N 个 Shard 不会合并请求，会发生 N 次请求。
 
-1. 客户端发送请求到任意一个节点，这个 node 成为 coordinate node（协调节点）。coordinate node 创建一个大小为 from + size 的优先级队列用来存放结果。
-2. coordinate node 对 document 进行路由，将请求转发到对应的 node，此时会使用 round-robin 随机轮询算法，在 primary shard 以及其所有 replica 中随机选择一个，让读请求负载均衡。
-3. 每个分片在本地执行搜索请求，并将查询结果打分排序，然后将结果保存到 from + size 大小的有序队列中。
-4. 接着，每个分片将结果返回给 coordinate node，coordinate node 对数据进行汇总处理：合并、排序、分页，将汇总数据存到一个大小为 from + size 的全局有序队列。
+#### 🔬 扩展知识
 
-需要注意的是，在协调节点转发搜索请求的时候，如果有 N 个 Shard 位于同一个节点时，并不会合并这些请求，而是发生 N 次请求！
+::: details
 
-在 Fetch 阶段，协调节点会从 Query 阶段产生的全局排序列表中确定需要取回的文档 ID 列表，然后通过路由算法计算出各个文档对应的分片，并且用 multi get 的方式到对应的分片上获取文档数据。
+- 【L3】Query 阶段每个分片返回 from+size 条，深分页时协调节点需汇总 (from+size)*分片数 条，这是深分页问题的根源，见本文档「ES 为什么会有深分页问题？」。
+- 【L4】Prefer 参数可控制查询优先路由到主分片或副本，`_primary` 可保证读到最新数据。
 
-**Fetch 阶段的流程**如下：
+:::
 
-1. coordinate node 确定需要获取哪些文档，然后向相关节点发起 multi get 请求；
-2. 分片所在节点读取文档数据，并且进行 `_source` 字段过滤、处理高亮参数等，然后把处理后的文档数据返回给协调节点；
-3. coordinate node 汇总所有数据后，返回给客户端。
+#### 🏭 实战场景
+
+::: details
+
+5 分片 + 1 副本集群，查询 from=0, size=10。Query 阶段每个分片返回 10 条，协调节点汇总 50 条取前 10；Fetch 阶段只需获取 10 个文档。整体耗时主要由最慢的分片决定，通常在 10-50ms。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "ES 搜索是单次请求" → 实际是 Query + Fetch 两阶段，协调节点需要两次网络交互。
+- ❌ "同一节点的多个分片会合并查询" → 不会合并，N 个分片发生 N 次请求。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：Query 阶段和 Fetch 阶段为什么分开？** → 分离可以让协调节点先确定全局排序，再精确取回文档，避免不必要的数据传输。
 
 ### 【困难】ES 存储数据的流程是怎样的？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Elasticsearch 架构 / 存储流程
+
+#### 💎 关键结论
+
+ES 写入流程为：路由到主分片 → 写 Index Buffer + Translog → Refresh（1s 可搜索） → Flush（fsync 刷盘） → Merge（合并 Segment）。
+
+#### ⚡记忆卡片
+
+- **口诀**：路由主写，Buffer+Translog，Refresh 可搜，Flush 持久
+- **关键词**：Index Buffer ／ Translog ／ Refresh ／ Flush ／ Merge
+- **链路**：写入 → Index Buffer + Translog → Refresh(1s) → Flush(fsync) → Merge
+
+#### 📖 核心知识
 
 ```mermaid
 graph TB
@@ -1067,184 +1700,348 @@ graph TB
     L --> M["所有副本确认后响应客户端"]
 ```
 
-::: tip 扩展
+从三个角度阐述：
 
-- [Elasticsearch 从入门到实践之分布式文档的存储流程](https://www.itshujia.com/read/elasticsearch/359.html)
-- https://github.com/doocs/advanced-java/blob/main/docs/high-concurrency/es-write-query-search.md
-
-:::
-
-::: important 要点
-
-- **集群角度**：请求任意节点，路由转发到主分片；主分片写入本地，然后复制数据到副本分片；最后响应客户端
-- **分片角度**：对内容做格式校验、分词
-- **节点角度**：持久化、refresh Lucene Segment，flush(fsync) Translog
-
-:::
+1. **集群角度**：请求路由到主分片，主分片写入后复制到副本，确认后响应。
+2. **分片角度**：对内容进行格式校验、分词处理。
+3. **节点角度**：
+   - **Refresh**（默认 1s）：Index Buffer 写入 Filesystem Cache，可被搜索（近实时原因）。
+   - **Translog**：追加写入，默认 fsync 刷盘，保证数据不丢。
+   - **Flush**（默认 30min 或 translog 满 512MB）：fsync 刷盘，清空 Translog。
+   - **Merge**：合并 Segment，物理删除标记删除的文档。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/50ff0b019c6f47f6a5a00103adfc3301.png)
 
-ES 存储数据的流程可以从三个角度来阐述：
+#### 🔬 扩展知识
 
-- 从**集群**的角度来看，数据写入会先路由到主分片，在主分片上写入成功后，会并发写副本分片，最后响应给客户端。
+::: details
 
-  ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/7788e062ae544310a999180c4953bc48.png)
+- 【L3】**近实时与持久性的本质**：写入到可搜索的延迟 = refresh 间隔（默认 1 秒）；写完立即要读需 `refresh=true`，但频繁 refresh 有性能代价。
+- 【L4】**Translog 之于 Segment 类似 MySQL 的 redo log**：宕机时未 flush 的 Segment 通过重放 Translog 恢复。`index.translog.durability` 默认 `request`（每次写 fsync），调为 `async` 可提吞吐但宕机丢最近 5 秒数据。
 
-- 从**分片**的角度来看，数据到达分片后，需要对内容进行格式校验、分词处理然后再索引数据。
-
-- 从**节点**的角度来看，ES 数据持久化的步骤可归纳为：**Refresh、写 Translog、Flush、Merge。**
-
-  ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/9b3ea3bae0d342b7928a7cdc9bc9d8e5.png)
-  - 默认，ES 会每秒执行一次 **Refresh** 操作，把 Index Buffer 的数据写入磁盘中，但不会调用 fsync 刷盘。ES 提供近实时搜索的原因是因为数据被 Refresh 后才能被检索出来 。
-  - 为了保证数据不丢失，在**写完 Index Buffer 后，ES 还要写 Translog**。Translog 是追加写入的，并且默认是调用 fsync 进行刷盘的。
-  - **Flush** 操作会将 Filesystem Cache 中的数据持久化到磁盘中，默认 30 分钟或者在 Translog 写满时（默认 512 MB）触发执行。Flush 将磁盘缓存持久化到磁盘后，会清空 Translog。
-  - 最后，ES 和 Lucene 会自动执行 **Merge** 操作，清理过多的 Segment 文件，这个时候被标记为删除的文档会正式被物理删除。
-
-**L3 追问——近实时与持久性的本质**：
-
-- **写入到可搜索的延迟 = refresh 间隔（默认 1 秒）**：数据必须经过 refresh 生成新 Segment 才可被搜索；写完立即要读需 `refresh=true`，但要清楚其性能代价，不适合高频写链路。
-- **Translog 之于 Segment，类似 MySQL 的 redo log 之于数据页**：节点宕机时，尚未 flush 的 Segment 数据通过重放 Translog 恢复；`index.translog.durability` 默认 `request`（每次写都 fsync，不丢已提交数据），调为 `async` 可提吞吐但宕机丢最近 5 秒（`sync_interval`）数据。
-
-### 【中等】ES 相关性计算和聚合计算为什么会有计算偏差？⭐⭐
-
-在 ES 中，不仅仅是普通搜索，相关性计算（评分）和聚合计算也是先在每个 shard 的本地进行计算，再由 coordinate node 进行汇总。由于分片的本地计算是独立的，只能基于数据子集来进行计算，所以难免出现数据偏差。
-
-![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/0848782a8d894f078e0f7f9583ed6743.png)
-
-![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/3656b57ba1f4491ebc4a2297f03d7bbc.png)
-
-解决这个问题的方式也有多种：
-
-- 当数据量不大的情况下，**设置主分片数为 1**，这意味着在数据全集上进行聚合。 但这种方案不太现实。
-- **设置 [`shard_size`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-shard-size) 参数**，将计算数据范围变大，**牺牲整体性能，提高精准度**。shard_size 的默认值是 `size * 1.5 + 10`。
-- **使用 DFS Query Then Fetch**， 在 URL 参数中指定：`_search?search_type=dfs_query_then_fetch`。这样设定之后，ES 先会把每个分片的词频和文档频率的数据汇总到协调节点进行处理，然后再进行相关性算分。这样的话会消耗更多的 CPU 和内存资源，效率低下！
-- 尽量保证数据均匀地分布在各个分片中。
-
-### 【困难】ES 如何保证读写一致？⭐⭐⭐⭐
-
-**乐观并发控制**：ES 为每个文档维护 `_seq_no`（全局序列号）和 `_primary_term`（主分片任期）。应用更新时可携带 `if_seq_no` 和 `if_primary_term` 实现乐观锁：版本不匹配说明文档已被并发修改（返回 409），由应用层处理冲突重试。基于外部 `version` 的乐观锁自 6.7 起已废弃。
-
-**写一致性**：通过 `wait_for_active_shards` 控制（默认 1，即主分片可用即可写入；可设为具体数字或 `all`）。活跃分片数不足时写入直接失败。默认值偏向可用性，对丢数敏感的场景可调高，代价是可用性下降。
-
-**读一致性**：
-
-- ES 读取在主分片与副本间轮询，副本是异步复制的，存在极短窗口读到尚未同步的数据。
-- 需要读最新数据时，可设置 `preference=primary` 强制读主分片；或读取后校验 `_seq_no`/`_primary_term`。
-- 写完立即要读需 `refresh=true`（近实时机制下默认 1 秒后才可搜索），注意频繁 refresh 的性能代价。
-
-**L3 追问——写入丢失与重复的分析**：
-
-- **丢数场景**：主分片写成功但副本未同步时节点宕机（副本会被重建，期间数据丢失）；`translog.durability: async` 时宕机丢失未刷盘的写入（默认 `request` 级别不会丢）。
-- **重复场景**：不指定 `_id`（自动生成 ID）时客户端超时重试会产生重复文档；解法是**指定业务唯一 `_id`**——写入天然幂等，重试失败会变成更新而非新增；无法保证 ID 唯一时则在业务层做去重。
-
-### 【困难】ES 查询速度为什么快？⭐⭐⭐
-
-- **倒排索引**：Elasticsearch 查询速度快最核心的点在于使用倒排索引。
-  - 在 Elasticsearch 中，为了提高查询效率，它对存储的文档进行了分词处理。分词是将连续的文本切分成一个个独立的词项的过程。对文本进行分词后，Elasticsearch 会为每个词项创建一个倒排索引。这样，当用户进行查询时，Elasticsearch 只需要在倒排索引中查找匹配的词项，从而快速地定位到相关的文档。
-  - 正向索引的结构是每个文档和关键字做关联，每个文档都有与之对应的关键字，记录关键字在文档中出现的位置和次数；而倒排索引则是将文档中的词项和文档的 ID 进行关联，这样就可以通过词项快速找到包含它的文档。
-- **分片**：Elasticsearch 通过分片，支持分布式存储和搜索，可以实现搜索的并行处理和负载均衡。
-
-::: tip 扩展
-
-https://cloud.tencent.com/developer/article/1922613
+> 📚 延伸阅读：[ES 从入门到实践之存储流程](https://www.itshujia.com/read/elasticsearch/359.html)
 
 :::
 
+#### 🏭 实战场景
+
+::: details
+
+某日志集群日增 500 万文档，默认 Refresh=1s、Translog durability=request。在批量写入时将 refresh_interval 调为 30s、translog 调为 async，写入吞吐从 5000 doc/s 提升到 20000 doc/s，代价是宕机可能丢失最近 5 秒数据。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "ES 写入立即可以搜索" → 需等待 Refresh（默认 1s）后才可搜索，近实时非实时。
+- ❌ "Translog 不重要" → Translog 是宕机恢复的关键，关闭或丢失会导致数据丢失。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：写入后如何立即搜索？** → 设置 `refresh=true` 或 `refresh=wait_for`，见本文档「ES 如何保证读写一致？」。
+
+### 【中等】ES 相关性计算和聚合计算为什么会有计算偏差？⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 架构 / 计算偏差
+
+#### 💎 关键结论
+
+ES 相关性评分和聚合在各分片本地独立计算，只基于数据子集，导致偏差。可通过单分片、调大 shard_size、DFS 查询等方式缓解。
+
+#### ⚡记忆卡片
+
+- **口诀**：分片本地算，子集有偏差
+- **关键词**：本地计算 ／ 数据子集 ／ shard_size ／ DFS Query Then Fetch
+- **链路**：各分片本地计算 → 协调节点汇总 → 结果偏差
+
+#### 📖 核心知识
+
+ES 的相关性评分和聚合先在每个分片本地计算，再由协调节点汇总。由于本地计算基于数据子集，难免产生偏差。
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/0848782a8d894f078e0f7f9583ed6743.png)
+
+解决方式：
+1. **单分片**：数据量不大时设置主分片数为 1，在全集上计算。
+2. **调大 shard_size**：扩大每个分片的计算范围，牺牲性能提高精准度（默认 `size * 1.5 + 10`）。
+3. **DFS Query Then Fetch**：先汇总各分片的词频/文档频率，再计算相关性，代价是更多 CPU 和内存。
+4. **数据均匀分布**：尽量保证数据均匀分布在各分片。
+
+#### 🔀 发散问题
+
+- **Q：shard_size 调多大合适？** → 默认 `size * 1.5 + 10`，可逐步调大直到偏差可接受，但性能会下降。
+
+### 【困难】ES 如何保证读写一致？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Elasticsearch 架构 / 一致性
+
+#### 💎 关键结论
+
+ES 通过乐观并发控制（_seq_no + _primary_term）、写一致性（wait_for_active_shards）、读偏好（preference）来保证读写一致性。
+
+#### ⚡记忆卡片
+
+- **口诀**：乐观锁 seq_no，写一致性 active_shards，读主分片 preference
+- **关键词**：_seq_no ／ _primary_term ／ wait_for_active_shards ／ preference ／ refresh
+- **链路**：写入确认 → 乐观锁控制并发 → 读偏好保证一致性
+
+#### 📖 核心知识
+
+**乐观并发控制**：ES 为每个文档维护 `_seq_no` 和 `_primary_term`。更新时携带 `if_seq_no` 和 `if_primary_term`，版本不匹配则返回 409。
+
+**写一致性**：通过 `wait_for_active_shards` 控制（默认 1，可设为具体数字或 `all`）。
+
+**读一致性**：
+- 读取在主分片与副本间轮询，副本异步复制，存在极短窗口读到未同步数据。
+- 需读最新数据时，设置 `preference=primary` 强制读主分片。
+- 写完立即要读需 `refresh=true`（默认 1 秒后才可搜索）。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】**丢数场景**：主分片写成功但副本未同步时宕机（副本重建期间数据丢失）；`translog.durability: async` 时宕机丢失未刷盘写入（默认 `request` 级别不会丢）。
+- 【L4】**重复场景**：不指定 `_id`（自动生成 ID）时客户端超时重试会产生重复文档；解法是指定业务唯一 `_id`，写入天然幂等。
+
+:::
+
+#### 🏭 实战场景
+
+::: details
+
+某订单系统写入 ES 后立即查询订单状态，偶发查不到刚写入的订单。分析发现是近实时机制（refresh 1s 延迟）导致。改为写入时设置 `refresh=wait_for`，查询时设置 `preference=_primary`，彻底解决一致性问题。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "ES 写入后立即可以读到" → 近实时机制下默认 1 秒后才可搜索，需主动 refresh。
+- ❌ "ES 是强一致性的" → ES 是最终一致性，副本异步复制，存在不一致窗口。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：如何保证不丢数据？** → `translog.durability: request`（默认） + `wait_for_active_shards: all`，见本文档「ES 存储数据的流程是怎样的？」。
+
+### 【困难】ES 查询速度为什么快？⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 架构 / 查询性能
+
+#### 💎 关键结论
+
+ES 查询快的核心原因是倒排索引 + FST 常驻内存 + 分片并行查询，三者结合实现毫秒级搜索。
+
+#### ⚡记忆卡片
+
+- **口诀**：倒排 + FST + 分片并行，毫秒级搜索
+- **关键词**：倒排索引 ／ FST ／ 分片并行 ／ Posting List ／ 缓存
+- **链路**：查询 → FST 定位词项 → Posting List 取文档 → 分片并行汇总
+
+#### 📖 核心知识
+
+1. **倒排索引**：将文档分词后建立词项到文档 ID 的映射，查询时只需查找词项而非遍历全文。
+2. **FST 常驻内存**：Term Index（FST）常驻内存，快速定位词项在磁盘上的位置，避免全量扫描。
+3. **Posting List 压缩**：FOR 编码 + Roaring Bitmap 压缩文档 ID 列表，加速多条件求交运算。
+4. **分片并行**：查询在不同分片上并行执行，充分利用集群资源。
+5. **Filter 缓存**：filter context 的查询结果可缓存在 node query cache 中，重复查询直接命中。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】ES 查询优化的多层次：FST 内存索引（微秒级） → Posting List 压缩解码（毫秒级） → 分片并行（水平扩展） → filter 缓存（重复查询零开销）。
+- 【L4】对于高频查询，可结合 `routing` 将相关数据集中到同一分片，减少跨分片查询开销。
+
+> 📚 延伸阅读：[ES 查询性能优化](https://cloud.tencent.com/developer/article/1922613)
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：倒排索引为什么比 B+ 树快？** → 倒排索引基于词项字典序 + FST 前缀压缩，适合全文搜索；B+ 树适合精确查找，见本文档「ES 如何实现倒排索引？」。
+
 ### 【中等】ES 生产环境部署情况是怎样的？⭐
 
-**典型问题**
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 架构 / 生产部署
 
-- 你们的 Elasticsearch 生产环境部署情况是怎样的？
-- 你们的 Elasticsearch 生产环境集群规模有多大？
-- 你们的 Elasticsearch 生产环境中有多少索引，每个索引大概有多少个分片？
+#### 💎 关键结论
 
-**知识点**
+生产部署需描述集群规模、节点配置、索引数、分片数、文档总量和日增量，展示对 ES 实际运维的经验。
 
-根据实际 Elasticsearch 集群情况描述，以下是一个案例：
+#### ⚡记忆卡片
+
+- **口诀**：版本、规模、容量、增量四要素
+- **关键词**：集群规模 ／ 节点配置 ／ 分片数 ／ 日增量
+- **链路**：版本 → 集群规模 → 容量 → 增量 → 运维经验
+
+#### 📖 核心知识
+
+根据实际 ES 集群情况描述，以下是一个案例：
 
 - **版本**：6.3.2
 - **集群规模**：21 个节点，8 核 16G 内存，400G 磁盘
 - **容量**：6600GB/8400GB，900+ 索引、1.3 万分片、150 亿+ 文档
 - **增量**：日增 4 百万文档，5 GB
 
+#### 🔀 发散问题
+
+- **Q：你们的 ES 集群遇到过什么问题？** → 可根据实际经验描述分片不均衡、深分页、GC 停顿等问题和解决方案。
+
 ## Elasticsearch 优化
 
 ### 【中等】使用 ES 有哪些最佳实践？⭐
 
-- **索引**
-  - 大索引应拆分，增强性能，减少风险
-  - index 可以按日期拆分为 **`index_yyyyMMdd`**，然后用 alias 映射
-- **分片**：分片太大会导致查询慢、数据迁移和恢复时间长
-  - 非日志型业务分片不超过 **30 GB**
-  - 日志型业务分片不超过 **50 GB**
-  - 单分片文档数不超过 **21 亿**
-  - 单节点分片数不要超过 **600** 个
-- **文档**
-  - 单个文档大小不能超过 **100MB**
-- **字段**
-  - 一个索引中的字段数默认最大为 **1000**，但是不建议超过 **100**
-  - text 和 keyword 必须理清楚，keyword 是不会进行分词。
-  - 对于 `keyword` 类型，默认只索引前 **256** 个字符。超过此长度的字符串将不会被索引（即无法被 term 查询、聚合）。可以通过 `ignore_above` 参数调整。
-- **Settings 设置**
-  - 分片数设置后，不可修改
-  - 副本数默认 1 个
-- **Mapping 设置**
-  - text 数据类型默认是关闭 fielddate
-  - 关闭 `_source` 会导致无法使用 reindex
-  - `copy_to` 虽然方便，但会显著增加索引大小和写入开销。只在明确需要跨字段搜索时才使用。
-- **Refresh**
-  - 写入时，尽量不要执行 refresh，在并发较大的情况下，ES 负载可能会被打满。
-- **索引别名**
-  - 尽量使用索引的别名，在类似于进行索引字段类型变更需要进行索引重建的时候会减少很多的问题。
-  - 别名的下面可以挂载多个索引，若是索引拆分之后业务验证允许可以这么使用。
-  - alias 下面可以挂多个索引，但是需要注意的是每次请求很容易放大，比如说 alias 挂了 50 个索引，每个索引有 5 个分片，那么从集群的维度来看一共就是 50\*5=250 次 query 和 fetch，很容易导致读放大的情况。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 优化 / 最佳实践
+
+#### 💎 关键结论
+
+ES 最佳实践涵盖索引拆分、分片控制、字段类型选择、Mapping 优化、Refresh 调优和别名使用等方面。
+
+#### ⚡记忆卡片
+
+- **口诀**：索引拆、分片控、字段精、刷新调
+- **关键词**：索引拆分 ／ 分片容量 ／ keyword vs text ／ Refresh ／ 别名
+- **链路**：索引设计 → Mapping 优化 → 写入调优 → 查询优化
+
+#### 📖 核心知识
+
+- **索引**：大索引按日期拆分 `index_yyyyMMdd`，用 alias 映射。
+- **分片**：非日志型不超 30GB，日志型不超 50GB，单分片文档不超 21 亿，单节点不超 600 个。
+- **字段**：text 和 keyword 必须分清，keyword 默认只索引前 256 字符（`ignore_above` 可调）。
+- **Mapping**：text 默认关闭 fielddata；关闭 `_source` 会导致无法 reindex；`copy_to` 会增加索引大小。
+- **Settings**：分片数设置后不可修改，副本数默认 1 个。
+- **Refresh**：写入时尽量不执行 refresh，并发大时 ES 负载可能被打满。
+- **别名**：尽量使用别名，便于索引重建；但别名下挂多索引时注意读放大。
 
 ### 【中等】ES JVM 设置需要注意什么？⭐⭐
 
-::: tip 扩展
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 优化 / JVM
 
-- [A Heap of Trouble: Managing Elasticsearch's Managed Heap](https://www.elastic.co/blog/a-heap-of-trouble)
-- https://wiki.openjdk.org/display/HotSpot/CompressedOops
-- https://blog.csdn.net/liujianyangbj/article/details/108049482
+#### 💎 关键结论
+
+ES JVM 内存不超过 32GB（利用 Compressed Oops），Xms 和 Xmx 设置相同，一般分配 50% 可用内存给 ES。
+
+#### ⚡记忆卡片
+
+- **口诀**：Xms=Xmx，不超 32G，一半给 ES
+- **关键词**：Xms ／ Xmx ／ 32GB ／ Compressed Oops
+- **链路**：内存分配 → JVM 设置 → Compressed Oops 优化 → GC 调优
+
+#### 📖 核心知识
+
+1. 从 ES6 开始，支持 64 位 JVM。
+2. 将 `-Xms` 和 `-Xmx` 设置相同，避免运行时内存重新分配。
+3. 一般将 50% 可用内存分配给 ES，另外 50% 留给操作系统文件缓存。
+4. **JVM 内存不超 32GB**：超过后 Compressed Oops 失效，对象指针占用翻倍，实际可用内存反而更少。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】**Compressed Oops**：Java 对象按 8 字节对齐，指针使用偏移量而非真实地址，可寻址最大 32GB。超过 32GB 后指针占用翻倍，性能下降。
+- 【L4】ES 7.x 支持 G1 GC，对于大堆（>8GB）可考虑切换，减少 GC 停顿时间。
+
+> 📚 延伸阅读：[A Heap of Trouble](https://www.elastic.co/blog/a-heap-of-trouble)
 
 :::
 
-::: important 要点
+#### ⚠️ 常见误区
 
-`-Xms` 和 `-Xmx` 设置 JVM，JVM 内存不超过 32GB
+::: details
+
+常见误区：
+
+- ❌ "内存越大越好" → 超过 32GB 后 Compressed Oops 失效，实际性能反而下降。
+- ❌ "Xms 和 Xmx 可以不同" → 不同会导致运行时内存重新分配，产生 GC 停顿。
 
 :::
 
-ES 实际上是一个 Java 进程，因此也需要考虑 JVM 设置。关于 ES JVM 的设置，有以下几点建议：
+#### 🔀 发散问题
 
-- 从 ES6 开始，支持 64 位的 JVM
-- 将内存 `Xms` 和 `Xmx` 设置一样，需要注意过多的堆可能会使垃圾回收停顿时间过长
-- 一般，将 50％ 的可用内存分配给 ES
-- ES 内存不要超过 32 GB
-
-实际上，一般而言，**绝大部分 JVM 内存最好都不要超过 32 GB**，不仅仅是 ES 内存。
-
-对于 32 位系统来说，JVM 的对象指针占用 32 位（4 byte），可以表示 `2^32` 个内存地址。由于，CPU 寻址的最小单位是 byte，`2^32` byte 即 4GB，也就是说 JVM 最大可以支持 4GB。对于 64 位系统来说，如果直接引用，就需要使用 64 位的指针，相比 32 位 指针，多使用了一倍的内存。并且，指针在主内存和各级缓存间移动数据时，会占用更大的带宽。
-
-Java 使用了一种叫做 [Compressed oops](https://wiki.openjdk.org/display/HotSpot/CompressedOops) 的技术来进行优化。该技术利用 Java 对象按照 8 字节对齐的机制，让 Java 对象指针指向一个映射地址偏移量（非真实 64 位 地址）。这种方式可以寻址最大位 32 GB 的内存空间。一旦超出 32 GB，就无法利用压缩指针技术，对象指针只能指向真实内存地址，这会造成空间的浪费。
+- **Q：为什么 ES 只需要 50% 内存？** → 另外 50% 留给操作系统的文件系统缓存，用于缓存 Lucene Segment 文件，提升查询性能。
 
 ### 【中等】ES 主机有哪些优化点？⭐
 
-- 关闭缓存 swap;
-- 堆内存设置为：Min（节点内存/2, 32GB）;
-- 设置最大文件句柄数；
-- 线程池+队列大小根据业务需要做调整；
-- 磁盘存储 raid 方式——存储有条件使用 RAID10，增加单节点性能以及避免单节点存储故障。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Elasticsearch 优化 / 主机优化
+
+#### 💎 关键结论
+
+ES 主机优化包括关闭 swap、合理设置堆内存、调整文件句柄数、优化线程池和磁盘 RAID。
+
+#### ⚡记忆卡片
+
+- **口诀**：关 swap、设内存、调句柄、RAID10
+- **关键词**：swap ／ 堆内存 ／ 文件句柄 ／ RAID10
+- **链路**：关闭 swap → 设置堆内存 → 调整句柄数 → 磁盘优化
+
+#### 📖 核心知识
+
+1. **关闭 swap**：避免内存交换到磁盘，严重影响性能。
+2. **堆内存**：`Min(节点内存/2, 32GB)`。
+3. **文件句柄数**：设置最大文件句柄数（ES 大量文件操作）。
+4. **线程池 + 队列**：根据业务需要调整大小。
+5. **磁盘 RAID**：有条件使用 RAID10，增加单节点性能并避免存储故障。
 
 ### 【中等】ES 索引数据多，如何优化？⭐⭐⭐
 
-- **动态索引**：如果单索引数据量过大，可以创建索引模板，并周期性创建新索引（举例来说，索引名为 blog_yyyyMMdd），实现数据的分解。
-- **冷热数据分离**：将一定范围（如：一周、一月等）的数据作为热数据，其他数据作为冷数据。针对冷数据，可以考虑定期 force_merge + shrink 进行压缩，以节省存储空间和检索效率。
-- **分区再均衡**：Elasticsearch 集群可以动态根据节点数的变化，调整索引分片在集群上的分布。但需要注意的是，要提前合理规划好索引的分片数：分片数过少，则增加节点也无法水平扩展；分片数过多，影响 Elasticsearch 读写效率。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 优化 / 索引优化
+
+#### 💎 关键结论
+
+大量数据优化策略：动态索引按时间拆分、冷热数据分离、分区再均衡，结合 ILM 自动化管理。
+
+#### ⚡记忆卡片
+
+- **口诀**：索引拆、冷热分、再均衡
+- **关键词**：动态索引 ／ 冷热分离 ／ force_merge ／ shrink ／ 再均衡
+- **链路**：数据拆分 → 冷热分离 → 分区均衡 → ILM 自动化
+
+#### 📖 核心知识
+
+1. **动态索引**：单索引数据量过大时，创建索引模板周期性创建新索引（如 `blog_yyyyMMdd`）。
+2. **冷热数据分离**：近期数据为热数据（高配节点），历史数据为冷数据（低配节点）。冷数据定期 force_merge + shrink 压缩。
+3. **分区再均衡**：根据节点数变化动态调整分片分布，提前规划分片数。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】结合 ILM（Index Lifecycle Management）策略可自动化冷热分离和索引清理，见本文档「ES 如何实现索引生命周期管理（ILM）？」。
+- 【L4】对于搜索型索引，可使用 `searchable_snapshots`（可搜索快照）将冷数据存储在廉价存储（如 S3）上，降低成本。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：冷热分离具体怎么实现？** → 通过 ILM 策略的 Hot/Warm/Cold/Delete 阶段自动迁移索引到不同节点，见本文档「ES 如何实现索引生命周期管理（ILM）？」。
 
 ## Elasticsearch 高级
 
 ### 【困难】ES 如何实现向量搜索（kNN）？⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 高级 / 向量搜索
+
+#### 💎 关键结论
+
+ES 8.0+ 通过 dense_vector 字段和 HNSW 索引原生支持 kNN 向量搜索，时间复杂度 O(log N)，可与 BM25 混合搜索实现融合排序。
+
+#### ⚡记忆卡片
+
+- **口诀**：八向量、HNSW、混合搜
+- **关键词**：dense_vector ／ HNSW ／ kNN ／ 混合搜索
+- **链路**：Embedding 模型 → dense_vector 存储 → HNSW 索引 → kNN 查询 → 融合排序
+
+#### 📖 核心知识
 
 Elasticsearch 8.0 原生支持向量搜索，用于 AI/ML 场景下的相似性检索（如 RAG、图像搜索、推荐系统）。
 
@@ -1259,13 +2056,11 @@ graph TB
     H --> I["构建 HNSW 索引"]
 ```
 
-**核心概念**：
+1. **dense_vector 字段类型**：用于存储浮点数向量，支持 `cosine`、`dot_product`、`l2_norm` 等相似度度量。
+2. **kNN Search**：近似最近邻搜索，基于 HNSW（Hierarchical Navigable Small World）索引实现，时间复杂度约 `O(log N)`。
+3. **混合搜索**：可将 kNN 与传统 BM25 全文搜索组合，通过 `sub_searches` 实现融合排序。
 
-- **dense_vector 字段类型**：用于存储浮点数向量，支持 `cosine`、`dot_product`、`l2_norm` 等相似度度量。
-- **kNN Search**：近似最近邻搜索，基于 HNSW（Hierarchical Navigable Small World）索引实现，时间复杂度约 `O(log N)`。
-- **混合搜索**：可将 kNN 与传统 BM25 全文搜索组合，通过 `sub_searches` 实现融合排序。
-
-**Mapping 示例**：
+::: details Mapping 示例
 
 ```json
 {
@@ -1282,7 +2077,9 @@ graph TB
 }
 ```
 
-**kNN 查询示例**：
+:::
+
+::: details kNN 查询示例
 
 ```json
 {
@@ -1295,7 +2092,58 @@ graph TB
 }
 ```
 
+:::
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】**num_candidates** 控制搜索精度与性能的平衡：值越大结果越精确但速度越慢，建议设为 k 的 10-100 倍。
+- 【L4】ES 8.x 支持 **quantized kNN**（量化向量），将 float32 压缩为 int8，内存占用降 75%，精度损失极小。
+
+> 📚 延伸阅读：[Elasticsearch kNN Search](https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html)
+
+:::
+
+#### 🏭 实战场景
+
+::: details
+
+某电商平台使用 ES 8.x 实现商品图片搜索：10 亿商品向量（768 维），16 节点集群，kNN 查询 P99 < 50ms。通过 `num_candidates=200`、`k=20` 配置，召回率达 95%+，日均处理 500 万次向量搜索请求。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "kNN 是精确搜索" → kNN 基于 HNSW 是近似搜索（ANN），不是暴力遍历的精确 KNN，存在精度损失。
+- ❌ "向量维度越高越好" → 维度增加会导致 HNSW 索引膨胀和查询变慢，应根据场景选择合适的维度（常用 128-1024）。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：ES 向量搜索和专用向量数据库（如 Milvus）有什么区别？** → ES 优势在于与传统搜索融合（混合搜索）、运维一体化；专用向量库在纯向量场景下性能更极致。
+- **Q：什么是 HNSW？** → Hierarchical Navigable Small World，一种图索引算法，通过多层跳表结构实现 O(log N) 的近似最近邻搜索。
+
 ### 【困难】ES 如何实现索引生命周期管理（ILM）？⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Elasticsearch 高级 / ILM
+
+#### 💎 关键结论
+
+ILM 通过 Hot→Warm→Cold→Delete 四阶段自动化管理索引生命周期，特别适用于日志、指标等时间序列数据，减少人工运维成本。
+
+#### ⚡记忆卡片
+
+- **口诀**：热温冷删四阶段
+- **关键词**：Hot ／ Warm ／ Cold ／ Delete ／ Rollover
+- **链路**：Hot 写入 → Warm 压缩 → Cold 冻结 → Delete 清理
+
+#### 📖 核心知识
 
 Index Lifecycle Management（ILM）是 Elasticsearch 用于自动化索引生命周期管理的机制，特别适用于日志、指标等时间序列数据。
 
@@ -1310,16 +2158,12 @@ graph LR
     D --> H["自动删除"]
 ```
 
-**ILM 策略阶段**：
+1. **Hot**：Rollover——当索引大小/文档数/年龄达到阈值时自动创建新索引。
+2. **Warm**：Shrink + Force Merge——压缩分片、合并 Segment，降低资源占用。
+3. **Cold**：Freeze——冻结索引，减少内存占用，仅支持查询。
+4. **Delete**：Delete——自动删除过期数据。
 
-| 阶段 | 动作 | 说明 |
-|------|------|------|
-| Hot | Rollover | 当索引大小/文档数/年龄达到阈值时自动创建新索引 |
-| Warm | Shrink, Force Merge | 压缩分片、合并 Segment，降低资源占用 |
-| Cold | Freeze | 冻结索引，减少内存占用，仅支持查询 |
-| Delete | Delete | 自动删除过期数据 |
-
-**ILM 策略示例**：
+::: details ILM 策略示例
 
 ```json
 {
@@ -1353,11 +2197,61 @@ graph LR
 }
 ```
 
+:::
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】ILM 策略通过 `index.lifecycle.name` 绑定到索引，配合 Index Template 可自动应用到新创建的索引。
+- 【L4】ES 8.x 引入了 **Searchable Snapshots**，可在 Cold 阶段将数据存储在 S3/HDFS 等廉价存储上，保持可搜索能力。
+
+> 📚 延伸阅读：[Index Lifecycle Management](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-lifecycle-management.html)
+
+:::
+
+#### 🏭 实战场景
+
+::: details
+
+某日志平台日均写入 50GB 日志数据，使用 ILM 策略：Hot 阶段 7 天 Rollover、Warm 阶段 Shrink 到 1 分片并 Force Merge、Cold 阶段 30 天后冻结、90 天自动删除。存储成本降低 60%，运维零人工干预。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "ILM 可以修改主分片数" → Shrink 只能减少分片数（且必须是原分片数的因子），不能增加。
+- ❌ "Warm 阶段索引不可写也不可读" → Warm 阶段索引不可写但可正常查询，只是资源占用被压缩。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：ILM 和手动管理索引有什么区别？** → ILM 全自动化，无需人工干预；手动管理需要定时脚本清理、合并，维护成本高。
+
 ### 【困难】ES 如何实现海量数据的高效写入？⭐⭐
 
-**Bulk API 批量写入**
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 高级 / 写入优化
 
-Bulk API 将多个操作打包成单次请求，显著减少网络开销：
+#### 💎 关键结论
+
+海量写入核心是 Bulk 批量 + 调大 Refresh/Translog 间隔 + 减少副本 + 自动生成 ID，综合可提升写入吐量 5-10 倍。
+
+#### ⚡记忆卡片
+
+- **口诀**：批量写、慢刷新、少副本、自生ID
+- **关键词**：Bulk API ／ Refresh Interval ／ Translog ／ 自动生成 ID
+- **链路**：Bulk 批量 → 调大 Refresh → 异步 Translog → 减少副本 → 写入吐量提升
+
+#### 📖 核心知识
+
+1. **Bulk API 批量写入**：将多个操作打包成单次请求，显著减少网络开销。
+
+::: details Bulk API 示例
 
 ```json
 POST _bulk
@@ -1367,16 +2261,61 @@ POST _bulk
 { "field1": "value2" }
 ```
 
-**写入性能优化策略**：
+:::
 
-- **增大 Refresh Interval**：`index.refresh_interval: 30s`，减少 Segment 生成频率。
-- **增大 Translog 刷盘间隔**：`index.translog.durability: async`（异步刷盘，有少量数据丢失风险）。
-- **减少副本数**：写入时将副本数设为 0，完成后再恢复。
-- **关闭 `_source`**：如果不需要 reindex 和高亮，可关闭以节省存储。
-- **使用自动生成 ID**：避免版本检查开销。
-- **调大 indexing buffer**：`indices.memory.index_buffer_size: 20%`。
+2. **增大 Refresh Interval**：`index.refresh_interval: 30s`，减少 Segment 生成频率。
+3. **增大 Translog 刷盘间隔**：`index.translog.durability: async`（异步刷盘，有少量数据丢失风险）。
+4. **减少副本数**：写入时将副本数设为 0，完成后再恢复。
+5. **使用自动生成 ID**：避免版本检查开销。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】**关闭 `_source`**：如果不需要 reindex 和高亮，可关闭以节省存储；**调大 indexing buffer**：`indices.memory.index_buffer_size: 20%`。
+- 【L4】对于超大规模初始加载（如数据迁移），可临时将 `number_of_replicas` 设为 0、`refresh_interval` 设为 `-1`，完成后恢复。
+
+:::
+
+#### 🏭 实战场景
+
+::: details
+
+某数据平台日常写入吐量 10 万 docs/s，通过以下优化提升到 80 万 docs/s：Bulk size 调整为 5000 条/批、refresh_interval 设为 30s、translog 改为 async、写入期间副本数设为 0。集群 6 节点，日写入量 50GB。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "Bulk 批量越大越好" → 过大的 Bulk 会导致单次请求占用过多内存，建议 5-15MB 或 500-1000 条/批。
+- ❌ "异步 Translog 没有风险" → 异步刷盘在节点崩溃时可能丢失最近一次刷盘间隔内的数据。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：Bulk 写入失败怎么处理？** → Bulk 响应中会标记失败的操作，可提取失败项重试，不影响其他成功操作。
+- **Q：写入时副本数设为 0 有什么风险？** → 写入期间如果节点故障，没有副本可用，数据可能丢失，只适用于可重放的批量加载场景。
 
 ### 【困难】Doc Values 和 Fielddata 有什么区别？⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Elasticsearch 高级 / 存储结构
+
+#### 💎 关键结论
+
+Doc Values 是索引时预构建的列式存储（磁盘、堆外），适用于 keyword/numeric；Fielddata 是查询时加载到堆内存的正排结构，仅用于 text，有 OOM 风险。
+
+#### ⚡记忆卡片
+
+- **口诀**：Doc Values 堆外稳，Fielddata 堆内险
+- **关键词**：Doc Values ／ Fielddata ／ 堆外内存 ／ OOM ／ 列式存储
+- **链路**：写入时构建 Doc Values（磁盘） → 查询时按需 mmap；text 字段查询时加载 Fielddata（堆内存）
+
+#### 📖 核心知识
 
 | 特性 | Fielddata | Doc Values |
 |------|-----------|------------|
@@ -1386,10 +2325,42 @@ POST _bulk
 | OOM 风险 | 高（占用堆内存） | 低（使用堆外内存） |
 | 默认启用 | 否（text 默认关闭） | 是 |
 
-**关键点**：
+1. **Fielddata**：在查询时将倒排索引转置为正排格式加载到堆内存，适用于 text 字段的聚合/排序，但大索引场景下容易导致 OOM。
+2. **Doc Values**：索引时预构建的列式存储结构，写入磁盘，按需 mmap 到内存，适用于 keyword/numeric 等字段的聚合/排序，性能更稳定。
+3. **选型原则**：需要聚合/排序的字段优先用 keyword（自动启用 Doc Values），text 字段仅在必要时开启 Fielddata。
 
-- **Fielddata**：在查询时将倒排索引转置为正排格式加载到堆内存，适用于 text 字段的聚合/排序，但大索引场景下容易导致 OOM。
-- **Doc Values**：索引时预构建的列式存储结构，写入磁盘，按需 mmap 到内存，适用于 keyword/numeric 等字段的聚合/排序，性能更稳定。
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】Doc Values 采用列式存储，每个字段一个文件，对聚合/排序场景非常高效，但不支持 text 字段（因为 text 会被分词，无法列式存储）。
+- 【L4】ES 8.x 中，keyword 字段的 Doc Values 支持 **eager_global_ordinals** 优化，在聚合场景下提前加载全局序号表，减少查询时的计算开销。
+
+:::
+
+#### 🏭 实战场景
+
+::: details
+
+某日志平台曾对 text 字段开启 Fielddata 做聚合，导致 JVM Heap 频繁 GC，OOM 崩溃。改为 keyword 字段 + Doc Values 后，聚合性能提升 3 倍，堆内存占用降低 80%。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "Doc Values 和 Fielddata 是一样的" → 存储位置、构建时机、OOM 风险完全不同，Doc Values 是堆外磁盘存储，Fielddata 是堆内存加载。
+- ❌ "text 字段也可以开启 Doc Values" → Doc Values 不支持 text 类型，text 字段只能用 Fielddata，建议改为 keyword。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：为什么 text 字段不支持 Doc Values？** → text 字段会被分词为多个 term，无法构建固定的列式结构，只能在查询时动态加载。
+- **Q：如何避免 Fielddata OOM？** → 使用 keyword 替代 text、设置 `fielddata` 断路器限制内存占用，或使用聚合专用的 keyword 子字段。
 
 ## 参考资料
 
