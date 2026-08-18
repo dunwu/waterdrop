@@ -1684,33 +1684,19 @@ ES 写入流程为：路由到主分片 → 写 Index Buffer + Translog → Refr
 
 #### 📖 核心知识
 
-```mermaid
-graph TB
-    A["客户端写入请求"] --> B["协调节点"]
-    B --> C["路由到主分片"]
-    C --> D["主分片写入"]
-    D --> E["Index Buffer"]
-    D --> F["Translog 追加写入"]
-    E --> G["Refresh (1s): 写入 Filesystem Cache"]
-    G --> H["可被搜索 - 近实时"]
-    F --> I["Flush (30min/translog满): fsync 刷盘"]
-    I --> J["清空 Translog"]
-    G --> K["Merge: 合并 Segment + 物理删除"]
-    D --> L["复制到副本分片"]
-    L --> M["所有副本确认后响应客户端"]
-```
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/50ff0b019c6f47f6a5a00103adfc3301.png)
 
 从三个角度阐述：
 
 1. **集群角度**：请求路由到主分片，主分片写入后复制到副本，确认后响应。
+   ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/7788e062ae544310a999180c4953bc48.png)
 2. **分片角度**：对内容进行格式校验、分词处理。
 3. **节点角度**：
    - **Refresh**（默认 1s）：Index Buffer 写入 Filesystem Cache，可被搜索（近实时原因）。
    - **Translog**：追加写入，默认 fsync 刷盘，保证数据不丢。
    - **Flush**（默认 30min 或 translog 满 512MB）：fsync 刷盘，清空 Translog。
    - **Merge**：合并 Segment，物理删除标记删除的文档。
-
-![](https://raw.githubusercontent.com/dunwu/images/master/archive/2025/03/50ff0b019c6f47f6a5a00103adfc3301.png)
+   ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/9b3ea3bae0d342b7928a7cdc9bc9d8e5.png)
 
 #### 🔬 扩展知识
 
@@ -1765,6 +1751,8 @@ ES 相关性评分和聚合在各分片本地独立计算，只基于数据子�
 ES 的相关性评分和聚合先在每个分片本地计算，再由协调节点汇总。由于本地计算基于数据子集，难免产生偏差。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/0848782a8d894f078e0f7f9583ed6743.png)
+
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/3656b57ba1f4491ebc4a2297f03d7bbc.png)
 
 解决方式：
 1. **单分片**：数据量不大时设置主分片数为 1，在全集上计算。

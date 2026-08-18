@@ -704,6 +704,8 @@ Redis 支持非严格的事务，其事务不支持回滚。[`MULTI`](https://re
 
 `WATCH` 可以用于创建 Redis 没有内置的原子操作。
 
+![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/28394fb19243eead19252521a4cef9f5.jpg)
+
 举个例子，以下代码实现了原创的 `ZPOP` 命令，它可以原子地弹出有序集合中分值（`score`）最小的元素：
 
 ```shell

@@ -84,6 +84,7 @@ export default hopeTheme({
     math: {
       type: 'katex'
     },
+    mermaid: true,
     stylize: [
       {
         matcher: 'Recommended',

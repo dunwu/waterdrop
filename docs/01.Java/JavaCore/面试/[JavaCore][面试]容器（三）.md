@@ -20,9 +20,21 @@ permalink: /pages/ed0f8b4b/
 
 ### 【中等】Stream API 的中间操作和终端操作有什么区别？⭐⭐⭐
 
-Stream 操作分为**中间操作**（返回 Stream，可链式）和**终端操作**（触发执行，返回结果）。
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Stream API / 执行模型
 
-**核心区别**：
+#### 💎 关键结论
+
+Stream 操作分两类：**中间操作**惰性求值、返回 Stream，只记录流水线不执行；**终端操作**才触发实际执行并返回结果。没有终端操作，中间操作永远不执行。
+
+#### ⚡记忆卡片
+
+- **口诀**：中间惰性可链式，终端触发才出结果
+- **关键词**：惰性求值 ／ 流水线 ／ 短路
+- **链路**：中间操作记录流水线 → 终端操作触发执行 → 元素逐个流经各阶段
+
+#### 📖 核心知识
+
+1. **两类操作定义**：Stream 操作分为**中间操作**（返回 Stream，可链式）和**终端操作**（触发执行，返回结果）。
 
 | **维度** | **中间操作** | **终端操作** |
 | -------- | ------------ | ------------ |
@@ -31,7 +43,7 @@ Stream 操作分为**中间操作**（返回 Stream，可链式）和**终端操
 | **链式调用** | 可继续接操作 | 流终止，不可再操作 |
 | **短路** | 部分支持（如 `limit`） | 部分支持（如 `findFirst`） |
 
-**常见中间操作**：
+2. **常见中间操作**：
 
 | **操作** | **说明** | **示例** |
 | -------- | -------- | -------- |
@@ -44,7 +56,7 @@ Stream 操作分为**中间操作**（返回 Stream，可链式）和**终端操
 | `skip` | 跳过前 N 个 | `.skip(5)` |
 | `peek` | 查看（调试用） | `.peek(System.out::println)` |
 
-**常见终端操作**：
+3. **常见终端操作**：
 
 | **操作** | **说明** | **示例** |
 | -------- | -------- | -------- |
@@ -57,7 +69,7 @@ Stream 操作分为**中间操作**（返回 Stream，可链式）和**终端操
 | `findFirst`/`findAny` | 查找 | `.findFirst()` |
 | `toArray` | 转数组 | `.toArray(String[]::new)` |
 
-**惰性求值示例**：
+4. **惰性求值示例**：
 
 ```java
 // 中间操作不执行，直到终端操作触发
@@ -68,16 +80,42 @@ Stream<String> stream = list.stream()
 stream.forEach(System.out::println);  // 此刻才执行全部流水线
 ```
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】惰性求值实现原理：`filter`/`map` 等中间操作是 `AbstractPipeline` 的子类（无状态操作 StatelessOp / 有状态操作 StatefulOp），调用时只是把自己链入流水线并记录流标志位；只有终端操作从最后一个阶段起调用 `opWrapSink` 组装出 Sink 链后，数据才真正逐元素流动。
+- 【L3】纵向融合：流水线按“单个元素流经所有阶段”执行，而非“每个阶段处理全部元素”，一次遍历即可完成 filter + map + collect，避免中间集合与多次遍历。
+- 【L4】版本演进：Java 9 新增 `takeWhile` / `dropWhile` / `ofNullable`；Java 16 新增 `Stream.toList()`，返回不可修改 List，与 `Collectors.toList()` 返回可变 ArrayList 不等价。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：同一个 Stream 能调用两次终端操作吗？** → 不能，会抛 `IllegalStateException`。流是一次性的，被终端操作消费后不可复用，需重新 `collection.stream()` 生成新流。
+- **Q：peek 一定会执行吗？** → 不保证。`peek` 是调试用中间操作，没有终端操作触发时不执行，且官方文档说明某些情况下可能被实现优化掉，不要用它承载业务逻辑。
+
 ### 【中等】什么是短路操作？⭐⭐
 
-**短路操作**指无需处理所有元素即可返回结果，提升性能。
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Stream API / 短路操作
 
-**短路中间操作**：
+#### 💎 关键结论
 
-- `limit(n)`：取到 n 个后停止。
-- `skip(n)` 虽不短路，但配合 `limit` 可实现"分页"。
+短路操作无需处理所有元素即可返回结果，一旦条件命中就立即终止流水线，显著降低遍历成本。典型代表是 `findFirst` / `anyMatch` / `limit`。
 
-**短路终端操作**：
+#### ⚡记忆卡片
+
+- **口诀**：find 遇一即停，any/all/none 见微知著，limit 到数就停
+- **关键词**：短路 ／ find ／ match
+- **链路**：元素流经流水线 → 谓词命中 → 短路信号向上游传播 → 流水线停止
+
+#### 📖 核心知识
+
+1. **定义**：**短路操作**指无需处理所有元素即可返回结果，提升性能。
+2. **短路中间操作**：
+   - `limit(n)`：取到 n 个后停止。
+   - `skip(n)` 虽不短路，但配合 `limit` 可实现“分页”。
+3. **短路终端操作**：
 
 | **操作** | **短路条件** |
 | -------- | ------------ |
@@ -87,7 +125,7 @@ stream.forEach(System.out::println);  // 此刻才执行全部流水线
 | `allMatch()` | 遇到 false 即停止，返回 false |
 | `noneMatch()` | 遇到 true 即停止，返回 false |
 
-**示例**：
+4. **示例**：
 
 ```java
 // 1. findFirst 短路：只处理到第一个匹配元素
@@ -101,11 +139,28 @@ boolean hasLong = list.stream()
     .anyMatch(s -> s.length() > 10);
 ```
 
+#### 🔀 发散问题
+
+- **Q：findFirst 和 findAny 有什么区别？** → 串行流下结果一致；并行流中 `findAny` 可率先返回任一分区结果，通常更快；不关心顺序时应优先用 `findAny`。
+- **Q：limit 能截断无限流吗？** → 可以。`Stream.iterate` / `generate` 产生的无限流必须搭配 `limit(n)` 使用，取够 n 个即截断，这是短路机制的经典用法。
+
 ### 【中等】并行流（Parallel Stream）的原理和注意事项？⭐⭐⭐
 
-并行流利用 **ForkJoinPool.commonPool()** 并行处理数据，适合**数据量大**且**无顺序要求**的场景。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Stream API / 并行流
 
-**使用方式**：
+#### 💎 关键结论
+
+并行流基于 `ForkJoinPool.commonPool()` 分治拆分数据并行计算，适合**数据量大、纯计算、无共享可变状态**的场景；小数据、阻塞操作、有副作用时使用反而更慢甚至出错。
+
+#### ⚡记忆卡片
+
+- **口诀**：大数据、纯计算、无共享才并行；小数据、阻塞、副作用勿用
+- **关键词**：ForkJoinPool ／ 分治 ／ commonPool
+- **链路**：parallel() 标记流水线 → Spliterator 拆分数据 → ForkJoin 任务并行计算 → 结果合并
+
+#### 📖 核心知识
+
+1. **使用方式**：
 
 ```java
 // 串行流
@@ -119,13 +174,13 @@ list.stream().parallel().filter(...).collect(...);
 stream.sequential();
 ```
 
-**底层原理**：
+2. **底层原理**：
 
 - 基于 `ForkJoinPool.commonPool()`，默认线程数 = CPU 核心数 - 1。
 - 使用**分治策略**：将源数据分割，并行处理，最后合并结果。
 - 源数据需支持**高效分割**（如 `ArrayList` 支持，`LinkedList` 不支持）。
 
-**适用场景**：
+3. **适用场景**：
 
 | **适合并行** | **不适合并行** |
 | ------------ | -------------- |
@@ -135,7 +190,7 @@ stream.sequential();
 | 无共享可变状态 | 有副作用（修改共享变量） |
 | 源支持分割（ArrayList） | 源不支持分割（LinkedList） |
 
-**常见陷阱**：
+4. **常见陷阱**：
 
 ```java
 // ❌ 陷阱1：线程安全问题（共享可变状态）
@@ -156,7 +211,7 @@ list.parallelStream().forEach(item -> {
 });
 ```
 
-**性能对比**：
+5. **性能对比**：
 
 ```java
 // 数据量大时，并行流更快
@@ -166,11 +221,58 @@ long count = IntStream.range(0, 10_000_000)
     .count();  // 并行更快
 ```
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】线程数控制：commonPool 并行度默认为 `Runtime.getRuntime().availableProcessors() - 1`，可用 JVM 参数 `-Djava.util.concurrent.ForkJoinPool.common.parallelism` 调整；发起调用的当前线程也会参与计算。
+- 【L3】拆分质量决定加速比：`ArrayList` 的 Spliterator 可 O(1) 均匀二分；`LinkedList`、IO 流拆分质量差；`sorted` 是有状态操作，并行下需汇聚全部数据再排序，开销显著。
+- 【L4】隔离方案：任务含阻塞调用时，可将并行流提交到自建 `ForkJoinPool` 执行（Java 8 起该行为成立），避免污染全局 commonPool；IO 密集型并发更推荐 `CompletableFuture` + 自定义线程池。
+
+:::
+
+#### 🏭 实战场景
+
+::: details
+
+某风控服务内存中对千万级订单记录做 `filter + summingLong` 聚合：8 核机器上串行流耗时约 1.2s，`parallelStream` 降至约 0.25s（加速比约 4~5 倍，未达线性主因拆分合并开销与尾任务不均，具体数值以实际压测为准）。另一案例：批处理中误将含 100ms RPC 调用的逻辑放入并行流，commonPool 的 7 个工作线程全部阻塞，导致同 JVM 内其他接口的并行流任务排队劣化为准串行，后改为自定义线程池 + `CompletableFuture` 修复。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ “并行流一定比串行快” → 并行有拆分、合并与线程调度开销，数据量小（数千以内）或元素处理简单时串行往往更快。
+- ❌ “parallelStream 天然线程安全” → 流水线本身线程安全，但 lambda 中若捕获共享可变状态（如 `ArrayList::add`）会发生竞态丢数据，应改用 `collect` 收集结果。
+- ❌ “parallel() 和 sequential() 可分段混合生效” → 并行/串行标志是整条流水线的状态，以最后一次调用为准，并非分段执行。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：并行流中 forEach 顺序为什么不稳定？** → 各分区并行处理，遍历顺序不可预期，且共享副作用存在竞态；需要有序消费用 `forEachOrdered`，需要结果用 `collect`。
+- **Q：IO 密集型并发该用什么？** → 不适合并行流，阻塞会耗尽 commonPool；推荐 `CompletableFuture` + 自定义线程池，或 Java 21+ 的虚拟线程。
+
 ### 【中等】Collectors 工具类有哪些常用方法？⭐⭐⭐
 
-`Collectors` 提供丰富的收集器，是 Stream API 的核心工具。
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Stream API / 收集器
 
-**归类汇总**：
+#### 💎 关键结论
+
+`Collectors` 是 Stream 的汇聚工具箱：`toList`/`toMap`/`toCollection` 转集合，`groupingBy`/`partitioningBy` 分组分区，`summingInt`/`summarizingInt` 归约统计；`toMap` 需特别注意 key 冲突与 value 为 null 的 NPE。
+
+#### ⚡记忆卡片
+
+- **口诀**：to 系转集合，grouping 分组 partitioning 分区，summing 统计归约
+- **关键词**：toMap ／ groupingBy ／ partitioningBy
+- **链路**：stream.collect → Collector 供应容器 → 逐元素累积 → 并行合并出结果
+
+#### 📖 核心知识
+
+1. **收集为集合**：`Collectors` 提供丰富的收集器，是 Stream API 的核心工具。
 
 | **收集器** | **作用** | **示例** |
 | ---------- | -------- | -------- |
@@ -180,7 +282,7 @@ long count = IntStream.range(0, 10_000_000)
 | `toCollection()` | 收集为指定集合 | `.collect(Collectors.toCollection(LinkedList::new))` |
 | `joining()` | 拼接字符串 | `.collect(Collectors.joining(", "))` |
 
-**分组分区**：
+2. **分组分区**：
 
 ```java
 // 分组（groupingBy）
@@ -206,7 +308,7 @@ Map<Dept, Integer> sumByDept = employees.stream()
     .collect(Collectors.groupingBy(Employee::getDept, Collectors.summingInt(Employee::getSalary)));
 ```
 
-**归约统计**：
+3. **归约统计**：
 
 ```java
 // 求和
@@ -224,7 +326,7 @@ Optional<Integer> max = list.stream()
     .collect(Collectors.maxBy(Comparator.naturalOrder()));
 ```
 
-**toMap 的常见坑**：
+4. **toMap 的常见坑（key 冲突）**：
 
 ```java
 // ❌ key 重复时抛 IllegalStateException
@@ -245,6 +347,33 @@ Map<Long, String> map = users.stream()
         User::getId, User::getName, (a, b) -> a, LinkedHashMap::new));
 ```
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】Collector 四要素：`supplier` 创建结果容器、`accumulator` 逐元素累积、`combiner` 合并并行分片结果、`finisher` 做最终转换；`characteristics`（CONCURRENT / UNORDERED / IDENTITY_FINISH）决定并行归并策略。
+- 【L3】toMap 双参版累加器走 `Map.merge`，value 为 null 时会抛 NPE，需换三参/四参重载或 forEach 手动 put，详见本文档「集合转 Map」。
+- 【L4】版本演进：Java 12 新增 `Collectors.teeing` 可同时跑两个收集器并合并结果；Java 16 的 `Stream.toList()` 可替代 `Collectors.toList()`（返回不可修改 List）。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ “toMap 遇到重复 key 会保留后值” → 双参版直接抛 `IllegalStateException`，需显式传入 merge 函数决定取舍。
+- ❌ “`toList()` 返回的 List 不可变” → `Collectors.toList()` 返回可变 ArrayList，只是规范不保证具体实现；需要不可变语义用 Java 16 的 `Stream.toList()` 或 `toUnmodifiableList()`（Java 10+）。
+- ❌ “partitioningBy 就是 groupingBy” → 前者是布尔条件的特例，结果 Map 保证同时包含 true/false 两个 key，后者分组键可为任意类型。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：groupingBy 如何一次算出多指标？** → 下游收集器用 `Collectors.teeing`（Java 12+）或分别收集；也可用 `summarizingInt` 一次得到 count/sum/min/avg/max 摘要。
+- **Q：Stream.reduce 和 Collectors.reducing 有什么区别？** → `Stream.reduce` 是终端操作，返回累积值或 Optional；`Collectors.reducing` 是收集器，可作为 `groupingBy` 的下游，分组后逐组归约更方便。
+
 ## Java 容器工具类
 
 **`Collections` 工具类常用方法**:
@@ -255,7 +384,23 @@ Map<Long, String> map = users.stream()
 
 ### 【简单】排序操作⭐
 
-```
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Collections 工具类 / 排序操作
+
+#### 💎 关键结论
+
+`Collections` 提供 `reverse`/`shuffle`/`sort`/`swap`/`rotate` 等静态方法对 List 重排，`sort` 支持自定义 `Comparator`，均为原地修改、不产生新集合。
+
+#### ⚡记忆卡片
+
+- **口诀**：reverse 反转 shuffle 乱，sort 排序 swap 换，rotate 旋转整体搬
+- **关键词**：sort ／ Comparator ／ 原地修改
+- **链路**：静态方法接收 List → 直接修改原集合 → 返回 void（无新集合）
+
+#### 📖 核心知识
+
+`Collections` 的排序类方法均作用于 `List`，常用如下：
+
+```java
 void reverse(List list)//反转
 void shuffle(List list)//随机排序
 void sort(List list)//按自然排序的升序排序
@@ -266,7 +411,23 @@ void rotate(List list, int distance)//旋转。当 distance 为正数时，将 l
 
 ### 【简单】查找，替换操作⭐
 
-```
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Collections 工具类 / 查找替换
+
+#### 💎 关键结论
+
+`Collections` 提供 `binarySearch`/`max`/`min`/`fill`/`frequency`/`replaceAll` 等静态方法；注意 `binarySearch` 前提是 List 已有序，否则结果不可预期。
+
+#### ⚡记忆卡片
+
+- **口诀**：二分查找先有序，最值可配 Comparator，fill 全替 frequency 计数
+- **关键词**：binarySearch ／ frequency ／ replaceAll
+- **链路**：前置有序 → 查找（二分/最值/子列表）→ 替换（fill/replaceAll）
+
+#### 📖 核心知识
+
+查找与替换类静态方法常用如下：
+
+```java
 int binarySearch(List list, Object key)//对 List 进行二分查找，返回索引，注意 List 必须是有序的
 int max(Collection coll)//根据元素的自然顺序，返回最大的元素。 类比 int min(Collection coll)
 int max(Collection coll, Comparator c)//根据定制排序，返回最大元素，排序规则由 Comparatator 类控制。类比 int min(Collection coll, Comparator c)
@@ -278,15 +439,27 @@ boolean replaceAll(List list, Object oldVal, Object newVal)//用新元素替换�
 
 ### 【简单】同步控制⭐
 
-`Collections` 提供了多个`synchronizedXxx()`方法·，该方法可以将指定集合包装成线程同步的集合，从而解决多线程并发访问集合时的线程安全问题。
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Collections 工具类 / 同步控制
 
-我们知道 `HashSet`，`TreeSet`，`ArrayList`,`LinkedList`,`HashMap`,`TreeMap` 都是线程不安全的。`Collections` 提供了多个静态方法可以把他们包装成线程同步的集合。
+#### 💎 关键结论
 
-**最好不要用下面这些方法，效率非常低，需要线程安全的集合类型时请考虑使用 JUC 包下的并发集合。**
+`synchronizedXxx` 用互斥锁把集合包装成同步集合，粗粒度且效率低；需要线程安全时应优先选 JUC 并发集合，如 `ConcurrentHashMap`、`CopyOnWriteArrayList`。
 
-方法如下：
+#### ⚡记忆卡片
 
-```
+- **口诀**：同步包装是粗锁，效率太低不推荐；并发集合找 JUC
+- **关键词**：synchronizedXxx ／ 互斥锁 ／ JUC
+- **链路**：普通集合经 synchronizedXxx 包装 → 方法级加锁 → 高竞争下性能差 → 改用 JUC 并发集合
+
+#### 📖 核心知识
+
+1. **作用**：`Collections` 提供了多个 `synchronizedXxx()` 方法，可以将指定集合包装成线程同步的集合，从而解决多线程并发访问集合时的线程安全问题。
+
+2. **包装对象**：`HashSet`、`TreeSet`、`ArrayList`、`LinkedList`、`HashMap`、`TreeMap` 都是线程不安全的，`Collections` 提供了多个静态方法可以把他们包装成线程同步的集合。
+
+3. **不推荐使用**：最好不要用下面这些方法，效率非常低，需要线程安全的集合类型时请考虑使用 JUC 包下的并发集合。
+
+```java
 synchronizedCollection(Collection<T>  c) //返回指定 collection 支持的同步（线程安全的）collection。
 synchronizedList(List<T> list)//返回指定列表支持的同步（线程安全的）List。
 synchronizedMap(Map<K,V> m) //返回由指定映射支持的同步（线程安全的）Map。
@@ -521,9 +694,7 @@ s=list.toArray(new String[0]);
 
 > **使用工具类 `Arrays.asList()` 把数组转换成集合时，不能使用其修改集合相关的方法， 它的 `add/remove/clear` 方法会抛出 `UnsupportedOperationException` 异常。**
 
-::: info 不能直接使用 Arrays.asList 来转换基本类型数组
-
-:::
+**不能直接使用 Arrays.asList 来转换基本类型数组**
 
 ```java
 // ❌ 错误：基本类型数组会被视为单个元素
@@ -541,9 +712,7 @@ List<Integer> streamList = Arrays.stream(intArray)
                                   .collect(Collectors.toList());
 ```
 
-::: info 使用集合的修改方法：add()、remove()、clear()会抛出异常
-
-:::
+**使用集合的修改方法：add()、remove()、clear()会抛出异常**
 
 Arrays.asList 返回的 List 并不是我们期望的 java.util.ArrayList，而是 Arrays 的内部类。
 
@@ -612,9 +781,7 @@ CollectionUtils.addAll(list, str);
 
 ## 使用 List.subList 有什么注意点？
 
-::: info List.subList 使用陷阱
-
-:::
+**List.subList 使用陷阱**
 
 `List.subList` 返回的子 List 不是一个普通的 ArrayList，即**不是副本，是视图**。
 
@@ -652,9 +819,7 @@ sub.remove(0);
 // list: [A, C, X, D]
 ```
 
-::: info List.subList 正确使用模式
-
-:::
+**List.subList 正确使用模式**
 
 ```java
 // 需要长期持有或独立修改
