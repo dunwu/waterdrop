@@ -2820,7 +2820,7 @@ public class ProducerConsumerDemo03 {
 
 ## Java 容器
 
-### 【中等】Java 线程安全的集合有哪些?⭐⭐⭐⭐
+### 【中等】Java 线程安全的集合有哪些？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：并发容器 / 选型
 

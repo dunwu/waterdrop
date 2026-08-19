@@ -30,8 +30,6 @@ index: false
 
 ## [DevOps 面试](DevOps面试.md) 💯
 
-- [DevOps 综合面试](../04.DevOps/[DevOps]面试.md) 💯
-
 ## 🚪 传送
 
 ◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾

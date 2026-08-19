@@ -10,15 +10,33 @@ permalink: /pages/c1b7fc82/
 
 # JavaCore 面试
 
-> **题库统计**：共收录 **292** 道面试题，覆盖 Java 基础 / 容器 / 并发 / JVM 四大板块。其中简单题 **84** 道（28.8%），中等题 **164** 道（56.2%），困难题 **44** 道（15.1%）。整体难度呈正态分布，中等题占比过半，适合初中级工程师系统备战；困难题集中在并发和 JVM 模块，适合高级岗位深度考察。
+> **题库统计**：共收录 **294** 道面试题，覆盖 Java 基础 / 容器 / 并发 / JVM 四大板块。其中简单题 **83** 道（28.2%），中等题 **163** 道（55.4%），困难题 **48** 道（16.3%）。整体难度呈正态分布，中等题占比过半，适合初中级工程师系统备战；困难题集中在并发和 JVM 模块，适合高级岗位深度考察。
 
 ## 📖 内容
 
 ### Java 基础
 
-> - [Java 基础面试一](../01.Java/JavaCore/面试/[JavaCore][面试]基础（一）.md)
-> - [Java 基础面试二](../01.Java/JavaCore/面试/[JavaCore][面试]基础（二）.md)
-> - [Java 基础面试三](../01.Java/JavaCore/面试/[JavaCore][面试]基础（三）.md)
+::: tip **题库**
+
+- [Java 基础面试一](../01.Java/JavaCore/面试/[JavaCore][面试]基础（一）.md)
+- [Java 基础面试二](../01.Java/JavaCore/面试/[JavaCore][面试]基础（二）.md)
+- [Java 基础面试三](../01.Java/JavaCore/面试/[JavaCore][面试]基础（三）.md)
+
+:::
+
+::: note **统计**：共 **109** 题
+
+- 难易度：| 简单 **53** 题 | 中等 **53** 题 | 困难 **3** 题 |
+- 重要度：| 一星 **16** 题 | 二星 **45** 题 | 三星 **38** 题 | 四星 **7** 题 | 五星 **3** 题 |
+
+:::
+
+```mermaid
+pie title Java 基础 - 难易度分布
+    "简单(53)" : 53
+    "中等(53)" : 53
+    "困难(3)" : 3
+```
 
 | 分类          | 题目                                                         | 难易度 | 重要度     | 掌握度 | 评估 |
 | :------------ | :----------------------------------------------------------- | :----- | :--------- | :----: | :--- |
@@ -83,9 +101,8 @@ permalink: /pages/c1b7fc82/
 | Object        | Object#clone() 方法和 Cloneable 接口如何使用？               | 中等   | ⭐⭐       |   ✅   |      |
 | String        | String、StringBuffer、StringBuilder 有什么区别？             | 简单   | ⭐⭐⭐⭐⭐ |   ✅   |      |
 | String        | String 为什么是不可变的？                                    | 简单   | ⭐⭐⭐     |   ✅   |      |
-| String        | 字符串拼接用"+" 还是 StringBuilder？                         | 简单   | ⭐⭐⭐     |   ✅   |      |     |
+| String        | 字符串拼接用"+" 还是 StringBuilder？                         | 简单   | ⭐⭐⭐     |   ✅   |      |
 | String        | String#equals() 和 Object#equals() 有何区别？                | 简单   | ⭐⭐⭐     |   ✅   |      |
-| String        | 字符串常量池有什么用？                                       | 简单   | ⭐⭐⭐     |   ✅   |      |
 | String        | `String s = new String("abc")` 创建了几个字符串对象？        | 简单   | ⭐⭐⭐⭐   |   ✅   |      |
 | String        | String#intern 方法有什么用？                                 | 简单   | ⭐⭐⭐     |   ⚠️   |      |
 | String        | String 类型的变量和常量做“+”运算时会发生什么？               | 简单   | ⭐⭐       |   ✅   |      |
@@ -121,23 +138,41 @@ permalink: /pages/c1b7fc82/
 | Java 新特性   | Java 11 的 HTTP Client API 有什么特点？                      | 中等   | ⭐⭐       |   ❌   |      |
 | Java 新特性   | Java 11 的字符串 API 有哪些增强？                            | 中等   | ⭐         |   ❌   |      |
 | Java 新特性   | Java 11 对 GC 有哪些重要更新？                               | 中等   | ⭐⭐       |   ❌   |      |
-| Java 新特性   | Java 14 对 switch 有哪些增强？                               | 中等   | ⭐⭐       |   ⚠️   |      |     |
+| Java 新特性   | Java 14 对 switch 有哪些增强？                               | 中等   | ⭐⭐       |   ⚠️   |      |
 | Java 新特性   | Java 16 的 Record（记录类）有什么用？                        | 中等   | ⭐⭐       |   ❌   |      |
-| Java 新特性   | Java 17 的 Sealed Classes（密封类）是什么？                  | 中等   | ⭐⭐⭐     |   ✅   |      |     |
-| Java 新特性   | Java 17 的 Record（记录类）是什么？                          | 中等   | ⭐⭐⭐     |   ✅   |      |     |
-| Java 新特性   | Java 17 的文本块（Text Blocks）是什么？                      | 中等   | ⭐⭐       |   ⚠️   |      |     |
-| Java 新特性   | Java 17 的 instanceof 模式匹配是什么？                       | 中等   | ⭐⭐⭐     |   ✅   |      |     |
-| Java 新特性   | Java 17 的 switch 表达式增强是什么？                         | 中等   | ⭐⭐⭐     |   ❌   |      |     |
-| Java 新特性   | Java 21 的 switch 模式匹配有什么增强？                       | 中等   | ⭐⭐⭐     |   ❌   |      |     |
-| Java 新特性   | Java 21 的记录模式（Record Patterns）是什么？                | 中等   | ⭐⭐       |   ❌   |      |     |
-| Java 新特性   | Java 21 的未命名变量（Unnamed Variables）是什么？            | 中等   | ⭐         |   ❌   |      |     |
-| Java 新特性   | Java 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？ | 中等   | ⭐⭐       |   ❌   |      |     |
+| Java 新特性   | Java 17 的 Sealed Classes（密封类）是什么？                  | 中等   | ⭐⭐⭐     |   ✅   |      |
+| Java 新特性   | Java 17 的 Record（记录类）是什么？                          | 中等   | ⭐⭐⭐     |   ✅   |      |
+| Java 新特性   | Java 17 的文本块（Text Blocks）是什么？                      | 中等   | ⭐⭐       |   ⚠️   |      |
+| Java 新特性   | Java 17 的 instanceof 模式匹配是什么？                       | 中等   | ⭐⭐⭐     |   ✅   |      |
+| Java 新特性   | Java 17 的 switch 表达式增强是什么？                         | 中等   | ⭐⭐⭐     |   ❌   |      |
+| Java 新特性   | Java 21 的 switch 模式匹配有什么增强？                       | 中等   | ⭐⭐⭐     |   ❌   |      |
+| Java 新特性   | Java 21 的记录模式（Record Patterns）是什么？                | 中等   | ⭐⭐       |   ❌   |      |
+| Java 新特性   | Java 21 的未命名变量（Unnamed Variables）是什么？            | 中等   | ⭐         |   ❌   |      |
+| Java 新特性   | Java 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？ | 中等   | ⭐⭐       |   ❌   |      |
 
 ### Java 容器
 
-> - [Java 容器面试一](../01.Java/JavaCore/面试/[JavaCore][面试]容器（一）.md)
-> - [Java 容器面试二](../01.Java/JavaCore/面试/[JavaCore][面试]容器（二）.md)
-> - [Java 容器面试三](../01.Java/JavaCore/面试/[JavaCore][面试]容器（三）.md)
+::: tip **题库**
+
+- [Java 容器面试一](../01.Java/JavaCore/面试/[JavaCore][面试]容器（一）.md)
+- [Java 容器面试二](../01.Java/JavaCore/面试/[JavaCore][面试]容器（二）.md)
+- [Java 容器面试三](../01.Java/JavaCore/面试/[JavaCore][面试]容器（三）.md)
+
+:::
+
+::: note **统计**：共 **45** 题
+
+- 难易度：| 简单 **15** 题 | 中等 **24** 题 | 困难 **6** 题 |
+- 重要度：| 一星 **4** 题 | 二星 **12** 题 | 三星 **21** 题 | 四星 **5** 题 | 五星 **3** 题 |
+
+:::
+
+```mermaid
+pie title Java 容器 - 难易度分布
+    "简单(15)" : 15
+    "中等(24)" : 24
+    "困难(6)" : 6
+```
 
 | 分类            | 题目                                                   | 难易度 | 重要度     | 掌握度 | 评估 |
 | :-------------- | :----------------------------------------------------- | :----- | :--------- | :----: | ---- |
@@ -176,6 +211,9 @@ permalink: /pages/c1b7fc82/
 | Map             | HashMap 的负载因子为什么是 0.75？                      | 中等   | ⭐⭐⭐     |   ✅   |      |
 | Map             | ConcurrentHashMap 的 size() 方法如何实现？             | 中等   | ⭐⭐       |   ⚠️   |      |
 | Map             | HashMap 和 TreeMap 何时该用哪个？                      | 中等   | ⭐⭐⭐     |   ✅   |      |
+| Map             | ConcurrentSkipListMap 的原理是什么？                   | 困难   | ⭐⭐⭐⭐   |        |      |
+| Map             | IdentityHashMap 和 HashMap 有什么区别？                | 中等   | ⭐⭐⭐     |        |      |
+| Map             | EnumMap 和 EnumSet 的实现原理是什么？                  | 中等   | ⭐⭐⭐     |        |      |
 | Stream API      | Stream API 的中间操作和终端操作有什么区别？            | 中等   | ⭐⭐⭐     |   ⚠️   |      |
 | Stream API      | 什么是短路操作？                                       | 中等   | ⭐⭐       |   ❌   |      |
 | Stream API      | 并行流（Parallel Stream）的原理和注意事项？            | 中等   | ⭐⭐⭐     |   ⚠️   |      |
@@ -186,9 +224,27 @@ permalink: /pages/c1b7fc82/
 
 ### Java 并发
 
-> - [Java 并发面试一](../01.Java/JavaCore/面试/[JavaCore][面试]并发（一）.md)
-> - [Java 并发面试二](../01.Java/JavaCore/面试/[JavaCore][面试]并发（二）.md)
-> - [Java 并发面试三](../01.Java/JavaCore/面试/[JavaCore][面试]并发（三）.md)
+::: tip **题库**
+
+- [Java 并发面试一](../01.Java/JavaCore/面试/[JavaCore][面试]并发（一）.md)
+- [Java 并发面试二](../01.Java/JavaCore/面试/[JavaCore][面试]并发（二）.md)
+- [Java 并发面试三](../01.Java/JavaCore/面试/[JavaCore][面试]并发（三）.md)
+
+:::
+
+::: note **统计**：共 **98** 题
+
+- 难易度：| 简单 **13** 题 | 中等 **64** 题 | 困难 **21** 题 |
+- 重要度：| 一星 **2** 题 | 二星 **21** 题 | 三星 **38** 题 | 四星 **21** 题 | 五星 **16** 题 |
+
+:::
+
+```mermaid
+pie title Java 并发 - 难易度分布
+    "简单(13)" : 13
+    "中等(64)" : 64
+    "困难(21)" : 21
+```
 
 | 分类              | 题目                                                                                                      | 难易度 | 重要度     | 掌握度 | 评估 |
 | :---------------- | :-------------------------------------------------------------------------------------------------------- | :----- | :--------- | :----: | ---- |
@@ -216,7 +272,7 @@ permalink: /pages/c1b7fc82/
 | Java 内存模型     | `volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？                            | 中等   | ⭐⭐⭐⭐⭐ |   ✅   |      |
 | Java 内存模型     | `synchronized` 有什么作用？                                                                               | 中等   | ⭐⭐⭐⭐⭐ |   ✅   |      |
 | Java 内存模型     | `synchronized` 的实现原理是什么？                                                                         | 中等   | ⭐⭐⭐⭐⭐ |   ✅   |      |
-| Java 内存模型     | JDK6 对 `synchronized` 进行了哪些优化？                                                                   | 困难   | ⭐⭐⭐⭐   |   ✅   |      |
+| Java 内存模型     | JDK 6 对 `synchronized` 进行了哪些优化？                                                                  | 困难   | ⭐⭐⭐⭐   |   ✅   |      |
 | Java 内存模型     | synchronized 锁升级的详细过程是怎样的？                                                                   | 困难   | ⭐⭐⭐⭐⭐ |   ✅   |      |
 | Java 内存模型     | 为什么 DCL 单例模式需要 volatile？                                                                        | 困难   | ⭐⭐⭐⭐   |   ✅   |      |
 | Java 内存模型     | final 关键字可以保证线程的可见性吗？                                                                      | 中等   | ⭐⭐       |   ⚠️   |      |
@@ -293,8 +349,26 @@ permalink: /pages/c1b7fc82/
 
 ### Java 虚拟机
 
-> - [Java 虚拟机面试一](../01.Java/JavaCore/面试/[JavaCore][面试]虚拟机（一）.md)
-> - [Java 虚拟机面试二](../01.Java/JavaCore/面试/[JavaCore][面试]虚拟机（二）.md)
+::: tip **题库**
+
+- [Java 虚拟机面试一](../01.Java/JavaCore/面试/[JavaCore][面试]虚拟机（一）.md)
+- [Java 虚拟机面试二](../01.Java/JavaCore/面试/[JavaCore][面试]虚拟机（二）.md)
+
+:::
+
+::: note **统计**：共 **42** 题
+
+- 难易度：| 简单 **2** 题 | 中等 **22** 题 | 困难 **18** 题 |
+- 重要度：| 一星 **1** 题 | 二星 **12** 题 | 三星 **13** 题 | 四星 **11** 题 | 五星 **5** 题 |
+
+:::
+
+```mermaid
+pie title Java 虚拟机 - 难易度分布
+    "简单(2)" : 2
+    "中等(22)" : 22
+    "困难(18)" : 18
+```
 
 | 分类     | 题目                                                                          | 难易度 | 重要度     | 掌握度 | 评估 |
 | :------- | :---------------------------------------------------------------------------- | :----- | :--------- | :----: | ---- |
@@ -316,7 +390,7 @@ permalink: /pages/c1b7fc82/
 | 字节码   | .class 文件的结构包含哪些主要部分？                                           | 中等   | ⭐⭐       |   ⚠️   |      |
 | 字节码   | 如何查看 Java 字节码？常用工具有哪些？                                        | 中等   | ⭐⭐       |   ✅   |      |
 | 字节码   | Java 字节码有哪些典型应用场景？                                               | 中等   | ⭐         |   ✅   |      |
-| 字节码   | 什么是 JIT？                                                                  | 中等   | ⭐⭐⭐     |   ✅   |      |
+| 字节码   | 什么是 JIT？JIT 编译器是如何工作的？                                            | 困难   | ⭐⭐⭐⭐⭐ |   ✅   |      |
 | 字节码   | 什么是逃逸分析？                                                              | 困难   | ⭐⭐⭐     |   ⚠️   |      |
 | 字节码   | 什么是 AOT？                                                                  | 困难   | ⭐⭐       |   ⚠️   |      |
 | 垃圾收集 | 如何判断 Java 对象是否可以被回收？                                            | 困难   | ⭐⭐⭐⭐⭐ |   ✅   |      |
@@ -338,3 +412,5 @@ permalink: /pages/c1b7fc82/
 | JVM 调优 | 如何在 Java 中进行内存泄漏分析？                                              | 中等   | ⭐⭐⭐⭐   |   ✅   |      |
 | JVM 调优 | 如何对 Java 的垃圾回收进行调优？                                              | 中等   | ⭐⭐⭐     |   ⚠️   |      |
 | JVM 调优 | Java 应用的内存持续性增长，但是监控显示堆内存没有什么变化，可能的原因有哪些？ | 中等   | ⭐⭐       |   ❌   |      |
+| JVM 调优 | 线上 CPU 飙高（100%），如何快速排查定位？                                        | 困难   | ⭐⭐⭐⭐   |        |      |
+| JVM 调优 | 如何解读 GC 日志？                                                                  | 困难   | ⭐⭐⭐     |        |      |

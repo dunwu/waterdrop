@@ -354,9 +354,9 @@ MongoDB 全文检索分两步：先创建文本索引（text index），再用 `
 
 #### ⚡记忆卡片
 
-- **口诀**：建 text 索引，用 $text 搜索
-- **关键词**：text index ／ $text ／ $search ／ 相关性排序
-- **链路**：创建文本索引 → $text + $search 查询 → 相关性评分排序
+- **口诀**：建 text 索引，用 `$text` 搜索
+- **关键词**：text index ／ `$text` ／ `$search` ／ 相关性排序
+- **链路**：创建文本索引 → `$text` + `$search` 查询 → 相关性评分排序
 
 #### 📖 核心知识
 
@@ -435,8 +435,8 @@ MongoDB 提供三种聚合方式：**聚合管道**（首选）、**单一目的
 #### ⚡记忆卡片
 
 - **口诀**：阶段串联成管道，前一输出后一输入
-- **关键词**：stage ／ pipeline ／ $match ／ $group ／ $lookup
-- **链路**：$match 过滤 → $group 分组 → $sort 排序 → $project 投影 → 输出结果
+- **关键词**：stage ／ pipeline ／ `$match` ／ `$group` ／ `$lookup`
+- **链路**：`$match` 过滤 → `$group` 分组 → `$sort` 排序 → `$project` 投影 → 输出结果
 
 #### 📖 核心知识
 
@@ -506,12 +506,12 @@ db.orders.aggregate([
 
 #### 💎 关键结论
 
-MongoDB 聚合管道的阶段与 SQL 聚合函数一一对应：$match=WHERE、$group=GROUP BY、$project=SELECT、$lookup=JOIN。两者表达能力等价，但 MongoDB 是流式处理，SQL 是声明式。
+MongoDB 聚合管道的阶段与 SQL 聚合函数一一对应：`$match`=WHERE、`$group`=GROUP BY、`$project`=SELECT、`$lookup`=JOIN。两者表达能力等价，但 MongoDB 是流式处理，SQL 是声明式。
 
 #### ⚡记忆卡片
 
 - **口诀**：match 对应 where，group 对应 group by，lookup 对应 join
-- **关键词**：$match=WHERE ／ $group=GROUP BY ／ $lookup=JOIN ／ $out=SELECT INTO
+- **关键词**：`$match`=WHERE ／ `$group`=GROUP BY ／ `$lookup`=JOIN ／ `$out`=SELECT INTO
 - **链路**：SQL 声明式结果 → MongoDB 流式管道 → 功能等价，风格不同
 
 #### 📖 核心知识

@@ -358,7 +358,7 @@ String tenantId = RpcContext.getContext().getAttachment("tenantId");
 
 **隐式传参与显式方法参数的取舍？** 业务强相关参数应放在方法签名中保证可见性与类型安全；横切关注点（链路、租户、灰度标）才用 attachment，避免污染接口定义。
 
-**异步调用中 attachment 为什么容易丢？** `RpcContext` 基于 `ThreadLocal`，异步回调运行在其他线程，上下文不会自动迁移，需手动传递或使用 Dubbo 提供的异步调用 API。详见本文档『Dubbo 如何实现异步回调通知？』。
+**异步调用中 attachment 为什么容易丢？** `RpcContext` 基于 `ThreadLocal`，异步回调运行在其他线程，上下文不会自动迁移，需手动传递或使用 Dubbo 提供的异步调用 API。详见《Dubbo 面试之架构》『Dubbo 如何支持异步调用？』。
 
 ### 【中等】Dubbo 的本地存根（Stub）是什么？如何使用？⭐⭐
 
@@ -380,12 +380,12 @@ String tenantId = RpcContext.getContext().getAttachment("tenantId");
 
 **与 Filter 的区别**：
 
-| 维度     | Stub（本地存根）        | Filter                |
-| -------- | ----------------------- | --------------------- |
-| 执行位置 | 消费端业务代码          | 消费端/提供端框架层   |
-| 编写方式 | 实现服务接口            | 实现 Filter 接口      |
-| 控制粒度 | 可决定是否发起远程调用  | 在调用链中拦截        |
-| 适用场景 | 参数校验、缓存、前置逻辑 | 通用横切逻辑          |
+| 维度     | Stub（本地存根）         | Filter              |
+| -------- | ------------------------ | ------------------- |
+| 执行位置 | 消费端业务代码           | 消费端/提供端框架层 |
+| 编写方式 | 实现服务接口             | 实现 Filter 接口    |
+| 控制粒度 | 可决定是否发起远程调用   | 在调用链中拦截      |
+| 适用场景 | 参数校验、缓存、前置逻辑 | 通用横切逻辑        |
 
 ::: details Stub 使用示例
 
@@ -473,13 +473,13 @@ Mock 用于服务降级兜底，Stub 用于消费端前置/后置逻辑增强，
 
 **核心结论**：Mock 用于服务降级兜底，Stub 用于消费端前置/后置逻辑增强，两者目的不同。
 
-| 维度       | Stub（本地存根）              | Mock（本地伪装）              |
-| ---------- | ----------------------------- | ----------------------------- |
-| 目的       | 消费端逻辑增强（校验、缓存）  | 服务降级兜底                  |
-| 触发时机   | 每次调用都执行                | 调用失败/强制 Mock 时执行     |
-| 是否调用远程 | 可自行决定                    | 默认不调用（失败后）          |
-| 构造参数   | 服务接口（远程代理）          | 无特殊要求                    |
-| 配置参数   | `stub`                        | `mock`                        |
+| 维度         | Stub（本地存根）             | Mock（本地伪装）          |
+| ------------ | ---------------------------- | ------------------------- |
+| 目的         | 消费端逻辑增强（校验、缓存） | 服务降级兜底              |
+| 触发时机     | 每次调用都执行               | 调用失败/强制 Mock 时执行 |
+| 是否调用远程 | 可自行决定                   | 默认不调用（失败后）      |
+| 构造参数     | 服务接口（远程代理）         | 无特殊要求                |
+| 配置参数     | `stub`                       | `mock`                    |
 
 Mock 的常见用法：`mock="return empty"`（返回空值）、`mock="return null"`（返回 null）、`mock="return true"`（返回固定值）、`mock="force:return null"`（强制 Mock，不发起远程调用）、`mock="fail:return null"`（失败后 Mock），也可指定自定义 Mock 类（实现服务接口 + 无参构造）。
 
@@ -494,118 +494,6 @@ Mock 的常见用法：`mock="return empty"`（返回空值）、`mock="return n
 **Stub 和 Mock 能否同时配置？** 可以。执行顺序上是先经过 Stub，Stub 内部调用远程代理，远程调用失败后由集群容错决定是否走 Mock 兜底。
 
 **Mock 适合返回什么数据？** 空集合、默认对象、缓存快照等对业务无害的兜底值；涉及资金、库存等强一致语义的操作不应 Mock 出假成功结果。
-
-### 【中等】Dubbo 如何实现异步回调通知？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Dubbo / 异步调用
-
-#### 💎 关键结论
-
-Dubbo 支持基于 `CompletableFuture` 的异步调用和回调（Dubbo 2.7+ 推荐），也支持旧版 RpcContext 异步方式和参数回调（Callback），避免线程阻塞、提升吞吐量。理由：异步化把等待 IO 的线程释放出来，是高并发场景提升吞吐的常用手段。
-
-#### ⚡记忆卡片
-
-**口诀**：Future 声明式、RpcContext 旧写法、Callback 反向调
-**关键词**：CompletableFuture／RpcContext／参数回调
-**链路**：消费端发起调用立即返回 → 响应到达后触发 Future 回调 → 回调在独立线程执行不阻塞业务线程
-
-#### 📖 核心知识
-
-**核心结论**：Dubbo 支持基于 `CompletableFuture` 的异步调用和回调，避免线程阻塞，提升吞吐量。
-
-::: details 方式一：CompletableFuture（Dubbo 2.7+ 推荐）
-
-```java
-// 服务接口声明返回 CompletableFuture
-public interface UserService {
-    CompletableFuture<User> getUserAsync(Long id);
-}
-
-// 消费端调用
-userService.getUserAsync(1L)
-    .thenApply(user -> enrichUser(user))
-    .thenAccept(user -> System.out.println(user))
-    .exceptionally(ex -> { ex.printStackTrace(); return null; });
-```
-
-:::
-
-::: details 方式二：RpcContext 异步（Dubbo 2.x 旧版用法）
-
-```java
-// 开启异步
-RpcContext.getContext().setAttachment("async", "true");
-// 调用立即返回 null
-userService.getUser(1L);
-// 获取 Future
-Future<User> future = RpcContext.getContext().getFuture();
-// 设置回调
-future.addListener(f -> {
-    if (f.isSuccess()) {
-        System.out.println("成功: " + f.getNow());
-    } else {
-        System.out.println("失败: " + f.cause());
-    }
-});
-```
-
-:::
-
-::: details 方式三：参数回调（Callback）
-
-Dubbo 支持将回调接口作为参数，提供端在处理完成后回调消费端。
-
-```java
-// 定义回调接口
-public interface Listener {
-    void onEvent(String event);
-}
-
-// 服务接口
-public interface NotifyService {
-    void listen(String key, Listener listener);  // listener 标记为 callback
-}
-
-// 消费端
-notifyService.listen("topic1", new Listener() {
-    @Override
-    public void onEvent(String event) {
-        System.out.println("收到回调: " + event);
-    }
-});
-```
-
-**配置**：
-
-```xml
-<dubbo:reference interface="com.example.NotifyService">
-    <dubbo:method name="listen">
-        <dubbo:argument index="1" callback="true"/>
-    </dubbo:method>
-</dubbo:reference>
-```
-
-:::
-
-#### 🔬 扩展知识
-
-【L3】参数回调的本质是提供端持有消费端回调接口的代理并反向发起调用，因此回调次数和连接数有限制（`callbacks` 参数控制单个连接上的回调实例数），防止回调泄漏。
-
-【L4】`CompletableFuture` 回调默认在 IO 线程或公共线程池执行，回调逻辑中不应执行耗时阻塞操作，必要时应用 `thenApplyAsync` 等切换到自定义线程池。
-
-#### ⚠️ 常见误区
-
-::: details
-常见误区：
-❌ "异步调用后消费端线程完全不参与任何等待" → 调用线程不阻塞，但响应仍需网络往返，整体 RT 不变；异步的收益在于线程复用与吞吐提升，而非单次调用变快。
-❌ "参数回调和消息队列可以互相替代" → 回调依托 RPC 长连接，连接断开回调即失效，不具备持久化与削峰能力；可靠的异步通知应使用消息队列。
-:::
-
-#### 🔀 发散问题
-
-**异步调用和隐式传参配合要注意什么？** `RpcContext` 基于 `ThreadLocal`，异步线程拿不到调用线程的上下文，attachment 需要显式传递。见本文档『Dubbo 如何实现隐式参数传递？』。
-
-**CompletableFuture 方式相比旧版 async 好在哪？** 类型安全、组合能力强（链式编排多个异步任务），且与 JDK 标准 API 一致，旧版基于 attachment 开关的写法在 Dubbo 2.7+ 已不推荐。
 
 ### 【中等】Dubbo 中如何实现服务端与客户端的版本兼容？⭐⭐
 
@@ -731,6 +619,7 @@ public class DevelopProviderServiceV2 implements DevelopService{
 - 如果入参、出参上删除或修改属性，会影响旧版本调用，可以新增接口。
 
 #### 🔬 扩展知识
+
 【L3】消费端配置 `version="*"` 可匹配任意版本的提供者，适合对版本不敏感的场景，但会削弱版本隔离的保护作用，生产环境慎用。
 
 【L4】序列化层面的兼容同样关键：Hessian2 等序列化方式对新增字段容忍度较高，而删除字段、修改类型则可能导致反序列化失败，接口演进时需与序列化协议特性一并考虑。
@@ -832,7 +721,7 @@ Dubbo 分组通过轻量级的逻辑隔离，在不增加物理部署成本的�
 
 **多环境隔离只靠 group 够吗？** 逻辑隔离足够时可以用 group；但环境间需要网络、数据层面彻底隔离时，应使用独立注册中心或独立集群，group 防不住误配置之外的越界调用。
 
-### 【中等】Dubbo 中如何配置多协议、多注册中心？⭐⭐
+### 【中等】Dubbo 中如何配置多协议？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Dubbo / 多协议配置
 
@@ -949,8 +838,8 @@ Dubbo 支持为不同服务指定不同协议，只需声明多个 `<dubbo:proto
 
 #### ⚡记忆卡片
 
-**口诀**：无接口也能调、$invoke 三参数、POJO 变 Map
-**关键词**：GenericService／$invoke／generic=true
+**口诀**：无接口也能调、`$invoke` 三参数、POJO 变 Map
+**关键词**：GenericService／`$invoke`／generic=true
 **链路**：开启泛化引用 → 以接口名+方法名+参数类型发起调用 → 服务端 GenericFilter 把 Map 还原为 POJO → 返回结果
 
 #### 📖 核心知识
@@ -1098,16 +987,16 @@ public interface OrderService {
 
 **调优检查清单**：
 
-| 检查项         | 建议值/策略                          |
-| -------------- | ------------------------------------ |
-| 序列化方式     | Kryo/Protobuf（避免 JDK 序列化）     |
-| 线程池类型     | eager（低延迟）/ fixed（通用）       |
-| IO 线程数      | CPU 核数                             |
-| 业务线程数     | 根据压测，通常 200-500               |
-| 超时时间       | 平均 RT × 3 + 200ms                  |
-| 重试次数       | 读 2 次，写 0 次                     |
-| 连接数         | 服务端 accepts=1000，消费端 5-10     |
-| 心跳间隔       | 60s（默认）                          |
+| 检查项     | 建议值/策略                      |
+| ---------- | -------------------------------- |
+| 序列化方式 | Kryo/Protobuf（避免 JDK 序列化） |
+| 线程池类型 | eager（低延迟）/ fixed（通用）   |
+| IO 线程数  | CPU 核数                         |
+| 业务线程数 | 根据压测，通常 200-500           |
+| 超时时间   | 平均 RT × 3 + 200ms              |
+| 重试次数   | 读 2 次，写 0 次                 |
+| 连接数     | 服务端 accepts=1000，消费端 5-10 |
+| 心跳间隔   | 60s（默认）                      |
 
 **监控与压测**：
 
