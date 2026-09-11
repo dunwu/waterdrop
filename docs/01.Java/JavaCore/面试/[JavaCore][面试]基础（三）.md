@@ -182,11 +182,13 @@ void addNumbers(List<? super Integer> list) {
 | **`<? super T>`**                  | `Object`             | `List<? super Integer>` → `List` |
 
 3. **擦除的作用**：
+
    - **兼容性**：确保泛型代码能与旧版 Java（非泛型）字节码兼容。
    - **运行时效率**：避免为每个泛型类型生成新类，减少 JVM 负担。
    - **简化设计**：统一类型系统，避免 C++ 模板的复杂性。
 
 4. **擦除带来的问题**：
+
    - **类型信息丢失**：运行时无法获取泛型参数（`List<String>` 和 `List<Integer>` 运行时都是 `List`）。
 
      ```java
@@ -450,6 +452,7 @@ GraalVM 将 Java 编译为**原生可执行文件**时，采用的是 **closed-w
 | 支持泛型擦除后的类型操作   | 安全隐患（如破坏单例）   |
 
 2. **性能优化建议**：
+
    - **缓存 `Class`/`Method`/`Field` 对象**：避免重复反射调用。
    - **优先使用 `getDeclaredXXX`**：比 `getXXX` 更高效（不检查继承链）。
    - **限制 `setAccessible(true)`**：频繁调用影响性能。
@@ -1351,7 +1354,7 @@ fileChannel.read(buffer, 0, buffer, new CompletionHandler<Integer, ByteBuffer>()
 - **Q：为什么高并发服务器选 NIO 而不是 AIO？** → NIO 生态成熟（Netty）、跨平台行为一致；AIO 在 Linux 实现不彻底、编程模型复杂，收益有限。
 - **Q：FileChannel 能用 Selector 吗？** → 不能，文件 I/O 不支持多路复用，Selector 只适用于网络 Channel（`SocketChannel`/`ServerSocketChannel`/`DatagramChannel`）。
 
-### 【困难】NIO 如何实现多路复用？⭐⭐⭐
+### 【困难】NIO 如何实现多路复用？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Java IO / NIO 多路复用
 
@@ -1488,7 +1491,7 @@ while (true) {
 - **Q：为什么注册到 Selector 的 Channel 必须非阻塞？** → 若 Channel 阻塞，事件就绪后实际读写仍可能挂起，整个 Selector 线程被卡死，多路复用失效；这也是 `FileChannel`（无法设非阻塞）不能注册 Selector 的原因。
 - **Q：JDK NIO 的 epoll 空轮询 bug 是什么？** → 某些情况下 `select()` 在没有就绪事件时立即返回（触发条件与连接异常关闭有关），导致 CPU 100%；Netty 通过统计空轮询次数，超阈值后重建 Selector 规避。
 
-### 【困难】Java 写入文件到磁盘会经历哪些过程？⭐⭐
+### 【困难】Java 写入文件到磁盘会经历哪些过程？⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Java IO / 写盘流程与页缓存
 
@@ -1582,212 +1585,6 @@ Java 写盘经历“用户缓冲区 → 内核页缓存 → 磁盘缓存 → 物
 
 - **Q：`flush()` 能保证数据落盘吗？** → 不能。`flush()` 只把 JVM 用户缓冲区刷到内核页缓存，要真正落盘需 `FileDescriptor.sync()` 或 `FileChannel.force(true)`。
 - **Q：数据库（如 MySQL/Kafka）为什么自己管理刷盘？** → 它们用页缓存提升吞吐，再通过 redo log 顺序写 + 定时/显式 `fsync` 控制持久化时机，在性能与可靠性间取平衡；Kafka 甚至依赖操作系统页缓存 + 副本机制而非单机 fsync。
-
-## Java 语法糖
-
-### 【中等】Java 中有哪些常见的语法糖？⭐⭐
-
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 语法糖 / 脱糖机制
-
-#### 💎 关键结论
-
-语法糖是不增加语言能力、只提升书写体验的便捷语法，编译期都会被“脱糖”为基础结构（可用 `javap -c` 验证）；常见的有自动装箱、增强 for、变长参数、lambda、try-with-resources 等。
-
-#### ⚡记忆卡片
-
-- **口诀**：写着甜，编完淡，脱糖之后是基础，javap 可验证
-- **关键词**：脱糖 ／ 编译器转换 ／ 可读性
-- **链路**：源码语法糖 → 编译器脱糖 → 基础字节码结构 → 运行时无特殊支持
-
-#### 📖 核心知识
-
-**语法糖（Syntactic sugar）** 代指的是编程语言为了方便程序员开发程序而设计的一种特殊语法，这种语法对编程语言的功能并没有影响。实现相同的功能，基于语法糖写出来的代码往往更简单简洁且更易阅读。
-
-Java 中最常用的语法糖主要有泛型、自动拆装箱、变长参数、枚举、内部类、增强 for 循环、try-with-resources 语法、lambda 表达式等。所有这些语法糖在编译阶段都会被"脱糖"(desugar)，即转换为更基础的 Java 语法结构。可以使用`javap -c`命令查看字节码来验证这一点。语法糖虽然不增加语言功能，但能显著提高代码的可读性和编写效率，是 Java 语言不断演进的重要组成部分。
-
-**自动装箱与拆箱 (Autoboxing/Unboxing)**
-
-```java
-// 自动装箱
-Integer i = 10;  // 实际编译为 Integer.valueOf(10)
-
-// 自动拆箱
-int n = i;      // 实际编译为 i.intValue()
-```
-
-**增强 for 循环 (foreach)**
-
-```java
-List<String> list = Arrays.asList("a", "b", "c");
-// 语法糖形式
-for (String s : list) {
-    System.out.println(s);
-}
-// 实际编译为迭代器模式
-for (Iterator<String> it = list.iterator(); it.hasNext();) {
-    String s = it.next();
-    System.out.println(s);
-}
-```
-
-**变长参数 (Varargs)**
-
-```java
-public void print(String... args) {
-    for (String arg : args) {
-        System.out.println(arg);
-    }
-}
-// 实际编译为数组参数
-public void print(String[] args) { ... }
-```
-
-**数值字面量下划线**
-
-```java
-int million = 1_000_000;  // 编译后等同于 1000000
-```
-
-**字符串拼接**
-
-```java
-String s = "a" + "b" + "c";
-// 编译优化为
-String s = "abc";
-
-// 变量拼接会转为 StringBuilder
-String a = "a", b = "b";
-String result = a + b;
-// 编译为
-String result = new StringBuilder().append(a).append(b).toString();
-```
-
-**switch 支持字符串 (Java 7+)**
-
-```java
-String fruit = "apple";
-switch (fruit) {
-    case "apple":
-        System.out.println("It's an apple");
-        break;
-    // 实际编译为基于 hashCode() 和 equals() 的比较
-}
-```
-
-**默认构造方法**
-
-```java
-public class Person {}
-// 如果没有显式定义构造方法，编译器会自动添加无参构造方法
-```
-
-**枚举类 (Java 5+)**
-
-```java
-enum Color { RED, GREEN, BLUE }
-// 实际编译为继承 java.lang.Enum 的类
-```
-
-**内部类访问外部类成员**
-
-```java
-class Outer {
-    private int x = 10;
-    class Inner {
-        void print() {
-            System.out.println(x);  // 实际通过 Outer.this.x 访问
-        }
-    }
-}
-```
-
-**方法引用 (Java 8+)**
-
-```java
-List<String> list = Arrays.asList("a", "b", "c");
-list.forEach(System.out::println);
-// 编译为 lambda 表达式
-list.forEach(s -> System.out.println(s));
-```
-
-**钻石操作符 (Diamond Operator, Java 7+)**
-
-```java
-List<String> list = new ArrayList<>();  // 类型推断
-// Java 7 之前需要
-List<String> list = new ArrayList<String>();
-```
-
-**集合字面量 (Java 9+ 的 List.of 等）**
-
-```java
-List<String> list = List.of("a", "b", "c");
-Set<Integer> set = Set.of(1, 2, 3);
-Map<String, Integer> map = Map.of("a", 1, "b", 2);
-```
-
-**Lambda 表达式 (Java 8+)**
-
-```java
-// Lambda 表达式
-Runnable r = () -> System.out.println("Hello");
-// 实际生成实现 Runnable 的匿名类
-```
-
-**try-with-resources (Java 7+)**
-
-```java
-try (InputStream is = new FileInputStream("file.txt")) {
-    // 使用资源
-}  // 自动调用 close()
-// 编译为 try-finally 块
-```
-
-**接口中的默认方法和静态方法 (Java 8+)**
-
-```java
-interface MyInterface {
-    default void defaultMethod() {
-        System.out.println("Default method");
-    }
-
-    static void staticMethod() {
-        System.out.println("Static method");
-    }
-}
-```
-
-**记录类 (Record, Java 14 预览 / Java 16 正式版)**
-
-```java
-record Point(int x, int y) {}
-// 编译后自动生成：
-// - 私有 final 字段 x 和 y
-// - 公共构造方法
-// - 访问器方法 x() 和 y()
-// - equals(), hashCode(), toString()
-```
-
-**`instanceof` 模式匹配**
-
-```java
-if (obj instanceof String s) {
-    // 可以直接使用 s
-    System.out.println(s.length());
-}
-```
-
-**文本块 (Text Blocks, Java 15 正式版)**
-
-```java
-String html = """
-    <html>
-        <body>
-            <p>Hello, world</p>
-        </body>
-    </html>
-    """;
-```
 
 ## Java 新特性
 
@@ -2759,66 +2556,6 @@ public double area(Shape shape) {
 - **Q：`non-sealed` 有什么意义？** → 密封链可以在某个子类处“放开”：该子类之后允许任意类继承，而密封类对其他分支的约束仍然生效。
 - **Q：密封类和枚举怎么选？** → 取值固定且无需携带不同字段结构用枚举；每个分支需要不同数据字段（如不同形状参数）时用密封类 + record。
 
-### 【中等】Java 17 的 Record（记录类）是什么？⭐⭐⭐
-
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 16-17 新特性 / Record
-
-#### 💎 关键结论
-
-Record（JDK 16 正式版）用一行声明不可变数据类，自动生成构造器、访问器与 `equals`/`hashCode`/`toString`；紧凑构造器用于参数校验，限制是不能继承类、字段不可变、无 native 方法。
-
-#### ⚡记忆卡片
-
-- **口诀**：record 不可变，访问器无 get，校验写紧凑构造器
-- **关键词**：record ／ 紧凑构造器 ／ java.lang.Record
-- **链路**：声明组件 → 自动生成样板代码 → 紧凑构造器校验 → 不可变使用
-
-#### 📖 核心知识
-
-**Record（JDK 16 正式版）**是 Java 的**不可变数据载体**，自动生成样板代码，是 Lombok `@Data` 的官方替代品。
-
-```java
-// 一行定义
-public record Point(int x, int y) {}
-
-// 等价的传统 Java 类需 60+ 行（构造器、getter、equals、hashCode、toString）
-
-// 使用
-Point p = new Point(3, 4);
-System.out.println(p.x());          // 3（注意：无 get 前缀）
-System.out.println(p);              // Point[x=3, y=4]
-```
-
-**紧凑构造器**：用于参数校验
-
-```java
-public record Range(int start, int end) {
-    public Range {  // 紧凑构造器
-        if (start > end) throw new IllegalArgumentException("start > end");
-    }
-}
-```
-
-**Record 的限制**：
-
-- **不能继承**其他类（隐式继承 `java.lang.Record`）
-- 字段**不可变**（`final`）
-- 不能声明 `native` 方法
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L4】版本演进：Record 在 Java 14 首次预览（JEP 359）、Java 15 二次预览（JEP 384）、Java 16 正式发布（JEP 395）；Java 17 是 LTS，因此在生产中广泛落地，后续与 record 模式（Java 21）配合解构。
-- 【L3】与 Lombok 对比：record 无需注解处理器、无字节码魔法，反射与序列化框架可直接识别；但 Lombok 可生成可变对象、builder、setter，两者适用面不同。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：Record 的完整特性（定义、限制、场景）？** → 见本文档「Java 16 的 Record（记录类）有什么用？」。
-- **Q：record 能自定义访问器吗？** → 可以，重写与组件同名的访问器方法即可（如返回前加校验/格式化），字段赋值逻辑仍由编译器生成。
-
 ### 【中等】Java 17 的文本块（Text Blocks）是什么？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 15-17 新特性 / 文本块
@@ -3199,7 +2936,7 @@ switch (shape) {
 
 - **Q：为什么不用空标识符而要用 `_`？** → 很多场景（catch 参数、Lambda 参数）语法上必须声明变量，`_` 既满足语法又明确表达“不用”，比随便取名或加 @SuppressWarnings 更清晰。
 
-### 【中等】Java 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？⭐⭐
+### 【中等】Java 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 21 新特性 / ScopedValue 与虚拟线程
 

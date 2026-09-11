@@ -17,7 +17,7 @@ export default navbar([
         icon: 'devicon:java',
         prefix: 'JavaCore/',
         link: 'JavaCore/',
-        children: ['基础特性/', '高级特性/', '容器/', 'IO/', '并发/', 'JVM/', '面试/']
+        children: ['基础/', 'IO/', '容器/', '并发/', 'JVM/', '面试/']
       },
       { text: 'JavaWeb', icon: 'mdi:numeric-2-box-multiple-outline', link: 'JavaWeb/' },
       { text: '软件', icon: 'mdi:numeric-3-box-multiple-outline', link: '软件/' },
@@ -116,17 +116,9 @@ export default navbar([
       { text: '分布式理论', link: '分布式理论/' },
       { text: '分布式协同', link: '分布式协同/' },
       { text: '分布式调度', link: '分布式调度/' },
-      { text: '分布式治理', link: '分布式治理/' },
-      {
-        text: '分布式通信',
-        link: '分布式通信/'
-        // prefix: '分布式通信/',
-        // children: [
-        //   { text: 'RPC', icon: 'file-icons:powerpc', link: 'RPC/' },
-        //   { text: 'MQ', icon: 'mdi:mq', link: 'MQ/' }
-        // ]
-      },
-      { text: '分布式存储', link: '分布式存储/' }
+      { text: '分布式存储', link: '分布式存储/' },
+      { text: '分布式通信', link: '分布式通信/' },
+      { text: '分布式治理', link: '分布式治理/' }
     ]
   },
   {

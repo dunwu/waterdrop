@@ -1418,6 +1418,7 @@ MySQL 复制基于 **binlog** 实现，异步复制由三个线程完成：
 
 - **Q：如何处理主从同步延迟？** → 见本文档「如何处理 MySQL 主从同步延迟」。
 - **Q：什么是 CDC？** → 见本文档「什么是 CDC（Change Data Capture）」。
+- **Q：组复制（MGR）和 binlog 三种格式？** → MGR 基于 Paxos 变种 XCom 的多数派写入、binlog 三种格式（STATEMENT/ROW/MIXED）完整对比表，详见《分布式存储面试》『MySQL 主从复制的原理是什么？』。
 
 ### 【中等】如何处理 MySQL 主从同步延迟？⭐⭐⭐
 
@@ -1457,6 +1458,7 @@ MySQL 复制基于 **binlog** 实现，异步复制由三个线程完成：
 #### 🔀 发散问题
 
 - **Q：MySQL 如何实现主从同步？** → 见本文档「MySQL 如何实现主从同步」。
+- **Q：强制读主与并行复制怎么落地？** → ShardingSphere HintManager 强制路由主库的 Java 实现、从库并行复制配置（LOGICAL_CLOCK/WRITESET）、位点差/心跳表延迟监控，详见《分布式存储面试》『如何应对主从复制延迟？』。
 
 ## MySQL 架构
 

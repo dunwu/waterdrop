@@ -45,9 +45,10 @@ Hash 碰撞指不同 key 经哈希函数算出相同桶索引，无法彻底避�
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】开放寻址的探测策略有线性探测、二次探测、双重哈希；负载因子越高碰撞越密集，这也是 ThreadLocalMap 在碰撞严重时扩容的原因。
 - 【L3】HashMap 的 hash() 用 `(h = key.hashCode()) ^ (h >>> 16)` 高低 16 位异或扰动，让小表的索引也能利用高位信息，进一步降低碰撞。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -90,17 +91,19 @@ HashMap 无锁、允许 null、性能更高，是绝大多数场景首选；Hash
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】Hashtable 的锁是整个对象（全表锁），与 ConcurrentHashMap 的分段/桶级细粒度锁相比并发吞吐差距明显，对比详见本文档「ConcurrentHashMap 和 Hashtable 有什么区别？」。
 - 【L3】Hashtable 的 enumerator 不抛快速失败异常，但同样是弱一致的，并非强一致快照。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ "Hashtable 线程安全，所以并发场景该用它" → 错，全表锁在高并发下串行化严重，现代代码应使用 ConcurrentHashMap。
 - ❌ "Hashtable 是 HashMap 的线程安全父类" → 错，两者无继承关系，Hashtable 继承已过时的 Dictionary，HashMap 继承 AbstractMap。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -163,9 +166,10 @@ public class HashSet<E> {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】HashSet 的去重依赖元素的 hashCode() 与 equals()：先比 hash 定位桶，再 equals 判等，两者必须同时正确重写。
 - 【L3】LinkedHashSet 继承 HashSet，内部用 LinkedHashMap 构造，因此额外保持插入顺序。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -214,10 +218,11 @@ public class HashSet<E> {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】LinkedHashMap 用 accessOrder=true 时，每次 get() 会把节点移到链表尾部，重写 removeEldestEntry() 即可实现 LRU 缓存淘汰。
 - 【L3】TreeMap 支持丰富导航方法：firstKey()/lastKey()、ceilingKey()/floorKey()、higherKey()/lowerKey()，定位 O(log n)。
 - 【L4】三者均非线程安全：并发无序用 ConcurrentHashMap，并发有序用 ConcurrentSkipListMap。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -229,9 +234,10 @@ public class HashSet<E> {
 
 ::: details
 常见误区：
+
 - ❌ "LinkedHashMap 是线程安全的 LRU" → 错，它非线程安全，并发 LRU 需外部加锁或自实现（如加锁包装/Caffeine）。
 - ❌ "TreeMap 允许 null 键" → 错，自然顺序下 put null 键会抛 NPE，仅当 Comparator 显式容忍时才可能。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -330,10 +336,11 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent) {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】treeifyBin() 树化前先判断 table 长度：不足 64 时优先 resize() 扩容而非树化，避免小表过早树化浪费内存。
 - 【L3】JDK 8 扩容迁移时每个桶拆成 lo/hi 两条链保序迁移，详见本文档「HashMap 的扩容（resize）源码分析」。
 - 【L4】与 ConcurrentHashMap 对比：后者同样 Node[]+链表/树，但 hash 用 spread() 且屏蔽符号位（内部用负数哈希做状态标记），并发控制为 CAS + 桶级 synchronized。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -345,10 +352,11 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent) {
 
 ::: details
 常见误区：
+
 - ❌ "链表长度到 8 就一定树化" → 错，还需数组长度 ≥ 64，否则 treeifyBin() 优先 resize() 扩容。
 - ❌ "容量 16 时 put 第 13 个才扩容" → 阈值 threshold = 16 × 0.75 = 12，size 自增后 > 12 即触发，即第 13 个元素插入时就扩容，判断发生在插入之后。
 - ❌ "HashMap JDK 8 后并发也安全了" → 错，尾插法只消除了死循环，并发 put 覆盖丢失依然存在。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -386,10 +394,11 @@ JDK 8 四大改动：引入红黑树（链表 ≥8 且数组 ≥64 树化）；�
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 8 的 TreeNode 继承 LinkedHashMap.Entry，节点体积约为普通 Node 的 2 倍，这是树化阈值不宜过小的内存考量。
 - 【L3】JDK 8 putVal() 合并了 JDK 7 的 addEntry()/createEntry() 逻辑，并将扩容判断统一放到插入完成后（`++size > threshold`）。
 - 【L4】JDK 7 的 transfer() 负责扩容迁移并逆序头插，正是它在并发下成环；JDK 8 的 resize() 内联了 lo/hi 双链保序迁移。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -401,9 +410,10 @@ JDK 8 四大改动：引入红黑树（链表 ≥8 且数组 ≥64 树化）；�
 
 ::: details
 常见误区：
+
 - ❌ "JDK 8 改尾插法后就线程安全了" → 错，尾插法只解决扩容成环，并发 put 的覆盖丢失、size 不准问题依旧存在。
 - ❌ "JDK 8 完全取消了 rehash" → 不准确，扩容仍需迁移节点，只是用 `hash & oldCap` 代替逐个重新计算哈希。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -459,9 +469,10 @@ if ((p = tab[i = (n - 1) & hash]) == null) {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 8 的 resize() 内部用 lo/hi 双链尾插迁移，结构上不再成环；但两个线程同时扩容仍会互相覆盖 table 引用导致整桶丢失。
 - 【L4】ConcurrentHashMap 的对应设计：空桶 CAS 插入、非空桶 synchronized 锁首节点、多线程协同扩容 transfer()，逐点击破上述问题，见本文档「ConcurrentHashMap 的底层实现原理是什么？」。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -473,9 +484,10 @@ if ((p = tab[i = (n - 1) & hash]) == null) {
 
 ::: details
 常见误区：
+
 - ❌ "JDK 8 改成尾插法，HashMap 就线程安全了" → 错，只是消除了死循环，并发覆盖丢失、size 不准依然存在。
 - ❌ "Collections.synchronizedMap() 与 ConcurrentHashMap 性能相当" → 错，前者是全表锁串行化，高并发吞吐远低于桶级锁的后者。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -483,73 +495,186 @@ if ((p = tab[i = (n - 1) & hash]) == null) {
 - **Q：如何用代码复现数据丢失？** → 多线程并发 put 不同 key 到空桶（构造同索引），跑完比对 size 与预期值，size 偏小即发生覆盖。
 - **Q：迭代中修改 HashMap 会怎样？** → 抛 ConcurrentModificationException（fail-fast），需用 Iterator.remove() 或 removeIf()。
 
-### 【中等】WeakHashMap 有什么用？⭐⭐
+### 【困难】HashMap 的扩容（resize）源码分析⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Map / WeakHashMap
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Map / HashMap
 
 #### 💎 关键结论
 
-WeakHashMap 的 key 是弱引用：key 一旦没有外部强引用，GC 就会回收并通过 ReferenceQueue 触发条目清理，适合跟随对象生命周期的缓存与附加元数据，避免手动 remove 防内存泄漏。
+resize 在 size 超过 容量×负载因子 时触发，容量翻倍。JDK 8 核心优化：因容量是 2 的幂，元素新位置只由 hash & oldCap 一位决定——留在原索引或移到原索引+oldCap，免重算哈希且尾插保序不成环。
 
 #### ⚡记忆卡片
 
-- **口诀**：key 弱引用，GC 回收，队列清理，值仍强引用
-- **关键词**：WeakReference ／ ReferenceQueue ／ expungeStaleEntries
-- **链路**：key 无强引用 → GC 回收 → 进 ReferenceQueue → expungeStaleEntries() 移除条目
+- **口诀**：超阈值翻倍，高位定去留，lo 留 hi 走，尾插不成环
+- **关键词**：threshold ／ hash & oldCap ／ lo/hi 链
+- **链路**：++size > threshold → resize 容量×2 → 每桶按 hash & oldCap 拆 lo/hi → 分别挂原索引与原索引+oldCap
 
 #### 📖 核心知识
 
-1. **弱引用键**：key 是 WeakReference，当 key 对象不再被其他强引用指向时被 GC 回收，条目自动清理，适合存储与对象生命周期相关的临时数据。
+1. **触发条件**：`++size > threshold`（threshold = capacity × loadFactor），扩容后新容量 = 旧容量 × 2。
+2. **JDK 8 核心优化**：容量始终是 2 的幂，扩容后元素在新数组的位置只有两种可能——**原索引**（hash 的新增高位为 0）或**原索引 + 旧容量**（新增高位为 1）：
 
 ```java
-// WeakHashMap 的 key 是 WeakReference（弱引用）
-private static class Entry<K,V> extends WeakReference<Object> {
-    V value;
-    int hash;
-    Entry<K,V> next;
+// 扩容时的元素迁移逻辑（简化）
+if ((e.hash & oldCap) == 0) {
+    // 低位链：位置不变
+    loTail.next = e;
+} else {
+    // 高位链：位置 = 原索引 + oldCap
+    hiTail.next = e;
 }
 ```
 
-2. **自动清理机制**：被回收的键进入内部 `ReferenceQueue`，put/get/size 等操作时调用 `expungeStaleEntries()` 检查并清理失效条目，无需手动 remove()：
+3. **迁移实现**：每个桶的节点按 `hash & oldCap` 拆成 lo、hi 两条链表，保持原有顺序直接挂到新数组的 i 与 i + oldCap 位置，无需重新计算哈希。
+4. **JDK 7 vs JDK 8 对比**：
 
-```java
-public class WeakHashMap<K,V> {
-    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+| **维度**     | **JDK 7**                  | **JDK 8**                   |
+| ------------ | -------------------------- | --------------------------- |
+| **链表迁移** | 头插法（逆序）             | 尾插法（保序）              |
+| **索引计算** | 重新 `hash & (newCap-1)`   | 根据 `hash & oldCap` 分两组 |
+| **并发问题** | 可能形成环形链表导致死循环 | 无环（但仍有数据丢失风险）  |
+| **性能**     | O(n) 重哈希                | O(n) 但减少 hash 计算       |
 
-    // 垃圾回收器将无其他引用的键放入队列
-    // WeakHashMap 在操作时（put/get/size）会检查并清理
-    private void expungeStaleEntries() {
-        Reference<?> ref;
-        while ((ref = queue.poll()) != null) {
-            // 清理对应条目：移除Entry，value置null帮助GC
-        }
-    }
-}
-```
+5. **容量必须是 2 的幂的原因**：`(n - 1) & hash` 等价于 `hash % n` 但位运算更快；扩容时只需判断新增最高位，简化迁移；n-1 二进制全为 1，保证桶分布均匀。
 
-3. **典型场景**：缓存系统（键对象失效后自动释放大 value 防内存堆积）；监听器/元数据存储（对象销毁时关联数据自动清除）。
-4. **注意事项**：仅键是弱引用，value 不是，若 value 反向强引用 key 则永不回收；非线程安全需外部同步；清理时机依赖 GC 运行，不可预测。
+#### 🔬 扩展知识
 
-::: details 示例代码
+::: details
 
-```java
-WeakHashMap<Object, String> weakMap = new WeakHashMap<>();
-Object key = new Object();
-weakMap.put(key, "Value");
+- 【L3】resize() 中 threshold 同步翻倍，若新容量超过 MAXIMUM_CAPACITY（2^30）则不再扩容，仅把 threshold 调为 Integer.MAX_VALUE 硬扛。
+- 【L3】红黑树桶扩容时 TreeNode 同样按 hash & oldCap 拆链，若拆后节点数 ≤ 6 会用 untreeify() 退化回链表。
+- 【L4】JDK 7 的 transfer() 逆序头插是并发成环的根源：两线程交叉迁移使 A.next=B 与 B.next=A 同时成立；JDK 8 尾插保序从结构上消除。
+  :::
 
-// 当 key 的强引用置为 null，且发生 GC 后，weakMap 中的条目会被自动移除
-key = null;
-System.gc(); // 仅示例，实际中不推荐显式调用 GC
+#### 🏭 实战场景
 
-// 此时 weakMap 可能已为空（条目被回收）
-```
-
+::: details
+某报表服务把 100 万条汇总数据放入未预设容量的 HashMap，运行中连续扩容 16 次（16 → 2097152），每次 resize 都伴随明显的 STW 抖动；按已知规模用 `new HashMap<>(1_400_000)` 预设后一次扩容到位，构建耗时从约 1.2s 降至约 0.4s，运行期无再扩容。
 :::
+
+#### ⚠️ 常见误区
+
+::: details
+常见误区：
+
+- ❌ "扩容就是把所有元素重新哈希一遍" → JDK 8 不需要，用 hash & oldCap 一位判断迁移，复杂度仍是 O(n) 但免掉哈希计算。
+- ❌ "resize 只在插入时发生" → 对，触发点在 put 后 ++size > threshold；初始 table 为 null 时首次 put 也会经 resize() 懒初始化。
+  :::
 
 #### 🔀 发散问题
 
-- **Q：ThreadLocalMap 的 Entry 也是弱引用吗？** → 是，key（ThreadLocal）是弱引用，但 value 是强引用，所以不调 remove() 仍可能内存泄漏，与 WeakHashMap 的自动清理不同。
-- **Q：value 强引用 key 会怎样？** → key 永不被回收，条目永不清理，失去弱引用意义，设计时需避免 value 持有 key。
+- **Q：为什么是 2 倍扩容而不是 1.5 倍？** → 2 的幂让 (n-1)&hash 与 hash&oldCap 迁移判断都可用位运算，1.5 倍会破坏这些优化。
+- **Q：扩容是原子的吗？并发会怎样？** → 不是，多线程同时 resize 会互相覆盖 table、丢节点；JDK 8 只是不再成环，并发场景仍需 ConcurrentHashMap。
+- **Q：初始容量怎么设最省？** → 预估元素数除以负载因子再向上取 2 的幂，如存 100 万条可传 1_400_000，交给 tableSizeFor 取整。
+
+### 【中等】HashMap 的负载因子为什么是 0.75？⭐⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Map / HashMap
+
+#### 💎 关键结论
+
+负载因子是空间与时间的权衡：0.75 时平均每个桶 0.75 个元素，按泊松分布桶内达 8 个的概率约 6×10⁻⁸，这也是树化阈值取 8 的依据。0.5 浪费空间，1.0 冲突频发，0.75 是经验甜点。
+
+#### ⚡记忆卡片
+
+- **口诀**：0.75 是甜点，泊松定阈值 8，高低两难取中间
+- **关键词**：泊松分布 ／ threshold ／ 时空权衡
+- **链路**：loadFactor 0.75 → threshold = 容量×0.75 → 桶满 8 概率 6×10⁻⁸ → 树化阈值 8
+
+#### 📖 核心知识
+
+1. **空间与时间的平衡**：负载因子（loadFactor）是时间与空间的权衡。
+   - 过低（如 0.5）：空间浪费大，但冲突少、查询快；
+   - 过高（如 1.0）：空间利用率高，但冲突增多、链表变长、查询慢；
+   - 0.75 是数学上的“甜点”，平均每个桶 0.75 个元素。
+2. **泊松分布依据**：负载因子 0.75 时，桶中元素数量符合泊松分布（λ ≈ 0.5）；桶中链表长度 ≥ 8 的概率约为 0.00000006（千万分之一量级），所以树化阈值选 8。
+3. **2 的幂兼容**：`threshold = capacity × 0.75`，容量为 2 的幂时 threshold 为整数（如 16×0.75=12）。
+4. **自定义负载因子场景**：
+
+| **场景**           | **推荐 loadFactor** | **原因**           |
+| ------------------ | ------------------- | ------------------ |
+| 内存敏感（嵌入式） | 0.8 ~ 1.0           | 减少桶数量，省内存 |
+| 查询性能优先       | 0.5 ~ 0.7           | 减少冲突，加快查询 |
+| 通用场景           | 0.75（默认）        | 平衡               |
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】源码注释中的泊松概率表给出了桶内 0~8 个元素的概率，长度 8 时约 6×10⁻⁸，注释原文说明链表长度几乎不会达到树化阈值，树化是为极端情况兜底。
+- 【L3】tableSizeFor() 保证容量恒为 2 的幂，配合默认 0.75 使 threshold 恒为整数，避免浮点比较误差。
+  :::
+
+#### ⚠️ 常见误区
+
+::: details
+常见误区：
+
+- ❌ "调高负载因子总能省内存" → 不全面，冲突概率与链表长度随之上升，查询退化；内存敏感场景更推荐用 initialCapacity 精准预设容量。
+- ❌ "0.75 是官方拍脑袋定的" → 错，源码注释有泊松分布推导支撑，与树化阈值 8 联动设计。
+  :::
+
+#### 🔀 发散问题
+
+- **Q：什么场景值得改负载因子？** → 元素规模已知且内存受限（如嵌入式）可调高；极端查询敏感且内存宽裕可调低，通用场景保持默认。
+- **Q：threshold 何时更新？** → 构造与每次 resize 时重算（新容量 × 负载因子）；put 后以 ++size > threshold 判断是否触发扩容。
+
+### 【中等】HashMap 和 TreeMap 何时该用哪个？⭐⭐⭐
+
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Map / TreeMap
+
+#### 💎 关键结论
+
+不需要有序就用 HashMap（平均 O(1)，内存更省）；需要按键排序或范围查询就用 TreeMap（O(log n)）。若只要最终输出有序，可先 HashMap 构建再一次性转换，避免构建期持续付出 O(log n)。
+
+#### ⚡记忆卡片
+
+- **口诀**：无序 HashMap，有序 TreeMap，范围查询找树
+- **关键词**：O(1) ／ O(log n) ／ subMap
+- **链路**：需要排序/范围查询？→ 否：HashMap；是：TreeMap
+
+#### 📖 核心知识
+
+1. **维度对比**：
+
+| **维度**       | **HashMap**        | **TreeMap**                     |
+| -------------- | ------------------ | ------------------------------- |
+| **底层结构**   | 数组 + 链表/红黑树 | 红黑树                          |
+| **时间复杂度** | O(1) 平均          | O(log n)                        |
+| **顺序性**     | 无序               | 有序（自然/Comparator）         |
+| **null 键**    | 允许 1 个          | 不允许（除非自定义 Comparator） |
+| **内存占用**   | 较低               | 较高（树节点开销）              |
+| **范围查询**   | 不支持             | `subMap`/`headMap`/`tailMap`    |
+
+2. **选择建议**：
+   - **不需要排序** → `HashMap`（绝大多数场景）；
+   - **需要按键排序** → `TreeMap`；
+   - **需要范围查询**（如找出 100-200 之间的 key）→ `TreeMap`；
+   - **需要访问顺序（LRU）** → `LinkedHashMap`。
+3. **TreeMap 额外能力**：key 需可比较（自然顺序 Comparable 或构造传入 Comparator），支持 firstKey()/lastKey()、ceilingKey()/floorKey() 等导航方法。
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】TreeMap 树节点含左右子与父指针，内存开销明显高于 HashMap.Node，同规模下内存占用更高。
+- 【L3】先 HashMap 构建再 `new TreeMap<>(hashMap)` 一次转换，比构建期直接写 TreeMap 的逐次 O(log n) 插入总体更省。
+  :::
+
+#### ⚠️ 常见误区
+
+::: details
+常见误区：
+
+- ❌ "TreeMap 查询总是比 HashMap 慢，永远别用" → 不全面，需要有序/范围查询时 TreeMap 的 O(log n + m) 远优于 HashMap 全量遍历 O(n)。
+- ❌ "HashMap 也能按键有序遍历" → 错，HashMap 完全无序且扩容后顺序变化，有序需求请用 TreeMap 或 LinkedHashMap。
+  :::
+
+#### 🔀 发散问题
+
+- **Q：只要输出时有序，该选谁？** → 先用 HashMap 构建，输出前排序或一次性放入 TreeMap，避免构建期持续 O(log n)。
+- **Q：TreeMap 的范围查询为什么快？** → 红黑树有序，定位起点 O(log n) 后顺序遍历 m 个即可，总体 O(log n + m)。
+- **Q：并发下要有序 Map 用什么？** → ConcurrentSkipListMap，见本文档「ConcurrentSkipListMap 的原理是什么？」。
 
 ### 【中等】ConcurrentHashMap 和 Hashtable 有什么区别？⭐⭐⭐
 
@@ -582,10 +707,11 @@ System.gc(); // 仅示例，实际中不推荐显式调用 GC
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】Hashtable 的每个公开方法都加 this 锁，读也被阻塞；ConcurrentHashMap（JDK8+）的 get 完全无锁，volatile 保证可见性。
 - 【L3】Hashtable 的枚举器不抛 ConcurrentModificationException 但同样弱一致；CHM 的 keySet/entrySet 视图也支持弱一致迭代。
 - 【L4】版本演进：Hashtable（JDK 1.0）→ Collections.synchronizedMap（JDK 1.2）→ ConcurrentHashMap（JDK 1.5）→ JDK 8 重构为 CAS + 桶锁。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -597,9 +723,10 @@ System.gc(); // 仅示例，实际中不推荐显式调用 GC
 
 ::: details
 常见误区：
+
 - ❌ "Hashtable 更老所以更稳定，并发场景更安全" → 错，安全与稳定无关锁粒度，全表锁反而是吞吐瓶颈与死代码温床。
 - ❌ "ConcurrentHashMap 允许 null 值只是习惯问题" → 错，是刻意设计，避免并发下 get() 返回 null 的二义性，见本文档「ConcurrentHashMap 为什么 key 和 value 不能为 null？」。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -689,10 +816,11 @@ GET 完全无锁：定位桶后遍历链表/树，依赖 volatile 保证可见�
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】initTable() 用 sizeCtl 的 CAS 保证 table 只初始化一次；扩容中 ForwardingNode（hash = MOVED）标记已迁移的桶，put 线程遇到会先协助迁移。
 - 【L3】get() 无锁的底气：val、next 均 volatile；树化桶的查找通过 TreeBin 维护的读写锁状态保证一致性。
 - 【L4】与 HashMap 对比：spread() 额外屏蔽符号位（保留负数哈希做状态标记，如 MOVED/TREEBIN）；size() 弱一致而非精确值。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -704,9 +832,10 @@ GET 完全无锁：定位桶后遍历链表/树，依赖 volatile 保证可见�
 
 ::: details
 常见误区：
+
 - ❌ "ConcurrentHashMap 完全无锁" → 错，读无锁，但写非空桶仍用 synchronized 锁首节点，只是粒度到桶。
 - ❌ "size() 是精确值" → 错，size() 是弱一致的估算，统计期间可能有并发修改，见本文档「ConcurrentHashMap 的 size() 方法如何实现？」。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -817,17 +946,19 @@ if (!map.containsKey("key")) {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】put 时的判空点在 putVal() 入口：key 或 value 为 null 直接抛 NullPointerException，属于快速失败而非静默行为。
 - 【L3】TreeMap 在自然顺序下也不允许 null 键（compareTo(null) 抛 NPE），但原因是比较而非并发。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ "禁止 null 只是编码习惯约定" → 错，是刻意设计：并发下 containsKey + get 的组合也不是原子的，无法事后补救歧义。
 - ❌ "HashMap 允许 null 说明它设计更先进" → 不准确，是单线程语义下的取舍，代价是调用方需自行区分两种 null。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -854,13 +985,13 @@ if (!map.containsKey("key")) {
 2. **复合操作非原子**：“检查然后执行（check-then-act）”不是原子的，例如 `if (!map.containsKey(key)) { map.put(key, value); }`，在检查与执行之间其他线程可能已修改 map，导致覆盖或重复初始化。
 3. **解决方案**：使用原子复合方法或显式同步（会降低并发性能）：
 
-| **方法**           | **语义**                 |
-| ------------------ | ------------------------ |
-| `putIfAbsent()`    | 不存在才插入             |
-| `computeIfAbsent()`| 不存在时计算并插入       |
-| `computeIfPresent()`| 存在时原子更新         |
-| `compute()`        | 原子地计算新值           |
-| `merge()`          | 原子地合并旧值与新值     |
+| **方法**             | **语义**             |
+| -------------------- | -------------------- |
+| `putIfAbsent()`      | 不存在才插入         |
+| `computeIfAbsent()`  | 不存在时计算并插入   |
+| `computeIfPresent()` | 存在时原子更新       |
+| `compute()`          | 原子地计算新值       |
+| `merge()`            | 原子地合并旧值与新值 |
 
 4. **示例**：
 
@@ -884,142 +1015,24 @@ map.computeIfAbsent("key", k -> 1);
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 8 中这些原子方法在桶级别加 synchronized 执行映射函数，保证同桶操作串行；注意映射函数里不要再修改其他桶，否则可能死锁或抛 IllegalStateException（结构性修改受限）。
 - 【L3】并发计数经典写法：`map.merge(key, 1L, Long::sum)`，配合 LongAdder 可进一步降低热点 key 的竞争。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ "ConcurrentHashMap 线程安全，所以任意组合用法都安全" → 错，安全的是单个方法，check-then-act 组合仍有竞态。
 - ❌ "get + put 实现计数没问题" → 错，并发下会丢失更新，应用 merge(key, 1, Long::sum) 或 compute。
-:::
+  :::
 
 #### 🔀 发散问题
 
 - **Q：computeIfAbsent 里能再 put 其他 key 吗？** → 不建议，映射函数执行期间持有桶锁，跨桶修改可能死锁或抛异常，应保持函数无副作用。
 - **Q：putIfAbsent 与 computeIfAbsent 怎么选？** → 值已算好用前者；值构造昂贵且希望“不存在才计算”用后者，避免无效构造开销。
-
-### 【困难】HashMap 的扩容（resize）源码分析⭐⭐⭐
-
-> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Map / HashMap
-
-#### 💎 关键结论
-
-resize 在 size 超过 容量×负载因子 时触发，容量翻倍。JDK 8 核心优化：因容量是 2 的幂，元素新位置只由 hash & oldCap 一位决定——留在原索引或移到原索引+oldCap，免重算哈希且尾插保序不成环。
-
-#### ⚡记忆卡片
-
-- **口诀**：超阈值翻倍，高位定去留，lo 留 hi 走，尾插不成环
-- **关键词**：threshold ／ hash & oldCap ／ lo/hi 链
-- **链路**：++size > threshold → resize 容量×2 → 每桶按 hash & oldCap 拆 lo/hi → 分别挂原索引与原索引+oldCap
-
-#### 📖 核心知识
-
-1. **触发条件**：`++size > threshold`（threshold = capacity × loadFactor），扩容后新容量 = 旧容量 × 2。
-2. **JDK 8 核心优化**：容量始终是 2 的幂，扩容后元素在新数组的位置只有两种可能——**原索引**（hash 的新增高位为 0）或**原索引 + 旧容量**（新增高位为 1）：
-
-```java
-// 扩容时的元素迁移逻辑（简化）
-if ((e.hash & oldCap) == 0) {
-    // 低位链：位置不变
-    loTail.next = e;
-} else {
-    // 高位链：位置 = 原索引 + oldCap
-    hiTail.next = e;
-}
-```
-
-3. **迁移实现**：每个桶的节点按 `hash & oldCap` 拆成 lo、hi 两条链表，保持原有顺序直接挂到新数组的 i 与 i + oldCap 位置，无需重新计算哈希。
-4. **JDK 7 vs JDK 8 对比**：
-
-| **维度**     | **JDK 7**                  | **JDK 8**                   |
-| ------------ | -------------------------- | --------------------------- |
-| **链表迁移** | 头插法（逆序）             | 尾插法（保序）              |
-| **索引计算** | 重新 `hash & (newCap-1)`   | 根据 `hash & oldCap` 分两组 |
-| **并发问题** | 可能形成环形链表导致死循环 | 无环（但仍有数据丢失风险）  |
-| **性能**     | O(n) 重哈希                | O(n) 但减少 hash 计算       |
-
-5. **容量必须是 2 的幂的原因**：`(n - 1) & hash` 等价于 `hash % n` 但位运算更快；扩容时只需判断新增最高位，简化迁移；n-1 二进制全为 1，保证桶分布均匀。
-
-#### 🔬 扩展知识
-
-::: details
-- 【L3】resize() 中 threshold 同步翻倍，若新容量超过 MAXIMUM_CAPACITY（2^30）则不再扩容，仅把 threshold 调为 Integer.MAX_VALUE 硬扛。
-- 【L3】红黑树桶扩容时 TreeNode 同样按 hash & oldCap 拆链，若拆后节点数 ≤ 6 会用 untreeify() 退化回链表。
-- 【L4】JDK 7 的 transfer() 逆序头插是并发成环的根源：两线程交叉迁移使 A.next=B 与 B.next=A 同时成立；JDK 8 尾插保序从结构上消除。
-:::
-
-#### 🏭 实战场景
-
-::: details
-某报表服务把 100 万条汇总数据放入未预设容量的 HashMap，运行中连续扩容 16 次（16 → 2097152），每次 resize 都伴随明显的 STW 抖动；按已知规模用 `new HashMap<>(1_400_000)` 预设后一次扩容到位，构建耗时从约 1.2s 降至约 0.4s，运行期无再扩容。
-:::
-
-#### ⚠️ 常见误区
-
-::: details
-常见误区：
-- ❌ "扩容就是把所有元素重新哈希一遍" → JDK 8 不需要，用 hash & oldCap 一位判断迁移，复杂度仍是 O(n) 但免掉哈希计算。
-- ❌ "resize 只在插入时发生" → 对，触发点在 put 后 ++size > threshold；初始 table 为 null 时首次 put 也会经 resize() 懒初始化。
-:::
-
-#### 🔀 发散问题
-
-- **Q：为什么是 2 倍扩容而不是 1.5 倍？** → 2 的幂让 (n-1)&hash 与 hash&oldCap 迁移判断都可用位运算，1.5 倍会破坏这些优化。
-- **Q：扩容是原子的吗？并发会怎样？** → 不是，多线程同时 resize 会互相覆盖 table、丢节点；JDK 8 只是不再成环，并发场景仍需 ConcurrentHashMap。
-- **Q：初始容量怎么设最省？** → 预估元素数除以负载因子再向上取 2 的幂，如存 100 万条可传 1_400_000，交给 tableSizeFor 取整。
-
-### 【中等】HashMap 的负载因子为什么是 0.75？⭐⭐⭐
-
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Map / HashMap
-
-#### 💎 关键结论
-
-负载因子是空间与时间的权衡：0.75 时平均每个桶 0.75 个元素，按泊松分布桶内达 8 个的概率约 6×10⁻⁸，这也是树化阈值取 8 的依据。0.5 浪费空间，1.0 冲突频发，0.75 是经验甜点。
-
-#### ⚡记忆卡片
-
-- **口诀**：0.75 是甜点，泊松定阈值 8，高低两难取中间
-- **关键词**：泊松分布 ／ threshold ／ 时空权衡
-- **链路**：loadFactor 0.75 → threshold = 容量×0.75 → 桶满 8 概率 6×10⁻⁸ → 树化阈值 8
-
-#### 📖 核心知识
-
-1. **空间与时间的平衡**：负载因子（loadFactor）是时间与空间的权衡。
-   - 过低（如 0.5）：空间浪费大，但冲突少、查询快；
-   - 过高（如 1.0）：空间利用率高，但冲突增多、链表变长、查询慢；
-   - 0.75 是数学上的“甜点”，平均每个桶 0.75 个元素。
-2. **泊松分布依据**：负载因子 0.75 时，桶中元素数量符合泊松分布（λ ≈ 0.5）；桶中链表长度 ≥ 8 的概率约为 0.00000006（千万分之一量级），所以树化阈值选 8。
-3. **2 的幂兼容**：`threshold = capacity × 0.75`，容量为 2 的幂时 threshold 为整数（如 16×0.75=12）。
-4. **自定义负载因子场景**：
-
-| **场景**           | **推荐 loadFactor** | **原因**           |
-| ------------------ | ------------------- | ------------------ |
-| 内存敏感（嵌入式） | 0.8 ~ 1.0           | 减少桶数量，省内存 |
-| 查询性能优先       | 0.5 ~ 0.7           | 减少冲突，加快查询 |
-| 通用场景           | 0.75（默认）        | 平衡               |
-
-#### 🔬 扩展知识
-
-::: details
-- 【L3】源码注释中的泊松概率表给出了桶内 0~8 个元素的概率，长度 8 时约 6×10⁻⁸，注释原文说明链表长度几乎不会达到树化阈值，树化是为极端情况兜底。
-- 【L3】tableSizeFor() 保证容量恒为 2 的幂，配合默认 0.75 使 threshold 恒为整数，避免浮点比较误差。
-:::
-
-#### ⚠️ 常见误区
-
-::: details
-常见误区：
-- ❌ "调高负载因子总能省内存" → 不全面，冲突概率与链表长度随之上升，查询退化；内存敏感场景更推荐用 initialCapacity 精准预设容量。
-- ❌ "0.75 是官方拍脑袋定的" → 错，源码注释有泊松分布推导支撑，与树化阈值 8 联动设计。
-:::
-
-#### 🔀 发散问题
-
-- **Q：什么场景值得改负载因子？** → 元素规模已知且内存受限（如嵌入式）可调高；极端查询敏感且内存宽裕可调低，通用场景保持默认。
-- **Q：threshold 何时更新？** → 构造与每次 resize 时重算（新容量 × 负载因子）；put 后以 ++size > threshold 判断是否触发扩容。
 
 ### 【中等】ConcurrentHashMap 的 size() 方法如何实现？⭐⭐
 
@@ -1089,60 +1102,73 @@ private final void addCount(long x, int check) {
 - **Q：JDK 7 的 size() 怎么做？** → 依次锁住每个 Segment 累加 count，先乐观无锁尝试，失败再逐个加锁，同样弱一致且开销更大。
 - **Q：mappingCount() 是什么？** → JDK 8 新增，返回 long 型计数，避免元素数超过 21 亿时 int 溢出，新代码推荐用它。
 
-### 【中等】HashMap 和 TreeMap 何时该用哪个？⭐⭐⭐
+### 【中等】WeakHashMap 有什么用？⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Map / TreeMap
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Map / WeakHashMap
 
 #### 💎 关键结论
 
-不需要有序就用 HashMap（平均 O(1)，内存更省）；需要按键排序或范围查询就用 TreeMap（O(log n)）。若只要最终输出有序，可先 HashMap 构建再一次性转换，避免构建期持续付出 O(log n)。
+WeakHashMap 的 key 是弱引用：key 一旦没有外部强引用，GC 就会回收并通过 ReferenceQueue 触发条目清理，适合跟随对象生命周期的缓存与附加元数据，避免手动 remove 防内存泄漏。
 
 #### ⚡记忆卡片
 
-- **口诀**：无序 HashMap，有序 TreeMap，范围查询找树
-- **关键词**：O(1) ／ O(log n) ／ subMap
-- **链路**：需要排序/范围查询？→ 否：HashMap；是：TreeMap
+- **口诀**：key 弱引用，GC 回收，队列清理，值仍强引用
+- **关键词**：WeakReference ／ ReferenceQueue ／ expungeStaleEntries
+- **链路**：key 无强引用 → GC 回收 → 进 ReferenceQueue → expungeStaleEntries() 移除条目
 
 #### 📖 核心知识
 
-1. **维度对比**：
+1. **弱引用键**：key 是 WeakReference，当 key 对象不再被其他强引用指向时被 GC 回收，条目自动清理，适合存储与对象生命周期相关的临时数据。
 
-| **维度**       | **HashMap**        | **TreeMap**                     |
-| -------------- | ------------------ | ------------------------------- |
-| **底层结构**   | 数组 + 链表/红黑树 | 红黑树                          |
-| **时间复杂度** | O(1) 平均          | O(log n)                        |
-| **顺序性**     | 无序               | 有序（自然/Comparator）         |
-| **null 键**    | 允许 1 个          | 不允许（除非自定义 Comparator） |
-| **内存占用**   | 较低               | 较高（树节点开销）              |
-| **范围查询**   | 不支持             | `subMap`/`headMap`/`tailMap`    |
+```java
+// WeakHashMap 的 key 是 WeakReference（弱引用）
+private static class Entry<K,V> extends WeakReference<Object> {
+    V value;
+    int hash;
+    Entry<K,V> next;
+}
+```
 
-2. **选择建议**：
-   - **不需要排序** → `HashMap`（绝大多数场景）；
-   - **需要按键排序** → `TreeMap`；
-   - **需要范围查询**（如找出 100-200 之间的 key）→ `TreeMap`；
-   - **需要访问顺序（LRU）** → `LinkedHashMap`。
-3. **TreeMap 额外能力**：key 需可比较（自然顺序 Comparable 或构造传入 Comparator），支持 firstKey()/lastKey()、ceilingKey()/floorKey() 等导航方法。
+2. **自动清理机制**：被回收的键进入内部 `ReferenceQueue`，put/get/size 等操作时调用 `expungeStaleEntries()` 检查并清理失效条目，无需手动 remove()：
 
-#### 🔬 扩展知识
+```java
+public class WeakHashMap<K,V> {
+    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
-::: details
-- 【L3】TreeMap 树节点含左右子与父指针，内存开销明显高于 HashMap.Node，同规模下内存占用更高。
-- 【L3】先 HashMap 构建再 `new TreeMap<>(hashMap)` 一次转换，比构建期直接写 TreeMap 的逐次 O(log n) 插入总体更省。
-:::
+    // 垃圾回收器将无其他引用的键放入队列
+    // WeakHashMap 在操作时（put/get/size）会检查并清理
+    private void expungeStaleEntries() {
+        Reference<?> ref;
+        while ((ref = queue.poll()) != null) {
+            // 清理对应条目：移除Entry，value置null帮助GC
+        }
+    }
+}
+```
 
-#### ⚠️ 常见误区
+3. **典型场景**：缓存系统（键对象失效后自动释放大 value 防内存堆积）；监听器/元数据存储（对象销毁时关联数据自动清除）。
+4. **注意事项**：仅键是弱引用，value 不是，若 value 反向强引用 key 则永不回收；非线程安全需外部同步；清理时机依赖 GC 运行，不可预测。
 
-::: details
-常见误区：
-- ❌ "TreeMap 查询总是比 HashMap 慢，永远别用" → 不全面，需要有序/范围查询时 TreeMap 的 O(log n + m) 远优于 HashMap 全量遍历 O(n)。
-- ❌ "HashMap 也能按键有序遍历" → 错，HashMap 完全无序且扩容后顺序变化，有序需求请用 TreeMap 或 LinkedHashMap。
+::: details 示例代码
+
+```java
+WeakHashMap<Object, String> weakMap = new WeakHashMap<>();
+Object key = new Object();
+weakMap.put(key, "Value");
+
+// 当 key 的强引用置为 null，且发生 GC 后，weakMap 中的条目会被自动移除
+key = null;
+System.gc(); // 仅示例，实际中不推荐显式调用 GC
+
+// 此时 weakMap 可能已为空（条目被回收）
+```
+
 :::
 
 #### 🔀 发散问题
 
-- **Q：只要输出时有序，该选谁？** → 先用 HashMap 构建，输出前排序或一次性放入 TreeMap，避免构建期持续 O(log n)。
-- **Q：TreeMap 的范围查询为什么快？** → 红黑树有序，定位起点 O(log n) 后顺序遍历 m 个即可，总体 O(log n + m)。
-- **Q：并发下要有序 Map 用什么？** → ConcurrentSkipListMap，见本文档「ConcurrentSkipListMap 的原理是什么？」。
+- **Q：ThreadLocalMap 的 Entry 也是弱引用吗？** → 是，key（ThreadLocal）是弱引用，但 value 是强引用，所以不调 remove() 仍可能内存泄漏，与 WeakHashMap 的自动清理不同。
+- **Q：value 强引用 key 会怎样？** → key 永不被回收，条目永不清理，失去弱引用意义，设计时需避免 value 持有 key。
 
 ### 【困难】ConcurrentSkipListMap 的原理是什么？⭐⭐⭐⭐
 
@@ -1199,10 +1225,11 @@ Level 0:  Head → 10 → 20 → 30 → 40 → 50 → 60 → 70 → null
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】删除采用逻辑删除：先 CAS 标记再冻结后继指针，避免并发下大范围重链；size() 不维护精确计数，遍历时允许并发修改。
 - 【L4】为什么数据库/中间件偏爱跳表而非红黑树：插入删除只影响局部节点、CAS 友好，红黑树旋转可能牵动多个节点难以并发；范围查询找到起点后沿底层链表直走，红黑树需中序遍历维护栈状态；实现也更简单（工程实现约 200 行 vs 红黑树 500+ 行）。
 - 【L4】工业应用：Redis ZSet、LevelDB/RocksDB MemTable、HBase MemStore（直接用 ConcurrentSkipListMap）、Lucene 倒排链跳跃表；Redis 跳表节点自带 level[] 数组、层数随机（平均 1/(1-p) 层），Java 版用 Index 节点挂载在数据节点上便于 CAS，核心算法一致但 Java 版因无锁并发更复杂。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -1214,9 +1241,10 @@ HBase 的 MemStore 用 ConcurrentSkipListMap 存储写入缓冲，单 Region 承
 
 ::: details
 常见误区：
+
 - ❌ "跳表查询一定比红黑树慢" → 两者同为 O(log n)，跳表在并发与范围查询场景反而更优，复杂度常数差异有限。
 - ❌ "ConcurrentSkipListMap 的 size() 是精确值" → 错，size() 遍历计算且不精确，高频调 size() 的热路径需谨慎，O(n) 开销不可忽视。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1276,17 +1304,19 @@ map.put(key, "value2");
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】开放寻址 + 引用判等使 IdentityHashMap 适合短生命周期的对象身份跟踪；JVM 内部类似场景还有 ClassValue 等按 Class 引用索引的结构。
 - 【L3】ThreadLocalMap 借用开放寻址思想但 Entry 的 key 是 ThreadLocal 弱引用，是独立实现，不等同于 IdentityHashMap。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ "IdentityHashMap 是 HashMap 的高性能版" → 错，判等语义完全不同（== vs equals），误用会把逻辑相等的 key 当成不同 key。
 - ❌ "字符串常量当 key 一定去重" → 要小心常量池行为：字面量共享引用会覆盖，new String() 则是不同引用，行为取决于引用是否同一。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1377,9 +1407,10 @@ add/remove/contains 都是单个位运算，O(1) 且常数 <1ns；交/并/差集
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】EnumSet 是抽象类，静态工厂 of()/noneOf()/allOf()/complementOf() 根据枚举规模返回 RegularEnumSet 或 JumboEnumSet；complementOf 直接按位取反实现补集。
 - 【L4】与 HashMap 相比 EnumMap 不支持 null key（put null 键抛 NPE）但允许 null value；而 HashMap 两者都允许。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -1391,9 +1422,10 @@ add/remove/contains 都是单个位运算，O(1) 且常数 <1ns；交/并/差集
 
 ::: details
 常见误区：
+
 - ❌ "EnumMap 允许 null 键" → 错，put null 键抛 NullPointerException，仅值允许为 null。
 - ❌ "自己用枚举 ordinal 建数组更灵活" → 不推荐，EnumMap 提供类型安全、迭代顺序与空值检查，手写数组容易越界且语义不清。
-:::
+  :::
 
 #### 🔀 发散问题
 

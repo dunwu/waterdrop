@@ -296,26 +296,26 @@ private static final int TIDYING    =  2 << COUNT_BITS;
 private static final int TERMINATED =  3 << COUNT_BITS;
 ```
 
-  **`ctl` 用于控制线程池的运行状态和线程池中的有效线程数量**。它包含两部分的信息：
+**`ctl` 用于控制线程池的运行状态和线程池中的有效线程数量**。它包含两部分的信息：
 
-  - 线程池的运行状态（`runState`）
-  - 线程池内有效线程的数量（`workerCount`）
-  - 可以看到，`ctl` 使用了 `Integer` 类型来保存，高 3 位保存 `runState`，低 29 位保存 `workerCount`。`COUNT_BITS` 就是 29，`CAPACITY` 就是 1 左移 29 位减 1（29 个 1），这个常量表示 `workerCount` 的上限值，大约是 5 亿。
+- 线程池的运行状态（`runState`）
+- 线程池内有效线程的数量（`workerCount`）
+- 可以看到，`ctl` 使用了 `Integer` 类型来保存，高 3 位保存 `runState`，低 29 位保存 `workerCount`。`COUNT_BITS` 就是 29，`CAPACITY` 就是 1 左移 29 位减 1（29 个 1），这个常量表示 `workerCount` 的上限值，大约是 5 亿。
 
-  **线程池一共有五种运行状态**：
+**线程池一共有五种运行状态**：
 
-  - **`RUNNING`（运行状态）**。接受新任务，并且也能处理阻塞队列中的任务。
-  - **`SHUTDOWN`（关闭状态）**。不接受新任务，但可以处理阻塞队列中的任务。
-    - 在线程池处于 `RUNNING` 状态时，调用 `shutdown` 方法会使线程池进入到该状态。
-    - `finalize` 方法在执行过程中也会调用 `shutdown` 方法进入该状态。
-  - **`STOP`（停止状态）**。不接受新任务，也不处理队列中的任务。会中断正在处理任务的线程。在线程池处于 `RUNNING` 或 `SHUTDOWN` 状态时，调用 `shutdownNow` 方法会使线程池进入到该状态。
-  - **`TIDYING`（整理状态）**。如果所有的任务都已终止了，`workerCount`（有效线程数）为 0，线程池进入该状态后会调用 `terminated` 方法进入 `TERMINATED` 状态。
-  - **`TERMINATED`（已终止状态）**。在 `terminated` 方法执行完后进入该状态。默认 `terminated` 方法中什么也没有做。进入 `TERMINATED` 的条件如下：
-    - 线程池不是 `RUNNING` 状态；
-    - 线程池状态不是 `TIDYING` 状态或 `TERMINATED` 状态；
-    - 如果线程池状态是 `SHUTDOWN` 并且 `workerQueue` 为空；
-    - `workerCount` 为 0；
-    - 设置 `TIDYING` 状态成功。
+- **`RUNNING`（运行状态）**。接受新任务，并且也能处理阻塞队列中的任务。
+- **`SHUTDOWN`（关闭状态）**。不接受新任务，但可以处理阻塞队列中的任务。
+  - 在线程池处于 `RUNNING` 状态时，调用 `shutdown` 方法会使线程池进入到该状态。
+  - `finalize` 方法在执行过程中也会调用 `shutdown` 方法进入该状态。
+- **`STOP`（停止状态）**。不接受新任务，也不处理队列中的任务。会中断正在处理任务的线程。在线程池处于 `RUNNING` 或 `SHUTDOWN` 状态时，调用 `shutdownNow` 方法会使线程池进入到该状态。
+- **`TIDYING`（整理状态）**。如果所有的任务都已终止了，`workerCount`（有效线程数）为 0，线程池进入该状态后会调用 `terminated` 方法进入 `TERMINATED` 状态。
+- **`TERMINATED`（已终止状态）**。在 `terminated` 方法执行完后进入该状态。默认 `terminated` 方法中什么也没有做。进入 `TERMINATED` 的条件如下：
+  - 线程池不是 `RUNNING` 状态；
+  - 线程池状态不是 `TIDYING` 状态或 `TERMINATED` 状态；
+  - 如果线程池状态是 `SHUTDOWN` 并且 `workerQueue` 为空；
+  - `workerCount` 为 0；
+  - 设置 `TIDYING` 状态成功。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/09/e926fa2451744708b1bcaee5b301c6ad.png)
 
@@ -584,8 +584,8 @@ tokio 是 Rust 生态的异步运行时，其线程模型与 Java 线程池有�
 - **C10K 解决方案**：Linux epoll（2002 年，Linux 2.6）引入事件驱动模型——一个线程通过 `epoll_wait` 轮询数万个 fd，有事件才处理。Nginx 正是基于此模型以极少的 worker 进程支撑数万并发连接。
 - **C10M 时代（2010 年代）**：用户态网络栈（DPDK、XDP、io_uring）进一步将数据面从内核旁路到用户态，单机可达千万并发连接。此时线程的角色彻底改变：线程不再是连接的处理者，而是 CPU 核心的执行单元——一个核心一个线程，通过事件循环驱动所有连接。
 - **对 Java 线程池配置的启示**：
-  - 传统 I/O 密集型公式 \( N_{threads} = N_{cpu} \times (1 + W/C) \) 适用于**每任务占用一个线程的阻塞模型**（如 Servlet + 同步 JDBC）。
-  - 若采用 NIO/Netty + 事件循环，线程数应回归 \( N_{cpu} + 1 \)（类似 tokio），并发能力由异步 IO + epoll 承载。
+  - 传统 I/O 密集型公式 \( N*{threads} = N*{cpu} \times (1 + W/C) \) 适用于**每任务占用一个线程的阻塞模型**（如 Servlet + 同步 JDBC）。
+  - 若采用 NIO/Netty + 事件循环，线程数应回归 \( N\_{cpu} + 1 \)（类似 tokio），并发能力由异步 IO + epoll 承载。
   - 若采用虚拟线程，线程数 = 任务数（无需调参），OS 线程数 = CPU 核数，载体线程自动复用——这是向 Go/tokio 模型靠拢的信号。
 
 :::
@@ -695,7 +695,7 @@ Java 线程池支持以下拒绝策略：
 
 | 策略名称（实现类）      | 处理方式                                             | 优点                               | 缺点                               | 适用场景                                 |
 | ----------------------- | ---------------------------------------------------- | ---------------------------------- | ---------------------------------- | ---------------------------------------- |
-| **AbortPolicy**（默认） | 直接抛出 `RejectedExecutionException` 异常           | 快速失败，避免系统过载           | 需要调用方处理异常                 | 需要明确知道任务被拒绝的场景             |
+| **AbortPolicy**（默认） | 直接抛出 `RejectedExecutionException` 异常           | 快速失败，避免系统过载             | 需要调用方处理异常                 | 需要明确知道任务被拒绝的场景             |
 | **CallerRunsPolicy**    | 让提交任务的线程自己执行该任务                       | 降低新任务提交速度，保证任务不丢失 | 可能阻塞调用线程，影响整体性能     | 低优先级任务或允许同步执行的场景         |
 | **DiscardPolicy**       | 静默丢弃新提交的任务，不做任何通知                   | 系统行为简单                       | 任务丢失无感知，可能造成数据不一致 | 允许丢弃非关键任务的场景（如日志记录）   |
 | **DiscardOldestPolicy** | 丢弃队列中最旧的任务（队头），然后尝试重新提交新任务 | 优先处理新任务                     | 可能丢失重要旧任务                 | 新任务比旧任务更重要的场景（如实时数据） |
@@ -1107,79 +1107,6 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 - **Q：如果最大响应时间收紧到 0.5s 呢？** → 并发需求翻倍：corePoolSize ≈ 200，队列容量按 0.4s 等待窗口算 = 200 × (0.4/0.1) = 800。
 - **Q：通用线程数公式？** → 见本文档「如何合理地设置 Java 线程池的线程数？」。
 
-### 【中等】虚拟线程需要池化吗？为什么？⭐⭐⭐
-
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：虚拟线程 / 池化
-
-#### 💎 关键结论
-
-不需要。虚拟线程创建成本极低（约 1μs、约 1KB 内存），池化违背“复用昂贵资源”的初衷；正确姿势是每任务一个虚拟线程（thread-per-task），用完即弃。
-
-#### ⚡记忆卡片
-
-- **口诀**：虚拟线程不池化，一任务一线程，用完就丢
-- **关键词**：thread-per-task ／ newVirtualThreadPerTaskExecutor ／ 轻量资源
-- **链路**：任务到来 → 新建虚拟线程 → 执行（阻塞时 unmount）→ 结束回收
-
-#### 📖 核心知识
-
-**不需要池化。虚拟线程创建成本极低，池化反而会引入不必要的复杂度。**
-
-1. **为什么不需要池化**：
-   - **创建成本极低**：虚拟线程的创建和销毁是用户态操作，无需系统调用，创建成本约 1μs（平台线程约 1ms），内存占用仅约 1KB（平台线程约 1MB）。
-   - **池化违背设计初衷**：池化技术的核心目的是“复用昂贵资源”，虚拟线程本身就是轻量资源，池化等于用池管理池，徒增复杂度。
-   - **JEP 444 明确建议**：每个任务一个虚拟线程（thread-per-task），用完即弃，无需池化。
-2. **推荐用法**（`Executors.newVirtualThreadPerTaskExecutor()`，Java 21 随虚拟线程正式化提供）：
-
-```java
-// 每个任务一个虚拟线程，无需池化
-try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-    for (int i = 0; i < 100_000; i++) {
-        executor.submit(() -> {
-            doSomeIO();  // I/O 阻塞不会占用 OS 线程
-        });
-    }
-}
-// executor 关闭时自动等待所有虚拟线程完成
-```
-
-3. **与传统线程池对比**：
-
-| 维度             | 传统线程池             | 虚拟线程               |
-| :--------------- | :--------------------- | :--------------------- |
-| **创建成本**     | 高（~1ms + 内核态）    | 极低（~1μs + 用户态）  |
-| **内存占用**     | ~1MB/线程              | ~1KB/线程              |
-| **是否需要池化** | 是（复用昂贵资源）     | 否（直接创建）         |
-| **并发上限**     | 数千（受限于 OS 线程） | 数百万（受限于堆内存） |
-| **阻塞代价**     | OS 线程阻塞            | 仅虚拟线程挂起         |
-
-4. **注意事项**：虚拟线程不适合 CPU 密集型任务（纯计算无法从虚拟线程获益）；如果在 `synchronized` 块内执行阻塞 I/O，会导致 Pinning（载体线程被钉住），应改用 `ReentrantLock`；虚拟线程与结构化并发搭配使用，可获得更好的错误传播和取消传播能力。
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L3】需要“池化”的不是虚拟线程本身，而是它背后的稀缺资源：如数据库连接、下游接口配额，应通过 Semaphore 或连接池限流，而不是限制虚拟线程数量。
-- 【L4】横向对比：Go 的 goroutine、Kotlin 协程同样不池化，都是“每任务一个轻量执行单元 + 少量 OS 线程复用”的 M:N 模型；虚拟线程的载体线程池（ForkJoinPool，默认并行度 = CPU 核数）才是真正被复用的部分。
-
-:::
-
-#### ⚠️ 常见误区
-
-::: details
-
-常见误区：
-
-- ❌ “虚拟线程也应该像平台线程一样放进固定大小线程池” → 池化会把虚拟线程的并发上限人为锁死在池大小上，丢失了百万级并发的能力；被池化的“线程”实际是载体线程的借用权，语义完全错位。
-- ❌ “虚拟线程能加速 CPU 密集型任务” → 虚拟线程只降低调度与阻塞成本，并行度仍取决于 CPU 核数，纯计算任务不会变快。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：虚拟线程在 synchronized 下被钉住怎么办？** → 见本文档「虚拟线程的 Pinning 是什么？如何避免？」。
-- **Q：虚拟线程如何组织父子任务？** → 见本文档「虚拟线程的结构化并发是什么？」。
-
 ## Java 并发同步工具
 
 ### 【中等】CountDownLatch 的工作原理是什么？⭐⭐⭐⭐
@@ -1315,7 +1242,7 @@ CyclicBarrier 是基于「锁 + 条件等待」实现的同步工具，核心作
 | :------------------ | :----------------------------------------------------------------------------------- |
 | **初始化**          | 创建时指定（如 `new CyclicBarrier(3)`），代表需 “集齐” 的线程数                      |
 | **线程等待**        | 线程调用 `await()` 时阻塞并且计数器 + 1                                              |
-| **屏障**            | 当计数器达到屏障后，执行回调（若设置），所有线程被唤醒，继续执行后续逻辑            |
+| **屏障**            | 当计数器达到屏障后，执行回调（若设置），所有线程被唤醒，继续执行后续逻辑             |
 | **重置计数器**      | 自动重置计数器，可重复使用                                                           |
 | **支持中断 / 超时** | await(timeout, unit) 支持超时；线程在等待时若被中断，会抛出 `BrokenBarrierException` |
 | **底层依赖**        | 基于 `ReentrantLock + Condition` 实现，而非 AQS 直接封装                             |
@@ -1414,7 +1341,7 @@ Semaphore 是基于 AQS 实现的限流同步工具，核心作用是**控制同
 2. **原子性**：均通过 CAS 保证原子性：抢许可证（`acquire()`）→ state 减 1；还许可证（`release()`）→ state 加 1。
 3. **两种模式**：公平模式按线程等待顺序抢证，避免饥饿；非公平（默认）直接抢证，性能更高，可能导致线程饥饿。
 
-     ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/6f8b6e4367c0b860a521f7937ad9d2e4.jpg)
+   ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/6f8b6e4367c0b860a521f7937ad9d2e4.jpg)
 
 4. **可响应中断 / 超时**：`acquireInterruptibly()` 响应线程中断，`tryAcquire(timeout)` 支持超时放弃抢证。
 5. **许可证可超额归还**：`release()` 不校验线程是否持有许可证，可手动调用增加许可证（需谨慎，避免超预期限流）。
@@ -1799,133 +1726,6 @@ ForkJoinPool 是专为**分治任务**设计的线程池，核心作用是将大
 - **Q：CompletableFuture 默认用哪个线程池？** → 默认 `ForkJoinPool.commonPool()`，见本文档「CompletableFuture 的工作原理是什么？」。
 - **Q：CPU 密集型任务线程数怎么定？** → 见本文档「如何合理地设置 Java 线程池的线程数？」（核心数+1）。
 
-### 【困难】虚拟线程的 Pinning 是什么？如何避免？⭐⭐⭐⭐
-
-> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：虚拟线程 / Pinning
-
-#### 💎 关键结论
-
-Pinning 是虚拟线程在 `synchronized` 块或 native 方法中阻塞时无法从载体线程卸载（unmount），导致载体线程被占用；用 `ReentrantLock` 替代 `synchronized` 可避免，JDK 24（JEP 491）彻底修复。
-
-#### ⚡记忆卡片
-
-- **口诀**：sync 钉住、lock 可卸、JFR 可测、JDK24 修复
-- **关键词**：synchronized ／ 载体线程 ／ unmount
-- **链路**：synchronized 内阻塞 IO → 无法 unmount → 载体线程耗尽 → 吞吐崩塌
-
-#### 📖 核心知识
-
-**Pinning（载体线程针住）** 指虚拟线程在 `synchronized` 块或 `native` 方法中执行阻塞操作时，无法从载体线程（Carrier Thread）上卸载（unmount），导致载体线程被占用，影响整体吞吐量。
-
-**（1）Pinning 的发生条件**
-
-| 场景                            | 是否 Pinning | 说明                                                             |
-| :------------------------------ | :----------- | :--------------------------------------------------------------- |
-| `synchronized` 块内执行阻塞 I/O | ✅ 会        | `synchronized` 持有对象监视器（monitor）时，虚拟线程无法 unmount |
-| `ReentrantLock` 内执行阻塞 I/O  | ❌ 不会      | `ReentrantLock` 不依赖 JVM 内置监视器，虚拟线程可正常 unmount    |
-| `native` 方法内执行阻塞         | ✅ 会        | JVM 无法控制 native 方法内的栈帧，无法安全卸载                   |
-| 无锁的阻塞 I/O                  | ❌ 不会      | 虚拟线程可正常卸载                                               |
-
-**（2）Pinning 的影响**
-
-- 虚拟线程被钉住，载体线程无法执行其他虚拟线程。
-- 大量虚拟线程 Pinning 时，ForkJoinPool 的载体线程池（默认 CPU 核数）会被耗尽，导致所有虚拟线程都无法调度。
-- 极端情况下，可能需要创建新的载体线程（上限 256），但会降低性能。
-
-**（3）如何检测 Pinning**
-
-- **JFR 事件**：`jdk.VirtualThreadPinned` 事件记录每次 Pinning 的线程 ID、持续时间、栈帧信息。
-- **系统属性**：`-Djdk.tracePinnedThreads=short` 在 stderr 输出 Pinning 线程的栈信息；`-Djdk.tracePinnedThreads=full` 输出完整栈帧。
-
-**（4）如何避免 Pinning**
-
-- **用 `ReentrantLock` 替代 `synchronized`**：这是最直接有效的方案。`ReentrantLock.lock()` 不会阻止虚拟线程卸载。
-- **JEP 491（JDK 24）**：`synchronized` 不再导致 Pinning——JDK 24 起，虚拟线程在 `synchronized` 块内也能正常 unmount/mount，彻底解决了 Pinning 问题。
-- **避免在 `synchronized` 内执行阻塞 I/O**：如果无法升级 JDK 版本，将 I/O 操作移到 `synchronized` 块外。
-
-```java
-// ❌ 不良实践：synchronized + I/O → Pinning
-synchronized (lock) {
-    httpClient.send(request, bodyHandler); // 虚拟线程被钉住
-}
-
-// ✅ 最佳实践：ReentrantLock → 可正常卸载
-private final ReentrantLock lock = new ReentrantLock();
-lock.lock();
-try {
-    httpClient.send(request, bodyHandler); // 虚拟线程正常卸载
-} finally {
-    lock.unlock();
-}
-```
-
-**（5）Pinning 与池化的关系**
-
-Pinning 是虚拟线程最常见的性能陷阱。如果虚拟线程被池化（如放入线程池），Pinning 会导致池中载体线程被耗尽，进而所有虚拟线程都无法执行——这正是「虚拟线程不需要池化」的另一个重要原因：池化模式下的 Pinning 影响会被放大。
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L4】Erlang 进程模型与 Kotlin 协程的 Pinning 对比：
-
-**Erlang 进程模型如何天然避免 Pinning**
-
-Erlang 的并发模型基于轻量进程（BEAM Process），其调度机制从根本上消除了 Pinning 问题：
-
-- **抢占式调度（Preemptive Scheduler）**：BEAM 虚拟机对每个进程分配 reduction budget（约 2000 次函数调用），一旦消耗完毕，调度器强制挂起当前进程，切换至下一个就绪进程。这种抢占是**硬件级的、不可抗拒的**——进程无法「钉住」调度器，因为调度器在 reduction 耗尽后无条件抢占。
-- **无锁并发模型**：Erlang 进程间不共享内存，通信仅通过消息传递（Actor Model）。进程内部无 `synchronized` 概念，不存在监视器（monitor）持有问题。阻塞操作（如 `receive` 等待消息）只是让进程挂起，调度器立即切换到其他进程，完全不存在 Pinning 场景。
-- **与 JVM 虚拟线程的核心差异**：
-  - JVM 虚拟线程的 Pinning 根因是 `synchronized` 持有的对象监视器（monitor）在 JVM 层面不可安全释放——monitor 与 OS 线程绑定，虚拟线程 unmount 时无法携带 monitor。
-  - Erlang 进程从不持有任何「锁」或「监视器」，它们的挂起（suspend）是纯粹的寄存器/栈保存，调度器可以在任何指令边界安全切换——不存在「持有资源而不能切换」的场景。
-- **设计哲学对比**：Erlang 选择了「抢占式 + 无共享」来保证**绝对公平调度**，代价是消息复制的内存开销。Java 虚拟线程选择了「协作式 + 共享内存」来获得**低延迟 + 低内存**，代价是 Pinning 这一需要开发者注意的语义陷阱（JDK 24 已修复）。
-
-**Kotlin Coroutine 的 suspend 机制对比**
-
-Kotlin 协程通过编译期状态机实现了协作式挂起，其机制与 Java 虚拟线程不同但目标相似：
-
-- **suspend 函数 = 编译期着色**：`suspend` 关键字在编译时被转换为 Continuation-Passing Style（CPS）。每个 suspend 调用点是一个状态机分支，函数被编译为 `switch(state) { case 0: ... case 1: ... }`。挂起时，局部变量被捕获到 continuation 对象中，函数返回 `COROUTINE_SUSPENDED` 标记——**线程立即释放**，无需任何 OS 层面的阻塞。
-- **与虚拟线程的本质差异**：
-
-  | 维度             | Kotlin Coroutine                             | Java 虚拟线程                              |
-  | ---------------- | -------------------------------------------- | ------------------------------------------ |
-  | **挂起方式**     | 编译期状态机（代码染色）                     | JVM 运行时栈帧保存（透明）                 |
-  | **函数着色**     | 必须声明 `suspend`（红函数）                 | 无关键字，所有代码天然支持                 |
-  | **阻塞处理**     | `suspend` 函数内调用阻塞 API 仍会阻塞线程    | 阻塞 API 自动 unmount（synchronized 除外） |
-  | **Pinning 问题** | 不存在——suspend 不持有任何锁                 | JDK 21 存在（synchronized），JDK 24 已修复 |
-  | **调度器**       | `Dispatchers.Default/IO/Unconfined` 显式控制 | ForkJoinPool 载体线程池                    |
-
-- **为什么 Kotlin 协程天然无 Pinning**：
-  - suspend 的挂起是纯用户态的状态保存，不涉及 JVM monitor 或 native 方法。挂起点前后，协程不持有任何 OS 级资源。
-  - dispatcher 可以自由地将恢复后的协程调度到任意线程，因为协程本身是线程无关的（thread-agnostic）。
-  - 这揭示了 Pinning 的本质：**Pinning 不是「虚拟线程」的问题，而是「共享可变状态（monitor）+ 协作式调度」的组合问题**。Kotlin 通过编译期状态机将「状态」编码到对象字段中，避免了 monitor 这一 OS 级资源。
-
-:::
-
-#### 🏭 实战场景
-
-::: details
-
-某 IO 密集型服务升级到 Java 21 虚拟线程后，压测发现吞吐不升反降：通过 JFR 采集到大量 `jdk.VirtualThreadPinned` 事件，定位到一处第三方驱动在 `synchronized` 块内执行阻塞网络 IO；在 16 核机器上，载体线程默认只有 16 个，被钉住后几乎无法调度其他虚拟线程。将该处改用 `ReentrantLock` 后 Pinning 事件降为 0，吞吐恢复预期水平。
-
-:::
-
-#### ⚠️ 常见误区
-
-::: details
-
-常见误区：
-
-- ❌ “虚拟线程一阻塞就会 Pinning” → 普通（无锁的）阻塞 IO 会正常 unmount，只有 `synchronized` 块内阻塞和 native 方法内阻塞才会 Pinning。
-- ❌ “JDK 21 已经解决了 Pinning” → JDK 21 虚拟线程正式版仍存在 synchronized 导致的 Pinning，JDK 24 的 JEP 491 才让 synchronized 内也能正常 unmount。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：为什么 ReentrantLock 不会导致 Pinning？** → 它基于 AQS 实现，不依赖 JVM 对象监视器（monitor），虚拟线程挂起时不涉及 monitor 归属问题，可以安全 unmount。
-- **Q：Pinning 和池化有什么关系？** → 见本题（5）及本文档「虚拟线程需要池化吗？为什么？」：池化会放大 Pinning 的危害。
-
 ### 【中等】CompletableFuture 有哪些用法？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：CompletableFuture / API 用法
@@ -1951,10 +1751,10 @@ CompletableFuture 是 Java 8+ 提供的**异步任务编排工具**，常用 API
 | **结果消费**        | `thenAccept`（同步）<br/>`thenAcceptAsync`（异步）                                        | 消费任务结果（无返回值）                      | `cf.thenAccept(s -> System.out.println(s));`                                                                    |
 | **任务衔接**        | `thenRun`（同步）<br/>`thenRunAsync`（异步）                                              | 任务完成后执行无参操作（不依赖结果）          | `cf.thenRun(() -> System.out.println("任务完成"));`                                                             |
 | **多任务合并**      | `allOf`（全部完成）<br/>`anyOf`（任一完成）                                               | 等待任务完成                                  | `CompletableFuture.allOf(cf1, cf2).join();`<br/>`Object result = CompletableFuture.anyOf(cf1, cf2).get();`      |
-| **结果组合**        | `thenCombine`／`thenCombineAsync`                                                        | 合并两个任务的结果，生成新结果                | `cf1.thenCombine(cf2, (r1, r2) -> r1 + r2);`                                                                    |
+| **结果组合**        | `thenCombine`／`thenCombineAsync`                                                         | 合并两个任务的结果，生成新结果                | `cf1.thenCombine(cf2, (r1, r2) -> r1 + r2);`                                                                    |
 | **异常处理**        | `exceptionally`                                                                           | 任务异常时返回默认值                          | `cf.exceptionally(e -> "默认值");`                                                                              |
 | **异常 / 完成处理** | `whenComplete`                                                                            | 无论成功 / 失败，都执行回调（可获取异常）     | `cf.whenComplete((res, e) -> { if(e!=null) e.printStackTrace(); });`                                            |
-| **超时控制**        | `completeOnTimeout`／`orTimeout`（Java 9+）                                              | 超时后返回默认值 / 抛出超时异常               | `// 3秒超时返回默认值<br>cf.completeOnTimeout("超时默认值", 3, TimeUnit.SECONDS);`                              |
+| **超时控制**        | `completeOnTimeout`／`orTimeout`（Java 9+）                                               | 超时后返回默认值 / 抛出超时异常               | `// 3秒超时返回默认值<br>cf.completeOnTimeout("超时默认值", 3, TimeUnit.SECONDS);`                              |
 | **结果获取**        | `get`（阻塞）<br/>`join`（阻塞，不抛检查异常）<br/>`getNow`（立即获取，无结果返回默认值） | 获取任务结果，按需选择阻塞 / 非阻塞           | `String res = cf.join(); // 推荐，无需捕获异常`                                                                 |
 
 #### 🔬 扩展知识
@@ -1971,7 +1771,7 @@ CompletableFuture 是 Java 8+ 提供的**异步任务编排工具**，常用 API
 - **Q：CompletableFuture 内部是如何实现异步编排的？** → 见本文档「CompletableFuture 的工作原理是什么？」。
 - **Q：如何用它控制多线程执行顺序？** → 见本文档「Java 中如何控制多线程的执行顺序？」，基于 thenXxx 链式编排实现。
 
-### 【困难】CompletableFuture 的工作原理是什么？⭐⭐⭐
+### 【困难】CompletableFuture 的工作原理是什么？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：CompletableFuture / 实现原理
 
@@ -2046,120 +1846,6 @@ CompletableFuture 是基于「状态机 + 回调链表」实现的异步编程�
 
 - **Q：常用 API 有哪些？** → 见本文档「CompletableFuture 有哪些用法？」。
 - **Q：异步任务里抛异常了怎么处理？** → 用 `exceptionally()` 返回兜底值，或 `handle()` 同时处理结果与异常；异常会沿链传播直到被处理。
-
-### 【困难】虚拟线程的结构化并发是什么？⭐⭐⭐
-
-> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：虚拟线程 / 结构化并发
-
-#### 💎 关键结论
-
-结构化并发让并发任务的生命周期像代码块一样有明确边界：`StructuredTaskScope` 统一管理子任务，fork 派生、join 等待、close 保证无子任务遗留；异常与取消自动在父子任务间传播，是虚拟线程的最佳搭档。
-
-#### ⚡记忆卡片
-
-- **口诀**：scope 定边界，fork 派子任务，join 等完成，失败即关停，close 不泄漏
-- **关键词**：StructuredTaskScope ／ fork ／ ShutdownOnFailure ／ ShutdownOnSuccess
-- **链路**：创建 scope → fork 子任务 → join 等待 → 取结果/传播异常 → close 自动清理
-
-#### 📖 核心知识
-
-**结构化并发（Structured Concurrency）** 是 JDK 21 引入的并发编程范式（预览特性，`--enable-preview`），JDK 25 正式转正。核心思想是：**并发任务的生命周期应像代码块一样有明确的边界**，父任务等待所有子任务完成后再继续，确保资源不泄漏。
-
-**（1）问题背景：传统并发的痛点**
-
-```java
-// 传统方式：子任务的生命周期脱离父任务控制
-Future<User> f1 = executor.submit(() -> getUser());
-Future<Order> f2 = executor.submit(() -> getOrder());
-// 若 f1 异常，f2 仍在执行，导致资源泄漏
-User user = f1.get();  // 阻塞
-Order order = f2.get();
-```
-
-问题：子任务异常/取消时，其他子任务无法自动取消；调试困难（堆栈不连贯）。
-
-**（2）StructuredTaskScope（JDK21 预览特性）**
-
-```java
-try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-    Subtask<User> userTask = scope.fork(() -> getUser());
-    Subtask<Order> orderTask = scope.fork(() -> getOrder());
-
-    scope.join();              // 等待所有子任务完成
-    scope.throwIfFailed();     // 任一失败则抛异常
-
-    // 所有子任务都成功，安全获取结果
-    process(userTask.get(), orderTask.get());
-}  // 自动关闭，确保无子任务遗留
-```
-
-**（3）两种内置策略**
-
-| 策略                | 行为                           | 适用场景               |
-| ------------------- | ------------------------------ | ---------------------- |
-| `ShutdownOnFailure` | 任一子任务失败，取消其他子任务 | 全部成功才有意义       |
-| `ShutdownOnSuccess` | 任一子任务成功，取消其他子任务 | 只需最快结果（如查询） |
-
-**（4）与虚拟线程的配合**
-
-结构化并发与虚拟线程是天然搭档：
-
-- 虚拟线程轻量，可以为每个子任务创建一个虚拟线程，无需担心线程数。
-- `StructuredTaskScope.fork()` 内部使用虚拟线程执行任务。
-- 结合后，可以用同步代码风格编写高并发逻辑，无需回调或链式 API。
-
-```java
-// 虚拟线程 + 结构化并发：同时请求 3 个服务，取最快响应
-try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
-    scope.fork(() -> callServiceA());
-    scope.fork(() -> callServiceB());
-    scope.fork(() -> callServiceC());
-    scope.join();
-    String result = scope.result();  // 最快的服务返回
-}
-```
-
-**（5）结构化并发的核心价值**
-
-- **错误传播**：子任务异常自动传播到父任务。
-- **取消传播**：父任务取消，所有子任务自动取消。
-- **可观察性**：线程 dump 中父子任务关系清晰。
-- **资源安全**：scope 关闭时保证所有子任务结束，无泄漏。
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L4】版本演进：
-  - **JDK 19（孵化）**：`StructuredTaskScope` 作为孵化器 API 首次引入（`jdk.incubator.concurrent`）。
-  - **JDK 21（预览）**：升级为预览 API（`java.util.concurrent`），需 `--enable-preview` 启用。
-  - **JDK 25（正式）**：转为正式特性，无需额外编译参数即可使用。
-
-:::
-
-#### 🏭 实战场景
-
-::: details
-
-某聚合接口需并行调用 3 个下游服务，原先用 CompletableFuture 编排：某个下游超时后其余调用不会被取消，高峰期 800 QPS 下堆积大量无效连接。改用 `StructuredTaskScope.ShutdownOnFailure` + 虚拟线程后，任一子任务失败立即取消其余子任务，下游连接池占用率从近 90% 降到 40% 以下，接口 P99 延迟回落到 300ms 以内。
-
-:::
-
-#### ⚠️ 常见误区
-
-::: details
-
-常见误区：
-
-- ❌ “StructuredTaskScope 可以复用多次” → scope 关闭后不可复用，再次 join/close 会抛 `IllegalStateException`，每轮并发需新建。
-- ❌ “fork 可以在 join 之后随时补交子任务” → fork 只能在 scope 关闭前调用，且 join 之后 fork 会直接抛异常。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：它和 CompletableFuture 编排有什么区别？** → CompletableFuture 是链式回调风格，结构化并发是块作用域 + 同步代码风格，异常/取消自动传播、无任务泄漏；二者可表达等价的编排逻辑。
-- **Q：虚拟线程还有哪些性能陷阱？** → 见本文档「虚拟线程的 Pinning 是什么？如何避免？」。
 
 ### 【中等】BlockingQueue 的核心方法有哪些？抛异常/返回特殊值/阻塞/超时四类方法有什么区别？⭐⭐
 
@@ -2534,7 +2220,7 @@ singleExecutor.shutdown();
 ::: details
 
 - 【L3】各方案的底层原理：`join()` 内部基于 wait/notify，当前线程在目标线程对象上等待其终止；CountDownLatch/Semaphore 底层基于 AQS；CompletableFuture 的 thenXxx 依赖回调机制（见本文档「CompletableFuture 的工作原理是什么？」）。
-- 【L4】新范式：Java 21+ 可用虚拟线程 + 结构化并发（见本文档「虚拟线程的结构化并发是什么？」）以同步代码风格表达顺序与依赖，无需手动链式编排。
+- 【L4】新范式：Java 21+ 可用虚拟线程 + 结构化并发（见并发（一）「虚拟线程的结构化并发是什么？」）以同步代码风格表达顺序与依赖，无需手动链式编排。
 
 :::
 
@@ -2818,7 +2504,7 @@ public class ProducerConsumerDemo03 {
 - **Q：BlockingQueue 的四类方法怎么选？** → 见本文档「BlockingQueue 的核心方法有哪些？抛异常/返回特殊值/阻塞/超时四类方法有什么区别？」。
 - **Q：为什么推荐 BlockingQueue 实现？** → 它内置了队满/队空的阻塞等待与线程安全，无需手写锁与唤醒逻辑，代码更少且不易出错。
 
-## Java 容器
+## Java 并发容器
 
 ### 【中等】Java 线程安全的集合有哪些？⭐⭐⭐⭐
 
@@ -2949,235 +2635,14 @@ Rust 通过所有权系统 + `Send`/`Sync` trait 在编译期保证线程安全�
 常见误区：
 
 - ❌ “Collections.synchronizedList 可以直接安全遍历” → 迭代时仍需手动对包装对象加锁（`synchronized(list) { ... }`），否则抛 `ConcurrentModificationException`。
-- ❌ “JDK8 的 ConcurrentHashMap 还是分段锁” → JDK8 已改为 Node 数组 + CAS + synchronized 锁桶头，见本文档「ConcurrentHashMap 的实现原理是什么？」。
+- ❌ "JDK8 的 ConcurrentHashMap 还是分段锁" → JDK8 已改为 Node 数组 + CAS + synchronized 锁桶头，见容器专题「ConcurrentHashMap 的底层实现原理是什么？」。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：读多写少的 List 怎么选？** → 见本文档「CopyOnWriteArrayList 的原理是什么？适用什么场景？」。
-- **Q：高并发 Map 的实现细节？** → 见本文档「ConcurrentHashMap 的实现原理是什么？」。
-
-### 【困难】ConcurrentHashMap 的实现原理是什么？⭐⭐⭐⭐⭐
-
-> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：并发容器 / ConcurrentHashMap
-
-#### 💎 关键结论
-
-JDK7 用分段锁（16 个 Segment 各带一把锁），JDK8 改为 Node 数组 + CAS + synchronized：空桶 CAS 无锁插入，非空桶 synchronized 锁桶头节点，多线程协助扩容，size() 用类 LongAdder 的分段计数。
-
-#### ⚡记忆卡片
-
-- **口诀**：七段锁十六段，八锁桶头 CAS 空，扩容大家帮，size 分段计
-- **关键词**：Segment ／ CAS ／ synchronized 锁桶头 ／ ForwardingNode ／ CounterCell
-- **链路**：hash 定位桶 → 空桶 CAS → 非空桶锁头节点 → 达阈转红黑树 → 多线程协助扩容
-
-#### 📖 核心知识
-
-`ConcurrentHashMap` 是 Java 并发 Map 的核心实现，**JDK7 和 JDK8 的实现差异巨大**。
-
-**（1）JDK7：分段锁（Segment）**
-
-- 将数据分成 16 个 `Segment`（默认），每个 Segment 是一个独立的 `HashMap`，自带 `ReentrantLock`。
-- 不同 Segment 可并发读写，理论并发度 = Segment 数（默认 16）。
-- **缺点**：Segment 数量固定，扩展性差；二次 hash 开销。
-
-**（2）JDK8：CAS + synchronized**
-
-JDK8 摒弃了 Segment，改用 **Node 数组 + CAS + synchronized**：
-
-```java
-transient volatile Node<K,V>[] table;  // 桶数组，volatile 保证可见性
-```
-
-- **锁粒度细化**：从 Segment（段）降到 Node（桶），并发度 = 桶数量。
-- **put 流程**：
-
-```mermaid
-graph TD
-    A[计算 hash 定位桶] --> B{桶为空?}
-    B -->|是| C[CAS 插入空桶]
-    C -->|成功| D[完成]
-    C -->|失败| E[进入自旋重试]
-    B -->|否| F{正在扩容?}
-    F -->|是| G[协助扩容]
-    F -->|否| H[synchronized 锁住桶头节点]
-    H --> I[链表/红黑树插入]
-    I --> J[检查是否需转红黑树]
-    J --> K[完成]
-```
-
-1. 计算 hash，定位桶。
-2. 桶为空：CAS 插入（无锁）。
-3. 桶非空：`synchronized` 锁住头节点，遍历链表/红黑树插入。
-4. 链表长度 ≥ 8 且数组长度 ≥ 64：转红黑树（否则扩容）。
-
-**（3）扩容机制（多线程协助）**
-
-- 扩容时，每个线程认领一段桶（`stride`），迁移数据。
-- 迁移期间，`ForwardingNode`（hash=-1）标记已迁移的桶，读请求转发到新表。
-- 写请求遇到 ForwardingNode 会协助扩容。
-
-**（4）size() 的实现**
-
-JDK8 不维护精确计数，而是：
-
-1. 使用 `baseCount` + `CounterCell[]` 分段计数（类似 LongAdder）。
-2. `size()` = baseCount + 所有 CounterCell 之和，**非精确**（并发下可能略有偏差）。
-
-**CounterCell 伪共享消除**：`CounterCell` 类使用 `@sun.misc.Contended` 注解，JVM 会在字段前后添加 padding 填充至完整缓存行（通常 64 字节），避免多个 CounterCell 落在同一缓存行导致的**伪共享（False Sharing）**——一个 CPU 核修改计数值，不会导致其他核的缓存行失效，从而保证高并发计数的性能。
-
-**（5）源码关键细节**
-
-- **casTabAt**：`put` 操作中，桶为空时使用 `U.compareAndSetObject(tab, i, null, newNode)`（即 `casTabAt` 宏）进行无锁 CAS 插入。这是 JDK8 相比 JDK7 分段锁的最大改进——首次插入无需加锁。
-- **synchronized 锁头节点**：桶非空时，`synchronized (f)` 锁住桶的第一个节点（头节点），而非整个 Segment。锁粒度从「段」降到「桶」，并发度随扩容自动提升。
-
-**（6）JDK7 vs JDK8 对比**
-
-见下方扩展知识中的版本演进对比表。
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L3】`sizeCtl` 的双重含义：为负数时表示正在初始化/扩容（-1 为初始化中，-N 表示有 N-1 个线程参与扩容），为正数时表示下次扩容阈值；它是多线程协作扩容的协调中枢。
-- 【L3】树化与退化阈值：链表长度 ≥ 8 且数组长度 ≥ 64 才转红黑树（否则只扩容）；删除导致树内节点数 ≤ 6 时退化为链表。
-- 【L4】JDK7 vs JDK8 版本演进对比：
-
-| 特性         | JDK7                     | JDK8                     |
-| ------------ | ------------------------ | ------------------------ |
-| **锁机制**   | Segment（ReentrantLock） | CAS + synchronized       |
-| **锁粒度**   | Segment（段）            | Node（桶）               |
-| **并发度**   | 16（固定）               | 桶数量（随扩容增长）     |
-| **数据结构** | Segment[] + HashEntry[]  | Node[] + 链表/红黑树     |
-| **size()**   | 精确（加锁累加）         | 近似（CounterCell 分段） |
-| **扩容**     | 仅 Segment 内扩容        | 全表扩容 + 多线程协助    |
-
-:::
-
-#### 🏭 实战场景
-
-::: details
-
-某网关本地限流计数器用 ConcurrentHashMap 存储 10 万+ API 的计数：JDK7 分段锁并发度固定为 16，峰值 2 万写 QPS 下锁竞争明显、计数更新 CPU 开销高；升级 JDK8 后锁粒度细化到桶级别（并发度 = 桶数量），配合桶内 CAS，同等负载下计数更新相关 CPU 占用下降约 30%，P99 延迟回落。
-
-:::
-
-#### ⚠️ 常见误区
-
-::: details
-
-常见误区：
-
-- ❌ “ConcurrentHashMap 支持 null 键/值” → 不支持，key 或 value 为 null 直接抛 NPE，避免并发环境下 `get(key)==null` 的二义性。
-- ❌ “size() 返回精确值” → 是近似值，基于 baseCount + CounterCell 求和，并发写入期间可能有偏差。
-- ❌ “get() 也需要加锁” → get 全程无锁，依赖 volatile 读（table、Node 的 val/next 均为 volatile）保证可见性。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：线程安全集合整体怎么选型？** → 见本文档「Java 线程安全的集合有哪些?」。
-- **Q：size() 的分段计数思想还见于哪里？** → LongAdder：同样是 base + 分散单元求和，降低热点竞争。
-
-### 【中等】CopyOnWriteArrayList 的原理是什么？适用什么场景？⭐⭐⭐
-
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：并发容器 / CopyOnWriteArrayList
-
-#### 💎 关键结论
-
-CopyOnWriteArrayList 的核心是写时复制（COW）：读完全无锁，直接读 volatile 数组快照；写时加锁复制整个数组、修改副本后替换引用。适合白名单、监听器列表等读多写少场景，写频繁或数据量大则性能与内存都会崩。
-
-#### ⚡记忆卡片
-
-- **口诀**：读无锁拿快照，写复制换引用，读多写少是它的主场
-- **关键词**：写时复制 ／ volatile 数组 ／ 快照迭代器
-- **链路**：写加锁 → 复制数组 → 修改副本 → 替换引用 → 读见新快照
-
-#### 📖 核心知识
-
-**`CopyOnWriteArrayList`** 是线程安全的 List 实现，核心思想是**写时复制（Copy-On-Write）**。
-
-**（1）核心原理**
-
-```java
-final transient Object lock = new Object();
-private transient Object[] array;  // volatile 数组引用
-
-public boolean add(E e) {
-    synchronized (lock) {
-        Object[] elements = getArray();
-        int len = elements.length;
-        Object[] newElements = Arrays.copyOf(elements, len + 1);  // 复制新数组
-        newElements[len] = e;
-        setArray(newElements);  // 替换引用
-        return true;
-    }
-}
-
-public E get(int index) {
-    return get(getArray(), index);  // 无锁读
-}
-```
-
-- **读操作**：完全无锁，直接读 volatile 数组。
-- **写操作**：加锁，复制整个数组，修改副本，替换引用。
-
-**（2）特性**
-
-| 特性            | 说明                                     |
-| --------------- | ---------------------------------------- |
-| **读性能**      | 极高（无锁，无 volatile 读屏障外的开销） |
-| **写性能**      | 差（O(n) 复制 + 加锁）                   |
-| **弱一致性**    | 读到的可能是旧快照（写后引用未切换前）   |
-| **内存占用**    | 高（每次写都复制整个数组）               |
-| **null 元素**   | 允许                                     |
-
-**（3）适用场景**
-
-- **读多写少**：如配置列表、监听器列表、白名单。
-- **读优先**：读操作远多于写操作，且可接受短暂不一致。
-- **遍历不修改**：迭代器是快照，不支持 `remove`/`add`（抛 `UnsupportedOperationException`）。
-
-**（4）不适用场景**
-
-- 写频繁：每次写 O(n) 复制，性能灾难。
-- 大数据量：内存翻倍。
-- 强一致性：弱一致性可能导致读到旧数据。
-
-**（5）与 Vector/Collections.synchronizedList 对比**
-
-| 特性       | `CopyOnWriteArrayList` | `Vector` / `synchronizedList` |
-| ---------- | ---------------------- | ----------------------------- |
-| **读**     | 无锁                   | synchronized                  |
-| **写**     | 复制数组 + 锁          | synchronized                  |
-| **迭代器** | 快照（不抛 CME）       | 需手动加锁，否则 CME          |
-| **适用**   | 读多写少               | 读写均衡                      |
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L3】锁实现的版本演进：早期 JDK 用 `ReentrantLock` 加锁，JDK 15+ 改为内部 `Object lock` + `synchronized`（上文源码即新版实现），简化了实现并利用 JVM 锁优化。
-- 【L3】迭代器语义：迭代器创建时持有当时的数组快照，后续写入对它不可见，因此遍历期间无需加锁也不会抛 `ConcurrentModificationException`。
-
-:::
-
-#### ⚠️ 常见误区
-
-::: details
-
-常见误区：
-
-- ❌ “CopyOnWriteArrayList 读也要加锁” → 读完全无锁，只读 volatile 数组引用，这正是它在读密集场景性能高的原因。
-- ❌ “它适合读写均衡场景” → 每次写都是 O(n) 复制 + 内存短暂翻倍，只适合读多写少；写频繁时应选 synchronizedList 或细粒度锁方案。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：它和 Vector 的核心区别？** → 见本题（5）对比表：Vector 读写都加 synchronized，COW 读无锁写复制，适用场景不同。
-- **Q：线程安全集合整体怎么选型？** → 见本文档「Java 线程安全的集合有哪些?」。
+- **Q：读多写少的 List 怎么选？** → 见容器专题「CopyOnWriteArrayList 的原理是什么？」。
+- **Q：高并发 Map 的实现细节？** → 见容器专题「ConcurrentHashMap 的底层实现原理是什么？」。
 
 ### 【中等】ConcurrentLinkedQueue 的原理是什么？⭐⭐
 

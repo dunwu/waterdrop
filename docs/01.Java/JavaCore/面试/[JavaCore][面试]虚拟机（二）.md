@@ -95,10 +95,11 @@ public class ReferenceCountingGC {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**不可达 ≠ 立即回收**：对象被判定不可达后还有两次标记机会——若重写了 `finalize()` 且未被调用过，会被放入 F-Queue 由低优先级线程执行，可在其中重新建立引用完成"自救"（自救仅一次机会）。
 - 【L3】**安全点约束**：可达性分析必须保证引用图快照一致，因此需要在安全点（Safepoint）暂停用户线程，分析过程与 GC 停顿直接相关。
 - 【L4】**跨语言对比**：CPython 以引用计数为主 + 分代 GC 兜底处理循环引用；Swift/Objective-C 使用 ARC（编译期插入 retain/release，Swift 用弱引用弱解循环）；Go 使用并发三色标记，与 JVM 同属可达性分析家族。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -110,10 +111,11 @@ public class ReferenceCountingGC {
 
 ::: details
 常见误区：
+
 - ❌ "引用计数是 Java GC 的判定算法" → 错误，HotSpot 因循环引用问题从未采用引用计数，仅作为对比知识出现。
 - ❌ "对象不可达就一定会立刻被回收" → 不可达只是必要条件，还受 GC 触发时机、`finalize()` 自救、晋升/分代策略影响。
 - ❌ "GC Roots 只有栈中局部变量" → 静态字段、常量、JNI 引用、锁持有的对象等都是 GC Roots。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -149,6 +151,7 @@ public class ReferenceCountingGC {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**JDK 9+ 替代方案 Cleaner**：JDK 9 引入 `java.lang.ref.Cleaner`，基于**虚引用 + ReferenceQueue** 实现更安全的资源清理：
 
 ```java
@@ -177,7 +180,7 @@ public class ResourceHolder implements AutoCloseable {
 
 - 【L3】**Cleaner vs finalize()**：Cleaner 在**专用线程**中执行，不影响 GC 进度；基于虚引用，对象已被回收后才触发清理，不会"复活"对象；但它仍是**兜底机制**，应优先用 `try-with-resources` 显式释放。
 - 【L3】**finalize 的回收延迟机制**：重写了 `finalize()` 的对象被标记不可达后会被放入 F-Queue，由低优先级 Finalizer 线程串行执行，若其中阻塞会拖慢整个回收链路。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -270,19 +273,20 @@ void oop_field_store(oop* field, oop new_value) {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**增量更新的代价**：CMS 重新标记（Remark）阶段需重新扫描黑色对象新增的引用，扫描范围可能接近全堆，是 CMS 停顿的主要来源；可配合 `-XX:+CMSScavengeFirstRemark` 先做一次 Young GC 缩小 Remark 扫描范围。
 - 【L3】**SATB 的代价**：以标记开始的快照为准，并发期间新分配的对象（浮动垃圾）本轮不回收；SATB 队列积压过多时可能触发退化处理（ evacuation failure 风险）。
 - 【L4】**各 GC 漏标方案横向对比**：
 
-| GC             | 标记算法             | 解决漏标方案 | 特点                            |
-| :------------- | :------------------- | :----------- | :------------------------------ |
-| **CMS**        | 三色标记             | 增量更新     | 重新标记阶段 STW 较长           |
-| **G1**         | 三色标记             | SATB         | 重新标记阶段短，但浮动垃圾稍多  |
-| **ZGC**        | 三色标记（染色指针） | 读屏障       | 无长 STW 标记，靠读屏障保证一致性 |
-| **Shenandoah** | 三色标记（转发指针） | SATB + 读屏障 | 并发整理，仅极短 STW            |
+| GC             | 标记算法             | 解决漏标方案  | 特点                              |
+| :------------- | :------------------- | :------------ | :-------------------------------- |
+| **CMS**        | 三色标记             | 增量更新      | 重新标记阶段 STW 较长             |
+| **G1**         | 三色标记             | SATB          | 重新标记阶段短，但浮动垃圾稍多    |
+| **ZGC**        | 三色标记（染色指针） | 读屏障        | 无长 STW 标记，靠读屏障保证一致性 |
+| **Shenandoah** | 三色标记（转发指针） | SATB + 读屏障 | 并发整理，仅极短 STW              |
 
 - 【L4】**Go 的选择**：Go 1.8+ 采用混合写屏障（Dijkstra 增量更新 + Yuasa SATB 结合），使并发标记期间无需重新扫描栈，停顿降至亚毫秒级。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -294,10 +298,11 @@ void oop_field_store(oop* field, oop new_value) {
 
 ::: details
 常见误区：
+
 - ❌ "漏标只需一个条件就会发生" → 必须黑指新白与灰断旧白**同时满足**，这正是增量更新/SATB 破坏其一即可的原因。
 - ❌ "SATB 会漏掉并发期间新创建的对象" → 不会漏标安全性，新对象默认存活视为黑色（或下轮处理），最多成为浮动垃圾。
 - ❌ "读屏障与写屏障可以互换" → 写屏障拦截写操作（CMS/G1 用），读屏障拦截读操作（ZGC/Shenandoah 用），实现机制和开销不同。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -305,7 +310,7 @@ void oop_field_store(oop* field, oop new_value) {
 - **Q：浮动垃圾是什么？** → 并发标记期间已死亡但被快照认为存活的对象，本轮无法回收，下轮处理；SATB 方案的典型副作用。
 - **Q：ZGC 靠读屏障如何保证一致性？** → 见本文档「Java 的 ZGC 垃圾回收流程是怎样的？」。
 
-### 【中等】什么是安全点和安全区域？⭐⭐⭐
+### 【中等】什么是安全点和安全区域？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：垃圾收集 / 停顿机制
 
@@ -360,10 +365,11 @@ for (int i = 0; i < Integer.MAX_VALUE; i++) {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**计数循环陷阱**：HotSpot 对 `int` 等可数循环（counted loop）默认不在循环体内插入安全点检查，若循环体纯计算且次数巨大会长时间无法停顿；规避方式：改用 long 计数器、循环内加无副作用方法调用，或 `-XX:+UseCountedLoopSafepoints`（JDK 10+ 默认启用，JDK 14+ 进一步改进）。
 - 【L3】**主动式中断 vs 被动式中断**：HotSpot 采用主动式中断——线程自行 poll 标志位；另一种思路是硬件中断强制暂停线程，实现复杂且需保证任意指令处均可安全停顿，主流 JVM 未采用。
 - 【L4】**同步开销**：所有线程到达安全点才能开始 GC，最慢线程决定停顿延迟（Time-To-Safepoint）；JDK 10+ 可用 `-Xlog:safepoint` 观察 ttsp 耗时，ZGC/Shenandoah 通过减少 STW 阶段从根本上削弱了该问题。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -452,10 +458,11 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**ReferenceQueue 机制**：软/弱/虚引用都可关联 `ReferenceQueue`，对象被回收后对应引用对象会入队，可轮询感知回收事件；虚引用必须关联队列。
 - 【L3】**软引用的回收时机细节**：HotSpot 通过 `-XX:SoftRefLRUPolicyMSPerMB`（默认 1000）控制软引用存活时长——空闲堆下软引用至少存活「空闲内存 MB × 该值」毫秒才被回收；堆接近耗尽时（OOM 前）才会集中清理。
 - 【L4】**典型应用链路**：`DirectByteBuffer` 用 Cleaner（虚引用实现）释放堆外内存；`ThreadLocal` 的 Entry 用弱引用 key 防泄漏；`WeakHashMap` 用于缓存元数据（如 ClassLoader 相关缓存）。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -528,24 +535,25 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 
 **6. 常见垃圾回收器与算法对应**
 
-| 回收器                | 新生代算法  | 老年代算法            | 特点                          |
-| --------------------- | ----------- | --------------------- | ----------------------------- |
-| **Serial**            | 复制        | 标记-整理             | 单线程，STW 时间长。          |
-| **ParNew**            | 复制        | 标记-清除（配 CMS）  | Serial 的多线程版。           |
+| 回收器                | 新生代算法  | 老年代算法                | 特点                          |
+| --------------------- | ----------- | ------------------------- | ----------------------------- |
+| **Serial**            | 复制        | 标记-整理                 | 单线程，STW 时间长。          |
+| **ParNew**            | 复制        | 标记-清除（配 CMS）       | Serial 的多线程版。           |
 | **Parallel Scavenge** | 复制        | 标记-整理（Parallel Old） | 吞吐量优先。                  |
-| **CMS**               | -           | 标记-清除（并发）     | 低延迟，但内存碎片多。        |
-| **G1**                | 复制 + 分区 | 标记-整理 + 分区      | 兼顾吞吐与延迟，Region 分区。 |
-| **ZGC/Shenandoah**    | 复制 + 分区 | 标记-整理 + 分区      | 亚毫秒级停顿，并发标记/整理。 |
+| **CMS**               | -           | 标记-清除（并发）         | 低延迟，但内存碎片多。        |
+| **G1**                | 复制 + 分区 | 标记-整理 + 分区          | 兼顾吞吐与延迟，Region 分区。 |
+| **ZGC/Shenandoah**    | 复制 + 分区 | 标记-整理 + 分区          | 亚毫秒级停顿，并发标记/整理。 |
 
 现代 JVM 趋向于使用**分代+分区+并发**的复合算法（如 G1），在吞吐量和延迟之间取得平衡。
 
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**记忆集的实现——卡表（Card Table）**：G1 之前主流实现是将老年代划分为 512 字节的卡（Card），年轻代 GC 时只扫描被标记为脏的卡对应的 RSet 条目，把跨代扫描从 O(全堆) 降为 O(脏卡数)；写屏障负责在跨代引用时标脏卡。
 - 【L3】**复制算法的分配担保**：若 Survivor 装不下 Eden 存活对象，会通过分配担保机制提前转入老年代（见本文档「JVM 的内存分配策略是怎样的？对象何时晋升老年代？」）。
 - 【L4】**算法演进脉络**：标记-清除/复制/标记-整理（串行）→ 并行多线程（Parallel）→ 并发标记（CMS 增量）→ 分代+分区+并发复合（G1）→ 全并发低延迟（ZGC 染色指针/Shenandoah 转发指针）；核心矛盾始终是停顿时间 vs 吞吐量 vs 内存开销。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -573,17 +581,17 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 
 以下是 Java 主要垃圾收集器的详细对比表格，涵盖算法、特点、适用场景和关键参数：
 
-| **垃圾收集器**        | **分类**         | **算法**                          | **目标**               | **适用场景**                  | **JDK 版本**         | **启用参数**                     | **优缺点**                                                     |
-| --------------------- | ---------------- | --------------------------------- | ---------------------- | ----------------------------- | -------------------- | -------------------------------- | -------------------------------------------------------------- |
-| **Serial GC**         | 串行             | 新生代：复制<br>老年代：标记-整理 | 简单低开销             | 单核、客户端应用、小堆        | 所有版本             | `-XX:+UseSerialGC`               | ✔️ 内存占用小<br>❌ 全程 STW，延迟高                           |
-| **Parallel Scavenge** | 并行（吞吐优先） | 新生代：复制                      | 高吞吐量               | 后台计算、多核大堆            | JDK 1.4+             | `-XX:+UseParallelGC`             | ✔️ 吞吐量高<br>❌ 停顿时间较长                                 |
-| **Parallel Old**      | 并行（吞吐优先） | 老年代：标记-整理                 | 配合 Parallel Scavenge | 与 Parallel Scavenge 搭配使用 | JDK 6+               | `-XX:+UseParallelOldGC`          | ✔️ 老年代并行回收<br>❌ 仍以吞吐优先，延迟较高                 |
-| **ParNew**            | 并行             | 新生代：复制                      | 低停顿（与 CMS 配合）  | 需与 CMS 搭配的多核环境       | JDK 1.4+             | `-XX:+UseParNewGC`               | ✔️ 多线程版 Serial GC<br>❌ 仅新生代，需搭配 CMS               |
-| **CMS**               | 并发（低延迟）   | 老年代：标记-清除                 | 最小化停顿时间         | 老年代低延迟应用              | JDK 5~14（9 废弃，14 移除） | `-XX:+UseConcMarkSweepGC`        | ✔️ 并发收集，低停顿<br>❌ 内存碎片、并发模式失败风险           |
-| **G1**                | 分区+并发        | 标记-整理（分 Region）            | 平衡吞吐与延迟         | 大堆（数十 GB）                | JDK 7+（JDK 9+默认） | `-XX:+UseG1GC`                   | ✔️ 可预测停顿、大堆友好<br>❌ 内存占用略高                     |
-| **ZGC**               | 并发             | 染色指针+读屏障                   | 亚毫秒级停顿（<10ms）  | 超大堆（TB 级）、云原生       | JDK 11 实验，JDK 15 生产可用 | `-XX:+UseZGC`                    | ✔️ 极低停顿、堆大小几乎无限制<br>❌ 吞吐量略低于 G1            |
-| **分代 ZGC**          | 并发+分代        | 染色指针+分代回收                 | 亚毫秒级（<1ms）       | JDK 21+ 低延迟首选            | JDK 21+              | `-XX:+UseZGC -XX:+ZGenerational` | ✔️ 分代优化、停顿更低、吞吐更高<br>❌ JDK 21+ 才支持           |
-| **Shenandoah**        | 并发             | 转发指针+读屏障                   | 低延迟（与 ZGC 竞争）  | Red Hat 系、低延迟大堆        | JDK 12 实验，JDK 15 转正 | `-XX:+UseShenandoahGC`           | ✔️ 并发压缩、停顿与堆大小无关<br>❌ 非 Oracle 官方默认         |
+| **垃圾收集器**        | **分类**         | **算法**                          | **目标**               | **适用场景**                  | **JDK 版本**                 | **启用参数**                     | **优缺点**                                             |
+| --------------------- | ---------------- | --------------------------------- | ---------------------- | ----------------------------- | ---------------------------- | -------------------------------- | ------------------------------------------------------ |
+| **Serial GC**         | 串行             | 新生代：复制<br>老年代：标记-整理 | 简单低开销             | 单核、客户端应用、小堆        | 所有版本                     | `-XX:+UseSerialGC`               | ✔️ 内存占用小<br>❌ 全程 STW，延迟高                   |
+| **Parallel Scavenge** | 并行（吞吐优先） | 新生代：复制                      | 高吞吐量               | 后台计算、多核大堆            | JDK 1.4+                     | `-XX:+UseParallelGC`             | ✔️ 吞吐量高<br>❌ 停顿时间较长                         |
+| **Parallel Old**      | 并行（吞吐优先） | 老年代：标记-整理                 | 配合 Parallel Scavenge | 与 Parallel Scavenge 搭配使用 | JDK 6+                       | `-XX:+UseParallelOldGC`          | ✔️ 老年代并行回收<br>❌ 仍以吞吐优先，延迟较高         |
+| **ParNew**            | 并行             | 新生代：复制                      | 低停顿（与 CMS 配合）  | 需与 CMS 搭配的多核环境       | JDK 1.4+                     | `-XX:+UseParNewGC`               | ✔️ 多线程版 Serial GC<br>❌ 仅新生代，需搭配 CMS       |
+| **CMS**               | 并发（低延迟）   | 老年代：标记-清除                 | 最小化停顿时间         | 老年代低延迟应用              | JDK 5~14（9 废弃，14 移除）  | `-XX:+UseConcMarkSweepGC`        | ✔️ 并发收集，低停顿<br>❌ 内存碎片、并发模式失败风险   |
+| **G1**                | 分区+并发        | 标记-整理（分 Region）            | 平衡吞吐与延迟         | 大堆（数十 GB）               | JDK 7+（JDK 9+默认）         | `-XX:+UseG1GC`                   | ✔️ 可预测停顿、大堆友好<br>❌ 内存占用略高             |
+| **ZGC**               | 并发             | 染色指针+读屏障                   | 亚毫秒级停顿（<10ms）  | 超大堆（TB 级）、云原生       | JDK 11 实验，JDK 15 生产可用 | `-XX:+UseZGC`                    | ✔️ 极低停顿、堆大小几乎无限制<br>❌ 吞吐量略低于 G1    |
+| **分代 ZGC**          | 并发+分代        | 染色指针+分代回收                 | 亚毫秒级（<1ms）       | JDK 21+ 低延迟首选            | JDK 21+                      | `-XX:+UseZGC -XX:+ZGenerational` | ✔️ 分代优化、停顿更低、吞吐更高<br>❌ JDK 21+ 才支持   |
+| **Shenandoah**        | 并发             | 转发指针+读屏障                   | 低延迟（与 ZGC 竞争）  | Red Hat 系、低延迟大堆        | JDK 12 实验，JDK 15 转正     | `-XX:+UseShenandoahGC`           | ✔️ 并发压缩、停顿与堆大小无关<br>❌ 非 Oracle 官方默认 |
 
 **关键对比维度**
 
@@ -604,10 +612,11 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**组合规则**：收集器需分代搭配——ParNew/CMS 只能搭配老年代 CMS；Parallel Scavenge 只能搭配 Parallel Old（不能配 CMS）；G1/ZGC/Shenandoah 是整堆收集器，无需搭配。
 - 【L3】**版本演进关键节点**：CMS 于 JDK 9 标记废弃、JDK 14 移除；G1 自 JDK 9 成为默认；ZGC 于 JDK 11 实验引入、JDK 15 生产可用、JDK 21 支持分代；Shenandoah 于 JDK 12 实验引入、JDK 15 转正。
 - 【L4】**选型量化参考**：4C8G 小堆批处理选 Parallel（吞吐可达 99%）；8~64GB 在线服务 G1 默认 200ms 停顿目标即可满足 P99；百 GB 级低延迟用分代 ZGC（停顿与堆大小无关，<1ms）。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -690,10 +699,11 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**Major GC ≠ Full GC**：Major GC 通常仅指老年代回收（CMS 的并发回收周期），Full GC 是全堆+元空间；业界常混用，面试时应主动澄清。
 - 【L3】**G1 视角的重定义**：G1 中没有传统 Old GC，只有 Young GC 与 Mixed GC；仅当 Evacuation Failure（分配失败）时才退化为全堆 Serial 式 Full GC（JDK 10 前单线程，之后并行）。
 - 【L4】**Full GC 停顿量级**：4GB 堆 Serial Old 整理约 1~3 秒；G1 Full GC（并行）约 0.5~1 秒；ZGC 无传统 Full GC 概念（退化时也是并发处理）——这正是低延迟 GC 的核心价值。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -705,11 +715,12 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 
 ::: details
 常见误区：
+
 - ❌ "Major GC 就是 Full GC" → Major GC 一般仅指老年代回收；Full GC 回收全堆+元空间，代价更高。
 - ❌ "Young GC 只回收 Eden" → 还包括两个 Survivor 区，存活对象在 Survivor 间复制。
 - ❌ "所有收集器都支持单独 Old GC" → Parallel GC 不支持，老年代不足时直接触发 Full GC。
 - ❌ "Mixed GC 回收全部老年代" → 仅回收老年代中垃圾比例高的部分 Region，全量回收是 Full GC。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -770,6 +781,7 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**TLAB（Thread Local Allocation Buffer）**：Eden 中的线程私有分配缓冲，避免多线程分配时的锁竞争（`-XX:+UseTLAB` 默认开启），是"对象优先在 Eden 分配"的快速路径。
 - 【L3】**标量替换与栈上分配**：逃逸分析（`-XX:+DoEscapeAnalysis` 默认开启）确认对象不逃逸时，JIT 可做标量替换将对象拆散为基本类型分配在栈上，等效于"栈分配"。
 - 【L4】**跨语言分代 GC 对比**：
@@ -795,6 +807,7 @@ Reference<?> ref = queue.poll(); // 不为 null 说明对象被回收
 | 晋升阈值   | 可配置（默认 15）          | 无                   | 固定 2 次 GC                  |
 | 栈分配     | 标量替换（等效）           | 逃逸分析（真栈分配） | 无栈分配                      |
 | 写屏障用途 | 分代追踪 + 并发标记        | 并发标记             | 分代追踪 + 增量标记           |
+
 :::
 
 #### 🔀 发散问题
@@ -838,10 +851,11 @@ CMS 是一种以**低延迟**为目标的垃圾回收器，主要用于老年代
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**新生代搭配**：CMS 自身只回收老年代，需搭配 ParNew（或 Serial Old 作为后备）；JDK 8 典型配置：`-XX:+UseConcMarkSweepGC -XX:+UseParNewGC`。
 - 【L3】**并发标记的漏标处理**：采用增量更新 + 写屏障，重新标记阶段需重扫被记录的黑对象，可配 `-XX:+CMSScavengeFirstRemark` 先做 Young GC 缩小扫描范围。
 - 【L4】**版本演进**：CMS 于 JDK 5 引入、JDK 9 标记废弃（`-XX:+UseConcMarkSweepGC` 会告警）、**JDK 14 正式移除**；被 G1 取代的根本原因：碎片无法根治、并发模式失败退化严重、CPU 敏感（并发阶段占用 25% 资源）。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -853,10 +867,11 @@ CMS 是一种以**低延迟**为目标的垃圾回收器，主要用于老年代
 
 ::: details
 常见误区：
+
 - ❌ "CMS 全程无 STW" → 初始标记与重新标记两个阶段必须 STW，只是耗时短。
 - ❌ "CMS 能整理内存碎片" → CMS 基于标记-清除，不移动对象，碎片只能靠周期性带压缩的 Full GC 解决。
 - ❌ "现在新项目还可用 CMS" → JDK 14 已移除 CMS，新项目应选 G1/ZGC。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -924,6 +939,7 @@ G1 是 JDK 9 默认的垃圾回收器，**面向全堆（新生代 + 老年代�
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**RSet 的实现开销**：RSet 本质是"谁引用了我"的倒排索引，用 Card Table + 精炼队列维护，写屏障在跨 Region 引用时记录；RSet 通常占堆 5%~20%，是 G1 内存开销的主源。
 - 【L3】**IHOP 自适应**：JDK 9+ 默认开启 Adaptive IHOP（`-XX:+G1UseAdaptiveIHOP`），根据历史晋升速率自动提前启动并发标记，避免标记未完成时老年代已满导致 Evacuation Failure。
 - 【L4】**跨语言 GC 对比：G1 vs Go 三色标记 vs ZGC**：
@@ -955,10 +971,11 @@ G1 是 JDK 9 默认的垃圾回收器，**面向全堆（新生代 + 老年代�
 
 ::: details
 常见误区：
+
 - ❌ "G1 的 Region 固定属于某一代" → Region 的角色是动态的，每次回收后可在 Eden/Survivor/Old/Humongous 间切换。
 - ❌ "G1 不会产生 Full GC" → Evacuation Failure（分配失败）时仍会退化为全堆 Full GC，需通过 IHOP 自适应与堆预留避免。
 - ❌ "MaxGCPauseMillis 设得越小越好" → 过小会导致每次只回收极少 Region，回收频率飙升、吞吐下降甚至积压垃圾。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -966,7 +983,7 @@ G1 是 JDK 9 默认的垃圾回收器，**面向全堆（新生代 + 老年代�
 - **Q：什么场景下 G1 不如 Parallel GC？** → 小堆（<4GB）吞吐优先场景：G1 的 RSet/写屏障开销占比高，Parallel GC 吞吐更高。
 - **Q：G1 与 ZGC 怎么选？** → 见本文档「Java 的 ZGC 垃圾回收流程是怎样的？」。
 
-### 【困难】Java 的 ZGC 垃圾回收流程是怎样的？⭐⭐⭐
+### 【困难】Java 的 ZGC 垃圾回收流程是怎样的？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：垃圾收集 / ZGC
 
@@ -1024,10 +1041,11 @@ java -XX:+UseZGC -XX:+ZGenerational -Xmx8g YourApplication
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**染色指针位布局**：ZGC 在 64 位指针中只用 42 位寻址（故单堆上限 4TB），剩余高位存 4 个标志位（Marked0/Marked1/Remapped/Finalizable），标记信息存在指针里而非对象头，无需 STW 即可并发标记。
 - 【L3】**读屏障的"自愈"**：读屏障发现指针指向旧地址/未染色时，会就地修正指针并加载新地址（self-healing），后续访问无额外开销；这是停顿与堆大小无关的关键（JDK 16 起连线程栈扫描也并发化，停顿进一步降至微秒级）。
 - 【L4】**版本演进**：JDK 11 实验引入 → JDK 15 生产可用 → JDK 16 支持并发扫描线程栈、停顿与根数量无关 → JDK 21 分代 ZGC（`-XX:+ZGenerational`）→ JDK 23 分代成为 ZGC 默认模式、非分代模式移除。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -1039,10 +1057,11 @@ java -XX:+UseZGC -XX:+ZGenerational -Xmx8g YourApplication
 
 ::: details
 常见误区：
+
 - ❌ "ZGC 完全没有 STW" → 初始标记与最终重映射仍有极短 STW，只是不随堆大小增长。
 - ❌ "任何 JDK 11+ 都可直接生产用 ZGC" → JDK 11~14 的 ZGC 是实验特性（需 `-XX:+UnlockExperimentalVMOptions`），JDK 15 起才生产可用。
 - ❌ "ZGC 吞吐永远高于 G1" → JDK 21 前非分代 ZGC 吞吐通常略低于 G1，分代 ZGC（JDK 21+）才基本追平。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1083,19 +1102,20 @@ Shenandoah 的核心创新是**转发指针**（Brooks Pointer，得名于其发
 
 **2. Shenandoah 工作流程**
 
-| 阶段                    | 是否 STW | 说明                                                      |
-| :---------------------- | :------- | :-------------------------------------------------------- |
-| **初始标记**            | 是       | 标记 GC Roots 直接引用的对象，短暂停顿                    |
-| **并发标记**            | 否       | 遍历对象图标记存活对象，与用户线程并发（SATB 快照）       |
-| **最终标记**            | 是       | 处理剩余的 SATB 队列，完成标记，短暂停顿                  |
+| 阶段                       | 是否 STW | 说明                                                      |
+| :------------------------- | :------- | :-------------------------------------------------------- |
+| **初始标记**               | 是       | 标记 GC Roots 直接引用的对象，短暂停顿                    |
+| **并发标记**               | 否       | 遍历对象图标记存活对象，与用户线程并发（SATB 快照）       |
+| **最终标记**               | 是       | 处理剩余的 SATB 队列，完成标记，短暂停顿                  |
 | **并发整理（evacuation）** | 否       | 将存活对象并发复制到新 Region，通过转发指针维护引用一致性 |
-| **初始引用更新**        | 是       | 更新 GC Roots 指向新对象地址，短暂停顿                    |
-| **并发引用更新**        | 否       | 并发更新堆中所有引用指向新对象                            |
-| **最终引用更新**        | 是       | 处理剩余引用更新，短暂停顿                                |
+| **初始引用更新**           | 是       | 更新 GC Roots 指向新对象地址，短暂停顿                    |
+| **并发引用更新**           | 否       | 并发更新堆中所有引用指向新对象                            |
+| **最终引用更新**           | 是       | 处理剩余引用更新，短暂停顿                                |
 
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**Shenandoah vs ZGC 对比**：
 
 | 维度         | Shenandoah                           | ZGC                                 |
@@ -1109,7 +1129,7 @@ Shenandoah 的核心创新是**转发指针**（Brooks Pointer，得名于其发
 
 - 【L3】**转发指针的代价**：每次对象访问多一层间接寻址（读屏障检查转发指针），吞吐开销高于 ZGC 的染色指针；JDK 15 后引入 SATB + 读屏障组合优化引用更新阶段。
 - 【L4】**生态差异**：Oracle JDK 不自带 Shenandoah，需使用 OpenJDK 官方构建或 Red Hat 构建；两者目标一致但实现路线不同（对象头 vs 指针染色）。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1159,18 +1179,20 @@ java -XX:+UseConcMarkSweepGC \
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**伴随的 promotion failed**：与 CMF 常同时出现——Young GC 时 Survivor 装不下、老年代也无连续空间接收晋升对象，同样退化为 Serial Old Full GC；GC 日志关键字：`concurrent mode failure`、`promotion failed`。
 - 【L3】**为什么 CMS 必须提前启动**：CMS 并发标记+清除期间用户线程持续晋升对象，老年代需预留「并发周期时长 × 晋升速率」的空间；JDK 6u24 之前 JVM 会根据历史晋升量自适应调整阈值，反而导致不可预测，故建议显式固定。
 - 【L4】**根治方案**：CMF 是 CMS 架构性缺陷（标记-清除无整理 + 退化单线程），G1 用 Region 分区 + Mixed GC、ZGC/Shenandoah 用全并发从根本规避；JDK 14 已移除 CMS。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ "CMF 是内存泄漏导致的" → 不一定，多数是阈值/晋升速率/碎片配置问题；先看 GC 日志回收后老年代水位是否下降，不降才怀疑泄漏。
 - ❌ "调高 CMSInitiatingOccupancyFraction 能解决" → 方向反了，应**调低**提前触发；调高会让并发回收启动更晚，恶化问题。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1221,10 +1243,11 @@ java -XX:+UseConcMarkSweepGC \
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**jhat 已被移除**：jhat 于 JDK 9 被标记废弃、JDK 10 移除，堆 dump 分析应使用 MAT 或 VisualVM；jinfo 可在线动态修改部分参数（如 `-XX:+PrintGCDetails`）便于应急诊断。
 - 【L3】**Arthas 常用命令**：`dashboard`（总览）、`thread -n 3`（CPU Top 线程）、`trace`（方法耗时链路）、`heapdump`（导出堆快照）、`profiler`（火焰图）。
 - 【L4】**版本差异**：JDK 8 自带 VisualVM/JConsole，JDK 9+ 从 JDK 发行包移除（独立下载）；JFR 于 JDK 11 开源免费，配合 JMC 成为低开销生产剖析首选。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1277,10 +1300,11 @@ java -XX:+UseConcMarkSweepGC \
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**参数分类**：标准参数（`-D`）、X 参数（`-Xms/-Xmx/-Xmn/-Xss`）、XX 参数（`-XX:+` 布尔、`-XX:` 键值）；`-XX:+PrintFlagsFinal` 可查看全部参数及默认值，`jinfo -flags <pid>` 查看运行时值。
 - 【L3】**容器环境**：JDK 8u191+/JDK 10+ 默认开启 `-XX:+UseContainerSupport`，按 cgroup 限制计算堆与线程数；也可用 `-XX:MaxRAMPercentage=75` 按比例设堆。
 - 【L4】**日志参数版本差异**：JDK 8 用 `-XX:+PrintGCDetails -Xloggc:gc.log`；JDK 9+ 统一为 `-Xlog:gc*:file=gc.log:time,uptime:filecount=5,filesize=10M`（旧参数已废弃）。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1384,6 +1408,7 @@ jmap -dump:format=b,file=heap.hprof <pid>
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**实时诊断工具（无需堆快照）**：
 
 **Arthas（阿里开源）**：
@@ -1409,6 +1434,7 @@ profiler start -d 30 -f /tmp/flamegraph.html
 
 - **heap profile**：类似 JVM 的 heap dump，但它是**采样型**而非完整快照。Go 默认每分配 512KB 内存记录一次采样，可通过 `runtime.MemProfileRate` 调整。
 - **获取方式**：
+
   ```go
   // 方式 1：HTTP 端点（类似 JMX）
   import _ "net/http/pprof"
@@ -1418,6 +1444,7 @@ profiler start -d 30 -f /tmp/flamegraph.html
   f, _ := os.Create("heap.prof")
   pprof.WriteHeapProfile(f)
   ```
+
 - **分析工具**：`go tool pprof` 提供交互式分析（`top`、`list`、`web`），支持火焰图、调用图，功能类似 MAT 的 Histogram 和 Dominator Tree。
 - **goroutine profile**：Go 独有，可查看所有 goroutine 栈信息，快速定位 goroutine 泄漏。
 
@@ -1452,16 +1479,18 @@ ms_print massif.out  # 查看报告
 | Go 内存泄漏       | `pprof heap` + `goroutine` profile          |
 | C/C++ 内存泄漏    | Valgrind Memcheck + AddressSanitizer        |
 | 跨语言混合泄漏    | 各语言专用工具 + `pmap` / `/proc/pid/smaps` |
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ "Java 有 GC 就不会内存泄漏" → 泄漏的本质是对象被意外强引用持有，GC 无法回收"可达"的对象。
 - ❌ "heap dump 随时可以随便打" → `jmap -dump:live` 会触发 Full GC 且 STW，大堆生产环境需避开高峰或用 Arthas `heapdump`。
 - ❌ "内存涨就是泄漏" → 缓存预热、连接池扩容等正常增长也会涨；判断标准是 **Full GC 后水位是否回落**。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1560,6 +1589,7 @@ GC 调优核心思路：**尽可能使对象在年轻代被回收，减少对象
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**高级工具**：
 
   ```bash
@@ -1568,9 +1598,10 @@ GC 调优核心思路：**尽可能使对象在年轻代被回收，减少对象
   ```
 
   JFR 开销 <1%，适合生产环境长时间采样；Arthas 可实时诊断内存泄漏（如 `heapdump` 命令）。
+
 - 【L3】**量化经验值**：健康应用 Young GC <50ms、每分钟 ≤2~3 次；Full GC 应 <1 次/小时；吞吐量目标 ≥95%（批处理 ≥99%）。
 - 【L4】**调优优先级**：先代码（减少分配/大对象/泄漏）→ 再收集器选型 → 最后调参数；参数调优是最后手段，多数 GC 问题根源在代码分配行为。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1610,10 +1641,11 @@ GC 调优核心思路：**尽可能使对象在年轻代被回收，减少对象
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**NMT 使用细节**：需启动时开启 `-XX:NativeMemoryTracking=summary|detail`（开销约 5%~10%），支持基线对比：`jcmd <pid> VM.native_memory baseline` 后再 `detail.diff` 看增量。
 - 【L3】**直接内存的回收机制**：DirectByteBuffer 靠 Cleaner（虚引用）回收，若堆压力小 GC 不频繁，堆外内存会持续积压；可显式调用 `sun.misc.Cleaner` 或设 `-XX:MaxDirectMemorySize` 触发回收。
 - 【L4】**容器场景叠加**：glibc malloc arena 碎片（大量线程下 RSS 虚高）也会表现为内存增长，可用 `MALLOC_ARENA_MAX=2` 验证；`pmap -x` 中大量 64MB 匿名段是典型特征。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1722,10 +1754,11 @@ profiler stop        # 停止并生成火焰图（SVG）
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**区分 user/sys CPU**：`sys` 高常见于锁竞争、上下文切换、GC 频繁；用 `vmstat 1` 看 cs 列（上下文切换），`pidstat -t -p <pid>` 看线程级。
 - 【L3】**GC 线程导致 CPU 高的识别**：jstack 中线程名为 `GC Thread#`、`VM Thread`、`G1 Conc#` 等；结合 `jstat -gc` 若 YGC 每秒多次且耗时长，说明是 GC 风暴而非业务代码。
 - 【L4】**火焰图解读**：平顶（plateau）= 该方法自身耗时多；宽塔 = 调用链热点；async-profiler 支持 `-e cpu`、`-e alloc`、`-e lock` 多维度采样，可定位内存分配与锁热点。
-:::
+  :::
 
 #### 🏭 实战场景
 
@@ -1737,17 +1770,18 @@ profiler stop        # 停止并生成火焰图（SVG）
 
 ::: details
 常见误区：
+
 - ❌ "CPU 高直接重启就好" → 重启丢失现场，必须先 jstack/火焰图取证再处置。
 - ❌ "堆栈在框架代码里就是框架的锅" → 多数是业务传入的数据触发的（如超长字符串、恶意正则），要看参数特征。
 - ❌ "线程 BLOCKED 也会把 CPU 打满" → BLOCKED 是等待不耗 CPU，但大量线程切换会让 sys CPU 升高。
-:::
+  :::
 
 #### 🔀 发散问题
 
 - **Q：如何区分是业务代码还是 GC 导致的 CPU 高？** → 先 `jstat -gc <pid> 1s` 看 GC 频率；若 YGC/FGC 激增则按 GC 调优处理（见本文档「如何对 Java 的垃圾回收进行调优？」）。
 - **Q：Windows 环境没有 top -H 怎么办？** → 用 `tasklist` + `jstack`，线程 ID 用 `Integer.toHexString` 换算；或直接用 Arthas dashboard。
 
-### 【困难】如何解读 GC 日志？⭐⭐⭐
+### 【困难】如何解读 GC 日志？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：调优 / GC 日志
 
@@ -1832,6 +1866,7 @@ GC 日志是 JVM 性能调优的**第一手数据**。不同 JDK 版本的日志
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**user/sys/real 关系**：real 远小于 user+sys 说明多线程并行；real 大于 user+sys 说明 GC 线程在等待（如磁盘换页、CPU 争抢）。
 - 【L3】**GC 日志实战分析**：
 
@@ -1884,6 +1919,7 @@ GC(42) Old: 1024M->1100M(2048M)
 | `-XX:+PrintGCDetails`             | JDK 8 GC 日志        | 生产环境必开                                  |
 | `-Xlog:gc*:file=gc.log:time`      | JDK 9+ GC 日志       | 生产环境必开                                  |
 | `-XX:+HeapDumpOnOutOfMemoryError` | OOM 时自动 dump      | 生产环境必开                                  |
+
 :::
 
 #### 🏭 实战场景
@@ -1896,10 +1932,11 @@ GC(42) Old: 1024M->1100M(2048M)
 
 ::: details
 常见误区：
+
 - ❌ "A->B(C) 中的 C 是当前使用量" → C 是区域总容量；A、B 才是回收前/后使用量。
 - ❌ "Young GC 次数多就一定有问题" → 次数多但单次 <20ms 且吞吐达标则正常；要综合停顿占比判断。
 - ❌ "JDK 9+ 还能用 PrintGCDetails" → 已废弃，启动时会告警，应改用 `-Xlog:gc*`。
-:::
+  :::
 
 #### 🔀 发散问题
 

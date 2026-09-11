@@ -27,6 +27,7 @@ permalink: /pages/640f919f/
 Java 容器位于 `java.util`，分 **Collection**（List/Set/Queue）和 **Map** 两大体系。选型口诀：要顺序可重复用 List，要唯一用 Set，要排队用 Queue，要键值用 Map；并发场景选 `java.util.concurrent`。
 
 #### ⚡记忆卡片
+
 - **口诀**：List 有序可重，Set 唯一无序，Queue 排队进出，Map 键值成对
 - **关键词**：Collection／Map／并发包
 - **链路**：Collection → List/Set/Queue → ArrayList/HashSet/ArrayDeque；Map → HashMap/TreeMap/ConcurrentHashMap
@@ -75,15 +76,18 @@ Java 容器位于 `java.util`，分 **Collection**（List/Set/Queue）和 **Map*
 - 单线程：`ArrayList`、`HashMap`
 - 多线程：`ConcurrentHashMap`、`CopyOnWriteArrayList`
 - 包装同步：`Collections.synchronizedList/synchronizedMap`
-:::
+  :::
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】不可变集合：`Collections.unmodifiableList` 只是原集合的只读**视图**（原集合变更会反映到视图）；Java 9 的 `List.of`/`List.copyOf` 才是真正不可变的独立集合（拷贝后与原集合无关）。
 - 【L4】版本演进：JDK 1.0 的 Vector/Hashtable → JDK 1.2 集合框架（Collections Framework，引入 Iterator 体系）→ Java 8 Stream 集成 → Java 9 不可变集合工厂 → JDK 21 Sequenced Collections。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：为什么 Map 不继承 Collection？** → Map 是键值对语义，无法自然融入元素级迭代模型；两者通过 `entrySet()`/`keySet()`/`values()` 桥接，`values()` 返回的 Collection 视图与 Map 联动。
 - **Q：Vector 和 ArrayList 如何选？** → 一律优先 ArrayList；需要线程安全时用 `Collections.synchronizedList` 或 `CopyOnWriteArrayList`，Vector 方法级 `synchronized` 锁粒度太粗。
 
@@ -96,6 +100,7 @@ Java 容器位于 `java.util`，分 **Collection**（List/Set/Queue）和 **Map*
 序列集合是 **JDK 21** 引入的接口体系（SequencedCollection/SequencedSet/SequencedMap），为有明确顺序的集合统一了首尾访问 API（`first()`/`last()`/`addFirst()`/`reversed()` 等），消除了不同集合取首尾元素方式不一致的问题。
 
 #### ⚡记忆卡片
+
 - **口诀**：21 序列三接口，首尾增删全统一，reversed 视图逆序看
 - **关键词**：JDK 21／first-last／reversed
 - **链路**：SequencedCollection → SequencedSet / Deque；SequencedMap 独立成支
@@ -151,13 +156,16 @@ list.reversed(); // ["C", "B", "A"]（逆序视图，非拷贝）
 5. **设计意义**：统一了 `List`、`Set`、`Deque`、`Map` 等有序集合的首尾访问 API，消除了因集合类型不同而导致的 API 不一致问题。
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】`reversed()` 返回的是逆序**视图**而非拷贝，修改视图会反映到原集合，且视图可再次 `reversed()` 还原。
 - 【L3】`Deque` 被改造为继承 `SequencedCollection`，`SortedSet`/`SortedMap` 被改造为继承 `SequencedSet`/`SequencedMap`，`TreeSet.first()` 等方法即来源于此体系。
 - 【L4】版本演进：JDK 1.2 引入 SortedSet.last() → JDK 6 LinkedHashSet 仍无尾元素访问 → JDK 21（JEP 431）以 Sequenced Collections 统一。注意 JDK 21 是正式特性（非预览）。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：HashSet/HashMap 能用 first() 吗？** → 不能。它们无序，未实现 Sequenced 接口；只有 LinkedHashSet、TreeSet、LinkedHashMap、TreeMap 等有序实现支持。
 - **Q：`List.of()` 返回的不可变 List 支持这些方法吗？** → 支持 `first()`/`last()`/`reversed()`，但 `addFirst()`/`removeLast()` 等写操作会抛 `UnsupportedOperationException`。
 
@@ -170,6 +178,7 @@ list.reversed(); // ["C", "B", "A"]（逆序视图，非拷贝）
 Comparable 是类自己实现的"自然排序"（内部 `compareTo`），Comparator 是外部提供的"比较策略"（`compare(o1, o2)`）。类有唯一自然顺序且可改源码用 Comparable；多排序维度或不可改源码时用 Comparator。
 
 #### ⚡记忆卡片
+
 - **口诀**：Comparable 自己比，Comparator 别人比
 - **关键词**：自然排序／外部比较器／java.lang vs java.util
 - **链路**：Comparable.compareTo → Collections.sort(list)；Comparator.compare → Collections.sort(list, c)
@@ -224,13 +233,16 @@ Comparator<Person> reverseAge =
 ```
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】约定：`compareTo` 结果应与 `equals` 一致（`(a.compareTo(b) == 0) == a.equals(b)`），否则 TreeSet/TreeMap 行为会偏离 Set/Map 契约（Javadoc 称之为 "strongly recommended"）。
 - 【L3】`return a - b` 式比较器在数值接近 int 边界时会溢出（如 `Integer.MIN_VALUE` 参与比较），应使用 `Integer.compare(a, b)`。
 - 【L4】Java 16 的 record 会自动按组件声明顺序实现 Comparable；Comparator 还提供 `nullsFirst`/`nullsLast` 处理含 null 的排序。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：TreeSet 排序时用的是哪个？** → 优先用构造器传入的 Comparator；没有则要求元素实现 Comparable，否则抛 `ClassCastException`。
 - **Q：compareTo 返回值的含义？** → 负数表示当前对象小于参数对象，0 表示相等，正数表示大于；具体数值大小无意义，只看符号。
 
@@ -243,6 +255,7 @@ Comparator<Person> reverseAge =
 ConcurrentModificationException 是用迭代器遍历集合时，检测到集合被结构性修改（增删）抛出的运行时异常，是 fail-fast 机制的体现。底层靠迭代器的 `expectedModCount` 与集合 `modCount` 比对，不一致立即抛出。
 
 #### ⚡记忆卡片
+
 - **口诀**：边遍历边改结构，modCount 对不上就抛
 - **关键词**：modCount／expectedModCount／fail-fast
 - **链路**：集合修改 modCount++ → 迭代器 next() 检查 → 不一致抛 CME
@@ -285,6 +298,7 @@ while (iterator.hasNext()) {
 }
 // list = ["A", "D"]
 ```
+
 :::
 
 ::: details 示例：Java 8+ 的 removeIf（最简洁）
@@ -295,16 +309,20 @@ List<String> list = new ArrayList<>(Arrays.asList("A", "B", "C", "D"));
 list.removeIf(item -> item.startsWith("B") || item.equals("C")); // ✔️
 // list = ["A", "D"]
 ```
+
 :::
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】`ArrayList` 迭代器 `remove()` 内部会同步更新 `expectedModCount = modCount`，因此通过迭代器删除不会触发 fail-fast。
 - 【L3】`modCount` 只在结构性修改（add/remove/clear）时递增，`set()` 替换元素不改变 `modCount`，因此遍历中 `set` 不会抛 CME。
 - 【L4】fail-fast 是**尽力检测**而非同步机制：`checkForComodification` 没有内存屏障，多核下不保证一定能检测到并发修改；`ConcurrentHashMap` 等并发容器的迭代器是弱一致的，不抛 CME。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：增强 for 循环中删除元素为什么会抛异常？** → 增强 for 底层就是迭代器，直接调用 `list.remove()` 改变了 `modCount`，下次 `next()` 检查即抛 CME；可用 `iterator.remove()` 或 `removeIf` 代替。
 - **Q：Map 遍历中删除怎么办？** → 用 `map.entrySet().removeIf(...)` 或 entrySet 迭代器的 `remove()`。
 
@@ -319,6 +337,7 @@ list.removeIf(item -> item.startsWith("B") || item.equals("C")); // ✔️
 可以。ArrayList 底层是 `Object[]`，允许添加任意个 `null`（含重复）。但取值时要判空防 NPE，且 HashSet 只允许 1 个 null、TreeSet 自然排序下加 null 会抛 NPE、Hashtable 禁止 null 键值。
 
 #### ⚡记忆卡片
+
 - **口诀**：ArrayList 随便放 null，TreeSet 自然排序不放，Hashtable 键值都不放
 - **关键词**：Object[]／NullPointerException／容器 null 策略
 - **链路**：add(null) 存入 elementData → get(i) 可能为 null → 调用方法前判空
@@ -330,14 +349,14 @@ list.removeIf(item -> item.startsWith("B") || item.equals("C")); // ✔️
 3. **慎用场景**：数据库映射（ORM）、JSON 序列化工具可能对 `null` 有特殊限制。
 4. **与其他容器对比**：
 
-| 容器             | null 策略                                            |
-| ---------------- | ---------------------------------------------------- |
-| `ArrayList`      | 允许任意个 null                                      |
-| `HashSet`        | 允许 1 个 null                                       |
-| `TreeSet`        | 自然排序下添加 null 抛 `NullPointerException`        |
-| `HashMap`        | 允许 null 键和值                                     |
-| `Hashtable`      | 禁止 null 键和值                                     |
-| `ConcurrentHashMap` | 禁止 null 键和值（避免二义性）                    |
+| 容器                | null 策略                                     |
+| ------------------- | --------------------------------------------- |
+| `ArrayList`         | 允许任意个 null                               |
+| `HashSet`           | 允许 1 个 null                                |
+| `TreeSet`           | 自然排序下添加 null 抛 `NullPointerException` |
+| `HashMap`           | 允许 null 键和值                              |
+| `Hashtable`         | 禁止 null 键和值                              |
+| `ConcurrentHashMap` | 禁止 null 键和值（避免二义性）                |
 
 5. **建议**：明确是否需要 `null`，避免滥用；必要时用 `Optional` 或默认值替代。
 
@@ -350,6 +369,7 @@ list.removeIf(item -> item.startsWith("B") || item.equals("C")); // ✔️
 元素数达到容量时触发 `grow()` 扩容：新容量 = 旧容量 + 旧容量一半（**1.5 倍**），再用 `Arrays.copyOf` 拷贝。单次 add 最坏 O(n)，摊还 O(1)。1.5 倍是空间浪费（约 33%）与扩容次数的经验折中。
 
 #### ⚡记忆卡片
+
 - **口诀**：满则扩，一倍半，copyOf 搬迁，摊还 O(1)
 - **关键词**：grow()／1.5×／Arrays.copyOf
 - **链路**：add → ensureCapacityInternal → grow → newCapacity = old + old >> 1 → Arrays.copyOf
@@ -415,7 +435,9 @@ ArrayList<String> list = new ArrayList<>(10000);
 ```
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】源码细节：`grow()` 中 `oldCapacity >> 1` 即旧容量的一半；`MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8`，预留 8 字节给部分 JVM 的数组头（VM 实现差异）。
 - 【L3】JDK 8+ `elementData` 初始为共享空数组 `DEFAULTCAPACITY_EMPTY_ELEMENTDATA`，首次 add 才分配容量 10（懒初始化）；`transient` 修饰 elementData，序列化走 `writeObject` 只写有效元素。
 - 【L4】跨语言对比：Go slice 扩容策略的演变
@@ -430,6 +452,7 @@ Go 的策略比 Java 更激进：小容量时用 2×（快速逼近目标，减�
 :::
 
 #### 🔀 发散问题
+
 - **Q：ArrayList 扩容会缩容吗？** → 不会。删除大量元素后容量不变，需手动 `trimToSize()` 收缩到当前 size。
 - **Q：为什么默认初始容量是 10？** → JDK 8+ 采用懒初始化，空 ArrayList 不占 elementData 内存，首次 add 才分配 10；10 是历史沿袭的经验值。
 
@@ -442,6 +465,7 @@ Go 的策略比 Java 更激进：小容量时用 2×（快速逼近目标，减�
 两者都是连续内存、O(1) 索引访问；区别在于：数组定长、可存基本类型、无泛型；ArrayList 动态扩容、只存引用类型、有泛型和丰富 API。大多数业务场景选 ArrayList，极致性能/固定长度/基本类型选数组。
 
 #### ⚡记忆卡片
+
 - **口诀**：数组定长存原始，ArrayList 动态带泛型
 - **关键词**：固定长度／装箱／泛型
 - **链路**：容量需求未知 → ArrayList → 扩容 1.5×；容量固定/基本类型 → 原生数组
@@ -470,6 +494,7 @@ Go 的策略比 Java 更激进：小容量时用 2×（快速逼近目标，减�
 3. **选型**：需极致性能、固定长度或存储基本类型时（如数学计算）选数组；需要动态大小、便捷操作或泛型安全时（大多数业务场景）选 ArrayList。
 
 #### 🔀 发散问题
+
 - **Q：数组和 ArrayList 的协变性有何不同？** → 数组是协变的（`Integer[]` 是 `Object[]` 的子类型），向 `Object[]` 写入错误类型在运行时抛 `ArrayStoreException`；ArrayList 的泛型是编译期检查，类型不匹配直接编译失败。
 - **Q：为什么基本类型集合会有装箱开销？** → ArrayList 只能存引用类型，`int` 需装箱为 Integer；JDK 提供 IntStream/LongStream/DoubleStream 等原始类型特化来规避装箱。
 
@@ -482,6 +507,7 @@ Go 的策略比 Java 更激进：小容量时用 2×（快速逼近目标，减�
 ArrayList 基于动态数组，随机访问 O(1)、缓存友好，绝大多数场景更优；LinkedList 基于双向链表，仅头尾操作 O(1)，中间操作仍需 O(n) 定位。除非频繁头插删或需要 Deque 语义，否则一律选 ArrayList。
 
 #### ⚡记忆卡片
+
 - **口诀**：数组快在连续内存，链表输在指针跳转
 - **关键词**：O(1) 随机访问／Cache Line／Deque
 - **链路**：结构（数组 vs 双链表）→ 访问 O(1) vs O(n) → 缓存局部性差异 → 性能数量级差距
@@ -498,7 +524,7 @@ ArrayList 基于动态数组，随机访问 O(1)、缓存友好，绝大多数�
 | **插入/删除性能** | - 尾部操作：⚡ **O(1)**<br>- 中间/头部操作：🐢 **O(n)**（需移动元素） | - 头尾操作：⚡ **O(1)**<br>- 中间操作：🐢 **O(n)**（需遍历定位） |
 | **适用场景**      | - 频繁随机访问<br>- 数据量稳定或尾部操作多                            | - 频繁头尾插入/删除<br>- 数据动态性强                            |
 | **额外功能**      | 仅基础列表操作                                                        | 实现了 `Deque` 接口（可作队列/栈使用）                           |
-| **空间局部性**    | ✔️ 更好（CPU 缓存友好）                                               | ❌ 较差（节点分散存储）                                           |
+| **空间局部性**    | ✔️ 更好（CPU 缓存友好）                                               | ❌ 较差（节点分散存储）                                          |
 
 2. **对比小结**：
    - **访问速度**：`ArrayList` 随机访问极快（数组索引 O(1)），`LinkedList` 需遍历链表（O(n)）。
@@ -545,23 +571,28 @@ ArrayList 的连续内存访问能充分利用 CPU 的 Memory Bandwidth（现代
 >
 > - 默认情况下，`Collections.synchronizedList` 包装的 `ArrayList` 比 `LinkedList` 线程安全开销更低。
 > - Java 8+ 的 `Stream` 操作在 `ArrayList` 上效率更高。
-:::
+>   :::
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】`LinkedList.get(i)` 由内部 `node(int index)` 定位：从离 index 更近的一端（头或尾）开始遍历，最坏仍是 O(n/2) ≈ O(n)。
 - 【L3】JDK 1.6 的 LinkedList 是循环双向链表（first.prev == last），JDK 1.7 改为非循环，减少边界判断、降低内存占用。
 - 【L4】栈/队列场景的现代替代：JDK 官方推荐用 `ArrayDeque` 替代 LinkedList 作栈/队列（无节点分配开销，缓存更友好）。
-:::
+  :::
 
 #### ⚠️ 常见误区
+
 ::: details
 常见误区：
+
 - ❌ "LinkedList 增删一定比 ArrayList 快" → 只有已知节点位置（如迭代器持有位置）时删除才是 O(1)；实际按索引操作需先 O(n) 定位，整体仍是 O(n)。
 - ❌ "两者性能差不多，随便选" → 顺序遍历 ArrayList 可快 10 倍以上（Cache Line 局部性差异），大多数基准测试中 ArrayList 全面占优。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：为什么教科书说 LinkedList 适合频繁增删？** → 前提是"已持有迭代器位置"时插入删除为 O(1)；若每次都要先按索引定位，O(n) 定位就是瓶颈。
 - **Q：作为栈使用选谁？** → 优先 `ArrayDeque`（见本文档「ArrayDeque 与 LinkedList 有什么区别？」），其次 LinkedList，不要用 Stack。
 
@@ -574,6 +605,7 @@ ArrayList 的连续内存访问能充分利用 CPU 的 Memory Bandwidth（现代
 CopyOnWriteArrayList 用"写时复制"（CoW）实现线程安全：读无锁（volatile 数组保证可见性），写时加 ReentrantLock、拷贝新数组、在新数组修改后替换引用。读完全不受写阻塞，适合**读多写少**的并发场景。
 
 #### ⚡记忆卡片
+
 - **口诀**：读无锁，写复制，volatile 保可见，读多写少才划算
 - **关键词**：CoW／volatile／ReentrantLock
 - **链路**：写请求 → 加锁 → Arrays.copyOf 复制 → 修改新数组 → 替换 array 引用（volatile 写）
@@ -595,26 +627,32 @@ CopyOnWriteArrayList 用"写时复制"（CoW）实现线程安全：读无锁（
 :::
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】迭代器创建时持有当前数组快照引用，遍历期间其他线程的修改对遍历不可见，因此迭代器**不会抛 ConcurrentModificationException**，且不支持 `remove()`（抛 `UnsupportedOperationException`）。
 - 【L3】写操作复制整个数组，写开销 O(n) + 双倍内存峰值；`volatile` 只保证引用替换的可见性，复合操作仍靠锁保证原子性。
 - 【L4】与 `Collections.synchronizedList` 对比：后者读写都加锁，读多写少场景吞吐低于 CoW；写多场景 CoW 频繁复制反而更慢。与 `ReadWriteLock` 方案对比：CoW 读零开销但牺牲一致性（快照读）。
-:::
+  :::
 
 #### 🏭 实战场景
+
 ::: details
 
 典型生产用法是配置/监听器缓存：服务 QPS 数万、配置推送每分钟仅 1~2 次的场景，读路径完全无锁（单次读仅一次 volatile 引用读取），P99 读延迟可稳定在微秒级；若改用 synchronizedList，每次读都要获取对象锁，高并发下锁竞争会使读延迟上升数倍。
 :::
 
 #### ⚠️ 常见误区
+
 ::: details
 常见误区：
+
 - ❌ "CopyOnWriteArrayList 是万能的并发 List" → 写频繁时每次写都复制整个数组且加锁，开销高于 synchronizedList；写多场景应考虑其他方案。
 - ❌ "读能拿到最新数据" → 迭代器读的是快照，不保证看到其他线程的最新写入（弱一致性），需实时一致性时要额外协调。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：什么场景不适合 CopyOnWriteArrayList？** → 写多读少（复制开销大）、对内存敏感（写时双份数组）、要求读到最新数据的强一致场景。
 - **Q：和 ConcurrentHashMap 的设计哲学差异？** → CHM 用 CAS + synchronized 细粒度锁做原地更新（强一致、读写均衡）；CoW 用整体复制换读无锁（快照读、读多写少）。
 
@@ -627,6 +665,7 @@ CopyOnWriteArrayList 用"写时复制"（CoW）实现线程安全：读无锁（
 RandomAccess 是无方法的**标记接口**，标识集合支持 O(1) 快速随机访问，供泛型算法选择遍历策略：实现它（如 ArrayList）用索引遍历，未实现（如 LinkedList）用迭代器遍历，避免 O(n²) 级别的性能陷阱。
 
 #### ⚡记忆卡片
+
 - **口诀**：标记接口无方法，随机访问看它判断
 - **关键词**：标记接口／instanceof／遍历策略
 - **链路**：泛型算法 → instanceof RandomAccess → 索引遍历 or 迭代器遍历
@@ -675,12 +714,15 @@ for (int i = 0; i < linkedList.size(); i++) { linkedList.get(i); }  // O(n²)，
 ```
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】JDK 的 `Collections.binarySearch`/`sort` 等算法内部就用 `instanceof RandomAccess` 分流：随机访问列表用索引二分，链表则用迭代器顺序扫描。
 - 【L4】标记接口是 JDK 的经典模式（同类还有 Serializable、Cloneable），用类型本身携带元信息；现代设计更倾向用注解替代，但 JDK 为兼容保留。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：为什么 CopyOnWriteArrayList 不实现 RandomAccess？** → 它底层确实是数组、get(i) 也是 O(1)，但 JDK 未标记，官方注释无明确解释；实践中若算法依赖该标记分流，对其会退化为迭代器遍历（结果仍然正确）。
 
 ### 【中等】Iterator 和 Iterable 有什么区别？⭐⭐
@@ -692,6 +734,7 @@ for (int i = 0; i < linkedList.size(); i++) { linkedList.get(i); }  // O(n²)，
 Iterable 表示"可被迭代"的容器，提供 `iterator()` 返回迭代器，是 foreach 的前提；Iterator 是迭代器本身，用 `hasNext()/next()` 遍历并记录当前位置。每次调用 Iterable 的 `iterator()` 都应返回新的独立迭代器。
 
 #### ⚡记忆卡片
+
 - **口诀**：Iterable 能遍历，Iterator 在遍历
 - **关键词**：foreach／iterator()／hasNext-next
 - **链路**：foreach → Iterable.iterator() → Iterator.hasNext()/next()
@@ -760,12 +803,15 @@ public class MyCollection<T> implements Iterable<T> {
 ```
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】Java 8 起 Iterable 增加 `forEach()`、`spliterator()` 默认方法；Spliterator（可分割迭代器）是 parallelStream 并行遍历的底层支撑。
 - 【L4】设计视角：Iterable 是"迭代器工厂"——每次 `iterator()` 返回新迭代器，多个遍历互不干扰；若让集合直接实现 Iterator，只能维护一个游标，无法并发多路遍历。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：只实现 Iterator 能用 foreach 吗？** → 不能，foreach 只接受数组或 Iterable 实现类；Iterator 需手动 while 循环消费。
 - **Q：Spliterator 和 Iterator 的区别？** → Spliterator 支持 `trySplit()` 分割成多段并行遍历，并携带大小估计与特征值（SIZED/ORDERED 等），服务于并行流。
 
@@ -778,6 +824,7 @@ public class MyCollection<T> implements Iterable<T> {
 fail-fast 用 modCount/expectedModCount 比对，遍历中检测到结构性修改立即抛 ConcurrentModificationException（java.util 系）；fail-safe 基于副本/快照遍历，不抛异常但弱一致（java.util.concurrent 系）。fail-fast 只是检测手段，不能当同步机制。
 
 #### ⚡记忆卡片
+
 - **口诀**：fast 比对 modCount 抛异常，safe 遍历副本看快照
 - **关键词**：modCount／快照／弱一致
 - **链路**：结构性修改 → modCount ≠ expectedModCount → 抛 CME；写时复制 → 迭代器持快照 → 不抛异常
@@ -834,21 +881,30 @@ while (it.hasNext()) {
    - **迭代器 remove**：`fail-fast` 集合的迭代器 `remove()` 会同步更新 `expectedModCount`，安全。
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】`ConcurrentLinkedQueue`、`ConcurrentHashMap` 的迭代器并不基于副本，而是"弱一致性"（weakly consistent）：遍历期间可感知部分修改且不抛 CME，与 CopyOnWriteArrayList 的真快照略有区别。
 - 【L4】fail-safe 的内存代价量化：CopyOnWriteArrayList 每次写复制整个数组，写多场景内存峰值可达 2 倍、写吞吐显著下降；而弱一致性容器无复制开销。
-:::
+  :::
 
 #### ⚠️ 常见误区
+
 ::: details
 常见误区：
+
 - ❌ "fail-fast 能检测所有并发修改" → 它只比对 modCount，检查点之间发生的修改可能漏检，不能替代同步。
 - ❌ "fail-safe 迭代器能看到最新数据" → 快照类迭代器（如 CopyOnWriteArrayList）遍历的是创建时的副本，期间的修改不可见。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：增强 for 循环中删除元素会触发 fail-fast 吗？** → 会。增强 for 底层是迭代器，直接调集合 remove 会使 modCount 不一致而抛 CME（见本文档「什么是 ConcurrentModificationException？」）。
 - **Q：java.util.concurrent 下哪些容器是 fail-safe？** → CopyOnWriteArrayList/CopyOnWriteArraySet（快照型）；ConcurrentHashMap、ConcurrentLinkedQueue 属弱一致性迭代器，同样不抛 CME。
+
+### 【中等】Vector 和 Stack 为什么被弃用？⭐⭐
+
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：List / Vector
 
 ## Set
 
@@ -861,6 +917,7 @@ while (it.hasNext()) {
 三者都保证元素唯一：HashSet 基于 HashMap、无序、O(1)；LinkedHashSet 额外维护双向链表保持插入顺序；TreeSet 基于红黑树、自动排序、O(log n)。选型：只要唯一选 HashSet，要插入顺序选 LinkedHashSet，要排序/范围查询选 TreeSet。
 
 #### ⚡记忆卡片
+
 - **口诀**：Hash 快无序，Linked 保插入，Tree 自排序
 - **关键词**：HashMap 打底／双向链表／红黑树
 - **链路**：唯一性判断（equals/hashCode 或 compare）→ 底层结构决定顺序 → 复杂度 O(1) vs O(log n)
@@ -905,10 +962,12 @@ Set<String> customTreeSet = new TreeSet<>(Comparator.reverseOrder());
 ::: details 特殊注意事项
 
 - **相等性判断**：
+
   - 三者都使用`equals()`方法判断元素是否相同
   - TreeSet 同时会使用`compareTo()`或`compare()`方法（必须与 equals 逻辑一致）
 
 - **TreeSet 排序规则**：
+
   - 元素必须实现`Comparable`接口，或在构造时提供`Comparator`
   - 否则会抛出`ClassCastException`
 
@@ -922,20 +981,25 @@ Set<String> customTreeSet = new TreeSet<>(Comparator.reverseOrder());
 :::
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】HashSet 判重依赖 `hashCode()` + `equals()`：重写 equals 必须同步重写 hashCode，否则同一逻辑对象会被视为不同元素。
 - 【L3】LinkedHashSet 继承 HashSet，构造时调用 HashSet 的受保护构造器创建 LinkedHashMap，靠节点的 before/after 指针维护插入顺序，因此迭代性能优于 HashSet（无需扫描哈希桶）。
 - 【L4】TreeSet 支持 `subSet`/`headSet`/`tailSet` 范围视图（ backed by 同一棵红黑树），这是 HashSet 系不具备的能力；SortedSet 的 first()/last() 在 JDK 21 后归入 SequencedSet 体系。
-:::
+  :::
 
 #### ⚠️ 常见误区
+
 ::: details
 常见误区：
+
 - ❌ "HashSet 的遍历顺序是随机的" → 严格说不是随机，而是由元素哈希值与桶容量决定；容量/扩容变化时顺序可能改变，代码不应依赖该顺序。
 - ❌ "TreeSet 用 equals 判重" → TreeSet 用 compareTo/compare 判断相等，比较逻辑与 equals 不一致时会偏离 Set 契约（JDK 文档明确提示）。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：TreeSet 能做范围查询吗？** → 可以，`subSet(from, to)` 等返回原树的范围视图，配合 NavigableSet 还能取 `ceiling()`/`floor()`。
 - **Q：HashSet 的迭代顺序稳定吗？** → 同一 JVM 同一容量下稳定，但扩容（rehash）后可能变化，不应依赖；需稳定顺序用 LinkedHashSet。
 
@@ -950,6 +1014,7 @@ Set<String> customTreeSet = new TreeSet<>(Comparator.reverseOrder());
 Queue 是单端 FIFO 队列（队尾入队、队首出队）；Deque 继承 Queue，两端都可进出，既能当队列也能当栈（push/pop）。标准 FIFO 用 Queue 语义，两端操作或栈功能用 Deque。
 
 #### ⚡记忆卡片
+
 - **口诀**：Queue 一头进出，Deque 两头通吃
 - **关键词**：FIFO／双端／push-pop
 - **链路**：Queue（offer/poll）→ Deque 继承扩展 → First/Last 双端 API → 可作栈
@@ -1030,9 +1095,10 @@ deque.pop();          // = removeFirst()
   Queue<String> safeQueue = new ConcurrentLinkedQueue<>();
   Deque<String> safeDeque = new ConcurrentLinkedDeque<>();
   ```
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：为什么 offer/poll 比 add/remove 更推荐？** → add/remove/element 在容量受限或队列为空时抛异常，offer/poll/peek 返回 false/null，更适合容错处理；BlockingQueue 体系在此基础上再加阻塞语义。
 - **Q：BlockingQueue 属于 Queue 吗？** → 是，BlockingQueue 继承 Queue，ArrayBlockingQueue/LinkedBlockingQueue 都可当普通 Queue 使用。
 
@@ -1045,6 +1111,7 @@ deque.pop();          // = removeFirst()
 ArrayDeque 基于循环数组，内存紧凑、头尾操作常数更小，队列/栈场景性能更优，是首选；LinkedList 基于双向链表，额外实现了 List，支持中间操作和索引访问。纯双端队列场景一律选 ArrayDeque。
 
 #### ⚡记忆卡片
+
 - **口诀**：栈和队列 ArrayDeque，中间操作才 LinkedList
 - **关键词**：循环数组／双向链表／Deque
 - **链路**：双端需求 → ArrayDeque（数组、无节点开销）；需要 List 能力 → LinkedList
@@ -1070,6 +1137,7 @@ ArrayDeque 基于循环数组，内存紧凑、头尾操作常数更小，队列
 | **适用场景**      | 高频双端操作（如栈、队列）              | 需要中间操作或混合 `List/Deque` 需求的场景     |
 
 #### 🔀 发散问题
+
 - **Q：ArrayDeque 的循环数组如何工作？** → 用 head/tail 两个指针在数组上环形移动，头尾相接避免移动元素；容量满时翻倍扩容并整体搬迁（摊还仍是 O(1)）。不支持中间随机插入。
 - **Q：LinkedList 既然实现了 List，get(i) 是 O(1) 吗？** → 不是，仍需从最近端遍历到 index，随机访问仍是 O(n)，索引遍历会退化成 O(n²)。
 
@@ -1082,6 +1150,7 @@ ArrayDeque 基于循环数组，内存紧凑、头尾操作常数更小，队列
 PriorityQueue 是基于二叉堆（默认小顶堆）的无界优先级队列：入队/出队 O(log n)、peek O(1)，poll 总返回优先级最高的元素。常用于 Top K、Dijkstra、任务调度；非线程安全，多线程用 PriorityBlockingQueue。
 
 #### ⚡记忆卡片
+
 - **口诀**：堆上排队，小的先出；要大的，Comparator 反转
 - **关键词**：小顶堆／O(log n)／Top K
 - **链路**：offer → siftUp 上浮；poll → 取堆顶 + siftDown 下沉
@@ -1103,9 +1172,9 @@ PriorityQueue 是基于二叉堆（默认小顶堆）的无界优先级队列：
 
 3. **排序规则**：默认自然排序（元素需实现 `Comparable`）；自定义排序通过 `Comparator` 指定（如大顶堆）：
 
-  ```java
-  PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
-  ```
+```java
+PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+```
 
 4. **使用场景**：任务调度（按优先级执行）、Top K 问题（维护前 K 个最大/最小值）、Dijkstra 算法（优先处理最短路径）。
 5. **注意事项**：
@@ -1114,6 +1183,7 @@ PriorityQueue 是基于二叉堆（默认小顶堆）的无界优先级队列：
    - **性能权衡**：插入/删除 O(log n)，但查找 O(n)。
 
 #### 🔀 发散问题
+
 - **Q：迭代 PriorityQueue 是按优先级顺序吗？** → 不是。迭代器按底层数组顺序输出，只有连续 poll 才保证优先级顺序。
 - **Q：Top K 问题为什么用堆？** → 维护大小为 K 的堆，时间复杂度 O(n log K)，优于全排序的 O(n log n)，适合海量数据流式处理。
 
@@ -1126,6 +1196,7 @@ PriorityQueue 是基于二叉堆（默认小顶堆）的无界优先级队列：
 BlockingQueue 是线程安全的阻塞队列：队列满时 put 阻塞、空时 take 阻塞，是生产者-消费者模型的标准组件。核心是 put()/take() 两个阻塞方法，按场景选实现类：固定容量 ArrayBlockingQueue、高吞吐 LinkedBlockingQueue、直接传递 SynchronousQueue。
 
 #### ⚡记忆卡片
+
 - **口诀**：满则阻塞 put，空则阻塞 take
 - **关键词**：生产者-消费者／put-take／容量控制
 - **链路**：生产者 put → 队满阻塞等待 → 消费者 take 唤醒；线程池任务队列即 BlockingQueue
@@ -1157,20 +1228,25 @@ BlockingQueue 是线程安全的阻塞队列：队列满时 put 阻塞、空时 
 **一句话总结**：多线程间安全传递数据的阻塞队列，核心方法是 `put()`（阻塞插入）和 `take()`（阻塞取出），按场景选实现类。
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】四组操作方法语义：抛异常（add/remove/element）、返回特殊值（offer/poll/peek）、无限阻塞（put/take）、超时（offer(e, time, unit)/poll(time, unit)）。
 - 【L3】源码要点：ArrayBlockingQueue 用单个 ReentrantLock + notEmpty/notFull 两个 Condition；LinkedBlockingQueue 用 putLock/takeLock 双锁 + AtomicInteger count 协调容量。
 - 【L4】版本演进：JDK 5 引入 BlockingQueue 及 Array/Linked/Priority/Synchronous 实现；JDK 6 增加 DelayQueue、LinkedBlockingDeque；JDK 7 增加 LinkedTransferQueue。
-:::
+  :::
 
 #### ⚠️ 常见误区
+
 ::: details
 常见误区：
+
 - ❌ "BlockingQueue 一切操作都阻塞" → 只有 put/take 阻塞，offer/poll 是非阻塞的，另有带超时的重载。
 - ❌ "无界队列更方便" → LinkedBlockingQueue 默认容量 Integer.MAX_VALUE，生产快消费慢时会积压任务导致 OOM，生产环境应显式指定容量并搭配拒绝策略。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：offer 超时版有什么用途？** → `offer(e, timeout, unit)` 在限时内尝试入队，失败返回 false，适合需要降级或监控背压的生产者。
 - **Q：SynchronousQueue 容量为 0 怎么用？** → put 必须等到有线程 take 才完成，用于直接交接任务，如 Executors.newCachedThreadPool 的工作队列。
 
@@ -1183,6 +1259,7 @@ BlockingQueue 是线程安全的阻塞队列：队列满时 put 阻塞、空时 
 两者都是线程安全的阻塞队列：ArrayBlockingQueue 数组实现、必须指定固定容量、单锁，内存紧凑、防 OOM；LinkedBlockingQueue 链表实现、putLock/takeLock 双锁分离，高并发吞吐更高，但默认容量 Integer.MAX_VALUE 需防无界积压。
 
 #### ⚡记忆卡片
+
 - **口诀**：Array 定容单锁稳，Linked 双锁吞吐高
 - **关键词**：单锁 vs 双锁／固定容量／OOM 风险
 - **链路**：结构（数组 vs 链表）→ 容量（必指定 vs 默认无界）→ 锁（单锁 vs 双锁）→ 选型（防 OOM vs 高吞吐）
@@ -1220,37 +1297,40 @@ BlockingQueue 是线程安全的阻塞队列：队列满时 put 阻塞、空时 
    - 选 **LinkedBlockingQueue**：✔️ **高并发**（生产者-消费者模型）；✔️ **队列大小不固定**（默认几乎无界，但可手动指定容量）；✔️ **需要更高的吞吐量**（双锁机制减少竞争）。
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】源码细节：ArrayBlockingQueue 用循环数组 + count 计数，靠 count == capacity / count == 0 判断满/空；LinkedBlockingQueue 使用哨兵节点 head，put 时若 count 为 0 会同时拿 putLock 与 head 锁，双锁下仍通过 AtomicInteger count 保证容量一致性。
 - 【L4】版本与替代：两者均为 JDK 5 引入；更高吞吐可评估 LinkedTransferQueue（JDK 7，CAS 无锁结构）；需要双端阻塞语义用 LinkedBlockingDeque（JDK 6）。
-:::
+  :::
 
 #### 🏭 实战场景
+
 ::: details
 
 订单异步处理线程池：生产者 8 线程、消费者 16 线程，任务队列用 ArrayBlockingQueue(2000) + 拒绝策略 CallerRunsPolicy，高峰期队列打满时生产者被自然反压，避免 OOM，P99 处理延迟稳定在 200ms 内；同类服务若误用默认无界的 LinkedBlockingQueue，高峰期曾出现 10 分钟积压 50 万任务、堆内存打满触发 Full GC 的故障。
 :::
 
 #### ⚠️ 常见误区
+
 ::: details
 常见误区：
+
 - ❌ "LinkedBlockingQueue 双锁所以更快，一律选它" → 无界默认容量有 OOM 风险，且低并发下双锁并无收益；内存敏感/需背压场景应选有界 ArrayBlockingQueue。
 - ❌ "ArrayBlockingQueue 可以扩容" → 数组容量构造时固定，队列满时 put 阻塞而非扩容，这正是它防 OOM 的原因。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：双锁为什么能提升吞吐？** → putLock 与 takeLock 分离后，入队与出队可并行执行，锁竞争从两方变一方，高并发下吞吐更高；代价是用 AtomicInteger count 在双锁间协调容量。
 - **Q：线程池任务队列一般选哪个？** → Executors.newFixedThreadPool 默认 LinkedBlockingQueue（无界，有 OOM 风险）；生产建议手动 new ThreadPoolExecutor + 有界 ArrayBlockingQueue。
-
-### 【中等】Vector 和 Stack 为什么被弃用？⭐⭐
-
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：List / Vector
 
 #### 💎 关键结论
 
 Vector 是 JDK 1.0 产物，所有方法 synchronized 锁粒度过粗、性能差；Stack 继承 Vector 违反组合优于继承，接口被污染。现代替代：List 用 ArrayList + 同步包装或 CopyOnWriteArrayList，栈用 ArrayDeque。
 
 #### ⚡记忆卡片
+
 - **口诀**：Vector 锁太粗，Stack 继承错，栈用 ArrayDeque
 - **关键词**：方法级 synchronized／继承 Vector／ArrayDeque
 - **链路**：JDK 1.0 Vector → 方法级锁性能差 → 集合框架出现更优替代 → 弃用
@@ -1298,21 +1378,27 @@ Deque<String> stack = new ConcurrentLinkedDeque<>();
 | 多线程 Map              | `ConcurrentHashMap`                               |
 | 单线程栈/队列           | `ArrayDeque`                                      |
 | 多线程队列              | `ConcurrentLinkedQueue` / `LinkedBlockingQueue`   |
+
 :::
 
 #### 🔬 扩展知识
+
 ::: details
+
 - 【L3】Vector 的 `synchronized` 修饰在方法级，锁对象是 Vector 实例本身；即使单线程调用也要承担 monitorenter/monitorexit 的开销，且复合操作（先检查再操作）仍需外部加锁，方法级同步并不能保证组合操作原子性。
 - 【L4】版本演进：JDK 1.0 Vector/Stack/Hashtable（非集合框架）→ JDK 1.2 集合框架引入 ArrayList/ArrayDeque 等 → 官方文档不再推荐但保持兼容（deprecated by convention 与移除不同，它们并未标记 @Deprecated，只是"不推荐"）。
-:::
+  :::
 
 #### ⚠️ 常见误区
+
 ::: details
 常见误区：
+
 - ❌ "Vector 线程安全所以比 ArrayList 好" → 方法级锁粒度粗，性能差且复合操作仍不安全；需要同步时应用 Collections.synchronizedList 或 CopyOnWriteArrayList，单线程直接用 ArrayList。
 - ❌ "Stack 是线程安全栈的最佳选择" → Stack 继承 Vector 接口被污染（暴露 get(i)、indexOf 等与栈语义无关的方法），推荐 ArrayDeque；并发栈可用 ConcurrentLinkedDeque。
-:::
+  :::
 
 #### 🔀 发散问题
+
 - **Q：Hashtable 为什么也被 ConcurrentHashMap 取代？** → 同样是方法级 synchronized，锁住整张表，读写互斥；ConcurrentHashMap 用分段锁（JDK 7）/CAS + synchronized（JDK 8+）细粒度并发。
 - **Q：ArrayDeque 比 Stack 快在哪？** → 无同步开销、无 Vector 继承带来的多余方法，且数组连续内存对缓存友好，官方文档明确推荐用它替代 Stack。

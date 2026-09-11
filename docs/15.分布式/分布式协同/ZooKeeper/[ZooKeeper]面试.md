@@ -181,7 +181,7 @@ ZooKeeper 可以处理两种类型的队列：
 #### 🔀 发散问题
 
 **Q：分布式锁的标准实现细节是什么？**
-A：标准方案是「临时顺序节点 + Watch 前一个节点」避免羊群效应，生产环境推荐用 Curator 的 InterProcessMutex。详见本文档『ZooKeeper 的典型应用场景有哪些？如何实现分布式锁？』。
+A：标准方案是「临时顺序节点 + Watch 前一个节点」避免羊群效应，生产环境推荐用 Curator 的 InterProcessMutex。详见《分布式协同面试》『ZooKeeper 分布式锁的工作原理是什么？』。
 
 **Q：为什么 ZooKeeper 不适合做海量消息推送？**
 A：Watcher 一次性触发 + 全内存存储决定了它不适合高吞吐推送通道，海量推送应选消息队列，ZooKeeper 更适合配置动态下发这类低频协调场景。
@@ -345,7 +345,7 @@ Observer 不参与投票、不影响 Quorum 计数，专门用于扩展读性能
 #### 🔀 发散问题
 
 **Q：写请求的完整流程是怎样的？**
-A：所有写请求最终交给 Leader，以 Proposal 广播并等待过半 ACK 后提交。详见本文档『ZooKeeper 写操作工作流程是怎样的？』。
+A：所有写请求最终交给 Leader，以 Proposal 广播并等待过半 ACK 后提交。详见本文档『ZooKeeper 的读写操作工作流程是怎样的？』。
 
 **Q：为什么集群推荐奇数节点？**
 A：相同容错能力下奇数节点写 ACK 更少、性能更优。详见本文档『ZooKeeper 集群为什么推荐奇数节点？』。
@@ -471,61 +471,34 @@ A：客户端本地缓存地址列表 + 注册中心故障降级、多机房部�
 
 ## ZooKeeper 工作流
 
-### 【中等】ZooKeeper 读操作工作流程是怎样的？⭐⭐
+### 【中等】ZooKeeper 的读写操作工作流程是怎样的？⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：ZooKeeper / 读写流程
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：ZooKeeper / 读写流程
 
 #### 💎 关键结论
 
-Leader/Follower/Observer 都可直接处理读请求，从本地内存读取数据返回即可，服务器之间无需任何交互。因此 Follower/Observer 越多，读吞吐量越大。
+读请求 Leader/Follower/Observer 都能直接处理，从本地内存读取返回，服务器之间无需交互，因此从节点越多读吞吐越大；写请求全部转发给 Leader，以事务 Proposal 广播给 Follower，收到过半数 ACK 即提交。一读一写体现了 ZooKeeper "读可水平扩展、写强一致"的设计取向。
 
 #### ⚡记忆卡片
 
-- **口诀**：谁接谁读，本地内存直出
-- **关键词**：本地读 ／ 无交互 ／ 读水平扩展
-- **链路**：客户端连接任意服务器 → 服务器从本地内存读数据 → 直接返回结果
+- **口诀**：读谁接谁本地直出，写必走 Leader 过半提交
+- **关键词**：本地读 ／ 无交互 ／ 读水平扩展 ／ Leader ／ Proposal ／ ACK ／ 过半 ／ Commit
+- **链路**：读——客户端连任意服务器 → 本地内存读数据 → 直接返回；写——写请求 → Leader 生成 Proposal → 广播 Follower → 过半 ACK → 广播 Commit → 响应客户端
 
 #### 📖 核心知识
+
+**读操作**
 
 1. **任意节点可读**：**Leader/Follower/Observer 都可直接处理读请求，从本地内存中读取数据并返回给客户端即可**。
 2. **读水平扩展**：由于处理读请求不需要服务器之间的交互，**Follower/Observer 越多，整体系统的读请求吞吐量越大**，也即读性能越好。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/8bbe50fab903486cb206ea1f5431327e.png)
 
-#### 🔬 扩展知识
-
-【L3】本地读可能滞后
-
-::: details
-
-Follower/Observer 的本地数据可能略落后于 Leader，读到的是"本地视图"而非"全局最新"。对强新鲜度敏感的场景应先执行 `sync` 或直接读 Leader，详见本文档『ZooKeeper 提供了怎样的一致性保证？』。
-
-:::
-
-#### 🔀 发散问题
-
-**Q：写请求也能在任意节点处理吗？**
-A：不能。所有写请求最终都要转发给 Leader 统一处理，这是与读流程的本质区别。详见本文档『ZooKeeper 写操作工作流程是怎样的？』。
-
-### 【中等】ZooKeeper 写操作工作流程是怎样的？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：ZooKeeper / 读写流程
-
-#### 💎 关键结论
-
-所有写请求都由 Leader 处理：Leader 将写请求以事务 Proposal 广播给所有 Follower，收到过半数 ACK 即认为写成功；写到 Follower/Observer 的请求会先转发给 Leader。
-
-#### ⚡记忆卡片
-
-- **口诀**：写必走 Leader，过半即提交
-- **关键词**：Leader ／ Proposal ／ ACK ／ 过半 ／ Commit
-- **链路**：写请求 → Leader 生成 Proposal → 广播 Follower → 过半 ACK → 广播 Commit → 响应客户端
-
-#### 📖 核心知识
+**写操作**
 
 所有的写请求实际上都要交给 Leader 处理。Leader 将写请求以事务形式发给所有 Follower 并等待 ACK，一旦收到半数以上 Follower 的 ACK，即认为写操作成功。
 
-**写 Leader**
+_写 Leader_
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/d99ccb9cabe9486eb1dc03a1e9c37640.png)
 
@@ -543,7 +516,7 @@ A：不能。所有写请求最终都要转发给 Leader 统一处理，这是�
 > - Leader 不需要得到所有 Follower 的 ACK，只要收到过半的 ACK 即可，同时 Leader 本身对自己有一个 ACK。上图中有 4 个 Follower，只需其中两个返回 ACK 即可，因为 $(2+1) / (4+1) > 1/2$ 。
 > - Observer 虽然无投票权，但仍须同步 Leader 的数据从而在处理读请求时可以返回尽可能新的数据。
 
-**写 Follower/Observer**
+_写 Follower/Observer_
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2024/12/338cdfef25dc43e192fbd8a5bb2eb10a.png)
 
@@ -551,6 +524,14 @@ A：不能。所有写请求最终都要转发给 Leader 统一处理，这是�
 - 除了多了一步请求转发，其它流程与直接写 Leader 无任何区别。
 
 #### 🔬 扩展知识
+
+【L3】本地读可能滞后
+
+::: details
+
+Follower/Observer 的本地数据可能略落后于 Leader，读到的是"本地视图"而非"全局最新"。对强新鲜度敏感的场景应先执行 `sync` 或直接读 Leader，详见本文档『ZooKeeper 提供了怎样的一致性保证？』。
+
+:::
 
 【L3】与两阶段提交（2PC）的差异
 
@@ -833,7 +814,7 @@ A：断开期间的事件全部丢失，重连后原生 Watcher 也不会自动�
 
 ## Zab 协议
 
-### 【中等】ZAB 的工作原理是什么？⭐⭐
+### 【中等】ZAB 的工作原理是什么？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：ZooKeeper / ZAB 协议
 
@@ -1086,7 +1067,7 @@ Leader 按 zxid 严格顺序生成并按序提交 Proposal，Follower 也严格�
 #### 🔀 发散问题
 
 **Q：原子广播和写操作工作流程是同一件事吗？**
-A：是同一流程的不同视角：写操作工作流描述请求路径（五步），原子广播描述协议语义（Proposal/ACK/Commit）。详见本文档『ZooKeeper 写操作工作流程是怎样的？』。
+A：是同一流程的不同视角：写操作工作流描述请求路径（五步），原子广播描述协议语义（Proposal/ACK/Commit）。详见本文档『ZooKeeper 的读写操作工作流程是怎样的？』。
 
 ## ZooKeeper 一致性
 
@@ -1158,7 +1139,7 @@ etcd 基于 Raft，默认读请求由 Leader 处理，是线性一致的；ZooKe
 A：CP 系统，网络分区时少数派停摆、选举期间不可用，牺牲可用性保一致性。详见本文档『ZooKeeper 是 CP 还是 AP？』。
 
 **Q：Follower 读为什么会滞后？**
-A：写请求由 Leader 异步广播给 Follower，提交只需过半 ACK，未 ACK 的 Follower 本地数据自然短暂落后。详见本文档『ZooKeeper 写操作工作流程是怎样的？』。
+A：写请求由 Leader 异步广播给 Follower，提交只需过半 ACK，未 ACK 的 Follower 本地数据自然短暂落后。详见本文档『ZooKeeper 的读写操作工作流程是怎样的？』。
 
 ### 【中等】ZooKeeper 是 CP 还是 AP？⭐⭐⭐
 
@@ -1635,84 +1616,6 @@ N 个节点可容忍 ⌊(N-1)/2⌋ 个故障：3→1、5→2、7→3、9→4。�
 
 **Q：过半机制还防住了什么问题？**
 A：防住了脑裂：两个分区不可能同时过半，不会出现双 Leader。详见本文档『ZooKeeper 如何应对脑裂问题？』。
-
-### 【中等】ZooKeeper 的典型应用场景有哪些？如何实现分布式锁？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：ZooKeeper / 分布式锁
-
-#### 💎 关键结论
-
-ZooKeeper 分布式锁的标准姿势是「临时顺序节点 + Watch 前一个节点」：序号最小者持锁，只监听前驱而非父目录以避免羊群效应，会话过期自动删节点防死锁。
-
-#### ⚡记忆卡片
-
-- **口诀**：顺序排队，前驱唤醒
-- **关键词**：临时顺序节点 ／ 最小者得锁 ／ Watch 前驱 ／ 羊群效应 ／ Curator
-- **链路**：创建临时顺序节点 → 判断是否最小 → 是则得锁／否则 Watch 前驱 → 前驱删除被唤醒 → 得锁 → 删己节点释放
-
-#### 📖 核心知识
-
-ZooKeeper 的典型应用场景（发布订阅、命名服务、配置管理、分布式锁、集群管理、Master 选举、队列管理）在[简介部分](#zookeeper-简介)已有介绍，这里重点说明分布式锁的实现方案。
-
-1. **排他锁（Exclusive Lock）的标准实现**：使用“临时顺序节点 + Watch 前一个节点”实现，避免羊群效应（Herd Effect）：
-   1. 客户端在 `/lock` 节点下创建临时顺序节点 `/lock/seq-00000001`。
-   2. 客户端获取 `/lock` 下所有子节点，判断自己是否是序号最小的节点：**是**则获取锁，执行业务逻辑；**否**则监听**比自己序号小 1 的前一个节点**（而非监听所有节点），等待前一个节点删除事件。
-   3. 前一个节点释放锁（删除自己），客户端收到 Watch 通知，再次检查自己是否是最小节点，如果是则获取锁。
-   4. 客户端执行完业务后，删除自己的节点释放锁。
-   5. 如果客户端 Session 过期，临时节点自动删除，锁自动释放，避免死锁。
-
-```
-/lock
-  ├── seq-00000001  ← 获得锁（最小节点）
-  ├── seq-00000002  ← Watch seq-00000001
-  └── seq-00000003  ← Watch seq-00000002
-```
-
-2. **为什么监听前一个节点而不是所有节点？** 如果所有客户端都监听 `/lock` 的子节点变化，当锁释放时，**所有等待的客户端都会被唤醒并竞争**，这就是“羊群效应”（Herd Effect），会对 ZooKeeper 造成巨大压力，且只有一个客户端能成功，其余再次阻塞。监听前一个节点，形成**链式唤醒**，每次只有一个客户端被唤醒，效率更高。
-3. **共享锁（读写锁）的实现**：
-   - **读锁**：创建临时顺序节点 `/lock/read-`，检查是否**没有序号更小的 write 节点**，是则获取读锁。
-   - **写锁**：创建临时顺序节点 `/lock/write-`，检查是否是**最小节点**，是则获取写锁。
-   - **释放**：删除自己的节点。
-4. **Curator InterProcessMutex**：生产环境推荐使用 Curator 封装好的分布式锁：
-
-```java
-InterProcessMutex lock = new InterProcessMutex(client, "/lock");
-try {
-    if (lock.acquire(5, TimeUnit.SECONDS)) {
-        // 获取锁成功，执行业务逻辑
-    }
-} finally {
-    lock.release();
-}
-```
-
-Curator 的 `InterProcessMutex` 是可重入锁，内部实现了上述标准算法，并处理了 Session 重连等边界情况。
-
-#### 🔬 扩展知识
-
-【L3】与 Redis 分布式锁的对比
-
-::: details
-
-ZK 锁靠临时节点自动释放 + 顺序保证公平，可靠性高、无“锁过期但业务未完”的典型难题，但吞吐与延迟逊于 Redis；Redis 锁性能高，但需额外处理锁续期（watchdog）与主从切换丢锁问题。低频强协调选 ZK，高频临界区选 Redis。
-
-:::
-
-【L4】公平性与可重入
-
-::: details
-
-顺序节点天然形成公平排队，不会饿死等待者；Curator InterProcessMutex 在此基础上支持同线程可重入，并处理了重连、会话失效等边界情况，手写实现很容易遗漏这些细节。
-
-:::
-
-#### 🔀 发散问题
-
-**Q：锁持有者宕机了怎么办？**
-A：其会话超时后临时节点自动删除，下一个等待者被链式唤醒，天然避免死锁；但要注意业务幂等，防止锁被提前释放引发并发问题。
-
-**Q：为什么不用 getChildren 监听父目录？**
-A：会引发羊群效应，每次释放锁唤醒全部等待者，对服务端造成 O(N) 压力，链式 Watch 前驱每次只唤醒一个。
 
 ## 参考资料
 

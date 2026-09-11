@@ -43,10 +43,11 @@ permalink: /pages/e04a6099/
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】访问控制以“类 + 包”为粒度，不精确到模块；JDK 9 模块系统（JPMS）在此之上增加了模块级封装，`public` 类未被模块 `exports` 时对外部模块仍不可见。
 - 【L3】`private` 成员可被反射配合 `setAccessible(true)` 访问（受 JDK 9+ 模块系统限制），说明访问控制是编译期契约而非运行时绝对屏障。
 - 【L4】对比 Kotlin：无 `protected` 包语义，默认可见性为 `public`，更依赖显式声明。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -78,10 +79,11 @@ permalink: /pages/e04a6099/
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】对象实体在堆中包含对象头（Mark Word、类型指针）、实例数据与对齐填充；引用在 64 位 JVM 开启指针压缩（`-XX:+UseCompressedOops`，默认开启）时占 4 字节。
 - 【L3】方法参数与赋值传递的均为引用副本（Java is pass-by-value of references），修改引用指向不影响调用方，但通过引用修改对象状态会影响调用方。
 - 【L4】C++ 中对象可值语义（栈上直接构造），拷贝默认按值复制；Java 除基本类型外一律引用语义。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -195,6 +197,7 @@ class MyList<E> extends AbstractList<E> {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 17 的 `sealed class`/`sealed interface`（permits 限定实现者）配合 JDK 21 的 Pattern Matching for switch，可实现代数数据类型（ADT），编译器可检查 switch 穷举性，取代 JDK 17 前的 Visitor 模式：
 
 ```java
@@ -233,19 +236,21 @@ trait Logger {
 #### 🏭 实战场景
 
 ::: details
+
 - JDK 8 正是借助 `default` 方法给 `Collection` 增加 `stream()`/`parallelStream()`/`removeIf()`，让 Guava、Apache Commons 等海量第三方集合实现无需重新编译即可平滑升级；若当年用抽象方法演进，整个生态会因 `AbstractMethodError` 崩溃。
 - 典型微服务工程中，业务模块普遍采用“接口（SPI 契约）+ Abstract 骨架类 + 具体实现”三层结构（如 Spring 的 `List`/`AbstractList` 同款套路），一次接口新增方法可借助 default 做到零停机发布。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ “接口只能有抽象方法” → JDK 8+ 支持 default/static 方法，JDK 9+ 支持 private 方法。
 - ❌ “抽象类必须有抽象方法” → 可以所有方法都是具体的（如工具类模板）。
 - ❌ “接口 = 纯抽象类” → JDK 8 以前相近，之后接口能力大幅增强，两者定位分化。
 - ❌ “default 方法破坏单继承” → default 只影响行为继承，不影响状态继承（无成员变量），Java 仍是单继承。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -294,17 +299,18 @@ trait Logger {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】非静态内部类能访问外部私有成员的原理：编译器为外部类生成访问器方法（如 `access$000`），内部类通过这些合成方法间接访问；JDK 11+ 引入 Nestmates（嵌套伙伴）机制，`NestHost`/`NestMembers` 属性让 JVM 原生支持嵌套类间私有访问，不再生成访问器。
 - 【L3】非静态内部类字节码中隐含一个指向外部实例的字段（`this$0`），这是它不能有静态成员、且可能引发内存泄漏的根本原因。
 - 【L4】Kotlin 的 `inner class` 对应 Java 非静态内部类，默认嵌套类则对应 Java 静态嵌套类，语义默认相反。
-:::
+  :::
 
 #### 🔀 发散问题
 
 - **Q：静态嵌套类为什么不叫“静态内部类”？** → 严格来说它与外部实例无关，官方文档称 Static Nested Class，只有非 static 的才叫 Inner Class；见本文档「四种内部类有什么区别？」。
 - **Q：Lambda 能完全替代匿名内部类吗？** → 仅函数式接口场景可以；需要继承类、多方法实现或访问 this 指向自身实例时仍须用匿名内部类。
 
-### 【中等】四种内部类有什么区别？⭐
+### 【中等】四种内部类有什么区别？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：面向对象 / 内部类
 
@@ -336,10 +342,11 @@ trait Logger {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】匿名内部类编译后生成 `Outer$1.class`、`Outer$2.class` 等编号类名；捕获的 effectively final 局部变量会被复制为构造器参数存入匿名类字段。
 - 【L3】静态嵌套类不生成 `this$0` 字段，与外部类仅是命名空间关系，可被序列化、可定义静态成员（JDK 16 前成员/局部/匿名内部类不能定义 static 成员，JDK 16+ 放开）。
 - 【L4】对比 Kotlin：嵌套类默认不持外部引用（等价 Java 静态嵌套类），需显式 `inner` 关键字才持有，从语言层面降低了泄漏风险。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -370,9 +377,10 @@ Java 类不支持多重继承，核心是为了避免菱形继承问题（Diamon
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】C++ 用虚继承（virtual inheritance）解决菱形问题，但引入虚基类指针与构造顺序复杂性；Python 用 C3 线性化算法确定多继承的 MRO（方法解析顺序）。
 - 【L4】Java 接口 default 冲突规则（类优先、子接口优先、否则强制显式覆盖）相比 C++/Python 的隐式决议，把歧义暴露到编译期，是更安全的设计取舍。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -468,10 +476,11 @@ class Address implements Cloneable {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】序列化式深拷贝要求引用图中所有对象实现 `Serializable`，`transient` 字段不会被复制；JSON 往返式深拷贝（如 Gson/Jackson 序列化再反序列化）无需 Serializable，但默认不支持循环引用，需自行处理或用带循环检测的库。
 - 【L3】手动递归克隆要求每个引用类型都实现 `Cloneable` 并正确重写 `clone()`，链路长、易遗漏，这也是《Effective Java》建议改用拷贝构造器的原因。
 - 【L4】对比 C++：拷贝构造/赋值运算符由开发者显式定义值语义；Java 的 `clone()` 依赖 `Cloneable` 标记接口改变父类方法行为，被公认为设计缺陷。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -544,10 +553,11 @@ class Address implements Cloneable {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】LSP 的严格表述是“子类型必须能替换其基类型而不破坏程序正确性”，实践中表现为：子类不应加强前置条件、不应削弱后置条件（契约式设计）；违反 LSP 的典型例子是 `Square extends Rectangle`。
 - 【L3】DIP 的落地手段是依赖注入（DI），Spring 的 IoC 容器就是 DIP 的工程化实现。
 - 【L4】SOLID 也有适用边界：过度拆分会导致类爆炸，简单 CRUD 脚本不必教条式套用；原则服务于可读性与变更成本，不是目的本身。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -590,8 +600,8 @@ list.add("A");      // ✔️ 合法，修改的是对象内容
 list = new ArrayList<>();  // ❌ 编译错误，引用不可重新赋值
 ```
 
-   - **局部变量**：使用前必须赋值（可在声明后赋值一次）。
-   - **方法参数**：`final` 参数在方法内不可重新赋值（常用于匿名内部类捕获变量）。
+- **局部变量**：使用前必须赋值（可在声明后赋值一次）。
+- **方法参数**：`final` 参数在方法内不可重新赋值（常用于匿名内部类捕获变量）。
 
 3. **final 与 JVM 优化**：
 
@@ -603,10 +613,11 @@ list = new ArrayList<>();  // ❌ 编译错误，引用不可重新赋值
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JMM 的 final 语义是 `String`/包装类等不可变对象能安全共享的前提：构造完成后 final 字段对其他线程立即可见，无需同步。
 - 【L3】`final` 方法的内联优势在现代 JIT（基于类型画像的投机内联）下已不明显，声明 final 的主要价值是设计约束而非性能。
 - 【L4】不可变对象推荐组合拳：类 final + 字段 final + 不提供 setter + 防御性拷贝，JDK 14+ 的 `record` 天然满足前三条。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -668,10 +679,11 @@ public class Dog extends Animal {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】字节码层面，实例方法的 `this` 存放在局部变量表的第 0 号槽位；`this()/super()` 构造器调用编译为 `invokespecial`，与普通虚方法调用的 `invokevirtual` 不同（构造器不参与动态分派）。
 - 【L3】构造器中 `this` 逸出（如 `this` 传入线程/注册监听器）会发布未构造完成的对象，是并发安全隐患。
 - 【L4】Kotlin 中用 `this` 与 `super` 同样语义，但主构造器参数直接声明字段，减少了 `this.name = name` 样板代码。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -747,9 +759,10 @@ new Child().hello();  // 输出 "Parent"（类方法优先于接口默认方法�
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】“类优先”是为了兼容 JDK 8 之前的代码：当年给 `Collection` 加 `removeIf()` default 方法时，`ArrayList` 等已有同名实现的类会自动沿用自身实现，避免行为突变。
 - 【L3】显式调用语法是 `接口名.super.method()`（不能用 `this.super` 或单独的 `super`）；若冲突接口之间存在继承关系，则按子接口优先自动决议，无需覆盖。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -790,9 +803,9 @@ Animal a = new Dog();
 a.sound();  // 实际调用 Dog.sound()
 ```
 
-   - **类加载时**：JVM 为每个类生成**虚方法表（vtable）**，存储该类所有虚方法的直接引用。
-   - **方法调用时**：通过对象的**运行时类型**查找其 vtable，定位实际方法。
-   - **非虚方法**：`static`、`final`、`private` 方法不进入 vtable（静态绑定）。
+- **类加载时**：JVM 为每个类生成**虚方法表（vtable）**，存储该类所有虚方法的直接引用。
+- **方法调用时**：通过对象的**运行时类型**查找其 vtable，定位实际方法。
+- **非虚方法**：`static`、`final`、`private` 方法不进入 vtable（静态绑定）。
 
 4. **字节码层面**：
 
@@ -832,19 +845,21 @@ new Sub();  // 输出 "Sub.init"（父类构造器中调用了子类的 init）
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】接口方法调用使用 `invokeinterface` 指令，通过接口方法表（itable）查找实现，比 vtable 多一层间接开销；JIT 会用内联缓存（Inline Cache）加速热点虚调用，类型不稳定时会去优化（deoptimize）回解释执行。
 - 【L3】JIT 能识别“单态/双态调用点”做去虚化（devirtualization）：若运行时发现调用点几乎只有一种类型，会把虚调用直接内联成具体方法，性能接近静态调用。
 - 【L4】对比 C++ 的虚函数表（vptr 指向 vtable）与 Java vtable：Java 的表随类元数据存放在方法区/元空间，对象头里存的是类型指针而非函数表指针。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ “字段也支持多态” → 字段访问是静态绑定，看编译时声明类型；多态仅限实例方法。
 - ❌ “重载也是运行时多态” → 重载在编译期根据实参类型选定方法签名，属于静态绑定。
 - ❌ “向上转型后能调用子类新增方法” → 编译时类型决定可见方法集，需向下转型（并做 instanceof 检查）才能调用。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -890,10 +905,11 @@ Object 类是一个特殊的类，是所有类的父类。它主要提供了以�
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】`wait/notify` 基于对象监视器（monitor）实现，必须在持有该对象锁的同步块内调用，否则抛 `IllegalMonitorStateException`；`wait` 会释放锁而 `sleep` 不会，这是二者最常考的区别。
 - 【L3】JDK 5+ 推荐用 `java.util.concurrent` 的 `Lock` + `Condition`（`await/signal`）替代 `wait/notify`，可多等待队列、支持中断与超时。
 - 【L4】对比 C# 的 `System.Object`：同样提供 `Equals/GetHashCode/ToString/GetType`，但无线程协作方法（用 `Monitor.Wait/Pulse`）；Kotlin 的 `Any` 直接复用 Java Object 这些方法。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -949,11 +965,13 @@ System.out.println(s1 == s3); // false ← new 在堆上创建了新对象
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**JDK 16+ Value-Based 警告**：JDK 16 将 `Integer`、`Long` 等包装类标记为 **value-based**，并明确警告：
 
 > "Use of identity-sensitive operations (such as `==`) on value-based classes may have unpredictable effects."
 
 这意味着对包装类使用 `==` 不仅是不推荐的，在未来的 Valhalla 项目中（引入值类型后），`Integer` 可能会变成无引用地址的值类型，届时 `==` 的行为将彻底变化。所以现在养成习惯非常重要。
+
 - 【L4】**跨语言视角：identity vs equality 的设计哲学**：
 
 | 语言           | 身份比较               | 内容比较                   | 核心差异                                                           |
@@ -970,18 +988,20 @@ System.out.println(s1 == s3); // false ← new 在堆上创建了新对象
 #### 🏭 实战场景
 
 ::: details
+
 - 高频故障模式：用 `Long` 包装类型存订单 ID，测试阶段用 `==` 比较，ID ≤ 127 时全绿；上线后订单号超出 IntegerCache 范围，`==` 恒为 false，订单查重失效产生重复单据，回滚并全量改 `equals()` 后恢复。
 - 工程规范：阿里巴巴《Java 开发手册》明确规定“所有包装类对象之间值的比较，全部使用 equals 方法”，并用 P3C 插件在 CI 中静态扫描 `==` 比较包装类型的代码。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ “`==` 也能比较字符串内容” → 它比较的是引用地址，`"a"=="a"` 为 true 只是常量池复用的假象，`new String("a")=="a"` 为 false。
 - ❌ “Integer 在 127 内 `==` 为 true，说明可以安全比较” → 一旦数值超出 [-128, 127] 缓存范围即为 false，行为随取值变化，绝不能依赖。
 - ❌ “重写 equals 后 `==` 行为也会变” → `==` 是运算符不可重载，两者完全独立。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1072,6 +1092,7 @@ System.out.println(map.get(k2));    // null  ← HashMap 找不到！
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】**Hash Flooding 攻击——为什么 HashMap 需要红黑树**：2011 年，安全研究人员发表了一篇著名论文，展示了对 Java Web 服务器发起 **Hash Flooding（哈希洪水）DDoS 攻击**的原理：
 
 1. 构造一批精心挑选的字符串，使它们的 `hashCode()` 全部碰撞到同一个桶
@@ -1103,23 +1124,25 @@ class Person:
 - **Rust**：`Hash` trait 与 `Eq` trait 完全独立——不需要重写 `Hash` 就必须重写 `Eq`，但 HashMap 内部使用 `Eq`（而非 `==` / `equals`）来判断相等
 
 > 📚 延伸阅读：[Java hashCode() 和 equals() 的若干问题解答](https://www.cnblogs.com/skywang12345/p/3324958.html)
-:::
+> :::
 
 #### 🏭 实战场景
 
 ::: details
+
 - 典型事故：用自定义 POJO（含 userId/orderId）作 HashMap key 做请求去重缓存，只重写 equals 未重写 hashCode，重复请求全部穿透，高峰期缓存命中率接近 0、后端数据库被打满；补上 `Objects.hash(userId, orderId)` 后命中率恢复到 ~99%。
 - 安全侧：对外 HTTP 接口若把客户端参数名直接存入 HashMap，可能被 Hash Flooding 拖到 CPU 100%；JDK 8 树化后最坏查找 O(log n)，但仍应限制单次请求参数数量（如 ≤ 1000）。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ “hashCode 相等则 equals 必相等” → 方向反了，哈希允许碰撞，hashCode 相等不代表逻辑相等，最终仍靠 equals 判定。
 - ❌ “只重写 hashCode 不重写 equals 也行” → 默认 equals 比较地址，逻辑相等的对象仍判不等，同样破坏契约。
 - ❌ “hashCode 与 equals 可以用不同字段” → 二者必须基于同一组关键字段，否则 equals 相等而哈希不同，去重直接失效。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1164,10 +1187,11 @@ class Person:
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】执行机制：重写了 `finalize()` 的对象在创建时会被注册到 ReferenceQueue，由单线程的 Finalizer Thread 轮询执行；每个对象的 `finalize()` 最多被调用一次，在 `finalize()` 中重新让对象可达即可“复活”，但第二次回收不会再给机会。
 - 【L3】版本演进：JDK 9 将 `finalize()` 标记 `@Deprecated`，JDK 18 进一步标记 `forRemoval = true`，并提供 `--finalization=disabled` 启动参数，官方方向是彻底移除。
 - 【L4】C++ 析构函数随作用域结束确定性执行；Java 因 GC 时机不确定没有等价物，确定性清理只能靠显式 `close()` 纪律（try-with-resources）。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1255,10 +1279,11 @@ public Person(Person other) {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】数组是特例：数组类型可直接调用 `clone()` 且无需实现 `Cloneable`（如 `int[] copy = arr.clone()`），行为仍是浅拷贝。
 - 【L3】`Cloneable` 是“改变父类方法行为”的标记接口：`Object.clone()` 运行时检查对象是否实现 `Cloneable`，未实现则抛 `CloneNotSupportedException`——接口无方法却决定方法合法性，这正是《Effective Java》批评的设计矛盾。
 - 【L4】拷贝构造器优于 clone 的理由：无需强制类型转换、可接受接口类型参数、不受 final 字段与 `Cloneable` 约束、不会意外破坏单例。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1300,6 +1325,7 @@ String 不可变，适合常量与共享；StringBuilder 可变、非线程安�
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】`StringBuffer` 的线程安全来自方法级 `synchronized`（如 `append`），只保证单次方法调用原子，复合操作（先读后写多步）仍非原子；`StringBuilder` 与它共享父类 `AbstractStringBuilder`，仅差同步。
 - 【L4】**跨语言视角：不可变字符串 vs 可变字符串 vs 借用的世界**——Java 的 `String`（不可变）/ `StringBuilder`（可变）/ `StringBuffer`（可变+线程安全）三元模型在其他语言中有完全不同的表达：
 
@@ -1321,18 +1347,20 @@ String 不可变，适合常量与共享；StringBuilder 可变、非线程安�
 #### 🏭 实战场景
 
 ::: details
+
 - 导出/日志拼接：循环拼接生成数十 MB 的 CSV 导出文件时，用 String `+` 拼接是 O(n²) 复杂度：10 万行记录在 4C8G 实例上要跑几十秒，并产生大量临时对象触发频繁 Young GC；改用预分配容量的 `StringBuilder` 后降到 1 秒内。
 - 线程安全选型：多线程共享缓冲区场景下，`StringBuffer` 比 `StringBuilder` 慢（方法级锁开销，微基准中通常慢 2~3 倍）；更优解是每线程各持一个 `StringBuilder` 最后汇总，避免共享可变状态。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ “StringBuffer 线程安全，多线程随便用都安全” → 只保证单次方法调用原子，复合操作（如“先 length 再 append”）仍需额外同步。
 - ❌ “`+` 拼接一定低效必须禁用” → 常量拼接编译期折叠，JDK 9+ 用 `invokedynamic` + `makeConcatWithConstants` 优化，简单拼接无性能问题，只有循环拼接才需换 `StringBuilder`。
 - ❌ “StringBuilder 可以完全替代 String” → String 不可变才能安全共享、做常量池复用、当 HashMap key，两者定位不同。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1385,10 +1413,11 @@ System.out.println(s2); // 输出 "Hello World"（新对象）
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】`String` 内部有 `hash` 字段缓存 `hashCode()` 结果（初值 0，计算一次后复用），这是它适合当 HashMap key 的前提。
 - 【L3】JDK 6 中 `substring()` 直接共享原 `char[]` 引用，大字符串取小子串会导致整块数组无法回收（内存泄漏）；JDK 7+ 改为拷贝新数组修复。
 - 【L4】跨语言对比：Kotlin 的 String 同为不可变（底层即 Java String）；Go 的 string 不可变；Rust 则把可变性交给类型系统（`String` 可变、`&str` 不可变视图）。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1420,10 +1449,11 @@ System.out.println(s2); // 输出 "Hello World"（新对象）
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 8 中，含变量的 `+` 拼接被编译为 `new StringBuilder().append(...).append(...).toString()`，每次表达式生成临时对象；循环内拼接等价于每轮新建一个 `StringBuilder`，是性能陷阱。
 - 【L3】JDK 9+ 改用 `invokedynamic` 调用 `StringConcatFactory.makeConcatWithConstants`，由 JVM 按拼接配方选择最优实现，避免大量临时 `StringBuilder`。
-> 📚 延伸阅读：[StringBuilder？来重温一下字符串拼接吧](https://juejin.cn/post/7182872058743750715)
-:::
+  > 📚 延伸阅读：[StringBuilder？来重温一下字符串拼接吧](https://juejin.cn/post/7182872058743750715)
+  > :::
 
 #### 🔀 发散问题
 
@@ -1460,9 +1490,10 @@ System.out.println(s2); // 输出 "Hello World"（新对象）
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】`String#equals` 的完整链路：先 `==` 引用相等快返 → `instanceof` 类型检查 → 长度不等直接 false → 逐字符比较（JDK 9+ 基于 `byte[]` 与 coder 标识，且依赖 JIT 内联优化）；源码细节见本文档「String 的 equals 方法是如何实现的？」。
 - 【L4】对比 Kotlin：`==` 默认调用 `equals()`（结构化相等），`===` 才是身份比较，与 Java 直觉正好相反。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1529,6 +1560,7 @@ String s = "abc";  // 字节码：仅 ldc #3 → astore_1
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 7 起字符串常量池从永久代移入堆内存；`ldc` 指令在类加载解析阶段将符号引用替换为直接引用，池中不存在时在运行时常量池（位于堆）中创建。
 - 【L4】**跨语言视角：C/C++ 的字符串拷贝陷阱**：
 
@@ -1551,16 +1583,18 @@ Rust 则走向另一个极端：`String` 是唯一定义的"拥有者"，`s2 = s
 #### 🏭 实战场景
 
 ::: details
+
 - 按 JOL 测量（JDK 8、开启指针压缩）：一个 String 对象自身占 24 B（对象头 16B + hash 4B + 引用 4B），一个 3 字符的 `char[]` 再占 24B；每多余一次 `new String("abc")` 就浪费约 48B。批量任务处理 1000 万条记录时若每条都 `new String(字段)`，相当于多产生约 480MB 重复对象，直接改引用常量池即可全部省下。
-:::
+  :::
 
 #### ⚠️ 常见误区
 
 ::: details
 常见误区：
+
 - ❌ “`new String("abc")` 一定创建 2 个对象” → 取决于字面量是否已入池，已存在时只新建堆上 1 个。
 - ❌ “`String s = "abc"` 一定创建 1 个对象” → 常量池中已存在则直接复用，可能不新建任何对象。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1598,9 +1632,10 @@ String#intern 方法的**作用**有：
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】版本行为差异：JDK 6 中 `intern()` 找不到同值时会把字符串拷贝进永久代再返回新引用；JDK 7+ 常量池在堆中，池中无同值时直接登记堆中对象的引用。经典例子：`new String("a") + new String("b")` 的结果调用 `intern()` 后与 `"ab"` 做 `==`，JDK 7+ 返回 true、JDK 6 返回 false。
 - 【L3】池底层是固定大小的哈希表 StringTable（桶数随版本不同，JDK 8 为 60013，JDK 11+ 为 65536），可用 `-XX:StringTableSize` 调整；大量 `intern()` 时需关注查找开销与池内存压力。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1634,12 +1669,12 @@ String#intern 方法的**作用**有：
 
    - **含变量的运算**（如 `str + "b"`）→ 隐式转换为 `StringBuilder` 操作：
 
-  ```java
-  // 实际执行逻辑
-  new StringBuilder().append(str).append("b").toString()
-  ```
+```java
+// 实际执行逻辑
+new StringBuilder().append(str).append("b").toString()
+```
 
-   - **每次运算** 生成临时 `StringBuilder` 和最终 `String` 对象。
+- **每次运算** 生成临时 `StringBuilder` 和最终 `String` 对象。
 
 3. **性能关键差异**：
 
@@ -1651,22 +1686,23 @@ String#intern 方法的**作用**有：
 
 4. **最佳实践**：简单拼接直接用 `+`（可读性优先）；循环/批量拼接：
 
-  ```java
-  // ✔️ 正确写法
-  StringBuilder sb = new StringBuilder();
-  for (String str : list) sb.append(str);
-  String result = sb.toString();
+```java
+// ✔️ 正确写法
+StringBuilder sb = new StringBuilder();
+for (String str : list) sb.append(str);
+String result = sb.toString();
 
-  // ❌ 错误写法（低效）
-  String s = "";
-  for (String str : list) s += str; // 每次循环隐式新建 StringBuilder
-  ```
+// ❌ 错误写法（低效）
+String s = "";
+for (String str : list) s += str; // 每次循环隐式新建 StringBuilder
+```
 
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 8 中每次含变量的 “+” 表达式都编译为独立的 `new StringBuilder()`，循环 n 次就新建 n 个缓冲区；JDK 9+ 改用 `invokedynamic` + `makeConcatWithConstants`，对单表达式拼接更优，但循环场景仍应显式复用同一个 `StringBuilder`。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1728,10 +1764,11 @@ private final byte coder;        // 编码标识（LATIN1=0, UTF16=1）
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】Compact Strings 可用 `-XX:-CompactStrings` 关闭（默认开启），方便对照压测；coder=UTF16 时方法需分支处理，个别操作略慢，但内存收益远大于开销。
 - 【L3】G1 的 String Deduplication 只合并底层数组（对象引用身份不变），与常量池复用是两套机制。
 - 【L4】`AbstractStringBuilder`（StringBuilder/StringBuffer 父类）在 JDK 9+ 也同步改为 `byte[]` 存储，拼接链路全程享受紧凑存储。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1793,9 +1830,10 @@ String result = list.stream()
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】实现链路：`StringJoiner` 内部就是 StringBuilder；`String.join` 源码内部委托 `StringJoiner`；`Collectors.joining` 返回的收集器也以 StringJoiner 为累加器，并行流时通过 combiner 合并。
 - 【L3】它们自动处理“最后一个元素后不加分隔符”的经典麻烦，比手写 StringBuilder + 条件判断更不易出错。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1855,9 +1893,10 @@ public boolean equals(Object anObject) {
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 9+ 源码基于 `byte[]` 与 coder 标识比较，且 HotSpot 提供字符串比较的 intrinsic（可向量化批量对比），热点路径比手写循环快得多。
 - 【L3】`equals` 契约五性质（自反、对称、传递、一致、非空性）在 String 实现中均为标准示例，重写业务 equals 时应逐条自查。
-:::
+  :::
 
 #### 🔀 发散问题
 
@@ -1919,9 +1958,10 @@ StringBuilder sb = new StringBuilder(1024);  // 预分配 1KB
 #### 🔬 扩展知识
 
 ::: details
+
 - 【L3】JDK 9+ 中 `AbstractStringBuilder` 的 value 也同步改为 `byte[]`（配合 Compact Strings），容量按字节计；扩容上限 `MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8`，超限走 `hugeCapacity` 处理，再超限抛 `OutOfMemoryError`。
 - 【L4】与 ArrayList 1.5 倍扩容相比，字符串 2 倍+2 扩容更激进：大容量拼接时重分配次数更少，但短期内存峰值也更高，超大拼接场景预分配容量尤其重要。
-:::
+  :::
 
 #### 🔀 发散问题
 
