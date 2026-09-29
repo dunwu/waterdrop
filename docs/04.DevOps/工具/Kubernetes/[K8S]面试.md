@@ -27,11 +27,22 @@ permalink: /pages/219f58bb/
 
 Kubernetes 是开源的容器编排平台，自动化部署、扩缩容和管理容器化应用。架构分控制面与节点两层：kube-apiserver 是统一入口，etcd 保存状态，scheduler 负责调度，kubelet 在节点上执行 Pod 管理。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：控制面管决策，节点管执行；API 是门，etcd 是账本
 - **关键词**：容器编排 ／ 控制面 ／ 期望状态
 - **链路**：kubectl → kube-apiserver → etcd ／ scheduler → kubelet → 容器运行时
+
+#### 📊 量化参考
+
+| 指标          | 数值                                                                    | 备注                                         |
+| :------------ | :---------------------------------------------------------------------- | :------------------------------------------- |
+| 官方支撑规模  | 单集群 5000 节点 / 15 万 Pod（SIG-Scaling SLO）                         | 单节点 100 Pod；超出建议拆多集群而非硬扛     |
+| etcd 容量     | 默认配额 2GB，生产建议设 8GB 上限                                       | 超配额拒绝写入，Event 类高频对象要收敛       |
+| etcd 磁盘要求 | fsync P99 < 10ms（SSD/NVMe）                                            | etcd 是唯一有状态组件，奇数节点（3/5）过半写 |
+| API 延迟 SLO  | 99% API 调用 < 1s；Pod 启动 99% < 10s（镜像已缓存）                     | 超标优先排查 etcd 压力与大范围 List 请求     |
+| 控制面副本    | kube-apiserver 无状态 3 副本 LB 前置；scheduler/controller-manager 选主 | 单副本即有全局单点风险                       |
+| 节点组件      | kubelet 心跳默认 10s，节点 NotReady 判定默认 40s                        | 心跳超时触发 Pod 重调度（带容忍度）          |
 
 #### 📖 核心知识
 
@@ -54,15 +65,15 @@ Kubernetes（K8s）是一个**开源的容器编排平台**，用于**自动化�
 
 **主要组件及作用**
 
-| 组件                   | 所在位置 | 职责                                             |
-| :--------------------- | :------- | :----------------------------------------------- |
-| **kube-apiserver**     | 控制面   | 集群统一入口，提供 REST API，所有组件经它交互    |
-| **etcd**               | 控制面   | 分布式 KV 存储，保存集群全部状态数据             |
-| **kube-scheduler**     | 控制面   | 为未调度的 Pod 按策略选择合适节点                |
-| **kube-controller-manager** | 控制面 | 运行各类控制器（Deployment、Node 等），维护期望状态 |
-| **kubelet**            | 工作节点 | 节点代理，确保容器按 Pod 规约运行并上报状态      |
-| **kube-proxy**         | 工作节点 | 维护节点网络规则，落地 Service 的转发            |
-| **容器运行时**         | 工作节点 | 真正负责拉取镜像、运行容器（如 containerd）      |
+| 组件                        | 所在位置 | 职责                                                |
+| :-------------------------- | :------- | :-------------------------------------------------- |
+| **kube-apiserver**          | 控制面   | 集群统一入口，提供 REST API，所有组件经它交互       |
+| **etcd**                    | 控制面   | 分布式 KV 存储，保存集群全部状态数据                |
+| **kube-scheduler**          | 控制面   | 为未调度的 Pod 按策略选择合适节点                   |
+| **kube-controller-manager** | 控制面   | 运行各类控制器（Deployment、Node 等），维护期望状态 |
+| **kubelet**                 | 工作节点 | 节点代理，确保容器按 Pod 规约运行并上报状态         |
+| **kube-proxy**              | 工作节点 | 维护节点网络规则，落地 Service 的转发               |
+| **容器运行时**              | 工作节点 | 真正负责拉取镜像、运行容器（如 containerd）         |
 
 #### 🔬 扩展知识
 
@@ -77,9 +88,17 @@ Kubernetes（K8s）是一个**开源的容器编排平台**，用于**自动化�
 
 #### 🔀 发散问题
 
-- **Q：Pod 在架构中处于什么位置？** → Pod 是最小部署单元，由 kubelet 在节点上管理，见本文档「Kubernetes 中的 Pod 是什么？其作用是什么？」。
-- **Q：工作负载控制器有哪些？** → Deployment、StatefulSet、DaemonSet 等各有分工，见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
-- **Q：Pod 如何被分配到节点？** → 由 kube-scheduler 按亲和性等策略决定，见本文档「Kubernetes 中 Pod 的调度策略有哪些？」。
+- **Q：Pod 在架构中处于什么位置？**
+
+  → Pod 是最小部署单元，由 kubelet 在节点上管理，见本文档「Kubernetes 中的 Pod 是什么？其作用是什么？」。
+
+- **Q：工作负载控制器有哪些？**
+
+  → Deployment、StatefulSet、DaemonSet 等各有分工，见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
+
+- **Q：Pod 如何被分配到节点？**
+
+  → 由 kube-scheduler 按亲和性等策略决定，见本文档「Kubernetes 中 Pod 的调度策略有哪些？」。
 
 ## Pod
 
@@ -91,7 +110,7 @@ Kubernetes（K8s）是一个**开源的容器编排平台**，用于**自动化�
 
 Pod 是 K8s 最小的部署和管理单元，封装一个或多个紧耦合容器，共享网络命名空间和存储卷。它是调度、扩缩容、自愈的最小单位，容器间可通过 localhost 直接通信。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一 Pod 多容器，共享网络与存储；调度自愈最小单元
 - **关键词**：最小部署单元 ／ 共享网络 ／ 临时性
@@ -129,9 +148,17 @@ Pod 具有**临时性**，生命周期结束后会被销毁重建，其 IP 可�
 
 #### 🔀 发散问题
 
-- **Q：如何创建一个 Pod？** → 生产推荐 YAML + `kubectl apply`，见本文档「如何在 Kubernetes 中创建一个 Pod？」。
-- **Q：Pod 的健康状态如何保障？** → 通过三类探针检测，见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
-- **Q：Pod 资源紧张时会怎样？** → 按 QoS 等级被驱逐，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
+- **Q：如何创建一个 Pod？**
+
+  → 生产推荐 YAML + `kubectl apply`，见本文档「如何在 Kubernetes 中创建一个 Pod？」。
+
+- **Q：Pod 的健康状态如何保障？**
+
+  → 通过三类探针检测，见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
+
+- **Q：Pod 资源紧张时会怎样？**
+
+  → 按 QoS 等级被驱逐，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
 
 ### 【中等】如何在 Kubernetes 中创建一个 Pod？⭐⭐
 
@@ -141,7 +168,7 @@ Pod 具有**临时性**，生命周期结束后会被销毁重建，其 IP 可�
 
 生产环境用 YAML 声明 Pod 并 `kubectl apply` 应用，可版本控制、可重复；命令式 `kubectl run` 仅用于临时测试。且生产中不应裸建 Pod，应交给 Deployment 等控制器管理。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：生产写 YAML，测试用 run；裸 Pod 不可靠，控制器来托管
 - **关键词**：kubectl apply ／ YAML 声明式 ／ 控制器托管
@@ -202,9 +229,17 @@ _注意：必须加 `--restart=Never` 才会创建独立 Pod，否则会默认�
 
 #### 🔀 发散问题
 
-- **Q：Pod 的本质和构成是什么？** → 见本文档「Kubernetes 中的 Pod 是什么？其作用是什么？」。
-- **Q：Pod 版本如何更新？** → 通过控制器的滚动更新，见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
-- **Q：Pod 启动失败怎么排查？** → 见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
+- **Q：Pod 的本质和构成是什么？**
+
+  → 见本文档「Kubernetes 中的 Pod 是什么？其作用是什么？」。
+
+- **Q：Pod 版本如何更新？**
+
+  → 通过控制器的滚动更新，见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
+
+- **Q：Pod 启动失败怎么排查？**
+
+  → 见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
 
 ## Service 与 Ingress
 
@@ -216,7 +251,7 @@ _注意：必须加 `--restart=Never` 才会创建独立 Pod，否则会默认�
 
 Service 为动态变化的 Pod 集合提供稳定的 IP、DNS 和端口，通过标签选择器实现服务发现与负载均衡，是集群内部的稳定访问端点。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Pod 会变，Service 不变；标签选后端，VIP 做入口
 - **关键词**：稳定端点 ／ 服务发现 ／ 负载均衡
@@ -235,8 +270,13 @@ Service 为动态变化的 Pod 集合提供稳定的 IP、DNS 和端口，通过
 
 #### 🔀 发散问题
 
-- **Q：Service 完整有哪些类型？** → 含 ExternalName 与 Headless，见本文档「Kubernetes 中的 Service 有哪几种类型？」。
-- **Q：与 Ingress 怎么分工？** → 见本文档「Kubernetes 中的 Service 和 Ingress 有什么区别？」。
+- **Q：Service 完整有哪些类型？**
+
+  → 含 ExternalName 与 Headless，见本文档「Kubernetes 中的 Service 有哪几种类型？」。
+
+- **Q：与 Ingress 怎么分工？**
+
+  → 见本文档「Kubernetes 中的 Service 和 Ingress 有什么区别？」。
 
 ### 【简单】Ingress（入口）：外部流量网关⭐⭐
 
@@ -246,7 +286,7 @@ Service 为动态变化的 Pod 集合提供稳定的 IP、DNS 和端口，通过
 
 Ingress 是集群的统一 HTTP(S) 入口，按域名和路径把外部流量路由到不同后端 Service，并可在入口做 TLS 终结；规则生效必须先部署 Ingress Controller。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：外流走 Ingress，域名路径定去向；规则要生效，控制器先装
 - **关键词**：L7 路由 ／ TLS 终止 ／ Ingress Controller
@@ -264,8 +304,13 @@ Ingress 是集群的统一 HTTP(S) 入口，按域名和路径把外部流量路
 
 #### 🔀 发散问题
 
-- **Q：Ingress 资源具体怎么配置？** → 见本文档「Kubernetes 中的 Ingress 资源有什么作用？如何配置？」。
-- **Q：与 Service 的本质区别？** → 见本文档「Kubernetes 中的 Service 和 Ingress 有什么区别？」。
+- **Q：Ingress 资源具体怎么配置？**
+
+  → 见本文档「Kubernetes 中的 Ingress 资源有什么作用？如何配置？」。
+
+- **Q：与 Service 的本质区别？**
+
+  → 见本文档「Kubernetes 中的 Service 和 Ingress 有什么区别？」。
 
 ### 【中等】Kubernetes 中的 Service 和 Ingress 有什么区别？⭐⭐⭐
 
@@ -275,7 +320,7 @@ Ingress 是集群的统一 HTTP(S) 入口，按域名和路径把外部流量路
 
 Service 工作在 L4，解决集群内部的稳定访问与负载均衡；Ingress 工作在 L7，管理外部 HTTP(S) 流量的域名/路径路由与 TLS 终结。典型路径：外部用户 → Ingress → Service → Pod。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：内用 Service（L4），外用 Ingress（L7）；Ingress 依赖 Service 做后端
 - **关键词**：L4 vs L7 ／ 内部稳定 ／ 外部路由
@@ -311,8 +356,13 @@ Service 工作在 L4，解决集群内部的稳定访问与负载均衡；Ingres
 
 #### 🔀 发散问题
 
-- **Q：Service 的类型怎么选？** → 见本文档「Kubernetes 中的 Service 有哪几种类型？」。
-- **Q：Ingress 的 YAML 怎么写？** → 见本文档「Kubernetes 中的 Ingress 资源有什么作用？如何配置？」。
+- **Q：Service 的类型怎么选？**
+
+  → 见本文档「Kubernetes 中的 Service 有哪几种类型？」。
+
+- **Q：Ingress 的 YAML 怎么写？**
+
+  → 见本文档「Kubernetes 中的 Ingress 资源有什么作用？如何配置？」。
 
 ## Deployment 与更新
 
@@ -324,7 +374,7 @@ Service 工作在 L4，解决集群内部的稳定访问与负载均衡；Ingres
 
 滚动更新是 Deployment 的默认更新策略：创建新 ReplicaSet，按 maxSurge/maxUnavailable 控制节奏逐步替换旧 Pod，实现零停机发布。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：新 RS 逐步替旧，边建边删不停服
 - **关键词**：零停机 ／ maxSurge ／ maxUnavailable
@@ -372,8 +422,13 @@ kubectl rollout status deployment/my-app  # 查看实时状态
 
 #### 🔀 发散问题
 
-- **Q：更新出问题怎么办？** → 见本文档「回滚操作」。
-- **Q：完整发布流程命令有哪些？** → 见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
+- **Q：更新出问题怎么办？**
+
+  → 见本文档「回滚操作」。
+
+- **Q：完整发布流程命令有哪些？**
+
+  → 见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
 
 ### 【中等】回滚操作⭐⭐
 
@@ -383,7 +438,7 @@ kubectl rollout status deployment/my-app  # 查看实时状态
 
 回滚利用 Deployment 保留的历史 ReplicaSet，用 `kubectl rollout undo` 把 Pod 模板重置为旧版本并再次触发更新；`revisionHistoryLimit` 决定可回滚的深度。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：history 看版本，undo 回到过去，--to-revision 定点回
 - **关键词**：rollout undo ／ 修订历史 ／ revisionHistoryLimit
@@ -432,8 +487,13 @@ kubectl rollout undo deployment/my-app --to-revision=1
 
 #### 🔀 发散问题
 
-- **Q：滚动更新本身是怎么回事？** → 见本文档「滚动更新」。
-- **Q：发布与回滚的完整命令链？** → 见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
+- **Q：滚动更新本身是怎么回事？**
+
+  → 见本文档「滚动更新」。
+
+- **Q：发布与回滚的完整命令链？**
+
+  → 见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
 
 ### 【中等】Kubernetes 中如何进行滚动更新和回滚？⭐⭐⭐
 
@@ -443,7 +503,7 @@ kubectl rollout undo deployment/my-app --to-revision=1
 
 滚动更新和回滚都是 Deployment 的核心能力：更新靠创建新 ReplicaSet 逐步替换 Pod，回滚靠 `rollout undo` 重置 Pod 模板到历史版本，全程用 rollout 子命令观察和控制。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：更新换 RS，回滚 undo 翻旧账；status 看进度，history 查版本
 - **关键词**：Deployment ／ ReplicaSet ／ rollout 命令族
@@ -486,9 +546,17 @@ kubectl rollout undo deployment/my-app --to-revision=1
 
 #### 🔀 发散问题
 
-- **Q：滚动更新的参数如何控制节奏？** → 见本文档「滚动更新」。
-- **Q：回滚能回多深由什么决定？** → 见本文档「回滚操作」。
-- **Q：更新期间 502 如何治理？** → 与探针和优雅关闭相关，见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
+- **Q：滚动更新的参数如何控制节奏？**
+
+  → 见本文档「滚动更新」。
+
+- **Q：回滚能回多深由什么决定？**
+
+  → 见本文档「回滚操作」。
+
+- **Q：更新期间 502 如何治理？**
+
+  → 与探针和优雅关闭相关，见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
 
 ## 配置管理
 
@@ -500,7 +568,7 @@ kubectl rollout undo deployment/my-app --to-revision=1
 
 ConfigMap 以明文存储非敏感配置（环境变量、配置文件、命令行参数），可作为环境变量注入或挂载为配置文件，实现配置与镜像解耦。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：配置进 ConfigMap，明文存放别放密
 - **关键词**：非敏感 ／ 明文 ／ 挂载或注入
@@ -517,8 +585,13 @@ ConfigMap 以明文存储非敏感配置（环境变量、配置文件、命令�
 
 #### 🔀 发散问题
 
-- **Q：敏感信息用什么？** → 见本文档「Secret（密钥）」。
-- **Q：两者如何对比选型？** → 见本文档「Kubernetes 中的 ConfigMap 和 Secret 有什么作用？」。
+- **Q：敏感信息用什么？**
+
+  → 见本文档「Secret（密钥）」。
+
+- **Q：两者如何对比选型？**
+
+  → 见本文档「Kubernetes 中的 ConfigMap 和 Secret 有什么作用？」。
 
 ### 【简单】Secret（密钥）⭐⭐
 
@@ -528,7 +601,7 @@ ConfigMap 以明文存储非敏感配置（环境变量、配置文件、命令�
 
 Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编码（是编码不是加密），推荐以只读文件挂载而非环境变量注入。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：敏感信息进 Secret，Base64 非加密，挂载优于注入
 - **关键词**：敏感信息 ／ Base64 编码 ／ 文件挂载
@@ -546,8 +619,13 @@ Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编�
 
 #### 🔀 发散问题
 
-- **Q：非敏感配置放哪？** → 见本文档「ConfigMap（配置映射）」。
-- **Q：Secret 默认不加密怎么办？** → 涉及 etcd 加密与外部密钥系统，见本文档「Kubernetes 中如何进行安全配置？」。
+- **Q：非敏感配置放哪？**
+
+  → 见本文档「ConfigMap（配置映射）」。
+
+- **Q：Secret 默认不加密怎么办？**
+
+  → 涉及 etcd 加密与外部密钥系统，见本文档「Kubernetes 中如何进行安全配置？」。
 
 ### 【中等】Kubernetes 中的 ConfigMap 和 Secret 有什么作用？⭐⭐⭐
 
@@ -557,7 +635,7 @@ Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编�
 
 用 ConfigMap 管理非敏感应用配置，用 Secret 管理密码密钥等敏感信息；两者都支持环境变量注入与文件挂载，实现配置与镜像解耦、多环境复用。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：普通配置 ConfigMap，敏感数据 Secret；永远不用 ConfigMap 存密码
 - **关键词**：配置与镜像解耦 ／ 明文 vs Base64 ／ 挂载注入
@@ -591,8 +669,13 @@ Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编�
 
 #### 🔀 发散问题
 
-- **Q：各自的细节？** → 见本文档「ConfigMap（配置映射）」与「Secret（密钥）」。
-- **Q：配置变更后 Pod 如何生效？** → 可结合 rollout restart，见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
+- **Q：各自的细节？**
+
+  → 见本文档「ConfigMap（配置映射）」与「Secret（密钥）」。
+
+- **Q：配置变更后 Pod 如何生效？**
+
+  → 可结合 rollout restart，见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
 
 ### 【中等】Kubernetes 中如何配置资源配额？⭐⭐
 
@@ -602,7 +685,7 @@ Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编�
 
 在命名空间创建 ResourceQuota 对象即可限制该命名空间的计算资源总量与对象数量，防止资源滥用、控制成本；需与 Pod 的 requests/limits 配合，超配额时资源创建会被拒绝。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：配额按命名空间，两类上限：资源总量 + 对象个数
 - **关键词**：ResourceQuota ／ 命名空间 ／ requests 总量
@@ -640,8 +723,13 @@ Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编�
 
 #### 🔀 发散问题
 
-- **Q：配额通常配在什么隔离单元上？** → 见本文档「Kubernetes 中的 Namespace 有什么作用？」。
-- **Q：requests/limits 还影响什么？** → 决定 QoS 与驱逐顺序，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
+- **Q：配额通常配在什么隔离单元上？**
+
+  → 见本文档「Kubernetes 中的 Namespace 有什么作用？」。
+
+- **Q：requests/limits 还影响什么？**
+
+  → 决定 QoS 与驱逐顺序，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
 
 ### 【简单】Kubernetes 中的 Namespace 有什么作用？⭐⭐
 
@@ -651,7 +739,7 @@ Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编�
 
 Namespace 是集群的虚拟分区，提供逻辑隔离的工作空间，支撑环境/团队隔离、资源配额与 RBAC 权限边界；它是逻辑隔离而非物理隔离。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一集群多空间，隔离靠命名空间；删库先看清，删除不可逆
 - **关键词**：逻辑隔离 ／ 环境分离 ／ 配额与权限载体
@@ -682,8 +770,13 @@ Namespace 是集群的虚拟分区，提供逻辑隔离的工作空间，支撑�
 
 #### 🔀 发散问题
 
-- **Q：按命名空间限资源怎么做？** → 见本文档「Kubernetes 中如何配置资源配额？」。
-- **Q：按命名空间控权限怎么做？** → 见本文档「什么是 Kubernetes 中的 RBAC？」。
+- **Q：按命名空间限资源怎么做？**
+
+  → 见本文档「Kubernetes 中如何配置资源配额？」。
+
+- **Q：按命名空间控权限怎么做？**
+
+  → 见本文档「什么是 Kubernetes 中的 RBAC？」。
 
 ## 日志与存储
 
@@ -695,7 +788,7 @@ Namespace 是集群的虚拟分区，提供逻辑隔离的工作空间，支撑�
 
 应用应把日志输出到 stdout/stderr；开发用 kubectl logs 即可，生产必须建集群级日志架构：DaemonSet 日志代理 + 中心化后端 + 可视化，典型如 EFK。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：日志走标准输出，生产必建集群级；EFK 三件套，代理 DaemonSet
 - **关键词**：stdout/stderr ／ DaemonSet 采集 ／ 中心化后端
@@ -747,8 +840,13 @@ Kubernetes 本身不提供内置的集中式日志解决方案，但其基础机
 
 #### 🔀 发散问题
 
-- **Q：日志代理为什么用 DaemonSet？** → 见本文档「Kubernetes 中的 DaemonSet 有什么作用？」。
-- **Q：排查问题时日志怎么看？** → 见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
+- **Q：日志代理为什么用 DaemonSet？**
+
+  → 见本文档「Kubernetes 中的 DaemonSet 有什么作用？」。
+
+- **Q：排查问题时日志怎么看？**
+
+  → 见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
 
 ### 【中等】Kubernetes 中如何实现持久化存储？⭐⭐⭐
 
@@ -758,7 +856,7 @@ Kubernetes 本身不提供内置的集中式日志解决方案，但其基础机
 
 持久化存储用 PV/PVC 机制：管理员定义 PV 提供存储，用户用 PVC 申请并挂载到 Pod；生产推荐 StorageClass 动态供给，容器销毁后数据仍保留在 PV 中。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：PV 是仓库，PVC 是申请单，StorageClass 自动建仓
 - **关键词**：PV/PVC ／ 动态供给 ／ 数据持久
@@ -873,8 +971,13 @@ PVC 引用 StorageClass 即可动态获取存储。
 
 #### 🔀 发散问题
 
-- **Q：PV 与 PVC 的本质区别？** → 见本文档「Kubernetes 中的 Persistent Volume 和 Persistent Volume Claim 有什么区别？」。
-- **Q：有状态应用如何绑定独立 PVC？** → 见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
+- **Q：PV 与 PVC 的本质区别？**
+
+  → 见本文档「Kubernetes 中的 Persistent Volume 和 Persistent Volume Claim 有什么区别？」。
+
+- **Q：有状态应用如何绑定独立 PVC？**
+
+  → 见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
 
 ## Helm
 
@@ -886,7 +989,7 @@ PVC 引用 StorageClass 即可动态获取存储。
 
 Helm 是 K8s 的包管理工具：把多资源清单打包为 Chart，一键安装/升级/回滚，模板化配置适配多环境，并自动处理依赖。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Chart 是包，Release 是实例；install 部署，rollback 救命
 - **关键词**：Chart ／ Release ／ 模板化配置
@@ -917,8 +1020,13 @@ Helm 作为 Kubernetes 包管理工具的核心作用：
 
 #### 🔀 发散问题
 
-- **Q：具体怎么部署应用？** → 见本文档「如何在 Kubernetes 中使用 Helm 部署应用？」。
-- **Q：版本与回滚机制？** → 见本文档「Kubernetes 的 Helm Charts 如何实现应用的版本控制？」。
+- **Q：具体怎么部署应用？**
+
+  → 见本文档「如何在 Kubernetes 中使用 Helm 部署应用？」。
+
+- **Q：版本与回滚机制？**
+
+  → 见本文档「Kubernetes 的 Helm Charts 如何实现应用的版本控制？」。
 
 ### 【中等】如何在 Kubernetes 中使用 Helm 部署应用？⭐⭐
 
@@ -928,7 +1036,7 @@ Helm 作为 Kubernetes 包管理工具的核心作用：
 
 Helm 部署四步：加仓库 → 搜 Chart 并自定义 values → `helm install` 创建 Release → 用 upgrade/rollback/uninstall 管理生命周期；也可 `helm create` 开发自己的 Chart。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：加库搜包改 values，install 上线，upgrade 升级，rollback 回滚
 - **关键词**：helm repo ／ values 覆盖 ／ Release 生命周期
@@ -964,8 +1072,13 @@ Helm 部署四步：加仓库 → 搜 Chart 并自定义 values → `helm instal
 
 #### 🔀 发散问题
 
-- **Q：Helm 解决什么问题？** → 见本文档「Kubernetes 中的 Helm 有什么作用？」。
-- **Q：Release 的版本与依赖怎么管？** → 见本文档「Kubernetes 的 Helm Charts 如何实现应用的版本控制？」。
+- **Q：Helm 解决什么问题？**
+
+  → 见本文档「Kubernetes 中的 Helm 有什么作用？」。
+
+- **Q：Release 的版本与依赖怎么管？**
+
+  → 见本文档「Kubernetes 的 Helm Charts 如何实现应用的版本控制？」。
 
 ## 安全
 
@@ -977,7 +1090,7 @@ Helm 部署四步：加仓库 → 搜 Chart 并自定义 values → `helm instal
 
 K8s 安全分五层：API 入口防护（TLS+RBAC）、Pod 安全上下文与资源限制、NetworkPolicy 网络隔离、镜像供应链安全、审计与监控，纵深防御缺一不可。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：门禁（API）窗禁（网络）查身份（RBAC），货物（镜像）要安检，全程留监控
 - **关键词**：RBAC ／ 安全上下文 ／ NetworkPolicy
@@ -1006,9 +1119,17 @@ K8s 安全分五层：API 入口防护（TLS+RBAC）、Pod 安全上下文与资
 
 #### 🔀 发散问题
 
-- **Q：网络隔离具体怎么写规则？** → 见本文档「Kubernetes 中的网络策略如何实现？」。
-- **Q：权限控制机制？** → 见本文档「什么是 Kubernetes 中的 RBAC？」。
-- **Q：敏感信息存储？** → 见本文档「Kubernetes 中的 ConfigMap 和 Secret 有什么作用？」。
+- **Q：网络隔离具体怎么写规则？**
+
+  → 见本文档「Kubernetes 中的网络策略如何实现？」。
+
+- **Q：权限控制机制？**
+
+  → 见本文档「什么是 Kubernetes 中的 RBAC？」。
+
+- **Q：敏感信息存储？**
+
+  → 见本文档「Kubernetes 中的 ConfigMap 和 Secret 有什么作用？」。
 
 ## 工作负载
 
@@ -1020,7 +1141,7 @@ K8s 安全分五层：API 入口防护（TLS+RBAC）、Pod 安全上下文与资
 
 服务自动伸缩主要靠 HPA：根据 CPU/内存或自定义指标动态调整 Pod 副本数；前提是部署 Metrics Server 且 Pod 声明了 resources.requests。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：HPA 看指标调副本，没 requests 不干活
 - **关键词**：HPA ／ Metrics Server ／ min/maxReplicas
@@ -1052,10 +1173,15 @@ Kubernetes 中服务自动伸缩的核心要点：
 
 #### 🔀 发散问题
 
-- **Q：requests/limits 设不好会怎样？** → 影响 QoS 与驱逐，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
-- **Q：HPA 扩的是哪种控制器？** → 见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
+- **Q：requests/limits 设不好会怎样？**
 
-### 【中等】Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？⭐⭐⭐⭐⭐
+  → 影响 QoS 与驱逐，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
+
+- **Q：HPA 扩的是哪种控制器？**
+
+  → 见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
+
+### 【困难】Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Kubernetes / 工作负载
 
@@ -1063,11 +1189,20 @@ Kubernetes 中服务自动伸缩的核心要点：
 
 Deployment 管无状态：副本身份随机、并行滚动、共享存储；StatefulSet 管有状态：固定序号身份、每实例独立 PVC、严格有序扩缩与更新。选型看是否依赖稳定身份、独立存储或有序语义。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：无状态 Deployment，有状态 StatefulSet；身份稳不稳、存储分不分、顺序严不严
 - **关键词**：稳定身份 ／ 独立 PVC ／ 有序语义
 - **链路**：判断状态依赖 → 选控制器 → 配存储与探针 → 验证失效场景
+
+#### 📊 量化参考
+
+- **Deployment 滚动更新**：10 副本并行更新约 1~2min（maxSurge=25%, maxUnavailable=25%）
+- **StatefulSet 有序更新**：10 副本需 10 倍串行时间，约 5~10min（逐个等待 Ready）
+- **PVC 清理**：StatefulSet 删除后 PVC 不自动清理，需手动处理（否则存储泄漏）
+- **StatefulSet 扩容**：10 个 Pod 约 3~5min（每个需等前一个 Ready）
+- **Deployment 副本命名**：随机后缀（如 app-7d4b9c-x2f9p），重建后身份变化
+- **StatefulSet 固定序号**：db-0, db-1, db-2...，重建后保持原身份 + PVC 跟随
 
 #### 📖 核心知识
 
@@ -1149,10 +1284,21 @@ Kubernetes 中 Deployment 与 StatefulSet 的核心区别：
 
 #### 🔀 发散问题
 
-- **Q：StatefulSet 为什么配 Headless Service？** → Headless 为每个 Pod 提供独立 DNS 实现稳定身份，关联普通 ClusterIP 则无法定向访问特定实例；详见本文档「Kubernetes 中的 Service 有哪几种类型？」。
-- **Q：StatefulSet 的 PVC 删除后怎么办？** → PVC 刻意保留防误删，自动清理可用 `persistentVolumeClaimRetentionPolicy`（1.23 beta、1.27 GA）或流水线显式删除。
-- **Q：有状态服务的探针怎么配？** → startup 覆盖恢复窗口、readiness 控流量，见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
-- **Q：ES 硬跑在 Deployment 上最坏会怎样？** → 身份随机 + 无专属存储导致成员关系抖动、共享卷写坏索引、主分片迁移风暴把集群打成 red。
+- **Q：StatefulSet 为什么配 Headless Service？**
+
+  → Headless 为每个 Pod 提供独立 DNS 实现稳定身份，关联普通 ClusterIP 则无法定向访问特定实例；详见本文档「Kubernetes 中的 Service 有哪几种类型？」。
+
+- **Q：StatefulSet 的 PVC 删除后怎么办？**
+
+  → PVC 刻意保留防误删，自动清理可用 `persistentVolumeClaimRetentionPolicy`（1.23 beta、1.27 GA）或流水线显式删除。
+
+- **Q：有状态服务的探针怎么配？**
+
+  → startup 覆盖恢复窗口、readiness 控流量，见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
+
+- **Q：ES 硬跑在 Deployment 上最坏会怎样？**
+
+  → 身份随机 + 无专属存储导致成员关系抖动、共享卷写坏索引、主分片迁移风暴把集群打成 red。
 
 ### 【中等】Kubernetes 中的 Ingress 资源有什么作用？如何配置？⭐⭐⭐
 
@@ -1162,7 +1308,7 @@ Kubernetes 中 Deployment 与 StatefulSet 的核心区别：
 
 Ingress 资源声明集群入口的 L7 路由规则：按域名/路径把 HTTP(S) 流量导向不同 Service，并可终结 TLS；规则生效的前提是部署 Ingress Controller 并用 ingressClassName 指定。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：host 定域名，path 定路径，tls 挂证书，控制器先就位
 - **关键词**：域名路由 ／ TLS 终结 ／ ingressClassName
@@ -1197,8 +1343,13 @@ Kubernetes 中 Ingress 资源的核心要点：
 
 #### 🔀 发散问题
 
-- **Q：Ingress 和 Service 怎么分工？** → 见本文档「Kubernetes 中的 Service 和 Ingress 有什么区别？」。
-- **Q：大量 HTTP 服务对外暴露怎么设计？** → 见本文档「Kubernetes 中的 Service 有哪几种类型？」中的暴露层次权衡。
+- **Q：Ingress 和 Service 怎么分工？**
+
+  → 见本文档「Kubernetes 中的 Service 和 Ingress 有什么区别？」。
+
+- **Q：大量 HTTP 服务对外暴露怎么设计？**
+
+  → 见本文档「Kubernetes 中的 Service 有哪几种类型？」中的暴露层次权衡。
 
 ### 【中等】Kubernetes 中的 DaemonSet 有什么作用？⭐⭐
 
@@ -1208,7 +1359,7 @@ Kubernetes 中 Ingress 资源的核心要点：
 
 DaemonSet 确保所有（或指定标签的）节点上各运行一个 Pod 副本，专为节点级系统服务设计：监控、日志采集、网络/存储插件，并随节点增减自动伸缩。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一节点一副本，节点级服务专用；新节点自动补，无副本数概念
 - **关键词**：每节点一份 ／ 节点级服务 ／ 自动适配
@@ -1243,8 +1394,13 @@ Kubernetes 中 DaemonSet 的核心要点：
 
 #### 🔀 发散问题
 
-- **Q：日志采集为什么用 DaemonSet？** → 见本文档「Kubernetes 中如何进行日志管理？」。
-- **Q：DaemonSet 与 Deployment 的区别？** → 前者按节点维度铺副本，后者按副本数伸缩，选型见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
+- **Q：日志采集为什么用 DaemonSet？**
+
+  → 见本文档「Kubernetes 中如何进行日志管理？」。
+
+- **Q：DaemonSet 与 Deployment 的区别？**
+
+  → 前者按节点维度铺副本，后者按副本数伸缩，选型见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
 
 ### 【中等】Kubernetes 中的 ReplicaSet 和 ReplicationController 有什么区别？⭐
 
@@ -1254,7 +1410,7 @@ Kubernetes 中 DaemonSet 的核心要点：
 
 ReplicaSet 是 ReplicationController 的升级替代：核心差异在标签选择器——RS 支持集合选择器（matchExpressions），RC 只支持等值匹配；RS 是 Deployment 的底层依赖，RC 已逐步淘汰。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：RS 能集合匹配，RC 只能等值；新集群只用 RS
 - **关键词**：matchExpressions ／ apps/v1 ／ Deployment 底层
@@ -1275,9 +1431,11 @@ Kubernetes 中 ReplicaSet 与 ReplicationController 的核心区别：
 
 #### 🔀 发散问题
 
-- **Q：实际生产中谁在管理 ReplicaSet？** → Deployment 通过新旧 RS 实现滚动更新，见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
+- **Q：实际生产中谁在管理 ReplicaSet？**
 
-### 【中等】Kubernetes 中的 Service 有哪几种类型？⭐⭐⭐⭐
+  → Deployment 通过新旧 RS 实现滚动更新，见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
+
+### 【中等】Kubernetes 中的 Service 有哪几种类型？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Kubernetes / 网络
 
@@ -1285,7 +1443,7 @@ Kubernetes 中 ReplicaSet 与 ReplicationController 的核心区别：
 
 Service 四种基本类型：ClusterIP 集群内、NodePort 节点端口、LoadBalancer 云 LB 公网、ExternalName 外部域名映射，另有 Headless 服务 StatefulSet。选型看暴露层次与成本。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：内用 ClusterIP，外测 NodePort，公网 LoadBalancer，外部域名 ExternalName，有状态用 Headless
 - **关键词**：暴露层次 ／ kube-proxy ／ 成本权衡
@@ -1349,6 +1507,19 @@ Service 四种基本类型：ClusterIP 集群内、NodePort 节点端口、LoadB
 
 :::
 
+#### 🔄 迁移策略
+
+::: details
+
+**场景：kube-proxy 从 iptables 模式迁移到 IPVS 模式（规模驱动的集群升级）**
+
+- **触发信号**：Service/Endpoint 规模逼近 iptables 承受上限——经验阈值：Service 过千或规则数超 10 万条后，规则同步与匹配延迟显著上升；上方实战场景的 8000 Service 事故即是典型信号。
+- **步骤**：① 前置检查：节点内核加载 `ip_vs`/`ip_vs_wrr`/`ip_vs_sh` 模块（`lsmod | grep ip_vs`），内核版本 ≥ 4.19 更稳；② 容量规划：按内存调大 `nf_conntrack_max`（生产常配 100 万+），部署 conntrack 表占用率告警（> 80%）；③ 滚动切换：kube-proxy ConfigMap 改 `mode: ipvs`，按「测试集群 → 生产灰度节点 → 全量」逐节点滚动重启 kube-proxy（DaemonSet 滚动，业务 Pod 不重启）；④ 效果验证：对比切换前后 Service 规则同步耗时（iptables 变更需全量重建、万级规则秒级；IPVS 基于哈希增量更新、毫秒级）、新建连接 P99 与 kube-proxy CPU；⑤ 观察一周：盯 IPVS 虚拟 IP 残留与 UDP/DNS 服务的 conntrack 行为。
+- **回滚预案**：ConfigMap 改回 `mode: iptables` 并滚动重启 kube-proxy 即完成回退；模式切换不改变 Pod IP 与 Service VIP 的编址，回滚风险极低。
+- **踩坑提示**：① IPVS 下 Pod 间访问产生更多 conntrack 记录，UDP 高并发（DNS）更易打满 conntrack 表，需与上限调整同步落地；② 低版本内核存在 IPVS 虚拟 VIP 清理不净的问题，重启后用脚本清理残留 dummy 接口；③ IPVS 默认调度算法为 rr，生产建议 wrr/sh 并配合 readinessProbe，避免流量打到未就绪副本。
+
+:::
+
 #### ⚠️ 常见误区
 
 ::: details
@@ -1363,10 +1534,21 @@ Service 四种基本类型：ClusterIP 集群内、NodePort 节点端口、LoadB
 
 #### 🔀 发散问题
 
-- **Q：ClusterIP 由谁分配、Pod 怎么发现 Service？** → ClusterIP 由 apiserver 从 `--service-cluster-ip-range` 网段分配，发现靠 CoreDNS 解析或环境变量注入（后者有启动顺序坑）。
-- **Q：Endpoints 变更多久生效？滚动时为什么 502？** → 规则亚秒级生效，但 DNS 缓存拖长感知；502 根因是流量与就绪不同步，需 readinessProbe + preStop + 优雅关闭，见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
-- **Q：externalTrafficPolicy: Local 得到什么牺牲什么？** → 得到真实源 IP 与低延迟，牺牲负载均匀性（仅本节点有 Endpoint 才接流量），节点故障时入口流量直接丢弃。
-- **Q：HTTP 入口路由还能怎么做？** → 见本文档「Kubernetes 中的 Ingress 资源有什么作用？如何配置？」。
+- **Q：ClusterIP 由谁分配、Pod 怎么发现 Service？**
+
+  → ClusterIP 由 apiserver 从 `--service-cluster-ip-range` 网段分配，发现靠 CoreDNS 解析或环境变量注入（后者有启动顺序坑）。
+
+- **Q：Endpoints 变更多久生效？滚动时为什么 502？**
+
+  → 规则亚秒级生效，但 DNS 缓存拖长感知；502 根因是流量与就绪不同步，需 readinessProbe + preStop + 优雅关闭，见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
+
+- **Q：externalTrafficPolicy: Local 得到什么牺牲什么？**
+
+  → 得到真实源 IP 与低延迟，牺牲负载均匀性（仅本节点有 Endpoint 才接流量），节点故障时入口流量直接丢弃。
+
+- **Q：HTTP 入口路由还能怎么做？**
+
+  → 见本文档「Kubernetes 中的 Ingress 资源有什么作用？如何配置？」。
 
 ### 【中等】Kubernetes 的 Helm Charts 如何实现应用的版本控制？⭐⭐
 
@@ -1376,7 +1558,7 @@ Service 四种基本类型：ClusterIP 集群内、NodePort 节点端口、LoadB
 
 Helm 版本控制双轨：Chart 版本（Chart.yaml 语义化版本）管模板，Release 版本（自动递增）管部署实例；helm history/rollback 实现全链路追踪与回滚，依赖用 Chart.lock 锁定。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Chart 管模板版本，Release 管部署版本；lock 锁依赖，history 可回溯
 - **关键词**：Chart version ／ Release revision ／ Chart.lock
@@ -1409,8 +1591,13 @@ Helm Charts 实现应用版本控制的核心机制：
 
 #### 🔀 发散问题
 
-- **Q：Helm 部署流程是什么？** → 见本文档「如何在 Kubernetes 中使用 Helm 部署应用？」。
-- **Q：Helm 回滚与 Deployment 回滚什么关系？** → Helm 回滚重新应用历史渲染结果，底层仍触发 Deployment 滚动，见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
+- **Q：Helm 部署流程是什么？**
+
+  → 见本文档「如何在 Kubernetes 中使用 Helm 部署应用？」。
+
+- **Q：Helm 回滚与 Deployment 回滚什么关系？**
+
+  → Helm 回滚重新应用历史渲染结果，底层仍触发 Deployment 滚动，见本文档「Kubernetes 中如何进行滚动更新和回滚？」。
 
 ## 任务调度
 
@@ -1422,7 +1609,7 @@ Helm Charts 实现应用版本控制的核心机制：
 
 Job 管单次任务：确保指定数量 Pod 成功完成后退出；CronJob 管周期任务：按 cron 表达式定时触发 Job，本质是 Job 的定时调度器。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一次性用 Job，定时用 CronJob；Job 保成功，CronJob 保准时
 - **关键词**：completions/parallelism ／ cron schedule ／ jobTemplate
@@ -1501,8 +1688,13 @@ spec:
 
 #### 🔀 发散问题
 
-- **Q：定时任务日志怎么看、失败怎么查？** → 与 Pod 排查思路一致，见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
-- **Q：任务型 Pod 的资源限制？** → 同样受配额与 QoS 约束，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
+- **Q：定时任务日志怎么看、失败怎么查？**
+
+  → 与 Pod 排查思路一致，见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
+
+- **Q：任务型 Pod 的资源限制？**
+
+  → 同样受配额与 QoS 约束，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
 
 ### 【中等】Kubernetes 中的 Persistent Volume 和 Persistent Volume Claim 有什么区别？⭐⭐⭐
 
@@ -1512,7 +1704,7 @@ spec:
 
 PV 是存储资源本身（管理员提供，集群级），PVC 是对存储的请求（开发者声明，命名空间级）；K8s 负责把两者绑定，动态供给用 StorageClass 自动创建 PV。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：PV 是仓库，PVC 是申请单；管理员建仓，开发者递单
 - **关键词**：资源 vs 请求 ／ 集群级 vs 命名空间级 ／ 静态 vs 动态供给
@@ -1557,8 +1749,13 @@ Kubernetes 的作用是将 PVC（申请单）与合适的 PV（仓库）进行�
 
 #### 🔀 发散问题
 
-- **Q：具体怎么一步步配置？** → 见本文档「Kubernetes 中如何实现持久化存储？」。
-- **Q：有状态应用如何每实例一份 PVC？** → volumeClaimTemplates，见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
+- **Q：具体怎么一步步配置？**
+
+  → 见本文档「Kubernetes 中如何实现持久化存储？」。
+
+- **Q：有状态应用如何每实例一份 PVC？**
+
+  → volumeClaimTemplates，见本文档「Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？」。
 
 ## 网络策略
 
@@ -1570,7 +1767,7 @@ Kubernetes 的作用是将 PVC（申请单）与合适的 PV（仓库）进行�
 
 NetworkPolicy 是基于标签的 Pod 级防火墙，采用白名单模型：Pod 未被选中时全通，被选中后入站默认拒绝；生效前提是网络插件（Calico/Cilium）支持。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：无策全通，有策白名单；入站默认拒，出站默认放
 - **关键词**：白名单 ／ podSelector ／ Ingress/Egress
@@ -1653,12 +1850,17 @@ spec:
 
 #### 🔀 发散问题
 
-- **Q：网络隔离在安全体系中的位置？** → 见本文档「Kubernetes 中如何进行安全配置？」。
-- **Q：跨命名空间放行怎么写？** → 用 namespaceSelector 配合标签，与命名空间隔离设计相关，见本文档「Kubernetes 中的 Namespace 有什么作用？」。
+- **Q：网络隔离在安全体系中的位置？**
+
+  → 见本文档「Kubernetes 中如何进行安全配置？」。
+
+- **Q：跨命名空间放行怎么写？**
+
+  → 用 namespaceSelector 配合标签，与命名空间隔离设计相关，见本文档「Kubernetes 中的 Namespace 有什么作用？」。
 
 ## 探针与健康检查
 
-### 【中等】Kubernetes 中的探针有哪些类型？各有什么作用？⭐⭐⭐⭐
+### 【中等】Kubernetes 中的探针有哪些类型？各有什么作用？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Kubernetes / 健康检查
 
@@ -1666,7 +1868,7 @@ spec:
 
 三类探针：liveness 决定是否重启，readiness 决定是否接流量，startup 保护慢启动容器。原则：liveness 要保守（只探自身），readiness 可严格（可探依赖），重启代价高、摘流量代价低。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：活着看 liveness，接活看 readiness，启动慢靠 startup 兜底
 - **关键词**：重启 vs 摘流量 ／ httpGet/exec/tcpSocket ／ 阈值参数
@@ -1744,7 +1946,8 @@ spec:
 | `failureThreshold`    | **3**  | 连续失败多少次判定失败                           |
 | `successThreshold`    | 1      | 仅对 readiness 有意义，liveness/startup 必须为 1 |
 
-  默认配置下，一个容器从探测失败到触发动作至少需要 3 × 10 = 30 秒。
+默认配置下，一个容器从探测失败到触发动作至少需要 3 × 10 = 30 秒。
+
 - 【L4】**失效场景**
   - **readinessProbe 过激进引发滚动雪崩**：`periodSeconds: 1` + `failureThreshold: 1`，新 Pod 预热时接口瞬间超时，被全部摘出 Endpoints，流量压回旧 Pod → 旧 Pod 也被摘 → **Service 无可用 Endpoint，滚动更新雪崩**。
   - **liveness 的 timeoutSeconds 过短**：GC 或高负载下接口耗时 2 秒 > 默认超时 1 秒 → 判失败 → 重启 → 冷启动负载更重 → 反复被杀成 CrashLoopBackOff 正反馈环。
@@ -1788,14 +1991,25 @@ spec:
 
 #### 🔀 发散问题
 
-- **Q：readiness 失败后存量流量多久排干？** → Endpoint 摘除亚秒级生效，但客户端 DNS 缓存（CoreDNS TTL 30 秒、JVM 默认无限缓存）会拖长，需 `terminationGracePeriodSeconds` + `preStop sleep` 兜底。
-- **Q：exec 探针在高密度节点要注意什么？** → 每次探测 fork + exec 一个进程，100 Pod 节点 + 5 秒间隔意味着每秒 20 个进程开销；高密度优先 httpGet，exec 间隔建议 30 秒以上。
-- **Q：startupProbe 成功后另两个探针立即接管有什么坑？** → 窗口设得太短慢启动应用照样被杀；应取“最长启动时间 × 2”作为安全边界。
-- **Q：探针失败导致的重启状态怎么看？** → 见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
+- **Q：readiness 失败后存量流量多久排干？**
+
+  → Endpoint 摘除亚秒级生效，但客户端 DNS 缓存（CoreDNS TTL 30 秒、JVM 默认无限缓存）会拖长，需 `terminationGracePeriodSeconds` + `preStop sleep` 兜底。
+
+- **Q：exec 探针在高密度节点要注意什么？**
+
+  → 每次探测 fork + exec 一个进程，100 Pod 节点 + 5 秒间隔意味着每秒 20 个进程开销；高密度优先 httpGet，exec 间隔建议 30 秒以上。
+
+- **Q：startupProbe 成功后另两个探针立即接管有什么坑？**
+
+  → 窗口设得太短慢启动应用照样被杀；应取“最长启动时间 × 2”作为安全边界。
+
+- **Q：探针失败导致的重启状态怎么看？**
+
+  → 见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
 
 ## 调度策略
 
-### 【困难】Kubernetes 中 Pod 的调度策略有哪些？⭐⭐⭐⭐
+### 【困难】Kubernetes 中 Pod 的调度策略有哪些？⭐⭐⭐⭐⭐
 
 > 🎯 目标等级：L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Kubernetes / 调度
 
@@ -1803,11 +2017,20 @@ spec:
 
 调度五件套：nodeSelector 简单匹配、nodeAffinity 表达式、Pod 亲和/反亲和聚散、污点容忍独占推开、topologySpreadConstraints 均匀打散。硬约束决定能不能去，软约束决定去哪更好。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：拉用亲和，推用污点；硬约束管 Pending，软约束管打分
 - **关键词**：nodeAffinity ／ taint-toleration ／ topologySpreadConstraints
 - **链路**：过滤（Filtering）淘汰不合格节点 → 打分（Scoring）选最高分 → 绑定
+
+#### 📊 量化参考
+
+- **调度延迟**：1000 节点集群 P99 约 1~~5s，5000 节点大规模集群 P99 约 10~~30s
+- **调度吞吐**：大规模集群约 100~300 Pod/s（取决于插件数量和打分复杂度）
+- **拓扑分散约束**：topologySpreadConstraints 均匀分布到可用区，maxSkew 默认 1
+- **反亲和性能开销**：比亲和性高 3~5 倍（需遍历所有已调度 Pod 匹配标签）
+- **内置调度插件**：20+ 个（Predicate + Priority），过滤阶段淘汰不合格节点
+- **调度队列**：3 级优先级（Preempt、BestEffort、Burstable），高优先级 Pod 可抢占低优先级
 
 #### 📖 核心知识
 
@@ -1898,7 +2121,8 @@ topologySpreadConstraints:
 # 不声明任何 toleration，自然避开运维打的维护污点（maintain=true:NoSchedule）
 ```
 
-  同时配置 PDB（`minAvailable: 4`），防止滚动更新或主动驱逐一次性打挂超过 1/3 副本；维护节点由运维流程统一打 `maintain=true:NoSchedule` 污点，恢复后摘除。
+同时配置 PDB（`minAvailable: 4`），防止滚动更新或主动驱逐一次性打挂超过 1/3 副本；维护节点由运维流程统一打 `maintain=true:NoSchedule` 污点，恢复后摘除。
+
 - **权衡**：`whenUnsatisfiable: DoNotSchedule` 的代价是——某可用区整体故障时，新 Pod 会因无法保持均匀而 Pending，这是“宁缺毋滥”的正确行为（防止全部挤进单区），但必须配 Pending 告警；若业务要求“先跑起来再说”，改为 `ScheduleAnyway`（软约束），并依赖后续重平衡修复分布。
 
 :::
@@ -1917,14 +2141,25 @@ topologySpreadConstraints:
 
 #### 🔀 发散问题
 
-- **Q：调度分哪两个阶段，亲和性分别在哪起作用？** → 过滤（硬约束淘汰节点）与打分（软约束加权求和选最高分），排查 Pending 只看过滤阶段失败原因。
-- **Q：NoExecute 和 NoSchedule 本质区别？** → NoExecute 会立即驱逐不容忍的已运行 Pod；`tolerationSeconds` 可延迟驱逐，典型用于容忍节点 unreachable 300 秒避免迁移风暴。
-- **Q：调度与驱逐顺序有什么关系？** → 资源声明决定 QoS 等级，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
-- **Q：每节点必跑一个副本用什么机制？** → 见本文档「Kubernetes 中的 DaemonSet 有什么作用？」。
+- **Q：调度分哪两个阶段，亲和性分别在哪起作用？**
+
+  → 过滤（硬约束淘汰节点）与打分（软约束加权求和选最高分），排查 Pending 只看过滤阶段失败原因。
+
+- **Q：NoExecute 和 NoSchedule 本质区别？**
+
+  → NoExecute 会立即驱逐不容忍的已运行 Pod；`tolerationSeconds` 可延迟驱逐，典型用于容忍节点 unreachable 300 秒避免迁移风暴。
+
+- **Q：调度与驱逐顺序有什么关系？**
+
+  → 资源声明决定 QoS 等级，见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
+
+- **Q：每节点必跑一个副本用什么机制？**
+
+  → 见本文档「Kubernetes 中的 DaemonSet 有什么作用？」。
 
 ## RBAC
 
-### 【中等】什么是 Kubernetes 中的 RBAC？⭐⭐⭐
+### 【困难】什么是 Kubernetes 中的 RBAC？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Kubernetes / 权限
 
@@ -1932,7 +2167,7 @@ topologySpreadConstraints:
 
 RBAC 是基于角色的访问控制：用 Role/ClusterRole 定义权限规则，用 RoleBinding/ClusterRoleBinding 把规则绑给用户/组/ServiceAccount，遵循最小权限原则。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Role 定规则，Binding 绑主体；命名空间看 Role，集群看 ClusterRole
 - **关键词**：Role ／ Binding ／ 最小权限
@@ -1966,8 +2201,13 @@ RBAC 是基于角色的访问控制：用 Role/ClusterRole 定义权限规则，
 
 #### 🔀 发散问题
 
-- **Q：RBAC 与命名空间怎么配合？** → 见本文档「Kubernetes 中的 Namespace 有什么作用？」。
-- **Q：RBAC 在安全体系中的位置？** → 见本文档「Kubernetes 中如何进行安全配置？」。
+- **Q：RBAC 与命名空间怎么配合？**
+
+  → 见本文档「Kubernetes 中的 Namespace 有什么作用？」。
+
+- **Q：RBAC 在安全体系中的位置？**
+
+  → 见本文档「Kubernetes 中如何进行安全配置？」。
 
 ## Pod 驱逐与 QoS
 
@@ -1979,11 +2219,21 @@ RBAC 是基于角色的访问控制：用 Role/ClusterRole 定义权限规则，
 
 QoS 是 K8s 的资源保护等级，由 requests/limits 声明决定：Guaranteed 最后驱逐、Burstable 居中、BestEffort 最先驱逐；节点压力时 kubelet 按 QoS + 超用程度排序驱逐。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：声明全且等是保级，只申 requests 是突级，啥都不设最先死
 - **关键词**：Guaranteed ／ Burstable ／ BestEffort
 - **链路**：节点压力超阈值 → kubelet 按 QoS 排序驱逐 → 控制器在别的节点重建
+
+#### 📊 量化参考
+
+| 指标               | 数值                                                                                      | 备注                                                            |
+| :----------------- | :---------------------------------------------------------------------------------------- | :-------------------------------------------------------------- |
+| 硬驱逐阈值（默认） | memory.available<100Mi；nodefs.available<10%；imagefs.available<15%；nodefs.inodesFree<5% | kubelet 默认值，生产常调大留提前量                              |
+| 驱逐顺序           | BestEffort → 超限 Burstable → Guaranteed（最后）                                          | 同 QoS 内按「实际用量 − requests」差值排序                      |
+| OOM 优先级         | oom_score_adj：Guaranteed −997，BestEffort 1000                                           | 内核 OOM Killer 与 kubelet 驱逐方向一致                         |
+| 压力状态恢复       | eviction-pressure-transition-period 默认 5m                                               | 防止驱逐状态频繁抖动                                            |
+| CPU 压力           | 不触发驱逐                                                                                | 驱逐只看内存与磁盘/inode 压力，CPU 超卖靠 LimitRange + 调度约束 |
 
 #### 📖 核心知识
 
@@ -2019,9 +2269,17 @@ Kubernetes 根据 Pod 的资源声明将其划分为三个 **QoS 等级**，决�
 
 #### 🔀 发散问题
 
-- **Q：requests/limits 从哪约束？** → 命名空间配额与 LimitRange，见本文档「Kubernetes 中如何配置资源配额？」。
-- **Q：被驱逐后 Pod 去哪了？** → 重新调度，受调度策略约束，见本文档「Kubernetes 中 Pod 的调度策略有哪些？」。
-- **Q：OOMKilled 状态怎么排查？** → 退出码 137，见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
+- **Q：requests/limits 从哪约束？**
+
+  → 命名空间配额与 LimitRange，见本文档「Kubernetes 中如何配置资源配额？」。
+
+- **Q：被驱逐后 Pod 去哪了？**
+
+  → 重新调度，受调度策略约束，见本文档「Kubernetes 中 Pod 的调度策略有哪些？」。
+
+- **Q：OOMKilled 状态怎么排查？**
+
+  → 退出码 137，见本文档「Pod 一直处于 CrashLoopBackOff，如何排查？」。
 
 ## 故障排查
 
@@ -2033,7 +2291,7 @@ Kubernetes 根据 Pod 的资源声明将其划分为三个 **QoS 等级**，决�
 
 CrashLoopBackOff 是容器反复崩溃后 kubelet 的指数退避重启。三板斧：describe 看事件与退出码、logs --previous 看崩溃现场、按退出码定方向，能解决九成问题。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：describe 看事件，logs 加 previous，退出码定方向
 - **关键词**：指数退避 ／ 退出码 ／ --previous
@@ -2084,9 +2342,125 @@ kubectl logs <pod-name> --previous # 上一次崩溃的容器日志（关键！�
 
 #### 🔀 发散问题
 
-- **Q：探针误杀导致的反复重启怎么治理？** → 见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
-- **Q：退出码 137 背后的驱逐顺序？** → 见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
-- **Q：配置缺失导致的启动失败？** → 见本文档「Kubernetes 中的 ConfigMap 和 Secret 有什么作用？」。
+- **Q：探针误杀导致的反复重启怎么治理？**
+
+  → 见本文档「Kubernetes 中的探针有哪些类型？各有什么作用？」。
+
+- **Q：退出码 137 背后的驱逐顺序？**
+
+  → 见本文档「Kubernetes 中 Pod 的 QoS 等级是什么？节点资源不足时如何驱逐 Pod？」。
+
+- **Q：配置缺失导致的启动失败？**
+
+  → 见本文档「Kubernetes 中的 ConfigMap 和 Secret 有什么作用？」。
+
+### 【困难】Kubernetes 的 List-Watch 与 Informer 机制是什么？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Kubernetes / 控制面
+
+#### 💎 关键结论
+
+List-Watch 是 K8s 控制面获取资源变化的核心机制：先 List 全量拉取，再 Watch 增量监听变化。Informer 在此基础上加了本地缓存（Indexer）和事件队列，避免每次变化都直接请求 API Server。这是 Controller 模式的基石——所有 Operator、kube-proxy、kubelet 都依赖 Informer 感知资源变化。
+
+#### ⚡ 记忆卡片
+
+- **口诀**：List 全量、Watch 增量、Informer 加缓存
+- **关键词**：List ／ Watch ／ Reflector ／ Indexer ／ DeltaFIFO ／ ResourceVersion ／ SharedInformer
+- **链路**：API Server(etcd) → Reflector(List+Watch) → DeltaFIFO(事件队列) → Indexer(本地缓存) → EventHandler(回调) → Controller(业务逻辑)
+
+#### 📖 核心知识
+
+**List-Watch 机制**
+
+K8s 采用声明式 API，控制面需要持续感知资源变化。List-Watch 分两步：
+
+1. **List**：首次启动时，从 API Server 全量拉取目标资源（如所有 Pod），获取 `resourceVersion`（乐观锁版本号）；
+2. **Watch**：以 `resourceVersion` 为起点，通过 HTTP chunked transfer / WebSocket 长连接，持续接收增量变更事件（ADDED / MODIFIED / DELETED）。
+
+```
+Client                          API Server (etcd)
+  │── List(pods) ──────────────▶│ 返回全量 + resourceVersion=100
+  │◀── 全量数据 ────────────────│
+  │── Watch(resourceVersion=100)▶│ 建立长连接
+  │◀── ADDED pod-A ─────────────│ etcd 变更推送
+  │◀── MODIFIED pod-B ──────────│
+  │◀── DELETED pod-C ──────────│
+```
+
+**Informer 架构**
+
+Informer 是 client-go 对 List-Watch 的封装，解决了「多个 Controller 都要 Watch 同一资源」的重复请求问题：
+
+| 组件               | 职责                                                                   |
+| ------------------ | ---------------------------------------------------------------------- |
+| **Reflector**      | 执行 List-Watch，将事件写入 DeltaFIFO                                  |
+| **DeltaFIFO**      | 事件队列，按资源 key 去重合并（同一 Pod 的多次 UPDATE 合并为最新状态） |
+| **Indexer**        | 本地缓存，按 namespace/name 索引，支持自定义索引函数                   |
+| **SharedInformer** | 多个 Controller 共享同一个 Informer 实例，避免重复 List-Watch          |
+| **EventHandler**   | 注册回调（OnAdd / OnUpdate / OnDelete），事件从 DeltaFIFO 弹出时触发   |
+
+**为什么需要 Informer 而不是直接 Watch？**
+
+- **减少 API Server 压力**：100 个 Controller 各 Watch 一次 = 100 个长连接；SharedInformer = 1 个连接 + 本地广播；
+- **本地缓存零延迟读**：Controller 需要读资源状态时直接查 Indexer，不用请求 API Server；
+- **事件去重**：DeltaFIFO 合并同一资源的连续变更，减少不必要的 reconcile。
+
+::: details ResourceVersion 与断线重连
+
+- **ResourceVersion** 是 etcd 的全局递增版本号，Watch 基于它保证不丢事件；
+- **断线重连**：Watch 连接断开后，Reflector 以最后收到的 `resourceVersion` 重新 Watch；
+- **Bookmark 事件**：API Server 定期发送 Bookmark（只含 resourceVersion，无数据），用于推进 Watch 起点，减少重连时的重复事件；
+- **超时保护**：若 `resourceVersion` 太旧（etcd compaction 已清理），API Server 返回 410 Gone，Reflector 触发重新 List。
+
+:::
+
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】DeltaFIFO 的去重逻辑：同一 key 的多个 Delta 类型事件（Added → Modified → Modified）会被合并为一个 Sync 事件（携带最新状态）。但 Delete 事件不会被合并——确保删除操作不丢失。
+- 【L3】Indexer 的自定义索引：默认按 `namespace/name` 索引，但可注册自定义索引函数。例如按 Pod 的 `nodeName` 建索引，快速查询「某节点上的所有 Pod」。
+- 【L4】Informer 与 Operator 的关系：Operator 的核心是 Controller（reconcile loop），Controller 通过 Informer 感知 CRD 变化。每次事件触发 `Reconcile()` 方法，将当前状态向期望状态推进。这就是「声明式 API + Reconcile Loop」的实现基础。
+- 【L4】性能调优：大规模集群（> 5000 节点）中，Informer 的本地缓存可能占用大量内存。优化手段：① 使用 `TweakListOptions` 过滤不需要的资源（如只 Watch 特定 label）；② 使用 `SharedIndexInformer` 的 Resync 周期控制全量同步频率。
+
+:::
+
+#### 🏭 实战场景
+
+::: details
+
+**某平台 Operator 开发中的 Informer 实践**：
+
+- **场景**：自定义 CRD `AppDeployment`，需要 Watch 其变化并自动创建 Deployment + Service；
+- **实现**：
+  1. 用 `controller-runtime` 的 `Manager` 创建 SharedInformer；
+  2. 注册 `Reconciler`，`Reconcile()` 方法读取 `AppDeployment` 当前状态，对比实际 Deployment 状态，差异部分 patch 修复；
+  3. Informer 缓存 + 事件队列保证不丢事件、不重复处理；
+- **踩坑**：① 未设 `ResyncPeriod`，本地缓存与 API Server 长期不一致（极端情况下）；② `Reconcile()` 中直接 Update 全量对象导致冲突，改为 Patch + `resourceVersion` 乐观锁。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "Watch 是轮询" → Watch 是长连接推送（HTTP chunked / WebSocket），不是定时拉取；轮询效率低且延迟高。
+- ❌ "Informer 缓存会一直与 API Server 一致" → 缓存是最终一致的，极端情况下可能短暂落后；Controller 的 Reconcile 必须能处理「缓存状态 ≠ 实际状态」的情况。
+- ❌ "每个 Controller 都需要自己的 Informer" → 应使用 SharedInformer 共享，否则同一资源的多个 Watch 会压垮 API Server。
+
+:::
+
+#### 🔀 发散问题
+
+- **Q：etcd 在 K8s 中扮演什么角色？**
+
+  → etcd 是 K8s 的「唯一数据源」，所有资源状态存储在 etcd 中，List-Watch 的数据源头就是 etcd 的 Watch 机制。
+
+- **Q：K8s 的声明式 API 与 Reconcile Loop 是什么？**
+
+  → Informer 是感知层，Reconcile Loop 是执行层，两者构成 Controller 模式的核心。
 
 ## 参考资料
 

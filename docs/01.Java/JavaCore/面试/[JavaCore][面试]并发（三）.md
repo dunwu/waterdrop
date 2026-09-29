@@ -18,7 +18,7 @@ permalink: /pages/f7892a67/
 
 ## Java 线程池
 
-### 【简单】为什么要用线程池？⭐⭐⭐⭐
+### 【简单】为什么要用线程池？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：线程池 / 核心价值
 
@@ -26,7 +26,7 @@ permalink: /pages/f7892a67/
 
 线程池的核心价值是复用线程，避免频繁创建/销毁的开销。三大好处：降低资源消耗、提高响应速度、让线程可统一分配、调优和监控。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：复用省消耗、免等响应快、统一好管理
 - **关键词**：线程复用 ／ 响应速度 ／ 可管理性
@@ -50,17 +50,19 @@ permalink: /pages/f7892a67/
 
 #### 🔀 发散问题
 
-- **Q：线程池和数据库连接池的共同点是什么？** → 都是池化思想的应用，复用昂贵资源（线程/连接）以降低创建开销，并通过上限控制保护系统不被打垮；区别在于管理的资源类型与回收策略不同。
+- **Q：线程池和数据库连接池的共同点是什么？**
 
-### 【简单】Java 创建线程池有哪些方式？⭐⭐⭐⭐
+  → 都是池化思想的应用，复用昂贵资源（线程/连接）以降低创建开销，并通过上限控制保护系统不被打垮；区别在于管理的资源类型与回收策略不同。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：线程池 / 创建方式
+### 【简单】Java 创建线程池有哪些方式？⭐⭐⭐
+
+> 🎯 目标等级：L2-L4 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：线程池 / 创建方式
 
 #### 💎 关键结论
 
 两条主路径：简单场景用 `Executors` 工厂方法，需要精细控制时直接用 `ThreadPoolExecutor` 构造器；分治并行任务用 `ForkJoinPool`（JDK7+）。生产推荐构造器方式，避免无界队列导致 OOM。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Fixed 固定 Single 单，Cached 弹性 Scheduled 延，精细控制构造器，分治就用 ForkJoin
 - **关键词**：Executors ／ ThreadPoolExecutor ／ ForkJoinPool
@@ -100,20 +102,29 @@ ForkJoinPool forkJoinPool = new ForkJoinPool(int parallelism);
 
 4. **选型原则**：简单场景用工厂方法，需要精细控制时用构造器；根据任务类型选择合适的线程池类型；避免使用无界队列以防内存溢出。
 
+5. **`Executors.newVirtualThreadPerTaskExecutor()`（JDK 21+）**：JDK 21（JEP 444，正式特性）交付虚拟线程后，`Executors` 新增了「每任务一虚拟线程」的执行器。它不是复用池而是**每提交一个任务就新建一个虚拟线程**——因为虚拟线程本身足够廉价（栈按需增长、由 JVM 调度挂载到载体线程），"池化"反而成为瓶颈。对应的手写形式是 `Thread.ofVirtual().start(runnable)` 或 `Thread.ofVirtual().factory()`。
+
 #### 🔬 扩展知识
 
 ::: details
 
 - 【L3】阿里开发规约禁止使用 `Executors` 的原因：`newFixedThreadPool` 和 `newSingleThreadExecutor` 使用无界的 `LinkedBlockingQueue`，任务堆积可能耗尽内存；`newCachedThreadPool` 的 `maximumPoolSize` 为 `Integer.MAX_VALUE`，可能创建大量线程导致 OOM。
+- 【L4】平台线程池与虚拟线程执行器的选型边界：**IO 密集、高并发、任务数远大于核数**的场景（网关聚合、批量 RPC、爬虫）适合虚拟线程执行器，线程数不再是需要调优的参数；**CPU 密集**场景虚拟线程没有收益（并行度仍受核数限制，反而多一层挂载/卸载开销），应继续用 `corePoolSize ≈ 核数 + 1` 的平台线程池或 `ForkJoinPool`。虚拟线程执行器**没有队列容量与拒绝策略这两个天然的背压闸门**，流量洪峰下会无限制创建虚拟线程，真正的瓶颈会转移到下游连接池/数据库连接数上，必须自行用 `Semaphore` 做并发上限保护。
+- 【L4】虚拟线程的两个已知限制：**pinning（钉住）**——在 `synchronized` 块内发生阻塞时，虚拟线程无法从载体线程卸载，会把载体线程一起钉住，JDK 21–23 期间需改用 `ReentrantLock`，该限制由 JDK 24 的 JEP 491 消除；**`ThreadLocal` 内存放大**——百万级虚拟线程下每个线程一份 ThreadLocal 副本会放大堆占用，官方方向是 Scoped Values（仍为预览特性）。结构化并发 `StructuredTaskScope` 在 JDK 21 引入后长期处于预览状态，生产使用需确认所用 JDK 版本的特性状态。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：大量短小 IO 任务该选哪种线程池？** → 可选 `CachedThreadPool`（弹性伸缩、空闲线程复用），但生产上更推荐用 `ThreadPoolExecutor` 构造器等价实现并设置有界参数，避免线程数失控。
-- **Q：七参数的详细作用？** → 见本文档「Java 线程池有哪些核心参数？各有什么作用？」。
+- **Q：大量短小 IO 任务该选哪种线程池？**
 
-### 【中等】Java 线程池有哪些核心参数？各有什么作用？⭐⭐⭐⭐⭐
+  → 可选 `CachedThreadPool`（弹性伸缩、空闲线程复用），但生产上更推荐用 `ThreadPoolExecutor` 构造器等价实现并设置有界参数，避免线程数失控。
+
+- **Q：七参数的详细作用？**
+
+  → 见本文档「Java 线程池有哪些核心参数？各有什么作用？」。
+
+### 【中等】Java 线程池有哪些核心参数？各有什么作用？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：线程池 / 核心参数
 
@@ -121,7 +132,7 @@ ForkJoinPool forkJoinPool = new ForkJoinPool(int parallelism);
 
 七参数决定任务命运：`corePoolSize` 定常驻线程、`workQueue` 缓冲任务、`maximumPoolSize` 定临时线程、`handler` 兜底拒绝；配合 `keepAliveTime`、`unit`、`threadFactory` 控制回收与创建方式。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：core 常驻 max 临时，队列缓冲 keepAlive 回收，factory 起名 handler 拒
 - **关键词**：corePoolSize ／ maximumPoolSize ／ workQueue ／ handler
@@ -174,6 +185,18 @@ public ThreadPoolExecutor(int corePoolSize,// 线程池的核心线程数量
 
 :::
 
+#### 📊 量化参考
+
+| 指标                        | 数值                                                               | 备注                           |
+| --------------------------- | ------------------------------------------------------------------ | ------------------------------ |
+| FixedThreadPool 默认值      | core = max = N，LinkedBlockingQueue 无界                           | 队列可无限堆积，易 OOM         |
+| CachedThreadPool 默认值     | core = 0，max = Integer.MAX_VALUE，keepAlive 60s，SynchronousQueue | 线程数无上限，可能耗尽系统资源 |
+| SingleThreadExecutor 默认值 | core = max = 1，无界队列                                           | 顺序执行，同样存在 OOM 风险    |
+| ScheduledThreadPool 默认值  | core = N，max = Integer.MAX_VALUE，DelayedWorkQueue                | 适用于定时/周期任务            |
+| Tomcat 工作线程             | maxThreads 默认 200，acceptCount 默认 100                          | 高并发短连接场景按 QPS 评估    |
+| Dubbo 默认线程池            | fixed 200，queues=0（SynchronousQueue）                            | 缺省快速失败，避免请求堆积     |
+| Netty EventLoop 线程数      | 默认 2×CPU 核数                                                    | IO 密集型场景的经验值          |
+
 #### ⚠️ 常见误区
 
 ::: details
@@ -182,23 +205,29 @@ public ThreadPoolExecutor(int corePoolSize,// 线程池的核心线程数量
 
 - ❌ “线程池创建完成后会立刻启动 corePoolSize 个线程” → 默认情况下创建线程池之后线程数是 0，需要提交任务后才会逐个创建；可用 `prestartAllCoreThreads()` 预启动全部核心线程。
 - ❌ “用无界队列更安全，任务不会丢” → 无界队列会让 `maximumPoolSize` 失效，任务无限堆积反而引发 OOM，生产推荐有界队列 + 拒绝策略。
+- ❌ “线程池里用 `ThreadLocal` 存上下文，反正每个任务都在自己的线程上” → **线程复用**恰恰是 `ThreadLocal` 最危险的场景：任务 A 在线程 T 上写入的 `ThreadLocal` 若未在 `finally` 中 `remove()`，线程 T 被任务 B 复用时就会读到 A 的脏数据（典型事故是 traceId / 租户 ID / 用户身份串号）；同时 `ThreadLocalMap` 的 Entry 是**弱引用 key + 强引用 value**，线程池中的线程长期存活使 Entry 无法随线程结束而释放，value 被队列里那条永不断裂的引用链拖住形成内存泄漏。规范做法是任务入口 `set`、出口 `finally` 中 `remove`，或改用 `TransmittableThreadLocal`（阿里 TTL）解决线程池场景下的上下文传递——完整的泄漏因果链与 TTL 原理见并发（二）「如何解决 `ThreadLocal` 内存泄漏问题？」。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：不同阻塞队列该怎么选？** → 见本文档「Java 线程池支持哪些阻塞队列，如何选择？」。
-- **Q：拒绝策略如何选择？** → 见本文档「Java 线程池支持哪些拒绝策略？如何选择？」。
+- **Q：不同阻塞队列该怎么选？**
+
+  → 见本文档「Java 线程池支持哪些阻塞队列，如何选择？」。
+
+- **Q：拒绝策略如何选择？**
+
+  → 见本文档「Java 线程池支持哪些拒绝策略？如何选择？」。
 
 ### 【中等】Java 线程池的工作原理是什么？⭐⭐⭐⭐⭐
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：线程池 / 工作流程
+> 🎯 目标等级：L2-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：线程池 / 工作流程
 
 #### 💎 关键结论
 
 线程池按四步处理任务：核心线程直接执行 → 入队等待 → 创建非核心线程 → 触发拒绝策略；空闲线程超过 keepAliveTime 会被回收。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一核心、二入队、三最大、四拒绝
 - **关键词**：corePoolSize ／ workQueue ／ maximumPoolSize ／ 拒绝策略
@@ -423,6 +452,10 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 }
 ```
 
+- 【L4】**线程池隔离与舱壁（Bulkhead）模式**：`ThreadPoolExecutor` 在架构层面的第二重价值不是"省线程"，而是**故障隔离边界**。把所有异步任务共用一个池，等价于把全船的舱室打通——任一类任务因下游抖动而变慢，就会占满 worker、灌满队列，把同池的其他业务一起拖死（线程池耗尽是雪崩最常见的传导路径）。正确做法是**按下游依赖 / 业务域拆池**：调用 A 服务的任务、调用 B 服务的任务、本地计算任务各自独立池，各配独立的 `maximumPoolSize` 与有界队列，使单个依赖的故障被限制在自己的舱室内。拆池的代价是总线程数上升与资源碎片化，因此粒度要按"故障域"而非"方法"划分，并配合独立的拒绝策略与监控埋点（活跃线程数、队列堆积、拒绝计数按池维度上报）。
+- 【L4】**`Worker` 为什么继承 `ReentrantLock` 且不可重入**：`Worker` 自身是一把锁，`runWorker` 执行任务期间持有它。`shutdown()` 调用的 `interruptIdleWorkers()` 只对 `tryLock()` 成功的 worker 发中断——正在跑任务的 worker 拿不到锁，因此不会被误中断，这就是"只中断空闲线程"的实现基础。`Worker` 的锁被故意设计成不可重入，是为了让 `runWorker` 在调用用户任务前后 `unlock/lock` 时能真正释放再获取，从而让 `tryLock` 的语义严格等价于"当前是否空闲"。
+- 【L4】**虚拟线程出现后平台线程池的定位变化**：JDK 21（JEP 444）之后，"用线程池复用线程以摊薄创建成本"这一原始动机被削弱——虚拟线程创建成本极低，官方明确建议**不要池化虚拟线程**，而是 `Executors.newVirtualThreadPerTaskExecutor()` 每任务一线程。但 `ThreadPoolExecutor` 并未过时，它的角色从"线程复用器"转为**并发度与背压的控制器**：`maximumPoolSize` + 有界队列 + 拒绝策略构成的三道闸门，在虚拟线程模型下反而需要由 `Semaphore` 显式重建（虚拟线程执行器没有队列与拒绝策略）。CPU 密集型任务仍应留在平台线程池 / `ForkJoinPool`。
+
 :::
 
 #### ⚠️ 常见误区
@@ -438,10 +471,15 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 
 #### 🔀 发散问题
 
-- **Q：Worker 类的作用是什么？** → Worker 是工作线程的载体，实现了 Runnable，每个 Worker 包装一个线程，负责循环获取任务执行（`runWorker`）；它还通过不可重入锁特性辅助区分线程是否空闲，供 `interruptIdleWorkers` 使用。
-- **Q：execute() 与 submit() 有什么区别？** → `execute()` 提交 Runnable，无返回值；`submit()` 提交 Callable/Runnable，返回 Future，可通过 `Future.get()` 获取结果并捕获任务异常。
+- **Q：Worker 类的作用是什么？**
 
-### 【简单】Java 线程池的核心线程会被回收吗？⭐⭐⭐
+  → Worker 是工作线程的载体，实现了 Runnable，每个 Worker 包装一个线程，负责循环获取任务执行（`runWorker`）；它还通过不可重入锁特性辅助区分线程是否空闲，供 `interruptIdleWorkers` 使用。
+
+- **Q：execute() 与 submit() 有什么区别？**
+
+  → `execute()` 提交 Runnable，无返回值；`submit()` 提交 Callable/Runnable，返回 Future，可通过 `Future.get()` 获取结果并捕获任务异常。
+
+### 【简单】Java 线程池的核心线程会被回收吗？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：线程池 / 线程回收
 
@@ -449,7 +487,7 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 
 默认情况下核心线程常驻不回收，即使空闲也会保留；如需弹性缩容，调用 `allowCoreThreadTimeOut(true)` 后，核心线程空闲超过 keepAliveTime 也会被回收。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：核心常驻不回收，allow 开关核心也能走
 - **关键词**：核心线程 ／ keepAliveTime ／ allowCoreThreadTimeOut
@@ -471,17 +509,19 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 
 #### 🔀 发散问题
 
-- **Q：非核心线程具体是怎么被回收的？** → Worker 在 `runWorker` 循环中用 `workQueue.poll(keepAliveTime, unit)` 限时取任务，超时取不到且线程数超过 corePoolSize 时退出循环，由 `processWorkerExit` 完成回收。
+- **Q：非核心线程具体是怎么被回收的？**
+
+  → Worker 在 `runWorker` 循环中用 `workQueue.poll(keepAliveTime, unit)` 限时取任务，超时取不到且线程数超过 corePoolSize 时退出循环，由 `processWorkerExit` 完成回收。
 
 ### 【中等】如何合理地设置 Java 线程池的线程数？⭐⭐⭐⭐
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：线程池 / 线程数调优
+> 🎯 目标等级：L2-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：线程池 / 线程数调优
 
 #### 💎 关键结论
 
 先看任务类型再套公式：CPU 密集型取 `核心数+1`，IO 密集型取 `核心数×(1+W/C)`；公式只是理论起点，最终必须压测校准。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：CPU 加一，IO 乘比值，压测来校准
 - **关键词**：CPU 密集型 ／ IO 密集型 ／ W/C 比值
@@ -576,7 +616,7 @@ tokio 是 Rust 生态的异步运行时，其线程模型与 Java 线程池有�
 - **默认 worker_threads = CPU 核心数**：tokio 只会创建与 CPU 核数相等的 worker 线程，所有异步任务在这些线程上通过协作式调度执行。
 - **任务模型**：tokio 的 `task` 是 Future（类似 Java 的 CompletableFuture），`.await` 点是协作式让出点。一个 worker 线程可以在一个 OS 线程上并发驱动数万个 task——这与虚拟线程的载体线程复用机制同构。
 - **与 Java 的核心差异**：Java 线程池中的「线程数」指 OS 线程数，而 tokio 的「worker 数」指 OS 线程数，task 数不受此限制。IO 密集时，tokio 只用少量线程（如 4~8 核）即可支撑数十万并发连接，因为 IO 操作被委托给操作系统的 epoll/kqueue/IOCP，不阻塞 worker 线程。
-- **配置建议**：tokio 文档建议 `worker_threads` = CPU 核心数，不需要像 Java 那样使用 \( W/C \) 公式放大线程数——因为阻塞 IO 在 tokio 中通过异步 IO + 事件循环完成，不消耗额外线程。
+- **配置建议**：tokio 文档建议 `worker_threads` = CPU 核心数，不需要像 Java 那样使用 `W/C` 公式放大线程数——因为阻塞 IO 在 tokio 中通过异步 IO + 事件循环完成，不消耗额外线程。
 
 **Linux epoll 与 C10K → C10M 的设计范式演变**
 
@@ -584,9 +624,22 @@ tokio 是 Rust 生态的异步运行时，其线程模型与 Java 线程池有�
 - **C10K 解决方案**：Linux epoll（2002 年，Linux 2.6）引入事件驱动模型——一个线程通过 `epoll_wait` 轮询数万个 fd，有事件才处理。Nginx 正是基于此模型以极少的 worker 进程支撑数万并发连接。
 - **C10M 时代（2010 年代）**：用户态网络栈（DPDK、XDP、io_uring）进一步将数据面从内核旁路到用户态，单机可达千万并发连接。此时线程的角色彻底改变：线程不再是连接的处理者，而是 CPU 核心的执行单元——一个核心一个线程，通过事件循环驱动所有连接。
 - **对 Java 线程池配置的启示**：
-  - 传统 I/O 密集型公式 \( N*{threads} = N*{cpu} \times (1 + W/C) \) 适用于**每任务占用一个线程的阻塞模型**（如 Servlet + 同步 JDBC）。
-  - 若采用 NIO/Netty + 事件循环，线程数应回归 \( N\_{cpu} + 1 \)（类似 tokio），并发能力由异步 IO + epoll 承载。
+
+  - 传统 I/O 密集型公式 `N_threads = N_cpu × (1 + W/C)` 适用于**每任务占用一个线程的阻塞模型**（如 Servlet + 同步 JDBC）。
+  - 若采用 NIO/Netty + 事件循环，线程数应回归 `N_cpu + 1`（类似 tokio），并发能力由异步 IO + epoll 承载。
   - 若采用虚拟线程，线程数 = 任务数（无需调参），OS 线程数 = CPU 核数，载体线程自动复用——这是向 Go/tokio 模型靠拢的信号。
+
+- 【L4】**线程池参数的量化决策链路（P8 场次要答的是闭环，不是公式）**：公式只能给出起点，完整的决策链路是五步闭环：
+
+  1. **压测定基线**：在预发环境用真实流量模型压测，采集单任务的 CPU 计算时间 C 与等待时间 W（可从 APM 的 span 耗时拆分得到），得到 W/C 比值与单机可承载 QPS；同时记录压测中的 CPU 利用率、P99 响应时间、上下文切换率与 GC 停顿。
+  2. **由 SLA 反推队列容量**：队列容量不是拍脑袋的整数，而是由「可容忍排队时间 ÷ 单任务耗时 × 消费线程数」推出（见本文档「1000 个任务…线程池参数怎么设置？」）。队列越长，故障时的恢复时间越长、内存占用越高——**队列容量本质是在"削峰能力"与"故障暴露延迟"之间做权衡**。
+  3. **按业务语义定拒绝策略**：能重试的（消息消费、异步落库）用自定义策略持久化到 MQ/Redis 延迟重试；不能重试且必须让用户感知的（下单、支付）用 `AbortPolicy` 快速失败并返回明确错误码；能降级的用 `CallerRunsPolicy` 反压上游，但要确认调用线程是不是 Web 容器请求线程。
+  4. **监控告警先行**：必须上报的核心指标是**活跃线程数 / `maximumPoolSize` 比值、队列堆积深度与堆积增长速率、拒绝次数、任务排队耗时（P99）**。其中"拒绝次数 > 0"和"队列堆积持续增长"是两条独立的告警线——前者是已经丢任务，后者是即将丢任务，只告警前者会错失处置窗口。
+  5. **动态调参闭环**：基于配置中心（Nacos/Apollo）在运行时改 `corePoolSize`/`maximumPoolSize`/队列容量，配合灰度与变更审计，使参数能随流量演进，而不是每次调参都要发版。开源实现可直接用 Hippo4j、Dynamic TP。
+
+  这条链路的价值在于：面试官追问"你怎么知道 40 是对的"时，答案是"压测得出 W/C=4，SLA 要求 P99 < 200ms 反推队列 200，压测验证 P99=180ms、CPU 72%、CS 3000/s，上线后按池维度监控堆积与拒绝数，两个月内动态调整过 3 次"——而不是"公式算出来是 40"。
+
+- 【L4】**虚拟线程对线程数调优的冲击与限制**：JDK 21（JEP 444，正式特性）之后，IO 密集型场景可以不再计算线程数——`Executors.newVirtualThreadPerTaskExecutor()` 每任务一虚拟线程，W/C 公式失去意义（不再有"线程被 IO 阻塞浪费"的问题）。但三条边界必须讲清：① **CPU 密集场景不适用**，并行度仍受核数限制，虚拟线程只增加挂载/卸载开销；② **pinning 问题**——在 `synchronized` 块内阻塞会把载体线程一起钉住，JDK 21–23 需把临界区内的阻塞调用改为 `ReentrantLock`，该限制由 JDK 24 的 JEP 491 消除；③ **背压消失**——虚拟线程执行器没有队列容量与拒绝策略，百万级并发会把压力原样打到下游连接池，必须用 `Semaphore` 显式限流；④ **`ThreadLocal` 内存放大**——每虚拟线程一份副本，海量线程下堆占用被放大，官方方向是 Scoped Values（预览特性）；结构化并发 `StructuredTaskScope` 自 JDK 21 起长期处于预览状态，生产采用前需确认所用 JDK 的特性状态。
 
 :::
 
@@ -603,10 +656,15 @@ tokio 是 Rust 生态的异步运行时，其线程模型与 Java 线程池有�
 
 #### 🔀 发散问题
 
-- **Q：给定任务量和响应时限，参数怎么算？** → 见本文档「1000 个任务，每个任务 0.1s，最大响应时间 1s，线程池参数怎么设置？」。
-- **Q：线上想不重启调整线程数怎么办？** → 见本文档「Java 线程池参数在运行过程中能修改吗？如何修改？」。
+- **Q：给定任务量和响应时限，参数怎么算？**
 
-### 【中等】Java 线程池支持哪些阻塞队列，如何选择？⭐⭐⭐
+  → 见本文档「1000 个任务，每个任务 0.1s，最大响应时间 1s，线程池参数怎么设置？」。
+
+- **Q：线上想不重启调整线程数怎么办？**
+
+  → 见本文档「Java 线程池参数在运行过程中能修改吗？如何修改？」。
+
+### 【中等】Java 线程池支持哪些阻塞队列，如何选择？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：线程池 / 阻塞队列
 
@@ -614,7 +672,7 @@ tokio 是 Rust 生态的异步运行时，其线程模型与 Java 线程池有�
 
 常用五种：Array（有界数组）、Linked（可选有界链表，双锁）、Synchronous（零容量直传）、Priority（优先级堆）、Delay（延迟堆）；选型先看是否要优先级/延迟，再看能否预估峰值定容量。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Array 有界 Linked 双锁，Sync 直传吞吐高，Priority 排序 Delay 延
 - **关键词**：有界性 ／ 吞吐量 ／ 双锁分离
@@ -661,6 +719,20 @@ tokio 是 Rust 生态的异步运行时，其线程模型与 Java 线程池有�
 - **实时交易**：SynchronousQueue + CachedThreadPool
 - **定时任务**：DelayQueue（单线程消费）
 
+::: details
+
+**方案对比：**
+
+| 方案                  | 数据结构           | 有界/无界                          | 公平/非公平                             | 典型场景                         | 关键特性                                                           |
+| --------------------- | ------------------ | ---------------------------------- | --------------------------------------- | -------------------------------- | ------------------------------------------------------------------ |
+| ArrayBlockingQueue    | 数组               | 有界（必须指定容量）               | 可选公平锁（默认非公平）                | 已知并发量的稳定系统             | 内存连续、单锁竞争、put/take 互斥                                  |
+| LinkedBlockingQueue   | 链表节点           | 可选有界（默认 Integer.MAX_VALUE） | 非公平                                  | 任务量不可预测的中等吞吐系统     | 双锁分离（putLock/takeLock）、节点动态分配、默认近乎无界需警惕 OOM |
+| SynchronousQueue      | 无存储             | 零容量                             | 可选公平（TransferQueue/TransferStack） | 高并发短任务（CachedThreadPool） | 生产者-消费者直接握手、无缓冲、offer 失败即创建新线程              |
+| PriorityBlockingQueue | 二叉堆             | 无界（自动扩容）                   | 非公平                                  | 任务优先级调度系统               | 元素需实现 Comparable、出队按优先级而非 FIFO                       |
+| DelayQueue            | 堆 + PriorityQueue | 无界                               | 非公平                                  | 定时任务 / 缓存过期清理          | 元素需实现 Delayed 接口、getDelay 到期才能出队                     |
+
+:::
+
 #### 🔬 扩展知识
 
 ::: details
@@ -670,10 +742,27 @@ tokio 是 Rust 生态的异步运行时，其线程模型与 Java 线程池有�
 
 :::
 
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "`LinkedBlockingQueue` 不传容量也是安全的，反正链表能自动增长" → 无参构造的容量是 `Integer.MAX_VALUE`，即**事实上的无界队列**。它会让 `ThreadPoolExecutor` 的第二步 `workQueue.offer()` 永远成功，**`maximumPoolSize` 彻底失效**（第三步 `addWorker(command, false)` 永远走不到），线程数被钉死在 `corePoolSize`；下游一旦变慢，任务只进不出，堆积到堆耗尽抛 `OutOfMemoryError`。这是线程池生产事故的头号成因，也是阿里规约禁止 `Executors.newFixedThreadPool` / `newSingleThreadExecutor` 的直接原因。生产上必须显式传容量，并把容量当作"可容忍排队时间"的函数来算。
+- ❌ "`PriorityBlockingQueue` / `DelayQueue` 无界，所以也需要配拒绝策略兜底" → 二者**永远不会满**，`offer` 恒返回 true，因此线程池的拒绝策略对它们形同虚设；真正的风险是内存无上限增长，必须自行限制入队速率或改用有界方案。
+- ❌ "`SynchronousQueue` 吞吐最高，所以任何场景都该用它" → 它零容量、不缓冲，`offer` 失败即要求立刻有新线程接手。配 `maximumPoolSize = Integer.MAX_VALUE`（`CachedThreadPool` 的做法）会在突发流量下无限创建线程；配 `CallerRunsPolicy` 则退化为"提交线程自己干活"，把压力原样反弹给上游。它只适合**任务极短、且线程上限已明确设定**的场景。
+
+:::
+
 #### 🔀 发散问题
 
-- **Q：队列满了之后任务怎么处理？** → 触发拒绝策略，见本文档「Java 线程池支持哪些拒绝策略？如何选择？」。
-- **Q：DelayQueue 和 ScheduledThreadPoolExecutor 怎么选？** → 见本文档「DelayQueue 和 ScheduledThreadPool 有什么区别？」。
+- **Q：队列满了之后任务怎么处理？**
+
+  → 触发拒绝策略，见本文档「Java 线程池支持哪些拒绝策略？如何选择？」。
+
+- **Q：DelayQueue 和 ScheduledThreadPoolExecutor 怎么选？**
+
+  → 见本文档「DelayQueue 和 ScheduledThreadPool 有什么区别？」。
 
 ### 【中等】Java 线程池支持哪些拒绝策略？如何选择？⭐⭐⭐⭐
 
@@ -683,7 +772,7 @@ tokio 是 Rust 生态的异步运行时，其线程模型与 Java 线程池有�
 
 内置四种：AbortPolicy（默认抛异常）、CallerRunsPolicy（调用者自执行）、DiscardPolicy（静默丢弃）、DiscardOldestPolicy（丢最老）；触发前提是队列满且线程数达 maximumPoolSize，选型看能否容忍任务丢失。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Abort 抛异常，Caller 自己干，Discard 静默丢，Oldest 丢最老
 - **关键词**：AbortPolicy ／ CallerRunsPolicy ／ DiscardOldestPolicy
@@ -746,9 +835,11 @@ Java 线程池支持以下拒绝策略：
 
 #### 🔀 发散问题
 
-- **Q：拒绝策略能动态更换吗？** → 可以，`setRejectedExecutionHandler()` 立即生效，见本文档「Java 线程池参数在运行过程中能修改吗？如何修改？」。
+- **Q：拒绝策略能动态更换吗？**
 
-### 【中等】Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？⭐⭐
+  → 可以，`setRejectedExecutionHandler()` 立即生效，见本文档「Java 线程池参数在运行过程中能修改吗？如何修改？」。
+
+### 【中等】Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：线程池 / 异常处理
 
@@ -756,7 +847,7 @@ Java 线程池支持以下拒绝策略：
 
 任务异常默认会被线程池“吞掉”，不会直接抛给调用者；四条出路：`Future.get()` 捕获、自定义 `ThreadFactory` 设未捕获异常处理器、重写 `afterExecute`、任务内部 try-catch。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：get 捕获、factory 兜底、afterExecute 钩子、内部 try-catch
 - **关键词**：Future.get ／ UncaughtExceptionHandler ／ afterExecute
@@ -859,7 +950,9 @@ executor.execute(() -> {
 
 #### 🔀 发散问题
 
-- **Q：异步编排中异常怎么处理？** → CompletableFuture 提供 `exceptionally`、`whenComplete`、`handle` 等方法，见本文档「CompletableFuture 有哪些用法？」。
+- **Q：异步编排中异常怎么处理？**
+
+  → CompletableFuture 提供 `exceptionally`、`whenComplete`、`handle` 等方法，见本文档「CompletableFuture 有哪些用法？」。
 
 ### 【中等】Java 线程池中 shutdown 与 shutdownNow 的区别是什么？⭐⭐⭐
 
@@ -869,7 +962,7 @@ executor.execute(() -> {
 
 `shutdown()` 是温和关闭：不再接新任务，但等存量任务执行完；`shutdownNow()` 是立即关闭：中断所有线程、清空并返回未执行的任务。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：shutdown 温和等完，shutdownNow 立即中断
 - **关键词**：SHUTDOWN ／ STOP ／ interruptIdleWorkers
@@ -897,9 +990,11 @@ executor.execute(() -> {
 
 #### 🔀 发散问题
 
-- **Q：优雅停机应该用哪个？** → 通常先 `shutdown()` + `awaitTermination()` 等待一段时间，超时后再 `shutdownNow()` 兜底，保证尽量不丢任务又能及时退出。
+- **Q：优雅停机应该用哪个？**
 
-### 【困难】Java 线程池参数在运行过程中能修改吗？如何修改？⭐⭐
+  → 通常先 `shutdown()` + `awaitTermination()` 等待一段时间，超时后再 `shutdownNow()` 兜底，保证尽量不丢任务又能及时退出。
+
+### 【困难】Java 线程池参数在运行过程中能修改吗？如何修改？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：线程池 / 动态调参
 
@@ -907,7 +1002,7 @@ executor.execute(() -> {
 
 能。`ThreadPoolExecutor` 原生提供 setter 支持动态修改核心线程数、最大线程数、空闲时间、拒绝策略，无需重启；但队列实现类不可替换，队列容量动态调整需要自定义队列。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：core max keepAlive 可改，拒绝策略随时换，队列实现不能换，容量要定制
 - **关键词**：setCorePoolSize ／ setMaximumPoolSize ／ setRejectedExecutionHandler
@@ -952,6 +1047,38 @@ executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
 ::: details
 
+- 【L4】**`setCorePoolSize` / `setMaximumPoolSize` 的生效机制（源码级）**：这两个 setter 不是"下次提交任务才生效"，而是**当场对存量 worker 动手**：
+
+```java
+public void setCorePoolSize(int corePoolSize) {
+    if (corePoolSize < 0 || maximumPoolSize < corePoolSize)
+        throw new IllegalArgumentException();
+    int delta = corePoolSize - this.corePoolSize;
+    this.corePoolSize = corePoolSize;
+    if (workerCountOf(ctl.get()) > corePoolSize)
+        interruptIdleWorkers();          // 缩容：中断空闲 worker
+    else if (delta > 0) {
+        int k = Math.min(delta, workQueue.size());   // 扩容：只按队列积压量预启动
+        while (k-- > 0 && addWorker(null, true)) {
+            if (workerCountOf(ctl.get()) >= corePoolSize)
+                break;
+        }
+    }
+}
+
+public void setMaximumPoolSize(int maximumPoolSize) {
+    if (maximumPoolSize <= 0 || maximumPoolSize < corePoolSize)
+        throw new IllegalArgumentException();
+    this.maximumPoolSize = maximumPoolSize;
+    if (workerCountOf(ctl.get()) > maximumPoolSize)
+        interruptWorkers();              // 注意：中断所有 worker，不止空闲的
+}
+```
+
+三个容易被追问的细节：① **缩容是"软"的**——`interruptIdleWorkers()` 只能中断 `tryLock()` 成功的空闲 worker（`Worker` 自身的锁保证了正在执行任务的 worker 不会被中断），真正退出发生在这些 worker 下一次进入 `getTask()` 时：`timed = allowCoreThreadTimeOut || wc > corePoolSize` 成立，于是用 `poll(keepAliveTime)` 限时取任务，超时即返回 null 并走 `processWorkerExit`。所以缩容不是瞬时的，收敛速度取决于 keepAliveTime 与队列消化速度。② **扩容是"按需"的**——`Math.min(delta, workQueue.size())` 意味着队列没积压时一个新线程都不会预启动，调大 corePoolSize 不会立刻看到线程数上涨，这不是 bug。③ **`setMaximumPoolSize` 用的是 `interruptWorkers()`（中断全部）**，被中断的在途任务若不响应中断则不受影响，但响应中断的任务会抛 `InterruptedException`——缩 max 有打断业务的风险，这是"先调 max 后调 core"顺序之外更该注意的一点。
+
+- 【L4】**动态线程池的完整闭环不只是改参数**：Hippo4j / Dynamic TP 这类框架的价值链是「配置中心下发 → 参数热更新 → 指标采集 → 阈值告警 → 变更审计」。其中**指标采集是前提**：必须按池维度暴露活跃线程数（`getActiveCount()`）、当前池大小（`getPoolSize()`）、队列堆积深度（`getQueue().size()`）、已完成任务数（`getCompletedTaskCount()`）、拒绝次数（需在自定义 `RejectedExecutionHandler` 里自行埋点，JDK 不提供该计数），并派生出两个告警指标——**队列使用率**（堆积 / 容量）与**拒绝增量**。只监控"拒绝次数 > 0"会错失处置窗口，因为那时任务已经在丢了；队列使用率持续爬升才是提前量。
+- 【L4】**队列容量为什么不能靠"继承 + 覆写 setter"改**：`LinkedBlockingQueue` 与 `ArrayBlockingQueue` 的 `capacity` 都是 `private final int`，子类拿不到也改不了；用反射强改 final 字段在 JDK 9+ 的模块封装下不可靠，且 `final` 基本类型常量可能已被 JIT 内联折叠。开源动态线程池框架的通用做法是**自带一份可变容量的阻塞队列实现**（复制原队列源码，把 `capacity` 改为非 `final` 并暴露 `setCapacity`），替换线程池构造时传入的队列类型——这也是"队列实现类不可替换、但可在创建时就选定可变容量队列"的真正含义。
 - 【L3】**Spring 的 ThreadPoolTaskExecutor 增强**：Spring 的 `ThreadPoolTaskExecutor` 在原生基础上增加了更多动态能力：
 
 ```java
@@ -977,17 +1104,32 @@ public void adjustThreadPool() {
 }
 ```
 
-- 【L3】**动态调整队列容量**：队列容量的动态调整需要特殊处理，因为大多数 BlockingQueue 创建后容量固定。解决方案：① 使用自定义的可变容量队列；② 重建线程池（优雅迁移）。自定义队列示例：
+- 【L3】**动态调整队列容量**：队列容量的动态调整需要特殊处理，因为大多数 `BlockingQueue` 创建后容量固定（`capacity` 为 `private final`）。解决方案：① 使用**自带一份可变容量实现**的队列（把 `capacity` 改为非 final 并暴露 setter）；② 重建线程池并优雅迁移存量任务。可变容量队列的关键改动：
 
 ```java
-public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
-    public ResizableCapacityLinkedBlockingQueue(int capacity) {
-        super(capacity);
+// 关键：不能继承 LinkedBlockingQueue（父类 capacity 是 private final，子类改不了），
+// 必须复制一份实现，把 capacity 声明为非 final
+public final class VariableLinkedBlockingQueue<E> implements BlockingQueue<E> {
+
+    private int capacity;                            // 原实现是 private final int
+    private final AtomicInteger count = new AtomicInteger();
+
+    public VariableLinkedBlockingQueue(int capacity) {
+        this.capacity = capacity;
     }
 
-    public synchronized void setCapacity(int capacity) {
-        // 实现容量调整逻辑
+    public void setCapacity(int capacity) {
+        final int oldCapacity = this.capacity;
+        this.capacity = capacity;
+        final int size = count.get();
+        // 扩容且此前已满时，唤醒因队满而阻塞/失败的生产者
+        if (capacity > size && size >= oldCapacity) {
+            signalNotFull();
+        }
+        // 缩容无需主动丢弃：后续入队按新 capacity 判断即可，存量任务自然消化
     }
+
+    // 其余入队/出队/双锁逻辑与 LinkedBlockingQueue 一致
 }
 ```
 
@@ -1016,10 +1158,15 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 #### 🔀 发散问题
 
-- **Q：参数该调成多少？** → 见本文档「如何合理地设置 Java 线程池的线程数？」。
-- **Q：动态线程池框架一般还做什么？** → 除动态调参外，通常还提供运行指标采集（活跃线程、队列堆积、拒绝数）、告警、配置中心集成与参数变更审计。
+- **Q：参数该调成多少？**
 
-### 【中等】DelayQueue 和 ScheduledThreadPool 有什么区别？⭐⭐
+  → 见本文档「如何合理地设置 Java 线程池的线程数？」。
+
+- **Q：动态线程池框架一般还做什么？**
+
+  → 除动态调参外，通常还提供运行指标采集（活跃线程、队列堆积、拒绝数）、告警、配置中心集成与参数变更审计。
+
+### 【中等】DelayQueue 和 ScheduledThreadPool 有什么区别？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：定时任务 / 延迟队列
 
@@ -1027,7 +1174,7 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 `DelayQueue` 是只管“到期出队”的阻塞队列，不带线程；`ScheduledThreadPoolExecutor` 是自带线程池、支持周期任务的调度器，内部用的正是 DelayQueue 的变体 `DelayedWorkQueue`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：DelayQueue 只排队，Scheduled 又调又执行
 - **关键词**：BlockingQueue ／ DelayedWorkQueue ／ scheduleAtFixedRate
@@ -1068,7 +1215,9 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 #### 🔀 发散问题
 
-- **Q：海量延迟任务（如百万级订单超时）还适合用它们吗？** → 内存和堆排序开销较大，可考虑 Redis ZSet、RocketMQ 延迟消息或时间轮方案，见本文档「时间轮（Time Wheel）的工作原理是什么？」。
+- **Q：海量延迟任务（如百万级订单超时）还适合用它们吗？**
+
+  → 内存和堆排序开销较大，可考虑 Redis ZSet、RocketMQ 延迟消息或时间轮方案，见本文档「时间轮（Time Wheel）的工作原理是什么？」。
 
 ### 【中等】1000 个任务，每个任务 0.1s，最大响应时间 1s，线程池参数怎么设置？⭐⭐⭐
 
@@ -1078,7 +1227,7 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 核心线程数 = 任务总量 × 单任务耗时 / 总时限 = 1000×0.1/1 = 100；队列容量按“最后任务等待不超 0.9s”推得 900，选有界队列。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：线程数 = 总量×单耗/时限，队列容量 = 线程数×等待/单耗
 - **关键词**：corePoolSize=100 ／ 队列容量=900 ／ 有界队列
@@ -1099,13 +1248,22 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 - 【L3】公式本质：要在 T 秒内完成 N 个耗时 t 的任务，并发度下限为 N×t/T；队列容量则把“排队时间”也纳入响应时间约束，两者共同决定最坏情况下的响应时间。
 - 【L3】现实修正：若机器只有 8 核，100 个线程对 CPU 密集型任务会产生大量上下文切换，实际应结合「线程数 = 核数 × (1 + W/C)」重新评估；若任务为 IO 型则 100 线程可行。
+- 【L4】**算出 100 / 900 只是答题的第一步，P8 场次会顺着往下追三层**：
+  1. **100 个线程在这台机器上跑得动吗？** 若任务是 CPU 密集型，8 核机器上 100 个可运行线程意味着每个线程只能拿到约 8% 的 CPU 时间片，单任务耗时不再是 0.1s，前面的推算全部失效——**必须先声明"这 0.1s 里 CPU 计算占多少、等待占多少"**，否则题目本身不可解。
+  2. **第 1001 个任务来了怎么办？** 队列 900 + 线程 100 恰好覆盖 1000，一旦超量就触发拒绝策略。此时必须回答拒绝策略选哪种：`AbortPolicy` 快速失败让上游感知、`CallerRunsPolicy` 反压、还是自定义策略落 MQ 重试——**"最大响应时间 1s"这个 SLA 本身就否定了排队等待，超量任务应当立刻拒绝而不是继续排队**。
+  3. **这些数字怎么验证与演进？** 压测采集 P99 与队列堆积，上线后按池维度监控，再通过配置中心动态调参（见本文档「Java 线程池参数在运行过程中能修改吗？如何修改？」）。只报"100 和 900"而不给出这条闭环，在资深岗位上会被判定为"会套公式但没做过容量治理"。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：如果最大响应时间收紧到 0.5s 呢？** → 并发需求翻倍：corePoolSize ≈ 200，队列容量按 0.4s 等待窗口算 = 200 × (0.4/0.1) = 800。
-- **Q：通用线程数公式？** → 见本文档「如何合理地设置 Java 线程池的线程数？」。
+- **Q：如果最大响应时间收紧到 0.5s 呢？**
+
+  → 并发需求翻倍：corePoolSize ≈ 200，队列容量按 0.4s 等待窗口算 = 200 × (0.4/0.1) = 800。
+
+- **Q：通用线程数公式？**
+
+  → 见本文档「如何合理地设置 Java 线程池的线程数？」。
 
 ## Java 并发同步工具
 
@@ -1117,7 +1275,7 @@ public class ResizableCapacityLinkedBlockingQueue<E> extends LinkedBlockingQueue
 
 CountDownLatch 是基于 AQS 共享模式的同步工具：计数器对应 AQS 的 state，`countDown()` 使计数减 1，归零时唤醒所有 `await()` 等待的线程；一次性使用，不可重置。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：倒计数、等到零、一次性、不可重置
 - **关键词**：计数器 ／ AQS 共享模式 ／ countDown
@@ -1214,7 +1372,9 @@ System.out.println("All tasks done!");
 
 #### 🔀 发散问题
 
-- **Q：和 CyclicBarrier 怎么选？** → 见本文档「CyclicBarrier 的工作原理是什么？」及「对比一下 CountDownLatch、 CyclicBarrier、Semaphore？」。
+- **Q：和 CyclicBarrier 怎么选？**
+
+  → 见本文档「CyclicBarrier 的工作原理是什么？」及「对比一下 CountDownLatch、 CyclicBarrier、Semaphore？」。
 
 ### 【中等】CyclicBarrier 的工作原理是什么？⭐⭐⭐
 
@@ -1224,7 +1384,7 @@ System.out.println("All tasks done!");
 
 CyclicBarrier 基于 `ReentrantLock + Condition` 实现，让一组线程互相等待，直到所有线程都到达屏障点后一起继续执行；放行后可自动重置，可循环复用。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：集齐放行、自动重置、可循环、可回调
 - **关键词**：屏障点 ／ await ／ BrokenBarrierException
@@ -1238,14 +1398,14 @@ CyclicBarrier 是基于「锁 + 条件等待」实现的同步工具，核心作
 
 **核心机制**
 
-| 核心要素            | 作用                                                                                 |
-| :------------------ | :----------------------------------------------------------------------------------- |
-| **初始化**          | 创建时指定（如 `new CyclicBarrier(3)`），代表需 “集齐” 的线程数                      |
-| **线程等待**        | 线程调用 `await()` 时阻塞并且计数器 + 1                                              |
-| **屏障**            | 当计数器达到屏障后，执行回调（若设置），所有线程被唤醒，继续执行后续逻辑             |
-| **重置计数器**      | 自动重置计数器，可重复使用                                                           |
-| **支持中断 / 超时** | await(timeout, unit) 支持超时；线程在等待时若被中断，会抛出 `BrokenBarrierException` |
-| **底层依赖**        | 基于 `ReentrantLock + Condition` 实现，而非 AQS 直接封装                             |
+| 核心要素            | 作用                                                                                                                                              |
+| :------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **初始化**          | 创建时指定（如 `new CyclicBarrier(3)`），代表需 “集齐” 的线程数                                                                                   |
+| **线程等待**        | 线程调用 `await()` 时阻塞并且计数器 + 1                                                                                                           |
+| **屏障**            | 当计数器达到屏障后，执行回调（若设置），所有线程被唤醒，继续执行后续逻辑                                                                          |
+| **重置计数器**      | 自动重置计数器，可重复使用                                                                                                                        |
+| **支持中断 / 超时** | await(timeout, unit) 支持超时；等待中被中断的线程自身抛 `InterruptedException`，同时屏障进入 broken 状态，其余等待线程抛 `BrokenBarrierException` |
+| **底层依赖**        | 基于 `ReentrantLock + Condition` 实现，而非 AQS 直接封装                                                                                          |
 
 **核心流程**
 
@@ -1291,11 +1451,27 @@ for (int i = 0; i < 3; i++) {
 | 核心语义 | N 个线程互相等 “彼此都到屏障点” | 一个 / 多个线程等 “N 个任务完成” |
 | 触发动作 |  可选屏障动作（最后线程执行）   |          无内置触发动作          |
 
+::: details
+
+**方案对比（补充维度）：**
+
+| 维度         | CyclicBarrier                                     | CountDownLatch                           |
+| ------------ | ------------------------------------------------- | ---------------------------------------- |
+| 可重用性     | 可循环复用（自动重置计数器）                      | 一次性（归零后不可重置）                 |
+| 计数方式     | 正计数（0→N，await 一次 +1）                      | 倒计数（N→0，countDown 一次 -1）         |
+| 触发后行为   | 执行可选屏障动作（barrierAction）                 | 无内置触发动作，await 线程自行继续       |
+| 等待线程角色 | 所有 N 个线程互相等待，角色对等                   | 主线程等待，其他线程完成任务后 countDown |
+| 典型场景     | 多线程分阶段同步（数据加载→处理→汇总）            | 主线程等待 N 个子任务完成后汇总结果      |
+| 底层实现     | ReentrantLock + Condition + Generation 代标记     | AQS 共享模式（state 倒计数）             |
+| 异常处理     | 任一线程中断/超时 → 全部抛 BrokenBarrierException | 某线程异常不影响其他线程 countDown       |
+
+:::
+
 #### 🔬 扩展知识
 
 ::: details
 
-- 【L3】源码细节：CyclicBarrier 用 `Generation` 对象标记“代”，最后一个到达的线程执行 barrierAction 并调用 `nextGeneration()` 唤醒所有等待线程进入下一代；若有线程被中断、超时或 `reset()`，当前代被标记为 broken，其余线程抛 `BrokenBarrierException`。
+- 【L3】源码细节：CyclicBarrier 用 `Generation` 对象标记”代”，最后一个到达的线程执行 barrierAction 并调用 `nextGeneration()` 唤醒所有等待线程进入下一代；若有线程被中断、超时或 `reset()`，当前代被标记为 broken，其余线程抛 `BrokenBarrierException`。
 - 【L3】与 AQS 系工具不同，CyclicBarrier 的可重置性靠“锁内换代”实现，而不是 CAS 改计数。
 
 :::
@@ -1313,7 +1489,9 @@ for (int i = 0; i < 3; i++) {
 
 #### 🔀 发散问题
 
-- **Q：参与者数量运行时才确定怎么办？** → 用 Phaser 支持动态注册，见本文档「Phaser 的工作原理是什么？」。
+- **Q：参与者数量运行时才确定怎么办？**
+
+  → 用 Phaser 支持动态注册，见本文档「Phaser 的工作原理是什么？」。
 
 ### 【中等】Semaphore 的工作原理是什么？⭐⭐⭐
 
@@ -1323,7 +1501,7 @@ for (int i = 0; i < 3; i++) {
 
 Semaphore 是基于 AQS 的限流同步工具：许可证数量对应 AQS 的 state，`acquire()` 抢证（state-1）、`release()` 还证（state+1），从而控制同时访问资源的线程数。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：抢证执行、还证唤醒、公平可选、可超额还
 - **关键词**：许可证 ／ acquire ／ release
@@ -1437,9 +1615,11 @@ Thread-4 占用资源
 
 #### 🔀 发散问题
 
-- **Q：三者整体怎么选型？** → 见本文档「对比一下 CountDownLatch、 CyclicBarrier、Semaphore？」。
+- **Q：三者整体怎么选型？**
 
-### 【困难】对比一下 CountDownLatch、 CyclicBarrier、Semaphore？⭐⭐⭐
+  → 见本文档「对比一下 CountDownLatch、 CyclicBarrier、Semaphore？」。
+
+### 【困难】对比一下 CountDownLatch、 CyclicBarrier、Semaphore？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：同步工具 / 选型对比
 
@@ -1447,7 +1627,7 @@ Thread-4 占用资源
 
 一句话选型：等任务完成用 CountDownLatch（一次性倒计数），线程互相集齐用 CyclicBarrier（可循环），控制并发数用 Semaphore（许可证）；底层分别是 AQS、锁+Condition、AQS。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Latch 等完成、Barrier 等集齐、Semaphore 管并发
 - **关键词**：一次性 ／ 可循环 ／ 许可证
@@ -1457,14 +1637,14 @@ Thread-4 占用资源
 
 在 Java 并发编程中，`CountDownLatch`、`CyclicBarrier` 和 `Semaphore` 均用于线程协作，但设计目标、可重用性与适用场景差异明显。核心对比如下：
 
-| 特性             | CountDownLatch                | CyclicBarrier              | Semaphore                                  |
-| ---------------- | ----------------------------- | -------------------------- | ------------------------------------------ |
-| **可重用性**     | 一次性，不可重置              | 可重复使用                 | 可重复使用                                 |
-| **核心用途**     | 主线程等待 N 个子线程完成任务 | 多线程在屏障点同步         | 控制并发访问资源的线程数                   |
-| **计数器方向**   | 递减（`countDown()`）         | 递减（`await()`）          | 获取 / 释放许可（`acquire()`/`release()`） |
-| **是否支持回调** | 否                            | 是（屏障达成触发）         | 否                                         |
-| **典型场景**     | 多任务并行后汇总              | 多阶段并行计算、回合制同步 | 限流、数据库连接池、信号量                 |
-| **底层机制**     | AQS                           | ReentrantLock + Condition  | AQS                                        |
+| 特性             | CountDownLatch                   | CyclicBarrier                                                                        | Semaphore                                  |
+| ---------------- | -------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------ |
+| **可重用性**     | 一次性，不可重置                 | 可重复使用                                                                           | 可重复使用                                 |
+| **核心用途**     | 主线程等待 N 个子线程完成任务    | 多线程在屏障点同步                                                                   | 控制并发访问资源的线程数                   |
+| **计数器方向**   | 递减（`countDown()` 使计数 N→0） | 递增（`await()` 使到达数 0→N；内部 `count` 字段自 N 递减，二者是同一件事的两个视角） | 获取 / 释放许可（`acquire()`/`release()`） |
+| **是否支持回调** | 否                               | 是（屏障达成触发）                                                                   | 否                                         |
+| **典型场景**     | 多任务并行后汇总                 | 多阶段并行计算、回合制同步                                                           | 限流、数据库连接池、信号量                 |
+| **底层机制**     | AQS                              | ReentrantLock + Condition                                                            | AQS                                        |
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/a2d1794274bb877273c78d461a2e6059.jpg)
 
@@ -1510,8 +1690,13 @@ Thread-4 占用资源
 
 #### 🔀 发散问题
 
-- **Q：需要动态增减参与者和多阶段推进怎么办？** → 用 Phaser，见本文档「Phaser 的工作原理是什么？」。
-- **Q：两个线程之间交换数据用什么？** → 用 Exchanger，见本文档「Exchanger 的工作原理是什么？」。
+- **Q：需要动态增减参与者和多阶段推进怎么办？**
+
+  → 用 Phaser，见本文档「Phaser 的工作原理是什么？」。
+
+- **Q：两个线程之间交换数据用什么？**
+
+  → 用 Exchanger，见本文档「Exchanger 的工作原理是什么？」。
 
 ### 【中等】Exchanger 的工作原理是什么？⭐
 
@@ -1521,7 +1706,7 @@ Thread-4 占用资源
 
 Exchanger 是专门用于两个线程之间交换数据的同步点：双方各自调用 `exchange(data)` 阻塞，到齐后互换数据各自继续；仅支持成对线程。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：两人汇合、以物易物、到齐交换
 - **关键词**：exchange ／ 汇合点 ／ 槽位
@@ -1573,7 +1758,9 @@ new Thread(() -> {
 
 #### 🔀 发散问题
 
-- **Q：需要多方同步而不是两两交换怎么办？** → 选择 CyclicBarrier / Phaser，见本文档对应题目。
+- **Q：需要多方同步而不是两两交换怎么办？**
+
+  → 选择 CyclicBarrier / Phaser，见本文档对应题目。
 
 ### 【中等】Phaser 的工作原理是什么？⭐
 
@@ -1583,7 +1770,7 @@ new Thread(() -> {
 
 Phaser 是 JDK 7 引入的可复用同步器，可视为 CyclicBarrier 与 CountDownLatch 的增强版：参与者可动态注册、支持多阶段推进与 `onAdvance` 回调，还支持树形结构。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：动态注册、多阶段、onAdvance 回调、可树形
 - **关键词**：register ／ arriveAndAwaitAdvance ／ onAdvance
@@ -1645,11 +1832,13 @@ for (int i = 0; i < 3; i++) {
 
 #### 🔀 发散问题
 
-- **Q：只是简单等 N 个任务完成，还需要 Phaser 吗？** → 不需要，用更轻量的 CountDownLatch 即可，见本文档「CountDownLatch 的工作原理是什么？」。
+- **Q：只是简单等 N 个任务完成，还需要 Phaser 吗？**
+
+  → 不需要，用更轻量的 CountDownLatch 即可，见本文档「CountDownLatch 的工作原理是什么？」。
 
 ## Java 并发分工工具
 
-### 【困难】ForkJoinPool 的工作原理是什么？⭐⭐⭐
+### 【困难】ForkJoinPool 的工作原理是什么？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：分工工具 / ForkJoinPool
 
@@ -1657,7 +1846,7 @@ for (int i = 0; i < 3; i++) {
 
 ForkJoinPool 是专为分治任务设计的线程池：任务递归拆分到阈值后并行计算再合并，配合每线程双端队列与工作窃取，让空闲线程“偷”繁忙线程的任务，最大化多核利用率。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：拆分、计算、合并、窃取
 - **关键词**：RecursiveTask ／ fork-join ／ work-stealing
@@ -1690,8 +1879,16 @@ ForkJoinPool 是专为**分治任务**设计的线程池，核心作用是将大
 
 ::: details
 
-- 【L3】**调度原理**：工作线程是自定义的 `ForkJoinWorkerThread`，数量固定（默认 = CPU 核心数）；每个工作线程维护自己的双端队列，自有任务从队列头部取、窃取任务从其他线程队列**尾部**窃取（减少竞争）；`fork()` 将子任务加入当前线程队列，`join()` 等待任务完成，必要时帮助执行任务。
+- 【L3】**调度原理**：工作线程是自定义的 `ForkJoinWorkerThread`，**目标并行度**默认 = CPU 核心数（可自定义），但实际线程数并非严格固定——发生阻塞补偿时会临时超出并行度（见下方 `ManagedBlocker`）；每个工作线程维护自己的双端队列，自有任务从队列头部取、窃取任务从其他线程队列**尾部**窃取（减少竞争）；`fork()` 将子任务加入当前线程队列，`join()` 等待任务完成，必要时帮助执行任务。
 - 【L3】**commonPool**：`ForkJoinPool.commonPool()` 是全局共享池，并行度默认 = CPU 核心数 - 1（可用系统属性 `java.util.concurrent.ForkJoinPool.common.parallelism` 调整），Java 8 的 `parallelStream`、`Arrays.parallelSort` 默认都运行在它上面。
+- 【L4】**`ManagedBlocker`：阻塞操作的补偿机制（工作窃取模型的必要补丁）**：ForkJoinPool 的并行度假设是"worker 永远在算，不在等"。一旦任务里出现阻塞调用（`BlockingQueue.take()`、`synchronized` 等锁、`Socket` 同步读、`CountDownLatch.await()`），这个 worker 就退出了计算，**实际并行度塌陷**：8 核机器上 8 个 worker 全部阻塞，整个池吞吐归零，即使队列里还堆着可窃取的任务也没人偷。
+
+  JDK 的解法是 `ForkJoinPool.managedBlock(ManagedBlocker blocker)`：调用方把阻塞动作包成 `ManagedBlocker`（实现 `isReleasable()` 与 `block()`），池在执行 `block()` 前会判断当前 worker 数是否已达并行度，**若已达则临时创建一个补偿线程（compensation thread）顶上**，保证"可运行的任务数 ≈ 并行度"这一不变式；阻塞结束后补偿线程被回收（受 `maximumPoolSize` 上限约束，默认极大）。
+
+  典型用法是 `ForkJoinTask` 内部的 `join()` —— 它等待子任务时并不是傻等，而是通过 `ForkJoinPool.awaitJoin` 帮助执行其他任务（help-then-block），这正是 `join()` 必须在 ForkJoin 线程内调用的原因。同理，`ConcurrentHashMap` 早期版本对 `ForkJoinPool` 内的阻塞也做过类似处理。
+
+  **工程结论**：① 分治任务里含阻塞 IO 时，要么用 `ManagedBlocker` 包装，要么直接改用 `ThreadPoolExecutor` / 虚拟线程——不要把阻塞任务丢进 `commonPool`，它是全 JVM 共享的，一处阻塞会连带拖垮所有 `parallelStream`；② `ForkJoinPool` 的 `submit()` 提交**非** `ForkJoinTask` 的普通任务时，会走内部包装，同样不具备窃取加速效果，此时用 ForkJoinPool 相对 ThreadPoolExecutor 并无优势。
+
 - 【L4】**ForkJoinPool vs ThreadPoolExecutor**：
 
 | **特性**     | **ForkJoinPool**          | **ThreadPoolExecutor** |
@@ -1723,10 +1920,15 @@ ForkJoinPool 是专为**分治任务**设计的线程池，核心作用是将大
 
 #### 🔀 发散问题
 
-- **Q：CompletableFuture 默认用哪个线程池？** → 默认 `ForkJoinPool.commonPool()`，见本文档「CompletableFuture 的工作原理是什么？」。
-- **Q：CPU 密集型任务线程数怎么定？** → 见本文档「如何合理地设置 Java 线程池的线程数？」（核心数+1）。
+- **Q：CompletableFuture 默认用哪个线程池？**
 
-### 【中等】CompletableFuture 有哪些用法？⭐⭐⭐⭐
+  → 默认 `ForkJoinPool.commonPool()`，见本文档「CompletableFuture 的工作原理是什么？」。
+
+- **Q：CPU 密集型任务线程数怎么定？**
+
+  → 见本文档「如何合理地设置 Java 线程池的线程数？」（核心数+1）。
+
+### 【中等】CompletableFuture 有哪些用法？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：CompletableFuture / API 用法
 
@@ -1734,7 +1936,7 @@ ForkJoinPool 是专为**分治任务**设计的线程池，核心作用是将大
 
 CompletableFuture 是 Java 8 引入的异步编排工具：`supplyAsync`/`runAsync` 创建任务，`thenApply`/`thenAccept`/`thenRun` 链式衔接，`allOf`/`anyOf`/`thenCombine` 合并多任务，`exceptionally`/`whenComplete` 处理异常，`get`/`join` 取结果。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：supply 创建 then 链，allOf 合并 combine 拼，异常交给 exceptionally，取结果用 join
 - **关键词**：supplyAsync ／ thenApply ／ allOf ／ exceptionally
@@ -1744,32 +1946,59 @@ CompletableFuture 是 Java 8 引入的异步编排工具：`supplyAsync`/`runAsy
 
 CompletableFuture 是 Java 8+ 提供的**异步任务编排工具**，常用 API 按用法类型归纳如下：
 
-| 用法类型            | 核心方法（记忆关键词）                                                                    | 作用说明                                      | 示例代码                                                                                                        |
-| :------------------ | :---------------------------------------------------------------------------------------- | :-------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| **创建异步任务**    | `runAsync`（无返回值）<br/>`supplyAsync`（有返回值）                                      | 提交异步任务，指定线程池（默认 ForkJoinPool） | `// 有返回值异步任务<br>CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> "Hello", executor);` |
-| **结果转换**        | `thenApply`（同步）<br/>`thenApplyAsync`（异步）                                          | 对任务结果做转换，返回新结果                  | `cf.thenApply(s -> s + " World");`                                                                              |
-| **结果消费**        | `thenAccept`（同步）<br/>`thenAcceptAsync`（异步）                                        | 消费任务结果（无返回值）                      | `cf.thenAccept(s -> System.out.println(s));`                                                                    |
-| **任务衔接**        | `thenRun`（同步）<br/>`thenRunAsync`（异步）                                              | 任务完成后执行无参操作（不依赖结果）          | `cf.thenRun(() -> System.out.println("任务完成"));`                                                             |
-| **多任务合并**      | `allOf`（全部完成）<br/>`anyOf`（任一完成）                                               | 等待任务完成                                  | `CompletableFuture.allOf(cf1, cf2).join();`<br/>`Object result = CompletableFuture.anyOf(cf1, cf2).get();`      |
-| **结果组合**        | `thenCombine`／`thenCombineAsync`                                                         | 合并两个任务的结果，生成新结果                | `cf1.thenCombine(cf2, (r1, r2) -> r1 + r2);`                                                                    |
-| **异常处理**        | `exceptionally`                                                                           | 任务异常时返回默认值                          | `cf.exceptionally(e -> "默认值");`                                                                              |
-| **异常 / 完成处理** | `whenComplete`                                                                            | 无论成功 / 失败，都执行回调（可获取异常）     | `cf.whenComplete((res, e) -> { if(e!=null) e.printStackTrace(); });`                                            |
-| **超时控制**        | `completeOnTimeout`／`orTimeout`（Java 9+）                                               | 超时后返回默认值 / 抛出超时异常               | `// 3秒超时返回默认值<br>cf.completeOnTimeout("超时默认值", 3, TimeUnit.SECONDS);`                              |
-| **结果获取**        | `get`（阻塞）<br/>`join`（阻塞，不抛检查异常）<br/>`getNow`（立即获取，无结果返回默认值） | 获取任务结果，按需选择阻塞 / 非阻塞           | `String res = cf.join(); // 推荐，无需捕获异常`                                                                 |
+| 用法类型            | 核心方法（记忆关键词）                                                                    | 作用说明                                       | 示例代码                                                                                                        |
+| :------------------ | :---------------------------------------------------------------------------------------- | :--------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| **创建异步任务**    | `runAsync`（无返回值）<br/>`supplyAsync`（有返回值）                                      | 提交异步任务，指定线程池（默认 ForkJoinPool）  | `// 有返回值异步任务<br>CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> "Hello", executor);` |
+| **结果转换**        | `thenApply`（同步）<br/>`thenApplyAsync`（异步）                                          | 对任务结果做转换，返回新结果                   | `cf.thenApply(s -> s + " World");`                                                                              |
+| **结果消费**        | `thenAccept`（同步）<br/>`thenAcceptAsync`（异步）                                        | 消费任务结果（无返回值）                       | `cf.thenAccept(s -> System.out.println(s));`                                                                    |
+| **任务衔接**        | `thenRun`（同步）<br/>`thenRunAsync`（异步）                                              | 任务完成后执行无参操作（不依赖结果）           | `cf.thenRun(() -> System.out.println("任务完成"));`                                                             |
+| **多任务合并**      | `allOf`（全部完成）<br/>`anyOf`（任一完成）                                               | 等待任务完成                                   | `CompletableFuture.allOf(cf1, cf2).join();`<br/>`Object result = CompletableFuture.anyOf(cf1, cf2).get();`      |
+| **结果组合**        | `thenCombine`／`thenCombineAsync`                                                         | 合并两个任务的结果，生成新结果                 | `cf1.thenCombine(cf2, (r1, r2) -> r1 + r2);`                                                                    |
+| **异常处理**        | `exceptionally`                                                                           | 任务异常时返回默认值                           | `cf.exceptionally(e -> "默认值");`                                                                              |
+| **异常 / 完成处理** | `whenComplete`                                                                            | 无论成功 / 失败，都执行回调（可获取异常）      | `cf.whenComplete((res, e) -> { if(e!=null) e.printStackTrace(); });`                                            |
+| **结果 / 异常转换** | `handle`／`handleAsync`                                                                   | 无论成功失败都执行，且**可改写**最终结果或异常 | `cf.handle((res, e) -> e != null ? "兜底值" : res);`                                                            |
+| **超时控制**        | `completeOnTimeout`／`orTimeout`（Java 9+）                                               | 超时后返回默认值 / 抛出超时异常                | `// 3秒超时返回默认值<br>cf.completeOnTimeout("超时默认值", 3, TimeUnit.SECONDS);`                              |
+| **结果获取**        | `get`（阻塞）<br/>`join`（阻塞，不抛检查异常）<br/>`getNow`（立即获取，无结果返回默认值） | 获取任务结果，按需选择阻塞 / 非阻塞            | `String res = cf.join(); // 推荐，无需捕获异常`                                                                 |
 
 #### 🔬 扩展知识
 
 ::: details
 
-- 【L3】同步版与 Async 版的差异：`thenApply` 等不带 Async 的方法可能在前置任务的完成线程上直接执行（谁完成谁执行），而 `thenApplyAsync` 一定提交到线程池（默认 `ForkJoinPool.commonPool()`）执行；需要隔离执行线程时应选 Async 版本。
+- 【L3】同步版与 Async 版的差异：`thenApply` 等不带 Async 的方法**执行线程不确定**——若注册回调时前置任务尚未完成，回调在**完成前置任务的那个线程**上直接执行（谁完成谁执行）；若前置任务已经完成，回调则在**当前注册线程**上同步执行。而 `thenApplyAsync` 一定重新提交到线程池（默认 `ForkJoinPool.commonPool()`）。工程后果：不带 Async 的回调里若含阻塞调用或耗时逻辑，可能直接卡住 Web 容器的请求线程或上游完成线程，需要隔离执行线程时应选 Async 版本并显式传入自定义线程池。
+- 【L3】**`exceptionally` / `handle` / `whenComplete` 的异常语义差异（高频追问）**：
+
+| 方法            | 何时执行             | 能否改写结果                   | 异常是否继续向下游传播                                   |
+| :-------------- | :------------------- | :----------------------------- | :------------------------------------------------------- |
+| `exceptionally` | **仅**上游异常时     | 能（返回兜底值后异常被"消化"） | 不再传播，下游看到的是正常完成                           |
+| `handle`        | 成功与失败**都**执行 | 能（可同时改结果与异常）       | 取决于回调：正常返回则异常被消化，回调内再抛则传播新异常 |
+| `whenComplete`  | 成功与失败**都**执行 | **不能**（只读 `(res, e)`）    | **原样传播**——它是"旁观者"，不是异常处理器               |
+
+三个易错点：① `whenComplete` 里 `try-catch` 吞掉异常没有意义，返回的 CompletableFuture 仍会以原异常完成；② `whenComplete` 的回调自身若抛异常，且上游本来正常完成，则结果会以回调抛出的异常完成（覆盖原结果）；③ `exceptionally` 收到的 `Throwable` 通常是包装过的 `CompletionException`，取业务异常要 `e.getCause()`，直接 `instanceof BizException` 判断会永远为 false。
+
 - 【L4】版本演进：CompletableFuture 于 Java 8 引入；Java 9 新增 `delayExecutor()`、`orTimeout()`、`completeOnTimeout()` 等方法，补齐了超时与延迟调度能力。
+
+:::
+
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "`allOf(...).join()` 之后就能拿到所有任务的结果" → `allOf` 返回的是 `CompletableFuture<Void>`，**结果需要自己再对每个子 Future 调 `join()` 收集**；且 `allOf` 是"全部完成"语义，任一子任务抛异常时，`allOf` 的结果 Future 也会异常完成，但**其余子任务不会被取消**，仍会继续跑完——需要"快速失败并取消其余"时应改用 `anyOf` + 手动取消，或 JDK 21 的 `StructuredTaskScope`（预览特性）。
+- ❌ "链式调用中任意一环抛异常，后面就都不执行了，所以不用管" → 异常确实会沿链传播并跳过后续的 `thenApply`/`thenAccept`，但**若链尾没有 `exceptionally`/`handle`，也没有人调用 `get()`/`join()`，这个异常就被彻底静默丢弃**，日志里什么都不会留下。这是 CompletableFuture 版"线上异常失踪"，规范做法是每条链的末端必须有异常兜底或统一在 `whenComplete` 里打日志。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：CompletableFuture 内部是如何实现异步编排的？** → 见本文档「CompletableFuture 的工作原理是什么？」。
-- **Q：如何用它控制多线程执行顺序？** → 见本文档「Java 中如何控制多线程的执行顺序？」，基于 thenXxx 链式编排实现。
+- **Q：CompletableFuture 内部是如何实现异步编排的？**
+
+  → 见本文档「CompletableFuture 的工作原理是什么？」。
+
+- **Q：如何用它控制多线程执行顺序？**
+
+  → 见本文档「Java 中如何控制多线程的执行顺序？」，基于 thenXxx 链式编排实现。
 
 ### 【困难】CompletableFuture 的工作原理是什么？⭐⭐⭐⭐
 
@@ -1779,7 +2008,7 @@ CompletableFuture 是 Java 8+ 提供的**异步任务编排工具**，常用 API
 
 CompletableFuture 基于「状态机 + 回调链表」实现异步编排：状态机（volatile result/status + CAS）管理生命周期，每个 thenXxx 生成 Completion 回调节点挂到任务上，任务完成时逐个触发回调，依托线程池执行，全程无阻塞等待。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：状态机管生命周期，Completion 串回调链，CAS 保证原子性，线程池负责执行
 - **关键词**：状态机 ／ Completion 回调链表 ／ CAS+volatile ／ ForkJoinPool
@@ -1809,7 +2038,7 @@ CompletableFuture 是基于「状态机 + 回调链表」实现的异步编程�
 1. **状态管理**：通过 NEW、NORMAL 等状态标识任务生命周期，用 volatile 变量存储结果 / 异常，CAS 操作保证状态转换原子性。
 2. **任务调度**：异步任务（supplyAsync/runAsync）包装为 Runnable 提交线程池（默认公共池），执行完毕后调用 complete 类方法更新状态并触发回调。
 3. **回调机制**：回调函数注册到原任务列表，原任务完成后，回调在当前线程或指定线程池执行（Async 方法），结果链式传递形成流水线。
-4. **多任务协同**：allOf 用计数器等待所有任务完成；anyOf 监听首个完成的任务并返回其结果。
+4. **多任务协同**：`allOf` **不是靠计数器**实现的——它把传入的 CompletableFuture 数组递归折半构造成一棵**二叉完成树**（`andTree`），每个内部节点是一个 `BiRelay` 回调，只有当它的左右两个子 Future 都完成后才向上汇聚，最终使根 Future 完成；`anyOf` 同构，但内部节点是 `OrRelay`，任一子 Future 完成即向上短路传播并返回其结果。用树而非计数器的原因是：完成事件的传播天然沿回调链进行，无需额外的共享计数器与 CAS 竞争点。
 
 **核心逻辑总结**：以状态机管理生命周期，回调列表实现依赖链式，线程池调度异步执行，通过 CAS 和 volatile 保证线程安全，避免回调嵌套。
 
@@ -1838,14 +2067,21 @@ CompletableFuture 是基于「状态机 + 回调链表」实现的异步编程�
 常见误区：
 
 - ❌ “不指定线程池时，异步任务在主线程执行” → 默认提交到 `ForkJoinPool.commonPool()` 执行，与提交线程无关。
-- ❌ “get() 和 join() 完全一样” → 二者都阻塞等待，但 `get()` 抛检查异常（需 try-catch），`join()` 抛运行时异常 `CompletionException`，链式代码中推荐 `join()`。
+- ❌ “get() 和 join() 完全一样” → 二者都阻塞等待，但异常包装不同：`get()` 声明抛 `InterruptedException`、`ExecutionException`（业务异常在 `getCause()` 里）与 `CancellationException`，都是检查异常必须 try-catch；`join()` 抛的是**非检查**的 `CompletionException`（同样把业务异常包在 `getCause()`）。因此 `join()` 适合链式/Lambda 场景（不用在 Lambda 里 try-catch），`get()` 适合需要区分"被中断"与"任务失败"的场景。另注意 `get(timeout, unit)` 超时抛 `TimeoutException`，而 JDK 9 的 `orTimeout()` 是让 Future 本身以 `TimeoutException` **异常完成**，语义与传播范围都不同。
+- ❌ “`commonPool` 是 JDK 优化的公共池，用它准没错” → **`commonPool` 的并行度默认只有 `CPU 核数 - 1`，且被整个 JVM 进程共享**（`parallelStream`、`Arrays.parallelSort`、未指定 Executor 的 CompletableFuture 全都在上面）。把含阻塞 IO 的任务（RPC、JDBC、Redis）丢进去，8 核机器上 7 个 worker 一旦被阻塞占满，同进程内**所有并行流一起停摆**，表现为"CPU 很闲但请求全超时"，且堆栈里看不到自己的业务线程池名，极难定位。生产规范是：**凡有阻塞调用，一律显式传入自定义线程池**；确需在 ForkJoin 体系内阻塞，用 `ForkJoinPool.managedBlock` + `ManagedBlocker` 触发补偿线程（见本文档「ForkJoinPool 的工作原理是什么？」）。
+- ❌ “`thenApply` 的回调一定在异步线程上执行” → 不带 Async 的版本执行线程不确定：前置任务未完成时在**完成它的那个线程**上跑，前置任务已完成时在**当前注册线程**上同步跑。回调里含阻塞逻辑时可能直接卡住调用方（如 Web 请求线程），需要隔离时用 `thenApplyAsync(fn, executor)` 并显式传池。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：常用 API 有哪些？** → 见本文档「CompletableFuture 有哪些用法？」。
-- **Q：异步任务里抛异常了怎么处理？** → 用 `exceptionally()` 返回兜底值，或 `handle()` 同时处理结果与异常；异常会沿链传播直到被处理。
+- **Q：常用 API 有哪些？**
+
+  → 见本文档「CompletableFuture 有哪些用法？」。
+
+- **Q：异步任务里抛异常了怎么处理？**
+
+  → 用 `exceptionally()` 返回兜底值，或 `handle()` 同时处理结果与异常；异常会沿链传播直到被处理。
 
 ### 【中等】BlockingQueue 的核心方法有哪些？抛异常/返回特殊值/阻塞/超时四类方法有什么区别？⭐⭐
 
@@ -1855,7 +2091,7 @@ CompletableFuture 是基于「状态机 + 回调链表」实现的异步编程�
 
 BlockingQueue 按队满/队空时的行为定义了四组方法：抛异常（add/remove/element）、返回特殊值（offer/poll/peek）、一直阻塞（put/take）、限时阻塞（带超时的 offer/poll）；所有实现线程安全且不允许插入 null。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：add 抛错 offer 拒，put 死等 take 取，超时带参限时等，peek 只看不拿走
 - **关键词**：put/take ／ offer/poll ／ add/remove ／ 超时版
@@ -1893,8 +2129,13 @@ BlockingQueue 按队满/队空时的行为定义了四组方法：抛异常（ad
 
 #### 🔀 发散问题
 
-- **Q：常用阻塞队列如何选型？** → 见本文档「Java 线程池支持哪些阻塞队列，如何选择？」。
-- **Q：如何用 BlockingQueue 实现生产者消费者？** → 见本文档「Java 中如何实现生产者消费者模式？」，是最推荐的实现方式。
+- **Q：常用阻塞队列如何选型？**
+
+  → 见本文档「Java 线程池支持哪些阻塞队列，如何选择？」。
+
+- **Q：如何用 BlockingQueue 实现生产者消费者？**
+
+  → 见本文档「Java 中如何实现生产者消费者模式？」，是最推荐的实现方式。
 
 ### 【中等】Timer 的工作原理是什么？⭐⭐
 
@@ -1904,7 +2145,7 @@ BlockingQueue 按队满/队空时的行为定义了四组方法：抛异常（ad
 
 Timer 用单线程（TimerThread）+ 最小堆（按执行时间排序）调度任务，简单但不可靠：单任务耗时会阻塞后续任务，未捕获异常会直接杀死整个 Timer；生产环境建议用 ScheduledThreadPoolExecutor 替代。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：单线程调度，最小堆排序，固定延迟看结束，固定速率追计划，一个异常全军覆没
 - **关键词**：TimerThread ／ 最小堆 ／ scheduleAtFixedRate ／ ScheduledThreadPoolExecutor
@@ -1963,8 +2204,13 @@ Timer 用单线程（TimerThread）+ 最小堆（按执行时间排序）调度�
 
 #### 🔀 发散问题
 
-- **Q：DelayQueue 和 ScheduledThreadPool 有什么区别？** → 见本文档「DelayQueue 和 ScheduledThreadPool 有什么区别？」。
-- **Q：海量定时任务场景用什么方案？** → 时间轮（O(1) 插入/删除），见本文档「时间轮（Time Wheel）的工作原理是什么？」。
+- **Q：DelayQueue 和 ScheduledThreadPool 有什么区别？**
+
+  → 见本文档「DelayQueue 和 ScheduledThreadPool 有什么区别？」。
+
+- **Q：海量定时任务场景用什么方案？**
+
+  → 时间轮（O(1) 插入/删除），见本文档「时间轮（Time Wheel）的工作原理是什么？」。
 
 ### 【困难】时间轮（Time Wheel）的工作原理是什么？⭐⭐
 
@@ -1974,7 +2220,7 @@ Timer 用单线程（TimerThread）+ 最小堆（按执行时间排序）调度�
 
 JDK 内置定时器基于堆，增删任务是 O(logn)；时间轮用环形数组分片管理定时任务，添加/触发都是 O(1)，多级设计兼顾长短延迟，是 Kafka、Netty、Linux 内核等高性能场景的定时器核心方案。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：环形数组分槽位，指针每 tick 前进一格，海量定时 O(1)，长短延迟靠多级
 - **关键词**：环形数组 ／ tick ／ 槽位公式 ／ 多级时间轮
@@ -1986,7 +2232,7 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 
 **时间轮通过环形数组分片管理定时任务，以 O(1) 时间复杂度实现高效调度，多级设计兼顾长短延迟任务，是高性能定时器的核心实现方案。**
 
-时间轮（Timing Wheel）是 George Varghese 和 Tony Lauck 在 1996 年的论文 [Hashed and Hierarchical Timing Wheels: data structures to efficiently implement a timer facility](https://www.cse.wustl.edu/~cdgill/courses/cs6874/TimingWheels.ppt) 实现的，它在 Linux 内核中使用广泛，是 Linux 内核定时器的实现方法和基础之一。
+时间轮（Timing Wheel）是 George Varghese 和 Tony Lauck 在 1987 年 SOSP 会议论文 [Hashed and Hierarchical Timing Wheels: data structures to efficiently implement a timer facility](https://www.cse.wustl.edu/~cdgill/courses/cs6874/TimingWheels.ppt) 中提出的（扩展版于 1997 年刊于 IEEE/ACM Transactions on Networking），它在 Linux 内核中使用广泛，是 Linux 内核定时器的实现方法和基础之一。
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/archive/2026/02/8bf5f55729b1407e8e68177e6997c7a6.png)
 
@@ -2009,7 +2255,7 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 
 1. **任务添加**
 
-   - 计算目标槽位：`槽位 = （当前指针 + 延迟时间/tick) % 轮盘大小`
+   - 计算目标槽位：`槽位 = (当前指针 + 延迟时间 / tick) % 轮盘大小`
    - 相同槽位的任务以链表形式存储
 
    ```python
@@ -2055,8 +2301,10 @@ JDK 内置的三种实现定时器的方式，实现思路都非常相似，都�
 | 方案           | 添加复杂度 | 触发复杂度 | 内存占用 |
 | -------------- | ---------- | ---------- | -------- |
 | **时间轮**     | O(1)       | O(1)       | O(n)     |
-| **优先级队列** | O(log n)   | O(1)       | O(n)     |
+| **优先级队列** | O(log n)   | O(log n)   | O(n)     |
 | **轮询检测**   | O(1)       | O(n)       | O(1)     |
+
+> 注：优先级队列（最小堆）**查看**堆顶是 O(1)，但到期后**取出**堆顶需要下沉调整，因此触发是 O(log n)；这正是海量定时器场景下堆方案的瓶颈所在（`ScheduledThreadPoolExecutor` 的 `DelayedWorkQueue` 同理）。时间轮的触发只需遍历当前槽的链表，与总任务数无关，故为 O(1)。
 
 HashedWheelTimer 是 Netty 中时间轮算法的实现类。
 
@@ -2091,20 +2339,25 @@ HashedWheelTimer 是 Netty 中时间轮算法的实现类。
 
 #### 🔀 发散问题
 
-- **Q：DelayQueue 和时间轮怎么选？** → DelayQueue 基于最小堆（O(logn)），适合任务量小、需精确按到期时间出队的场景；海量定时任务选时间轮。
-- **Q：JDK 的延迟任务方案有哪些？** → 见本文档「DelayQueue 和 ScheduledThreadPool 有什么区别？」。
+- **Q：DelayQueue 和时间轮怎么选？**
+
+  → DelayQueue 基于最小堆（O(logn)），适合任务量小、需精确按到期时间出队的场景；海量定时任务选时间轮。
+
+- **Q：JDK 的延迟任务方案有哪些？**
+
+  → 见本文档「DelayQueue 和 ScheduledThreadPool 有什么区别？」。
 
 ## Java 并发应用
 
 ### 【中等】Java 中如何控制多线程的执行顺序？⭐⭐⭐
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：并发应用 / 线程顺序控制
+> 🎯 目标等级：L2-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：并发应用 / 线程顺序控制
 
 #### 💎 关键结论
 
 控制线程执行顺序的核心是用「阻塞等待」「同步控制」「任务编排」三类机制打破调度随机性：简单串行用 join，批次协同用 CountDownLatch，复杂依赖用 CompletableFuture 链式编排，严格 FIFO 用单线程池。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：join 串行、latch 批次、CF 编排、单池保序
 - **关键词**：join ／ CountDownLatch ／ CompletableFuture ／ newSingleThreadExecutor
@@ -2116,17 +2369,17 @@ Java 控制多线程执行顺序，核心是通过「阻塞等待」「同步控
 
 | 方法类型                                             | 核心 API（记忆关键词）                                                                         | 实现原理                                                         | 适用场景                                                   |
 | :--------------------------------------------------- | :--------------------------------------------------------------------------------------------- | :--------------------------------------------------------------- | :--------------------------------------------------------- |
-| join () 等待（最基础）                               | Thread.join()                                                                                  | 让当前线程阻塞，等待目标线程执行完成后再继续                     | 简单顺序（如 A 执行完再执行 B）、少量线程                  |
-| 锁 + 信号量（手动控制）                              | synchronized + 标志位CountDownLatch（倒计时门闩）                                              | ① 标志位：线程循环检查前置条件；② CountDownLatch：等待计数器归 0 | 多线程分批次执行（如先执行所有初始化线程，再执行业务线程） |
+| join() 等待（最基础）                                | Thread.join()                                                                                  | 让当前线程阻塞，等待目标线程执行完成后再继续                     | 简单顺序（如 A 执行完再执行 B）、少量线程                  |
+| 锁 + 信号量（手动控制）                              | synchronized + 标志位<br/>CountDownLatch（倒计时门闩）                                         | ① 标志位：线程循环检查前置条件；② CountDownLatch：等待计数器归 0 | 多线程分批次执行（如先执行所有初始化线程，再执行业务线程） |
 | 线程池按序执行                                       | Executors.newSingleThreadExecutor()                                                            | 单线程池串行执行提交的任务，底层基于队列 FIFO                    | 任务需严格按提交顺序执行，无需并行                         |
 | CompletableFuture 编排（推荐）                       | thenRun/thenAccept/thenApply                                                                   | 异步任务链式编排，前一个任务完成自动执行下一个                   | 复杂顺序（如 A→B 并行 C→D）、异步场景                      |
 | 同步工具（CountDownLatch、CyclicBarrier、Semaphore） | CountDownLatch.await()/countDown()<br/>CyclicBarrier.await()<br/>Semaphore.acquire()/release() | 底层直接或间接基于 AQS 实现                                      | 多线程先准备再统一执行（如多线程加载数据后，统一处理）     |
 
 ::: code-tabs#控制多线程的执行顺序
 
-@tab join () 控制顺序
+@tab join() 控制顺序
 
-`join()` 是线程级 别的阻塞，目标线程执行完才会释放当前线程。
+`join()` 是线程级别的阻塞，目标线程执行完才会释放当前线程。
 
 ```java
 // 定义3个线程
@@ -2178,24 +2431,29 @@ business.start();
 
 @tab CompletableFuture 链式编排
 
-链式调用天然支持顺序，`thenRunAsync` 保证前序任务完成后执行，适合复杂编排。
+链式调用天然支持顺序；需要"某步之后分叉并行、汇合后再继续"时，用同一个前置 Future 派生多条分支，再用 `allOf` 汇合。
 
 ```java
-// 自定义线程池（避免默认池）
+// 自定义线程池（避免默认 commonPool）
 ExecutorService executor = Executors.newFixedThreadPool(3);
 
-// 顺序：A完成→B和C并行→D完成
-CompletableFuture<Void> cf = CompletableFuture
-    .runAsync(() -> System.out.println("任务A执行"), executor) // 第一步：A
-    .thenRunAsync(() -> System.out.println("任务B执行"), executor) // 第二步：A完成后执行B
-    .thenRunAsync(() -> { // 第三步：B完成后，并行执行C
-        CompletableFuture.runAsync(() -> System.out.println("任务C执行"), executor).join();
-    }, executor)
-    .thenRunAsync(() -> System.out.println("任务D执行"), executor); // 第四步：C完成后执行D
+// 顺序：A 完成 → B 和 C 并行 → 二者都完成后执行 D
+CompletableFuture<Void> a = CompletableFuture
+    .runAsync(() -> System.out.println("任务A执行"), executor);
 
-cf.join(); // 等待所有任务完成
+// 从同一个 a 派生两条分支，B、C 真正并行
+CompletableFuture<Void> b = a.thenRunAsync(() -> System.out.println("任务B执行"), executor);
+CompletableFuture<Void> c = a.thenRunAsync(() -> System.out.println("任务C执行"), executor);
+
+// allOf 汇合后再执行 D
+CompletableFuture<Void> d = CompletableFuture.allOf(b, c)
+    .thenRunAsync(() -> System.out.println("任务D执行"), executor);
+
+d.join(); // 等待全链路完成
 executor.shutdown();
 ```
+
+**常见错误写法**：写成 `a.thenRunAsync(B).thenRunAsync(() -> { runAsync(C).join(); }).thenRunAsync(D)` 看似"B、C 并行"，实际是 **A→B→C→D 全串行**——内层 `join()` 会让 B 所在的线程同步等待 C 跑完，既没有并行，还白白占用一个池内线程（池容量小时甚至会自锁）。要并行必须**从同一个前置 Future 派生多条分支**。
 
 @tab 单线程池按提交顺序执行
 
@@ -2226,10 +2484,15 @@ singleExecutor.shutdown();
 
 #### 🔀 发散问题
 
-- **Q：join、CountDownLatch、CyclicBarrier 各自适合什么场景？** → 见本文档「对比一下 CountDownLatch、 CyclicBarrier、Semaphore？」。
-- **Q：为什么 CompletableFuture 编排是复杂场景的推荐方案？** → 链式 API 天然表达依赖关系，支持并行分支与异常统一处理，避免了 join/latch 的手工拼装。
+- **Q：join、CountDownLatch、CyclicBarrier 各自适合什么场景？**
 
-### 【中等】Java 中如何实现生产者消费者模式？⭐⭐⭐⭐
+  → 见本文档「对比一下 CountDownLatch、 CyclicBarrier、Semaphore？」。
+
+- **Q：为什么 CompletableFuture 编排是复杂场景的推荐方案？**
+
+  → 链式 API 天然表达依赖关系，支持并行分支与异常统一处理，避免了 join/latch 的手工拼装。
+
+### 【中等】Java 中如何实现生产者消费者模式？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：并发应用 / 生产者消费者
 
@@ -2237,7 +2500,7 @@ singleExecutor.shutdown();
 
 生产者消费者模式通过共享缓冲区解耦生产与消费；Java 有三种代表性实现：基于 BlockingQueue（推荐）、基于 Condition、基于 wait/notify，后两种需自己处理「队满/队空」判断与线程唤醒。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：BlockingQueue 开箱用，Condition 双条件，wait/notify 配 synchronized，while 循环防虚假唤醒
 - **关键词**：BlockingQueue ／ Condition ／ wait/notify
@@ -2501,20 +2764,25 @@ public class ProducerConsumerDemo03 {
 
 #### 🔀 发散问题
 
-- **Q：BlockingQueue 的四类方法怎么选？** → 见本文档「BlockingQueue 的核心方法有哪些？抛异常/返回特殊值/阻塞/超时四类方法有什么区别？」。
-- **Q：为什么推荐 BlockingQueue 实现？** → 它内置了队满/队空的阻塞等待与线程安全，无需手写锁与唤醒逻辑，代码更少且不易出错。
+- **Q：BlockingQueue 的四类方法怎么选？**
+
+  → 见本文档「BlockingQueue 的核心方法有哪些？抛异常/返回特殊值/阻塞/超时四类方法有什么区别？」。
+
+- **Q：为什么推荐 BlockingQueue 实现？**
+
+  → 它内置了队满/队空的阻塞等待与线程安全，无需手写锁与唤醒逻辑，代码更少且不易出错。
 
 ## Java 并发容器
 
 ### 【中等】Java 线程安全的集合有哪些？⭐⭐⭐⭐
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：并发容器 / 选型
+> 🎯 目标等级：L2-L4 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：并发容器 / 选型
 
 #### 💎 关键结论
 
 Java 线程安全集合分三代：遗留类（Vector/Hashtable，全表锁）、Collections 同步包装器（仍是全表锁）、JUC 并发集合（细粒度锁/CAS/COW）；生产首选 JUC，按读写比例与是否需有序选型。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：遗留全表锁，包装也一样，JUC 细粒度，读写比例定选型
 - **关键词**：Vector ／ synchronizedXxx ／ ConcurrentHashMap ／ CopyOnWriteArrayList
@@ -2636,13 +2904,30 @@ Rust 通过所有权系统 + `Send`/`Sync` trait 在编译期保证线程安全�
 
 - ❌ “Collections.synchronizedList 可以直接安全遍历” → 迭代时仍需手动对包装对象加锁（`synchronized(list) { ... }`），否则抛 `ConcurrentModificationException`。
 - ❌ "JDK8 的 ConcurrentHashMap 还是分段锁" → JDK8 已改为 Node 数组 + CAS + synchronized 锁桶头，见容器专题「ConcurrentHashMap 的底层实现原理是什么？」。
+- ❌ **“用了 `ConcurrentHashMap` 就线程安全了” → 它保证的是单个方法（`get`/`put`/`remove`）的原子性，复合操作（check-then-act）依然非原子**。经典错误写法：
+
+  ```java
+  if (!map.containsKey(key)) {   // ① 检查
+      map.put(key, value);       // ② 写入——①②之间可被其他线程插入
+  }
+  ```
+
+  两个线程同时通过 ①，后写者会覆盖先写者，"只初始化一次"的语义被破坏。正确做法是用 JDK 8 提供的原子复合方法：`computeIfAbsent`、`compute`、`merge`、`putIfAbsent`——它们在锁住桶头节点的前提下把"检查 + 计算 + 写入"做成一个原子步骤。同理，`if (map.get(k) > 0) map.put(k, map.get(k) - 1)` 这种"读-改-写"必须换成 `compute` 或用 `LongAdder`/`AtomicInteger` 作为 value。
+
+- ❌ “`computeIfAbsent` 的 mappingFunction 里可以再操作同一个 map” → **绝对不行**。在映射函数内部对同一个 `ConcurrentHashMap` 再做修改，会抛 `IllegalStateException: Recursive update`；某些路径下（如映射函数里等待另一个也在改同一 map 的线程）还会直接**死锁**，因为 `computeIfAbsent` 全程持有桶头节点的 `synchronized` 锁。JDK 文档明确要求映射函数"short and simple"且不得修改本 map。
+- ❌ “`CopyOnWriteArrayList` 线程安全又好写，可以当通用 List 用” → 每次写操作都要**复制整个底层数组**：内存瞬时翻倍（旧数组要等所有持有旧快照的迭代器释放后才能回收），写放大随元素数线性增长，且**只保证最终可见、不保证读写一致**——迭代器拿到的是创建那一刻的快照，看不到之后的修改。它只适用于**读极多、写极少、集合规模小**的场景（监听器列表、黑白名单、配置项）；写频繁或元素量大时应改用 `Collections.synchronizedList`、`ConcurrentLinkedQueue` 或加锁的 `ArrayList`。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：读多写少的 List 怎么选？** → 见容器专题「CopyOnWriteArrayList 的原理是什么？」。
-- **Q：高并发 Map 的实现细节？** → 见容器专题「ConcurrentHashMap 的底层实现原理是什么？」。
+- **Q：读多写少的 List 怎么选？**
+
+  → 见容器专题「CopyOnWriteArrayList 的原理是什么？」。
+
+- **Q：高并发 Map 的实现细节？**
+
+  → 见容器专题「ConcurrentHashMap 的底层实现原理是什么？」。
 
 ### 【中等】ConcurrentLinkedQueue 的原理是什么？⭐⭐
 
@@ -2652,7 +2937,7 @@ Rust 通过所有权系统 + `Send`/`Sync` trait 在编译期保证线程安全�
 
 ConcurrentLinkedQueue 是基于 CAS 的无锁非阻塞队列（Michael-Scott 算法）：入队 CAS 挂接节点、tail 滞后更新减少竞争，出队推进 head；无界、size() 需 O(n) 遍历且不精确。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：入队 CAS 挂节点，tail 隔次才推进，出队置空推 head，无锁无阻塞
 - **关键词**：CAS ／ Michael-Scott ／ head/tail 滞后 ／ 无界
@@ -2694,7 +2979,9 @@ public boolean offer(E e) {
                     return true;
                 }
             } else if (p == q) {
-                // 遇到自环节点（说明在扩容），重新从 head/tail 开始
+                // p.next == p 自环：该节点已被 poll() 出队并"自链"脱离队列
+                // （ConcurrentLinkedQueue 是无界链表，不存在扩容一说）
+                // 此时 tail 也可能已过期，需从 tail（若也失效则 head）重新定位
                 p = (t != (t = tail)) ? t : head;
             } else {
                 p = (p != t && t != (t = tail)) ? t : q;
@@ -2731,5 +3018,10 @@ public boolean offer(E e) {
 
 #### 🔀 发散问题
 
-- **Q：需要阻塞等待时怎么选？** → 选 LinkedBlockingQueue（双锁 + Condition 阻塞），见本题（4）对比表；或见本文档「Java 线程池支持哪些阻塞队列，如何选择？」。
-- **Q：size() 为什么是 O(n)？** → 无锁环境下维护精确计数会成为全局热点，CLQ 干脆放弃精确计数，遍历时统计 item 非空的节点数，结果可能偏差。
+- **Q：需要阻塞等待时怎么选？**
+
+  → 选 LinkedBlockingQueue（双锁 + Condition 阻塞），见本题（4）对比表；或见本文档「Java 线程池支持哪些阻塞队列，如何选择？」。
+
+- **Q：size() 为什么是 O(n)？**
+
+  → 无锁环境下维护精确计数会成为全局热点，CLQ 干脆放弃精确计数，遍历时统计 item 非空的节点数，结果可能偏差。

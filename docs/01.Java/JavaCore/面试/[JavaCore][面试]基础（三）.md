@@ -18,7 +18,7 @@ permalink: /pages/7704a3fb/
 
 ## Java 泛型
 
-### 【中等】Java 泛型的作用是什么？⭐⭐⭐
+### 【困难】Java 泛型的作用是什么？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 泛型 / 基础概念
 
@@ -26,7 +26,7 @@ permalink: /pages/7704a3fb/
 
 泛型通过类型参数把类型检查提前到编译期：既保证类型安全、避免运行时 `ClassCastException`，又消除强制转换、实现代码复用。代价是类型擦除——泛型信息只在编译期有效。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：类型作参数，编译保安全，运行被擦除，转换全免掉
 - **关键词**：类型参数 ／ 类型安全 ／ 类型擦除
@@ -74,10 +74,15 @@ String value = box.get(); // 无需强制转换
 
 #### 🔀 发散问题
 
-- **Q：泛型为什么不支持基本类型？** → 擦除后类型参数被替换为 `Object`，基本类型不是 `Object` 的子类，只能用包装类（如 `List<Integer>`）。
-- **Q：`List<String>` 是 `List<Object>` 的子类型吗？** → 不是，泛型是**不变的（invariant）**；需要协变读取时使用 `List<? extends Object>`。
+- **Q：泛型为什么不支持基本类型？**
 
-### 【中等】什么是 Java 泛型的上下界限定符？⭐⭐⭐
+  → 擦除后类型参数被替换为 `Object`，基本类型不是 `Object` 的子类，只能用包装类（如 `List<Integer>`）。
+
+- **Q：`List<String>` 是 `List<Object>` 的子类型吗？**
+
+  → 不是，泛型是**不变的（invariant）**；需要协变读取时使用 `List<? extends Object>`。
+
+### 【困难】什么是 Java 泛型的上下界限定符？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 泛型 / 通配符与 PECS
 
@@ -85,7 +90,7 @@ String value = box.get(); // 无需强制转换
 
 上下界限定符用于限制泛型类型参数的范围：`? extends T`（上界）只读不写，`? super T`（下界）可写难读，遵循 PECS 原则——生产者用 `extends`、消费者用 `super`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：上界只读，下界只写，生产 extends，消费 super
 - **关键词**：上界限定 ／ 下界限定 ／ PECS
@@ -149,18 +154,23 @@ void addNumbers(List<? super Integer> list) {
 
 #### 🔀 发散问题
 
-- **Q：为什么 `List<? extends Number>` 不能 `add(Integer)`？** → 它的实际类型可能是 `List<Double>`，写入 `Integer` 会破坏类型安全，编译器一律禁止。
-- **Q：无界通配符 `List<?>` 和 `List<Object>` 有何区别？** → `List<?>` 可接受任意类型的 List（只读）；`List<Object>` 是具体类型，`List<String>` 不能赋值给它。
+- **Q：为什么 `List<? extends Number>` 不能 `add(Integer)`？**
 
-### 【中等】泛型擦除的作用是什么？⭐⭐⭐
+  → 它的实际类型可能是 `List<Double>`，写入 `Integer` 会破坏类型安全，编译器一律禁止。
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 泛型 / 类型擦除
+- **Q：无界通配符 `List<?>` 和 `List<Object>` 有何区别？**
+
+  → `List<?>` 可接受任意类型的 List（只读）；`List<Object>` 是具体类型，`List<String>` 不能赋值给它。
+
+### 【困难】泛型擦除的作用是什么？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 泛型 / 类型擦除
 
 #### 💎 关键结论
 
 泛型擦除是 Java 泛型的实现机制：编译期检查类型安全，运行时丢弃类型参数（替换为原始类型或边界类型），以此兼容旧版字节码、避免为每个泛型实例生成新类，代价是运行时拿不到泛型参数。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：编译期检查，运行期擦除，无界变 Object，有界变边界
 - **关键词**：原始类型 ／ 桥接转换 ／ Class 令牌
@@ -227,26 +237,32 @@ void addNumbers(List<? super Integer> list) {
   | 泛型数组创建（`new T[]`）                                                | 使用 `Object[]` 转换或反射（`Array.newInstance`） |
   | 方法重载冲突（如 `void foo(List<String>)` 和 `void foo(List<Integer>)`） | 编译报错（擦除后方法签名相同）                    |
 
+- 【L3】**桥方法（Bridge Method）**：`class Node implements Comparable<Node>` 中业务代码写的是 `compareTo(Node)`，而接口擦除后签名是 `compareTo(Object)`——编译器会自动生成一个桥方法 `compareTo(Object)`，内部强转参数后转发到 `compareTo(Node)`，保证擦除不破坏多态。桥方法可用 `Method.isBridge()` 识别；反射遍历方法时会看到"同名方法出现两次"，做字节码增强或方法匹配（如自研 AOP、RPC 方法路由）时必须显式过滤桥方法，否则可能重复增强或匹配到错误方法。
 - 【L4】擦除的兼容代价：泛型字节码与非泛型字节码二进制兼容，因此 Java 5 引入泛型时未破坏存量代码；而 C++ 模板每个实例化生成独立代码，无此兼容红利但保留了完整类型信息。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：`new T[]` 为什么非法？** → 擦除后运行时不知道 `T` 的实际类型，无法确定数组元素类型；需用 `Array.newInstance(clazz, size)` 配合 `Class<T>` 创建。
-- **Q：泛型能用于 static 字段吗？** → 不能，静态成员属于类而非某个参数化实例，无法引用类型参数 `T`。
+- **Q：`new T[]` 为什么非法？**
+
+  → 擦除后运行时不知道 `T` 的实际类型，无法确定数组元素类型；需用 `Array.newInstance(clazz, size)` 配合 `Class<T>` 创建。
+
+- **Q：泛型能用于 static 字段吗？**
+
+  → 不能，静态成员属于类而非某个参数化实例，无法引用类型参数 `T`。
 
 ## Java 反射
 
-### 【简单】什么是反射？反射有什么作用？⭐⭐⭐⭐
+### 【简单】什么是反射？反射有什么作用？⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Java 反射 / 核心概念
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Java 反射 / 核心概念
 
 #### 💎 关键结论
 
 反射是 Java 在运行时获取并操作类信息（构造对象、调用方法、访问字段、读注解）的动态机制，是 Spring、ORM、动态代理等框架的基石，代价是性能开销和安全封装的破坏。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：运行取类信，动态造调改，框架全靠它，慢在检查装箱
 - **关键词**：Class ／ Method.invoke ／ setAccessible
@@ -397,6 +413,13 @@ JDK 对反射做了 **Inflation**（膨胀）优化，让频繁调用的反射�
 
 可通过 `-Dsun.reflect.inflationThreshold=0` 跳过 JNI 阶段，直接使用字节码 accessor。
 
+**【L4】反射的性能替代谱系：MethodHandle / VarHandle / LambdaMetafactory**
+
+- `MethodHandle`（JDK 7）：类型化的方法句柄，作为常量持有时 JIT 可对其做常量折叠与调用点内联，热点路径性能可接近直接调用；`Method.invoke()` 的目标与参数形态在运行期才确定，难以内联，这是二者的本质差距。
+- `VarHandle`（JDK 9）：字段/数组元素的访问句柄，附带内存访问模式（plain/opaque/volatile 等），是 `Unsafe` 字段访问的官方替代。
+- `LambdaMetafactory`：运行期把方法句柄包装成函数式接口实现（Lambda/方法引用的底层机制，详见本文档「Java 8 的 Lambda 表达式和函数式接口是什么？」），JIT 可完全内联，热点性能三者中最好，但只适用于函数式接口形状。
+- 工程应用：性能敏感的序列化框架普遍走"字节码生成或方法句柄"路线替代裸反射（如 Jackson 的 Blackbird 模块用 `LambdaMetafactory` 生成属性存取器）。
+
 **【L4】跨语言视角：反射的三种设计哲学**
 
 | 语言       | 反射机制                                              | 核心差异                                                |
@@ -406,7 +429,7 @@ JDK 对反射做了 **Inflation**（膨胀）优化，让频繁调用的反射�
 | **Python** | `getattr`/`setattr`/`hasattr`（内置）+ `inspect` 模块 | 动态类型语言，"反射"概念被弱化为普通操作                |
 | **Rust**   | 无运行时反射                                          | 通过 `#[derive]` + trait + 宏在编译期生成，零运行时开销 |
 
-**Go 的反思**：Go 有 `reflect` 但设计者 Rob Pike 曾公开表示"反射永远不应该是你代码的核心"——因为 Go 没有 Java 的 JIT 优化，每次 `reflect.Value.Call()` 都是纯解释执行，性能差距可达 100 倍以上。Java 的 Inflation 优化（JNI → 字节码 accessor）正是 Go 缺乏的。
+**Go 的反思**：Go 有 `reflect`，但设计者 Rob Pike 的名言是 “Reflection is never clear”（反射从不清爽）——因为 Go 没有 Java 的 JIT 优化，每次 `reflect.Value.Call()` 都是纯解释执行，性能差距可达 100 倍以上。Java 的 Inflation 优化（JNI → 字节码 accessor）正是 Go 缺乏的。
 
 **Rust 的零成本替代**：Rust 选择"编译期反射"——通过 `proc macro` 在编译时展开代码，完全消除运行时开销。代价是：任何反射需求必须在编译时声明（`#[derive(Serialize)]` 等）。这是一种哲学取舍：**Java 选择运行时灵活性，Rust 选择编译期安全性**。
 
@@ -416,7 +439,7 @@ GraalVM 将 Java 编译为**原生可执行文件**时，采用的是 **closed-w
 
 1. 默认**不支持运行时反射**（运行时调用 `Class.forName` 会抛出异常）
 2. 必须通过 `reflect-config.json` 预注册所有需要通过反射访问的类、方法、字段
-3. 动态代理、CGLIB 等运行时生成字节码的技术在 Native Image 中**不可用**
+3. 动态代理、CGLIB 等**运行时**生成字节码的方式受限：JDK 代理的接口组合必须在构建期通过可达性元数据预注册（Spring AOT 即在构建期生成代理类），CGLIB 式子类增强同样必须提前到构建期完成，纯运行期动态生成的路径不可用
 
 这意味着：Spring 应用迁移到 GraalVM Native Image 时，所有 `@Autowired`、AOP 代理、MyBatis Mapper 代理等依赖反射/动态代理的功能，都必须在编译期通过 AOT 处理或配置注册——这是 Java 生态从“动态运行时”向“静态编译”转型的最大挑战。
 
@@ -424,10 +447,15 @@ GraalVM 将 Java 编译为**原生可执行文件**时，采用的是 **closed-w
 
 #### 🔀 发散问题
 
-- **Q：获取 `Class` 对象有哪几种方式？** → 三种：`类名.class`、`对象.getClass()`、`Class.forName("全限定类名")`（需处理 `ClassNotFoundException`）。
-- **Q：反射为什么能破坏单例？** → 可通过 `getDeclaredConstructor()` + `setAccessible(true)` 调用私有构造器创建新实例；枚举单例因 JVM 在 `newInstance` 中强制拦截而免疫。
+- **Q：获取 `Class` 对象有哪几种方式？**
 
-### 【简单】反射有什么优缺点？⭐⭐⭐
+  → 三种：`类名.class`、`对象.getClass()`、`Class.forName("全限定类名")`（需处理 `ClassNotFoundException`）。
+
+- **Q：反射为什么能破坏单例？**
+
+  → 可通过 `getDeclaredConstructor()` + `setAccessible(true)` 调用私有构造器创建新实例；枚举单例因 JVM 在 `newInstance` 中强制拦截而免疫。
+
+### 【简单】反射有什么优缺点？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Java 反射 / 优缺点与优化
 
@@ -435,7 +463,7 @@ GraalVM 将 Java 编译为**原生可执行文件**时，采用的是 **closed-w
 
 反射的优点是高动态性、可访问私有成员、支持泛型擦除后的类型操作；缺点是性能较差、可读性下降、有安全隐患。工程中通过缓存反射对象和限制 `setAccessible` 来扬长避短。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：动态破封装，慢且不直观，缓存反射件，慎用 accessible
 - **关键词**：动态性 ／ 性能开销 ／ 破坏封装
@@ -485,10 +513,15 @@ GraalVM 将 Java 编译为**原生可执行文件**时，采用的是 **closed-w
 
 #### 🔀 发散问题
 
-- **Q：反射能修改 final 字段吗？** → 低版本 JDK 可通过反射修改普通 final 字段，但 JDK 12+ 已禁止通过反射修改 final 字段（抛 `IllegalAccessException`）。
-- **Q：什么时候该避免反射？** → 能用接口/多态解决的场景不用反射；反射适合框架层（依赖注入、ORM、代理），业务代码应尽量直接调用。
+- **Q：反射能修改 final 字段吗？**
 
-### 【中等】什么是 Java 中的动态代理？⭐⭐⭐⭐
+  → 低版本 JDK 可通过反射修改普通 final 字段，但 JDK 12+ 已禁止通过反射修改 final 字段（抛 `IllegalAccessException`）。
+
+- **Q：什么时候该避免反射？**
+
+  → 能用接口/多态解决的场景不用反射；反射适合框架层（依赖注入、ORM、代理），业务代码应尽量直接调用。
+
+### 【困难】什么是 Java 中的动态代理？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 反射 / 动态代理
 
@@ -496,7 +529,7 @@ GraalVM 将 Java 编译为**原生可执行文件**时，采用的是 **closed-w
 
 动态代理通过 `Proxy` + `InvocationHandler` 在运行时生成接口代理对象，不修改原代码即可拦截和增强方法调用，是 Spring AOP、RPC 框架的核心技术；局限是只能代理接口。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：接口生成代理，invoke 统一拦截，非侵入增强，AOP 靠它实现
 - **关键词**：Proxy ／ InvocationHandler ／ 基于接口
@@ -604,10 +637,15 @@ JavaScript 的 `Proxy` 是最强大的实现——它能拦截 13 种操作（ge
 
 #### 🔀 发散问题
 
-- **Q：JDK 动态代理为什么只能代理接口？** → `Proxy.newProxyInstance()` 生成的代理类 `$Proxy0` 已继承 `java.lang.reflect.Proxy`，Java 单继承限制下只能再实现接口；代理普通类需用 CGLIB（继承方式）。
-- **Q：Spring AOP 是如何选择代理方式的？** → 目标类有接口默认用 JDK 动态代理，无接口自动切换 CGLIB；可用 `@EnableAspectJAutoProxy(proxyTargetClass=true)` 强制 CGLIB，详见本文档「JDK 动态代理和 CGLIB 动态代理有什么区别？」。
+- **Q：JDK 动态代理为什么只能代理接口？**
 
-### 【中等】JDK 动态代理和 CGLIB 动态代理有什么区别？⭐⭐⭐⭐
+  → `Proxy.newProxyInstance()` 生成的代理类 `$Proxy0` 已继承 `java.lang.reflect.Proxy`，Java 单继承限制下只能再实现接口；代理普通类需用 CGLIB（继承方式）。
+
+- **Q：Spring AOP 是如何选择代理方式的？**
+
+  → 目标类有接口默认用 JDK 动态代理，无接口自动切换 CGLIB；可用 `@EnableAspectJAutoProxy(proxyTargetClass=true)` 强制 CGLIB，详见本文档「JDK 动态代理和 CGLIB 动态代理有什么区别？」。
+
+### 【困难】JDK 动态代理和 CGLIB 动态代理有什么区别？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 反射 / 代理实现对比
 
@@ -615,7 +653,7 @@ JavaScript 的 `Proxy` 是最强大的实现——它能拦截 13 种操作（ge
 
 JDK 动态代理基于接口、用反射实现，轻量但要求目标有接口；CGLIB 基于继承、用 ASM 生成子类，可代理普通类但无法代理 final 类/方法。现代 JVM 下两者性能差距已不明显。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：JDK 靠接口，CGLIB 靠继承，final 拦 CGLIB，无接口选 CGLIB
 - **关键词**：基于接口 ／ 基于继承 ／ ASM 字节码
@@ -724,27 +762,32 @@ UserService proxy = (UserService) enhancer.create();  // 生成子类对象
 
 CGLIB 曾是 Java 生态中字节码增强的事实标准，但近年来已被 **ByteBuddy** 逐步取代：
 
-| 对比            | CGLIB                                  | ByteBuddy                                  |
-| :-------------- | :------------------------------------- | :----------------------------------------- |
-| **活跃度**      | 2015 年后几乎停更                      | 持续活跃维护（最新版本 2024+）             |
-| **API 易用性**  | 低（`Enhancer` + `MethodInterceptor`） | 高（流式 API + 类型安全）                  |
-| **JDK 兼容性**  | JDK 17+ 反射限制导致报错               | 完美支持 JDK 8~21+                         |
-| **Spring 选择** | Spring 4.x 之前默认                    | Spring 5+ / Spring Boot 3+ 转向 ByteBuddy  |
-| **Hibernate**   | —                                      | Hibernate 5+ 使用 ByteBuddy 替代 Javassist |
-| **Mockito**     | —                                      | Mockito 2+ 放弃 CGLIB，全面迁移 ByteBuddy  |
+| 对比            | CGLIB                                                   | ByteBuddy                                                                   |
+| :-------------- | :------------------------------------------------------ | :-------------------------------------------------------------------------- |
+| **活跃度**      | 3.3.0（2019）后长期无新版本，Spring 改为内嵌自维护 fork | 持续活跃维护（最新版本 2024+）                                              |
+| **API 易用性**  | 低（`Enhancer` + `MethodInterceptor`）                  | 高（流式 API + 类型安全）                                                   |
+| **JDK 兼容性**  | JDK 17+ 反射限制导致报错                                | 完美支持 JDK 8~21+                                                          |
+| **Spring 选择** | Spring AOP 至今仍用内嵌 spring-core 的 CGLIB fork       | AOP 类代理未迁移 ByteBuddy（官方文档：CGLIB “repackaged into spring-core”） |
+| **Hibernate**   | —                                                       | Hibernate 5+ 使用 ByteBuddy 替代 Javassist                                  |
+| **Mockito**     | —                                                       | Mockito 2+ 放弃 CGLIB，全面迁移 ByteBuddy                                   |
 
-面试中如果能说出“Spring Boot 3.x 已经默认使用 ByteBuddy 而非 CGLIB”，表明你关注生态演进，而非停留在历史答案。
+准确的生态现状是：Spring Framework 6.x / Spring Boot 3.x 的 AOP 类代理**仍使用内嵌在 spring-core 里的 CGLIB fork**（官方文档原话：CGLIB “repackaged into spring-core”），已迁移到 ByteBuddy 的是 Mockito 2+ 与 Hibernate 5+。“Spring Boot 3 默认用 ByteBuddy 而非 CGLIB”是流传较广的讹传，面试中给出准确版本反而是加分项。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：为什么 CGLIB 不能代理 final 类/方法？** → CGLIB 靠生成子类实现代理，final 类不能被继承、final 方法不能被重写，因此无法增强。
-- **Q：Spring Boot 3 时代还需要背 CGLIB 吗？** → 原理仍需理解（面试高频），但要知道生态现状：Mockito 2+、Hibernate 5+ 已迁往 ByteBuddy，Spring Boot 3.x 也默认 ByteBuddy。
+- **Q：为什么 CGLIB 不能代理 final 类/方法？**
+
+  → CGLIB 靠生成子类实现代理，final 类不能被继承、final 方法不能被重写，因此无法增强。
+
+- **Q：Spring Boot 3 时代还需要背 CGLIB 吗？**
+
+  → 原理仍需理解（面试高频），但要知道生态现状：Mockito 2+、Hibernate 5+ 已迁往 ByteBuddy；而 Spring AOP 的类代理至今仍用内嵌 spring-core 的 CGLIB fork，并未迁移。
 
 ## Java 注解
 
-### 【中等】Java 中的注解原理是什么？⭐⭐
+### 【困难】Java 中的注解原理是什么？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 注解 / 原理
 
@@ -752,7 +795,7 @@ CGLIB 曾是 Java 生态中字节码增强的事实标准，但近年来已被 *
 
 注解本质是继承 `java.lang.annotation.Annotation` 的特殊接口，通过 `@Retention` 决定生命周期：编译期由 APT/编译器处理，运行时由反射读取，从而实现元数据编程。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：注解即接口，保留看 Retention，编译 APT，运行靠反射
 - **关键词**：元数据 ／ RetentionPolicy ／ APT
@@ -791,7 +834,7 @@ CGLIB 曾是 Java 生态中字节码增强的事实标准，但近年来已被 *
 - **代码生成**：Lombok 的 `@Data`
 - **静态检查**：`@Nullable`、`@Deprecated`
 
-### 【中等】如何自定义注解并使用注解处理器？⭐⭐
+### 【困难】如何自定义注解并使用注解处理器？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 注解 / 自定义与 APT
 
@@ -799,7 +842,7 @@ CGLIB 曾是 Java 生态中字节码增强的事实标准，但近年来已被 *
 
 自定义注解用 `@interface` 声明，由元注解（`@Target`/`@Retention` 等）约束行为；运行时注解用反射读取，编译期注解通过继承 `AbstractProcessor` 的注解处理器（APT）生成代码，Lombok/MapStruct 都是这个原理。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：@interface 定义，元注解约束，运行反射读，编译 APT 生成
 - **关键词**：@Target ／ AbstractProcessor ／ META-INF 注册
@@ -862,7 +905,7 @@ public class MyProcessor extends AbstractProcessor {
 
 ## Java 枚举
 
-### 【中等】Java 枚举的原理是什么？⭐⭐
+### 【困难】Java 枚举的原理是什么？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 枚举 / 原理
 
@@ -870,7 +913,7 @@ public class MyProcessor extends AbstractProcessor {
 
 枚举是 JDK 5 引入的语法，本质是继承 `java.lang.Enum` 的 final 类，每个枚举常量是类加载时创建的单例实例；JVM 保证其唯一性，反射也无法创建新枚举实例。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：枚举即 final 类，常量即单例，反射造不出，序列化不破坏
 - **关键词**：java.lang.Enum ／ ordinal ／ 单例
@@ -946,7 +989,7 @@ public enum OrderStatus {
 - `Constructor.newInstance()` **禁止创建枚举对象**（源码有强制检查）。
 - `Enum.valueOf()` 是获取枚举实例的安全方式。
 
-### 【中等】为什么说枚举是实现单例的最佳方式？⭐⭐
+### 【困难】为什么说枚举是实现单例的最佳方式？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 枚举 / 单例
 
@@ -954,7 +997,7 @@ public enum OrderStatus {
 
 枚举单例由 JVM 从三个层面保证安全：类加载机制保证线程安全、`newInstance` 强制拦截反射攻击、序列化仅存名称防止反序列化创建新实例，是《Effective Java》推荐的写法。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一行枚举即单例，加载安全防反射，序列化只存名
 - **关键词**：clinit ／ 反射拦截 ／ readResolve 免疫
@@ -1004,7 +1047,7 @@ Singleton.INSTANCE.doSomething();
 
 EnumMap 和 EnumSet 是专为枚举优化的容器：EnumMap 用 ordinal 作数组下标，EnumSet 用 long 位图，O(1) 操作且内存极小，应替代以枚举为键/元素的 HashMap/HashSet。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：枚举当键用 EnumMap，枚举集合用 EnumSet，数组位图快又省
 - **关键词**：ordinal 数组 ／ 位图 ／ O(1)
@@ -1052,9 +1095,19 @@ EnumSet<Day> all = EnumSet.allOf(Day.class);
 - 枚举作为键的 Map → 用 `EnumMap` 替代 `HashMap`。
 - 枚举集合操作（权限、状态组合）→ 用 `EnumSet` 替代 `HashSet`。
 
+#### 🔀 发散问题
+
+- **Q：`EnumMap` 底层用什么数据结构实现？为什么它比 `HashMap` 在枚举键场景下性能更优？**
+
+  → `EnumMap` 内部使用两个数组实现：一个 `Object[]` 存储值，按枚举常量的 `ordinal()` 作为下标直接寻址。由于枚举的 ordinal 是连续整数且数量固定，无需哈希计算、无冲突处理、无扩容开销，因此 put/get 操作比 `HashMap` 更快且内存更紧凑。
+
+- **Q：`EnumSet.of()` 和 `EnumSet.complementOf()` 在内部是用位运算实现的吗？当枚举值超过 64 个时底层如何存储？**
+
+  → 是的，`EnumSet` 底层使用位向量（bit vector）实现，每个枚举常量对应一个 bit 位。当枚举值不超过 64 个时使用 `RegularEnumSet`，内部仅用一个 `long` 存储；超过 64 个时自动切换为 `JumboEnumSet`，使用 `long[]` 数组存储，每个 `long` 承载 64 个 bit，所有位运算操作按数组元素逐段进行。
+
 ## Java SPI
 
-### 【中等】什么是 SPI，有什么用？⭐⭐⭐
+### 【困难】什么是 SPI，有什么用？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java SPI / 服务发现
 
@@ -1062,7 +1115,7 @@ EnumSet<Day> all = EnumSet.allOf(Day.class);
 
 SPI 通过“接口 + `META-INF/services` 配置文件”实现运行时服务发现，让接口与实现解耦、支持可插拔扩展；JDBC 驱动、SLF4J 日志实现都靠它，局限是会一次性加载所有实现。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：接口定标准，文件写实现，ServiceLoader 加载，即插即用
 - **关键词**：META-INF/services ／ ServiceLoader ／ 可插拔
@@ -1129,20 +1182,25 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 
 #### 🔀 发散问题
 
-- **Q：JDBC 是如何用 SPI 加载驱动的？** → 驱动 jar 的 `META-INF/services/java.sql.Driver` 声明实现类，`DriverManager` 静态块用 `ServiceLoader` 加载并注册，因此无需显式 `Class.forName`。
-- **Q：SPI 和 API 的方向为什么相反？** → API 是调用方使用提供方定义的方法；SPI 是调用方（框架）定义接口，由实现方提供实现并被框架回调，控制权在框架侧（可参考本文档 SPI 与 API 对比表）。
+- **Q：JDBC 是如何用 SPI 加载驱动的？**
+
+  → 驱动 jar 的 `META-INF/services/java.sql.Driver` 声明实现类，`DriverManager` 静态块用 `ServiceLoader` 加载并注册，因此无需显式 `Class.forName`。
+
+- **Q：SPI 和 API 的方向为什么相反？**
+
+  → API 是调用方使用提供方定义的方法；SPI 是调用方（框架）定义接口，由实现方提供实现并被框架回调，控制权在框架侧（可参考本文档 SPI 与 API 对比表）。
 
 ## Java IO
 
-### 【简单】什么是序列化？什么是反序列化？⭐⭐⭐
+### 【简单】什么是序列化？什么是反序列化？⭐⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Java IO / 序列化
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Java IO / 序列化
 
 #### 💎 关键结论
 
 序列化是把对象转为字节流以便存储/传输，反序列化是还原为对象；工程上需显式声明 `serialVersionUID`、用 `transient` 跳过敏感字段，并警惕反序列化漏洞。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：对象变字节，传输好存储，UID 防失败，transient 保安全
 - **关键词**：Serializable ／ serialVersionUID ／ transient
@@ -1209,17 +1267,25 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 ::: details
 
 - 【L3】`serialVersionUID` 机制：反序列化时会比对流中 UID 与当前类计算的 UID，不一致抛 `InvalidClassException`；不显式声明时由编译器根据类结构自动计算，类一改动就可能失配，因此必须显式声明（如 `1L`）。
-- 【L3】反序列化漏洞原理：恶意构造的字节流在 `readObject` 过程中可触发目标类的方法调用链（Gadget Chain），如 Commons Collections 系列漏洞；Java 9+ 可用 `ObjectInputFilter` 做白名单过滤。
+- 【L3】兼容性变更规则：`serialVersionUID` 一致时，**新增/删除字段属兼容变更**（缺失字段取默认值、多余字段被丢弃）；但修改字段类型、修改类的继承结构、`Serializable` 改 `Externalizable` 都是不兼容变更，反序列化直接失败——这决定了“缓存/MQ 里存 Java 序列化对象”的系统在类演进时的风险边界。
+- 【L3】反序列化不调用类自身的构造器，但会调用继承链中**第一个非 Serializable 父类的无参构造器**：本类的构造器校验与字段初始化器都不会执行，父类构造器的副作用（注册、计数）却会重复触发，这正是反序列化攻击能绕过构造器校验的根本原因。
+- 【L3】反序列化漏洞原理：恶意构造的字节流在 `readObject` 过程中可触发目标类的方法调用链（Gadget Chain），如 Commons Collections 系列漏洞；Java 9+ 可用 `ObjectInputFilter`（JEP 290 序列化过滤）在流层面做类白名单。
+- 【L4】`readResolve`/`writeReplace` 钩子可在反序列化后替换对象，是普通类单例防御的标准手段；枚举无需该钩子——反序列化走 `valueOf` 天然返回已有实例。遗留系统无法更换协议时，`ObjectInputFilter` 白名单是止血方案。
 - 【L4】选型经验：跨语言/高性能选 Protobuf（gRPC 默认），可读性优先选 JSON（Jackson/Gson），Java 原生序列化体积大、速度慢且仅限 Java，仅遗留系统（如 RMI）使用。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：`transient` 字段反序列化后是什么值？** → 对象字段为对应类型的默认值（对象引用为 `null`、int 为 0）；若实现 `Externalizable` 可在 `readExternal` 中自行恢复。
-- **Q：序列化会调用构造方法吗？** → 不会（针对实现 `Serializable` 的类），反序列化直接按流中数据填充字段；这也是反序列化攻击能绕过构造器校验的原因。
+- **Q：`transient` 字段反序列化后是什么值？**
 
-### 【中等】Java 提供了哪些 IO 方式？⭐⭐⭐
+  → 对象字段为对应类型的默认值（对象引用为 `null`、int 为 0）；若实现 `Externalizable` 可在 `readExternal` 中自行恢复。
+
+- **Q：序列化会调用构造方法吗？**
+
+  → 不会（针对实现 `Serializable` 的类），反序列化直接按流中数据填充字段；这也是反序列化攻击能绕过构造器校验的原因。
+
+### 【困难】Java 提供了哪些 IO 方式？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java IO / BIO、NIO、AIO
 
@@ -1227,7 +1293,7 @@ SPI 是 Java 提供的**服务发现机制**，通过**接口与实现分离**�
 
 Java IO 分三大类：BIO 同步阻塞（流 API，适合低并发）、NIO 同步非阻塞（Channel/Buffer/Selector，适合高并发，Netty 底层）、AIO 异步非阻塞（回调/Future，实际使用较少）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：BIO 一线程一连接，NIO 选择器多路复用，AIO 回调真异步
 - **关键词**：流 ／ Channel+Buffer+Selector ／ CompletionHandler
@@ -1345,14 +1411,20 @@ fileChannel.read(buffer, 0, buffer, new CompletionHandler<Integer, ByteBuffer>()
 
 - 【L3】BIO 的瓶颈：每个连接需要一个独立线程，线程数 ≈ 连接数，千级连接时线程上下文切换和栈内存（默认 1MB/线程）开销不可接受；NIO 用 Selector 多路复用，单线程可管理成千上万连接。
 - 【L3】AIO 的现实处境：Linux 下 JDK 的 AIO 底层仍依赖 epoll 模拟，并非真正内核级异步，性能优势不明显，因此 Netty 曾支持后又移除 AIO 传输，生态主流是 NIO。
+- 【L4】JDK 21 虚拟线程（JEP 444）改变了 IO 模型的权衡：同步阻塞代码跑在虚拟线程上，“每连接一线程”即可获得接近多路复用的并发能力，BIO 风格编程模型重新变得可行；但迁移存量代码要评估两点——`synchronized` 块内阻塞会钉住（pinning）载体线程（JDK 21~23 需改用 `ReentrantLock`，JDK 24 起该限制已移除），以及海量虚拟线程下 `ThreadLocal` 缓存的内存放大。
 - 【L4】Reactor 模式：NIO 多路复用是 Reactor 模型的基石，Netty 的主从 Reactor（Boss/Worker EventLoopGroup）即基于 Selector 实现，详见本文档「NIO 如何实现多路复用？」。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：为什么高并发服务器选 NIO 而不是 AIO？** → NIO 生态成熟（Netty）、跨平台行为一致；AIO 在 Linux 实现不彻底、编程模型复杂，收益有限。
-- **Q：FileChannel 能用 Selector 吗？** → 不能，文件 I/O 不支持多路复用，Selector 只适用于网络 Channel（`SocketChannel`/`ServerSocketChannel`/`DatagramChannel`）。
+- **Q：为什么高并发服务器选 NIO 而不是 AIO？**
+
+  → NIO 生态成熟（Netty）、跨平台行为一致；AIO 在 Linux 实现不彻底、编程模型复杂，收益有限。
+
+- **Q：FileChannel 能用 Selector 吗？**
+
+  → 不能，文件 I/O 不支持多路复用，Selector 只适用于网络 Channel（`SocketChannel`/`ServerSocketChannel`/`DatagramChannel`）。
 
 ### 【困难】NIO 如何实现多路复用？⭐⭐⭐⭐
 
@@ -1362,7 +1434,7 @@ fileChannel.read(buffer, 0, buffer, new CompletionHandler<Integer, ByteBuffer>()
 
 NIO 多路复用的核心是 Selector 轮询事件 + 非阻塞 Channel + Buffer 数据交换，单线程即可管理数千连接的 I/O 事件，底层依赖 epoll/IOCP，是 Netty 等高性能框架的底层原理。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：非阻塞通道，选择器轮询，就绪才处理，单线程万连
 - **关键词**：Selector ／ SelectionKey ／ epoll
@@ -1460,7 +1532,7 @@ while (true) {
 
 ::: details
 
-- 【L3】底层实现：**Linux** 基于 `epoll`（高效监控大量文件描述符）；**Windows** 基于 `IOCP`（完成端口）。相比传统 BIO 的线程池模型，NIO 单线程可处理数千连接。
+- 【L3】底层实现：**Linux** 基于 `epoll`（高效监控大量文件描述符），**macOS** 基于 `kqueue`；**Windows** 的 Selector 基于 `select`/`WSAPoll`——IOCP（完成端口）是 Windows 上 AIO（`AsynchronousSocketChannel`）的底层而非 Selector 的底层，二者不可混淆。相比传统 BIO 的线程池模型，NIO 单线程可处理数千连接。
 - 【L3】select/poll/epoll 演进：`select` 有 1024 个 fd 上限且每次需拷贝 fd 集合进内核；`poll` 取消数量上限但仍线性扫描；`epoll` 用红黑树管理 fd + 就绪链表回调，活跃连接少时接近 O(1)，且支持边沿触发（ET）减少重复通知。
 - 【L4】Netty 对 NIO 的工程化包装：主从 Reactor 线程模型、解决 JDK epoll 空轮询 bug（计数后重建 Selector）、`CompositeByteBuf` 零拷贝，生产环境一般不直接用裸 NIO。
 
@@ -1488,10 +1560,15 @@ while (true) {
 
 #### 🔀 发散问题
 
-- **Q：为什么注册到 Selector 的 Channel 必须非阻塞？** → 若 Channel 阻塞，事件就绪后实际读写仍可能挂起，整个 Selector 线程被卡死，多路复用失效；这也是 `FileChannel`（无法设非阻塞）不能注册 Selector 的原因。
-- **Q：JDK NIO 的 epoll 空轮询 bug 是什么？** → 某些情况下 `select()` 在没有就绪事件时立即返回（触发条件与连接异常关闭有关），导致 CPU 100%；Netty 通过统计空轮询次数，超阈值后重建 Selector 规避。
+- **Q：为什么注册到 Selector 的 Channel 必须非阻塞？**
 
-### 【困难】Java 写入文件到磁盘会经历哪些过程？⭐⭐⭐
+  → 若 Channel 阻塞，事件就绪后实际读写仍可能挂起，整个 Selector 线程被卡死，多路复用失效；这也是 `FileChannel`（无法设非阻塞）不能注册 Selector 的原因。
+
+- **Q：JDK NIO 的 epoll 空轮询 bug 是什么？**
+
+  → 某些情况下 `select()` 在没有就绪事件时立即返回（触发条件与连接异常关闭有关），导致 CPU 100%；Netty 通过统计空轮询次数，超阈值后重建 Selector 规避。
+
+### 【困难】Java 写入文件到磁盘会经历哪些过程？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Java IO / 写盘流程与页缓存
 
@@ -1499,7 +1576,7 @@ while (true) {
 
 Java 写盘经历“用户缓冲区 → 内核页缓存 → 磁盘缓存 → 物理介质”四级流水：`write` 返回只表示数据进了页缓存，`fsync` 才算落盘；零拷贝可省去用户空间拷贝。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：write 入缓存，fsync 才落盘，脏页定时刷，transferTo 零拷贝
 - **关键词**：页缓存 ／ 脏页 ／ fsync
@@ -1536,7 +1613,7 @@ Java 写盘经历“用户缓冲区 → 内核页缓存 → 磁盘缓存 → 物
 - 写入的数据暂存在 Page Cache 中，对应内存页被标记为 **脏页**（Dirty）。
 - **读优化**：后续读可直接命中缓存，避免磁盘 I/O。
 - **刷盘触发时机**：
-  - **定时回写**：内核线程（如 pdflush）周期性扫描脏页，默认 30 秒刷盘。
+  - **定时回写**：内核回写线程周期性扫描脏页，默认约 30 秒刷盘（早期内核为全局 pdflush 线程，Linux 2.6.32 起改为按备份设备划分的 per-bdi flusher 线程即 kworker，pdflush 已移除，再提 pdflush 属过时表述）。
   - **内存压力**：可用内存低于阈值时强制刷盘。
   - **显式同步**：应用程序调用 `fsync()` 或 `fdatasync()`，立即将指定文件的脏页刷入磁盘。
   - **文件关闭**：`close()` 会隐含刷新，但不保证物理落盘（依赖于文件系统实现）。
@@ -1583,12 +1660,17 @@ Java 写盘经历“用户缓冲区 → 内核页缓存 → 磁盘缓存 → 物
 
 #### 🔀 发散问题
 
-- **Q：`flush()` 能保证数据落盘吗？** → 不能。`flush()` 只把 JVM 用户缓冲区刷到内核页缓存，要真正落盘需 `FileDescriptor.sync()` 或 `FileChannel.force(true)`。
-- **Q：数据库（如 MySQL/Kafka）为什么自己管理刷盘？** → 它们用页缓存提升吞吐，再通过 redo log 顺序写 + 定时/显式 `fsync` 控制持久化时机，在性能与可靠性间取平衡；Kafka 甚至依赖操作系统页缓存 + 副本机制而非单机 fsync。
+- **Q：`flush()` 能保证数据落盘吗？**
+
+  → 不能。`flush()` 只把 JVM 用户缓冲区刷到内核页缓存，要真正落盘需 `FileDescriptor.sync()` 或 `FileChannel.force(true)`。
+
+- **Q：数据库（如 MySQL/Kafka）为什么自己管理刷盘？**
+
+  → 它们用页缓存提升吞吐，再通过 redo log 顺序写 + 定时/显式 `fsync` 控制持久化时机，在性能与可靠性间取平衡；Kafka 甚至依赖操作系统页缓存 + 副本机制而非单机 fsync。
 
 ## Java 新特性
 
-### 【中等】Java 8 的 Optional 的正确使用方式？⭐⭐⭐
+### 【中等】Java 8 的 Optional 的正确使用方式？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 8 新特性 / Optional
 
@@ -1596,7 +1678,7 @@ Java 写盘经历“用户缓冲区 → 内核页缓存 → 磁盘缓存 → 物
 
 `Optional` 是 Java 8 引入的容器对象，用于优雅表达“值可能为空”：只应作为返回类型，配合 `map`/`orElse`/`orElseGet` 链式处理；不要作字段、参数，更不要裸调 `get()`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：返回值可空，链式 map 取，orElse 兼底，裸 get 是错
 - **关键词**：ofNullable ／ map ／ orElseGet
@@ -1648,6 +1730,7 @@ String s = optional.get();  // 可能 NPE
 ::: details
 
 - 【L3】`orElse(T)` vs `orElseGet(Supplier)`：前者无论有无值都会立即计算默认值，后者懒加载；当默认值创建开销大或有副作用时务必用 `orElseGet`。
+- 【L3】性能代价：`Optional` 每次包装都是一次额外堆分配，在每秒百万级调用的热点路径（循环体内部、高频内部方法的返回值）会带来可测量的 GC 压力；`Optional` 的设计初衷（JDK 团队公开说明）仅是**返回类型**，性能敏感的内部 API 应直接返回 null、抛异常或改用其他约定。基本类型场景应使用 `OptionalInt`/`OptionalLong`/`OptionalDouble`，避免 `Optional<Integer>` 的双重装箱。
 - 【L3】`Optional` 内部用私有字段持值，空实例为静态单例 `Optional.EMPTY`；`Optional` 未实现 `Serializable`，这是它不适合作为字段类型的重要原因。
 - 【L4】版本演进：Java 9 新增 `ifPresentOrElse()`/`or()`/`stream()`；Java 10 新增无参 `orElseThrow()`；Java 11 新增 `isEmpty()`。
 
@@ -1655,18 +1738,23 @@ String s = optional.get();  // 可能 NPE
 
 #### 🔀 发散问题
 
-- **Q：为什么不建议把 Optional 作为方法参数？** → 会迫使调用方包装值、增加噪声且无类型收益；它的设计定位仅是返回类型，用于显式告知“可能为空”。
-- **Q：`orElseThrow()` 和 `get()` 有什么区别？** → 语义相同（无值抛 `NoSuchElementException`），但 `orElseThrow()` 名字明确表达异常意图，是 Java 10 后的推荐写法。
+- **Q：为什么不建议把 Optional 作为方法参数？**
 
-### 【中等】Java 8 的 Lambda 表达式和函数式接口是什么？⭐⭐⭐⭐
+  → 会迫使调用方包装值、增加噪声且无类型收益；它的设计定位仅是返回类型，用于显式告知“可能为空”。
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 8 新特性 / Lambda 与函数式接口
+- **Q：`orElseThrow()` 和 `get()` 有什么区别？**
+
+  → 语义相同（无值抛 `NoSuchElementException`），但 `orElseThrow()` 名字明确表达异常意图，是 Java 10 后的推荐写法。
+
+### 【困难】Java 8 的 Lambda 表达式和函数式接口是什么？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 8 新特性 / Lambda 与函数式接口
 
 #### 💎 关键结论
 
 Lambda 是 Java 8 引入的匿名函数，把行为作为参数传递，必须匹配只有一个抽象方法的函数式接口；其底层不是匿名内部类，而是通过 `invokedynamic` + `LambdaMetafactory` 在运行期动态链接。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：参数箭头体，接口单方法，运行 invokedynamic，无捕获可单例
 - **关键词**：`->` ／ @FunctionalInterface ／ invokedynamic
@@ -1736,7 +1824,7 @@ invokedynamic #14  // BootstrapMethod: LambdaMetafactory.metafactory()
 
 2. LambdaMetafactory 在运行时生成一个实现函数式接口的类
    → 通过 ASM 直接生成字节码
-   → 通过 Unsafe.defineAnonymousClass 加载（不生成 .class 文件）
+   → 通过运行期定义类加载（早期 JDK 用 Unsafe.defineAnonymousClass，JDK 15 起改用 MethodHandles.Lookup.defineHiddenClass，即 JEP 371 隐藏类；不生成 .class 文件）
 
 3. 返回一个 CallSite（调用点），后续调用直接使用该 CallSite
    → 返回的可能是一个新对象，也可能是缓存的单例（取决于是否捕获外部变量）
@@ -1760,7 +1848,11 @@ Supplier<String> s4 = new Supplier<>() {  // 每个 new 都是不同对象
 };
 ```
 
-**记忆点**：Lambda = "行为参数化"，函数式接口 = "只有一个抽象方法的接口"，底层 = `invokedynamic` + `LambdaMetafactory`（区别于匿名内部类的编译期类生成）。
+**【L4】调用点内联：Lambda 为什么不慢**
+
+`invokedynamic` 首次执行时由引导方法返回一个常量 `CallSite`，之后该调用点对 JIT 而言与普通虚调用无异——Lambda 方法体可被完全内联，热点性能不低于（通常还优于）匿名内部类；这与反射 `Method.invoke()`（目标运行期才确定、难以内联，见本文档「什么是反射？反射有什么作用？」）有本质区别。因此“Lambda 有损耗所以不敢用”是误区——真正的开销在装箱（如 `Stream<Integer>`）而非 Lambda 机制本身。
+
+**记忆点**：Lambda = “行为参数化”，函数式接口 = "只有一个抽象方法的接口"，底层 = `invokedynamic` + `LambdaMetafactory`（区别于匿名内部类的编译期类生成）。
 
 **【L4】跨语言视角：Lambda/Closure 的四种实现策略**
 
@@ -1779,10 +1871,15 @@ C++ lambda 的 `[]` 捕获列表（`[=]` 按值、`[&]` 按引用、`[this]` 等
 
 #### 🔀 发散问题
 
-- **Q：Lambda 捕获的变量为什么必须是 effectively final？** → Lambda 捕获的是变量的副本而非变量本身，若变量可变，副本与原值语义会不一致，编译器直接禁止。
-- **Q：方法引用和 Lambda 有什么关系？** → 方法引用（如 `String::length`）是 Lambda 的语法简写，编译后同样走 `invokedynamic` + `LambdaMetafactory`（使用不同的引导方法变体）。
+- **Q：Lambda 捕获的变量为什么必须是 effectively final？**
 
-### 【困难】Java 8 的 Stream API 的核心操作有哪些？⭐⭐⭐⭐
+  → Lambda 捕获的是变量的副本而非变量本身，若变量可变，副本与原值语义会不一致，编译器直接禁止。
+
+- **Q：方法引用和 Lambda 有什么关系？**
+
+  → 方法引用（如 `String::length`）是 Lambda 的语法简写，编译后同样走 `invokedynamic` + `LambdaMetafactory`（使用不同的引导方法变体）。
+
+### 【困难】Java 8 的 Stream API 的核心操作有哪些？⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：JDK 8 新特性 / Stream API
 
@@ -1790,7 +1887,7 @@ C++ lambda 的 `[]` 捕获列表（`[=]` 按值、`[&]` 按引用、`[this]` 等
 
 Stream 提供声明式、链式、可并行的集合处理：“数据源 → 中间操作（懒执行）→ 终端操作（触发计算）”；中间操作构建管道不执行，终端操作才遍历元素，短路操作可提前终止。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：中间懒执行，终端才触发，短路能提前，并行看拆分
 - **关键词**：中间操作 ／ 终端操作 ／ Spliterator
@@ -1930,10 +2027,15 @@ users.stream()
 
 #### 🔀 发散问题
 
-- **Q：`map` 和 `flatMap` 的区别？** → `map` 是一对一转换（每个元素映射为一个新元素）；`flatMap` 是一对多，把每个元素映射为一个流再压平合并，常用于展开嵌套集合。
-- **Q：并行流底层用什么线程池？** → 默认使用 `ForkJoinPool.commonPool()`（线程数约为 CPU 核数 - 1），可用自定义 ForkJoinPool 提交隔离；`findFirst` 在并行流中需全局同步保序，代价高，优先用 `findAny`。
+- **Q：`map` 和 `flatMap` 的区别？**
 
-### 【中等】Java 8 的接口的默认方法和静态方法是什么？⭐⭐⭐
+  → `map` 是一对一转换（每个元素映射为一个新元素）；`flatMap` 是一对多，把每个元素映射为一个流再压平合并，常用于展开嵌套集合。
+
+- **Q：并行流底层用什么线程池？**
+
+  → 默认使用 `ForkJoinPool.commonPool()`（线程数约为 CPU 核数 - 1），可用自定义 ForkJoinPool 提交隔离；`findFirst` 在并行流中需全局同步保序，代价高，优先用 `findAny`。
+
+### 【中等】Java 8 的接口的默认方法和静态方法是什么？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 8 新特性 / 接口演化
 
@@ -1941,7 +2043,7 @@ users.stream()
 
 Java 8 允许接口定义 `default` 方法和静态方法，在不破坏存量实现类的前提下给接口新增能力（接口演化）；冲突时遵循“类优先、同名默认方法必须显式重写”规则。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：default 带实现，接口可演化，类优先，冲突必重写
 - **关键词**：default ／ 类优先 ／ B.super
@@ -1997,8 +2099,13 @@ class C implements A, B {
 
 #### 🔀 发散问题
 
-- **Q：接口能有字段吗？** → 可以，但隐式为 `public static final` 常量，不能作实例状态；Java 8 的私有方法要等 Java 9 才支持（`private` 接口方法）。
-- **Q：抽象类和接口怎么选？** → 需要状态/构造器/非 public 成员选抽象类；需要多实现、默认行为组合选接口，Java 8 后接口已能覆盖大多数“可插拔能力”场景。
+- **Q：接口能有字段吗？**
+
+  → 可以，但隐式为 `public static final` 常量，不能作实例状态；Java 8 的私有方法要等 Java 9 才支持（`private` 接口方法）。
+
+- **Q：抽象类和接口怎么选？**
+
+  → 需要状态/构造器/非 public 成员选抽象类；需要多实现、默认行为组合选接口，Java 8 后接口已能覆盖大多数“可插拔能力”场景。
 
 ### 【中等】Java 8 的 java.time API 解决了什么问题？⭐⭐⭐
 
@@ -2008,7 +2115,7 @@ class C implements A, B {
 
 `java.time`（JSR-310）解决了 `Date`/`Calendar` 的三大痛点：非线程安全、设计混乱（月份从 0 开始）、时区处理复杂；新 API 不可变、线程安全、语义清晰。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：日期无时区，时刻用 Instant，加减用 plus，格式化线程安全
 - **关键词**：LocalDateTime ／ ZonedDateTime ／ DateTimeFormatter
@@ -2049,13 +2156,19 @@ String formatted = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-
 - 【L3】线程安全原理：`java.time` 所有类都是 `final` + 不可变对象，运算返回新实例，`DateTimeFormatter` 也因此线程安全、可声明为静态常量；而 `SimpleDateFormat` 内部持有可变的 `Calendar`，并发下会解析错乱。
 - 【L3】老类迁移：`Date` ↔ `LocalDateTime` 需经 `Instant` + `ZoneId` 中转（`date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()`）；`Calendar` 可用 `ZonedDateTime.from()` 转换。
 - 【L4】`Instant` 是 UTC 时间戳，适合存储和跨系统传输；展示给用户时再转 `ZonedDateTime`；跨时区运算必须用 `ZonedDateTime` 而非 `LocalDateTime`（后者无时区概念）。
+- 【L4】格式化模式陷阱：`YYYY-MM-dd` 中的大写 `Y` 是**周年（week-based-year）**而非日历年，跨年当周（如 12 月 29 日）会被格式化成下一年，是高频生产事故源；日历年必须用小写 `yyyy`。同理 `DD` 是 year-of-day，日期须用 `dd`。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：`LocalDateTime` 和 `Instant` 怎么选？** → 需要时区语义（存储、传输、跨时区比较）用 `Instant`；仅表示本地日历时间（如“每天 09:00 开会”）用 `LocalDateTime`。
-- **Q：`SimpleDateFormat` 为什么不线程安全？** → 它内部共享可变的 `Calendar` 实例做解析/格式化，多线程并发时字段被互相覆盖，需每次新建、`ThreadLocal` 包装或改用 `DateTimeFormatter`。
+- **Q：`LocalDateTime` 和 `Instant` 怎么选？**
+
+  → 需要时区语义（存储、传输、跨时区比较）用 `Instant`；仅表示本地日历时间（如“每天 09:00 开会”）用 `LocalDateTime`。
+
+- **Q：`SimpleDateFormat` 为什么不线程安全？**
+
+  → 它内部共享可变的 `Calendar` 实例做解析/格式化，多线程并发时字段被互相覆盖，需每次新建、`ThreadLocal` 包装或改用 `DateTimeFormatter`。
 
 ### 【中等】Java 9 引入的模块化系统（JPMS）有什么用？⭐
 
@@ -2065,7 +2178,7 @@ String formatted = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-
 
 JPMS（Project Jigsaw）用 `module-info.java` 声明模块依赖与导出包，解决 JAR 地狱和封装不足：强封装（未导出包反射也不可访）、可靠依赖检查、`jlink` 定制精简 JRE。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：requires 声明依赖，exports 控制可见，opens 留给反射，jlink 瘦身
 - **关键词**：module-info ／ exports ／ jlink
@@ -2089,7 +2202,7 @@ module com.example.app {
     requires transitive java.base;  // 传递依赖
     exports com.example.api;        // 导出包，对外可见
     // com.example.internal 不导出，外部无法访问
-    opens com.example.pojo to jackson;  // 仅对 jackson 反射开放
+    opens com.example.pojo;         // 运行时反射开放（给 Jackson/Spring 等类路径框架）
 }
 ```
 
@@ -2113,7 +2226,7 @@ module com.example.app {
 
 ::: details
 
-- 【L3】封装的强制力：未导出包在编译期和运行时都被拒绝访问，反射 `setAccessible(true)` 也无效（除非 `opens` 或启动参数 `--add-opens`），这比 `private` 更强。
+- 【L3】封装的强制力：未导出包在编译期和运行时都被拒绝访问，反射 `setAccessible(true)` 也无效（除非 `opens` 或启动参数 `--add-opens`），这比 `private` 更强。注意限定形式的 `opens 包 to 模块名` 只能指向**具名模块**——Jackson/Spring 等仍在类路径（未命名模块）上的框架无法被限定开放，只能用不限定 `opens` 或 `--add-opens`。
 - 【L3】与类路径的关系：未模块化的 jar 全部进入“未命名模块”，可读一切导出包，这是存量代码升级 Java 9+ 的主要兼容问题来源；Spring 等主流框架自身仍未全面模块化。
 - 【L4】`jlink` 定制 JRE 可将运行环境从数百 MB 缩小到几十 MB，是 GraalVM Native Image 之外的一种轻量化方案。
 
@@ -2121,9 +2234,11 @@ module com.example.app {
 
 #### 🔀 发散问题
 
-- **Q：为什么很多项目至今不用 JPMS？** → 生态库模块化不彻底、`--add-opens` 兼容参数繁琐，收益（封装/jlink）对普通业务应用吸引力有限；但在 CLI 工具和云原生镜像瘦身场景仍有价值。
+- **Q：为什么很多项目至今不用 JPMS？**
 
-### 【中等】Java 11 的 var 局部变量类型推断怎么用？有什么限制？⭐⭐
+  → 生态库模块化不彻底、`--add-opens` 兼容参数繁琐，收益（封装/jlink）对普通业务应用吸引力有限；但在 CLI 工具和云原生镜像瘦身场景仍有价值。
+
+### 【中等】Java 11 的 var 局部变量类型推断怎么用？有什么限制？⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 10-11 新特性 / var 类型推断
 
@@ -2131,7 +2246,7 @@ module com.example.app {
 
 `var`（JDK 10 引入、JDK 11 扩展到 Lambda 参数）让编译器从初始化表达式推断局部变量类型，仅是编译期语法糖，运行时类型不变；只能用于有初始化值的局部变量，不能用于字段、参数、返回值。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：局部可推断，字段参数不行，null 无初始化不能用
 - **关键词**：局部变量 ／ 编译期推断 ／ JDK 10
@@ -2178,7 +2293,9 @@ list.stream().filter((@NotNull var s) -> s.length() > 5);
 
 #### 🔀 发散问题
 
-- **Q：`var` 能用于方法返回值吗？** → 不能，方法签名是 API 契约，隐藏返回类型会损害可读性；局部变量作用域小，推断风险可控。
+- **Q：`var` 能用于方法返回值吗？**
+
+  → 不能，方法签名是 API 契约，隐藏返回类型会损害可读性；局部变量作用域小，推断风险可控。
 
 ### 【中等】Java 11 的 HTTP Client API 有什么特点？⭐⭐
 
@@ -2188,7 +2305,7 @@ list.stream().filter((@NotNull var s) -> s.length() > 5);
 
 `java.net.http.HttpClient`（JDK 11 正式版）是 Java 原生 HTTP 客户端：支持同步/异步（`CompletableFuture`）、默认 HTTP/2 多路复用、内置 WebSocket，用于替代老旧的 `HttpURLConnection`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：send 同步，sendAsync 异步，HTTP/2 默认开，客户端要复用
 - **关键词**：HttpClient ／ sendAsync ／ HTTP/2
@@ -2236,7 +2353,9 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 
 #### 🔀 发散问题
 
-- **Q：`HttpURLConnection` 为什么被弃用？** → API 古老难用（只支持 HTTP/1.1、同步阻塞、异常处理别扭），JDK 11 后有原生 HttpClient 替代。
+- **Q：`HttpURLConnection` 为什么被弃用？**
+
+  → API 古老难用（只支持 HTTP/1.1、同步阻塞、异常处理别扭），JDK 11 后有原生 HttpClient 替代。
 
 ### 【中等】Java 11 的字符串 API 有哪些增强？⭐
 
@@ -2246,7 +2365,7 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 
 Java 11 为 `String` 新增 `isBlank`/`strip` 系列/`lines`/`repeat` 等实用方法；其中 `strip()` 基于 `Character.isWhitespace()` 支持 Unicode 空白，是 `trim()` 的现代替代。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：strip 认 Unicode，isBlank 看空白，lines 出流，repeat 拼接
 - **关键词**：strip ／ isBlank ／ repeat
@@ -2278,9 +2397,11 @@ Java 11 为 `String` 类新增了多个实用方法：
 
 #### 🔀 发散问题
 
-- **Q：`isBlank()` 和 `isEmpty()` 有什么区别？** → `"".isEmpty()` 和 `" ".isEmpty()` 前者 true 后者 false；而 `" ".isBlank()` 为 true，即 `isBlank` = 空串或仅含空白字符。
+- **Q：`isBlank()` 和 `isEmpty()` 有什么区别？**
 
-### 【中等】Java 11 对 GC 有哪些重要更新？⭐⭐
+  → `"".isEmpty()` 和 `" ".isEmpty()` 前者 true 后者 false；而 `" ".isBlank()` 为 true，即 `isBlank` = 空串或仅含空白字符。
+
+### 【中等】Java 11 对 GC 有哪些重要更新？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 11 新特性 / GC 演进
 
@@ -2288,7 +2409,7 @@ Java 11 为 `String` 类新增了多个实用方法：
 
 JDK 11 是 GC 里程碑：引入低延迟的 ZGC（实验）与 Epsilon；同期 G1 已是默认 GC（JDK 9 起），CMS 被废弃并于 JDK 14 移除，ZGC 在 Java 15 达到生产可用。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：ZGC 亚毫秒，Epsilon 不回收，G1 是默认，CMS 被移除
 - **关键词**：ZGC ／ G1 ／ Epsilon
@@ -2298,10 +2419,10 @@ JDK 11 是 GC 里程碑：引入低延迟的 ZGC（实验）与 Epsilon；同期
 
 JDK 11 是 GC 领域的重要里程碑，引入了两个新一代垃圾收集器：
 
-| 收集器          | JDK 版本 | 核心特点                                                 |
-| :-------------- | :------- | :------------------------------------------------------- |
-| **ZGC**（实验） | JDK 11   | 亚毫秒停顿（<10ms），支持 TB 级堆，基于着色指针 + 读屏障 |
-| **Shenandoah**  | JDK 12   | 低延迟（与 ZGC 竞争），基于转发指针，Red Hat 开发        |
+| 收集器          | JDK 版本 | 核心特点                                                                             |
+| :-------------- | :------- | :----------------------------------------------------------------------------------- |
+| **ZGC**（实验） | JDK 11   | 低停顿（初期目标 <10ms，JDK 16 起进入亚毫秒级），支持 TB 级堆，基于着色指针 + 读屏障 |
+| **Shenandoah**  | JDK 12   | 低延迟（与 ZGC 竞争），基于转发指针，Red Hat 开发                                    |
 
 **其他 GC 变更**：
 
@@ -2331,7 +2452,9 @@ java -XX:+UseEpsilonGC -Xmx256m YourApplication
 
 #### 🔀 发散问题
 
-- **Q：为什么 CMS 被移除？** → CMS 并发标记产生内存碎片、需回退到串行 Full GC、代码维护成本高，自 JDK 9 废弃后于 JDK 14 正式移除，由 G1/ZGC 接替。
+- **Q：为什么 CMS 被移除？**
+
+  → CMS 并发标记产生内存碎片、需回退到串行 Full GC、代码维护成本高，自 JDK 9 废弃后于 JDK 14 正式移除，由 G1/ZGC 接替。
 
 ### 【中等】Java 14 对 switch 有哪些增强？⭐⭐
 
@@ -2341,7 +2464,7 @@ java -XX:+UseEpsilonGC -Xmx256m YourApplication
 
 JDK 14 正式标准化 switch 表达式：箭头语法默认无穿透、多值标签一行合并、`yield` 返回分支结果，switch 从语句升级为可赋值、必须穷尽的表达式。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：箭头不穿透，多值逗号连，块中用 yield，表达式必穷尽
 - **关键词**：`->` ／ yield ／ 穷尽检查
@@ -2409,9 +2532,11 @@ String result = switch (day) {
 
 #### 🔀 发散问题
 
-- **Q：`yield` 和 `return` 有什么区别？** → `return` 从方法返回；`yield` 仅从 switch 表达式中产出一个值，方法继续执行后面的代码。
+- **Q：`yield` 和 `return` 有什么区别？**
 
-### 【中等】Java 16 的 Record（记录类）有什么用？⭐⭐
+  → `return` 从方法返回；`yield` 仅从 switch 表达式中产出一个值，方法继续执行后面的代码。
+
+### 【中等】Java 16 的 Record（记录类）有什么用？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 16 新特性 / Record
 
@@ -2419,7 +2544,7 @@ String result = switch (day) {
 
 Record（Java 16 正式版）是不可变数据载体：一行声明自动生成构造器、访问器、`equals`/`hashCode`/`toString`，是 Lombok `@Data` 的官方替代品，适合 DTO/值对象等纯数据场景。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一行定数据，字段全 final，访问器无 get，紧凑构造器做校验
 - **关键词**：record ／ 不可变 ／ 紧凑构造器
@@ -2483,16 +2608,23 @@ public record Range(int start, int end) {
 ::: details
 
 - 【L3】编译产物：record 编译为 `final` 类，隐式继承 `java.lang.Record`，组件对应 `private final` 字段，访问器方法名与组件同名（无 `get` 前缀）；Java 16 起还支持在方法内声明局部 record。
+- 【L3】序列化特性（JEP 395）：record 不允许自定义 `writeObject`/`readObject` 等序列化钩子，序列化形式固定；反序列化**始终调用规范构造器**，因此紧凑构造器里的校验在反序列化时同样生效——无法像普通类那样通过构造恶意字节流绕过不变式，这是 record 相对 Lombok `@Data` 的深层安全优势。
+- 【L4】生成方法的实现：`equals`/`hashCode`/`toString` 通过 `invokedynamic` 引导（`ObjectMethods`），首次调用时才绑定实现，不走反射；Jackson 2.12+ 基于 record 的组件元数据原生支持其反序列化，无需注解或 `-parameters` 编译参数。
 - 【L4】横向对比：Kotlin `data class` 允许 `var` 与 `copy()`，更灵活但牺牲不可变保证；Lombok `@Data` 靠注解处理器生成代码，record 是语言级原生支持，反射、序列化框架对其支持更规范。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：Record 适合做 JPA 实体吗？** → 不适合：JPA 实体需要无参构造器、setter 和可变状态，而 record 全字段 final；record 更适合查询结果的 DTO 投影。
-- **Q：record 能实现接口吗？** → 可以，也可以添加实例方法、静态成员，但不能继承类、不能声明实例字段（组件之外）。
+- **Q：Record 适合做 JPA 实体吗？**
 
-### 【中等】Java 17 的 Sealed Classes（密封类）是什么？⭐⭐⭐
+  → 不适合：JPA 实体需要无参构造器、setter 和可变状态，而 record 全字段 final；record 更适合查询结果的 DTO 投影。
+
+- **Q：record 能实现接口吗？**
+
+  → 可以，也可以添加实例方法、静态成员，但不能继承类、不能声明实例字段（组件之外）。
+
+### 【中等】Java 17 的 Sealed Classes（密封类）是什么？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 17 新特性 / 密封类
 
@@ -2500,7 +2632,7 @@ public record Range(int start, int end) {
 
 密封类用 `sealed` + `permits` 显式声明允许的子类，在开放继承与 `final` 之间提供“有界继承”第三种选择；配合 switch 穷尽检查，是类型安全领域建模（ADT）的利器。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：sealed 定边界，permits 列子类，子类三选一，switch 能穷尽
 - **关键词**：sealed ／ permits ／ final/sealed/non-sealed
@@ -2553,10 +2685,15 @@ public double area(Shape shape) {
 
 #### 🔀 发散问题
 
-- **Q：`non-sealed` 有什么意义？** → 密封链可以在某个子类处“放开”：该子类之后允许任意类继承，而密封类对其他分支的约束仍然生效。
-- **Q：密封类和枚举怎么选？** → 取值固定且无需携带不同字段结构用枚举；每个分支需要不同数据字段（如不同形状参数）时用密封类 + record。
+- **Q：`non-sealed` 有什么意义？**
 
-### 【中等】Java 17 的文本块（Text Blocks）是什么？⭐⭐
+  → 密封链可以在某个子类处“放开”：该子类之后允许任意类继承，而密封类对其他分支的约束仍然生效。
+
+- **Q：密封类和枚举怎么选？**
+
+  → 取值固定且无需携带不同字段结构用枚举；每个分支需要不同数据字段（如不同形状参数）时用密封类 + record。
+
+### 【中等】Java 17 的文本块（Text Blocks）是什么？⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 15-17 新特性 / 文本块
 
@@ -2564,7 +2701,7 @@ public double area(Shape shape) {
 
 文本块（JDK 15 正式版）用 `"""` 定义多行字符串，自动去除公共缩进、统一换行符，解决 JSON/SQL/HTML 拼接的可读性问题，可用 `.formatted()` 插值。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：三引号包多行，缩进自动去，\s 留空格，formatted 插值
 - **关键词**：`"""` ／ 自动缩进 ／ formatted
@@ -2619,9 +2756,11 @@ String sql = """
 
 #### 🔀 发散问题
 
-- **Q：文本块和 `String.join`/StringBuilder 拼接怎么选？** → 静态多行内容用文本块；需要运行时动态拼接仍用 StringBuilder/格式化，两者不冲突。
+- **Q：文本块和 `String.join`/StringBuilder 拼接怎么选？**
 
-### 【中等】Java 17 的 instanceof 模式匹配是什么？⭐⭐⭐
+  → 静态多行内容用文本块；需要运行时动态拼接仍用 StringBuilder/格式化，两者不冲突。
+
+### 【中等】Java 17 的 instanceof 模式匹配是什么？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 16-17 新特性 / instanceof 模式匹配
 
@@ -2629,7 +2768,7 @@ String sql = """
 
 instanceof 模式匹配（JDK 16 正式版）把类型检查与变量绑定合二为一：`obj instanceof String s` 匹配成功即可直接用 `s`，消除显式强转；绑定变量只在匹配为真的分支内有效。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：匹配即绑定，免强转，作用域只看真分支
 - **关键词**：instanceof 绑定 ／ 作用域 ／ 确定赋值
@@ -2678,9 +2817,11 @@ System.out.println(s.length());
 
 #### 🔀 发散问题
 
-- **Q：`if (obj instanceof String s || other)` 后能用 `s` 吗？** → 不能，`||` 右侧与整个表达式为真时不能保证匹配成功；只有 `&&` 后续条件与取反提前返回等能确定匹配的上下文才可用。
+- **Q：`if (obj instanceof String s || other)` 后能用 `s` 吗？**
 
-### 【中等】Java 17 的 switch 表达式增强是什么？⭐⭐⭐
+  → 不能，`||` 右侧与整个表达式为真时不能保证匹配成功；只有 `&&` 后续条件与取反提前返回等能确定匹配的上下文才可用。
+
+### 【中等】Java 17 的 switch 表达式增强是什么？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 14-17 新特性 / switch 表达式
 
@@ -2688,7 +2829,7 @@ System.out.println(s.length());
 
 switch 表达式（JDK 14 正式版）引入箭头语法与 `yield`，使 switch 可赋值、默认不穿透、必须穷尽所有分支，从根源上消除忘写 `break` 的穿透 bug。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：箭头不穿透，多值一行写，块中 yield 返回，分支必穷尽
 - **关键词**：箭头语法 ／ yield ／ 穷尽检查
@@ -2745,7 +2886,9 @@ String result = switch (code) {
 
 #### 🔀 发散问题
 
-- **Q：switch 语句和 switch 表达式能混用语法吗？** → 不能：同一个 switch 要么全是冒号标签（语句，可穿透），要么全是箭头标签（表达式，不穿透）。
+- **Q：switch 语句和 switch 表达式能混用语法吗？**
+
+  → 不能：同一个 switch 要么全是冒号标签（语句，可穿透），要么全是箭头标签（表达式，不穿透）。
 
 ### 【中等】Java 21 的 switch 模式匹配有什么增强？⭐⭐⭐
 
@@ -2755,7 +2898,7 @@ String result = switch (code) {
 
 Java 21 正式版把 switch 从“值匹配”升级为模式匹配：支持任意类型模式、`when` 守卫条件、显式 `case null`，配合密封类实现编译器穷尽检查，无需 default。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：类型可匹配，when 加条件，null 显式接，密封能穷尽
 - **关键词**：类型模式 ／ when ／ case null
@@ -2811,8 +2954,13 @@ double area(Shape shape) {
 
 #### 🔀 发散问题
 
-- **Q：为什么有了模式匹配还要保留 default？** → 非密封的开放类型无法穷尽，仍需 default 兑底；只有密封类/枚举能让编译器验证穷尽性。
-- **Q：`when` 守卫和 `if` 嵌套有什么区别？** → `when` 是模式的一部分，守卫失败会回退到后续 case 继续匹配；分支内 `if` 则不会回退，语义更清晰且穷尽性可检查。
+- **Q：为什么有了模式匹配还要保留 default？**
+
+  → 非密封的开放类型无法穷尽，仍需 default 兑底；只有密封类/枚举能让编译器验证穷尽性。
+
+- **Q：`when` 守卫和 `if` 嵌套有什么区别？**
+
+  → `when` 是模式的一部分，守卫失败会回退到后续 case 继续匹配；分支内 `if` 则不会回退，语义更清晰且穷尽性可检查。
 
 ### 【中等】Java 21 的记录模式（Record Patterns）是什么？⭐⭐
 
@@ -2822,7 +2970,7 @@ double area(Shape shape) {
 
 记录模式（Java 21 正式版）允许在 `instanceof` 和 `switch` 中直接解构 record 的字段，支持嵌套与 `var` 推断，使 Java 具备类似 Scala/Kotlin 的解构能力。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：括号写组件，解构出字段，嵌套可递归，var 省类型
 - **关键词**：解构 ／ 嵌套模式 ／ Record Patterns
@@ -2872,7 +3020,9 @@ String describe(Object obj) {
 
 #### 🔀 发散问题
 
-- **Q：记录模式能用于普通类吗？** → 不能，仅适用于 record；普通类的模式匹配只能绑定整个对象（类型模式），字段级解构需要 record。
+- **Q：记录模式能用于普通类吗？**
+
+  → 不能，仅适用于 record；普通类的模式匹配只能绑定整个对象（类型模式），字段级解构需要 record。
 
 ### 【中等】Java 21 的未命名变量（Unnamed Variables）是什么？⭐
 
@@ -2882,7 +3032,7 @@ String describe(Object obj) {
 
 未命名变量用 `_` 表示“声明但不使用”的变量（Java 21 预览，Java 22 正式），可重复出现在同一作用域，明确表达“故意不用”的意图，消除 IDE 警告。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：不用就下划线，catch 参数可省，同作用域可重复
 - **关键词**：`_` ／ 未命名变量 ／ 意图表达
@@ -2934,17 +3084,19 @@ switch (shape) {
 
 #### 🔀 发散问题
 
-- **Q：为什么不用空标识符而要用 `_`？** → 很多场景（catch 参数、Lambda 参数）语法上必须声明变量，`_` 既满足语法又明确表达“不用”，比随便取名或加 @SuppressWarnings 更清晰。
+- **Q：为什么不用空标识符而要用 `_`？**
 
-### 【中等】Java 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？⭐⭐⭐
+  → 很多场景（catch 参数、Lambda 参数）语法上必须声明变量，`_` 既满足语法又明确表达“不用”，比随便取名或加 @SuppressWarnings 更清晰。
+
+### 【困难】Java 21 的 Scoped Values 是什么？与 ThreadLocal 有什么区别？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JDK 21 新特性 / ScopedValue 与虚拟线程
 
 #### 💎 关键结论
 
-ScopedValue（Java 21 预览，JEP 446）是不可变、作用域自动回收的线程上下文传递方案，无泄漏风险且对百万级虚拟线程友好，是 ThreadLocal 在高并发场景的替代者。
+ScopedValue（Java 21 首次预览、Java 25 正式定稿）是不可变、作用域自动回收的线程上下文传递方案，无泄漏风险且对百万级虚拟线程友好，是 ThreadLocal 在高并发场景的替代者。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：绑定一次只读，作用域结束自动失效，虚拟线程随便开
 - **关键词**：ScopedValue ／ 不可变 ／ 虚拟线程
@@ -2952,7 +3104,7 @@ ScopedValue（Java 21 预览，JEP 446）是不可变、作用域自动回收的
 
 #### 📖 核心知识
 
-**Scoped Values（Java 21 预览，JEP 446）** 是比 `ThreadLocal` 更安全、更高效的线程上下文传递方案，专为**虚拟线程**设计。
+**Scoped Values**（Java 21 首次预览 JEP 446，Java 25 正式 JEP 506）是比 `ThreadLocal` 更安全、更高效的线程上下文传递方案，专为**虚拟线程**设计。
 
 | 维度             | ThreadLocal                       | Scoped Values                  |
 | :--------------- | :-------------------------------- | :----------------------------- |
@@ -2983,12 +3135,17 @@ void processRequest() {
 ::: details
 
 - 【L3】性能原理：`ThreadLocal` 每线程维护一张可变映射表，百万虚拟线程时内存与拷贝开销巨大；ScopedValue 的值随调用栈绑定、多个作用域值可共享存储，不可变设计使其无需防御性拷贝与手动清理。
-- 【L3】版本状态：ScopedValue 自 Java 21（JEP 446）起多轮预览，与结构化并发（StructuredTaskScope，子任务自动继承作用域值）配套演进；生产引入前需确认所用 JDK 版本的支持状态。
+- 【L3】版本状态：ScopedValue 自 Java 21（JEP 446）起多轮预览迭代，于 Java 25（JEP 506）正式定稿；与之配套的结构化并发（StructuredTaskScope，子任务自动继承作用域值）截至 Java 25 仍为预览特性，生产引入前需确认所用 JDK 版本的支持状态。
 - 【L4】迁移考量：现有基于 `ThreadLocal` 的框架集成（如 MDC、事务上下文）需等待生态适配；只读上下文的场景（用户身份、traceId）迁移收益最大。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：虚拟线程时代 ThreadLocal 还能用吗？** → 能用但昂贵：每个虚拟线程都会持有一份副本，百万级虚拟线程下内存压力显著；平台线程场景 ThreadLocal 仍是标准方案。
-- **Q：ScopedValue 如何传递到子任务？** → 配合结构化并发的 `StructuredTaskScope`，fork 出的子任务自动继承父作用域绑定的值，无需手动传递。
+- **Q：虚拟线程时代 ThreadLocal 还能用吗？**
+
+  → 能用但昂贵：每个虚拟线程都会持有一份副本，百万级虚拟线程下内存压力显著；平台线程场景 ThreadLocal 仍是标准方案。
+
+- **Q：ScopedValue 如何传递到子任务？**
+
+  → 配合结构化并发的 `StructuredTaskScope`，fork 出的子任务自动继承父作用域绑定的值，无需手动传递。

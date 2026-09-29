@@ -27,7 +27,7 @@ permalink: /pages/5eea3123/
 
 RabbitMQ 是基于 AMQP 协议、用 Erlang 实现的开源消息中间件，由 Broker 通过「交换机 + 绑定 + 队列」完成消息的接收、路由与存储。选它是因为投递可靠（Confirm + 持久化 + 仲裁队列）、路由灵活、延迟低，适合解耦、削峰、异步化等业务消息场景。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一协议（AMQP）、一代理（Broker）、路由三件套（交换机—绑定—路由键）
 - **关键词**：AMQP ／ Broker ／ Exchange ／ Queue ／ Binding ／ Routing Key ／ VHost
@@ -52,6 +52,16 @@ RabbitMQ 是一个开源的消息队列中间件，基于 AMQP（Advanced Messag
 - **死信队列（DLX）**：用于存放处理失败或过期消息的“垃圾回收站”或“隔离分析区”。
 - **AMQP**：RabbitMQ 的核心通信协议，定义消息格式与交互规则。
 
+#### 🔀 发散问题
+
+- **Q：RabbitMQ 基于 AMQP 协议，而 Kafka 使用自定义二进制协议，这两种协议设计选择对各自适用场景有什么影响？**
+
+  → AMQP 是标准化协议，定义了丰富的路由模型（Exchange/Binding）、确认和事务语义，使 RabbitMQ 天然支持复杂路由和跨平台互操作，但协议开销较大。Kafka 的自定义协议极简高效，围绕 Topic-Partition 的追加写和拉取设计，牺牲了灵活路由能力，换来了极高的吞吐量和低延迟，适合日志和流数据场景。
+
+- **Q：RabbitMQ 的 VHost 隔离机制能否替代多集群部署？在安全要求较高的多租户场景中有什么局限？**
+
+  → VHost 提供逻辑隔离，不同 VHost 的 Exchange、Queue、用户权限完全独立，能满足一般的多应用资源隔离需求且无需额外集群开销。但在安全要求较高的场景中，VHost 共享同一 Broker 的 CPU、内存和网络资源，无法做到资源配额硬隔离和故障隔离，因此金融级多租户通常需要独立集群部署。
+
 ### 【简单】RabbitMQ 有哪些核心组件？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：RabbitMQ / 架构组件
@@ -60,7 +70,7 @@ RabbitMQ 是一个开源的消息队列中间件，基于 AMQP（Advanced Messag
 
 RabbitMQ 的核心组件可概括为「三类角色 + 一条链路」：生产者/消费者/Broker 三类角色，消息沿 Producer → Exchange →（Binding）→ Queue → Consumer 链路流动，而 Connection/Channel 承载通信、VHost 承载隔离。记住这条链路就能串起全部组件。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：生产消费靠 Broker，路由绑定连队列，连接信道走消息，虚拟主机做隔离
 - **关键词**：Producer ／ Consumer ／ Exchange ／ Queue ／ Binding ／ Routing Key ／ Virtual Host ／ Connection ／ Channel
@@ -82,44 +92,17 @@ RabbitMQ 的基本架构主要由以下核心组件组成：
 - **Connection（连接）**：RabbitMQ 的客户端与服务器之间的网络连接。
 - **Channel（信道）**：在连接中的虚拟连接，进行消息的读写操作。
 
-### 【简单】RabbitMQ 的 routing key 和 binding key 的最大长度是多少字节？⭐
+#### 🔀 发散问题
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：RabbitMQ / 消息路由
+- **Q：为什么 RabbitMQ 要设计 Connection 和 Channel 两层抽象？如果每个线程都创建独立 Connection 会有什么问题？**
 
-#### 💎 关键结论
+  → Connection 是底层 TCP 连接，建立和维持的开销较大（TCP 三次握手 + TLS + AMQP 握手），且操作系统对文件描述符数量有限制。Channel 是 Connection 上的轻量级逻辑信道，多个 Channel 复用同一条 TCP 连接，既实现了线程隔离又避免了连接数爆炸，是 RabbitMQ 高并发场景下的关键性能优化。
 
-Routing Key 与 Binding Key 的最大长度都是 **255 字节**，超限会抛出异常。理由：AMQP 协议中 short-string 的长度上限即 255 字节，RabbitMQ 沿用了这一约束。
+- **Q：Exchange 的四种路由模式（Direct/Fanout/Topic/Headers）分别适用于什么业务场景？如何用 Topic Exchange 实现多级路由？**
 
-#### ⚡记忆卡片
+  → Direct 适合精确路由（如订单服务按订单号分发）；Fanout 适合广播（如缓存同步通知所有节点）；Topic 适合按通配符匹配的多级分类路由（如 `order.east.*`）；Headers 适合基于消息属性键值对的复杂条件路由。Topic Exchange 通过 `.` 分隔的多级路由键和 `*`（匹配一个单词）、`#`（匹配零或多个单词）通配符，可以灵活实现按地域、业务类型等多维度路由。
 
-- **口诀**：路由绑定二五五，Direct 精确、Topic 通配、Headers 看头
-- **关键词**：255 字节 ／ Routing Key ／ Binding Key ／ Direct ／ Topic ／ Headers
-- **链路**：生产者指定 Routing Key → 交换机取 Binding Key 匹配（精确/通配/消息头）→ 命中则入队，未命中则按 mandatory 策略处理
-
-#### 📖 核心知识
-
-**长度限制**
-
-- **最大 255 字节**（超限会抛出异常）。
-- 适用于 **Routing Key**（生产者指定）和 **Binding Key**（队列绑定交换机时指定）。
-
-**匹配规则（不同交换机类型）**
-
-| **交换机类型** | **匹配方式**                                 | **示例**                             |
-| -------------- | -------------------------------------------- | ------------------------------------ |
-| **Direct**     | 完全匹配                                     | `routing_key == binding_key`         |
-| **Topic**      | 通配符匹配（`*` 匹配一个词，`#` 匹配多个词） | `*.order.#` 匹配 `user.order.create` |
-| **Headers**    | 不依赖 Routing Key，基于消息头键值对匹配     | `x-match: all/any`                   |
-
-**最佳实践**
-
-- **保持简短**：避免接近 255 字节，提升性能。
-- **命名规范**：如 `{服务}.{模块}.{事件}`（例：`user.order.paid`）。
-- **Topic 通配符**：合理使用 `*` 和 `#`，避免过度复杂。
-
-> ⚠️ **注意**：Headers 交换机忽略 Routing Key，仅依赖消息头（Headers）匹配。
-
-### 【中等】RabbitMQ 中 Connection 和 Channel 有什么区别？⭐⭐
+### 【中等】RabbitMQ 中 Connection 和 Channel 有什么区别？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 客户端通信
 
@@ -127,7 +110,7 @@ Routing Key 与 Binding Key 的最大长度都是 **255 字节**，超限会抛�
 
 Connection 是客户端与 Broker 之间的 TCP 物理连接，开销大；Channel 是 Connection 上的轻量逻辑信道，所有 AMQP 操作都在 Channel 上完成。原因是 TCP 建连昂贵且操作系统限制连接数，用多 Channel 复用一条连接才能兼顾性能与隔离。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：连接物理信道虚，一线一信道，长连复用不能少
 - **关键词**：TCP 物理连接 ／ 虚拟信道 ／ 多路复用 ／ 线程隔离 ／ 长连接
@@ -208,64 +191,167 @@ Connection/Channel 的「一条物理连接复用多个逻辑流」与 HTTP/2 �
 2. Spring AMQP 中如何配置连接与 Channel 的缓存？
    `CachingConnectionFactory` 默认缓存 Connection 并按需缓存 Channel，可通过 `connectionCacheSize`、`channelCacheSize` 调整缓存规模；当 Channel 缓存不够时会频繁开关 Channel，可观察 `channelCacheSize` 命中率来调优。
 3. 消息的发布与消费分别在什么层完成？
-   见本文档『RabbitMQ 如何实现消息路由？』：发布走 Exchange 路由，消费走 Queue 订阅，二者都以 Channel 为操作入口。
+   见本文档『RabbitMQ 如何通过交换机与绑定实现消息路由？』：发布走 Exchange 路由，消费走 Queue 订阅，二者都以 Channel 为操作入口。
 
 ## RabbitMQ 存储
 
-### 【中等】RabbitMQ 中的持久化队列与非持久化队列有什么区别？⭐⭐
+### 【中等】RabbitMQ 如何声明队列并配置持久化、容量与消息过期策略？⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 存储与持久化
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：RabbitMQ / 队列声明与存储策略
 
 #### 💎 关键结论
 
-持久化队列把元数据与消息落盘，Broker 重启后消息保留，代价是写盘带来的性能下降；非持久化队列纯内存、性能极高，但重启即丢。本质是在消息「可靠性」与「性能」之间做选择。
+用 queueDeclare 定义队列身份与生命周期，用 arguments 或策略限制容量和消息存活时间。durable 只保队列元数据；消息持久化、副本和确认要分别配置，不能把一个开关当成完整可靠性方案。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
-- **口诀**：持久落盘保可靠，内存队列拼性能，durable 一键切换
-- **关键词**：持久化队列 ／ 非持久化队列 ／ 磁盘 ／ 内存 ／ durable
-- **链路**：声明队列 durable=true → 消息写入后落盘 → Broker 重启仍可恢复 → 反之内存队列重启即清空
+- **口诀**：名称三布尔加参数，持久不等于副本；容量看 ready，双 TTL 取小
+- **关键词**：queueDeclare ／ durable ／ exclusive ／ autoDelete ／ x-max-length ／ x-message-ttl ／ expiration
+- **链路**：声明并校验属性 → 消息按持久化与副本策略存储 → 容量或 TTL 触发清理 → 按 overflow 与 DLX 配置处理
 
 #### 📖 核心知识
 
-RabbitMQ 提供持久化队列和非持久化队列两种队列类型，主要区别在于消息存储方式及服务器重启或崩溃时的行为：
+1. **声明的五个参数**：Java 使用 `queueDeclare(queue, durable, exclusive, autoDelete, arguments)`；不存在则创建，已存在则检查等价性。
 
-| 特性                | 持久化队列               | 非持久化队列                       |
-| :------------------ | :----------------------- | :--------------------------------- |
-| **存储位置**        | 磁盘                     | 内存                               |
-| **服务器重启/崩溃** | **消息保留**，确保不丢失 | **消息全部丢失**                   |
-| **性能**            | 较低（因需写磁盘）       | **极高**（内存操作）               |
-| **适用场景**        | 要求**消息可靠性**的场景 | 允许消息丢失，追求**高性能**的场景 |
+   | 参数         | 含义与边界                                                                           |
+   | :----------- | :----------------------------------------------------------------------------------- |
+   | `queue`      | vhost 内的队列名称；空串由 Broker 生成名称，须使用返回值获取实际名称                 |
+   | `durable`    | 是否保存队列元数据，使队列定义可在重启后恢复；不是消息持久化开关                     |
+   | `exclusive`  | 是否只允许声明它的连接使用；绑定的是 Connection 而非 Channel，该连接关闭后删除       |
+   | `autoDelete` | 曾有消费者的队列，在最后一个消费者取消订阅或断开后删除；从未有消费者时不能依赖它清理 |
+   | `arguments`  | 可选扩展，如队列类型、容量、消息 TTL、DLX 等；无扩展可传 `null`                      |
 
-- **核心权衡**：在消息的“可靠性”与“性能”之间做选择。
-- **生效前提**：队列持久化只保证队列元数据存在，消息不丢还需配合消息持久化（`deliveryMode=2`），详见《MQ面试》『Kafka、RocketMQ、RabbitMQ 如何存储数据与持久化？』。
+2. **声明校验与生命周期**：同名队列的 durable、exclusive、autoDelete 或需等价检查的参数冲突，会产生 `PRECONDITION_FAILED` 并关闭 Channel，而不是覆盖存量定义。支持动态调整的属性优先用 Policy；不可变属性需新建队列迁移，直接删除重建会丢失存量消息。独占临时队列适合 RPC 回调，不能靠 `durable=true` 抵消其连接关闭即删除的语义。
+3. **分开理解元数据、消息与副本**：`durable=true` 保存队列定义；经典队列中的消息需 `deliveryMode=2` 才请求持久化，并等待 Publisher Confirm 确认对应持久化条件。队列副本另由队列类型决定，durable 的经典队列仍可只有单副本；非持久化队列不能在重启后恢复，但不等于其消息从不写盘。
+4. **容量限制的是待投递消息**：`x-max-length` 限制 ready 条数，`x-max-length-bytes` 限制 ready 消息体总字节数，两者同时设置时任一触顶均生效；**unacked 不计入**，消息属性、头部和存储开销也不计入字节上限。可通过客户端 arguments、管理界面或 `rabbitmqctl` Policy 配置。
+
+   | `x-overflow`         | 达到容量限制后的行为                                            |
+   | :------------------- | :-------------------------------------------------------------- |
+   | `drop-head`（默认）  | 淘汰队首最旧的待投递消息；配置 DLX 时可转死信，否则丢弃         |
+   | `reject-publish`     | 拒绝新消息；启用 Publisher Confirm 后用 Nack 告知发布方         |
+   | `reject-publish-dlx` | 拒绝新消息并尝试转 DLX；并非所有队列类型支持，Quorum 不支持此值 |
+
+5. **消息 TTL 与队列过期分开配置**：`x-message-ttl` 是该队列内所有消息的 TTL，数值单位为毫秒；单条消息用字符串属性 `expiration` 表示毫秒，二者同时设置取较小值。过期消息不会再正常投递，但清理、死信转发未必准点；已交给消费者的 unacked 消息不靠消息 TTL 撤回。`x-expires` 则表示队列闲置多久后删除整个队列，不是消息 TTL。
+
+::: details 案例：声明持久化队列并配置容量和双 TTL（Java）
+
+```java
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DeclareQueueExample {
+    public static void main(String[] args) throws Exception {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost("localhost");
+        try (Connection connection = factory.newConnection();
+             Channel channel = connection.createChannel()) {
+            String queueName = "order_queue";
+            boolean durable = true;
+            boolean exclusive = false;
+            boolean autoDelete = false;
+            Map<String, Object> arguments = new HashMap<>();
+            arguments.put("x-queue-type", "classic");
+            arguments.put("x-max-length", 1000);
+            arguments.put("x-max-length-bytes", 10 * 1024 * 1024);
+            arguments.put("x-overflow", "reject-publish");
+            arguments.put("x-message-ttl", 60000);
+            channel.queueDeclare(queueName, durable, exclusive, autoDelete, arguments);
+
+            channel.confirmSelect();
+            AMQP.BasicProperties props = new AMQP.BasicProperties.Builder()
+                .deliveryMode(2)
+                .expiration("30000") // 队列 60 秒、单消息 30 秒，实际取 30 秒
+                .build();
+            channel.basicPublish("", queueName, props,
+                "Hello, World!".getBytes(StandardCharsets.UTF_8));
+            channel.waitForConfirmsOrDie(5000); // 示例同步等待，不替代路由失败监听
+        }
+    }
+}
+```
+
+参数仅为配置演示，不代表生产容量建议；示例不配置 DLX，过期消息会被丢弃。生产者还须按可靠性需求设置 `mandatory`、处理 Return，相关确认逻辑见本文档『RabbitMQ 如何确认消息并处理未确认投递？』。
+
+:::
+
+::: details 案例：容量为 10 的队列与连接独占临时队列（Python/Pika）
+
+```python
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+try:
+    channel = connection.channel()
+    channel.queue_declare(
+        queue='my_queue',
+        durable=True,
+        exclusive=False,
+        auto_delete=False,
+        arguments={'x-max-length': 10},
+    )
+    # 空名称让 Broker 生成名字；独占队列只允许当前连接使用。
+    result = channel.queue_declare(
+        queue='', durable=False, exclusive=True, auto_delete=True
+    )
+    callback_queue = result.method.queue
+finally:
+    connection.close()  # 独占回调队列随连接关闭删除，my_queue 不会因此删除
+```
+
+`my_queue` 默认使用 `drop-head`：第 11 条 ready 消息到达时会淘汰最旧的待投递消息。若已存在同名但属性不同的队列，不能用再次声明强行修改。
+
+:::
 
 #### 🔬 扩展知识
 
-**【L3】惰性队列（Lazy Queue）的中间形态**
-
 ::: details
 
-RabbitMQ 提供惰性队列（`x-queue-mode=lazy`）：消息一到达就直接写入磁盘，内存中只保留极少量索引，可支撑千万级消息堆积而不触发内存告警；代价是消费时每条消息都要读盘，吞吐显著下降。它是「内存队列」与「磁盘队列」之间的第三种形态，适合消化存量积压而非高吞吐实时消费。
+- 【L3】**过期不等于精确定时**：逐条 TTL 不同会出现队首阻塞，例如 5 秒 TTL 消息排在 60 秒消息后面，可能早已过期却要等到队首才被移除或死信转发；Quorum 也不能消除这一限制。统一队列 TTL 可避免这种由不同 TTL 顺序造成的阻塞，但不提供精确调度保证；多档延迟可用不同 TTL 队列承载。
+- 【L3】**容量不是内存预算**：ready 上限不限制消费者已取得的消息，也不覆盖元数据开销；还需配合 prefetch、节点内存与磁盘水位。多队列路由时，一个队列拒收导致 Confirm Nack，不代表其他队列没有接收，重发须考虑重复。
+- 【L3】**闲置队列与动态策略**：`x-expires` 计时要求队列没有消费者，且在期限内没有重新声明或调用 `basic.get`；删除整个队列不会把其中消息逐条转 DLX。可变 TTL、容量、DLX 优先用 Policy 管理，避免将可运营参数全部硬编码为声明属性；策略不能改变队列类型等不可变属性。
+- 【L4】**Lazy 的历史边界**：旧版经典队列的 `x-queue-mode=lazy` 让消息更积极地写盘以减少内存驻留，但并不保证任意积压下不告警，也不意味着每条消费都必读盘。RabbitMQ **3.12 起不再支持单独的 Lazy 模式，该参数被忽略**；经典队列已采用类似的磁盘优先行为，不应继续将开启 Lazy 当成新版调优建议。
+- 【L4】**Quorum 的持久化约束**：3.8 引入的仲裁队列必须声明为 durable、非独占，消息按其存储模型持久化并复制；不能用 `deliveryMode=1` 把它变成纯内存队列。多数派确认解决副本一致性，不代表能抵御多数副本永久损毁、误删或错误的业务处理。
+- 【L4】**持久化不等于同步刷盘**：经典队列的持久化消息先写入内存页，再异步批量落盘；小于 `queue_index_embed_msgs_below`（默认 4096 字节）的消息直接嵌入队列索引文件，省去一次独立 IO。「持久化」只描述存储路径与意图，生产者要确认消息真正安全，仍须依赖 Publisher Confirm——对持久化队列中的持久化消息，Confirm 会等到消息落盘（Quorum 则是多数派复制）后才发出，不能假设每条消息写入时都同步执行了 fsync。
+
+> 📚 延伸阅读：[Queue Length](https://www.rabbitmq.com/docs/maxlength)、[TTL](https://www.rabbitmq.com/docs/ttl)、[Lazy Queues](https://www.rabbitmq.com/lazy-queues.html)
 
 :::
 
-**【L4】仲裁队列的存储模型**
+#### ⚠️ 常见误区
 
 ::: details
 
-仲裁队列（Quorum Queue，3.8 引入）没有「持久化开关」——消息默认全部持久化并基于 Raft 协议复制到多数派节点落盘后才确认，用协议层的一致性换取可靠性。对比可见存储模型的演进：非持久化（纯内存）→ 持久化（单机落盘）→ 惰性（磁盘优先）→ 仲裁（多副本强一致落盘）。
+常见误区：
+
+- ❌ "durable 会把所有消息持久化并复制，非 durable 就纯内存" → 元数据恢复、消息持久化和副本是三个维度，不能由 durable 推导物理存储位置或绝不丢失。
+- ❌ "exclusive 只限制当前 Channel，autoDelete 在队列变空时生效" → exclusive 属于连接；autoDelete 看曾有消费者后的最后一次取消订阅，不看消息数量。
+- ❌ "队列上限包含 unacked，TTL 到期就立刻清空" → 容量统计 ready；消息过期后的物理清理存在队首等时机限制，TTL 也不是消费处理超时。
+- ❌ "任何 overflow 都会把消息送进死信队列" → 要区分淘汰旧消息和拒绝新消息，且需有效 DLX 配置；`reject-publish` 不会自动死信新消息，Quorum 不支持 `reject-publish-dlx`。
 
 :::
-
-> 📚 延伸阅读：[RabbitMQ Lazy Queues 官方文档](https://www.rabbitmq.com/lazy-queues.html)
 
 #### 🔀 发散问题
 
-1. 持久化队列里的消息就一定不丢吗？
-   不一定。持久化消息到达队列后会尽快写盘，但存在短暂批量窗口，单节点在该窗口内崩溃仍可能丢；真正堵死该窗口的是仲裁队列的多数派落盘确认。详见《MQ面试》『如何保证 MQ 消息不丢失？』。
-2. 非持久化队列有什么实际用途？
-   适合可丢弃的临时数据，如实时行情快照、监控埋点缓冲、测试环境的临时通道——用内存性能换取时效性，丢消息不影响业务正确性。
+- **Q：非持久化队列还有什么用途？**
+
+  → 用于允许随连接或节点生命周期丢弃的临时订阅、监控快照缓冲和测试通道，RPC 回调常使用独占队列。选择依据是生命周期与可丢弃性，不是保证纯内存或固定性能优势。
+
+- **Q：持久化队列中的消息一定不会丢吗？**
+
+  → 不一定，还取决于消息属性、发布确认、副本和消费确认；经典持久化消息的 Confirm 同样有持久化语义，并非只有 Quorum 才能等待落盘。详见《MQ面试》『Kafka、RocketMQ、RabbitMQ 如何存储数据与持久化？』及『如何保证 MQ 消息不丢失？』。
+
+- **Q：被容量策略淘汰或 TTL 清理的消息如何留痕？**
+
+  → 配置 DLX 并保证其可路由到实际队列，才能进行审计、补偿或重试；未配置时不能指望事后找回。见《MQ面试》『什么是死信队列？各 MQ 如何实现死信处理机制？』。
+
+- **Q：TTL 能实现延迟消息吗？**
+
+  → 可以用不挂消费者的 TTL 中转队列，过期后经 DLX 投递到业务队列，但须接受队首及转发时机的影响。见《MQ面试》『MQ 如何实现延迟消息？』；积压与节点水位的治理另见《MQ面试》『如何处理 MQ 消息积压？』。
 
 ### 【中等】什么是 RabbitMQ 中的虚拟主机（vhost）？有什么作用？⭐⭐
 
@@ -275,7 +361,7 @@ RabbitMQ 提供惰性队列（`x-queue-mode=lazy`）：消息一到达就直接�
 
 vhost 是 RabbitMQ 内部的「命名空间」，每个 vhost 拥有独立的交换机、队列、绑定与权限，用于在同一 Broker 上隔离多个应用或租户。理由是资源隔离 + 权限边界都在 vhost 这一层实现，比逐队列授权简单得多。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：vhost 即命名空间，资源隔离权限分，默认根号 `/`
 - **关键词**：vhost ／ 资源隔离 ／ 权限控制 ／ 多租户 ／ 默认 `/`
@@ -318,213 +404,61 @@ vhost 是逻辑隔离而非物理隔离：所有 vhost 共享同一 Broker 的�
 
 ## RabbitMQ 生产消费
 
-### 【中等】RabbitMQ 中如何声明一个队列？有哪些必要参数？⭐
+### 【中等】RabbitMQ 如何通过交换机与绑定实现消息路由？⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：RabbitMQ / 队列声明
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：RabbitMQ / 交换机与消息路由
 
 #### 💎 关键结论
 
-声明队列用 `queueDeclare`：不存在则创建，存在则校验参数一致性。五个核心参数中，`durable`、`exclusive`、`autoDelete` 三个布尔位决定了队列的可靠性与生命周期，是最容易答漏的点。
+消息先到交换机，再按类型和绑定分发到队列：Direct 精确、Fanout 广播、Topic 通配、Headers 看消息头。交换机负责分发，队列负责存储，发送方因此不用管理每个订阅者。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
-- **口诀**：名称加三布尔（durable/exclusive/autoDelete），外加 arguments 扩展位
-- **关键词**：queueDeclare ／ durable ／ exclusive ／ autoDelete ／ arguments
-- **链路**：声明队列 → 不存在则按参数创建 → 存在则校验参数匹配 → 参数冲突抛错 → arguments 决定 TTL/死信等扩展行为
+- **口诀**：直连精确、扇出广播、主题通配、消息头比条件，路由绑定二五五
+- **关键词**：Exchange ／ Binding ／ Routing Key ／ Binding Key ／ x-match ／ 255 字节
+- **链路**：生产者发布到交换机 → 按类型检查绑定规则 → 命中一个或多个队列 → 未命中由 AE 或 mandatory 处理
 
 #### 📖 核心知识
 
-- **声明方式**：通过客户端库的`queueDeclare`方法实现，队列不存在则创建，存在则验证参数匹配性
-- **核心参数**：
-  - **队列名称**：唯一标识，空字符串会生成随机名称
-  - **持久化（durable）**：`true`表示队列元数据持久化，重启不丢失
-  - **排他性（exclusive）**：`true`表示仅当前连接可见，连接关闭后自动删除
-  - **自动删除（autoDelete）**：`true`表示最后一个消费者断开后自动删除
-  - **其他参数（arguments）**：可选，用于配置消息过期时间、死信交换机等
-- **特性**：根据业务需求（可靠性、生命周期等）配置参数，确保队列行为符合预期
+1. **路由与存储分工**：生产者指定 Exchange 和 Routing Key；Binding 关联交换机与队列，并携带 Binding Key 或消息头条件。交换机不存储业务消息，命中的各队列独立保存投递状态、独立消费；交换机持久化只保存其定义。
+2. **四种交换机按匹配语义选型**：
 
-::: details 案例：声明一个持久化队列（Java）
+   | 类型    | 路由规则                                                             | Routing Key 是否参与匹配 | 适用场景                       |
+   | :------ | :------------------------------------------------------------------- | :----------------------- | :----------------------------- |
+   | Direct  | Routing Key 与 Binding Key 完全相等；同一 key 可绑定多个队列         | 是                       | 精确分类、日志分级             |
+   | Fanout  | 广播到全部绑定队列                                                   | 否，可传空串             | 事件通知、多服务订阅           |
+   | Topic   | 按 `.` 分词，用绑定中的 `*`、`#` 匹配                                | 是                       | 订单事件等多维度分类           |
+   | Headers | 比较绑定指定的消息头键值；`x-match=all` 为全部匹配，`any` 为任一匹配 | 否                       | 不适合编码进路由键的多属性条件 |
 
-```java
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+3. **Topic 的通配符有明确边界**：`*` 恰好匹配一个词，不能匹配零个或跨越多个词；`#` 匹配零个或多个词。通配规则在 Binding Key 中，不能把 Routing Key 当成正则表达式。
+4. **长度按字节而非字符计**：AMQP 0-9-1 的 Routing Key、Binding Key 都是 short-string，上限均为 **255 字节**，超限不能正常编码发送；UTF-8 中文通常占多个字节。命名宜简短且稳定，可用 `{服务}.{模块}.{事件}`，避免堆砌字段和宽泛通配。
+5. **默认交换机仍是交换机**：每个 vhost 都有名为 `""` 的 Direct 交换机。声明队列时 Broker 自动以队列名为 key 建立默认绑定，发布到空名交换机、以队列名为 Routing Key，即可投递到该队列，无须手工绑定。
 
-public class DeclareQueueExample {
-    public static void main(String[] args) throws Exception {
-        // 创建连接工厂
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+::: details 案例：四种交换机的匹配与边界
 
-        // 建立连接和信道
-        try (Connection connection = factory.newConnection();
-             Channel channel = connection.createChannel()) {
+- **Direct**：Q1 绑定 `error`、Q2 绑定 `info`，发布 `error` 只进入 Q1；若两个队列都绑定 `error`，两者都会收到。
+- **Fanout**：Q1、Q2、Q3 均绑定后，一条注册事件可同时交给邮件、短信、积分服务，各自用独立队列消费。
+- **Topic**：Q1 绑定 `order.*`，Q2 绑定 `order.create.#`。`order.create` 命中两者，`order.create.success` 只命中 Q2；`order.*` 不匹配 `order`，但 `order.#` 匹配 `order`、`order.create` 和 `order.create.success`。`*.order.#` 可匹配 `user.order.create`。
+- **Headers**：绑定参数 `{"x-match":"all","format":"pdf","type":"report"}` 要求消息同时具有对应的 `format`、`type` 键值；改为 `any` 则满足任一条件即可。
+- **默认交换机（Java）**：
 
-            // 声明队列
-            String queueName = "order_queue";
-            boolean durable = true;         // 持久化
-            boolean exclusive = false;      // 非排他
-            boolean autoDelete = false;     // 不自动删除
-            Map<String, Object> arguments = null;  // 无额外参数
-            channel.queueDeclare(queueName, durable, exclusive, autoDelete, arguments);
-            System.out.println("队列 " + queueName + " 声明成功");
-        }
-    }
-}
-```
+  ```java
+  channel.basicPublish("", "queueName", null, body);
+  ```
 
 :::
-
-#### 🔀 发散问题
-
-1. 重复声明同名但参数不同的队列会怎样？
-   Broker 不会覆盖，而是抛出 channel 异常（`PRECONDITION_FAILED`）并关闭当前 Channel，这是防止误改存量队列的保护机制。确需改参数只能删除重建（会丢消息）或用 Policy 方式调整。
-2. exclusive 和 autoDelete 有什么区别？
-   exclusive 绑定到「连接」——仅声明它的连接可见，连接断开即删；autoDelete 绑定到「消费者」——最后一个消费者断开才删。前者用于私有临时队列（如 RPC 回调队列），后者用于订阅型队列。
-
-### 【中等】RabbitMQ 如何实现消息路由？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 消息路由
-
-#### 💎 关键结论
-
-RabbitMQ 的消息路由由交换机（Exchange）完成：生产者从不直接把消息发给队列，而是发给交换机，交换机依据类型与绑定（Binding）规则把消息分发到一个或多个队列。这一设计把「发送」与「分发」解耦，是 RabbitMQ 路由灵活性的根源。
-
-#### ⚡记忆卡片
-
-- **口诀**：消息进交换机，绑定定去向，四类策略各不同
-- **关键词**：Exchange ／ Binding ／ Routing Key ／ Direct ／ Fanout ／ Topic ／ Headers
-- **链路**：生产者发消息到 Exchange → Exchange 查绑定关系 → 按类型规则匹配 Routing Key → 命中队列入队，未命中按 mandatory 处理
-
-#### 📖 核心知识
-
-RabbitMQ 通过交换机（Exchange）实现消息路由，而非直接发送到队列。交换机接收生产者消息，依据特定策略（路由键）将消息路由到一个或多个队列，其类型和绑定（Binding）规则决定消息流向。RabbitMQ 常见路由策略包括：
-
-- Direct 交换机：消息通过完全匹配路由键进行路由。
-- Fanout 交换机：广播消息到所有绑定的队列，不需要路由键。
-- Topic 交换机：根据路由键模式匹配进行路由。
-- Headers 交换机：根据消息头属性进行路由。
 
 #### 🔬 扩展知识
 
-**【L3】默认交换机与无名路由**
-
 ::: details
 
-每个新 vhost 都有一个名为 `""` 的默认 Direct 交换机：发布消息时若 exchange 传空串，Broker 会把消息路由到「与 routing key 同名」的队列。这让简单场景可以跳过显式绑定直接投递，也是 `basicPublish("", "queueName", ...)` 能工作的原因。
+- 【L3】**空段与全匹配**：`order..create` 中间的空段也参与分词，可被一个 `*` 匹配；单独的 `#` 可匹配所有 Routing Key，对绑定它的队列形成近似广播效果。应避免依赖不直观的空段命名，并对路由边界编写匹配测试。
+- 【L3】**预定义交换机与级联**：Broker 提供 `amq.direct`、`amq.fanout`、`amq.topic`、`amq.headers`。Exchange-to-Exchange Binding 可构建级联拓扑；声明 `internal=true` 后，该交换机不接受客户端直接发布，只接受 Broker 内部路由，例如来自上游交换机的消息。
+- 【L4】**匹配成本不等于整体吞吐**：Topic 按词组织匹配结构，复杂通配、过多绑定和过大的投递扇出都会增加开销。Fanout 虽省去 key 匹配，但大量下游队列仍有成本；Headers 的成本依赖条件数和绑定规模，不能固定断言它总是最慢或一律禁用，也不应无条件用 Topic 替代所有类型。
+
+> 📚 延伸阅读：[AMQP 0-9-1 快速参考](https://www.rabbitmq.com/amqp-0-9-1-quickref.html)、[RabbitMQ Exchanges 与绑定](https://www.rabbitmq.com/tutorials/amqp-concepts)
 
 :::
-
-**【L4】预定义交换机与 Internal 属性**
-
-::: details
-
-Broker 内置 `amq.direct`、`amq.fanout`、`amq.topic`、`amq.headers` 等预定义交换机；交换机还可声明为 `internal=true`，此类交换机不接受客户端直接发布，只能作为其他交换机的路由目标，用于构建「交换机 → 交换机」的级联路由拓扑。
-
-:::
-
-> 📚 延伸阅读：[AMQP 0-9-1 快速参考](https://www.rabbitmq.com/amqp-0-9-1-quickref.html)
-
-#### 🔀 发散问题
-
-1. 一条消息能同时进入多个队列吗？
-   能。Fanout 会广播到所有绑定队列，Topic/Direct 也允许多个队列绑定同一 key；消息是按引用分发的逻辑复制，各队列独立消费互不影响。
-2. 路由失败的消息去哪了？
-   默认静默丢弃；设置 `mandatory=true` 会退回生产者，或配置备用交换机（AE）兜底。详见本文档『RabbitMQ 中无法路由的消息会去到哪里？』。
-
-### 【中等】RabbitMQ 的四种交换机类型有什么区别？⭐⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：RabbitMQ / 消息路由
-
-#### 💎 关键结论
-
-四种交换机区别在匹配方式：Direct 精确匹配、Fanout 全量广播、Topic 通配符匹配、Headers 按消息头匹配。选型一句话：绝大多数场景用 Topic，点对点用 Direct，广播用 Fanout，尽量别用 Headers（性能最差）。
-
-#### ⚡记忆卡片
-
-- **口诀**：Direct 精确、Fanout 广播、Topic 通配、Headers 看头
-- **关键词**：Direct ／ Fanout ／ Topic ／ Headers ／ Routing Key ／ Binding Key ／ x-match
-- **链路**：生产者带 Routing Key 发布 → Direct 全等匹配 / Fanout 忽略 key 广播 / Topic 按 `*`、`#` 匹配 / Headers 比对消息头 → 命中队列收消息
-
-#### 📖 核心知识
-
-**四种交换机类型对比**
-
-| **交换机类型** | **路由规则**                                           | **是否需要 Routing Key** | **性能** | **典型应用场景**                        |
-| -------------- | ------------------------------------------------------ | ------------------------ | -------- | --------------------------------------- |
-| **Direct**     | **精确匹配** Routing Key == Binding Key                | 是                       | 高       | 点对点消息、日志分级（error/warn/info） |
-| **Fanout**     | **广播** 到所有绑定的队列，忽略 Routing Key            | 否                       | **最高** | 事件广播、系统通知                      |
-| **Topic**      | **模式匹配**，支持通配符 `*`（一个词）和 `#`（多个词） | 是                       | 中       | 复杂路由、多维度消息分类                |
-| **Headers**    | 基于**消息头**键值对匹配，忽略 Routing Key             | 否                       | **最低** | 需要多条件匹配的复杂路由                |
-
-**Direct Exchange（直连交换机）**
-
-- **路由规则**：消息的 `routing_key` 与队列绑定的 `binding_key` **完全一致** 时，消息才会被路由到该队列。
-- **特点**：简单、高效，支持一个路由键绑定多个队列。
-- **示例**：
-  - 队列 Q1 绑定 `binding_key = "error"`，队列 Q2 绑定 `binding_key = "info"`。
-  - 生产者发送 `routing_key = "error"` 的消息 → 进入 Q1。
-  - 生产者发送 `routing_key = "info"` 的消息 → 进入 Q2。
-- **应用场景**：日志分级处理（不同级别的日志路由到不同队列）。
-
-**Fanout Exchange（扇出交换机）**
-
-- **路由规则**：**广播** 消息到所有绑定的队列，**完全忽略** `routing_key`。
-- **特点**：性能最高（无需匹配），每个绑定的队列都会收到全量消息。
-- **示例**：
-  - 队列 Q1、Q2、Q3 都绑定到 Fanout Exchange。
-  - 生产者发送一条消息 → Q1、Q2、Q3 **都收到**该消息。
-- **应用场景**：事件广播（如用户注册后同时通知邮件服务、短信服务、积分服务）。
-
-**Topic Exchange（主题交换机）**
-
-- **路由规则**：基于**模式匹配**，`routing_key` 和 `binding_key` 都是用 `.` 分隔的字符串，支持通配符：
-  - `*`：匹配**一个**单词（如 `order.*` 匹配 `order.create` 但不匹配 `order.create.success`）。
-  - `#`：匹配**零个或多个**单词（如 `order.#` 匹配 `order`、`order.create`、`order.create.success`）。
-- **特点**：灵活性最高，是**最常用**的交换机类型。
-- **示例**：
-  - Q1 绑定 `binding_key = "order.*"`，Q2 绑定 `binding_key = "order.create.#"`。
-  - 发送 `routing_key = "order.create"` → Q1、Q2 **都收到**。
-  - 发送 `routing_key = "order.create.success"` → **仅 Q2 收到**。
-- **应用场景**：复杂的事件路由（如电商订单的多维度消息分类）。
-
-**Headers Exchange（头交换机）**
-
-- **路由规则**：**不依赖** Routing Key，而是根据**消息头（headers）** 的键值对匹配。
-  - `x-match: all`：所有 header 键值对都匹配才路由（AND 逻辑）。
-  - `x-match: any`：任一 header 键值对匹配即路由（OR 逻辑）。
-- **特点**：性能最低（需遍历所有 headers），灵活性高但复杂。
-- **示例**：
-  - 队列绑定 `headers = {"x-match": "all", "format": "pdf", "type": "report"}`。
-  - 消息 headers 包含 `{"format": "pdf", "type": "report"}` → 匹配成功，消息路由到该队列。
-- **应用场景**：需要多条件匹配的复杂路由（实际使用较少，通常用 Topic 替代）。
-
-**选型建议**
-
-- **大多数场景**：优先选择 **Topic Exchange**，灵活性最高。
-- **简单点对点**：使用 **Direct Exchange**。
-- **广播通知**：使用 **Fanout Exchange**。
-- **避免使用 Headers Exchange**：性能差，可用 Topic + 复杂路由键替代。
-
-#### 🔬 扩展知识
-
-**【L3】Topic 匹配的边界规则**
-
-::: details
-
-Routing Key 以 `.` 分段，空段也有语义：`order..create` 中的空串是一个独立单词；`#` 单独使用可匹配所有 key（等价于 Fanout 效果）；`*` 恰好匹配一个单词，`order.*` 不匹配 `order` 本身。这些边界是 Topic 路由面试题的高频陷阱。
-
-:::
-
-**【L4】Topic 匹配的性能实现**
-
-::: details
-
-Topic 交换机在 Broker 内部维护按单词组织的匹配结构，绑定数量大时匹配开销上升；生产上应控制单交换机的绑定数量级，避免用 `#` 开头的宽泛绑定覆盖一切，否则退化为近广播行为并放大投递扇出。
-
-:::
-
-> 📚 延伸阅读：[RabbitMQ Exchanges 与绑定官方文档](https://www.rabbitmq.com/tutorials/amqp-concepts)
 
 #### ⚠️ 常见误区
 
@@ -532,22 +466,28 @@ Topic 交换机在 Broker 内部维护按单词组织的匹配结构，绑定数
 
 常见误区：
 
-- ❌ “生产者把消息直接发给队列，交换机只是可选装饰” → 错误。消息必须先到交换机，由绑定决定去向；队列直连只发生在默认交换机 `""` 的特例中。
-- ❌ “Fanout 也需要 routing key，只是被忽略” → 表述不严谨。Fanout 路由完全不参与 key 匹配，发布时可以传任意值或空值，语义上「不需要」routing key。
-- ❌ “Headers 交换机最灵活所以最推荐” → 相反。Headers 匹配需遍历键值对，性能最差，生产中几乎总是可以用 Topic 的分段命名替代。
+- ❌ "默认交换机意味着绕过交换机直接写队列" → 仍走 Direct 路由，只是绑定由 Broker 自动建立。
+- ❌ "Direct 就是一对一，Fanout 必须设置有效 key" → Direct 可以命中多个同 key 队列；Fanout 完全忽略 key，发布时可传空串。
+- ❌ "`#` 至少匹配一个词，255 表示 255 个汉字" → `#` 允许零个词；长度限制按编码后的字节计算。
+- ❌ "Headers 一定最慢，应全部改成 Topic" → 两者表达的条件不同，应先按语义选型，再按实际绑定规模、消息头和扇出压测。
 
 :::
 
 #### 🔀 发散问题
 
-1. Direct 和 Topic 能不能互相替代？
-   Topic 用不含通配符的绑定即可模拟 Direct，但 Direct 匹配开销更低；明确点对点时优先 Direct，需要未来扩展路由维度时用 Topic。
-2. 交换机上没有任何绑定时消息会怎样？
-   无法路由：默认静默丢弃，`mandatory=true` 时退回生产者，也可用备用交换机（AE）收集。见本文档『RabbitMQ 中无法路由的消息会去到哪里？』。
-3. 交换机本身存消息吗？
-   不存。交换机只做路由转发，消息的暂存与持久化都发生在队列层，这也是为什么交换机和队列都要分别做持久化声明。
+- **Q：Direct 和 Topic 能互相替代吗？**
 
-### 【中等】RabbitMQ 中无法路由的消息会去到哪里？⭐⭐
+  → 不含通配符的 Topic 绑定可以表达精确匹配，但 Direct 不能表达 Topic 的通配订阅。精确分类用 Direct，需要分层事件订阅再用 Topic。
+
+- **Q：一条消息命中多个队列会怎样？**
+
+  → 每个命中队列各有一份独立的逻辑投递，某个队列 ACK 不会确认其他队列中的消息。同一队列被多条匹配绑定命中，不会因此重复入队。
+
+- **Q：没有匹配队列时消息去哪？**
+
+  → 未配置兜底时默认丢弃；AE 可继续路由，最终无法路由且设置 `mandatory=true` 时通过 Return 返回生产者。见本文档『RabbitMQ 中无法路由的消息会去到哪里？』。
+
+### 【中等】RabbitMQ 中无法路由的消息会去到哪里？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 可靠投递
 
@@ -555,7 +495,7 @@ Topic 交换机在 Broker 内部维护按单词组织的匹配结构，绑定数
 
 无法路由的消息默认被 Broker **静默丢弃**；设置 `mandatory=true` 时会通过 `basic.return` 退回生产者，也可用备用交换机（Alternate Exchange）兜底入队。最隐蔽的丢消息点正是默认丢弃，关键业务必须显式处理。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：默认丢弃无感知，mandatory 退回生产者，AE 兜底进备用队列
 - **关键词**：mandatory ／ basic.return ／ ReturnListener ／ Alternate Exchange ／ immediate 已废弃
@@ -620,7 +560,7 @@ channel.queueBind("unrouted_queue", "my_ae", "");
 
 :::
 
-> 📌 **注意**：RabbitMQ 3.0+ 已移除 `immediate` 参数，旧版本中设置 `immediate=true` 会导致无法路由的消息被丢弃（除非同时设置 `mandatory`）。
+> 📌 **注意**：RabbitMQ 3.0 起已弃用并移除 `immediate` 参数。按 AMQP 0-9-1 语义，旧版本中 `immediate=true` 要求消息必须能立即投递给消费者，否则同样经 `basic.return` 退回生产者（而非静默丢弃）；因其语义复杂、性能差且与 Publisher Confirm 时序纠缠，RabbitMQ 不再支持。「静默丢弃」只发生在未设 `mandatory` 的无法路由场景。
 
 #### 🔬 扩展知识
 
@@ -649,225 +589,89 @@ Alternate Exchange 可以是任意类型，常用 Fanout 挂一个兜底队列�
 2. mandatory 对性能有影响吗？
    很小。只是给 Broker 增加「路由失败时回传」的义务，路由成功路径几乎无额外开销，关键业务建议常开。
 
-### 【中等】RabbitMQ 中消息什么时候会进入死信交换机？⭐⭐
+### 【中等】RabbitMQ 如何确认消息并处理未确认投递？⭐⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 死信机制
-
-#### 💎 关键结论
-
-消息进入死信交换机（DLX）只有三种情况：**被拒绝且不重入队、TTL 过期、队列达到最大长度**。前提是队列声明时配置了 `x-dead-letter-exchange`；通过 DLX 可实现失败消息的优雅降级与故障隔离。
-
-#### ⚡记忆卡片
-
-- **口诀**：拒绝不过期、过期不拒绝、队列满挤出，三因进死信
-- **关键词**：basicReject ／ basicNack ／ requeue=false ／ TTL ／ x-max-length ／ x-dead-letter-exchange
-- **链路**：消息被拒（requeue=false）/ TTL 到期 / 队列溢出 → Broker 将其发布到 x-dead-letter-exchange → 按死信路由键进入死信队列 → 由补偿消费者处理
-
-#### 📖 核心知识
-
-在 RabbitMQ 中，消息进入 **死信交换机（Dead Letter Exchange, DLX）** 由以下 **3 种情况**触发（以官方定义为准）：
-
-**（1）消息被消费者拒绝**：消费者显式拒绝消息且不重新入队。
-
-```java
-channel.basicReject(deliveryTag, false); // 或 basicNack 且 requeue=false
-```
-
-- **典型场景**：消息处理失败且无需重试（如业务校验不通过）。
-
-**（2）消息过期（TTL 超时）**：
-
-- 消息设置了 **TTL（Time-To-Live）**，且未在过期前被消费。
-- 队列设置了 `x-message-ttl`，消息在队列中停留超时。
-
-**（3）队列达到最大长度**：队列设置了 `x-max-length` 或 `x-max-length-bytes`，且新消息到达时队列已满，最旧的消息被挤出成为死信。
-
-**关键配置步骤**
-
-1. **声明死信交换机（DLX）和死信队列**；
-2. **为普通队列绑定死信交换机**（`x-dead-letter-exchange`，可选 `x-dead-letter-routing-key`）。
-
-::: details 案例：DLX 配置（Java）
-
-```java
-// 1. 声明死信交换机与死信队列
-channel.exchangeDeclare("dlx_exchange", "direct");
-channel.queueDeclare("dlx_queue", false, false, false, null);
-channel.queueBind("dlx_queue", "dlx_exchange", "dlx_routing_key");
-
-// 2. 为普通队列绑定死信交换机
-Map<String, Object> args = new HashMap<>();
-args.put("x-dead-letter-exchange", "dlx_exchange"); // 指定 DLX
-args.put("x-dead-letter-routing-key", "dlx_routing_key"); // 可选
-channel.queueDeclare("normal_queue", false, false, false, args);
-```
-
-:::
-
-**注意事项**
-
-- 死信消息的 **原始属性**（如 headers）会被保留，但 `exchange` 和 `routingKey` 会被替换为 DLX 的配置。
-- 若未指定 `x-dead-letter-routing-key`，则使用消息原来的 routing key。
-
-**典型应用场景**
-
-- **延迟队列**：通过 TTL+DLX 实现消息延迟投递。
-- **失败处理**：将处理失败的消息自动路由到死信队列，供人工或异步处理。
-- **流量控制**：队列满时转移旧消息，避免阻塞新消息。
-
-#### 🔬 扩展知识
-
-**【L3】消息级 TTL 的「队首检查」陷阱**
-
-::: details
-
-按消息粒度设置 `expiration` 时，RabbitMQ 只在**队首**检查过期：一条 5 秒 TTL 的消息排在 60 秒 TTL 消息后面时，要等前面的消息出队才会被判定过期，因此过期时间并不精确。队列级 `x-message-ttl` 则整队统一、无此问题。需要精确定时请用延迟消息插件或仲裁队列方案。
-
-:::
-
-**【L4】死信与队列溢出策略的配合**
-
-::: details
-
-队列溢出行为可通过 `x-overflow` 调整：默认 `drop-head`（丢最旧，被丢消息若配置 DLX 会成为死信）；`reject-publish` 直接拒绝新消息发布；`reject-publish-dlx` 拒绝新消息的同时把被拒消息转 DLX。不同组合决定了「保新」还是「保旧」的业务语义。
-
-:::
-
-> 📚 延伸阅读：[RabbitMQ DLX 官方文档](https://www.rabbitmq.com/dlx.html)
-
-#### ⚠️ 常见误区
-
-::: details
-
-常见误区：
-
-- ❌ “队列被删除时，其中的消息会变成死信” → 错误。删除队列会直接连同消息一起删除，不会触发死信流转；想在删除前保全消息，必须先搬运或转储。
-- ❌ “镜像队列主节点崩溃时，未同步的消息会进入死信队列” → 错误。主节点崩溃且消息未同步时，消息是**直接丢失**而非进入 DLX；这正是镜像队列可靠性缺陷，仲裁队列以 Raft 多数派确认解决该问题。
-- ❌ “任何失败消息都会自动进死信” → 错误。必须满足三个触发条件之一，且队列预先配置了 `x-dead-letter-exchange`，否则被拒消息在 `requeue=false` 时会被直接丢弃。
-
-:::
-
-#### 🔀 发散问题
-
-1. 死信队列能再配置死信吗？
-   可以，死信队列本身也是队列，可再声明自己的 DLX，形成多级死信链；实践中常用它实现「重试 N 次后进最终人工队列」的退避重试。
-2. TTL + DLX 能做延迟队列吗？
-   可以：消息先进带 TTL 的中转队列，过期后转 DLX 路由到真实消费队列；缺点是精度受队首检查影响，且不同延迟需多个队列。详见《MQ面试》『MQ 如何实现延迟消息？』。
-3. 死信队列一定要人工处理吗？
-   不一定。可以挂自动补偿消费者按退避策略重投，超过重试上限再转人工队列，形成多级重试链。
-
-### 【中等】RabbitMQ 如何实现消息确认机制？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：RabbitMQ / 可靠投递
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：RabbitMQ / 发布确认与消费重投
 
 #### 💎 关键结论
 
-消息确认分两个方向：生产端用 Publisher Confirms 确认「消息到达 Broker」，消费端用手动 ACK 确认「业务处理完成」；两端都确认，消息才算走完一次可靠传输。理由：任一端缺失都会在对应环节留下丢失窗口。
+Publisher Confirm 确认发布结果，Consumer ACK 确认消费结果，两者相互独立；Return 补充路由失败通知。手动确认下，断连等情况会让未确认消息重投，所以业务完成后再 ACK，并始终保证幂等。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
-- **口诀**：生产 Confirm 问到达，消费 Ack 问处理，Return 补路由失败
-- **关键词**：Publisher Confirms ／ basicAck ／ basicNack ／ basicReject ／ requeue ／ mandatory
-- **链路**：生产者 confirmSelect 开启确认 → Broker 接收后回 Ack/Nack → 消费者 autoAck=false 手动确认 → 处理成功 basicAck，失败 basicNack 重入队或转死信
+- **口诀**：发布 Confirm、路由 Return、消费 ACK；未确认可重投，业务幂等兜底
+- **关键词**：Publisher Confirm ／ mandatory ／ basicAck ／ basicNack ／ deliveryTag ／ unacked ／ redelivered
+- **链路**：开启发布确认并监听 Return → Broker 按存储条件确认 → 手动消费 → 成功 ACK，失败选择重入队或死信 → 断连未确认可再次投递
 
 #### 📖 核心知识
 
-RabbitMQ 的消息确认机制主要用于确保可靠的消息传输，分为 **生产者确认** 和 **消费者确认** 两个方向。
+1. **发布确认与消费确认正交**：`confirmSelect()` 开启 Publisher Confirm，Broker 用 Ack/Nack 通知发布结果，不等待消费者处理。对于已路由消息，确认取决于目标队列的接收与持久化条件：持久化经典队列中的持久化消息需落盘，Quorum 需满足多数派复制条件；Consumer ACK 则是消费者向 Broker 释放本次投递的责任。
+2. **Confirm 不能替代 Return**：无匹配队列的消息也可能获得 Confirm Ack；设置 `mandatory=true` 并监听 `basic.return`，才能感知最终无法路由。开启两者时，无法路由消息先 Return、后 Confirm Ack，因此不能只按 Ack 将业务状态标为成功。
 
-**生产者确认机制（Publisher Confirms）**
+   | Confirm 使用方式 | 实现                           | 权衡                                         |
+   | :--------------- | :----------------------------- | :------------------------------------------- |
+   | 同步单条         | 每条发送后 `waitForConfirms()` | 简单，但等待往返使发送串行化                 |
+   | 同步批量         | 发送一批后统一等待             | 减少等待次数，失败后要辨别或重试一批         |
+   | 异步             | `addConfirmListener()` 回调    | 可维持在途窗口，吞吐较好，但需维护未确认集合 |
 
-生产者开启发布确认模式（Publisher Confirms）后，Broker 会返回一个确认信号，确保消息已成功到达 Broker。
+   三种方式的协议确认语义相同，不能简单按同步或异步给可靠性排名；差别在吞吐、状态管理和失败处理。
 
-- **`Basic.Ack`**：消息成功被 Broker 接收（并可能已持久化）。收到 `Ack` 才认为发送成功，否则需重发。
-- **`Basic.Nack`**：消息接收失败（罕见，如 Broker 内部错误）。
+3. **消费确认决定何时删除**：`autoAck=true` 不等业务完成，发送后即视为成功，消费者崩溃可能造成消息丢失；可靠消费用 `autoAck=false`，业务副作用成功提交后再确认。
 
-**三种 Confirm 模式**：
+   | 方法          | 参数                             | 行为                                                            |
+   | :------------ | :------------------------------- | :-------------------------------------------------------------- |
+   | `basicAck`    | `deliveryTag, multiple`          | 确认单条，或批量确认不大于该 tag 的未确认投递                   |
+   | `basicNack`   | `deliveryTag, multiple, requeue` | 拒绝单条或批量投递；`requeue=true` 重入队，false 尝试死信或丢弃 |
+   | `basicReject` | `deliveryTag, requeue`           | 仅拒绝单条，重入队选择同上                                      |
 
-| 模式             | 实现方式                                 | 性能     | 可靠性 | 适用场景                     |
-| :--------------- | :--------------------------------------- | :------- | :----- | :--------------------------- |
-| **同步单条确认** | `channel.waitForConfirms()` 逐条等待     | **最低** | 最高   | 极少使用，仅用于测试         |
-| **同步批量确认** | 批量发送后调用 `waitForConfirms()`       | 中       | 中     | 中等吞吐场景                 |
-| **异步确认**     | `addConfirmListener()` 异步回调 【推荐】 | **最高** | 高     | **生产环境首选**，高吞吐场景 |
+4. **deliveryTag 是 Channel 级标识**：Consumer ACK 必须在接收消息的同一 Channel 上发送；跨 Channel、重复确认或确认未知 tag 会导致通道异常。`multiple=true` 覆盖该通道截至指定 tag 的所有未确认投递，不只是某个业务批次；Publisher Confirm 的发布序号与消费投递 tag 也不是同一套业务编号。
+5. **unacked 的归宿与超时**：未 ACK 时消息暂归该消费者持有；Broker 检测到 Connection/Channel 关闭后，会将仍可恢复的未确认消息重入队，投递给可用消费者，不保证一定换人。支持消费确认超时的版本与队列类型中，Broker 超时会以 `PRECONDITION_FAILED` 关闭 Channel，并重入队该通道的未确认投递，而不是直接当作消费成功删除。重投带 `redelivered=true`，其 deliveryTag 属于新的投递上下文，不能当作稳定幂等键。
 
-**Confirm 和 Return 的区别**：
-
-| 机制        | 触发条件                             | 作用                   |
-| :---------- | :----------------------------------- | :--------------------- |
-| **Confirm** | 消息**是否到达 Broker**              | 确保消息被 Broker 接收 |
-| **Return**  | 消息到达 Broker 但**无法路由到队列** | 确保消息被正确路由     |
-
-- **Confirm** 回答的是：Broker 收到消息了吗？
-- **Return** 回答的是：Broker 收到消息了，但找不到对应的队列，怎么办？
-
-**消费者确认机制（Consumer Ack）**
-
-- **自动确认 (`autoAck=true`)**：消息一发出就被 Broker 删除。
-
-  - **风险**：消费者处理失败会导致消息**永久丢失**。
-
-- **手动确认 (`autoAck=false`) 【推荐】**：消费者必须显式发送确认命令（调用 `channel.basicAck()`），Broker 才会删除消息。
-  - **`basicAck`**：处理成功，确认删除。
-  - **`basicNack` / `basicReject`**：处理失败。可选择是否将消息**重新放回队列 (`requeue=true`)** 或**丢弃/转入死信队列 (`requeue=false`)**。
-
-**三种确认/拒绝方式对比**：
-
-| 方法          | 参数                                 | 行为                                      |
-| :------------ | :----------------------------------- | :---------------------------------------- |
-| `basicReject` | `deliveryTag`, `requeue`             | 拒绝**单条**消息                          |
-| `basicNack`   | `deliveryTag`, `multiple`, `requeue` | 拒绝**单条或多条**消息（`multiple=true`） |
-| `basicAck`    | `deliveryTag`, `multiple`            | 确认消息处理成功                          |
-
-::: details 案例：异步 Confirm 与 Return 监听（Java）
+::: details 案例：先注册 Confirm 与 Return，再发布（Java）
 
 ```java
-channel.confirmSelect(); // 开启 Confirm 模式
+channel.confirmSelect();
 channel.addConfirmListener(
-    (deliveryTag, multiple) -> {
-        // 消息确认成功
-        System.out.println("Ack: " + deliveryTag);
+    (publishSeqNo, multiple) -> {
+        // 生产实现：清理单条或截至该序号的未确认记录。
+        System.out.println("Ack: " + publishSeqNo + ", multiple=" + multiple);
     },
-    (deliveryTag, multiple) -> {
-        // 消息确认失败，需重发
-        System.out.println("Nack: " + deliveryTag);
+    (publishSeqNo, multiple) -> {
+        // 生产实现：将相关记录交给受限重试任务，避免回调中阻塞重发。
+        System.out.println("Nack: " + publishSeqNo + ", multiple=" + multiple);
     }
 );
-channel.basicPublish(exchange, routingKey, props, body.getBytes());
-```
-
-```java
-channel.addReturnListener((replyCode, replyText, exchange,
-    routingKey, properties, body) -> {
-    // 消息无法路由，被退回
-    System.out.println("Returned: " + new String(body));
+channel.addReturnListener((replyCode, replyText, returnedExchange,
+    returnedRoutingKey, properties, returnedBody) -> {
+    // 用 messageId 关联业务失败状态，后续 Confirm Ack 不应覆盖它。
+    System.out.println("Returned: " + properties.getMessageId());
 });
-
-// 必须设置 mandatory=true，Return 机制才会生效
-channel.basicPublish(exchange, routingKey,
-    new AMQP.BasicProperties.Builder().mandatory(true).build(),
-    body.getBytes());
+AMQP.BasicProperties props = new AMQP.BasicProperties.Builder()
+    .deliveryMode(2)
+    .messageId(java.util.UUID.randomUUID().toString())
+    .build();
+// mandatory 是 basicPublish 的布尔参数，不属于 BasicProperties。
+channel.basicPublish(exchange, routingKey, true, props,
+    body.getBytes(java.nio.charset.StandardCharsets.UTF_8));
 ```
+
+这是监听接口示例，不是完整重试器；实际发布前需登记消息与发布序号，记录 Return、超时及重试状态。重试同一业务消息时应复用稳定的业务幂等标识，不能每次重新生成身份。
 
 :::
 
 #### 🔬 扩展知识
 
-**【L3】Confirm 的时机语义**
-
 ::: details
 
-Broker 何时回 Ack 取决于消息属性：非持久化消息入队即确认；持久化消息需写入磁盘（或进入仲裁队列被多数派接受）后才确认。因此 Confirm Ack 对持久化消息的含金量更高，但也意味着更高的延迟——这是可靠性与吞吐的直接权衡。
+- 【L3】**异步确认的未确认集合**：发布前取得 `getNextPublishSeqNo()`，用有序集合（如 `ConcurrentSkipListMap`）保存消息；回调 `multiple=true` 时清理所有不大于该序号的记录。连接中断或等待超时只说明结果未知，不等于 Broker 未收到；受限重发要与消费端幂等配合，重连后也不能把旧 Channel 序号直接用于新通道。
+- 【L3】**消费确认超时不是消息 TTL**：Broker 的 `consumer_timeout` 默认通常为 30 分钟，按周期检查，并非精确到期；可用配置及支持版本的每队列 Policy/`x-consumer-timeout` 调整。RabbitMQ **4.3 起该超时能力仅支持 Quorum 队列**，应按实际版本和队列类型核对，既不能宣称 unacked 永不超时，也不能给所有队列套同一个保证。处理时间应留余量，不能只靠 Spring 消费线程超时替代 Broker 机制。
+- 【L3】**basicRecover 的适用边界**：`basicRecover(true)` 是 AMQP 0-9-1 的 Channel 级全量重投请求，不能指定单条；RabbitMQ 不支持 `requeue=false` 的恢复语义。它常见于旧客户端示例，使用前应核对客户端、Broker 版本与队列类型支持，不能把经典队列示例无条件套到 Quorum 或 Stream；不要与客户端连接自动恢复混为一谈。支持环境中可用于消费逻辑重置、下游依赖恢复后的全量重投，但应避免反复调用造成风暴；逐条失败优先用 Nack/Reject，通道失效则重建连接和消费者。
+- 【L4】**毒消息与版本化投递计数**：经典队列没有仲裁队列式的内建 delivery-limit，应自行计数、退避并转最终失败队列。Quorum 可配置 `x-delivery-limit` 或 `delivery-limit` Policy，超过限制后丢弃或转 DLX；**4.0 起默认限制为 20**。**4.3 起改按 `delivery-count` 而非 `acquired-count` 判限**，主动重入队与失败重投的计数语义须按版本核验，不能把任意一次 Nack 都当成必然增加一次失败计数。
+- 【L4】**幂等不能只在 redelivered 为 true 时启用**：该标记提示 Broker 重投，不能证明业务一定执行过；生产者因 Confirm 丢失而重发，也可能作为新的投递进入队列。应按消息 ID 或业务唯一键去重，令副作用与去重记录在一致的事务边界中提交，再 ACK。
+
+> 📚 延伸阅读：[Publisher Confirms](https://www.rabbitmq.com/confirms.html)、[Consumers 与确认超时](https://www.rabbitmq.com/docs/consumers)、[AMQP 0-9-1 支持边界](https://www.rabbitmq.com/docs/specification)、[Quorum Queues 与投递限制](https://www.rabbitmq.com/docs/quorum-queues)
 
 :::
-
-**【L4】Confirm 的 deliveryTag 与未确认集维护**
-
-::: details
-
-生产端需自行维护「已发布未确认」集合：Confirm 回调带 `multiple` 参数，为 true 时表示 ≤ deliveryTag 的所有消息批量确认，可用有序集合（如 ConcurrentSkipListMap）清理；超时未确认的消息需主动重发并配合消费端幂等防重复。这是异步确认落地时最容易写错的部分。
-
-:::
-
-> 📚 延伸阅读：[RabbitMQ Publisher Confirms 官方指南](https://www.rabbitmq.com/confirms.html)
 
 #### ⚠️ 常见误区
 
@@ -875,18 +679,31 @@ Broker 何时回 Ack 取决于消息属性：非持久化消息入队即确认�
 
 常见误区：
 
-- ❌ “Confirm 成功就等于消息不会丢” → 错误。Confirm 只保证 Broker 接收，若消息未持久化、队列无副本，Broker 崩溃仍会丢；完整不丢方案见《MQ面试》『如何保证 MQ 消息不丢失？』。
-- ❌ “autoAck=true 也能保证不丢，只要消费者快” → 错误。autoAck 是推送即删除，处理崩溃窗口内的消息永久丢失，可靠性要求高时必须手动确认。
-- ❌ “basicNack 和 basicReject 功能完全一样” → 不准确。basicReject 只能拒单条，basicNack 支持 `multiple=true` 批量拒绝，批量消费场景只能用 basicNack。
+- ❌ "Confirm Ack 就代表已入队、已消费、绝不会丢" → Confirm 不等于路由成功或业务完成；还需 Return、正确的存储副本策略和消费确认。完整方案见《MQ面试》『如何保证 MQ 消息不丢失？』。
+- ❌ "autoAck 只是替我在业务成功后 ACK" → Broker 不知道业务是否完成，自动确认会放弃对失败消费的恢复保障。
+- ❌ "unacked 永远不会超时，也可以拿 deliveryTag 永久去重" → 支持消费确认超时的配置会关闭通道并重投；tag 只在所属 Channel 的投递上下文中有效，跨通道可以重复数值。
+- ❌ "Nack 和 Reject 完全相同，批量 Nack 不影响已成功业务" → Reject 只拒绝单条；批量 Nack 会覆盖范围内仍未确认的投递，可能把已完成业务但尚未 ACK 的消息一起重投。
+- ❌ "没收到 ACK 就立即无限 requeue" → 未确认不代表处理失败，无限重试会形成毒消息循环和资源风暴，应采用幂等、退避、次数上限与最终失败处理。
 
 :::
 
 #### 🔀 发散问题
 
-1. 为什么异步 Confirm 比同步逐条快得多？
-   同步模式下每条消息都要等一个 RTT，管道无法填满；异步模式允许成百上千条在途消息，Broker 批量回确认，吞吐可高 1~2 个数量级（经验值）。
-2. 消费者宕机后未确认的消息怎么办？
-   Broker 检测到连接/Channel 关闭后会把未确认消息重新入队并投递给其他消费者，消息会带 redelivered 标记，消费逻辑需幂等。见本文档『RabbitMQ 中如何处理未被消费者确认的消息？』。
+- **Q：为什么异步 Confirm 通常比逐条同步快？**
+
+  → 逐条同步把每次网络往返串行化，异步则允许多条在途消息并处理批量确认。实际收益取决于网络、磁盘、队列类型与窗口大小，不能套固定吞吐倍数。
+
+- **Q：消费者很慢但连接正常，如何处理？**
+
+  → 先检查 unacked、业务耗时和 prefetch，避免取入超过处理能力的消息；再按版本配置合理的 Broker 确认超时，并为应用失败设计有界重试。见本文档『RabbitMQ 的 prefetch_count 有什么作用？如何设置？』。
+
+- **Q：断连后重投会不会重复扣款？**
+
+  → 如果业务已成功而 ACK 丢失，就可能再次收到同一业务消息，必须用订单号、请求号等稳定标识幂等处理。见《MQ面试》『如何保证 MQ 消息不重复？』。
+
+- **Q：拒绝且不重入队的消息去哪？**
+
+  → 配置了有效 DLX 时可转死信，否则会丢弃；毒消息达到重试上限也应进入可审计的最终失败路径。见《MQ面试》『什么是死信队列？各 MQ 如何实现死信处理机制？』。
 
 ### 【中等】RabbitMQ 如何实现消息的批量消费？⭐⭐
 
@@ -896,7 +713,7 @@ Broker 何时回 Ack 取决于消息属性：非持久化消息入队即确认�
 
 RabbitMQ 协议层不支持服务端批量推送，批量消费靠客户端实现：**Prefetch 预取 + 手动确认，攒够一批后统一处理、统一 ACK**。核心前提是业务幂等，否则批量重投会造成重复。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：预取攒批、手动确认、批量入库、幂等保底
 - **关键词**：basicQos ／ prefetchCount ／ 手动确认 ／ 批量 ACK ／ 幂等
@@ -908,7 +725,7 @@ RabbitMQ 协议本身不支持服务端批量推送，但可通过**客户端机
 
 **首选方法：Prefetch（预取） + 手动确认**
 
-- **设置预取数量**：使用 `channel.basicQos(prefetchCount)`，限制信道上次可持有的最大未确认消息数。
+- **设置预取数量**：使用 `channel.basicQos(prefetchCount)`，限制信道上可持有的最大未确认消息数。
 - **开启手动确认**：消费消息时，不自动确认，由业务逻辑控制。
 - **缓存与批量处理**：
   - 将收到的消息暂存到内存（如列表）。
@@ -956,163 +773,6 @@ RabbitMQ 协议本身不支持服务端批量推送，但可通过**客户端机
 3. 发送端怎么攒批提速？
    与消费端攒批对应，发送端把多条消息打包成一次网络请求，见《RocketMQ面试》『RocketMQ 如何实现批量消息？』。
 
-### 【中等】RabbitMQ 中如何处理未被消费者确认的消息？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 消费模式
-
-#### 💎 关键结论
-
-消费者未确认的消息，在消费者断开（宕机、断连）后会被 Broker **自动重新入队**，投递给下一个可用消费者，且消息带 `redelivered=true` 标记。这是 At-Least-Once 语义的直接体现，也是消费端必须幂等的原因之一。
-
-#### ⚡记忆卡片
-
-- **口诀**：未确认即未消费，断连重投带标记，幂等兼容重复
-- **关键词**：unacked ／ 重新入队 ／ redelivered ／ basicRecover ／ delivery-limit
-- **链路**：消费者收到消息未 ACK → 连接/Channel 断开 → Broker 将消息重新入队 → 投递给其他消费者（redelivered=true）→ 幂等逻辑兼容重复处理
-
-#### 📖 核心知识
-
-在 RabbitMQ 中，当消费者接收到一条消息后，若因某种原因未确认（ACK）该消息，这条消息会被重新入队并传递给其他消费者（或相同消费者再次接收）。详细实现方式如下：
-
-1. 在消费者代码中需启用消息确认机制（manual acknowledgment），即通过 `channel.basicAck` 手动确认消息处理完成。
-2. 若消费者未发送 `basicAck`（比如消费者宕机或消息处理异常导致连接断开），消息会被再次发送给下一个可用的消费者，以保证消息被再次处理。
-3. 重新投递的消息 `redelivered` 标志为 true，消费端可据此识别重试消息并做幂等校验。
-
-#### 🔬 扩展知识
-
-**【L3】basicRecover：主动重投未确认消息**
-
-::: details
-
-除被动等待断连外，消费者可显式调用 `basicRecover(requeue=true)` 要求 Broker 把当前 Channel 上所有未确认消息重新投递，适合消费逻辑热重置、依赖的下游刚恢复等场景；注意它是 Channel 级全量操作，不支持指定单条。
-
-:::
-
-**【L4】投递次数限制（delivery limit）**
-
-::: details
-
-经典队列的 requeue 没有次数限制，毒消息（永远处理失败）会无限循环；仲裁队列支持 `x-delivery-limit` 参数，超过重投次数后消息直接丢弃或转死信，从协议层切断了无限重投风暴，是仲裁队列相比经典队列的重要运维优势。
-
-:::
-
-> 📚 延伸阅读：[RabbitMQ Delivery Limit 官方文档](https://www.rabbitmq.com/delivery-limit.html)
-
-#### ⚠️ 常见误区
-
-::: details
-
-常见误区：
-
-- ❌ “未确认的消息会在超时后自动删除” → 错误。经典队列中 unacked 消息不会超时，只在消费者断开或显式 recover 时重投，消费者挂着但不 ACK 会导致消息一直被占用。
-- ❌ “重新投递的消息和原消息是同一次投递” → 错误。重投会分配新的 deliveryTag，且 redelivered=true；不能用 deliveryTag 做幂等键。
-
-:::
-
-#### 🔀 发散问题
-
-1. 消费者处理很慢但不宕机，消息会怎样？
-   消息一直处于 unacked 状态不会被别人消费，可能造成队列局部阻塞；应配合 consumer 超时机制（如 Spring AMQP 的 consumer timeout）或主动 Nack 释放消息。
-2. 如何避免毒消息无限重投？
-   经典队列用「失败计数 + 转死信」的应用层方案；仲裁队列直接配置 `x-delivery-limit`。见《MQ面试》『如何保证 MQ 消息不重复？』中 requeue 风暴的讨论。
-
-### 【简单】RabbitMQ 中如何设置队列的最大长度？⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：RabbitMQ / 队列参数
-
-#### 💎 关键结论
-
-通过队列参数 `x-max-length` 设置最大消息数，超出时默认按先进先出丢弃最旧消息（被丢消息若配置了 DLX 会转死信）。它是防止队列无限积压的第一道闸门。
-
-#### ⚡记忆卡片
-
-- **口诀**：x-max-length 限条数，超出丢旧保新，配 DLX 不白丢
-- **关键词**：x-max-length ／ x-max-length-bytes ／ x-overflow ／ drop-head
-- **链路**：声明队列带 x-max-length → 队列满时新消息到达 → 默认 drop-head 挤出最旧消息 → （可选）被挤消息转 DLX 留痕
-
-#### 📖 核心知识
-
-在 RabbitMQ 中，可通过 `x-max-length` 参数设置队列最大长度，该参数能在声明队列时指定队列允许的最大消息数，超出数量的消息会被自动删除（默认按先进先出原则删老消息）。
-
-具体实现步骤：
-
-1. 使用 RabbitMQ 管理工具（如 `rabbitmqctl` 或 RabbitMQ 管理控制台）。
-2. 通过代码创建队列时，设置队列属性。
-
-- 除条数外，还可用 `x-max-length-bytes` 按字节总量限制；
-- 溢出行为可用 `x-overflow` 调整：`drop-head`（默认丢最旧）、`reject-publish`（拒绝新消息）。
-
-::: details 案例：声明带最大长度的队列（Python/Pika）
-
-```python
-import pika
-
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel()
-
-# 设置队列的最大长度 x-max-length
-channel.queue_declare(queue='my_queue', arguments={'x-max-length': 10})
-
-connection.close()
-```
-
-在这段代码里，`queue_declare` 方法的 `arguments` 参数指定了 `x-max-length`，并将其值设为 10。
-
-:::
-
-#### 🔀 发散问题
-
-1. 被丢弃的旧消息能找回吗？
-   不能，除非队列配置了 `x-dead-letter-exchange`，被挤出的消息会转入死信队列留痕，可用于审计或补偿。
-2. 队列长度限制和内存水位是一回事吗？
-   不是。x-max-length 是队列级容量约束，内存水位是节点级资源保护（触发后阻塞全节点发布），两者应配合使用。见《MQ面试》『如何处理 MQ 消息积压？』。
-
-### 【简单】RabbitMQ 中如何配置消息的 TTL（过期时间）？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：RabbitMQ / 消息过期
-
-#### 💎 关键结论
-
-TTL 有两个设置点：队列级 `x-message-ttl`（全队列统一）与消息级 `expiration`（逐条设置），两者同时存在时取较小值。队列级更精确可控，消息级灵活但有过期检查的队首陷阱。
-
-#### ⚡记忆卡片
-
-- **口诀**：队列 x-message-ttl，消息 expiration，同设取小
-- **关键词**：x-message-ttl ／ expiration ／ 毫秒 ／ 取较小值
-- **链路**：声明队列设 TTL / 发布消息设 expiration → 消息在队时间超过 TTL → 过期被判死信 → 配置 DLX 则转发，否则丢弃
-
-#### 📖 核心知识
-
-要在 RabbitMQ 中配置消息的 TTL（过期时间），需通过设置队列或消息的 TTL（Time To Live，消息在队列中存活的时间），有两种方式：
-
-队列级别的 TTL：在声明队列时通过设置 `x-message-ttl` 参数指定队列中所有消息的 TTL。
-
-```java
-// Java 示例（使用 RabbitMQ 的官方客户端）
-Map<String, Object> args = new HashMap<>();
-args.put("x-message-ttl", 60000); // 设置队列的 TTL 为 60,000 毫秒（60 秒）
-channel.queueDeclare("myQueue", false, false, false, args);
-```
-
-消息级别的 TTL：在发送消息时通过 `AMQP.BasicProperties` 属性指定单个消息的 TTL。
-
-```java
-// Java 示例（使用 RabbitMQ 的官方客户端）
-AMQP.BasicProperties props = new AMQP.BasicProperties.Builder()
-    .expiration("60000") // 设置消息的 TTL 为 60,000 毫秒（60 秒）
-    .build();
-channel.basicPublish("", "myQueue", props, "Hello, World!".getBytes());
-```
-
-> 注意：两个 TTL 同时设置时，实际生效的是**较小值**；消息级 TTL 过期检查存在队首限制，精确定时请配合延迟消息插件。见《MQ面试》『MQ 如何实现延迟消息？』。
-
-#### 🔀 发散问题
-
-1. TTL 到期的消息一定会立刻被清理吗？
-   不一定。过期判定发生在消息即将投递给消费者的时刻（队首检查），未被消费的过期消息可能在队列中停留更久，只是不会再被投递。
-2. TTL 和死信队列配合能做什么？
-   实现延迟队列：中转队列设 TTL 且不挂消费者，过期消息自动转 DLX 路由到真实业务队列。见《MQ面试》『MQ 如何实现延迟消息？』。
-
 ### 【中等】RabbitMQ 有哪些工作模式？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 消费模式
@@ -1121,7 +781,7 @@ channel.basicPublish("", "myQueue", props, "Hello, World!".getBytes());
 
 RabbitMQ 的工作模式本质是「拓扑组合」：简单、工作队列、发布订阅、路由、主题、RPC 六种，差别只在交换机类型与消费者数量。抓住「用哪类交换机 + 几个消费者」就能推导出任何模式。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：单发单收是简单，多消竞争工作队，Fanout 广播、Direct 路由、Topic 通配、RPC 回调
 - **关键词**：Simple ／ Work Queue ／ Publish-Subscribe ／ Routing ／ Topic ／ RPC ／ reply_to ／ correlation_id
@@ -1218,7 +878,7 @@ RabbitMQ 有以下几种主要的工作模式：
 
 ::: details
 
-RPC 模式用 exclusive 临时队列接收响应，靠 `correlation_id` 匹配；客户端必须设超时，否则服务端崩溃会导致永久阻塞；服务端响应发布失败时客户端也只能靠超时兑底。正因这些脆弱性，生产环境的同步调用更推荐专门的 RPC 框架（如 Dubbo/gRPC）而非 MQ 自建。
+RPC 模式用 exclusive 临时队列接收响应，靠 `correlation_id` 匹配；客户端必须设超时，否则服务端崩溃会导致永久阻塞；服务端响应发布失败时客户端也只能靠超时兜底。正因这些脆弱性，生产环境的同步调用更推荐专门的 RPC 框架（如 Dubbo/gRPC）而非 MQ 自建。
 
 :::
 
@@ -1231,84 +891,105 @@ RPC 模式用 exclusive 临时队列接收响应，靠 `correlation_id` 匹配�
 
 ## RabbitMQ 集群
 
-### 【困难】RabbitMQ 如何实现高可用？⭐⭐
+### 【困难】RabbitMQ 集群与队列高可用如何设计和配置？⭐⭐⭐⭐
 
-> 🎯 目标等级：L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：RabbitMQ / 集群与高可用
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：20 min ｜ 🏷 标签：RabbitMQ / 集群与队列高可用
 
 #### 💎 关键结论
 
-RabbitMQ 高可用 = 集群保服务连续（元数据全节点共享，任一存活节点可接入）+ 队列复制保数据不丢（镜像队列或 3.8+ 推荐的仲裁队列）。再用负载均衡器统一接入、自动屏蔽故障节点，形成完整高可用闭环。
+集群共享元数据，不会自动复制每条消息。可靠业务通常用多节点集群加 Quorum 队列，再配接入故障转移和客户端恢复；跨地域转发另用 Federation 或 Shovel，不能把它们当作同一套队列副本。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
-- **口诀**：三节点磁盘、LB 接入、元数据共享、队列多副本
-- **关键词**：集群 ／ 磁盘节点 ／ 镜像队列 ／ 仲裁队列 ／ 负载均衡 ／ 故障转移
-- **链路**：多节点组集群共享元数据 → 队列通过镜像/仲裁复制到多节点 → 主节点宕机自动切主 → 客户端经 LB 接入任一存活节点继续服务
+- **口诀**：集群管元数据，仲裁管副本；多数派才能写，接入恢复另安排
+- **关键词**：Erlang Cookie ／ Quorum ／ Raft ／ 多数派 ／ LB ／ Policy ／ Federation ／ Shovel ／ Sharding
+- **链路**：节点认证组集群 → 分散队列副本故障域 → 多数派复制确认 → 故障后选主与客户端重连 → 跨集群按需异步转发
 
 #### 📖 核心知识
 
-**高可用关键点**
+1. **集群与队列复制不是一个层次**：集群共享队列、交换机、绑定等元数据，客户端通常可接入任一可用节点，由其转发到队列所在节点或 leader；跨节点访问有网络成本。普通经典队列没有消息副本，所在节点不可用时该队列仍会不可用，不能把「多入口」理解成「所有队列都有冗余」。
+2. **现代高可用队列优先用 Quorum**：多副本以 Raft 复制，依赖队列副本成员的多数派提交与选主；失去多数派时停止提供正常队列服务，不能让少数派单独继续写入。建议将至少 3 个副本分散到独立故障域，但必须核查实际副本成员，集群有 3 个节点不等于每个队列已有 3 副本。
 
-- **部署**：至少** 3 个节点**（最好都是磁盘节点），分布在不同物理机。
-- **接入层**：使用**负载均衡器**为客户端提供统一入口，自动屏蔽故障节点。
-- **故障转移**：当主节点宕机，**从节点会自动选举为新主**，恢复服务。
+   | 维度     | 普通经典队列         | 经典镜像队列（历史）               | Quorum 队列                                  |
+   | :------- | :------------------- | :--------------------------------- | :------------------------------------------- |
+   | 消息复制 | 单副本               | 按 Policy 配置 leader 与 mirrors   | 基于 Raft 的副本组                           |
+   | 配置入口 | 普通队列声明         | `ha-mode` 等旧策略                 | `x-queue-type=quorum`                        |
+   | 故障边界 | 所在节点故障影响队列 | 受副本同步状态、提升策略与分区影响 | 须多数派可用；不能抵御多数副本永久损毁等灾难 |
+   | 版本定位 | 非复制型队列         | **2021 年弃用，4.0 移除**          | **3.8 引入**，现代复制型队列方案             |
 
-**两大实现机制**
+3. **接入层和客户端也要恢复**：用 LB 健康检查屏蔽故障节点，或为客户端提供多节点地址；结合心跳、断连检测、退避重连和拓扑/消费者恢复。LB 不会把已有 TCP 连接无缝搬到另一节点；连接或 Channel 失效后要恢复相应资源，核对未确认发布并幂等重试，不能无限使用旧 Channel。
+4. **集群内认证与历史镜像策略分清**：同一 RabbitMQ 集群的节点通过一致的 **Erlang Cookie** 完成节点间认证，还须满足节点名解析、网络连通等条件；Cookie 不是应用的 AMQP 用户密码。历史镜像通过「策略名 + 队列名正则 + 定义」配置，`all` 复制到全部节点，`exactly` 指定总副本数，`nodes` 指定节点列表；4.0 起这些镜像策略不能再用于创建高可用队列。
+5. **跨集群转发、分片是可叠加能力，不是四种互斥集群**：
 
-**集群**
+   | 能力                                | 职责与边界                                                            |
+   | :---------------------------------- | :-------------------------------------------------------------------- |
+   | Federation（`rabbitmq_federation`） | 按交换机或队列进行订阅式跨集群转发，适合多级、多区域拓扑              |
+   | Shovel（`rabbitmq_shovel`）         | 在源与目标之间消费并重新发布，适合点对点搬运或迁移                    |
+   | Sharding（`rabbitmq_sharding`）     | 将逻辑消息流分到多个队列/节点，缓解单队列压力，但不会自动增加消息副本 |
 
-- **作用**：解决**服务连续性**。多个节点共享元数据（队列、交换机定义）。
-- **关键**：客户端可连接集群中**任一存活节点**进行所有操作。
-- **节点类型**：必须保证有**磁盘节点**在线（通常建议部署多个），以防元数据丢失。
+   Federation/Shovel 的两端可以是独立集群，通过 AMQP 凭据、权限及 TLS 等配置连接，**不要求共享 Erlang Cookie**，也不共享一套元数据或 Raft 多数派。
 
-**队列复制**
+::: details 案例：声明 3 副本 Quorum 队列（Java）
 
-- **作用**：解决**数据不丢失**。将队列内容（消息）复制到多个节点。
-- **两种实现**：
-  - **镜像队列**：传统方案，主从异步复制。通过**策略**启用，如 `rabbitmqctl set_policy ha-all "^ha\." '{"ha-mode":"all"}'`。
-  - **仲裁队列**：现代方案，基于 Raft 协议强一致复制。**消息需多数节点确认**，更安全，为 3.8+版本后的**推荐选择**（4.0 已移除镜像队列）。
+```java
+Map<String, Object> arguments = new HashMap<>();
+arguments.put("x-queue-type", "quorum");
+arguments.put("x-quorum-initial-group-size", 3);
+channel.queueDeclare("orders.quorum", true, false, false, arguments);
+```
 
-**镜像队列 vs 仲裁队列核心对比**
+`x-quorum-initial-group-size` 是初始副本组大小，不是 `x-quorum-queue`。需已有足够的可用集群节点，并核查实际成员和健康状态；新增集群节点也不代表已有队列自动达到期望副本数。可靠发布还要启用 Confirm，消费则使用手动 ACK 与业务幂等。
 
-| 特性           | 镜像队列                                     | 仲裁队列                                                       |
-| :------------- | :------------------------------------------- | :------------------------------------------------------------- |
-| **复制机制**   | **主从异步复制**                             | **Raft 共识算法**                                              |
-| **数据一致性** | **最终一致性**（主节点宕机可能**丢失消息**） | **强一致性**（消息确认即安全，**绝不丢失**）                   |
-| **性能**       | **延迟低，吞吐量高**（只需主节点确认）       | **延迟高，吞吐量相对低**（需多数节点确认，经验值下降 30%~50%） |
-| **故障恢复**   | 快，但可能选数据落后的节点为主               | 慢，但保证新主数据最全，**更安全**                             |
-| **设计目标**   | 灵活、高性能                                 | 数据安全、强一致                                               |
-| **适用场景**   | 允许微量丢失的非关键业务、低延迟场景         | **金融、交易等关键业务**，要求数据零丢失                       |
+:::
 
-选择建议：**优先选择仲裁队列**（新项目与关键业务，数据安全是首要优势）；仅在对延迟有极端要求且可容忍消息丢失时才考虑镜像队列。
+::: details 案例：4.0 之前的经典镜像 Policy，仅供存量维护
+
+```bash
+# 为重要队列设置共 2 个副本，即 1 个 leader + 1 个 mirror
+rabbitmqctl set_policy ha-important "^important\." '{"ha-mode":"exactly", "ha-params":2}'
+
+# 为 ha. 前缀队列复制到全部集群节点，副本开销随集群扩大
+rabbitmqctl set_policy ha-all "^ha\." '{"ha-mode":"all"}'
+```
+
+旧版也可在管理界面 `Admin → Policies` 配置。用 `important.`、`critical.` 等命名前缀限制匹配范围，避免不必要的全量复制；`exactly=2` 是历史参数示例，不是现代高可用推荐。只有一个节点时无法产生跨节点冗余。
+
+`ha-mode=nodes` 配合节点列表控制放置；`ha-promote-on-shutdown` 控制副本提升条件，**不是**放置策略。历史 `ha-sync-mode` 可选手动或自动同步，自动同步可能阻塞队列操作，需安排同步窗口。
+
+:::
 
 #### 🔬 扩展知识
 
-**【L3】磁盘节点与内存节点的取舍**
-
 ::: details
 
-集群中至少需要一个磁盘节点存储元数据，其余可以是内存节点以提升性能；但实践中推荐全部磁盘节点——内存节点重启后需从磁盘节点拉取元数据，磁盘节点全挂时集群无法启动。元数据体量小，磁盘开销可忽略，稳定性收益更大。
+- 【L3】**磁盘节点/内存节点属于旧元数据模式**：采用 Mnesia 的旧集群可区分 disk 与 RAM 节点，区别主要在元数据驻留方式，不是队列消息是否持久化。RAM 节点重启需要磁盘节点帮助恢复元数据，旧模式至少需要磁盘节点，生产通常采用全磁盘节点，避免单一磁盘节点依赖；不要把这种分类当作现代 Khepri 元数据存储下的通用调优手段。
+- 【L3】**镜像并非「必定异步、只等主确认」**：旧经典镜像队列的 Publisher Confirm 要等待所有当前镜像接受消息，持久化消息还涉及相应的落盘条件。新加入或恢复的镜像可能尚未同步历史内容；若策略允许提升未同步副本，便可能丢失旧消息，而选择仅提升同步副本又可能暂时不可用。应分别讨论实时复制、历史同步与故障提升，不能用一句「异步复制」替代。
+- 【L3】**分区策略不等于 Raft 多数派**：旧式集群的 `ignore`、`pause_minority`、`autoheal` 等策略影响节点侧分区处理，不能替代队列复制协议；`ignore` 下的历史镜像可能产生分叉，恢复结果取决于恢复策略，并非必定保留所谓多数派数据。Quorum 的多数派以该队列的副本组为准，少数派不能单独提交新消息，也不能靠强制选主无损恢复。
+- 【L4】**迁移与版本时间线**：3.8 引入 Quorum，不等于同年宣布镜像弃用；镜像于 2021 年弃用，4.0 移除。队列类型不能原地修改，升级前需新建 Quorum、受控停写搬运或有去重保障的双写、切换消费者并核对积压与业务结果，再下线旧队列。管理界面的 definitions 导入导出只搬元数据，不会搬走消息体；存量消息需排空或由 Shovel 等搬运。
+- 【L4】**同城副本与异地转发的取舍**：低延迟、稳定网络下可跨同城故障域部署 Quorum，但要计入多数派复制的网络往返；跨广域网通常采用独立集群加 Federation/Shovel。转发重连后可继续处理尚保留的源消息，但两端确认不是跨地域原子提交，仍需定义 RPO、积压与重复处理策略，不能把「联邦」等同自动多活一致性。
+- 【L4】**复制与分片的成本独立评估**：Quorum 的副本数、磁盘能力、消息大小、Confirm 窗口、网络延迟都会影响性能，不能宣称相对镜像固定下降 30%~50%。分片能提高并行度，却改变单队列顺序与积压观测方式；有业务顺序要求时应按业务键稳定路由，副本、幂等和分片级监控仍要另做。
+
+> 📚 延伸阅读：[Clustering](https://www.rabbitmq.com/clustering.html)、[Quorum Queues](https://www.rabbitmq.com/docs/quorum-queues)、[3.13 镜像队列历史文档](https://www.rabbitmq.com/docs/3.13/ha)、[Federation](https://www.rabbitmq.com/federation.html)
 
 :::
 
-**【L3】镜像→仲裁的版本演进时间线**
+#### 🏭 实战场景
 
 ::: details
 
-仲裁队列于 3.8 引入并同步宣布镜像队列弃维（deprecated）；此后新版本持续增强仲裁队列（如 delivery-limit、single-active-consumer），并在 4.0 彻底移除镜像队列代码。面试时给出这条时间线能显著体现版本敏感度。
+**推演：订单队列需要容忍节点故障，不是生产测量数据。** 假设各副本分散在独立故障域，节点的网络、磁盘正常，讨论的是单个队列的副本成员：
+
+| 副本数 N | 提交所需多数派 `floor(N/2)+1` | 可容忍同时不可用副本数 |
+| :------- | :---------------------------- | :--------------------- |
+| 3        | 2                             | 1                      |
+| 5        | 3                             | 2                      |
+
+1. **3 副本方案**：分布于 A/B/C，A 故障后 B/C 仍构成多数派，可在必要的选主和客户端恢复后继续；再损失一个副本便不能继续提供正常队列服务。3 个副本若共用一台宿主机，不能当成可容忍 1 台宿主机故障。
+2. **分区推演**：发生 2:1 网络分区时，只有含 2 个副本的一侧具备提交条件；接在少数派一侧的客户端必须切换到可用入口。5 副本的 3:2 分区同理，不能让两边同时对同一队列独立确认写入。
+3. **需求升级**：若要求同时容忍 2 个独立副本故障，可评估 5 副本，但复制、磁盘和网络成本增加；单纯把集群扩成 5 节点、不扩队列副本组，仍只有原来的故障容忍能力。
+4. **验收路径**：演练断连接入节点、关闭队列 leader、隔离少数派，记录实际恢复时间、Confirm 延迟、未确认发布及重复消费数量；核对已确认消息与业务处理结果。多数副本永久损毁、误删队列、未确认发布的命运需另有灾备与补偿方案，不能用上述数学推演承诺「绝不丢失」。
 
 :::
-
-**【L4】网络分区对高可用的破坏（脑裂行为的本质差异）**
-
-::: details
-
-集群高可用最大的敌人是网络分区：默认 `ignore` 策略下分区两侧继续服务，恢复后少数派数据被丢弃（镜像队列）或少数派自动停服（`pause_minority`，牺牲可用性换一致性）。
-两种队列的脑裂行为本质不同：镜像队列是「异步复制 + 人工策略」，分区时两侧可能各自继续接受写入（数据分叉），恢复后少数派数据被丢弃；仲裁队列是「共识协议内置安全」，Raft 少数派拒写、分区期间自动不可服务，恢复后数据天然收敛——这是分区场景下数据安全的根本解。
-
-:::
-
-> 📚 延伸阅读：[RabbitMQ Clustering 官方文档](https://www.rabbitmq.com/clustering.html)
 
 #### ⚠️ 常见误区
 
@@ -1316,206 +997,44 @@ RabbitMQ 高可用 = 集群保服务连续（元数据全节点共享，任一�
 
 常见误区：
 
-- ❌ “普通集群就是高可用” → 错误。普通集群只同步元数据，消息实体仅存于队列所在节点，节点宕机则该节点上的队列消息不可用，必须叠加队列复制才算高可用。
-- ❌ “仲裁队列和镜像队列可以随便混用” → 不准确。两者复制协议不同，队列类型不可原地互转，需新建队列并迁移；混用期间运维口径（分区策略、监控指标）也不统一。
-- ❌ “3 节点就能容忍任意 2 个节点挂” → 错误。仲裁队列要求多数派存活，3 节点只能容忍 1 个节点故障；容忍 f 个故障需 2f+1 个节点。
-- ❌ “镜像队列只是慢一点，数据一样安全” → 错误。异步复制下主宕机会丢未同步消息，切主可能选落后副本，与仲裁队列是不同一致性级别。
-- ❌ “新项目可以继续用镜像队列，成熟稳定” → 过时。镜像队列 3.8 起弃维、4.0 已移除，新项目应直接用仲裁队列。
-- ❌ “仲裁队列性能差，不能用在线业务” → 不准确。多数派确认带来的是吞吐下降（经验值 30%~50%）与延迟上升，对绝大多数在线业务仍可接受；仅极低延迟场景才需权衡。
+- ❌ "普通集群会自动把所有消息复制到每个节点" → 集群元数据与队列副本是两层；复制范围由队列类型和实际副本配置决定。
+- ❌ "有 LB 就不需要客户端恢复，切主完全无感" → 现有连接可能断开、在途结果可能未知，仍需恢复 Channel、消费者并幂等重试。
+- ❌ "3 节点能容忍任意 2 节点故障，Quorum 确认后绝不丢失" → 3 副本需 2 个构成多数派；协议安全保证有故障模型前提，不覆盖误删和多数数据副本永久损毁。
+- ❌ "镜像只等主确认、3.8 已弃用，现在仍可作为低延迟首选" → 旧镜像 Confirm 涉及镜像接受与持久化条件；3.8 是 Quorum 引入版本，镜像在 2021 年弃用并于 4.0 移除。
+- ❌ "联邦也属于同一个集群，所以必须共用 Cookie" → Federation/Shovel 连接独立 Broker 或集群，使用 AMQP 认证，不要求节点 Cookie 相同。
+- ❌ "改 Policy 或导出定义就完成镜像到 Quorum 的消息迁移" → 类型不能原地转换，定义不含消息体，必须设计实际搬运、切流、去重和校验。
 
 :::
 
 #### 🔀 发散问题
 
-1. 跨机房高可用怎么做？
-   同城多机房可用仲裁队列（容忍毫秒级跨机房延迟）；异地则依赖 Federation/Shovel 插件异步转发，接受最终一致。见本文档『RabbitMQ 有哪些集群模式？』。
-2. 客户端连接高可用怎么保证？
-   通过 LB/DNS 提供统一入口，客户端配置多节点地址列表自动故障转移；注意客户端应监听连接断开事件重建 Channel，而不是无限重试旧连接。
-3. 镜像队列主从切换为什么会丢消息？
-   异步复制下未同步消息随主节点丢失，新主可能选到落后副本；仲裁队列多数派落盘确认后才返回，从机制上消除该窗口。详见上文「镜像队列 vs 仲裁队列核心对比」。
-4. 存量镜像队列如何迁移到仲裁队列？
-   无法原地转换：需新建仲裁队列、双写或停写搬运存量、切换消费者后再下线旧队列；可利用管理插件的队列导入导出辅助。
-5. 仲裁队列的节点数要求？
-   需要多数派存活：3 副本容忍 1 节点故障，5 副本容忍 2 节点故障；副本数在声明时通过 `x-quorum-queue` 相关参数与集群规模决定。
+- **Q：普通集群相比单节点还有什么价值？**
 
-### 【简单】RabbitMQ 中如何创建一个镜像队列？⭐⭐
+  → 可以分散连接入口，把不同队列放到不同节点并统一元数据管理，非本地队列访问则需跨节点转发。它扩展的是整体资源与接入，不会自动消除某个单副本队列的故障点。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：RabbitMQ / 集群与高可用
+- **Q：镜像与 Quorum 可以同时存在吗？**
 
-#### 💎 关键结论
+  → 在仍支持镜像的旧版本中，可以有不同类型的队列并存，但同一个队列不能同时采用两套复制机制。迁移期需区分同步状态、确认语义和运维指标，4.0 以后则不能再保留经典镜像功能。
 
-镜像队列不需要单独“创建”，而是通过 Policy 为匹配的队列自动开启主从复制：策略三要素是名称、队列名正则、`ha-mode` 定义。前提是先组成集群；新项目建议直接用仲裁队列（3.8+ 官方推荐，镜像队列已在 4.0 移除）。
+- **Q：Federation 和 Shovel 怎么选？**
 
-#### ⚡记忆卡片
+  → 多级订阅式拓扑优先评估 Federation，指定源和目的的消息搬运可选 Shovel。两者都要考虑重连、转发确认、源端保留和幂等，不是队列的同步副本替代品。
 
-- **口诀**：策略三要素：名称、正则、ha-mode；exactly=2 最常用
-- **关键词**：Policy ／ ha-mode ／ ha-params ／ rabbitmqctl set_policy ／ 集群前提
-- **链路**：创建集群 → 定义 Policy（正则匹配队列）→ 匹配队列自动建镜像 → 主从同步服务
+- **Q：跨机房高可用只要增加副本吗？**
 
-#### 📖 核心知识
-
-镜像队列是通过**策略**为普通队列开启主从复制，实现高可用。它基于 RabbitMQ 集群环境。
-
-**策略三要素：**
-
-- **名称**：策略标识。
-- **模式**：匹配队列名的正则表达式（如 `^important\.` 匹配重要队列）。
-- **定义**：核心设置 `ha-mode`。
-  - `all`：镜像到所有节点（开销大）。
-  - `exactly`：**推荐**。指定副本数（如 `2`，即 1 主 1 从）。
-
-**配置方式：**
-
-- **管理界面**：在 `Admin` -> `Policies` 中添加。
-- **命令行**：使用 `rabbitmqctl set_policy` 命令。
-
-::: details 案例：为重要队列创建 2 个副本（生产环境常用）
-
-```bash
-# 为重要队列创建 2 个副本
-rabbitmqctl set_policy ha-important "^important\." '{"ha-mode":"exactly", "ha-params":2}'
-```
-
-:::
-
-**注意事项**
-
-- **集群是前提**：单节点无效。
-- **性能开销**：同步复制有开销，**只镜像关键队列**。
-- **队列命名**：用前缀（如 `critical.`）区分重要队列，便于策略匹配。
-
-**一句话总结：通过创建策略，为匹配的队列自动开启主从复制，实现高可用。**
-
-> ⚠️ 版本事实：镜像队列自 3.8 起不再推荐，官方推荐仲裁队列（Quorum Queue）；4.0 已移除镜像队列，存量系统应规划迁移。
-
-#### 🔀 发散问题
-
-1. 新业务还要不要用镜像队列？
-   不要。新项目直接用仲裁队列，声明 `x-queue-type=quorum` 即可，无需任何 Policy；镜像队列仅存在于需兼容旧版本的存量系统中。
-2. ha-mode=exactly 的副本分布在哪些节点？
-   由 Broker 自动选择（可通过 ha-promote-on-shutdown 等参数影响行为），没有显式指定节点的能力；需要指定节点用 `ha-mode=nodes`。
-
-### 【中等】RabbitMQ 有哪些集群模式？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 集群与高可用
-
-#### 💎 关键结论
-
-RabbitMQ 有四种集群模式：普通集群（只同步元数据）、镜像队列集群（消息全量冗余，已弃维）、联邦集群（跨地域异步转发）、分片集群（队列水平拆分）。所有模式都依赖 Erlang Cookie 一致来完成节点认证。
-
-#### ⚡记忆卡片
-
-- **口诀**：普通同步元数据，镜像冗余保可用，联邦跨域、分片扩容
-- **关键词**：普通集群 ／ 镜像队列 ／ Federation ／ Sharding ／ Erlang Cookie
-- **链路**：节点 Cookie 一致加入集群 → 按需求叠加镜像/联邦/分片能力 → 分别解决高可用/跨地域/容量三类问题
-
-#### 📖 核心知识
-
-RabbitMQ 有以下集群模式：
-
-- 普通集群
-- 镜像队列集群（高可用模式）
-- 联邦集群
-- 分片集群
-
-所有集群模式均依赖 **Erlang Cookie** 实现节点间认证，需确保一致。
-
-**普通集群**
-
-- **核心特点**
-  - 元数据（队列、交换机等）**全节点同步**
-  - **消息实体仅存于创建队列的节点**（其他节点通过指针访问）
-- **优点**
-  - 节省存储（消息不冗余）
-  - 横向扩展方便
-- **缺点**
-  - **单点故障风险**：若某节点宕机，其上的队列消息不可用
-  - 跨节点访问消息需网络传输
-
-**镜像队列集群（高可用模式）**
-
-- **核心特点**
-  - 队列**跨节点镜像复制**（消息实体全节点冗余）
-  - 通过策略（Policy）定义镜像规则（如 `ha-mode=all` 表示全节点复制）
-- **优点**
-  - **高可用**：任一节点宕机，其他节点可继续服务
-  - 自动故障转移（消费者无感知）
-- **缺点**
-  - **存储开销大**（消息全量复制）
-  - 写入性能略低（需同步所有副本）
-
-**联邦集群（Federation）**
-
-- **核心特点**
-  - **跨机房/地域**部署，消息按需异步转发
-  - 基于插件（`rabbitmq_federation`）实现
-- **适用场景**
-  - 异地容灾
-  - 多区域消息同步
-
-**分片集群（Sharding）**
-
-- **核心特点**
-  - 通过插件（`rabbitmq_sharding`）将队列**水平拆分**到不同节点
-  - 生产者自动路由到对应分片
-- **适用场景**
-  - 超大规模队列（减轻单节点压力）
-
-**方案对比**
-
-| **模式** | **数据冗余** | **高可用** | **跨地域** | **适用场景**             |
-| -------- | ------------ | ---------- | ---------- | ------------------------ |
-| 普通集群 | 无           | ❌         | ❌         | 开发测试、低重要性数据   |
-| 镜像队列 | 全量复制     | ✔️         | ❌         | 生产环境（如订单、支付） |
-| 联邦集群 | 按需同步     | ✔️         | ✔️         | 异地多活                 |
-| 分片集群 | 无           | ❌         | ❌         | 超大规模队列             |
-
-**选择建议**
-
-- **生产环境**：优先使用 **镜像队列集群**（需权衡性能与冗余）
-- **异地容灾**：结合 **联邦集群** + 镜像队列
-- **海量数据**：考虑 **分片集群**（但需业务适配）
-
-#### 🔬 扩展知识
-
-**【L3】仲裁队列对「镜像队列集群」的替代**
-
-::: details
-
-上表「生产环境选镜像队列」的结论需随版本更新：3.8+ 官方推荐仲裁队列作为高可用队列方案，4.0 已移除镜像队列。现代生产集群的推荐组合是：普通集群 + 仲裁队列（代替镜像）+ 按需联邦，实现强一致高可用。
-
-:::
-
-**【L4】Federation 与 Shovel 的分工**
-
-::: details
-
-两者都做跨集群转发：Federation 面向交换机/队列级的订阅式转发，支持多级拓扑与断点续传，适合异地多活；Shovel 更底层、配置更简单，适合点对点搬运消息。选型口诀：订阅转发用 Federation，管道搬运用 Shovel。
-
-:::
-
-> 📚 延伸阅读：[RabbitMQ Federation 官方文档](https://www.rabbitmq.com/federation.html)
-
-#### 🔀 发散问题
-
-1. 普通集群相比单节点的价值是什么？
-   主要是接入高可用与连接/吞吐的水平扩展：客户端可接任一节点，节点故障不丢元数据；但消息本身不冗余，不能承诺数据不丢。
-2. 分片插件的代价是什么？
-   分片后单队列语义被打破，顺序性、全局积压监控都需按分片重新设计，适合无顺序要求的大吞吐场景；有顺序要求的业务应按业务键手动分队列。
-3. 普通集群为什么还不算真正的高可用？
-   普通集群只同步元数据、消息实体不冗余，节点宕机则该节点上的队列消息不可用；要实现消息层面的高可用必须叠加队列复制（3.8 前用镜像队列、3.8+ 推荐仲裁队列），详见本文档『RabbitMQ 如何实现高可用？』。
+  → 不够，还需验证副本故障域、网络往返、入口健康与客户端恢复；异地独立集群的转发又有自己的 RPO。持久化与发布/消费确认的配合见本文档『RabbitMQ 如何确认消息并处理未确认投递？』。
 
 ## RabbitMQ 可靠传输
 
-### 【中等】RabbitMQ 如何实现背压机制？⭐⭐
+### 【中等】RabbitMQ 如何实现背压机制？⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 流量控制
+> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 流量控制
 
 #### 💎 关键结论
 
 RabbitMQ 的背压是一条连锁反应链：**消费者 QoS 限流 → Broker 队列积压 → 资源水位触发阻塞生产者连接**，把消费端的压力反向传导到生产端。它让系统吞吐由最慢的消费者决定，而非最快的生产者。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：QoS 起步，积压传导，水位阻塞生产者
 - **关键词**：prefetch ／ unacked ／ 队列积压 ／ vm_memory_high_watermark ／ connection.blocked
@@ -1563,6 +1082,19 @@ RabbitMQ 通过一套**连锁反应机制**实现背压，将消费者的处理�
 
 :::
 
+**【L3】完整的四层背压体系**
+
+::: details
+
+正文的连锁反应是主干，完整的背压其实分四层：
+
+1. **消费者侧 `prefetch_count`（最主要手段）**：限制单消费者未确认消息数，从源头限制推送速率。
+2. **节点资源水位阻塞生产者**：内存超过 `vm_memory_high_watermark`（默认为物理内存的 0.4）或磁盘低于 `disk_free_limit` 时，Broker 向所有发布连接发送 `connection.blocked` 并阻塞发布。**这是异步通知，客户端必须注册 BlockedListener/回调处理**，否则生产者线程会卡在 socket 写缓冲上「莫名卡死」且无任何报错，这是生产上最难排查的背压症状。
+3. **Credit Flow（Erlang 进程间信用流控）**：队列进程积压时停止向 Channel 进程发放 credit，Channel 进而反压到 Connection 进程，逐跳限速而不依赖全局水位。
+4. **队列级上限与溢出策略**：`x-max-length` / `x-max-length-bytes` 配合 `x-overflow`（`drop-head` / `reject-publish` / `reject-publish-dlx`）在入队口拒收或淘汰，把背压提前到单个队列粒度，避免拖垮整个节点。
+
+:::
+
 **【L4】与响应式流背压的对比**
 
 ::: details
@@ -1572,6 +1104,14 @@ RabbitMQ 背压是资源水位驱动的「硬背压」（直接阻塞连接）�
 :::
 
 > 📚 延伸阅读：[RabbitMQ Flow Control 官方文档](https://www.rabbitmq.com/flow-control.html)
+
+#### 🏭 实战场景
+
+::: details
+
+推演案例（数字为示意值，非官方基准或实测数据）：订单系统的事件生产者在大促期间发送速率达到 10000 msg/s，而下游消费者（负责写库和发通知）单实例处理能力仅约 700 msg/s，3 个消费者实例合计 2100 msg/s，产消速率差导致队列深度从 0 开始以每秒约 8000 条的速度增长，4 小时内积压到约 1.15 亿条消息，RabbitMQ 节点内存从 2GB 飙升至 8GB 触发 alarm 阈值，所有生产者连接被阻塞（connection.blocked），整个消息系统瘫痪。排查发现队列未配置任何深度限制，且消费者未设置 prefetch_count，单个消费者内存中堆积了数十万条未确认消息。修复措施：为关键队列设置 `max-length-bytes=2GB` 并配合 `overflow=reject-publish`，超出限制时消息直接拒绝并返回生产者 nack，防止无限积压；消费者从 3 个实例扩容至 12 个实例，每个消费者设置 `prefetch_count=100` 防止单消费者内存溢出；同时在生产者侧增加限流，将发送速率限制在消费者可承受的 8000 msg/s 以内，形成完整的背压传导链。
+
+:::
 
 #### 🔀 发散问题
 
@@ -1590,7 +1130,7 @@ RabbitMQ 背压是资源水位驱动的「硬背压」（直接阻塞连接）�
 
 选 Erlang 是因为它为电信级系统设计：轻量进程 + Actor 模型 + OTP 容错，与消息中间件「高并发、高可靠」的需求天然匹配。代价是语言小众、二开与运维门槛高，且不适合海量堆积场景。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：轻量进程百万级，OTP 自愈 let it crash，性能强但生态小
 - **关键词**：Erlang ／ 轻量进程 ／ Actor ／ OTP ／ 热升级 ／ 堆积弱
@@ -1602,20 +1142,20 @@ RabbitMQ 使用 **Erlang** 语言开发，这是一个由爱立信为电信系�
 
 **Erlang 的核心特性**
 
-| 特性           | 说明                                                     | 对 RabbitMQ 的影响                               |
-| :------------- | :------------------------------------------------------- | :----------------------------------------------- |
-| **轻量级进程** | Erlang 的进程极其轻量（约 2KB 栈），单机可创建百万级进程 | RabbitMQ 可为每个连接/信道创建独立进程，隔离性好 |
-| **Actor 模型** | 进程间通过消息传递通信，无共享内存                       | 天然适合消息队列的并发模型                       |
-| **OTP 框架**   | 提供 Supervisor 树、GenServer 等成熟模式                 | RabbitMQ 具备强大的容错和自愈能力                |
-| **抢占式调度** | Erlang VM 的调度器公平分配 CPU 时间                      | 单个慢请求不会阻塞其他请求                       |
-| **热代码升级** | 支持运行时替换代码                                       | RabbitMQ 可不停机升级                            |
+| 特性           | 说明                                                        | 对 RabbitMQ 的影响                               |
+| :------------- | :---------------------------------------------------------- | :----------------------------------------------- |
+| **轻量级进程** | Erlang 的进程极其轻量（约 2KB 栈），单机可创建百万级进程    | RabbitMQ 可为每个连接/信道创建独立进程，隔离性好 |
+| **Actor 模型** | 进程间通过消息传递通信，无共享内存                          | 天然适合消息队列的并发模型                       |
+| **OTP 框架**   | 提供 Supervisor 树、GenServer 等成熟模式                    | RabbitMQ 具备强大的容错和自愈能力                |
+| **抢占式调度** | 调度器按 reduction 计数（每进程约 2000 reductions）强制切换 | 单个慢请求不会阻塞其他请求                       |
+| **热代码升级** | 支持运行时替换代码                                          | RabbitMQ 可不停机升级                            |
 
 **优势**
 
-1. **高并发**：Erlang 的轻量级进程使得 RabbitMQ 在单机上能支持**数万并发连接**，延迟稳定在微秒级。
+1. **高并发**：Erlang 的轻量级进程使得 RabbitMQ 在单机上能支持**数万并发连接**，且延迟低而稳定。
 2. **高可用与容错**：OTP 的 Supervisor 树实现“let it crash”哲学，进程崩溃后自动重启，系统自愈能力强。
 3. **分布式原生支持**：Erlang 内置分布式通信机制，RabbitMQ 集群节点间通信天然高效。
-4. **低延迟**：Erlang 的调度和消息传递机制使得 RabbitMQ 的消息延迟可达**微秒级**，是主流 MQ 中延迟最低的。
+4. **低延迟**：局域网、小消息场景下消息延迟常见为亚毫秒级，相对以吞吐见长的 Kafka/RocketMQ，RabbitMQ 的差异化优势在低延迟与灵活路由（定性对比，非官方基准）。
 
 **劣势**
 
@@ -1634,6 +1174,8 @@ RabbitMQ 使用 **Erlang** 语言开发，这是一个由爱立信为电信系�
 | **吞吐量**   | 万级                   | **百万级**（最高） | 十万级           |
 | **堆积能力** | 弱（万级为佳）         | **极强**（亿级）   | 强（亿级）       |
 | **二次开发** | 困难（Erlang）         | 容易（Java/Scala） | **容易**（Java） |
+
+> 表中延迟/吞吐/堆积的数量级为常见量级示意，非官方基准数据；实际表现取决于消息大小、持久化配置、硬件与网络。Kafka 高吞吐的根因是顺序写 + page cache + 零拷贝（消费走 `sendfile`，写入是普通 `write` 到 page cache），并非 mmap 写消息。
 
 #### 🔬 扩展知识
 
@@ -1660,15 +1202,15 @@ Erlang 采用**每进程独立的小堆 + 分代 GC**：垃圾回收只停顿单
 2. 用 Java 重写一个 RabbitMQ 可行吗？
    技术上可行（如 Apache Qpid），但要重新解决海量连接的线程模型、全局 GC 停顿与容错框架问题，这正是 Erlang/OTP 数十年沉淀的护城河。
 
-### 【中等】RabbitMQ 的 prefetch_count 有什么作用？如何设置？⭐⭐
+### 【中等】RabbitMQ 的 prefetch_count 有什么作用？如何设置？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：RabbitMQ / 流量控制
 
 #### 💎 关键结论
 
-prefetch_count 是消费者限流的核心参数：**限制单个消费者未确认消息的最大数量**，达到上限后 Broker 停止推送。设置原则：消费快设大（50~~100）、消费慢设小（1~~10），必须配合手动 ACK 才生效。
+prefetch_count 是消费者限流的核心参数：**限制单个消费者未确认消息的最大数量**，达到上限后 Broker 停止推送。设置原则：消费快设大（50~100）、消费慢设小（1~10），必须配合手动 ACK 才生效。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：预取限未确认，达上限停推，ACK 一条补一条
 - **关键词**：basicQos ／ prefetchCount ／ unacked ／ 手动 ACK ／ 公平分发
@@ -1769,7 +1311,7 @@ prefetch=0 表示不设限，Broker 会尽可能多推（受内存与调度约�
 
 RabbitMQ 用 `rabbitmq-plugins` 工具管理插件，通过 Erlang 的 OTP 应用机制实现不停机扩展。面试重点记住五个高频插件：management（控制台）、federation（跨域）、shovel（搬运）、delayed_message_exchange（延迟）、auth_backend_ldap（认证）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：rabbitmq-plugins enable 启用，五大插件：管理/联邦/铲子/延迟/LDAP
 - **关键词**：rabbitmq-plugins ／ rabbitmq_management ／ rabbitmq_federation ／ rabbitmq_shovel ／ delayed_message_exchange ／ LDAP
@@ -1798,6 +1340,9 @@ rabbitmq-plugins disable <插件名>
 - `rabbitmq_shovel`：用于桥接不同 RabbitMQ 节点，实现消息转发。
 - `rabbitmq_delayed_message_exchange`：支持延迟消息，可在指定时间后投递消息。
 - `rabbitmq_auth_backend_ldap`：允许 RabbitMQ 通过 LDAP（轻量级目录访问协议）进行用户认证。
+- `rabbitmq_prometheus`：导出 Prometheus 监控指标，3.8+ 内置，替代旧的社区版 rabbitmq-exporter。
+- `rabbitmq_stomp` / `rabbitmq_mqtt` / `rabbitmq_web_stomp`：协议适配插件，让浏览器、IoT 设备等非 AMQP 客户端接入。
+- `rabbitmq_peer_discovery_k8s` / `_consul` / `_etcd`：集群节点自动发现，K8s 等动态环境下免手工维护节点列表。
 
 #### 🔬 扩展知识
 
@@ -1806,6 +1351,8 @@ rabbitmq-plugins disable <插件名>
 ::: details
 
 RabbitMQ 本身是 Erlang/OTP 应用，插件也是 OTP 应用，enable 即启动对应应用及其依赖；部分插件（如 management）需要监听额外端口（默认 15672），部署时需同步放通防火墙。可用 `rabbitmq-plugins list` 查看全部可用插件及启用状态。
+
+**安全边界**：management 的 15672 端口直接暴露公网是重大安全隐患（暴露的 Broker 曾多次成为扫描与勒索目标）；默认账号 guest/guest 出于安全设计只允许从 localhost 登录，远程管理必须创建专用账号并限制来源网络，或仅经内网/VPN 访问。
 
 :::
 
@@ -1820,7 +1367,7 @@ RabbitMQ 本身是 Erlang/OTP 应用，插件也是 OTP 应用，enable 即启�
 #### 🔀 发散问题
 
 1. federation 和 shovel 插件怎么选？
-   订阅式、多级、需断点续传的跨集群转发用 federation；简单的点对点消息搬运用 shovel。见本文档『RabbitMQ 有哪些集群模式？』。
+   订阅式、多级、需断点续传的跨集群转发用 federation；简单的点对点消息搬运用 shovel。见本文档『RabbitMQ 集群与队列高可用如何设计和配置？』。
 2. 延迟消息插件生产能用吗？
    能，但大量延迟消息会占用内存/磁盘，需评估延迟消息存量；金融级精确场景也可用 TTL+DLX 多队列方案对比选型。见《MQ面试》『MQ 如何实现延迟消息？』。
 

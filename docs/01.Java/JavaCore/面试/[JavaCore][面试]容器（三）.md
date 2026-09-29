@@ -18,15 +18,15 @@ permalink: /pages/ed0f8b4b/
 
 ## Stream API
 
-### 【中等】Stream API 的中间操作和终端操作有什么区别？⭐⭐⭐
+### 【困难】Stream API 的中间操作和终端操作有什么区别？⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Stream API / 执行模型
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Stream API / 执行模型
 
 #### 💎 关键结论
 
 Stream 操作分两类：**中间操作**惰性求值、返回 Stream，只记录流水线不执行；**终端操作**才触发实际执行并返回结果。没有终端操作，中间操作永远不执行。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：中间惰性可链式，终端触发才出结果
 - **关键词**：惰性求值 ／ 流水线 ／ 短路
@@ -36,38 +36,38 @@ Stream 操作分两类：**中间操作**惰性求值、返回 Stream，只记�
 
 1. **两类操作定义**：Stream 操作分为**中间操作**（返回 Stream，可链式）和**终端操作**（触发执行，返回结果）。
 
-| **维度** | **中间操作** | **终端操作** |
-| -------- | ------------ | ------------ |
-| **返回类型** | `Stream<T>` | 非 Stream（值/集合/void） |
-| **执行时机** | 惰性（不触发执行） | 立即触发整个流水线 |
-| **链式调用** | 可继续接操作 | 流终止，不可再操作 |
-| **短路** | 部分支持（如 `limit`） | 部分支持（如 `findFirst`） |
+| **维度**     | **中间操作**           | **终端操作**               |
+| ------------ | ---------------------- | -------------------------- |
+| **返回类型** | `Stream<T>`            | 非 Stream（值/集合/void）  |
+| **执行时机** | 惰性（不触发执行）     | 立即触发整个流水线         |
+| **链式调用** | 可继续接操作           | 流终止，不可再操作         |
+| **短路**     | 部分支持（如 `limit`） | 部分支持（如 `findFirst`） |
 
 2. **常见中间操作**：
 
-| **操作** | **说明** | **示例** |
-| -------- | -------- | -------- |
-| `filter` | 过滤 | `.filter(s -> s.length() > 3)` |
-| `map` | 转换 | `.map(String::toUpperCase)` |
-| `flatMap` | 扁平化 | `.flatMap(list -> list.stream())` |
-| `distinct` | 去重 | `.distinct()` |
-| `sorted` | 排序 | `.sorted(Comparator.reverseOrder())` |
-| `limit` | 取前 N 个 | `.limit(10)` |
-| `skip` | 跳过前 N 个 | `.skip(5)` |
-| `peek` | 查看（调试用） | `.peek(System.out::println)` |
+| **操作**   | **说明**       | **示例**                             |
+| ---------- | -------------- | ------------------------------------ |
+| `filter`   | 过滤           | `.filter(s -> s.length() > 3)`       |
+| `map`      | 转换           | `.map(String::toUpperCase)`          |
+| `flatMap`  | 扁平化         | `.flatMap(list -> list.stream())`    |
+| `distinct` | 去重           | `.distinct()`                        |
+| `sorted`   | 排序           | `.sorted(Comparator.reverseOrder())` |
+| `limit`    | 取前 N 个      | `.limit(10)`                         |
+| `skip`     | 跳过前 N 个    | `.skip(5)`                           |
+| `peek`     | 查看（调试用） | `.peek(System.out::println)`         |
 
 3. **常见终端操作**：
 
-| **操作** | **说明** | **示例** |
-| -------- | -------- | -------- |
-| `collect` | 收集为集合 | `.collect(Collectors.toList())` |
-| `forEach` | 遍历 | `.forEach(System.out::println)` |
-| `reduce` | 归约 | `.reduce(0, Integer::sum)` |
-| `count` | 计数 | `.count()` |
-| `min`/`max` | 最值 | `.max(Comparator.naturalOrder())` |
-| `anyMatch`/`allMatch`/`noneMatch` | 匹配 | `.anyMatch(s -> s.startsWith("a"))` |
-| `findFirst`/`findAny` | 查找 | `.findFirst()` |
-| `toArray` | 转数组 | `.toArray(String[]::new)` |
+| **操作**                          | **说明**   | **示例**                            |
+| --------------------------------- | ---------- | ----------------------------------- |
+| `collect`                         | 收集为集合 | `.collect(Collectors.toList())`     |
+| `forEach`                         | 遍历       | `.forEach(System.out::println)`     |
+| `reduce`                          | 归约       | `.reduce(0, Integer::sum)`          |
+| `count`                           | 计数       | `.count()`                          |
+| `min`/`max`                       | 最值       | `.max(Comparator.naturalOrder())`   |
+| `anyMatch`/`allMatch`/`noneMatch` | 匹配       | `.anyMatch(s -> s.startsWith("a"))` |
+| `findFirst`/`findAny`             | 查找       | `.findFirst()`                      |
+| `toArray`                         | 转数组     | `.toArray(String[]::new)`           |
 
 4. **惰性求值示例**：
 
@@ -92,8 +92,13 @@ stream.forEach(System.out::println);  // 此刻才执行全部流水线
 
 #### 🔀 发散问题
 
-- **Q：同一个 Stream 能调用两次终端操作吗？** → 不能，会抛 `IllegalStateException`。流是一次性的，被终端操作消费后不可复用，需重新 `collection.stream()` 生成新流。
-- **Q：peek 一定会执行吗？** → 不保证。`peek` 是调试用中间操作，没有终端操作触发时不执行，且官方文档说明某些情况下可能被实现优化掉，不要用它承载业务逻辑。
+- **Q：同一个 Stream 能调用两次终端操作吗？**
+
+  → 不能，会抛 `IllegalStateException`。流是一次性的，被终端操作消费后不可复用，需重新 `collection.stream()` 生成新流。
+
+- **Q：peek 一定会执行吗？**
+
+  → 不保证。`peek` 是调试用中间操作，没有终端操作触发时不执行，且官方文档说明某些情况下可能被实现优化掉，不要用它承载业务逻辑。
 
 ### 【中等】什么是短路操作？⭐⭐
 
@@ -103,7 +108,7 @@ stream.forEach(System.out::println);  // 此刻才执行全部流水线
 
 短路操作无需处理所有元素即可返回结果，一旦条件命中就立即终止流水线，显著降低遍历成本。典型代表是 `findFirst` / `anyMatch` / `limit`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：find 遇一即停，any/all/none 见微知著，limit 到数就停
 - **关键词**：短路 ／ find ／ match
@@ -117,13 +122,13 @@ stream.forEach(System.out::println);  // 此刻才执行全部流水线
    - `skip(n)` 虽不短路，但配合 `limit` 可实现“分页”。
 3. **短路终端操作**：
 
-| **操作** | **短路条件** |
-| -------- | ------------ |
-| `findFirst()` | 找到第一个即停止 |
-| `findAny()` | 找到任一个即停止（并行流更快） |
-| `anyMatch()` | 遇到 true 即停止，返回 true |
-| `allMatch()` | 遇到 false 即停止，返回 false |
-| `noneMatch()` | 遇到 true 即停止，返回 false |
+| **操作**      | **短路条件**                   |
+| ------------- | ------------------------------ |
+| `findFirst()` | 找到第一个即停止               |
+| `findAny()`   | 找到任一个即停止（并行流更快） |
+| `anyMatch()`  | 遇到 true 即停止，返回 true    |
+| `allMatch()`  | 遇到 false 即停止，返回 false  |
+| `noneMatch()` | 遇到 true 即停止，返回 false   |
 
 4. **示例**：
 
@@ -141,18 +146,23 @@ boolean hasLong = list.stream()
 
 #### 🔀 发散问题
 
-- **Q：findFirst 和 findAny 有什么区别？** → 串行流下结果一致；并行流中 `findAny` 可率先返回任一分区结果，通常更快；不关心顺序时应优先用 `findAny`。
-- **Q：limit 能截断无限流吗？** → 可以。`Stream.iterate` / `generate` 产生的无限流必须搭配 `limit(n)` 使用，取够 n 个即截断，这是短路机制的经典用法。
+- **Q：findFirst 和 findAny 有什么区别？**
 
-### 【中等】并行流（Parallel Stream）的原理和注意事项？⭐⭐⭐
+  → 串行流下结果一致；并行流中 `findAny` 可率先返回任一分区结果，通常更快；不关心顺序时应优先用 `findAny`。
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Stream API / 并行流
+- **Q：limit 能截断无限流吗？**
+
+  → 可以。`Stream.iterate` / `generate` 产生的无限流必须搭配 `limit(n)` 使用，取够 n 个即截断，这是短路机制的经典用法。
+
+### 【困难】并行流（Parallel Stream）的原理和注意事项？⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Stream API / 并行流
 
 #### 💎 关键结论
 
 并行流基于 `ForkJoinPool.commonPool()` 分治拆分数据并行计算，适合**数据量大、纯计算、无共享可变状态**的场景；小数据、阻塞操作、有副作用时使用反而更慢甚至出错。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：大数据、纯计算、无共享才并行；小数据、阻塞、副作用勿用
 - **关键词**：ForkJoinPool ／ 分治 ／ commonPool
@@ -182,12 +192,12 @@ stream.sequential();
 
 3. **适用场景**：
 
-| **适合并行** | **不适合并行** |
-| ------------ | -------------- |
-| 数据量大（>1万） | 数据量小 |
-| 元素处理耗时 | 元素处理简单 |
-| 无顺序要求 | 严格顺序要求 |
-| 无共享可变状态 | 有副作用（修改共享变量） |
+| **适合并行**            | **不适合并行**             |
+| ----------------------- | -------------------------- |
+| 数据量大（>1万）        | 数据量小                   |
+| 元素处理耗时            | 元素处理简单               |
+| 无顺序要求              | 严格顺序要求               |
+| 无共享可变状态          | 有副作用（修改共享变量）   |
 | 源支持分割（ArrayList） | 源不支持分割（LinkedList） |
 
 4. **常见陷阱**：
@@ -221,6 +231,18 @@ long count = IntStream.range(0, 10_000_000)
     .count();  // 并行更快
 ```
 
+::: details
+
+**并行方案对比：**
+
+| 方案                             | 适用数据量               | CPU 密集 / IO 密集       | 线程池控制                                        | 副作用风险                          | 性能特征                                                    |
+| -------------------------------- | ------------------------ | ------------------------ | ------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------- |
+| 串行 Stream                      | 小数据（< 数千元素）     | 均适用                   | 单线程，无调度开销                                | 低（单线程无竞态）                  | 小数据更快（无拆分/合并/线程切换开销）                      |
+| 并行 Stream（commonPool）        | 大数据（> 1 万）+ 纯计算 | 仅适合 CPU 密集型        | 共享 commonPool（默认 CPU 核数 -1），不可单独配置 | 中（lambda 捕获共享可变状态易竞态） | 大数据纯计算加速比 2~5 倍；含阻塞操作会饿死 commonPool      |
+| CompletableFuture + 自定义线程池 | 任意规模（可精细拆分）   | CPU 密集和 IO 密集均适用 | 完全控制线程池大小、队列策略                      | 低~中（显式编排，副作用更易追踪）   | IO 密集型可配大线程池避免阻塞饥饿；编排灵活但代码复杂度更高 |
+
+:::
+
 #### 🔬 扩展知识
 
 ::: details
@@ -228,6 +250,7 @@ long count = IntStream.range(0, 10_000_000)
 - 【L3】线程数控制：commonPool 并行度默认为 `Runtime.getRuntime().availableProcessors() - 1`，可用 JVM 参数 `-Djava.util.concurrent.ForkJoinPool.common.parallelism` 调整；发起调用的当前线程也会参与计算。
 - 【L3】拆分质量决定加速比：`ArrayList` 的 Spliterator 可 O(1) 均匀二分；`LinkedList`、IO 流拆分质量差；`sorted` 是有状态操作，并行下需汇聚全部数据再排序，开销显著。
 - 【L4】隔离方案：任务含阻塞调用时，可将并行流提交到自建 `ForkJoinPool` 执行（Java 8 起该行为成立），避免污染全局 commonPool；IO 密集型并发更推荐 `CompletableFuture` + 自定义线程池。
+- 【L4】容器化陷阱：commonPool 并行度取自 `availableProcessors()`。旧版 JDK（< 8u191）未感知 cgroup 配额时会读到宿主机核数，导致容器内并行流线程严重超配、上下文切换恶化；即使开启 `UseContainerSupport`，也建议结合容器 CPU limit 显式设置 `-Djava.util.concurrent.ForkJoinPool.common.parallelism`。另外 `ThreadLocal`/MDC 等线程绑定上下文（日志 traceId）跨 commonPool 线程会丢失，链路透传需显式处理。
 
 :::
 
@@ -253,10 +276,15 @@ long count = IntStream.range(0, 10_000_000)
 
 #### 🔀 发散问题
 
-- **Q：并行流中 forEach 顺序为什么不稳定？** → 各分区并行处理，遍历顺序不可预期，且共享副作用存在竞态；需要有序消费用 `forEachOrdered`，需要结果用 `collect`。
-- **Q：IO 密集型并发该用什么？** → 不适合并行流，阻塞会耗尽 commonPool；推荐 `CompletableFuture` + 自定义线程池，或 Java 21+ 的虚拟线程。
+- **Q：并行流中 forEach 顺序为什么不稳定？**
 
-### 【中等】Collectors 工具类有哪些常用方法？⭐⭐⭐
+  → 各分区并行处理，遍历顺序不可预期，且共享副作用存在竞态；需要有序消费用 `forEachOrdered`，需要结果用 `collect`。
+
+- **Q：IO 密集型并发该用什么？**
+
+  → 不适合并行流，阻塞会耗尽 commonPool；推荐 `CompletableFuture` + 自定义线程池，或 Java 21+ 的虚拟线程。
+
+### 【困难】Collectors 工具类有哪些常用方法？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Stream API / 收集器
 
@@ -264,7 +292,7 @@ long count = IntStream.range(0, 10_000_000)
 
 `Collectors` 是 Stream 的汇聚工具箱：`toList`/`toMap`/`toCollection` 转集合，`groupingBy`/`partitioningBy` 分组分区，`summingInt`/`summarizingInt` 归约统计；`toMap` 需特别注意 key 冲突与 value 为 null 的 NPE。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：to 系转集合，grouping 分组 partitioning 分区，summing 统计归约
 - **关键词**：toMap ／ groupingBy ／ partitioningBy
@@ -274,13 +302,13 @@ long count = IntStream.range(0, 10_000_000)
 
 1. **收集为集合**：`Collectors` 提供丰富的收集器，是 Stream API 的核心工具。
 
-| **收集器** | **作用** | **示例** |
-| ---------- | -------- | -------- |
-| `toList()` | 收集为 List | `.collect(Collectors.toList())` |
-| `toSet()` | 收集为 Set（去重） | `.collect(Collectors.toSet())` |
-| `toMap(k, v)` | 收集为 Map | `.collect(Collectors.toMap(User::getId, User::getName))` |
-| `toCollection()` | 收集为指定集合 | `.collect(Collectors.toCollection(LinkedList::new))` |
-| `joining()` | 拼接字符串 | `.collect(Collectors.joining(", "))` |
+| **收集器**       | **作用**           | **示例**                                                 |
+| ---------------- | ------------------ | -------------------------------------------------------- |
+| `toList()`       | 收集为 List        | `.collect(Collectors.toList())`                          |
+| `toSet()`        | 收集为 Set（去重） | `.collect(Collectors.toSet())`                           |
+| `toMap(k, v)`    | 收集为 Map         | `.collect(Collectors.toMap(User::getId, User::getName))` |
+| `toCollection()` | 收集为指定集合     | `.collect(Collectors.toCollection(LinkedList::new))`     |
+| `joining()`      | 拼接字符串         | `.collect(Collectors.joining(", "))`                     |
 
 2. **分组分区**：
 
@@ -371,8 +399,13 @@ Map<Long, String> map = users.stream()
 
 #### 🔀 发散问题
 
-- **Q：groupingBy 如何一次算出多指标？** → 下游收集器用 `Collectors.teeing`（Java 12+）或分别收集；也可用 `summarizingInt` 一次得到 count/sum/min/avg/max 摘要。
-- **Q：Stream.reduce 和 Collectors.reducing 有什么区别？** → `Stream.reduce` 是终端操作，返回累积值或 Optional；`Collectors.reducing` 是收集器，可作为 `groupingBy` 的下游，分组后逐组归约更方便。
+- **Q：groupingBy 如何一次算出多指标？**
+
+  → 下游收集器用 `Collectors.teeing`（Java 12+）或分别收集；也可用 `summarizingInt` 一次得到 count/sum/min/avg/max 摘要。
+
+- **Q：Stream.reduce 和 Collectors.reducing 有什么区别？**
+
+  → `Stream.reduce` 是终端操作，返回累积值或 Optional；`Collectors.reducing` 是收集器，可作为 `groupingBy` 的下游，分组后逐组归约更方便。
 
 ## Java 容器工具类
 
@@ -390,7 +423,7 @@ Map<Long, String> map = users.stream()
 
 `Collections` 提供 `reverse`/`shuffle`/`sort`/`swap`/`rotate` 等静态方法对 List 重排，`sort` 支持自定义 `Comparator`，均为原地修改、不产生新集合。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：reverse 反转 shuffle 乱，sort 排序 swap 换，rotate 旋转整体搬
 - **关键词**：sort ／ Comparator ／ 原地修改
@@ -409,6 +442,16 @@ void swap(List list, int i , int j)//交换两个索引位置的元素
 void rotate(List list, int distance)//旋转。当 distance 为正数时，将 list 后 distance 个元素整体移到前面。当 distance 为负数时，将 list 的前 distance 个元素整体移到后面
 ```
 
+#### 🔀 发散问题
+
+- **Q：`Collections.sort()` 底层使用什么排序算法？JDK 8 前后有什么变化？**
+
+  → 对象排序（`Collections.sort` / `List.sort`）在 JDK 7 起就统一使用改进的归并排序 **TimSort**，JDK 8 并未更换算法：TimSort 利用数据中已有序的区段（run）做归并，对部分有序数据效率高，最坏 O(n log n)，且是**稳定**排序。Dual-Pivot Quicksort（双轴快排）是 `Arrays.sort()` 对**基本类型数组**的排序算法——基本类型无相等语义、不要求稳定性，快排常数更小且原地排序省空间。网上流传的「JDK 8 起 Collections.sort 改为双轴快排」是讹传，混淆了对象排序与基本类型数组排序两条线。
+
+- **Q：对一个大规模 List 执行 `shuffle()` 后，如何验证其随机性是否均匀？生产环境中有哪些伪随机陷阱？**
+
+  → 可多次 shuffle 后统计每个元素出现在各位置的概率分布，用卡方检验判断是否均匀。生产中的陷阱包括：`java.util.Random` 的种子可预测导致结果可被推测，以及 32 位线性同余种子空间过小，高并发场景下不同线程可能产生相同序列，应改用 `ThreadLocalRandom`。
+
 ### 【简单】查找，替换操作⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Collections 工具类 / 查找替换
@@ -417,7 +460,7 @@ void rotate(List list, int distance)//旋转。当 distance 为正数时，将 l
 
 `Collections` 提供 `binarySearch`/`max`/`min`/`fill`/`frequency`/`replaceAll` 等静态方法；注意 `binarySearch` 前提是 List 已有序，否则结果不可预期。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：二分查找先有序，最值可配 Comparator，fill 全替 frequency 计数
 - **关键词**：binarySearch ／ frequency ／ replaceAll
@@ -437,6 +480,16 @@ int indexOfSubList(List list, List target)//统计 target 在 list 中第一次�
 boolean replaceAll(List list, Object oldVal, Object newVal)//用新元素替换旧元素
 ```
 
+#### 🔀 发散问题
+
+- **Q：`binarySearch` 在 List 未排序时调用会产生什么后果？是抛异常还是返回错误结果？**
+
+  → 不会抛异常，而是返回不可预期的结果——可能找到元素也可能返回错误的插入点。因为二分查找依赖有序性做折半判断，无序数据会让比较逻辑失效，所以调用前必须确保 List 已排序。
+
+- **Q：`frequency()` 内部是如何比较元素的？对于自定义对象需要注意什么？**
+
+  → `frequency()` 内部使用 `equals()` 方法逐一比较，若传入的目标对象为 null 则用特殊计数逻辑处理。对于自定义对象，必须正确重写 `equals()` 方法（通常还需配套重写 `hashCode()`），否则默认使用 `Object.equals()` 按引用比较，无法按业务语义判断相等。
+
 ### 【简单】同步控制⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：3 min ｜ 🏷 标签：Collections 工具类 / 同步控制
@@ -445,7 +498,7 @@ boolean replaceAll(List list, Object oldVal, Object newVal)//用新元素替换�
 
 `synchronizedXxx` 用互斥锁把集合包装成同步集合，粗粒度且效率低；需要线程安全时应优先选 JUC 并发集合，如 `ConcurrentHashMap`、`CopyOnWriteArrayList`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：同步包装是粗锁，效率太低不推荐；并发集合找 JUC
 - **关键词**：synchronizedXxx ／ 互斥锁 ／ JUC
@@ -466,7 +519,17 @@ synchronizedMap(Map<K,V> m) //返回由指定映射支持的同步（线程安�
 synchronizedSet(Set<T> s) //返回指定 set 支持的同步（线程安全的）set。
 ```
 
-## 集合判空
+#### 🔀 发散问题
+
+- **Q：`synchronizedList` 返回的包装类在迭代时为什么还需要手动加锁？不加锁会出现什么问题？**
+
+  → `synchronizedList` 只对单个方法加锁，迭代器操作（`iterator()` + `hasNext()` + `next()`）是多个方法组合，不在同一把锁的保护范围内。不加锁迭代时，若另一线程修改了列表，会抛出 `ConcurrentModificationException`。因此必须手动 `synchronized(list)` 包裹整个迭代块。
+
+- **Q：相比 `Collections.synchronizedMap()`，`ConcurrentHashMap` 在并发性能上有哪些具体优势？**
+
+  → `synchronizedMap` 对整个 Map 加一把全局锁，任何读写操作都互斥。`ConcurrentHashMap` 在 JDK 8 中采用 CAS + `synchronized` 锁定单个桶（Node），不同桶的读写可以并行，且读操作无需加锁（借助 `volatile` 保证可见性），并发吞吐量远高于粗锁方案。
+
+### 【简单】集合判空⭐⭐
 
 《阿里巴巴 Java 开发手册》的描述如下：
 
@@ -501,7 +564,17 @@ public boolean isEmpty() {
 }
 ```
 
-## 集合转 Map
+#### 🔀 发散问题
+
+- **Q：`ConcurrentHashMap` 的 `size()` 方法在高并发写入时返回的值是精确的吗？为什么？**
+
+  → 不是严格精确的。`size()` 内部通过 `sumCount()` 累加 `baseCount` 和 `CounterCell[]` 数组的值，累加过程中其他线程可能正在修改计数，导致返回值反映的是调用瞬间的近似值。这是用精度换取高并发性能的典型设计。
+
+- **Q：除了 `isEmpty()` 和 `size()==0`，`CollectionUtils.isEmpty()` 还额外处理了什么场景？推荐在什么场合使用？**
+
+  → Apache Commons 的 `CollectionUtils.isEmpty()` 额外处理了集合引用为 null 的情况，即 `coll == null || coll.isEmpty()`，避免 NPE。推荐在对外接口入参校验、DTO 字段判空等不确定集合是否为 null 的场景使用，代码更简洁安全。
+
+### 【中等】集合转 Map⭐⭐
 
 《阿里巴巴 Java 开发手册》的描述如下：
 
@@ -569,7 +642,7 @@ public static <T> T requireNonNull(T obj) {
 }
 ```
 
-## 集合遍历
+### 【中等】集合遍历⭐⭐
 
 《阿里巴巴 Java 开发手册》的描述如下：
 
@@ -600,7 +673,7 @@ System.out.println(list); /* [1, 3, 5, 7, 9] */
 - 使用 fail-safe 的集合类。`java.util`包下面的所有的集合类都是 fail-fast 的，而`java.util.concurrent`包下面的所有的类都是 fail-safe 的。
 - ……
 
-## 集合去重
+### 【简单】集合去重⭐⭐
 
 《阿里巴巴 Java 开发手册》的描述如下：
 
@@ -668,7 +741,17 @@ public int indexOf(Object o) {
 }
 ```
 
-## 集合转数组
+#### 🔀 发散问题
+
+- **Q：如果集合元素是自定义对象，用 `HashSet` 去重时需要重写哪些方法？漏写其中一个会怎样？**
+
+  → 必须同时重写 `hashCode()` 和 `equals()`。`HashSet` 先用 `hashCode()` 定位桶位置，再用 `equals()` 判断是否重复。若只重写 `equals()` 而漏写 `hashCode()`，两个逻辑相等的对象可能散列到不同桶，导致去重失败。
+
+- **Q：需要保持插入顺序的去重场景，应该用什么集合？`LinkedHashSet` 的性能与 `HashSet` 有何差异？**
+
+  → 应使用 `LinkedHashSet`，它在 `HashSet` 基础上用双向链表维护插入顺序。性能上，`LinkedHashSet` 的插入和查找仍为 O(1)，但因维护链表指针，常数开销略高于 `HashSet`，内存占用也稍大；在不需要有序性的场景应优先用 `HashSet`。
+
+### 【简单】集合转数组⭐⭐
 
 《阿里巴巴 Java 开发手册》的描述如下：
 
@@ -688,7 +771,17 @@ s=list.toArray(new String[0]);
 
 由于 JVM 优化，`new String[0]`作为`Collection.toArray()`方法的参数现在使用更好，`new String[0]`就是起一个模板的作用，指定了返回数组的类型，0 是为了节省空间，因为它只是为了说明返回的类型。详见：https://shipilev.net/blog/2016/arrays-wisdom-ancients/
 
-## 使用 Arrays.asList 有什么注意点？
+#### 🔀 发散问题
+
+- **Q：如果传入的数组长度小于集合大小，`toArray(T[])` 内部会如何处理？是截断还是扩容？**
+
+  → 不会截断，而是通过 `Arrays.copyOf` 创建一个与集合大小相同的新数组并填充返回。传入的数组仅用于指定返回类型模板，长度不足时内部自动扩容，长度足够时则直接使用该数组（多余位置填 null）。
+
+- **Q：`Arrays.asList()` 返回的 List 为什么不能 `add/remove`？它底层用的是什么数组？**
+
+  → `Arrays.asList()` 返回的是 `java.util.Arrays.ArrayList`（内部私有静态类），它直接包装了原始数组引用，没有实现 `AbstractList` 的 `add/remove`，仅继承了抛出 `UnsupportedOperationException` 的默认实现。它底层就是传入的原数组，因此也不支持改变大小的操作。
+
+### 【中等】使用 Arrays.asList 有什么注意点？⭐⭐
 
 《阿里巴巴 Java 开发手册》的描述如下：
 
@@ -725,6 +818,15 @@ list.add("D");  // 抛出 UnsupportedOperationException
 list.remove(0); // 同样抛出异常
 ```
 
+**set() 可以调用，且会写回原数组**：asList 返回的 List 是原数组的视图，虽然不能增删，但 `set()` 修改会直接反映到原数组上，这是比抛异常更隐蔽的坑。
+
+```java
+String[] arr = {"A", "B", "C"};
+List<String> view = Arrays.asList(arr);
+view.set(0, "X");          // 不抛异常
+System.out.println(arr[0]); // 输出 X —— 原数组被修改
+```
+
 正确做法是：
 
 【示例】使用 `new ArrayList<>(Arrays.asList(...))`
@@ -759,9 +861,10 @@ List<String> l3 = Lists.newArrayList("or", "string", "elements"); // from vararg
 【示例】使用 Java9 的 `List.of()`方法
 
 ```java
-Integer[] array = {1, 2, 3};
-List<Integer> list = List.of(array);
+List<Integer> list = List.of(1, 2, 3);  // 不可变 List，add/remove 抛 UnsupportedOperationException
 ```
+
+> ⚠️ 注意：`List.of(array)` **不能**把数组整体转成 List。`List.of` 除变长参数版外还提供 0-10 个参数的固定参数重载，只传一个数组时，重载解析在严格调用阶段即选中 `of(E)`，`E` 被推断为 `Integer[]`，实际得到的是只含 1 个元素的 `List<Integer[]>`（赋值给 `List<Integer>` 直接编译报错）——与 `Arrays.asList` 传基本类型数组是同一类陷阱。数组转不可变 List 应逐个传元素，或 `List.copyOf(Arrays.asList(array))`。
 
 【示例】使用 Guava
 
@@ -779,7 +882,7 @@ List<String> list = new ArrayList<String>();
 CollectionUtils.addAll(list, str);
 ```
 
-## 使用 List.subList 有什么注意点？
+### 【中等】使用 List.subList 有什么注意点？⭐⭐
 
 **List.subList 使用陷阱**
 
@@ -831,4 +934,3 @@ List<String> streamCopy = list.stream()
                                .limit(100)
                                .collect(Collectors.toList());
 ```
-

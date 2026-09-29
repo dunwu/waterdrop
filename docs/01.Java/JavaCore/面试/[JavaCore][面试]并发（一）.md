@@ -18,7 +18,7 @@ permalink: /pages/37e2c2f3/
 
 ## 并发简介
 
-### 【简单】并发和并行有什么区别？⭐⭐⭐
+### 【简单】并发和并行有什么区别？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：并发简介 / 基础概念
 
@@ -26,7 +26,7 @@ permalink: /pages/37e2c2f3/
 
 二者最关键的区别在于是否**同时**发生：**并发**是多个任务在同一时间段内**交替执行**（逻辑上的同时），**并行**是多个任务在多核上**真正同时执行**（物理上的同时）。并发是执行模型，并行是硬件能力。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：并发交替、并行同时；一人多事是并发，多人多事是并行
 - **关键词**：交替执行 ／ 同时执行 ／ 多核
@@ -56,10 +56,15 @@ permalink: /pages/37e2c2f3/
 
 #### 🔀 发散问题
 
-- **Q：单核 CPU 能跑多线程吗？** → 能，通过时间片轮转交替执行，实现的是并发而非并行，见本文档「单核 CPU 支持 Java 多线程吗？」。
-- **Q：并发一定比串行更快吗？** → 不一定，取决于任务类型、核数与锁竞争程度，见本文档「并发一定比串行更快吗？」。
+- **Q：单核 CPU 能跑多线程吗？**
 
-### 【简单】同步和异步有什么区别？⭐⭐⭐
+  → 能，通过时间片轮转交替执行，实现的是并发而非并行，见本文档「单核 CPU 支持 Java 多线程吗？」。
+
+- **Q：并发一定比串行更快吗？**
+
+  → 不一定，取决于任务类型、核数与锁竞争程度，见本文档「并发一定比串行更快吗？」。
+
+### 【简单】同步和异步有什么区别？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：并发简介 / 基础概念
 
@@ -67,7 +72,7 @@ permalink: /pages/37e2c2f3/
 
 同步和异步关注的是**调用结果的通信机制**：**同步**指调用方必须等待当前任务执行完、拿到结果才能继续；**异步**指调用发出后无需等待结果，可以先做别的事，结果就绪后通过回调、通知等方式告知调用方。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：同步像打电话，不挂不断；异步像发短信，发完即走
 - **关键词**：调用方等待 ／ 结果通知 ／ 回调机制
@@ -89,9 +94,11 @@ permalink: /pages/37e2c2f3/
 
 #### 🔀 发散问题
 
-- **Q：同步/异步与阻塞/非阻塞是一回事吗？** → 不是，两个正交维度：同步/异步看结果如何获得，阻塞/非阻塞看调用方是否挂起，四种组合都存在，见本文档「阻塞和非阻塞有什么区别？」。
+- **Q：同步/异步与阻塞/非阻塞是一回事吗？**
 
-### 【简单】阻塞和非阻塞有什么区别？⭐⭐⭐
+  → 不是，两个正交维度：同步/异步看结果如何获得，阻塞/非阻塞看调用方是否挂起，四种组合都存在，见本文档「阻塞和非阻塞有什么区别？」。
+
+### 【简单】阻塞和非阻塞有什么区别？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：并发简介 / 基础概念
 
@@ -99,7 +106,7 @@ permalink: /pages/37e2c2f3/
 
 阻塞和非阻塞关注的是**程序在等待调用结果时的状态**：**阻塞**指调用发起后当前线程挂起，必须等操作完成才能继续；**非阻塞**指调用立即返回、不挂起线程，可继续执行其他操作，之后再轮询或等待通知获取结果。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：阻塞排队等奶茶，不拿到不走；非阻塞点完就逛街，短信通知再取
 - **关键词**：调用方状态 ／ 挂起等待 ／ 立即返回
@@ -121,7 +128,9 @@ permalink: /pages/37e2c2f3/
 
 #### 🔀 发散问题
 
-- **Q：异步一定是非阻塞吗？** → 不一定，异步只说明结果由通知返回，调用方在等待通知期间仍可能选择阻塞等待；二者的划分维度不同。
+- **Q：异步一定是非阻塞吗？**
+
+  → 不一定，异步只说明结果由通知返回，调用方在等待通知期间仍可能选择阻塞等待；二者的划分维度不同。
 
 ### 【中等】进程、线程、协程、管程有什么区别？⭐⭐⭐
 
@@ -131,7 +140,7 @@ permalink: /pages/37e2c2f3/
 
 四者定位不同：**进程**是资源分配的基本单位，隔离性强；**线程**是 CPU 调度的基本单位，共享进程内存；**协程**是用户态轻量级线程，由程序员协作式调度；**管程**不是执行单元，而是管理共享资源的同步机制。前三者回答"谁在跑"，管程回答"怎么安全地共享"。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：进程管资源、线程管调度、协程用户态、管程管同步
 - **关键词**：资源分配 ／ CPU 调度 ／ 用户态调度 ／ 同步机制
@@ -188,8 +197,13 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 #### 🔀 发散问题
 
-- **Q：为什么 Java 选线程而不是进程作为并发基本单元？** → 线程共享内存、创建切换成本低，适合高频协作；代价是需同步机制保护共享数据。
-- **Q：管程在 Java 中的体现是什么？** → `synchronized` 就是管程模型：每个对象关联 Monitor，互斥进入临界区，配合 `wait()/notify()` 条件等待。
+- **Q：为什么 Java 选线程而不是进程作为并发基本单元？**
+
+  → 线程共享内存、创建切换成本低，适合高频协作；代价是需同步机制保护共享数据。
+
+- **Q：管程在 Java 中的体现是什么？**
+
+  → `synchronized` 就是管程模型：每个对象关联 Monitor，互斥进入临界区，配合 `wait()/notify()` 条件等待。
 
 ### 【中等】Java 线程和操作系统的线程有什么区别？⭐⭐⭐
 
@@ -199,7 +213,7 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 现代 HotSpot JVM 采用 **1:1 映射**，每个 Java 线程直接对应一个 OS 内核线程，区别主要在抽象层级：Java 线程是 JVM 用户态抽象，跨平台、可用虚拟线程实现 M:N 优化；OS 线程由内核直接管理、抢占式调度。早期 JVM 曾用用户线程（绿色线程）M:1 映射。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：早期多对一，现代一对一，虚拟线程 M 对 N
 - **关键词**：1:1 映射 ／ 内核线程 ／ 跨平台抽象
@@ -231,8 +245,13 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 #### 🔀 发散问题
 
-- **Q：为什么不用回 M:1 用户线程？** → 一个用户线程阻塞会拖住整个 OS 线程，且无法利用多核，被历史淘汰。
-- **Q：Java 线程优先级能影响 OS 调度吗？** → 只是提示，实际映射到 OS 优先级，不同系统行为不一致，不可依赖，见本文档「高优先级的 Java 线程一定先执行吗？」。
+- **Q：为什么不用回 M:1 用户线程？**
+
+  → 一个用户线程阻塞会拖住整个 OS 线程，且无法利用多核，被历史淘汰。
+
+- **Q：Java 线程优先级能影响 OS 调度吗？**
+
+  → 只是提示，实际映射到 OS 优先级，不同系统行为不一致，不可依赖，见本文档「高优先级的 Java 线程一定先执行吗？」。
 
 ### 【中等】单核 CPU 支持 Java 多线程吗？⭐⭐
 
@@ -242,7 +261,7 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 **单核 CPU 可以支持 Java 多线程**，但多个线程**无法真正并行执行**，而是通过**时间片轮转（分时调度）**在单个核心上交替运行，实现的是**并发**而非**并行**。Java 采用抢占式调度，由操作系统基于优先级和时间片分配 CPU。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：单核能多线程，不能多并行；时间片轮转，抢占式调度
 - **关键词**：时间片轮转 ／ 抢占式调度 ／ 并发非并行
@@ -266,8 +285,13 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 #### 🔀 发散问题
 
-- **Q：单核上开 1000 个线程有意义吗？** → 对 I/O 密集任务有意义（等待 I/O 时让出 CPU），对纯计算任务只会徒增切换开销。
-- **Q：协同式调度现在还有应用吗？** → 有，用户态协程（Go goroutine、Java 虚拟线程的协作式让出）就带有协同调度的影子。
+- **Q：单核上开 1000 个线程有意义吗？**
+
+  → 对 I/O 密集任务有意义（等待 I/O 时让出 CPU），对纯计算任务只会徒增切换开销。
+
+- **Q：协同式调度现在还有应用吗？**
+
+  → 有，用户态协程（Go goroutine、Java 虚拟线程的协作式让出）就带有协同调度的影子。
 
 ### 【简单】并发一定比串行更快吗？⭐⭐
 
@@ -277,7 +301,7 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 **并发不一定比串行更快**！多核并行计算、I/O 密集场景并发更快；单核切换、高锁竞争、简单任务场景串行更快。黄金法则：I/O 多用并发，计算多用多核，避免无脑加线程。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：I/O 多、上并发；计算多、靠多核；锁竞争、白折腾
 - **关键词**：多核 ／ I/O 密集 ／ 锁竞争 ／ 并发度
@@ -301,6 +325,16 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 - I/O 多用并发，计算多用多核
 - 避免无脑加线程，合理控制并发度
 
+#### 🔀 发散问题
+
+- **Q：如何判断一个任务是 I/O 密集型还是 CPU 密集型？线程池的核心线程数应该如何根据任务类型设定？**
+
+  → CPU 密集型任务主要消耗 CPU 周期（如计算、加密），核心线程数通常设为 CPU 核心数 + 1。I/O 密集型任务大量时间等待 I/O（如网络请求、数据库查询），核心线程数可设为 CPU 核心数 × 2 或更高，具体取决于 I/O 等待时间与计算时间的比值。实际应通过 profiling 工具测量任务特征后再调优。
+
+- **Q：Amdahl 定律对并发优化有什么指导意义？为什么并行加速比存在理论上限？**
+
+  → Amdahl 定律指出，程序的并行加速比受限于不可并行化的串行部分比例。即使将并行部分加速到无限快，总加速比也不会超过 1/串行比例。这意味着并发优化应先尽量缩小串行瓶颈（如锁竞争、单线程初始化），否则无限增加线程数收益趋近于零。
+
 ### 【简单】什么是并发安全？有哪些线程不安全的情况？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：并发简介 / 并发安全
@@ -309,7 +343,7 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 **并发安全**指保证程序的正确性，使并发处理结果符合预期，需同时满足**可见性、原子性、有序性**三大特性。典型不安全情况：竞态条件、非原子操作、可见性问题、死锁、资源泄漏；核心应对思路是减少共享数据、合理加锁。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：可见原子有序，三性保安全；少共享、慎加锁
 - **关键词**：可见性 ／ 原子性 ／ 有序性
@@ -339,8 +373,13 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 #### 🔀 发散问题
 
-- **Q：不可变对象为什么天然线程安全？** → 状态创建后不再变化，无需同步；`final` 字段的安全发布由 JMM 特殊保证。
-- **Q：哪些场景要额外警惕并发问题？** → 见本文档「哪些场景需要额外注意并发安全问题？」。
+- **Q：不可变对象为什么天然线程安全？**
+
+  → 状态创建后不再变化，无需同步；`final` 字段的安全发布由 JMM 特殊保证。
+
+- **Q：哪些场景要额外警惕并发问题？**
+
+  → 见本文档「哪些场景需要额外注意并发安全问题？」。
 
 ### 【中等】为什么会有并发安全问题？⭐⭐⭐
 
@@ -350,7 +389,7 @@ JVM 在单个进程中运行，JVM 中的线程共享属于该进程的堆。这
 
 并发安全问题源于三处硬件/软件优化：**缓存**导致可见性问题、**线程切换**导致原子性问题、**编译优化**导致有序性问题。它们都是为了性能而牺牲了天然一致性，需要 JMM 与同步机制来补偿。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：缓存丢可见、切换丢原子、重排丢有序
 - **关键词**：CPU 缓存 ／ 时间片切换 ／ 指令重排
@@ -398,8 +437,13 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 
 #### 🔀 发散问题
 
-- **Q：单核 CPU 是否就没有可见性问题？** → 不是，线程切换后寄存器/编译器优化仍可能导致修改未及时反映；只是多核缓存使问题更突出。
-- **Q：为什么高级语言的一条语句不是原子的？** → 原子性以 CPU 指令为准，高级语句往往编译为多条指令，切换可发生在任意两条之间。
+- **Q：单核 CPU 是否就没有可见性问题？**
+
+  → 不是，线程切换后寄存器/编译器优化仍可能导致修改未及时反映；只是多核缓存使问题更突出。
+
+- **Q：为什么高级语言的一条语句不是原子的？**
+
+  → 原子性以 CPU 指令为准，高级语句往往编译为多条指令，切换可发生在任意两条之间。
 
 ### 【中等】哪些场景需要额外注意并发安全问题？⭐⭐
 
@@ -409,7 +453,7 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 
 凡是"多线程 + 共享可变状态"的地方都要警惕：共享可变数据、线程时序协作、单例/静态容器、数据库外部资源、线程池与 ThreadLocal、check-then-act 拆分原子操作。通用原则：最小化共享资源，优先用线程安全类，控制锁粒度，避免死锁。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：共享可变必设防，单例静态易受伤；查改拆分要包裹，ThreadLocal 勤清理
 - **关键词**：共享可变数据 ／ 单例·静态容器 ／ check-then-act
@@ -436,10 +480,15 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 
 #### 🔀 发散问题
 
-- **Q：HashMap 在并发下会出什么问题？** → 并发 put 可能丢数据、死循环（JDK 7 头插法扩容）、size 不准；应换 ConcurrentHashMap。
-- **Q：线程池里 ThreadLocal 为什么要 remove？** → 线程复用会导致上次任务的值残留，引发数据串流与内存泄漏。
+- **Q：HashMap 在并发下会出什么问题？**
 
-### 【困难】什么是死锁？如何发现死锁？如何避免死锁？⭐⭐⭐⭐⭐
+  → 并发 put 可能丢数据、死循环（JDK 7 头插法扩容）、size 不准；应换 ConcurrentHashMap。
+
+- **Q：线程池里 ThreadLocal 为什么要 remove？**
+
+  → 线程复用会导致上次任务的值残留，引发数据串流与内存泄漏。
+
+### 【困难】什么是死锁？如何发现死锁？如何避免死锁？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：并发安全 / 死锁
 
@@ -447,7 +496,7 @@ CPU 能保证的原子操作是 CPU 指令级别的，而不是高级语言的�
 
 **死锁**是一组互相竞争资源的线程因互相等待而永久阻塞。必须同时满足**互斥、占有并等待、不可抢占、循环等待**四个条件；发现靠 `jstack`/`ThreadMXBean`，预防靠破坏必要条件（按序加锁、tryLock 超时、一次性申请）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：互斥占有不可抢，循环等待四条件；按序加锁破环，超时放弃保平安
 - **关键词**：四必要条件 ／ jstack ／ 按序加锁 ／ tryLock
@@ -689,6 +738,18 @@ Rust 的类型系统在编译期静态保证：
 转账类业务是死锁重灾区：账户 A→B 与 B→A 两笔转账并发时，若各自按"先锁付款方"加锁即形成环。生产实践：按账户 ID 全局排序加锁，配合 `tryLock(100ms)` 超时 + 随机退避（0~50ms），并用定时任务每 5s 调用 `ThreadMXBean.findDeadlockedThreads()`（单次开销毫秒级），发现死锁自动 dump 线程栈并告警，将死锁从"用户反馈才发现"变为分钟级自愈重试。
 :::
 
+#### 📊 量化参考
+
+| 指标                       | 数值                                    | 备注                                   |
+| -------------------------- | --------------------------------------- | -------------------------------------- |
+| 无竞争 CAS                 | 10~50ns                                 | 纯用户态原子指令，无内核参与           |
+| 高竞争 CAS/自旋锁          | 数百个时钟周期起                        | 缓存行在核间"乒乓"，自旋空耗 CPU       |
+| 重型锁 park/unpark         | 1~10μs                                  | 涉及内核态切换，比 CAS 慢 2~3 个数量级 |
+| tryLock 超时经验值         | 100~500ms + 随机退避（0~50ms）          | 破坏"请求与保持"条件，规避死锁         |
+| findDeadlockedThreads 开销 | 单次毫秒级                              | 轮询周期建议 5~30s，不宜过密           |
+| InnoDB 行锁等待            | `innodb_lock_wait_timeout` 默认 50s     | 数据库侧锁等待兜底配置                 |
+| JFR 锁竞争事件             | `jdk.JavaMonitorEnter` 阈值建议 10~20ms | 超过即记录为锁竞争热点                 |
+
 #### ⚠️ 常见误区
 
 ::: details
@@ -701,9 +762,17 @@ Rust 的类型系统在编译期静态保证：
 
 #### 🔀 发散问题
 
-- **Q：活锁与死锁有何区别？** → 活锁中线程在运行但无进展（互相谦让），死锁中线程完全阻塞，见本文档「什么是活锁？如何避免活锁？」。
-- **Q：分布式系统如何检测死锁？** → 等待图（wait-for graph）+ 超时机制：数据库（如 InnoDB）会主动检测事务环并回滚代价最小的事务。
-- **Q：jstack 能看到哪些锁信息？** → 能看到 `synchronized` 和 J.U.C 锁的持有/等待关系，native 锁和数据库锁看不到。
+- **Q：活锁与死锁有何区别？**
+
+  → 活锁中线程在运行但无进展（互相谦让），死锁中线程完全阻塞，见本文档「什么是活锁？如何避免活锁？」。
+
+- **Q：分布式系统如何检测死锁？**
+
+  → 等待图（wait-for graph）+ 超时机制：数据库（如 InnoDB）会主动检测事务环并回滚代价最小的事务。
+
+- **Q：jstack 能看到哪些锁信息？**
+
+  → 能看到 `synchronized` 和 J.U.C 锁的持有/等待关系，native 锁和数据库锁看不到。
 
 ### 【中等】什么是活锁？如何避免活锁？⭐⭐
 
@@ -713,7 +782,7 @@ Rust 的类型系统在编译期静态保证：
 
 **活锁**是线程都在运行（不阻塞），但因相互谦让或重复响应对方的状态变化，**谁都无法向前推进**。解法很简单：谦让时等待一个**随机时间**，打破同步碰撞，Raft 等分布式算法也用同样思路。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：死锁都不动，活锁都在动；谦让加随机，碰撞自然消
 - **关键词**：互相谦让 ／ 无进展 ／ 随机等待
@@ -744,8 +813,13 @@ Rust 的类型系统在编译期静态保证：
 
 #### 🔀 发散问题
 
-- **Q：活锁会自己解除吗？** → 可能，但不可依赖；不加随机性时同步碰撞会持续，必须用随机退避主动打破。
-- **Q：活锁和饥饿有什么区别？** → 活锁是当事各方互相谦让都无法推进；饥饿是某线程被其他线程持续挤占拿不到资源，见本文档「什么是饥饿问题？如何避免饥饿？」。
+- **Q：活锁会自己解除吗？**
+
+  → 可能，但不可依赖；不加随机性时同步碰撞会持续，必须用随机退避主动打破。
+
+- **Q：活锁和饥饿有什么区别？**
+
+  → 活锁是当事各方互相谦让都无法推进；饥饿是某线程被其他线程持续挤占拿不到资源，见本文档「什么是饥饿问题？如何避免饥饿？」。
 
 ### 【中等】什么是饥饿问题？如何避免饥饿？⭐⭐
 
@@ -755,7 +829,7 @@ Rust 的类型系统在编译期静态保证：
 
 **饥饿**是某些线程由于**长期无法获取所需资源**（CPU 时间、锁、I/O 等），导致任务无法执行或执行缓慢。常见原因是优先级不合理、非公平锁竞争、资源分配不均；应对：公平锁、合理优先级、tryLock 超时、缩短持锁时间。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：死锁全卡死，活锁空转圈，饥饿是个别线程吃不上饭
 - **关键词**：长期无资源 ／ 非公平锁 ／ 公平锁
@@ -814,8 +888,13 @@ if (lock.tryLock(100, TimeUnit.MILLISECONDS)) {
 
 #### 🔀 发散问题
 
-- **Q：公平锁一定没有饥饿吗？** → 基本能避免锁层面的饥饿，但若持锁线程执行时间过长，等待者依然要等很久，公平不等于快。
-- **Q：为什么 synchronized 不能设置为公平锁？** → 其基于 Monitor 的 `_cxq`/`_EntryList` 唤醒策略不保证 FIFO，设计上就不提供公平性开关。
+- **Q：公平锁一定没有饥饿吗？**
+
+  → 基本能避免锁层面的饥饿，但若持锁线程执行时间过长，等待者依然要等很久，公平不等于快。
+
+- **Q：为什么 synchronized 不能设置为公平锁？**
+
+  → 其基于 Monitor 的 `_cxq`/`_EntryList` 唤醒策略不保证 FIFO，设计上就不提供公平性开关。
 
 ### 【简单】简单介绍一下 Java 并发编程？⭐
 
@@ -825,7 +904,7 @@ if (lock.tryLock(100, TimeUnit.MILLISECONDS)) {
 
 并发编程可以抽象成三个核心问题：**分工**（如何拆解任务分配给线程）、**同步**（线程间如何协作）、**互斥**（同一时刻只允许一个线程访问共享资源）。Java 的 `java.util.concurrent`（J.U.C）包提供了原子类、锁、并发容器、队列、线程池等全套工具。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：分工同步互斥，三问破并发
 - **关键词**：分工 ／ 同步 ／ 互斥 ／ J.U.C
@@ -849,17 +928,27 @@ if (lock.tryLock(100, TimeUnit.MILLISECONDS)) {
    - **线程池** - 如：`ThreadPoolExecutor`、`Executors` 等。
 3. **底层基石**：J.U.C 包中的工具类是基于 `synchronized`、`volatile`、`CAS`、`ThreadLocal` 这样的并发核心机制打造的。所以，要想深入理解 J.U.C 工具类的特性、为什么具有这样那样的特性，就必须先理解这些核心机制。
 
+#### 🔀 发散问题
+
+- **Q：`ConcurrentHashMap` 是如何在不使用全局锁的情况下实现高并发读写的？JDK 7 和 JDK 8 的实现有什么本质区别？**
+
+  → JDK 7 采用分段锁（Segment），每个 Segment 是一个小的 `Hashtable`，锁粒度为 Segment 级别。JDK 8 彻底抛弃 Segment，改用 CAS + `synchronized` 锁定单个桶（Node 链表/红黑树的头节点），锁粒度细化到每个桶，读写并发度大幅提升，且读操作完全无锁。
+
+- **Q：`CountDownLatch` 和 `CyclicBarrier` 分别适用于什么样的线程协作场景？二者能否互相替代？**
+
+  → `CountDownLatch` 用于一个或多个线程等待其他线程完成操作，计数器不可重置，是一次性使用的。`CyclicBarrier` 用于多个线程互相等待到达同一个屏障点，计数器可重置重复使用，适合多轮迭代场景。虽然功能上有重叠，但 `CyclicBarrier` 的 cyclic 特性和 barrier action 是 `CountDownLatch` 无法直接替代的。
+
 ## Java 内存模型
 
-### 【中等】什么是 Java 内存模型？⭐⭐⭐⭐⭐
+### 【中等】什么是 Java 内存模型？⭐⭐⭐⭐
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Java 内存模型 / JMM
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Java 内存模型 / JMM
 
 #### 💎 关键结论
 
 **Java Memory Model (JMM)** 是 Java 规范定义的一套**多线程内存访问规则**，用于解决并发编程中的**可见性、原子性、有序性**问题，屏蔽硬件差异，让 Java 程序在不同硬件和操作系统上都能正确执行并发操作；其核心手段是 happens-before 规则与内存屏障。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：缓存重排切换，带来三大问题；JMM 定规则，屏蔽硬件差异
 - **关键词**：可见性 ／ 有序性 ／ 内存屏障
@@ -940,7 +1029,8 @@ ARM 和 POWER 架构是典型的**弱内存模型**：
 > 参考：Intel® 64 and IA-32 Architectures Software Developer's Manual, Volume 3A, Chapter 8.2 "Memory Ordering"；ARM Architecture Reference Manual, Chapter B2.2 "Memory Ordering"。
 
 > 📚 延伸阅读：[全面理解 Java 内存模型](https://blog.csdn.net/suifeng3051/article/details/52611310)
-> :::
+
+:::
 
 #### ⚠️ 常见误区
 
@@ -953,8 +1043,13 @@ ARM 和 POWER 架构是典型的**弱内存模型**：
 
 #### 🔀 发散问题
 
-- **Q：JMM 如何约束重排序？** → 通过 happens-before 偏序规则，见本文档「什么是 Happens-Before 规则？有什么用？」。
-- **Q：JMM 的底层实现是什么？** → 内存屏障，见本文档「什么是 Java 内存屏障？有什么用？」。
+- **Q：JMM 如何约束重排序？**
+
+  → 通过 happens-before 偏序规则，见本文档「什么是 Happens-Before 规则？有什么用？」。
+
+- **Q：JMM 的底层实现是什么？**
+
+  → 内存屏障，见本文档「什么是 Java 内存屏障？有什么用？」。
 
 ### 【困难】什么是 Happens-Before 规则？有什么用？⭐⭐⭐⭐
 
@@ -964,7 +1059,7 @@ ARM 和 POWER 架构是典型的**弱内存模型**：
 
 JMM 为程序中所有操作定义了偏序关系 **Happens-Before（先行发生原则）**，它是 JMM 的核心规则，用于**约束指令重排序、保证多线程可见性**，是判断数据是否存在竞争、线程是否安全的主要依据。记住 8 条规则（程序顺序、volatile、锁、start、join、中断、终结、传递性）即可一揽子解决两操作间是否可能冲突的问题。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：程序 volatile 锁，start join 中断终结加传递
 - **关键词**：偏序关系 ／ 可见性约束 ／ 8 条规则
@@ -989,6 +1084,7 @@ JMM 为程序中所有操作定义了偏序关系 **Happens-Before（先行发�
 
 - 【L3】happens-before 不等于时间先后：它描述的是可见性/因果约束，A happens-before B 不代表 A 物理上先于 B 执行；反之，无此关系的操作允许重排且结果不保证可见。
 - 【L4】happens-before 源自 1978 年 Lamport 论文《Time, Clocks, and the Ordering of Events in a Distributed System》，用于解决分布式系统中事件时序问题；C++11 内存模型几乎照搬了这一概念，两个语言规范都选择了"抽象机偏序"而非硬件时序。
+- 【L4】as-if-serial 与 happens-before 的分工：as-if-serial 面向**单线程**，承诺无论怎么重排序，单线程执行结果不变，是编译器/CPU 优化的底线；happens-before 面向**多线程**，定义存在同步关系的跨线程操作之间的可见性偏序。判断并发程序正确性只看 happens-before 链是否成立，与物理时间先后无关。
   :::
 
 #### 🏭 实战场景
@@ -1008,8 +1104,13 @@ JMM 为程序中所有操作定义了偏序关系 **Happens-Before（先行发�
 
 #### 🔀 发散问题
 
-- **Q：volatile 写读之间到底靠哪条规则保证可见性？** → volatile 规则：对同一变量的写 happens-before 后续的读，且结合传递性可传递之前的普通写。
-- **Q：happens-before 的底层实现是什么？** → 内存屏障与锁的获取/释放语义，见本文档「什么是 Java 内存屏障？有什么用？」。
+- **Q：volatile 写读之间到底靠哪条规则保证可见性？**
+
+  → volatile 规则：对同一变量的写 happens-before 后续的读，且结合传递性可传递之前的普通写。
+
+- **Q：happens-before 的底层实现是什么？**
+
+  → 内存屏障与锁的获取/释放语义，见本文档「什么是 Java 内存屏障？有什么用？」。
 
 > 📚 延伸阅读：1978 年，Lamport 在论文 [**Time, Clocks, and the Ordering of Events in a Distributed System**](https://lamport.azurewebsites.net/pubs/time-clocks.pdf) （[**译文**](https://cloud.tencent.com/developer/article/1163428)，[**解读**](https://zhuanlan.zhihu.com/p/56146800) ）中第一次提出了 Happens-Before，阐述了偏序关系（partial ordering）、逻辑时钟（Logical Clocks）概念。Happens-Before 的语义是一种因果关系：如果 A 事件是导致 B 事件的起因，那么 A 事件一定是先于（Happens-Before）B 事件发生的。
 
@@ -1021,7 +1122,7 @@ JMM 为程序中所有操作定义了偏序关系 **Happens-Before（先行发�
 
 内存屏障（Memory Barrier/Fence）是 JMM 的底层实现机制，通过**限制重排序**和**强制缓存同步**实现多线程的**可见性与有序性**。JVM 将其抽象为 LoadLoad、StoreStore、LoadStore、StoreLoad 四种，其中 StoreLoad 开销最大；volatile、synchronized、final 的语义都靠它落地。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：四屏障禁重排，刷缓存保可见；写前 StoreStore，写后 StoreLoad
 - **关键词**：禁止重排 ／ 缓存同步 ／ StoreLoad
@@ -1092,18 +1193,23 @@ DCL 单例在弱内存模型设备（ARM 服务器/手机）上更容易暴露"�
 
 #### 🔀 发散问题
 
-- **Q：volatile 读写的屏障插入规则具体是什么？** → 写前 StoreStore、写后 StoreLoad；读后 LoadLoad + LoadStore，见本文档「`volatile` 有什么作用？」。
-- **Q：synchronized 的可见性靠什么实现？** → 解锁时把工作内存刷回主内存、加锁时重新读取，底层同样是屏障 + Monitor 语义。
+- **Q：volatile 读写的屏障插入规则具体是什么？**
+
+  → 写前 StoreStore、写后 StoreLoad；读后 LoadLoad + LoadStore，见本文档「`volatile` 有什么作用？」。
+
+- **Q：synchronized 的可见性靠什么实现？**
+
+  → 解锁时把工作内存刷回主内存、加锁时重新读取，底层同样是屏障 + Monitor 语义。
 
 ### 【中等】`volatile` 有什么作用？⭐⭐⭐⭐⭐
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：并发机制 / volatile
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：并发机制 / volatile
 
 #### 💎 关键结论
 
 `volatile` 是轻量级的线程同步工具：**可以保证可见性和有序性，但不保证原子性**。适用于状态标志、DCL 单例等"单线程写、多线程读"场景；复合操作仍需锁或原子类，不能滥用。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：可见有序它都管，原子操作它不管；一写多读最合适，复合操作交给锁
 - **关键词**：可见性 ／ 禁止重排 ／ 不保证原子性
@@ -1196,7 +1302,7 @@ CPU 核在写入共享缓存行前，必须先通过 MESI 协议将其他核心�
 
 **`volatile` 读后的 `LoadLoad` + `LoadStore` 屏障会强制排空 Invalidate Queue**，确保读取前所有已收到的失效消息都被处理完毕，读到真正的最新值。
 
-**一句话总结**：`volatile` 的可见性不是"魔法瞬间同步"，而是通过 CPU 内存屏障强制 Store Buffer 刷新 + Invalidate Queue 排空，代价是流水线停顿（Pipeline Stall），单次 volatile 读约 20-100 个 CPU 周期（对比普通读的 L1 cache hit 约 4 个周期）。
+**一句话总结**：`volatile` 的可见性不是"魔法瞬间同步"，而是通过 CPU 内存屏障强制 Store Buffer 刷新 + Invalidate Queue 排空，代价是流水线停顿（Pipeline Stall）。该成本主要在**写侧**：x86 上 volatile 读与普通读等价（L1 cache hit 约 4 个周期），而 volatile 写需 `lock` 前缀指令 + StoreLoad 屏障强制刷 Store Buffer，约 20-100 个 CPU 周期。
 
 - 【L4】跨语言对比：Java volatile vs C++ atomic vs Go atomic：
 
@@ -1230,12 +1336,18 @@ CPU 核在写入共享缓存行前，必须先通过 MESI 协议将其他核心�
 
 - ❌ "volatile 能替代 synchronized" → volatile 不保证原子性，复合操作（如 i++、check-then-act）必须用锁或原子类，见本文档「`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？」。
 - ❌ "volatile 写之后其他线程立即就能看到" → 可见性由屏障强制 Store Buffer 刷新/Invalidate Queue 排空实现，有几十到上百周期的硬件成本，不是零开销。
+- ❌ "volatile 的可见性是靠 MESI 协议实现的" → 层次混淆：MESI 是 CPU 缓存一致性协议，与是否使用 volatile 无关，硬件层面始终在工作；volatile 的语义由 **JVM 插入的内存屏障**落地（x86 写侧为 `lock` 前缀指令）。MESI 保证缓存行不陈旧，屏障解决的是重排序与 Store Buffer/Invalidate Queue 的可见时机——不能说"volatile 靠 MESI 实现"，正如不能说"Java 内存模型是 MESI 的一层封装"。
   :::
 
 #### 🔀 发散问题
 
-- **Q：volatile 能保证线程安全吗？** → 不能彻底保证，缺原子性，见本文档「volatile 能完全保证并发安全吗？」。
-- **Q：为什么 DCL 必须加 volatile？** → 禁止"分配-初始化-赋值"重排序，见本文档「为什么 DCL 单例模式需要 volatile？」。
+- **Q：volatile 能保证线程安全吗？**
+
+  → 不能彻底保证，缺原子性，见本文档「volatile 能完全保证并发安全吗？」。
+
+- **Q：为什么 DCL 必须加 volatile？**
+
+  → 禁止"分配-初始化-赋值"重排序，见本文档「为什么 DCL 单例模式需要 volatile？」。
 
 ### 【中等】volatile 能完全保证并发安全吗？⭐⭐⭐⭐
 
@@ -1245,7 +1357,7 @@ CPU 核在写入共享缓存行前，必须先通过 MESI 协议将其他核心�
 
 **不能**。线程安全需要可见性、原子性、有序性三者兼备，而 `volatile` 不保证原子性，对 `inc++` 这类"读-改-写"复合操作无能为力；修复手段是 `synchronized`、`Lock` 或 `AtomicInteger`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：volatile 三缺一，原子性它没戏；i++ 要用原子类，或者加锁包起来
 - **关键词**：复合操作 ／ 读改写 ／ AtomicInteger
@@ -1336,10 +1448,15 @@ public void increase() {
 
 #### 🔀 发散问题
 
-- **Q：volatile 和 synchronized 怎么选？** → 简单状态用 volatile，复合操作用锁，见本文档「`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？」。
-- **Q：AtomicInteger 靠什么保证原子性？** → CAS（Unsafe.compareAndSwapInt）+ CPU 原子指令，属于乐观锁思路。
+- **Q：volatile 和 synchronized 怎么选？**
 
-### 【中等】`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？⭐⭐⭐⭐⭐
+  → 简单状态用 volatile，复合操作用锁，见本文档「`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？」。
+
+- **Q：AtomicInteger 靠什么保证原子性？**
+
+  → CAS（Unsafe.compareAndSwapInt）+ CPU 原子指令，属于乐观锁思路。
+
+### 【中等】`volatile` 和 `synchronized` 有什么区别？`volatile` 能替代 `synchronized` 吗？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：并发机制 / volatile
 
@@ -1347,7 +1464,7 @@ public void increase() {
 
 **`volatile` 无法替代 `synchronized`，因为 `volatile` 无法保证操作的原子性**。二者都保证可见性和有序性，但 synchronized 额外保证原子性且基于 Monitor 实现；volatile 轻量无锁，适合一写多读的状态标志。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：volatile 轻无锁，sync 重量管原子；三性差一个，替代不可能
 - **关键词**：原子性差异 ／ 内存屏障 ／ Monitor
@@ -1377,9 +1494,51 @@ public void increase() {
 - 【L4】JDK 6 之后 synchronized 经锁升级等优化，低竞争下性能与 volatile 差距缩小；选型看语义（是否需要互斥）而非只看性能，见本文档「JDK 6 对 `synchronized` 进行了哪些优化？」。
   :::
 
+#### 🏭 实战场景
+
+::: details
+
+**选型决策量化参考**（x86-64，JDK 17，4 核 8 线程，JMH 基准）：
+
+| 维度                | `volatile` 读/写                        | `synchronized`（无竞争）         | `synchronized`（中竞争 8 线程） | `AtomicInteger`            |
+| ------------------- | --------------------------------------- | -------------------------------- | ------------------------------- | -------------------------- |
+| 单次操作延迟（P50） | ~3-5 ns / ~15-25 ns                     | ~20-30 ns                        | ~150-300 ns                     | ~10-20 ns                  |
+| 单次操作延迟（P99） | ~10-30 ns / ~50-100 ns                  | ~100-300 ns                      | ~800-2000 ns                    | ~50-150 ns                 |
+| 1000 万次并发吞吐   | 读 3.5 亿 / 写 4000 万 ops              | 3000-5000 万 ops                 | 300-800 万 ops                  | 1-2 亿 ops                 |
+| 内存屏障开销（x86） | 写 = 1× `lock` 前缀（~20 周期）；读 ≈ 0 | monitorenter/exit 各 ~30-50 周期 | + Monitor 唤醒 ~500-1500 周期   | CAS 失败重试 ~10-30 周期   |
+| 上下文切换          | 无                                      | 无（偏向/轻量级锁）              | 有（park/unpark ~1-5 μs）       | 无                         |
+| 适用场景            | 一写多读状态标志、DCL                   | 临界区需要互斥                   | 同左（高竞争考虑 Lock/分片）    | 计数、序列号等简单原子操作 |
+
+**选型口诀**：标志位用 volatile，计数用 Atomic，复合操作才上 synchronized；先保证正确性，再谈性能。
+:::
+
+::: details
+
+**【故障】订单计数器"丢数"，对账差异 0.3%**
+
+- **故障**：某电商促销峰值，运营发现订单数与财务对账差异 0.3%（约 3 万单/天）。监控显示订单服务 QPS 8000，CPU 仅 40%，无明显异常。
+- **排查**：代码审查发现订单计数器使用 `volatile long orderCount`，业务逻辑 `orderCount++`。开发原意"用 volatile 保证可见性 + 避免锁开销"。但 `count++` 是读-改-写复合操作（3 条字节码：getfield → iadd → putfield），volatile 只保证单步可见，无法保证三步原子性。高并发下多线程同时读到相同旧值，各自 +1 写回，结果被覆盖。JMeter 复现：8 线程 × 10 万次 `volatile count++`，最终值仅 42 万（期望 80 万），丢失率 47%。
+- **修复**：改用 `AtomicLong.incrementAndGet()`（CAS 实现）。灰度后对账差异归零，吞吐从 8000 QPS 提升到 9500 QPS（Atomic 比 volatile 写略慢但远优于 synchronized）。
+- **教训**：
+  1. **volatile 只解决"看到"，不解决"抢"**——任何涉及"读旧值→计算→写新值"的操作都不能用 volatile。
+  2. **性能优化不能绕过语义正确性**：想省锁前先确认操作是否真是"单步写"，否则省下的纳秒级开销会用数据一致性来偿还。
+  3. **排查清单**：遇到"计数丢失/重复/错乱"类问题，第一反应 grep 所有 `volatile` 修饰的数值变量，检查是否存在复合操作。
+
+**【故障】DCL 单例漏加 volatile，灰度 10% 出现 NPE**
+
+- **故障**：某配置中心客户端灰度 10% 后，约 0.05% 请求抛 NPE，堆栈指向单例 `ConfigHolder.getInstance()` 的 `config.load()` 调用。回滚后问题消失。
+- **排查**：DCL 单例代码：`if (instance == null) { synchronized(lock) { if (instance == null) { instance = new ConfigHolder(); } } }`，但 `instance` 字段未加 `volatile`。`new ConfigHolder()` 在字节码层是 3 步（分配内存 → 调用构造 → 赋值引用），JIT 可能重排为"分配内存 → 赋值引用 → 调用构造"。其他线程看到 `instance != null` 时拿到的是未初始化对象，调用其方法即 NPE。x86 强内存序下重排概率极低（百万分之一），但 ARM 服务器（灰度环境）重排概率高 1-2 个数量级，故只在灰度机器暴露。
+- **修复**：给 `instance` 字段加 `volatile` 修饰，禁止构造过程的重排。灰度全量后 NPE 消失。
+- **教训**：
+  1. **DCL 的 volatile 不是"性能建议"而是"正确性必需"**——漏写不会在 x86 本机复现，但会在弱内存序硬件（ARM/POWER）或高并发下暴露。
+  2. **灰度环境差异是排查线索**：问题只在特定硬件/架构暴露时，优先怀疑内存序、JIT 重排序这类底层原因。
+  3. **现代替代方案**：直接用静态内部类或枚举单例，完全绕开 DCL 的复杂性，无需纠结 volatile。
+     :::
+
 #### ⚠️ 常见误区
 
 ::: details
+
 常见误区：
 
 - ❌ "volatile 是轻量版 synchronized" → 二者语义不同：volatile 不提供互斥，只是可见性/有序性工具。
@@ -1388,10 +1547,15 @@ public void increase() {
 
 #### 🔀 发散问题
 
-- **Q：volatile 适合什么场景？** → 单线程写、多线程读的状态标志、DCL 单例，见本文档「`volatile` 有什么作用？」。
-- **Q：ReentrantLock 相比 synchronized 多了什么？** → 可中断、可超时、公平锁、多 Condition，适合复杂同步需求。
+- **Q：volatile 适合什么场景？**
 
-### 【中等】`synchronized` 有什么作用？⭐⭐⭐⭐⭐
+  → 单线程写、多线程读的状态标志、DCL 单例，见本文档「`volatile` 有什么作用？」。
+
+- **Q：ReentrantLock 相比 synchronized 多了什么？**
+
+  → 可中断、可超时、公平锁、多 Condition，适合复杂同步需求。
+
+### 【中等】`synchronized` 有什么作用？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：并发机制 / synchronized
 
@@ -1399,7 +1563,7 @@ public void increase() {
 
 `synchronized` 是 Java 最基础的线程同步机制，通过 **原子性、可见性、有序性** 保障线程安全，适用于需要强一致性的场景；有三种用法（同步实例方法/静态方法/代码块），锁对象分别是实例、Class 对象、括号内指定对象。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：实例方法锁 this，静态方法锁 Class，代码块锁括号里
 - **关键词**：互斥 ／ 三性保证 ／ 三种用法
@@ -1425,18 +1589,23 @@ public void increase() {
 
 #### 🔀 发散问题
 
-- **Q：synchronized 是可重入的吗？** → 是，同一线程可重复获取同一把锁，由 Monitor 的重入计数实现。
-- **Q：静态同步方法和实例同步方法会互相阻塞吗？** → 不会，锁对象不同（Class vs 实例）。
+- **Q：synchronized 是可重入的吗？**
 
-### 【中等】`synchronized` 的实现原理是什么？⭐⭐⭐⭐⭐
+  → 是，同一线程可重复获取同一把锁，由 Monitor 的重入计数实现。
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：并发机制 / synchronized 原理
+- **Q：静态同步方法和实例同步方法会互相阻塞吗？**
+
+  → 不会，锁对象不同（Class vs 实例）。
+
+### 【中等】`synchronized` 的实现原理是什么？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：并发机制 / synchronized 原理
 
 #### 💎 关键结论
 
 `synchronized` 的底层实现涉及 **Java 对象头、Monitor（监视器）、锁升级机制**：同步代码块靠 `monitorenter`/`monitorexit` 字节码，同步方法靠 `ACC_SYNCHRONIZED` 标志；锁信息存在对象头 Mark Word 中，竞争失败的线程进入 Monitor 的 `_EntryList`/`_cxq` 等待。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：代码块 monitorenter，方法看 ACC 标志；锁在 Mark Word，等待靠 Monitor
 - **关键词**：monitorenter ／ Mark Word ／ ObjectMonitor
@@ -1482,8 +1651,13 @@ public void increase() {
 
 #### 🔀 发散问题
 
-- **Q：锁状态存在哪里？** → 对象头 Mark Word（64 位 JVM 共 64bit），不同锁状态复用这 64bit。
-- **Q：synchronized 可重入怎么实现？** → `_recursions` 计数，同线程重入加 1，退出减 1。
+- **Q：锁状态存在哪里？**
+
+  → 对象头 Mark Word（64 位 JVM 共 64bit），不同锁状态复用这 64bit。
+
+- **Q：synchronized 可重入怎么实现？**
+
+  → `_recursions` 计数，同线程重入加 1，退出减 1。
 
 ### 【困难】JDK 6 对 `synchronized` 进行了哪些优化？⭐⭐⭐⭐
 
@@ -1493,7 +1667,7 @@ public void increase() {
 
 **JDK 6 以后，`synchronized` 做了大量优化，性能已与 `Lock`、`ReadWriteLock` 基本持平**，核心三板斧：**锁升级**（无锁→偏向→轻量级→重量级，按竞争强度逐级升级）、**锁消除**（逃逸分析后消除无用锁）、**锁粗化**（合并相邻同锁同步块）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：升级消粗三板斧，竞争越烈锁越重
 - **关键词**：锁升级 ／ 锁消除 ／ 锁粗化
@@ -1581,10 +1755,15 @@ public class LockEliminationExample {
 
 #### 🔀 发散问题
 
-- **Q：重量级锁能不能降级回轻量级锁？** → 不能，锁升级单向不可降级（GC 时的内部处理除外）。
-- **Q：锁消除和锁粗化由谁完成？** → JIT 编译器在运行时动态完成，依赖逃逸分析，程序员无需干预。
+- **Q：重量级锁能不能降级回轻量级锁？**
 
-### 【困难】synchronized 锁升级的详细过程是怎样的？⭐⭐⭐⭐⭐
+  → 不能，锁升级单向不可降级（GC 时的内部处理除外）。
+
+- **Q：锁消除和锁粗化由谁完成？**
+
+  → JIT 编译器在运行时动态完成，依赖逃逸分析，程序员无需干预。
+
+### 【困难】synchronized 锁升级的详细过程是怎样的？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：并发机制 / 锁升级
 
@@ -1592,7 +1771,7 @@ public class LockEliminationExample {
 
 锁升级是 JDK 6 对 `synchronized` 的核心优化：无锁→偏向锁（CAS 写线程 ID）→轻量级锁（CAS + 自旋）→重量级锁（OS 互斥量），单向不可降级；偏向锁需全局安全点撤销，JDK 15（JEP 374）起已默认禁用。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：偏向记 ID，轻量 CAS 旋，重量进内核，升级不回头
 - **关键词**：偏向锁 ／ 轻量级锁 ／ 重量级锁 ／ JEP 374
@@ -1642,8 +1821,13 @@ JDK 15+ 迁移案例：存量服务大量使用 synchronized，升级 JDK 17 后
 
 #### 🔀 发散问题
 
-- **Q：轻量级锁的 Lock Record 在哪里？** → 在持有锁线程的栈帧中，是 Mark Word 的拷贝。
-- **Q：虚拟线程上 synchronized 会怎样？** → JDK 24（JEP 491）前会 Pinning 载体线程，之后已解决。
+- **Q：轻量级锁的 Lock Record 在哪里？**
+
+  → 在持有锁线程的栈帧中，是 Mark Word 的拷贝。
+
+- **Q：虚拟线程上 synchronized 会怎样？**
+
+  → JDK 24（JEP 491）前会 Pinning 载体线程，之后已解决。
 
 ### 【困难】为什么 DCL 单例模式需要 volatile？⭐⭐⭐⭐
 
@@ -1653,7 +1837,7 @@ JDK 15+ 迁移案例：存量服务大量使用 synchronized，升级 JDK 17 后
 
 因为 `new Singleton()` **不是原子操作**，分分配内存、初始化、赋引用三步，指令重排序可能把后两步对调，导致其他线程拿到**未初始化完成**的对象。`volatile` 通过 StoreStore 屏障禁止该重排序，保证安全发布。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：new 三步可重排，先赋引用后构造；volatile 立屏障，DCL 才可靠
 - **关键词**：非原子 ／ 指令重排序 ／ StoreStore 屏障 ／ 安全发布
@@ -1748,9 +1932,17 @@ class Singleton {
 
 #### 🔀 发散问题
 
-- **Q：除了 DCL，还有哪些线程安全的单例写法？** → 静态内部类（类加载机制）、枚举单例（防反射/序列化）、饿汉式，见本题 📖 核心知识中的替代方案。
-- **Q：volatile 为什么能禁止指令重排序？** → 通过插入内存屏障实现，见本文档「什么是内存屏障？」。
-- **Q：final 字段是否也需要 volatile 才能安全发布？** → 不需要，JMM 对 final 字段的初始化有特殊保证，见本文档「final 关键字可以保证线程的可见性吗？」。
+- **Q：除了 DCL，还有哪些线程安全的单例写法？**
+
+  → 静态内部类（类加载机制）、枚举单例（防反射/序列化）、饿汉式，见本题 📖 核心知识中的替代方案。
+
+- **Q：volatile 为什么能禁止指令重排序？**
+
+  → 通过插入内存屏障实现，见本文档「什么是内存屏障？」。
+
+- **Q：final 字段是否也需要 volatile 才能安全发布？**
+
+  → 不需要，JMM 对 final 字段的初始化有特殊保证，见本文档「final 关键字可以保证线程的可见性吗？」。
 
 ### 【中等】final 关键字可以保证线程的可见性吗？⭐⭐
 
@@ -1760,7 +1952,7 @@ class Singleton {
 
 **final 本身不直接保证可见性**，但 JMM 对 final 字段的**初始化**有特殊保证：对象构造完成后，final 字段的初始化值对所有线程立即可见，无需额外同步。但这仅限于初始化阶段，持续的状态可见性仍需 volatile。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：final 保初不保改，构造完成即发布；持续可见找 volatile
 - **关键词**：初始化阶段 ／ JMM 保证 ／ 内存屏障 ／ 引用不可变
@@ -1834,20 +2026,25 @@ final List<String> unsafeList = new ArrayList<>();
 
 #### 🔀 发散问题
 
-- **Q：为什么 DCL 单例需要 volatile 而 final 字段不需要？** → DCL 发布的是对象引用，需禁止构造重排；final 字段由 JMM 的初始化屏障保证，见本文档「为什么 DCL 单例模式需要 volatile？」。
-- **Q：构造器中 this 引用逸出会有什么后果？** → 其他线程可能看到未初始化完成的对象，final 字段的安全发布保证也随之失效，应避免在构造器中启动线程或注册回调。
+- **Q：为什么 DCL 单例需要 volatile 而 final 字段不需要？**
+
+  → DCL 发布的是对象引用，需禁止构造重排；final 字段由 JMM 的初始化屏障保证，见本文档「为什么 DCL 单例模式需要 volatile？」。
+
+- **Q：构造器中 this 引用逸出会有什么后果？**
+
+  → 其他线程可能看到未初始化完成的对象，final 字段的安全发布保证也随之失效，应避免在构造器中启动线程或注册回调。
 
 ## Java 线程
 
-### 【中等】Java 线程生命周期有哪些状态？状态之间如何切换？⭐⭐⭐⭐⭐
+### 【中等】Java 线程生命周期有哪些状态？状态之间如何切换？⭐⭐⭐
 
-> 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Java 线程 / 生命周期
+> 🎯 目标等级：L2-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Java 线程 / 生命周期
 
 #### 💎 关键结论
 
 `Thread.State` 定义 **6 种状态**：NEW、RUNNABLE、BLOCKED、WAITING、TIMED_WAITING、TERMINATED，任一时刻线程只能处于其一。关键区分：BLOCKED 是被动等 synchronized 锁，WAITING 是主动等待被唤醒，RUNNABLE 合并了 OS 层的 READY/RUNNING。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：新建可跑阻塞等，定时等待到终止；sleep 不释锁，wait 要释放
 - **关键词**：Thread.State ／ 6 状态 ／ 锁释放 ／ 唤醒机制
@@ -1898,12 +2095,14 @@ final List<String> unsafeList = new ArrayList<>();
 
 - 【L3】HotSpot 中线程状态存在 Java 层与 OS 层双重表示：RUNNABLE 可能实际在 OS 层处于 Sleeping（如执行阻塞式 accept/read 时，Java 状态仍是 RUNNABLE），排查线程卡顿时建议用 `jstack` + `vmstate`/arthas `thread` 组合判断。
 - 【L4】虚拟线程（JDK 21，JEP 444）在阻塞 I/O 或 park 时会从载体线程卸载（unmount），其 `Thread.State` 对外仍呈现 WAITING/RUNNABLE，与传统线程的状态语义不完全一致。
+- 【L4】生产排查链路（P8 必答）：CPU 100% 定位——`top -Hp <pid>` 找到高耗线程 TID → 转十六进制（`printf '%x\n' <tid>`）→ `jstack <pid>` 中匹配 `nid=0x...` 定位代码；死锁定位——`jstack` 输出末尾的 `Found one Java-level deadlock`，或编程式调用 `ThreadMXBean#findDeadlockedThreads()`；线程泄漏/线程池打满——监控 `activeCount`、队列堆积 `queueSize`、`completedTaskCount` 增速并设告警阈值。
   > 📚 延伸阅读：
   >
   > - [Java Thread Methods and Thread States](https://www.w3resource.com/java-tutorial/java-threadclass-methods-and-threadstates.php)
   > - [Java 线程的 5 种状态及切换（透彻讲解）](https://blog.csdn.net/pange1991/article/details/53860651)
   > - [Java 线程运行怎么有第六种状态？ - Dawell 的回答](https://www.zhihu.com/question/56494969/answer/154053599)
-  >   :::
+
+:::
 
 #### ⚠️ 常见误区
 
@@ -1917,10 +2116,15 @@ final List<String> unsafeList = new ArrayList<>();
 
 #### 🔀 发散问题
 
-- **Q：sleep 和 wait 的核心区别？** → sleep 不释放锁、属于 Thread；wait 释放锁、属于 Object 且需在 synchronized 中调用，见本文档「`Thread.sleep()`、`Thread.yield()`、`Thread.join()`、`Object.wait()` 有什么区别？」。
-- **Q：线程 TERMINATED 后能再次 start 吗？** → 不能，会抛 IllegalThreadStateException，见本文档「一个线程两次调用 `Thread.start()` 方法会怎样？」。
+- **Q：sleep 和 wait 的核心区别？**
 
-### 【中等】Java 中，创建线程有几种方式？⭐⭐⭐⭐
+  → sleep 不释放锁、属于 Thread；wait 释放锁、属于 Object 且需在 synchronized 中调用，见本文档「`Thread.sleep()`、`Thread.yield()`、`Thread.join()`、`Object.wait()` 有什么区别？」。
+
+- **Q：线程 TERMINATED 后能再次 start 吗？**
+
+  → 不能，会抛 IllegalThreadStateException，见本文档「一个线程两次调用 `Thread.start()` 方法会怎样？」。
+
+### 【中等】Java 中，创建线程有几种方式？⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 线程 / 线程创建
 
@@ -1928,7 +2132,7 @@ final List<String> unsafeList = new ArrayList<>();
 
 常见写法有实现 Runnable、继承 Thread、Callable+FutureTask、线程池等多种，但**本质上 Java 只有一种创建线程的方式：`new Thread().start()`**，所有方式最终都依赖它，区别只在于任务定义方式不同。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：写法看似好几种，本质都是 start 起；生产就用线程池
 - **关键词**：Runnable ／ Callable ／ 线程池 ／ new Thread().start()
@@ -1953,8 +2157,9 @@ final List<String> unsafeList = new ArrayList<>();
 
 - 【L3】`Thread.start()` 内部通过 JNI 调用 native `start0()` 创建 OS 内核线程，见本文档「`Thread.start()` 的内部原理是什么？」；`Runnable`/`Callable` 只是任务定义，本身不创建线程。
 - 【L4】虚拟线程（JDK 21，JEP 444）新增 `Thread.ofVirtual().start(runnable)` 与 `Executors.newVirtualThreadPerTaskExecutor()`，创建成本降到 KB 级栈内存，适合高并发 I/O 场景。
-  > 📚 延伸阅读：[大家都说 Java 有三种创建线程的方式！并发编程中的惊天骗局！](https://mp.weixin.qq.com/s/NspUsyhEmKnJ-4OprRFp9g)
-  > :::
+- 📚 延伸阅读：[大家都说 Java 有三种创建线程的方式！并发编程中的惊天骗局！](https://mp.weixin.qq.com/s/NspUsyhEmKnJ-4OprRFp9g)
+
+:::
 
 #### ⚠️ 常见误区
 
@@ -1967,10 +2172,15 @@ final List<String> unsafeList = new ArrayList<>();
 
 #### 🔀 发散问题
 
-- **Q：Runnable 和 Callable 有什么区别？** → Callable 有返回值、可抛受检异常，需配合 FutureTask/线程池使用；Runnable 无返回值。
-- **Q：为什么不推荐继承 Thread 类？** → Java 单继承限制，继承后无法再扩展其他类；且任务与线程机制耦合。
+- **Q：Runnable 和 Callable 有什么区别？**
 
-### 【简单】可以直接调用 `Thread.run()` 方法么？⭐⭐⭐
+  → Callable 有返回值、可抛受检异常，需配合 FutureTask/线程池使用；Runnable 无返回值。
+
+- **Q：为什么不推荐继承 Thread 类？**
+
+  → Java 单继承限制，继承后无法再扩展其他类；且任务与线程机制耦合。
+
+### 【简单】可以直接调用 `Thread.run()` 方法么？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Java 线程 / 线程启动
 
@@ -1978,7 +2188,7 @@ final List<String> unsafeList = new ArrayList<>();
 
 可以调用，但 `run()` 只是普通方法调用，**不会启动新线程**，会在当前线程同步执行。必须调用 `start()` 才能启动线程，由 JVM 在新线程中执行 `run()`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：run 是执行体，start 才是启动器；直接调 run，单线程白跑
 - **关键词**：普通方法调用 ／ 不启动新线程 ／ start() 委托
@@ -2000,7 +2210,9 @@ final List<String> unsafeList = new ArrayList<>();
 
 #### 🔀 发散问题
 
-- **Q：start() 内部到底做了什么？** → 状态检查、加入线程组、native start0() 创建 OS 线程、回调 run()，见本文档「`Thread.start()` 的内部原理是什么？」。
+- **Q：start() 内部到底做了什么？**
+
+  → 状态检查、加入线程组、native start0() 创建 OS 线程、回调 run()，见本文档「`Thread.start()` 的内部原理是什么？」。
 
 ### 【中等】`Thread.start()` 的内部原理是什么？⭐⭐
 
@@ -2010,7 +2222,7 @@ final List<String> unsafeList = new ArrayList<>();
 
 `start()` 由 JVM 实现，做两件事：**创建 OS 线程 + 让 OS 线程执行 run()**。源码流程为：检查状态（非 NEW 抛异常）→ 加入线程组 → native `start0()` 创建内核线程 → 新线程回调 `run()`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：start 先查态，入组调 start0，新线程跑 run
 - **关键词**：状态检查 ／ ThreadGroup ／ native start0 ／ 回调 run
@@ -2037,8 +2249,13 @@ final List<String> unsafeList = new ArrayList<>();
 
 #### 🔀 发散问题
 
-- **Q：两次调用 start() 会怎样？** → 抛 IllegalThreadStateException，见本文档「一个线程两次调用 `Thread.start()` 方法会怎样？」。
-- **Q：为什么不能重复 start？** → 线程生命周期单向，底层 OS 线程已创建，重复启动无定义，故在状态检查处直接拒绝。
+- **Q：两次调用 start() 会怎样？**
+
+  → 抛 IllegalThreadStateException，见本文档「一个线程两次调用 `Thread.start()` 方法会怎样？」。
+
+- **Q：为什么不能重复 start？**
+
+  → 线程生命周期单向，底层 OS 线程已创建，重复启动无定义，故在状态检查处直接拒绝。
 
 ### 【中等】如何正确停止 Java 线程？⭐⭐⭐
 
@@ -2048,7 +2265,7 @@ final List<String> unsafeList = new ArrayList<>();
 
 Java 没有安全的强制停止手段，正确方式是**协作式中断**：通过 `Thread.interrupt()` 设置中断标志位（不会直接停止线程），由任务自身循环检查 `isInterrupted()` 主动退出；阻塞中则通过捕获 `InterruptedException` 响应。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：中断只设标志位，退不退由任务自己定
 - **关键词**：interrupt ／ isInterrupted ／ InterruptedException ／ 协作式终止
@@ -2111,7 +2328,7 @@ public class ThreadStopDemo {
 
 - 【L3】中断标志是 Thread 对象上的布尔状态（HotSpot 中存于 OSThread），`interrupted()` 静态方法检查的是**当前线程**且会复位标志，`isInterrupted()` 检查目标线程且不复位，两者勿混用。
 - 【L3】JUC 中的 `Future.cancel(true)`、`ExecutorService.shutdownNow()` 底层都是对任务线程调用 interrupt()；对不响应中断的阻塞（如传统 BIO 的 socket read）中断无效，需关闭底层资源。
-- 【L4】替代方案对比：volatile 标志位仅适用无阻塞简单循环；interrupt 是标准方式；Thread.stop 强制停止已被移除，见本文档「使用 `volatile` 标记方式停止线程正确吗？」。
+- 【L4】替代方案对比：volatile 标志位仅适用无阻塞简单循环；interrupt 是标准方式；Thread.stop 自 JDK 20 起已退化为无条件抛 UnsupportedOperationException（并非物理移除方法签名），见本文档「使用 `volatile` 标记方式停止线程正确吗？」。
   :::
 
 #### ⚠️ 常见误区
@@ -2125,8 +2342,13 @@ public class ThreadStopDemo {
 
 #### 🔀 发散问题
 
-- **Q：为什么不用 Thread.stop 强制停止？** → stop 会直接终止线程导致数据完整性问题，已在 JDK 20 移除，见本文档「可以使用 `Thread.stop`，`Thread.suspend` 和 `Thread.resume` 停止线程吗？为什么？」。
-- **Q：volatile 标志位方式能替代 interrupt 吗？** → 仅适用于无阻塞简单循环，阻塞时无法检测标志位，见本文档「使用 `volatile` 标记方式停止线程正确吗？」。
+- **Q：为什么不用 Thread.stop 强制停止？**
+
+  → stop 会直接终止线程导致数据完整性问题，已在 JDK 20 移除，见本文档「可以使用 `Thread.stop`，`Thread.suspend` 和 `Thread.resume` 停止线程吗？为什么？」。
+
+- **Q：volatile 标志位方式能替代 interrupt 吗？**
+
+  → 仅适用于无阻塞简单循环，阻塞时无法检测标志位，见本文档「使用 `volatile` 标记方式停止线程正确吗？」。
 
 ### 【中等】可以使用 `Thread.stop`，`Thread.suspend` 和 `Thread.resume` 停止线程吗？为什么？⭐⭐
 
@@ -2136,7 +2358,7 @@ public class ThreadStopDemo {
 
 不可以，三者均已被废弃：`stop` 强制终止线程会破坏数据完整性；`suspend` 不释放锁就挂起，极易引发死锁。**`Thread.stop` 自 JDK 20 起已无条件抛出 `UnsupportedOperationException`**，应改用 interrupt 协作式停止。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：stop 毁数据，suspend 抱锁睡；都不安全，改用中断
 - **关键词**：@Deprecated ／ 数据完整性 ／ 不释放锁 ／ 死锁
@@ -2209,16 +2431,21 @@ public class ThreadStopErrorDemo {
 
 ::: details
 
-- 【L3】版本演进：stop/suspend/resume 自 JDK 1.2 起标记 @Deprecated；**自 JDK 20 起，`Thread.stop()` 无条件抛出 `UnsupportedOperationException`**（JDK 20 移除 stop；suspend/resume 也已在后续版本移除），调用即报错。
+- 【L3】版本演进：stop/suspend/resume 自 JDK 1.2 起标记 @Deprecated；**自 JDK 20 起，`Thread.stop()` 无条件抛出 `UnsupportedOperationException`**（方法签名并未物理移除，而是退化为"调用即抛异常"；`suspend()`/`resume()` 自 JDK 20 起同样无条件抛 `UnsupportedOperationException`）。
 - 【L4】横向对比：stop 是外部强制终止，interrupt 是协作式请求；前者无法保证临界区/事务的完整性，这也是 JUC 全部基于中断机制设计的原因。
   :::
 
 #### 🔀 发散问题
 
-- **Q：正确的停止方式是什么？** → interrupt + isInterrupted 协作式终止，见本文档「如何正确停止 Java 线程？」。
-- **Q：suspend 导致的死锁如何避免？** → 无法安全避免，唯一方案是不使用 suspend，改用 wait/park 等会释放锁的机制。
+- **Q：正确的停止方式是什么？**
 
-### 【简单】一个线程两次调用 `Thread.start()` 方法会怎样？⭐⭐⭐
+  → interrupt + isInterrupted 协作式终止，见本文档「如何正确停止 Java 线程？」。
+
+- **Q：suspend 导致的死锁如何避免？**
+
+  → 无法安全避免，唯一方案是不使用 suspend，改用 wait/park 等会释放锁的机制。
+
+### 【简单】一个线程两次调用 `Thread.start()` 方法会怎样？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Java 线程 / 线程启动
 
@@ -2226,7 +2453,7 @@ public class ThreadStopErrorDemo {
 
 Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 `IllegalThreadStateException`**。原因是 start() 入口会检查状态，此时线程已非 NEW。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：start 只能调一次，二次必抛状态异常
 - **关键词**：IllegalThreadStateException ／ 状态检查 ／ 单向生命周期
@@ -2247,9 +2474,11 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 #### 🔀 发散问题
 
-- **Q：start() 的内部流程是什么？** → 状态检查、加入线程组、native start0()、回调 run()，见本文档「`Thread.start()` 的内部原理是什么？」。
+- **Q：start() 的内部流程是什么？**
 
-### 【简单】`Thread.sleep()`、`Thread.yield()`、`Thread.join()`、`Object.wait()` 有什么区别？⭐⭐⭐⭐
+  → 状态检查、加入线程组、native start0()、回调 run()，见本文档「`Thread.start()` 的内部原理是什么？」。
+
+### 【简单】`Thread.sleep()`、`Thread.yield()`、`Thread.join()`、`Object.wait()` 有什么区别？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Java 线程 / 线程调度
 
@@ -2257,7 +2486,7 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 四者核心区别在**是否释放锁**：只有 `wait()` 释放锁并需 notify 唤醒，属于线程间协作；sleep/yield/join 都不释放锁，分别用于定时暂停、让出 CPU、等待线程结束。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：sleep 定时不释锁，wait 释锁等 notify；yield 让出看缘分，join 等人干完活
 - **关键词**：释放锁 ／ 唤醒机制 ／ 所属类 ／ 使用场景
@@ -2267,7 +2496,7 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 | 方法                        | 所属类   | 作用                                                     | 是否释放锁  | 使用场景                                   |
 | --------------------------- | -------- | -------------------------------------------------------- | ----------- | ------------------------------------------ |
-| **`Thread.sleep(long ms)`** | `Thread` | **让当前线程暂停执行指定时间**（不释放 CPU 资源）        | ❌ 不释放锁 | 模拟耗时操作、定时任务                     |
+| **`Thread.sleep(long ms)`** | `Thread` | **让当前线程暂停执行指定时间**（让出 CPU，但不释放锁）   | ❌ 不释放锁 | 模拟耗时操作、定时任务                     |
 | **`Thread.yield()`**        | `Thread` | **提示调度器让出 CPU，但可能立即重新竞争**（不保证让出） | ❌ 不释放锁 | 优化线程调度，减少竞争（极少使用）         |
 | **`Thread.join()`**         | `Thread` | **等待目标线程执行完毕**（阻塞当前线程）                 | ❌ 不释放锁 | 线程顺序执行，如主线程等待子线程结束       |
 | **`Object.wait()`**         | `Object` | **释放锁并进入等待，直到 `notify()`/`notifyAll()` 唤醒** | ✔️ 释放锁   | 线程间通信（需在 `synchronized` 块中使用） |
@@ -2284,8 +2513,9 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 - 【L3】wait/notify 基于对象 Monitor 的等待队列（HotSpot ObjectMonitor 的 `_WaitSet`），wait 时线程先入队再释放锁；join 内部正是基于 wait 实现（对目标线程对象 wait）。
 - 【L4】JUC 中 wait/notify 的替代品：`Condition.await()/signal()`（可多等待队列、公平可选）、`LockSupport.park()/unpark()`（无需持锁）。
-  > 📚 延伸阅读：[Java 并发编程：线程间协作的两种方式：wait、notify、notifyAll 和 Condition](http://www.cnblogs.com/dolphin0520/p/3920385.html)
-  > :::
+- 📚 延伸阅读：[Java 并发编程：线程间协作的两种方式：wait、notify、notifyAll 和 Condition](http://www.cnblogs.com/dolphin0520/p/3920385.html)
+
+:::
 
 #### ⚠️ 常见误区
 
@@ -2298,8 +2528,13 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 #### 🔀 发散问题
 
-- **Q：为什么 wait/notify 定义在 Object 而非 Thread？** → 锁是对象级的，任何对象都可作锁，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？」。
-- **Q：线程状态如何因这些方法变化？** → sleep 进 TIMED_WAITING，wait 进 WAITING，见本文档「Java 线程生命周期有哪些状态？状态之间如何切换？」。
+- **Q：为什么 wait/notify 定义在 Object 而非 Thread？**
+
+  → 锁是对象级的，任何对象都可作锁，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？」。
+
+- **Q：线程状态如何因这些方法变化？**
+
+  → sleep 进 TIMED_WAITING，wait 进 WAITING，见本文档「Java 线程生命周期有哪些状态？状态之间如何切换？」。
 
 ### 【中等】为什么 `Thread.sleep()`、`Thread.yield()` 设计为静态方法？⭐⭐
 
@@ -2309,7 +2544,7 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 因为 sleep/yield **只对当前正在运行的线程有意义**，设计为静态方法后只能作用于当前线程（`Thread.currentThread()`），避免开发者误以为可以对其他非 Running 状态的线程调用。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：sleep 只睡自己，静态防误用
 - **关键词**：Running 状态 ／ 当前线程 ／ 静态方法
@@ -2330,11 +2565,14 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
   >
   > - [Java 线程中 yield 与 join 方法的区别](http://www.importnew.com/14958.html)
   > - [sleep()，wait()，yield() 和 join() 方法的区别](https://blog.csdn.net/xiangwanpeng/article/details/54972952)
-  >   :::
+
+:::
 
 #### 🔀 发散问题
 
-- **Q：为什么 wait/notify 反而设计为实例方法？** → 它们是对象锁（Monitor）的行为，需绑定具体锁对象的等待队列，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？」。
+- **Q：为什么 wait/notify 反而设计为实例方法？**
+
+  → 它们是对象锁（Monitor）的行为，需绑定具体锁对象的等待队列，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？」。
 
 ### 【中等】为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？⭐⭐⭐
 
@@ -2344,7 +2582,7 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 因为**锁是对象的**，`wait()`/`notify()` 是锁（Monitor）的行为：Java 中任何对象都可作锁，等待队列也与对象强绑定，所以这些方法必须定义在 `Object` 里才能保证通用性。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：锁是对象的，等队挂在对象上；方法自然归 Object
 - **关键词**：对象级锁 ／ Monitor ／ 等待队列 ／ 通用性
@@ -2380,8 +2618,13 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 #### 🔀 发散问题
 
-- **Q：为什么调用前必须持有锁？** → wait 要释放锁，不持锁就无从释放；需 synchronized 保证检查条件与等待的原子性，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？」。
-- **Q：notify 和 notifyAll 怎么选？** → 只有一个等待者且条件单一时用 notify；多等待者或条件复杂时用 notifyAll，避免丢失信号。
+- **Q：为什么调用前必须持有锁？**
+
+  → wait 要释放锁，不持锁就无从释放；需 synchronized 保证检查条件与等待的原子性，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？」。
+
+- **Q：notify 和 notifyAll 怎么选？**
+
+  → 只有一个等待者且条件单一时用 notify；多等待者或条件复杂时用 notifyAll，避免丢失信号。
 
 ### 【中等】为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？⭐⭐⭐
 
@@ -2391,7 +2634,7 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 因为这些方法的语义都依赖**当前线程持有的对象锁**：wait 要释放锁才能进等待队列，notify 需要锁来保证检查条件与唤醒的原子性。不持锁调用会直接抛 `IllegalMonitorStateException`。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：wait 要释锁，notify 要持锁；无锁调用抛异常
 - **关键词**：持有对象锁 ／ IllegalMonitorStateException ／ 原子性
@@ -2422,8 +2665,13 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 #### 🔀 发散问题
 
-- **Q：wait 为什么建议在 while 循环里检查条件？** → 防止虚假唤醒（spurious wakeup）和被唤醒后条件已不成立，经典生产者-消费者写法均用 while。
-- **Q：为什么 wait/notify 定义在 Object？** → 锁是对象级的，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？」。
+- **Q：wait 为什么建议在 while 循环里检查条件？**
+
+  → 防止虚假唤醒（spurious wakeup）和被唤醒后条件已不成立，经典生产者-消费者写法均用 while。
+
+- **Q：为什么 wait/notify 定义在 Object？**
+
+  → 锁是对象级的，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 被定义在 `Object` 类里？」。
 
 ### 【中等】使用 `volatile` 标记方式停止线程正确吗？⭐⭐⭐
 
@@ -2433,7 +2681,7 @@ Java 线程不允许启动两次，**第二次调用 `Thread.start()` 会抛出 
 
 仅适用于无阻塞、无锁竞争的简单循环场景，**不是通用可靠方案**：线程阻塞时无法检测标志位。推荐 `Thread.interrupt` + `isInterrupted` 标准方式，能响应阻塞中断。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：标志位管简单循环，阻塞来了就失灵；通用还得靠中断
 - **关键词**：volatile 标志位 ／ 非阻塞循环 ／ 阻塞失效 ／ interrupt
@@ -2490,10 +2738,15 @@ public class MyTask extends Thread {
 
 #### 🔀 发散问题
 
-- **Q：标准的停止方式是什么？** → interrupt 协作式中断，见本文档「如何正确停止 Java 线程？」。
-- **Q：volatile 为什么能保证可见性？** → 写后强制刷回主存/触发缓存一致性协议，见本文档「volatile 关键字有什么作用？」。
+- **Q：标准的停止方式是什么？**
 
-### 【中等】Java 线程之间如何进行通信？⭐⭐⭐⭐
+  → interrupt 协作式中断，见本文档「如何正确停止 Java 线程？」。
+
+- **Q：volatile 为什么能保证可见性？**
+
+  → 写后强制刷回主存/触发缓存一致性协议，见本文档「volatile 关键字有什么作用？」。
+
+### 【中等】Java 线程之间如何进行通信？⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Java 线程 / 线程通信
 
@@ -2501,7 +2754,7 @@ public class MyTask extends Thread {
 
 线程间通信（ITC）指多线程协调工作、共享数据或传递消息的机制：基础手段有共享变量、wait/notify；生产优先用 JUC 工具类——数据交换用 BlockingQueue，协作等待用 CountDownLatch，资源控制用 Semaphore。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：状态共享 volatile，协作 wait/notify；生产用 JUC，别造轮子
 - **关键词**：共享变量 ／ wait/notify ／ BlockingQueue ／ JUC
@@ -2528,12 +2781,27 @@ public class MyTask extends Thread {
 - 资源控制 → **`Semaphore`**
 - 避免重复造轮子，优先使用 JUC（`java.util.concurrent`）工具类！
 
+::: details
+
+**通信机制方案对比：**
+
+| 方案                | 耦合度                                               | 灵活性                                          | 复杂度                                | 是否支持超时                        | 典型场景                           |
+| ------------------- | ---------------------------------------------------- | ----------------------------------------------- | ------------------------------------- | ----------------------------------- | ---------------------------------- |
+| wait/notify         | 高（需共享同一对象监视器，必须在 synchronized 块内） | 低（仅单条件通知，无优先级）                    | 中（需手动管理同步和 while 循环检查） | 支持（wait(timeout)）               | 经典生产者-消费者模型              |
+| join()              | 中（调用线程直接阻塞等待目标线程结束）               | 低（只能等待线程终止，无法中途唤醒）            | 低（一行调用）                        | 支持（join(timeout)）               | 主线程等待子线程计算完成           |
+| CountDownLatch      | 低（事件计数器，线程间无需直接引用）                 | 中（一次性，归零后不可重置）                    | 低（countDown + await）               | 支持（await(timeout, unit)）        | 主线程等待 N 个子任务完成          |
+| CompletableFuture   | 低（链式回调，无显式线程管理）                       | 高（支持 thenCompose/thenCombine/allOf 等组合） | 中高（异步编排有学习成本）            | 支持（orTimeout/completeOnTimeout） | 多阶段异步任务编排、回调链         |
+| BlockingQueue       | 中（生产者消费者通过队列解耦）                       | 高（可选有界/无界、公平/非公平、优先级队列）    | 低（put/take 内置阻塞语义）           | 支持（offer/offer(timeout)）        | 生产者-消费者、任务分发            |
+| Pipe（PipedStream） | 高（需配对 PipedInputStream/PipedOutputStream）      | 低（仅字节流传输，无消息边界）                  | 中（需处理 IOException，缓冲区有限）  | 不支持                              | 线程间原始字节流传输（已较少使用） |
+
+:::
+
 #### 🔬 扩展知识
 
 ::: details
 
 - 【L3】BlockingQueue 内部基于 ReentrantLock + 两个 Condition（notEmpty/notFull）实现阻塞语义；CountDownLatch 与 Semaphore 基于 AQS 的同步状态实现。
-- 【L4】通信模型横向对比：共享内存模型（上述全部）vs 消息传递模型（如 Akka Actor、Go channel）；Java 21+ 提供 `java.util.concurrent.Flow` 与 StructuredConcurrency（预览）进一步简化协作。
+- 【L4】通信模型横向对比：共享内存模型（上述全部）vs 消息传递模型（如 Akka Actor、Go channel）；JDK 9+ 提供响应式流接口 `java.util.concurrent.Flow`，JDK 21+ 提供结构化并发 `StructuredTaskScope`（截至 JDK 25 仍为预览特性）进一步简化协作。
   :::
 
 #### ⚠️ 常见误区
@@ -2547,8 +2815,13 @@ public class MyTask extends Thread {
 
 #### 🔀 发散问题
 
-- **Q：wait/notify 协作有什么约束？** → 必须在 synchronized 中调用、建议 while 循环检查条件，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？」。
-- **Q：虚拟线程下线程通信有何变化？** → 虚拟线程同样适用上述机制，且每任务一虚拟线程的模型下更推荐用队列/信号量控制并发度。
+- **Q：wait/notify 协作有什么约束？**
+
+  → 必须在 synchronized 中调用、建议 while 循环检查条件，见本文档「为什么 `Object.wait()`、`Object.notify()` 和 `Object.notifyAll()` 必须在 `synchronized` 方法/块中被调用？」。
+
+- **Q：虚拟线程下线程通信有何变化？**
+
+  → 虚拟线程同样适用上述机制，且每任务一虚拟线程的模型下更推荐用队列/信号量控制并发度。
 
 ### 【简单】高优先级的 Java 线程一定先执行吗？⭐⭐
 
@@ -2558,7 +2831,7 @@ public class MyTask extends Thread {
 
 不一定。线程优先级范围 `[1,10]`、默认 5，但 Java 优先级**依赖操作系统支持**，不同 OS 的优先级体系无法与 Java 一一对应，因此优先级控制并不可靠，不能作为正确性依据。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：优先级只是建议，执不执行看 OS
 - **关键词**：[1,10] ／ 默认 5 ／ OS 依赖 ／ 不可靠
@@ -2579,7 +2852,9 @@ public class MyTask extends Thread {
 
 #### 🔀 发散问题
 
-- **Q：想控制执行顺序该怎么办？** → 用 join、线程池的任务依赖编排或信号量等同步工具显式控制，而非依赖优先级。
+- **Q：想控制执行顺序该怎么办？**
+
+  → 用 join、线程池的任务依赖编排或信号量等同步工具显式控制，而非依赖优先级。
 
 ### 【中等】什么是守护线程？用户线程和守护线程有什么区别？⭐⭐⭐
 
@@ -2589,7 +2864,7 @@ public class MyTask extends Thread {
 
 守护线程是为其他线程提供服务的特殊线程（如 GC、JIT）：**当所有用户线程结束时，JVM 不等待守护线程，直接退出**。关键区别就在 JVM 退出行为，设置必须在 start() 前调用 setDaemon(true)。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：守护服务他人，用户走完 JVM 就撤；start 前设 daemon
 - **关键词**：JVM 退出行为 ／ setDaemon ／ GC 线程 ／ start 前设置
@@ -2613,7 +2888,7 @@ public class MyTask extends Thread {
 
 - **必须在 `start()` 前设置**：否则抛出 `IllegalThreadStateException`。
 - **避免在守护线程中执行 I/O/资源清理**：因为 JVM 退出时守护线程可能被强行终止，导致资源未正确释放。
-- **线程池的守护属性**：线程池中的线程默认继承创建线程的守护属性，需注意线程池场景下 `finally` 可能不执行。
+- **线程池的守护属性**：`Thread` 默认继承创建者线程的守护属性，但 `Executors` 默认线程工厂会强制 `setDaemon(false)`（池内线程为非守护）；只有自定义工厂未显式设置时才会透传创建池线程的守护属性，需注意该场景下 JVM 提前退出导致 `finally` 不执行。
 
 ::: details 案例：创建守护线程
 
@@ -2647,7 +2922,9 @@ daemonThread.start();
 
 #### 🔀 发散问题
 
-- **Q：线程池里的线程默认是守护线程吗？** → 默认不是，DefaultThreadFactory 创建的线程非守护；若主线程用守护属性创建池，池内线程会继承，导致 JVM 提前退出，需谨慎。
+- **Q：线程池里的线程默认是守护线程吗？**
+
+  → 默认不是：`Thread` 构造时虽继承创建者线程的守护属性，但 `Executors` 默认线程工厂会强制 `setDaemon(false)`；仅当自定义 ThreadFactory 未显式设置时，守护属性才会从创建池的线程透传，导致 JVM 提前退出，需谨慎。
 
 ### 【中等】什么是 FutureTask？它的原理是什么？⭐⭐⭐
 
@@ -2657,7 +2934,7 @@ daemonThread.start();
 
 `FutureTask` 是 Future 接口的标准实现，同时实现 Runnable，**既能提交给线程/线程池执行，又能异步获取结果**。内部用 volatile state + CAS 管理 7 种状态，get() 阻塞时通过 LockSupport.park 挂起等待线程。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：FutureTask 两接口，能跑又能取结果；state 七态 CAS 推，get 阻塞 park 挂
 - **关键词**：Future+Runnable ／ 状态机 ／ CAS ／ LockSupport
@@ -2728,8 +3005,13 @@ String result = futureTask.get();  // 阻塞直到任务完成
 
 #### 🔀 发散问题
 
-- **Q：FutureTask 和普通 Future 的关系？** → FutureTask 是 Future 的可运行实现，线程池 submit(Callable) 内部正是包装为 FutureTask。
-- **Q：为什么生产更推荐 CompletableFuture？** → 支持链式编排、回调、异常处理与组合，避免 get() 阻塞，见本题对比表。
+- **Q：FutureTask 和普通 Future 的关系？**
+
+  → FutureTask 是 Future 的可运行实现，线程池 submit(Callable) 内部正是包装为 FutureTask。
+
+- **Q：为什么生产更推荐 CompletableFuture？**
+
+  → 支持链式编排、回调、异常处理与组合，避免 get() 阻塞，见本题对比表。
 
 ## 虚拟线程
 
@@ -2741,7 +3023,7 @@ String result = futureTask.get();  // 阻塞直到任务完成
 
 **虚拟线程用更少的资源支持更高的并发**：传统线程 1:1 映射 OS 线程，栈约 1MB、数千个就接近极限；虚拟线程（JDK 21 正式版，JEP 444，Project Loom）由 JVM 用户态调度、与 OS 线程 M:N 映射，栈仅 KB 级，可轻松创建数百万个，阻塞时只挂起虚拟线程而不占用 OS 线程。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：传统线程内核管，虚拟线程 JVM 管；阻塞不占载体，百万并发随便开
 - **关键词**：M:N 映射 ／ 载体线程 ／ KB 级栈 ／ Pinning
@@ -2752,14 +3034,16 @@ String result = futureTask.get();  // 阻塞直到任务完成
 1. **定位**：虚拟线程（Virtual Threads，JDK 21 正式版，Project Loom）实现与 OS 线程 M:N 映射，显著提升并发能力，且编程模型与传统 `Thread` API 完全一致。
 
 ::: details 案例：传统线程 vs 虚拟线程对比表
-| 维度 | 传统线程（OS 线程） | 虚拟线程 |
+
+| 维度         | 传统线程（OS 线程） | 虚拟线程            |
 | :----------- | :------------------ | :------------------ |
-| **并发数量** | 数千个 | 数百万个 |
-| **内存开销** | 每个约 1MB | 每个约 1KB |
-| **创建成本** | 高（内核操作） | 极低（用户态） |
-| **阻塞代价** | 整个 OS 线程阻塞 | 仅虚拟线程挂起 |
-| **调度方** | 操作系统内核 | JVM（用户态调度器） |
-| **编程模型** | Thread API | 相同的 Thread API |
+| **并发数量** | 数千个              | 数百万个            |
+| **内存开销** | 每个约 1MB          | 每个约 1KB          |
+| **创建成本** | 高（内核操作）      | 极低（用户态）      |
+| **阻塞代价** | 整个 OS 线程阻塞    | 仅虚拟线程挂起      |
+| **调度方**   | 操作系统内核        | JVM（用户态调度器） |
+| **编程模型** | Thread API          | 相同的 Thread API   |
+
 :::
 
 2. **载体线程（Carrier Thread）**：虚拟线程运行在**载体线程**（即 OS 内核线程）上。当虚拟线程执行阻塞操作时，JVM 会自动将虚拟线程从载体线程上**卸载（unmount）**，载体线程可以去执行其他虚拟线程；阻塞结束后，虚拟线程被**重新挂载**（mount）到载体线程上继续执行。
@@ -2783,7 +3067,7 @@ try {
 
 4. **最佳实践**：
    - **适用场景**：I/O 密集型任务（HTTP 调用、数据库查询、文件读写）；**不适用**：CPU 密集型计算（虚拟线程无法加速纯计算）。
-   - **避免使用 ThreadLocal**：虚拟线程数量可达百万，ThreadLocal 内存开销巨大，推荐用 **Scoped Values**（JDK 21 预览）。
+   - **避免使用 ThreadLocal**：虚拟线程数量可达百万，ThreadLocal 内存开销巨大，推荐用 **Scoped Values**（JDK 21 预览引入，JDK 25 转正）。
    - **避免 synchronized 包裹阻塞操作**：改用 `ReentrantLock` 避免 Pinning。
    - **不池化虚拟线程**：创建成本极低，用 `Thread.ofVirtual().start()` 直接创建即可。
    - **配合 ExecutorService**：`Executors.newVirtualThreadPerTaskExecutor()` 每个任务一个虚拟线程。
@@ -2813,7 +3097,7 @@ Go 语言的 goroutine 与 Java 虚拟线程在**调度理念上高度相似**�
 
 - **GOMAXPROCS 决定并行度**：在 Go 中，`GOMAXPROCS` 决定了同时运行 OS 线程的最大数量（默认等于 CPU 核数），这与 Java 虚拟线程的载体线程并行度 `jdk.virtualThreadScheduler.parallelism` 的设定理念一致——二者都是把用户态协程复用到固定数量的内核线程上。
 - **G-M-P 调度模型**：Go 的调度器使用 G（goroutine）、M（machine/OS 线程）、P（processor/逻辑处理器）三层模型。P 在数量上受 `GOMAXPROCS` 限制，M 是实际的 OS 线程，G 在 P 的本地队列中排队。当一个 goroutine 发生阻塞系统调用时，P 会与当前 M 分离，与另一个 M 绑定继续调度其他 G——这与虚拟线程的 mount/unmount 机制的语义如出一辙。
-- **抢占式调度 vs 协作式调度**：区别在于，Go 1.14 之前 goroutine 依赖协作式抢占（函数入口插入栈检查），而 Java 虚拟线程从第一天起就支持真正的抢占式调度（`Continuation.yield()` 可在任意安全点触发）。
+- **抢占能力**：Go 1.14 之前依赖协作式抢占（函数入口插入栈检查），1.14 起引入基于信号的异步抢占；而 Java 虚拟线程目前是**协作式调度**——只在阻塞操作或显式 `Continuation.yield()` 处卸载，长时间纯计算循环不会被强制打断（这也是虚拟线程对 CPU 密集任务无收益的另一面）。
 
 **（二）Erlang Actor 模型对比**
 
@@ -2842,10 +3126,15 @@ Erlang 的并发模型走的是完全不同的一条路——**Actor 模型**：
 
 #### 🔀 发散问题
 
-- **Q：虚拟线程底层如何实现挂起/恢复？** → 靠 `Continuation` 做栈帧的 mount/unmount，详见本文档「虚拟线程的实现原理是什么？」。
-- **Q：虚拟线程上 ThreadLocal 有什么问题？** → 百万级虚拟线程会放大 ThreadLocal 内存开销，应改用 ScopedValue。
+- **Q：虚拟线程底层如何实现挂起/恢复？**
 
-### 【困难】虚拟线程的实现原理是什么？⭐⭐⭐⭐⭐
+  → 靠 `Continuation` 做栈帧的 mount/unmount，详见本文档「虚拟线程的实现原理是什么？」。
+
+- **Q：虚拟线程上 ThreadLocal 有什么问题？**
+
+  → 百万级虚拟线程会放大 ThreadLocal 内存开销，应改用 ScopedValue。
+
+### 【困难】虚拟线程的实现原理是什么？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：虚拟线程 / 实现原理
 
@@ -2853,7 +3142,7 @@ Erlang 的并发模型走的是完全不同的一条路——**Actor 模型**：
 
 虚拟线程是 JVM 在**用户态**实现的轻量级线程：通过 **M:N 调度**把海量虚拟线程复用到少量载体线程上；可挂起能力来自 **Continuation**——阻塞时把栈帧拷回堆（unmount），载体线程立即转干别的，阻塞结束后再拷回恢复（mount），全程无内核切换。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：M 对 N 调度、Continuation 挂栈、阻塞就卸载、恢复再挂载
 - **关键词**：M:N 调度 ／ Continuation ／ mount·unmount ／ Stack Chunk
@@ -2962,8 +3251,13 @@ Java 虚拟线程和 Go goroutine 虽然都是 M:N 用户态调度，但底层�
 
 #### 🔀 发散问题
 
-- **Q：如何确认是否发生 Pinning？** → 启动参数 `-Djdk.tracePinnedThreads=full` 可打印被钉住的调用栈。
-- **Q：虚拟线程与响应式编程怎么选？** → I/O 密集场景虚拟线程以同步写法得到相近吞吐，堆栈完整、心智负担更低；已深度使用 Reactor 的存量系统无需强迁。
+- **Q：如何确认是否发生 Pinning？**
+
+  → 启动参数 `-Djdk.tracePinnedThreads=full` 可打印被钉住的调用栈。
+
+- **Q：虚拟线程与响应式编程怎么选？**
+
+  → I/O 密集场景虚拟线程以同步写法得到相近吞吐，堆栈完整、心智负担更低；已深度使用 Reactor 的存量系统无需强迁。
 
 ### 【中等】虚拟线程需要池化吗？为什么？⭐⭐⭐
 
@@ -2973,7 +3267,7 @@ Java 虚拟线程和 Go goroutine 虽然都是 M:N 用户态调度，但底层�
 
 不需要。虚拟线程创建成本极低（约 1μs、约 1KB 内存），池化违背“复用昂贵资源”的初衷；正确姿势是每任务一个虚拟线程（thread-per-task），用完即弃。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：虚拟线程不池化，一任务一线程，用完就丢
 - **关键词**：thread-per-task ／ newVirtualThreadPerTaskExecutor ／ 轻量资源
@@ -3035,8 +3329,13 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
 #### 🔀 发散问题
 
-- **Q：虚拟线程在 synchronized 下被钉住怎么办？** → 见本文档「虚拟线程的 Pinning 是什么？如何避免？」。
-- **Q：虚拟线程如何组织父子任务？** → 见本文档「虚拟线程的结构化并发是什么？」。
+- **Q：虚拟线程在 synchronized 下被钉住怎么办？**
+
+  → 见本文档「虚拟线程的 Pinning 是什么？如何避免？」。
+
+- **Q：虚拟线程如何组织父子任务？**
+
+  → 见本文档「虚拟线程的结构化并发是什么？」。
 
 ### 【困难】虚拟线程的 Pinning 是什么？如何避免？⭐⭐⭐⭐
 
@@ -3046,7 +3345,7 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
 Pinning 是虚拟线程在 `synchronized` 块或 native 方法中阻塞时无法从载体线程卸载（unmount），导致载体线程被占用；用 `ReentrantLock` 替代 `synchronized` 可避免，JDK 24（JEP 491）彻底修复。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：sync 钉住、lock 可卸、JFR 可测、JDK24 修复
 - **关键词**：synchronized ／ 载体线程 ／ unmount
@@ -3079,7 +3378,7 @@ Pinning 是虚拟线程在 `synchronized` 块或 native 方法中阻塞时无法
 **（4）如何避免 Pinning**
 
 - **用 `ReentrantLock` 替代 `synchronized`**：这是最直接有效的方案。`ReentrantLock.lock()` 不会阻止虚拟线程卸载。
-- **JEP 491（JDK 24）**：`synchronized` 不再导致 Pinning——JDK 24 起，虚拟线程在 `synchronized` 块内也能正常 unmount/mount，彻底解决了 Pinning 问题。
+- **JEP 491（JDK 24）**：`synchronized` 不再导致 Pinning——JDK 24 起，虚拟线程在 `synchronized` 块内也能正常 unmount/mount，彻底解决了 `synchronized` 场景的 Pinning（`native` 方法/JNI 调用帧内阻塞导致的 Pinning 依然存在，JEP 491 无法消除）。
 - **避免在 `synchronized` 内执行阻塞 I/O**：如果无法升级 JDK 版本，将 I/O 操作移到 `synchronized` 块外。
 
 ```java
@@ -3162,8 +3461,13 @@ Kotlin 协程通过编译期状态机实现了协作式挂起，其机制与 Jav
 
 #### 🔀 发散问题
 
-- **Q：为什么 ReentrantLock 不会导致 Pinning？** → 它基于 AQS 实现，不依赖 JVM 对象监视器（monitor），虚拟线程挂起时不涉及 monitor 归属问题，可以安全 unmount。
-- **Q：Pinning 和池化有什么关系？** → 见本题（5）及本文档「虚拟线程需要池化吗？为什么？」：池化会放大 Pinning 的危害。
+- **Q：为什么 ReentrantLock 不会导致 Pinning？**
+
+  → 它基于 AQS 实现，不依赖 JVM 对象监视器（monitor），虚拟线程挂起时不涉及 monitor 归属问题，可以安全 unmount。
+
+- **Q：Pinning 和池化有什么关系？**
+
+  → 见本题（5）及本文档「虚拟线程需要池化吗？为什么？」：池化会放大 Pinning 的危害。
 
 ### 【中等】虚拟线程环境下 ThreadLocal 有什么问题？ScopedValue 如何解决？⭐⭐⭐
 
@@ -3173,7 +3477,7 @@ Kotlin 协程通过编译期状态机实现了协作式挂起，其机制与 Jav
 
 虚拟线程把线程数从数千放大到百万级，ThreadLocal 的内存开销、生命周期管理、上下文传递三大旧疾被同时放大；JDK 21 引入的 ScopedValue（JEP 446，JDK 21 预览 / JDK 25 转正）以「作用域绑定 + 不可变 + 自动解绑 + 结构化继承」成为虚拟线程时代的替代品。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：虚拟线程百万级，副本爆炸不可取；ScopedValue 绑作用域，只读自动解绑
 - **关键词**：内存爆炸 ／ 作用域绑定 ／ StructuredTaskScope 继承
@@ -3252,8 +3556,13 @@ ScopedValue.where(TRACE_ID, "req-123").run(() -> {
 
 #### 🔀 发散问题
 
-- **Q：为什么 ScopedValue 设计成不可变？** → 不可变才能安全地被任意子任务共享与继承，无需同步；需要可写状态时应在作用域内自建局部结构或仍用 ThreadLocal。
-- **Q：存量项目的 ThreadLocal 怎么迁？** → 不必强迁；新虚拟线程代码用 ScopedValue，跨线程池传递先用 TTL 兼容，逐步替换。
+- **Q：为什么 ScopedValue 设计成不可变？**
+
+  → 不可变才能安全地被任意子任务共享与继承，无需同步；需要可写状态时应在作用域内自建局部结构或仍用 ThreadLocal。
+
+- **Q：存量项目的 ThreadLocal 怎么迁？**
+
+  → 不必强迁；新虚拟线程代码用 ScopedValue，跨线程池传递先用 TTL 兼容，逐步替换。
 
 ### 【困难】虚拟线程的结构化并发是什么？⭐⭐⭐
 
@@ -3263,7 +3572,7 @@ ScopedValue.where(TRACE_ID, "req-123").run(() -> {
 
 结构化并发让并发任务的生命周期像代码块一样有明确边界：`StructuredTaskScope` 统一管理子任务，fork 派生、join 等待、close 保证无子任务遗留；异常与取消自动在父子任务间传播，是虚拟线程的最佳搭档。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：scope 定边界，fork 派子任务，join 等完成，失败即关停，close 不泄漏
 - **关键词**：StructuredTaskScope ／ fork ／ ShutdownOnFailure ／ ShutdownOnSuccess
@@ -3271,7 +3580,7 @@ ScopedValue.where(TRACE_ID, "req-123").run(() -> {
 
 #### 📖 核心知识
 
-**结构化并发（Structured Concurrency）** 是 JDK 21 引入的并发编程范式（预览特性，`--enable-preview`），JDK 25 正式转正。核心思想是：**并发任务的生命周期应像代码块一样有明确的边界**，父任务等待所有子任务完成后再继续，确保资源不泄漏。
+**结构化并发（Structured Concurrency）** 是 JDK 21 引入的并发编程范式（预览特性，需 `--enable-preview` 启用），**截至 JDK 25 仍为预览特性（第五次预览），尚未转正**。核心思想是：**并发任务的生命周期应像代码块一样有明确的边界**，父任务等待所有子任务完成后再继续，确保资源不泄漏。
 
 **（1）问题背景：传统并发的痛点**
 
@@ -3341,7 +3650,7 @@ try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
 - 【L4】版本演进：
   - **JDK 19（孵化）**：`StructuredTaskScope` 作为孵化器 API 首次引入（`jdk.incubator.concurrent`）。
   - **JDK 21（预览）**：升级为预览 API（`java.util.concurrent`），需 `--enable-preview` 启用。
-  - **JDK 25（正式）**：转为正式特性，无需额外编译参数即可使用。
+  - **JDK 25（仍为预览）**：第五次预览（JEP 505），仍需 `--enable-preview`，**尚未转正**——与同系列但已在 JDK 25 转正（JEP 506）的 ScopedValue 版本状态不同，面试中须区分两者，勿混为一谈。
 
 :::
 
@@ -3366,5 +3675,10 @@ try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
 
 #### 🔀 发散问题
 
-- **Q：它和 CompletableFuture 编排有什么区别？** → CompletableFuture 是链式回调风格，结构化并发是块作用域 + 同步代码风格，异常/取消自动传播、无任务泄漏；二者可表达等价的编排逻辑。
-- **Q：虚拟线程还有哪些性能陷阱？** → 见本文档「虚拟线程的 Pinning 是什么？如何避免？」。
+- **Q：它和 CompletableFuture 编排有什么区别？**
+
+  → CompletableFuture 是链式回调风格，结构化并发是块作用域 + 同步代码风格，异常/取消自动传播、无任务泄漏；二者可表达等价的编排逻辑。
+
+- **Q：虚拟线程还有哪些性能陷阱？**
+
+  → 见本文档「虚拟线程的 Pinning 是什么？如何避免？」。

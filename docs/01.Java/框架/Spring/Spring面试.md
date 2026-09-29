@@ -25,7 +25,7 @@ permalink: /pages/570851bb/
 
 Spring 是开源企业级 Java 开发框架，以 IoC 与 AOP 为核心，旨在简化复杂应用构建。它轻量、松耦、分层可选组件，还能集成各类主流框架，因此被称为"框架的框架"。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：IoC 管对象、AOP 切横切、分层选模块、集成框架的框架
 - **关键词**：企业级框架 ／ 轻量松耦 ／ 分层架构
@@ -40,8 +40,21 @@ Spring 是开源企业级 Java 开发框架，以 IoC 与 AOP 为核心，旨在
 
 #### 🔀 发散问题
 
-- **Q：Spring 具体好在哪？** → 非侵入、IoC 解耦、AOP、声明式事务、生态完整，见本文档「Spring 有哪些优点？」。
-- **Q：Spring 由哪些模块组成？** → 核心容器、AOP、数据访问、Web、测试等，见本文档「Spring 有哪些模块？」。
+- **Q：Spring 具体好在哪？**
+
+  → 非侵入、IoC 解耦、AOP、声明式事务、生态完整，见本文档「Spring 有哪些优点？」。
+
+- **Q：Spring 由哪些模块组成？**
+
+  → 核心容器、AOP、数据访问、Web、测试等，见本文档「Spring 有哪些模块？」。
+
+- **Q：Spring 的 IoC 容器启动时做了哪些事情？BeanFactory 和 ApplicationContext 的初始化过程有什么区别？**
+
+  → IoC 容器启动时主要完成：加载配置/扫描注解、解析 BeanDefinition、注册 BeanDefinition 到容器、实例化并初始化 Bean（含依赖注入和生命周期回调）。`BeanFactory` 是懒加载的，getBean 时才实例化；`ApplicationContext` 在启动时预实例化所有 singleton Bean，并额外支持事件发布、国际化、AOP 等高级功能。
+
+- **Q：Spring 框架的"非侵入性"具体体现在哪些设计细节上？和 EJB 的侵入式设计对比如何？**
+
+  → Spring 的 Bean 不需要继承特定基类或实现框架接口（POJO 即可），依赖通过注入而非查找获得，业务代码中看不到 Spring API。而 EJB 要求 Bean 实现 `SessionBean` 等接口、继承特定基类，并依赖容器提供的 `EJBContext`，业务代码与框架深度耦合。Spring 的非侵入设计使单元测试和代码迁移都更加容易。
 
 ### 【简单】Spring 有哪些优点？⭐⭐
 
@@ -51,7 +64,7 @@ Spring 是开源企业级 Java 开发框架，以 IoC 与 AOP 为核心，旨在
 
 Spring 的核心优点是非侵入设计、IoC 解耦、AOP 横切复用与完整生态。它让组件易于替换测试，事务声明化，集成覆盖企业开发全场景，是 Java 企业开发的事实标准。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：轻侵入、IoC 解耦、AOP 复用、事务声明、生态全、好测试
 - **关键词**：非侵入 ／ 控制反转 ／ 生态体系
@@ -73,8 +86,13 @@ Spring 的核心优点在于其非侵入式设计、强大的**解耦**能力以
 
 #### 🔀 发散问题
 
-- **Q：这些优点由哪些模块承载？** → 核心容器、AOP、数据访问/集成、Web、测试模块，见本文档「Spring 有哪些模块？」。
-- **Q：Spring 与 SpringBoot/SpringCloud 如何分工？** → Spring 做基础、Boot 做单服务、Cloud 做集群，见本文档「Spring、SpringBoot、SpringCloud 之间是什么关系？」。
+- **Q：这些优点由哪些模块承载？**
+
+  → 核心容器、AOP、数据访问/集成、Web、测试模块，见本文档「Spring 有哪些模块？」。
+
+- **Q：Spring 与 SpringBoot/SpringCloud 如何分工？**
+
+  → Spring 做基础、Boot 做单服务、Cloud 做集群，见本文档「Spring、SpringBoot、SpringCloud 之间是什么关系？」。
 
 ### 【简单】Spring 有哪些模块？⭐
 
@@ -84,7 +102,7 @@ Spring 的核心优点在于其非侵入式设计、强大的**解耦**能力以
 
 Spring 按职责分层组织：核心容器（Core/Beans/Context/SpEL）承载 IoC，AOP 模块做横切，数据访问/集成模块管持久化与事务，Web 模块支撑 MVC 与 WebFlux，另有测试、消息等模块，可按需裁剪。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：容器四件套、AOP 两片、数据三样、Web 三样、测试兜底
 - **关键词**：Core Container ／ AOP ／ Data Access ／ Web
@@ -122,8 +140,13 @@ Spring 的核心模块主要包括以下部分：
 
 #### 🔀 发散问题
 
-- **Q：Context 模块提供的事件传播是什么？** → 基于观察者模式的组件解耦通信，见本文档「Spring 事件机制是什么？」。
-- **Q：Web 模块里 MVC 和 WebFlux 怎么选？** → MVC 一线程一请求、WebFlux 非阻塞，见本文档「Spring WebFlux 是什么？它与 Spring MVC 有何不同？」。
+- **Q：Context 模块提供的事件传播是什么？**
+
+  → 基于观察者模式的组件解耦通信，见本文档「Spring 事件机制是什么？」。
+
+- **Q：Web 模块里 MVC 和 WebFlux 怎么选？**
+
+  → MVC 一线程一请求、WebFlux 非阻塞，见本文档「Spring WebFlux 是什么？它与 Spring MVC 有何不同？」。
 
 ### 【简单】Spring 有哪些里程碑版本？⭐
 
@@ -133,7 +156,7 @@ Spring 的核心模块主要包括以下部分：
 
 Spring 演进主线是"不断简化配置 + 拥抱新范式"：1.x 用 IoC 颠覆 EJB，2.x 简化 XML，3.x 开启 Java 配置，4.x 拥抱 Java 8，5.x 引入响应式，6.x 基线 JDK 17 拥抱云原生。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一 IoC、二简 XML、三 Java 配置、四 Java8、五响应式、六云原生
 - **关键词**：注解化 ／ 响应式 ／ JDK 17 基线
@@ -148,12 +171,17 @@ Spring 演进主线是"不断简化配置 + 拥抱新范式"：1.x 用 IoC 颠�
 | **Spring 3.x** | 2009 年  | Java 配置类、REST API 支持、SpEL 表达式语言                 | 开启 Java 配置时代，适应 Web 2.0 和移动端对 RESTful 服务的需求 |
 | **Spring 4.x** | 2013 年  | Java 8 支持、WebSocket、条件化配置                          | 全面拥抱 Java 8，为实时双向通信应用提供支持                    |
 | **Spring 5.x** | 2017 年  | 响应式编程、WebFlux 模块、函数式风格                        | 引入响应式编程范式，解决高并发场景下的资源利用率问题           |
-| **Spring 6.x** | 2022 年  | Java 17 基线、Jakarta EE 9+、GraalVM 原生镜像、虚拟线程支持 | 拥抱云原生，通过提前编译和虚拟线程实现极致性能优化           |
+| **Spring 6.x** | 2022 年  | Java 17 基线、Jakarta EE 9+、GraalVM 原生镜像、虚拟线程支持 | 拥抱云原生，通过提前编译和虚拟线程实现极致性能优化             |
 
 #### 🔀 发散问题
 
-- **Q：Spring 6 之上的 SpringBoot 3 有什么变化？** → 自动配置与条件装配是核心，见本文档「Spring 中用到了哪些设计模式？」中的条件化配置线索。
-- **Q：5.x 的 WebFlux 解决什么问题？** → 非阻塞 I/O 应对高并发，见本文档「Spring WebFlux 是什么？它与 Spring MVC 有何不同？」。
+- **Q：Spring 6 之上的 SpringBoot 3 有什么变化？**
+
+  → 自动配置与条件装配是核心，见本文档「Spring 中用到了哪些设计模式？」中的条件化配置线索。
+
+- **Q：5.x 的 WebFlux 解决什么问题？**
+
+  → 非阻塞 I/O 应对高并发，见本文档「Spring WebFlux 是什么？它与 Spring MVC 有何不同？」。
 
 ### 【简单】Spring 和 Spring MVC 之间是什么关系？⭐⭐
 
@@ -163,7 +191,7 @@ Spring 演进主线是"不断简化配置 + 拥抱新范式"：1.x 用 IoC 颠�
 
 Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Spring 的 Web 模块，专门处理 HTTP 请求与视图渲染，依赖 Spring 核心运行，是 Spring 在 Web 层的具体实现。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Spring 是地基，MVC 是 Web 层的房
 - **关键词**：基础框架 ／ Web 模块 ／ 包含关系
@@ -177,8 +205,13 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 
 #### 🔀 发散问题
 
-- **Q：Spring MVC 的请求处理主线是怎样的？** → DispatcherServlet 统一入口协调各组件，见本文档「Spring MVC 如何工作？」。
-- **Q：Spring、Boot、Cloud 三者什么关系？** → 递进关系：基础、单服务、集群，见本文档「Spring、SpringBoot、SpringCloud 之间是什么关系？」。
+- **Q：Spring MVC 的请求处理主线是怎样的？**
+
+  → DispatcherServlet 统一入口协调各组件，见本文档「Spring MVC 如何工作？」。
+
+- **Q：Spring、Boot、Cloud 三者什么关系？**
+
+  → 递进关系：基础、单服务、集群，见本文档「Spring、SpringBoot、SpringCloud 之间是什么关系？」。
 
 ### 【简单】Spring、SpringBoot、SpringCloud 之间是什么关系？⭐⭐
 
@@ -188,7 +221,7 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 
 三者递进：Spring 是生态基石，提供 IoC/AOP；Spring Boot 建在 Spring 之上，用自动配置和内嵌服务器快速搭建单体应用；Spring Cloud 基于 Boot 提供服务发现、配置中心等微服务治理套件。一句话：Spring 做基础，Boot 做单服务，Cloud 做集群。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Spring 打地基、Boot 盖房子、Cloud 建小区
 - **关键词**：生态基石 ／ 自动配置 ／ 微服务治理
@@ -204,10 +237,15 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 
 #### 🔀 发散问题
 
-- **Q：Boot 的自动配置靠什么实现？** → 条件装配 + SPI 思想，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
-- **Q：Spring 本体的核心能力是什么？** → IoC 与依赖注入，见本文档「什么是 IoC？什么是依赖注入？什么是 Spring IoC？」。
+- **Q：Boot 的自动配置靠什么实现？**
 
-### 【中等】Spring 中用到了哪些设计模式？⭐⭐⭐⭐
+  → 条件装配 + SPI 思想，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
+
+- **Q：Spring 本体的核心能力是什么？**
+
+  → IoC 与依赖注入，见本文档「什么是 IoC？什么是依赖注入？什么是 Spring IoC？」。
+
+### 【困难】Spring 中用到了哪些设计模式？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / 综合
 
@@ -215,7 +253,7 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 
 回答设计模式题要落到 Spring 源码的具体类与方法：工厂（BeanFactory）、单例（三级缓存）、代理（AopProxy）、模板方法（refresh/JdbcTemplate）、观察者（事件机制）、策略、适配器、装饰者、职责链九大模式均有明确落点。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：工单代模观，策适装链全
 - **关键词**：工厂 ／ 单例 ／ 代理 ／ 模板方法 ／ 观察者
@@ -233,7 +271,7 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 | **模板方法模式** | `AbstractApplicationContext#refresh()`、`JdbcTemplate`、`RestTemplate`、`AbstractPlatformTransactionManager#commit`    | 固定流程骨架，子类只实现差异步骤  |
 | **观察者模式**   | `ApplicationEventPublisher#publishEvent`、`ApplicationListener`、`SimpleApplicationEventMulticaster`                   | 事件驱动解耦组件间通信            |
 | **策略模式**     | `Resource`（ClassPath/FileSystem/Url）、`PlatformTransactionManager`（DataSource/JTA）、`HandlerAdapter`、`Scope` 接口 | 算法族可互换，运行时选择          |
-| **适配器模式**   | `HandlerAdapter`（适配 Controller/HttpRequestHandler/Servlet）、`AdvisorAdapter`                                       | 让不兼容的接口协同工作          |
+| **适配器模式**   | `HandlerAdapter`（适配 Controller/HttpRequestHandler/Servlet）、`AdvisorAdapter`                                       | 让不兼容的接口协同工作            |
 | **装饰者模式**   | `HttpServletRequestWrapper`、`BeanWrapper`、`TransactionAwareDataSourceProxy`                                          | 动态增强对象功能而不改其结构      |
 | **职责链模式**   | `HandlerExecutionChain`（拦截器链）、`FilterChain`                                                                     | 请求被多个处理器依次处理          |
 
@@ -249,6 +287,8 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 - 【失效】代理模式：CGLIB 无法代理 `final` 类/`final` 方法、`static` 方法。
 - 【失效】单例模式：单例 Bean 内含可变成员变量即并发不安全，Spring 不保证线程安全。
 - 【失效】工厂模式：`@Configuration` 配置类若被当作 `@Component` 处理（Lite 模式），`@Bean` 方法互调返回的是新对象而非容器单例，单例语义被破坏。
+- 【L3】**量化对比**：JDK 动态代理生成耗时约 1~2ms，单次调用开销约 100~300ns；CGLIB 生成耗时约 10~20ms（约一个数量级），但调用开销仅约 50~100ns（SpringBoot 2.x+ 使用 CGLIB FastClass 优化）。典型应用有 50~100 个代理 Bean，首次启动代理创建总耗时约 0.5~2s。
+- 【L3】**启动耗时拆解**：以中等规模 SpringBoot 应用（200~500 Bean）为例，`refresh()` 总耗时约 5~15s，其中组件扫描约 1~3s、Bean 实例化与依赖注入约 3~10s、AOP 代理创建约 0.5~2s。大型项目（2000+ Bean）可达 30~90s。
 
 :::
 
@@ -257,6 +297,7 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 - 【L3】`DefaultSingletonBeanRegistry` 的单例注册为何不直接整个流程加一把大锁？三级缓存本身用 `ConcurrentHashMap`，只有跨缓存升级（`getSingleton`）与注册（`addSingleton`）等临界区用 `synchronized(this.singletonObjects)` 保证原子性，锁粒度刻意做小，避免全局串行化拖慢并发 `getBean`。
 - 【L3】`AbstractApplicationContext#refresh()` 的模板方法骨架里，哪些步骤留给子类覆写？`refresh()` 固定 12 步骨架，子类主要覆写 `onRefresh()`（如 `ServletWebServerApplicationContext` 在此创建内嵌 Tomcat）与 `finishRefresh()` 等环节，正是"父类定流程、子类填差异"的标准用法。
 - 【L3】`BeanFactory` 与 `FactoryBean` 分别体现什么模式？`BeanFactory` 是工厂模式的顶层抽象（容器即工厂）；`FactoryBean` 是"把复杂对象创建过程模板化"的工厂，如 MyBatis 的 `SqlSessionFactoryBean`，`getObject()` 即核心步骤，前缀 `&` 可取工厂本身。
+- 【L3】**量化影响**：典型应用有 10~20 个 `BeanPostProcessor`（Spring 内置 + 业务自定义），每个 Bean 创建需依次经过全部 BPP，1000 个 Bean 约需 1~3s 纯 BPP 处理时间。CGLIB 代理类生成后会被 `ClassUtils` 缓存，同类代理不重复生成。
 - 【L4】场景题——多租户 SaaS 系统每租户独立 `DataSource` 且租户动态增长，Bean 层如何设计？`FactoryBean` 的 beanName 是静态的，无法随租户数扩展，不适合；推荐单例 `AbstractRoutingDataSource` + 租户路由（`determineCurrentLookupKey()` 从 `ThreadLocal` 取租户标识，目标库 Map 懒加载并加锁防重）；强隔离备选运行时经 `BeanDefinitionRegistryPostProcessor` 或 `DefaultListableBeanFactory#registerBeanDefinition` 动态注册每租户 `DataSource`。路由式实现简单、连接总量可控但隔离弱；每租户独立 Bean 隔离强但连接数线性增长，需配合租户淘汰策略。
 
 :::
@@ -272,9 +313,17 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 
 #### 🔀 发散问题
 
-- **Q：代理模式的 JDK/CGLIB 如何选型？** → 有接口默认 JDK、可强制 CGLIB，见本文档「Spring AOP 有哪些实现方式？」。
-- **Q：单例模式的并发陷阱是什么？** → 有状态单例不线程安全，见本文档「Spring 的单例 Bean 是否有并发安全问题？」。
-- **Q：观察者模式在 Spring 中怎么用？** → 事件发布/监听解耦组件通信，见本文档「Spring 事件机制是什么？」。
+- **Q：代理模式的 JDK/CGLIB 如何选型？**
+
+  → 有接口默认 JDK、可强制 CGLIB，见本文档「Spring AOP 有哪些实现方式？」。
+
+- **Q：单例模式的并发陷阱是什么？**
+
+  → 有状态单例不线程安全，见本文档「Spring 的单例 Bean 是否有并发安全问题？」。
+
+- **Q：观察者模式在 Spring 中怎么用？**
+
+  → 事件发布/监听解耦组件通信，见本文档「Spring 事件机制是什么？」。
 
 ### 【中等】Spring 通知有哪些类型？⭐⭐
 
@@ -284,7 +333,7 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 
 Spring AOP 有 5 种通知：Before、AfterReturning、AfterThrowing、After、Around。它们精确控制切面在目标方法执行的哪个时机介入，其中环绕通知最强大、使用频率最高。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：前后异常完，环绕包一圈
 - **关键词**：Before ／ AfterReturning ／ Around
@@ -308,7 +357,7 @@ Spring AOP 定义了 **5 种通知类型**，通过 `Advice` 接口实现，精�
 
 ::: details
 
-- 【L3】注解式切面中 5 种通知对应 `@Before`、`@AfterReturning`、`@AfterThrowing`、`@After`、`@Around`，由 `ReflectiveAspectJAspect` 解析为 AOP Alliance 的 `MethodInterceptor` 链统一执行。
+- 【L3】注解式切面中 5 种通知对应 `@Before`、`@AfterReturning`、`@AfterThrowing`、`@After`、`@Around`，由 `ReflectiveAspectJAdvisorFactory` 解析为 `AspectJMethodBeforeAdvice`、`AspectJAroundAdvice` 等通知对象，再统一适配为 AOP Alliance 的 `MethodInterceptor` 链执行。
 - 【L3】`@After` 与 `@AfterReturning` 的执行顺序在不同版本存在差异，若两者都有且依赖顺序，建议只用其一。
 - 【L4】通知织入后统一走拦截器链（`ReflectiveMethodInvocation#proceed` 递归推进），事务切面的 `TransactionInterceptor` 就是其中一环。
 
@@ -316,8 +365,13 @@ Spring AOP 定义了 **5 种通知类型**，通过 `Advice` 接口实现，精�
 
 #### 🔀 发散问题
 
-- **Q：通知依附的切面概念有哪些？** → 切面、切点、连接点、织入等术语，见本文档「什么是 AOP？」。
-- **Q：多个通知如何串联执行？** → 职责链式的拦截器链，见本文档「Spring 拦截链如何实现？」。
+- **Q：通知依附的切面概念有哪些？**
+
+  → 切面、切点、连接点、织入等术语，见本文档「什么是 AOP？」。
+
+- **Q：多个通知如何串联执行？**
+
+  → 职责链式的拦截器链，见本文档「Spring 拦截链如何实现？」。
 
 ## Bean
 
@@ -329,7 +383,7 @@ Spring AOP 定义了 **5 种通知类型**，通过 `Advice` 接口实现，精�
 
 Bean 是由 Spring IoC 容器实例化、装配和管理的对象，构成应用主体。其配置元信息以 `BeanDefinition` 形式存在，包含类名、作用域、依赖与生命周期回调等，容器按图纸创建对象。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：容器管对象，图纸 BeanDefinition
 - **关键词**：IoC 容器 ／ BeanDefinition ／ 配置元数据
@@ -352,8 +406,13 @@ Spring IoC 容器本身并不能识别配置的元数据，要将这些配置信
 
 #### 🔀 发散问题
 
-- **Q：Bean 如何进入容器？** → XML、注解扫描、Java 配置、@Import 四种，见本文档「Spring Bean 注册有几种方式？」。
-- **Q：Bean 从创建到销毁经历什么？** → 实例化→注入→初始化→就绪→销毁，见本文档「Spring Bean 的生命周期是怎样的？」。
+- **Q：Bean 如何进入容器？**
+
+  → XML、注解扫描、Java 配置、@Import 四种，见本文档「Spring Bean 注册有几种方式？」。
+
+- **Q：Bean 从创建到销毁经历什么？**
+
+  → 实例化→注入→初始化→就绪→销毁，见本文档「Spring Bean 的生命周期是怎样的？」。
 
 ### 【简单】Spring Bean 注册有几种方式？⭐
 
@@ -363,7 +422,7 @@ Spring IoC 容器本身并不能识别配置的元数据，要将这些配置信
 
 Bean 注册主要有四种：XML `<bean>` 标签、注解 + 组件扫描、Java 配置类 `@Bean`、`@Import` 动态导入。现代项目以注解扫描 + Java 配置为主，XML 逐渐边缘化。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：XML、扫描、@Bean、@Import
 - **关键词**：组件扫描 ／ Java 配置 ／ @Import
@@ -380,8 +439,21 @@ Spring Bean 的注册方式主要有：
 
 #### 🔀 发散问题
 
-- **Q：@Bean 和 @Component 有何区别？** → 一个作用于方法、一个作用于类，见本文档「@Bean 和@Component 有什么区别？」。
-- **Q：@Import 的条件化变体是什么？** → @Conditional 按条件注册，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
+- **Q：@Bean 和 @Component 有何区别？**
+
+  → 一个作用于方法、一个作用于类，见本文档「@Bean 和@Component 有什么区别？」。
+
+- **Q：@Import 的条件化变体是什么？**
+
+  → @Conditional 按条件注册，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
+
+- **Q：@Bean 注解标注的方法内部再次调用同类另一个 @Bean 方法，Spring 如何保证返回的是容器中的同一个 Bean？**
+
+  → 当 `@Bean` 方法位于 `@Configuration` 类中时，Spring 使用 CGLIB 对该配置类生成子类代理。代理在调用 `@Bean` 方法前会先检查容器中是否已存在该 Bean 实例，若存在则直接返回容器中的实例，而非执行方法体创建新对象，这就是所谓的 Full 模式。若配置类仅标注 `@Component`（Lite 模式），则不会代理，每次调用都会创建新实例。
+
+- **Q：如何通过 BeanDefinitionRegistryPostProcessor 在运行时动态注册 Bean？和 @Import 方式有什么取舍？**
+
+  → 实现 `BeanDefinitionRegistryPostProcessor` 接口，在 `postProcessBeanDefinitionRegistry()` 方法中通过 `registry.registerBeanDefinition()` 手动构建 `BeanDefinition` 并注册，适合需要根据外部配置（如数据库、远程服务）动态决定注册哪些 Bean 的场景。`@Import` 更适合在编译期确定的条件下注册 Bean，代码更简洁直观；而 `BeanDefinitionRegistryPostProcessor` 灵活性更强但复杂度也更高。
 
 ### 【简单】Spring Bean 支持哪些作用域？⭐⭐
 
@@ -391,7 +463,7 @@ Spring Bean 的注册方式主要有：
 
 Spring Bean 共 6 种作用域：通用的 singleton（默认，容器唯一实例）与 prototype（每次获取新实例）；Web 专用的 request、session、application、websocket。无状态组件用 singleton，有状态对象用 prototype 或 Web 作用域。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：单例多例是通用，请会话应用 WebSocket 是 Web
 - **关键词**：singleton ／ prototype ／ request·session
@@ -419,10 +491,15 @@ Spring Bean 一共有 **6 种**作用域，分为两类：**通用作用域**和
 
 #### 🔀 发散问题
 
-- **Q：singleton 共享实例会有并发问题吗？** → 取决于是否有可变状态，见本文档「Spring 的单例 Bean 是否有并发安全问题？」。
-- **Q：prototype 为何解决不了循环依赖？** → 不进缓存、不提前暴露，见本文档「Spring 如何解决循环依赖？」。
+- **Q：singleton 共享实例会有并发问题吗？**
 
-### 【中等】Spring Bean 的生命周期是怎样的？⭐⭐⭐⭐⭐
+  → 取决于是否有可变状态，见本文档「Spring 的单例 Bean 是否有并发安全问题？」。
+
+- **Q：prototype 为何解决不了循环依赖？**
+
+  → 不进缓存、不提前暴露，见本文档「Spring 如何解决循环依赖？」。
+
+### 【困难】Spring Bean 的生命周期是怎样的？⭐⭐⭐⭐⭐
 
 > 🎯 目标等级：L3 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Spring / Bean
 
@@ -430,7 +507,7 @@ Spring Bean 一共有 **6 种**作用域，分为两类：**通用作用域**和
 
 Bean 生命周期主线：实例化 → 提前暴露（三级缓存）→ 属性注入 → Aware 回调 → 初始化前（@PostConstruct）→ 初始化（afterPropertiesSet/init-method）→ 初始化后（AOP 代理）→ 就绪使用 → 销毁。全程由 `AbstractAutowireCapableBeanFactory#doCreateBean` 串起。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：实例化、先暴露、注属性、Aware、前、初、后、就绪、销毁
 - **关键词**：doCreateBean ／ BeanPostProcessor ／ singletonObjects
@@ -474,6 +551,7 @@ Bean 生命周期主线：实例化 → 提前暴露（三级缓存）→ 属性
 
 - 【L3】Aware 回调与 `@PostConstruct` 谁先执行？Aware 回调属于"初始化前注入容器信息"阶段，在 `BeanPostProcessor#postProcessBeforeInitialization` 之前执行；`@PostConstruct` 由 `CommonAnnotationBeanPostProcessor` 在前置处理阶段执行，所以 Aware 先于 `@PostConstruct`，顺序由 `AbstractAutowireCapableBeanFactory#initializeBean` 固定。
 - 【L3】`postProcessAfterInitialization` 返回一个全新对象，容器里存的到底是哪个？存的是返回值。AOP 正是利用这一点用代理对象替换原始 Bean；若后置处理器返回原对象则直接注册原对象，包装类增强都基于同一机制。
+- 【L3】**量化参数**：典型 SpringBoot 应用（200~500 Bean）启动时，每个 Bean 平均经过 10~15 个 `BeanPostProcessor`，单个 Bean 创建耗时约 0.5~5ms（含反射、注入、代理）。启动总耗时中，Bean 生命周期回调约占 30~50%，外部资源连接（数据库、缓存、MQ）占 40~60%。大型应用（2000+ Bean）启动可达 60~120s，其中代理创建和依赖注入各占约 20~30%。
 - 【L4】销毁回调在 `kill -9` 时会执行吗？不会。销毁回调只在容器正常 `close()`（如注册了 ShutdownHook 收到 SIGTERM）时触发，`kill -9` 直接终止 JVM，`@PreDestroy` 与 `destroy-method` 都不会执行。关键资源清理必须依赖外部机制（如连接池超时回收）兜底。
 
 :::
@@ -504,9 +582,17 @@ Bean 生命周期主线：实例化 → 提前暴露（三级缓存）→ 属性
 
 #### 🔀 发散问题
 
-- **Q：提前暴露的三级缓存如何解循环依赖？** → 工厂懒生成早期引用，见本文档「Spring 如何解决循环依赖？」。
-- **Q：初始化前后置处理器有哪些扩展点？** → BeanPostProcessor 等，见本文档「Spring 有哪些核心扩展点？」。
-- **Q：@PostConstruct/@PreDestroy 注解本身怎么用？** → 标注生命周期回调方法，见本文档「Spring 中的 @PostConstruct 和 @PreDestroy 注解的作用是什么？」。
+- **Q：提前暴露的三级缓存如何解循环依赖？**
+
+  → 工厂懒生成早期引用，见本文档「Spring 如何解决循环依赖？」。
+
+- **Q：初始化前后置处理器有哪些扩展点？**
+
+  → BeanPostProcessor 等，见本文档「Spring 有哪些核心扩展点？」。
+
+- **Q：@PostConstruct/@PreDestroy 注解本身怎么用？**
+
+  → 标注生命周期回调方法，见本文档「Spring 中的 @PostConstruct 和 @PreDestroy 注解的作用是什么？」。
 
 ### 【中等】Spring 的单例 Bean 是否有并发安全问题？⭐⭐
 
@@ -516,7 +602,7 @@ Bean 生命周期主线：实例化 → 提前暴露（三级缓存）→ 属性
 
 Spring 单例 Bean 本身不保证线程安全，问题取决于 Bean 内部状态：无状态（或状态不可变/线程安全）则安全，有可变共享状态则不安全。根治办法是设计成无状态，状态外置或用 ThreadLocal。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：容器管唯一，不管线程安全；无状态即安全
 - **关键词**：无状态 ／ 共享可变状态 ／ ThreadLocal
@@ -549,10 +635,15 @@ Spring 的单例 Bean 本身**并不保证线程安全**，其是否存在并发
 
 #### 🔀 发散问题
 
-- **Q：单例是如何在容器中保证唯一的？** → 三级缓存与单例注册表，见本文档「Spring 如何解决循环依赖？」。
-- **Q：Bean 作用域还有哪些？** → prototype 与 4 种 Web 作用域，见本文档「Spring Bean 支持哪些作用域？」。
+- **Q：单例是如何在容器中保证唯一的？**
 
-### 【中等】Spring 是如何启动的？⭐⭐
+  → 三级缓存与单例注册表，见本文档「Spring 如何解决循环依赖？」。
+
+- **Q：Bean 作用域还有哪些？**
+
+  → prototype 与 4 种 Web 作用域，见本文档「Spring Bean 支持哪些作用域？」。
+
+### 【困难】Spring 是如何启动的？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / IoC
 
@@ -560,7 +651,7 @@ Spring 的单例 Bean 本身**并不保证线程安全**，其是否存在并发
 
 Spring 启动即 IoC 容器初始化：加载配置 → 解析 BeanDefinition → 实例化单例 → 依赖注入 → 前置处理 → 初始化回调 → 后置处理 → 发布 ContextRefreshedEvent 容器就绪。初始化回调固定在两个 BeanPostProcessor 之间。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：读配置、析图纸、建对象、注依赖、前处、回调、后处、就绪
 - **关键词**：refresh ／ BeanDefinition ／ ContextRefreshedEvent
@@ -586,14 +677,21 @@ Spring 启动的核心是 IoC 容器的初始化，分为以下关键阶段：
 ::: details
 
 - 【L3】上述流程统一收口在 `AbstractApplicationContext#refresh()` 的 12 步模板方法中，`preInstantiateSingletons` 负责第 3 步的批量预实例化。
+- 【L3】启动耗时排查：Spring Framework 5.3 起提供 `ApplicationStartup` 启动观测 SPI，给 `SpringApplication` 挂上 `BufferingApplicationStartup` 即可环形缓冲各 `StartupStep`（Bean 创建、配置类解析等）的耗时；Spring Boot 2.4 起可通过 `/actuator/startup` 端点导出，定位启动慢的具体环节，替代"凭感觉加 @Lazy"的盲改。
+- 【L3】组件扫描提速：`spring-context-indexer` 在编译期生成 `META-INF/spring.components` 索引，运行期直接读索引替代类路径扫描；Spring 6 时代更进一步，用 AOT 在编译期完成 Bean 定义解析（见本文档「什么是 IoC？什么是依赖注入？什么是 Spring IoC？」的 AOT 条目）。
 - 【L4】`ContextRefreshedEvent` 可能触发多次（父子容器各 refresh 一次），监听时可用 `event.getApplicationContext().getParent() == null` 过滤。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：容器初始化的四个阶段怎么划分？** → 加载、注册、实例化注入、初始化，见本文档「Spring IOC 容器如何初始化？」。
-- **Q：就绪事件属于什么机制？** → 内置事件之一，见本文档「Spring 事件机制是什么？」。
+- **Q：容器初始化的四个阶段怎么划分？**
+
+  → 加载、注册、实例化注入、初始化，见本文档「Spring IOC 容器如何初始化？」。
+
+- **Q：就绪事件属于什么机制？**
+
+  → 内置事件之一，见本文档「Spring 事件机制是什么？」。
 
 ### 【中等】什么是自动装配？⭐⭐
 
@@ -603,7 +701,7 @@ Spring 启动的核心是 IoC 容器的初始化，分为以下关键阶段：
 
 自动装配是让容器按规则自动注入依赖，免去手写 `<property>`/`ref`。XML 的 autowire 有 no/byName/byType/constructor 四种取值；现代开发主流用注解：`@Autowired` 按类型、`@Resource` 按名称。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：no、名、型、构造；注解时代 Autowired 按型、Resource 按名
 - **关键词**：byName ／ byType ／ @Autowired
@@ -635,20 +733,25 @@ Spring 的自动装配，就是让容器根据某种规则自动把依赖注入�
 
 #### 🔀 发散问题
 
-- **Q：自动装配具体有哪些方式？** → XML 四种 + 注解两种，见本文档「Spring 自动装配的方式有哪些？」。
-- **Q：@Autowired/@Resource/@Inject 怎么选？** → 来源与装配策略不同，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
+- **Q：@Autowired/@Resource/@Inject 怎么选？**
+
+  → 来源与装配策略不同，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
+
+- **Q：多候选 Bean 如何指定优先级？**
+
+  → @Primary 标记优先注入，见本文档「Spring 中的 @Primary 注解的作用是什么？」。
 
 ## IoC
 
 ### 【简单】什么是 IoC？什么是依赖注入？什么是 Spring IoC？⭐⭐⭐⭐
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / IoC
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / IoC
 
 #### 💎 关键结论
 
 IoC 是设计思想：对象创建、组装、生命周期的控制权反转给容器；DI 是实现 IoC 的具体技术（构造器/setter/字段注入）；Spring IoC 容器是其主流实现，核心链路是配置元数据 → BeanDefinition → 容器实例化管理。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：IoC 是思想，DI 是手段，容器是载体
 - **关键词**：控制反转 ／ 依赖注入 ／ BeanDefinition
@@ -658,7 +761,27 @@ IoC 是设计思想：对象创建、组装、生命周期的控制权反转给�
 
 **控制反转（IoC）**是一种**设计思想**：将对象的**创建、组装、生命周期**的控制权从业务代码反转给**外部容器**——业务代码只声明"我需要什么"，由容器负责"给你什么"，目的是**解耦**。
 
-**依赖注入（DI）**是实现 IoC 的**具体技术**：由容器**动态地**将依赖关系**注入**到对象中（构造器、setter、字段三种方式）。
+**依赖注入（DI）**是实现 IoC 的**具体技术**：由容器**动态地**将依赖关系**注入**到对象中。共有五种方式：
+
+| 依赖注入方式        | 配置元数据举例                                     |
+| ------------------- | -------------------------------------------------- |
+| **构造器注入**      | `<constructor-arg name="user" ref="userBean" />`   |
+| **Setter 方法注入** | `<property name="user" ref="userBean"/>`           |
+| **字段注入**        | `@Autowired User user;`                            |
+| **方法注入**        | `@Autowired public void user(User user) { ... }`   |
+| **接口回调注入**    | `class MyBean implements BeanFactoryAware { ... }` |
+
+三种主流注入方式的对比：
+
+| 维度            | 构造器注入           | Setter 注入      | 字段注入     |
+| :-------------- | :------------------- | :--------------- | :----------- |
+| **不可变性**    | 支持（`final` 字段） | 不支持           | 不支持       |
+| **依赖完整性**  | 强（对象创建即完整） | 弱（可能未设置） | 弱           |
+| **循环依赖**    | 不支持（会报错）     | 支持             | 支持         |
+| **测试友好**    | 好（可直接 new）     | 中               | 差（需反射） |
+| **Spring 推荐** | **推荐**             | 推荐             | 不推荐       |
+
+Spring 官方建议：强制依赖使用构造器注入，可选依赖使用 Setter 注入，避免使用字段注入。
 
 **Spring IoC 容器**是 Spring 对 IoC/DI 的实现，核心链路（源码定位）：
 
@@ -675,10 +798,12 @@ IoC 是设计思想：对象创建、组装、生命周期的控制权反转给�
 ::: details 方案权衡与失效边界（L2/L3）
 
 - **BeanFactory vs ApplicationContext**：`BeanFactory` 是最小 IoC 容器，默认**懒加载**（首次 `getBean` 才创建）；`ApplicationContext` 在其上叠加事件发布（`ApplicationEventPublisher`）、国际化（`MessageSource`）、环境抽象（`Environment`）与 AOP 集成，且默认在 `refresh()` 中**预实例化**全部非懒加载单例，启动即暴露配置错误。生产应用一律用 `ApplicationContext`。
-- **构造器注入 vs setter vs 字段注入**：构造器注入保证依赖不可变、对象出生即完整、单测可直接 new，但循环依赖会失败；setter/字段注入灵活但依赖可空。官方推荐：强制依赖构造器、可选依赖 setter、避免字段注入。
+- **构造器注入 vs setter vs 字段注入**：构造器注入遇循环依赖直接失败其实是"好事"——它把设计问题暴露在启动期，而 Setter/字段注入被三级缓存悄悄掩盖。方法注入还有一种特殊形态：`@Lookup` 注解方法，由 CGLIB 重写方法每次返回新 Bean，解决"单例依赖 prototype"每次拿新实例的问题。接口回调注入（Aware 系列）注入的是容器自身资源（BeanFactory、ApplicationContext），而非业务 Bean。
 - 【失效】单例 Bean 不等于线程安全：容器只保证"唯一实例"，不保证状态安全。
 - 【失效】重复创建 `ApplicationContext`：容器不是轻量对象（扫描、实例化、代理创建全量执行），在请求路径里 new 容器会直接压垮内存与 GC。
 - 【失效】容器外 new 的对象不受管理：`@Autowired`、`@Transactional` 等全部失效。
+- 【L3】**量化参数**：典型中型 SpringBoot 应用包含 500~2000 个 `BeanDefinition`，`refresh()` 启动耗时约 5~15s；大型企业应用可达 3000~5000+ Bean，启动耗时 30~90s。单例 Bean 全部实例化后内存占用约 200MB~1GB（取决于对象大小和依赖深度）。
+- 【L3】**Spring Framework 6.0+ AOT**：Spring 6（2022）引入 AOT 编译支持，在编译期预生成 Bean 定义和代理代码，减少运行期反射开销，启动时间可缩短 30~50%，内存占用降低 20~30%。Spring Native / GraalVM 原生镜像可进一步将启动时间压缩到毫秒级。
 
 :::
 
@@ -702,90 +827,21 @@ IoC 是设计思想：对象创建、组装、生命周期的控制权反转给�
 
 #### 🔀 发散问题
 
-- **Q：两种容器的区别展开讲？** → BeanFactory 懒加载 vs ApplicationContext 预实例化，见本文档「BeanFactory 和 ApplicationContext 有什么区别？」。
-- **Q：注入方式有哪几种？** → 构造器、setter、字段、方法、接口回调，见本文档「Spring 一共有几种注入方式？」。
-- **Q：容器启动的完整阶段？** → refresh 十二步，见本文档「Spring 是如何启动的？」。
+- **Q：两种容器的区别展开讲？**
 
-### 【中等】Spring 一共有几种注入方式？⭐⭐
+  → BeanFactory 懒加载 vs ApplicationContext 预实例化，见本文档「BeanFactory 和 ApplicationContext 有什么区别？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / IoC
+- **Q：容器启动的完整阶段？**
 
-#### 💎 关键结论
+  → refresh 十二步，见本文档「Spring 是如何启动的？」。
 
-依赖注入有五种方式：构造器注入、Setter 方法注入、字段注入、方法注入、接口回调注入（Aware）。实践中构造器注入是首选，字段注入虽常见但官方不推荐。
+- **Q：循环依赖到底怎么被解决的？**
 
-#### ⚡记忆卡片
+  → 三级缓存提前暴露，见本文档「Spring 如何解决循环依赖？」。
 
-- **口诀**：构造、Setter、字段、方法、Aware 回调
-- **关键词**：构造器注入 ／ 字段注入 ／ Aware
-- **链路**：构造器（实例化时）→ Setter/字段（populateBean）→ Aware（回调）
+- **Q：@Autowired 的多候选消歧？**
 
-#### 📖 核心知识
-
-依赖注入有如下方式：
-
-| 依赖注入方式        | 配置元数据举例                                     |
-| ------------------- | -------------------------------------------------- |
-| **构造器注入**      | `<constructor-arg name="user" ref="userBean" />`   |
-| **Setter 方法注入** | `<property name="user" ref="userBean"/>`           |
-| **字段注入**        | `@Autowired User user;`                            |
-| **方法注入**        | `@Autowired public void user(User user) { ... }`   |
-| **接口回调注入**    | `class MyBean implements BeanFactoryAware { ... }` |
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L3】方法注入还有一种特殊形态：`@Lookup` 注解方法，由 CGLIB 重写方法每次返回新 Bean，解决"单例依赖 prototype"每次拿新实例的问题。
-- 【L3】接口回调注入（Aware 系列）注入的是容器自身资源（BeanFactory、ApplicationContext），而非业务 Bean。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：三种主流注入方式如何对比？** → 不可变性、循环依赖、测试友好度，见本文档「构造器注入、Setter 注入、字段注入有什么区别？」。
-- **Q：注入背后的自动装配规则？** → 按类型/按名称，见本文档「什么是自动装配？」。
-
-### 【中等】构造器注入、Setter 注入、字段注入有什么区别？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / IoC
-
-#### 💎 关键结论
-
-构造器注入支持不可变、对象出生即完整、测试友好但不支持循环依赖；Setter/字段注入灵活但依赖可空。Spring 官方建议：强制依赖用构造器，可选依赖用 Setter，避免字段注入。
-
-#### ⚡记忆卡片
-
-- **口诀**：构造器强完整，Setter 灵活，字段图省事但别用
-- **关键词**：不可变性 ／ 循环依赖 ／ 测试友好
-- **链路**：构造器（实例化时）vs Setter/字段（属性填充时）
-
-#### 📖 核心知识
-
-| 维度            | 构造器注入                                | Setter 注入      | 字段注入     |
-| :-------------- | :---------------------------------------- | :--------------- | :----------- |
-| **不可变性**    | 支持（`final` 字段）                      | 不支持           | 不支持       |
-| **依赖完整性**  | 强（对象创建即完整）                      | 弱（可能未设置） | 弱           |
-| **循环依赖**    | 不支持（会报错）                          | 支持             | 支持         |
-| **可选依赖**    | 不支持（需 `@Autowired(required=false)`） | 支持             | 支持         |
-| **测试友好**    | 好（可直接 new）                          | 中               | 差（需反射） |
-| **Spring 推荐** | **推荐**                                  | 推荐             | 不推荐       |
-
-**Spring 官方建议**：强制依赖使用构造器注入，可选依赖使用 Setter 注入，避免使用字段注入。构造器注入能保证依赖不可变、对象状态完整，且便于单元测试。
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L3】字段注入无法声明 final，且单测必须依赖 Spring 容器或反射设值，是官方反对的主因；Spring 4.3+ 单构造器可省略 `@Autowired`，降低了构造器注入的样板代码。
-- 【L4】构造器注入遇循环依赖直接失败其实是"好事"：它把设计问题暴露在启动期，而 Setter/字段注入被三级缓存悄悄掩盖。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：循环依赖到底怎么被解决的？** → 三级缓存提前暴露，见本文档「Spring 如何解决循环依赖？」。
-- **Q：@Autowired 的多候选消歧？** → @Qualifier/@Primary，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
+  → @Qualifier/@Primary，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
 
 ### 【中等】Spring IOC 容器如何初始化？⭐⭐
 
@@ -795,7 +851,7 @@ IoC 是设计思想：对象创建、组装、生命周期的控制权反转给�
 
 IoC 容器初始化四阶段：加载配置并调 refresh() → 解析注册 BeanDefinition（只登记图纸）→ 实例化与依赖注入 → Aware 回调、前后置处理与初始化回调完成 Bean 初始化。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：加载、注册、实例注入、初始化
 - **关键词**：refresh ／ BeanDefinitionRegistry ／ 预实例化
@@ -821,43 +877,15 @@ Spring IoC 容器初始化分为四个核心阶段：
 
 #### 🔀 发散问题
 
-- **Q：初始化阶段的完整顺序？** → 含销毁阶段的九步主线，见本文档「Spring Bean 的生命周期是怎样的？」。
-- **Q：能在实例化前改图纸的扩展点？** → BeanFactoryPostProcessor，见本文档「BeanFactoryPostProcessor 和 BeanPostProcessor 有什么区别？」。
+- **Q：初始化阶段的完整顺序？**
 
-### 【中等】Spring 自动装配的方式有哪些？⭐
+  → 含销毁阶段的九步主线，见本文档「Spring Bean 的生命周期是怎样的？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / IoC
+- **Q：能在实例化前改图纸的扩展点？**
 
-#### 💎 关键结论
+  → BeanFactoryPostProcessor，见本文档「BeanFactoryPostProcessor 和 BeanPostProcessor 有什么区别？」。
 
-自动装配分两代：XML 的 autowire 四种模式（no/byName/byType/constructor）；注解方式的 `@Autowired`（按类型，可配 @Qualifier）与 `@Resource`（JSR-250，默认按名称）。
-
-#### ⚡记忆卡片
-
-- **口诀**：no、名、型、构造；Autowired 看类型，Resource 看名字
-- **关键词**：byName ／ byType ／ @Autowired ／ @Resource
-- **链路**：XML autowire → @Autowired/@Resource → @Qualifier 消歧
-
-#### 📖 核心知识
-
-**XML 自动装配模式**（`<bean autowire="">`）：
-
-- `no`：默认，不自动装配，需手动声明依赖。
-- `byName`：根据属性名匹配容器中同名的 Bean。
-- `byType`：根据属性类型匹配唯一 Bean，存在多个同类型则报错。
-- `constructor`：通过构造器参数类型匹配，类似 `byType`。
-
-**主流注解方式**：
-
-- `@Autowired`：Spring 原生，默认按类型装配，可配合 `@Qualifier` 指定名称。
-- `@Resource`：JSR-250 规范，默认按名称装配，名称不匹配时降级为类型。
-
-#### 🔀 发散问题
-
-- **Q：三个注入注解的完整对比？** → 来源、装配策略、required 支持，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
-- **Q：多候选 Bean 如何指定优先级？** → @Primary 标记优先注入，见本文档「Spring 中的 @Primary 注解的作用是什么？」。
-
-### 【中等】Spring 中的 ObjectFactory 是什么？⭐⭐
+### 【困难】Spring 中的 ObjectFactory 是什么？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / IoC
 
@@ -865,7 +893,7 @@ Spring IoC 容器初始化分为四个核心阶段：
 
 `ObjectFactory<T>` 是 Spring 的函数式接口，仅含 `T getObject()`，核心作用是延迟获取 Bean。注入它而非直接注入 T，容器只在调用 getObject() 时才真正创建/获取实例，是三级缓存解循环依赖与作用域代理的底层机制。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：工厂存着不生产，调用才出货
 - **关键词**：延迟获取 ／ 三级缓存 ／ 作用域代理
@@ -888,8 +916,13 @@ Spring IoC 容器初始化分为四个核心阶段：
 
 #### 🔀 发散问题
 
-- **Q：ObjectFactory 在循环依赖中的完整作用？** → 懒生成早期引用，见本文档「Spring 解决循环依赖为什么一定要用三级缓存？」。
-- **Q：与 FactoryBean 什么关系？** → 都是"工厂"思想，见本文档「BeanFactory 和 FactoryBean 有什么区别？」。
+- **Q：ObjectFactory 在循环依赖中的完整作用？**
+
+  → 懒生成早期引用，见本文档「Spring 解决循环依赖为什么一定要用三级缓存？」。
+
+- **Q：与 FactoryBean 什么关系？**
+
+  → 都是"工厂"思想，见本文档「BeanFactory 和 FactoryBean 有什么区别？」。
 
 ### 【简单】BeanFactory 和 ApplicationContext 有什么区别？⭐⭐⭐
 
@@ -899,7 +932,7 @@ Spring IoC 容器初始化分为四个核心阶段：
 
 BeanFactory 是 Spring 基础 IoC 容器，提供配置框架与基本功能，默认懒加载；ApplicationContext 是具备应用特性的子接口，叠加国际化、资源访问、事件机制与 AOP 集成，默认预实例化单例。实际开发推荐 ApplicationContext。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：BeanFactory 是底座，AC 是全家桶；一个懒加载，一个预实例化
 - **关键词**：基础容器 ／ 应用上下文 ／ 预实例化
@@ -925,10 +958,15 @@ BeanFactory 是 Spring 基础 IoC 容器，提供配置框架与基本功能，�
 
 #### 🔀 发散问题
 
-- **Q：事件机制具体怎么用？** → 发布者/监听器/内置事件，见本文档「Spring 事件机制是什么？」。
-- **Q：还有一个长得很像的 FactoryBean？** → 它是造对象的工厂，见本文档「BeanFactory 和 FactoryBean 有什么区别？」。
+- **Q：事件机制具体怎么用？**
 
-### 【简单】BeanFactory 和 FactoryBean 有什么区别？⭐
+  → 发布者/监听器/内置事件，见本文档「Spring 事件机制是什么？」。
+
+- **Q：还有一个长得很像的 FactoryBean？**
+
+  → 它是造对象的工厂，见本文档「BeanFactory 和 FactoryBean 有什么区别？」。
+
+### 【简单】BeanFactory 和 FactoryBean 有什么区别？⭐⭐
 
 > 🎯 目标等级：L1 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / IoC
 
@@ -936,7 +974,7 @@ BeanFactory 是 Spring 基础 IoC 容器，提供配置框架与基本功能，�
 
 BeanFactory 是 Spring 基础 IoC 容器（管所有 Bean）；FactoryBean 是创建 Bean 的一种方式，本身是能生产其他对象的特殊 Bean。`getBean` 默认返回其 `getObject()` 的产品，加 `&` 前缀才取工厂本身。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：BeanFactory 管全局，FactoryBean 造单品；& 取工厂
 - **关键词**：容器 ／ 特殊 Bean ／ getObject
@@ -954,10 +992,15 @@ BeanFactory 是 Spring 基础 IoC 容器（管所有 Bean）；FactoryBean 是�
 
 #### 🔀 发散问题
 
-- **Q：容器层的工厂接口是什么？** → BeanFactory/ApplicationContext，见本文档「BeanFactory 和 ApplicationContext 有什么区别？」。
-- **Q：复杂对象的另一种注册方式？** → @Bean 方法，见本文档「@Bean 和@Component 有什么区别？」。
+- **Q：容器层的工厂接口是什么？**
 
-### 【中等】@Autowired、@Resource、@Inject 有什么区别？⭐⭐⭐
+  → BeanFactory/ApplicationContext，见本文档「BeanFactory 和 ApplicationContext 有什么区别？」。
+
+- **Q：复杂对象的另一种注册方式？**
+
+  → @Bean 方法，见本文档「@Bean 和@Component 有什么区别？」。
+
+### 【中等】@Autowired、@Resource、@Inject 有什么区别？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / IoC
 
@@ -965,7 +1008,7 @@ BeanFactory 是 Spring 基础 IoC 容器（管所有 Bean）；FactoryBean 是�
 
 三者都用于依赖注入：@Autowired 是 Spring 专属、默认按类型，支持 required=false；@Resource 是 JSR-250 标准、默认按名称；@Inject 是 JSR-330 标准、按类型。Spring 项目首选 @Autowired，想解耦 Spring 用 @Resource。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Autowired 看型、Resource 看名、Inject 看型要加包
 - **关键词**：按类型 ／ 按名称 ／ JSR 标准
@@ -1001,10 +1044,15 @@ BeanFactory 是 Spring 基础 IoC 容器（管所有 Bean）；FactoryBean 是�
 
 #### 🔀 发散问题
 
-- **Q：多候选时 @Primary 与 @Qualifier 谁优先？** → @Qualifier 显式指定优先于 @Primary，见本文档「Spring 中的 @Primary 注解的作用是什么？」。
-- **Q：@Qualifier 怎么用？** → 指定 Bean 名称消歧，见本文档「@Qualifier 注解有什么作用」。
+- **Q：多候选时 @Primary 与 @Qualifier 谁优先？**
 
-### 【中等】@Configuration 和 @Component 有什么区别？⭐⭐
+  → @Qualifier 显式指定优先于 @Primary，见本文档「Spring 中的 @Primary 注解的作用是什么？」。
+
+- **Q：@Qualifier 怎么用？**
+
+  → 指定 Bean 名称消歧，见本文档「@Qualifier 注解有什么作用」。
+
+### 【困难】@Configuration 和 @Component 有什么区别？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / IoC
 
@@ -1012,7 +1060,7 @@ BeanFactory 是 Spring 基础 IoC 容器（管所有 Bean）；FactoryBean 是�
 
 两者都能注册 Bean，关键差异在 Full/Lite 模式：@Configuration 默认 Full 模式，配置类被 CGLIB 代理，@Bean 方法互调返回容器单例；@Component 是 Lite 模式，互调每次返回新对象。需要 Bean 间依赖的配置类必须用 @Configuration。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Full 有代理保单例，Lite 直调每次新
 - **关键词**：Full 模式 ／ CGLIB 代理 ／ proxyBeanMethods
@@ -1063,8 +1111,13 @@ public class ConfigB {
 
 #### 🔀 发散问题
 
-- **Q：@Bean 注解本身的定位？** → 方法级显式声明 Bean，见本文档「@Bean 和@Component 有什么区别？」。
-- **Q：配置类如何条件化导入？** → @Import + @Conditional，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
+- **Q：@Bean 注解本身的定位？**
+
+  → 方法级显式声明 Bean，见本文档「@Bean 和@Component 有什么区别？」。
+
+- **Q：配置类如何条件化导入？**
+
+  → @Import + @Conditional，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
 
 ### 【困难】Spring 如何解决循环依赖？⭐⭐⭐⭐⭐
 
@@ -1074,7 +1127,7 @@ public class ConfigB {
 
 循环依赖是多 Bean 相互持有引用形成闭环。Spring 用三级缓存解决：实例化后立即把 ObjectFactory 放入三级缓存提前暴露，对方注入时调用工厂拿早期引用（可能是代理）升到二级缓存，最终都进一级缓存。仅支持 singleton + setter/字段注入。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一级成品、二级半成品、三级工厂；实例化后立即暴露
 - **关键词**：singletonObjects ／ earlySingletonObjects ／ singletonFactories
@@ -1139,6 +1192,7 @@ graph TD
 - 【L3】`addSingletonFactory` 的调用时机为什么必须在 `populateBean` 之前？它位于 `doCreateBean` 中实例化之后、属性注入之前；只有先暴露工厂，注入属性触发对方创建时，对方才能反向取到本 Bean 的早期引用；若放到注入之后，循环已死锁无解。
 - 【L4】prototype Bean 为什么无法解循环依赖？prototype 不注册进三级缓存、每次 `getBean` 都新建实例，反向依赖永远拿不到早期引用，创建链无限递归，Spring 检测到创建中标记重复后直接抛 `BeanCurrentlyInCreationException`。
 - 【L4】场景题——订单/库存/通知三个 Service 形成 A→B→C→A 三方循环，每次重构都可能启动失败，如何根治？应急：环中任一注入点加 `@Lazy` 先恢复启动。根因：三方相互引用说明模块边界错误；三级缓存只能救 setter/字段注入的两方循环。长期：把依赖方向梳理成单向分层，C→A 反向调用改事件发布（`ApplicationEventPublisher` 或 MQ），用 ArchUnit 在 CI 禁止包级循环依赖复发。
+- 【L4】Spring Boot 2.6 起默认禁止循环引用：`spring.main.allow-circular-references` 默认值改为 `false`，即便是三级缓存本可解决的 setter/字段注入循环依赖，也会在启动期直接抛 `BeanCurrentlyInCreationException` 拒绝启动。官方意图是倒逼开发者重构消除循环依赖、而非依赖容器兜底；老项目升级到 2.6+ 常在此翻车——临时可显式设 `allow-circular-references=true` 恢复旧行为，但根治仍是解耦（抽协调者、改事件驱动）。
 
 :::
 
@@ -1168,9 +1222,17 @@ graph TD
 
 #### 🔀 发散问题
 
-- **Q：为什么二级缓存不够、必须三级？** → AOP 代理懒生成 + 并发安全，见本文档「Spring 解决循环依赖为什么一定要用三级缓存？」。
-- **Q：提前暴露依赖的生命周期阶段？** → 实例化与属性注入的间隙，见本文档「Spring Bean 的生命周期是怎样的？」。
-- **Q：@Lazy 如何破解构造器循环依赖？** → 注入懒代理推迟真实创建，见本文档「Spring 中的 @Lazy 注解的作用是什么？」。
+- **Q：为什么二级缓存不够、必须三级？**
+
+  → AOP 代理懒生成 + 并发安全，见本文档「Spring 解决循环依赖为什么一定要用三级缓存？」。
+
+- **Q：提前暴露依赖的生命周期阶段？**
+
+  → 实例化与属性注入的间隙，见本文档「Spring Bean 的生命周期是怎样的？」。
+
+- **Q：@Lazy 如何破解构造器循环依赖？**
+
+  → 注入懒代理推迟真实创建，见本文档「Spring 中的 @Lazy 注解的作用是什么？」。
 
 ### 【困难】Spring 解决循环依赖为什么一定要用三级缓存？⭐⭐⭐⭐⭐
 
@@ -1180,7 +1242,7 @@ graph TD
 
 三级而非二级的核心原因是 AOP 代理：三级存 ObjectFactory，只有真正发生循环依赖被引用时才懒生成早期代理，不需要代理的 Bean 零开销；二级缓存方案则要么违背"代理在初始化后创建"的设计原则，要么注入原始对象与最终代理不一致。二级缓存另保证并发下早期引用唯一。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：工厂懒生成，无环零开销；二级保唯一，加锁保原子
 - **关键词**：ObjectFactory ／ getEarlyBeanReference ／ earlyProxyReferences
@@ -1258,21 +1320,29 @@ graph TD
 
 #### 🔀 发散问题
 
-- **Q：三级缓存的完整流转时序？** → A 依赖 B、B 依赖 A 的六步时序，见本文档「Spring 如何解决循环依赖？」。
-- **Q：ObjectFactory 接口是什么？** → 延迟获取实例的函数式接口，见本文档「Spring 中的 ObjectFactory 是什么？」。
-- **Q：代理在哪个生命周期阶段正常创建？** → postProcessAfterInitialization，见本文档「Spring Bean 的生命周期是怎样的？」。
+- **Q：三级缓存的完整流转时序？**
+
+  → A 依赖 B、B 依赖 A 的六步时序，见本文档「Spring 如何解决循环依赖？」。
+
+- **Q：ObjectFactory 接口是什么？**
+
+  → 延迟获取实例的函数式接口，见本文档「Spring 中的 ObjectFactory 是什么？」。
+
+- **Q：代理在哪个生命周期阶段正常创建？**
+
+  → postProcessAfterInitialization，见本文档「Spring Bean 的生命周期是怎样的？」。
 
 ## AOP
 
-### 【简单】什么是 AOP？⭐⭐⭐⭐
+### 【简单】什么是 AOP？⭐⭐⭐
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / AOP
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / AOP
 
 #### 💎 关键结论
 
 AOP（面向切面编程）把与业务无关的公共功能（日志、事务、权限）从业务代码剥离，集中管理与复用，是 OOP 的补充。Spring AOP 基于运行时动态代理，织入发生在 Bean 初始化后阶段，只能拦截 Spring Bean 的 public 方法。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：切面做什么、切点在哪里、连接点可以做、通知何时做
 - **关键词**：Aspect ／ Pointcut ／ Advice ／ 织入
@@ -1291,7 +1361,7 @@ AOP（面向切面编程）把与业务无关的公共功能（日志、事务�
 - **连接点（JoinPoint）**：**“可以做的点”**。程序执行中的节点（如方法调用），是切点的具体实例。Spring AOP 的连接点**只有方法执行**一种。
 - **通知（Advice）**：**“何时做”**。定义切面工作的具体时机，5 种类型的接口与触发时机见「Spring 通知有哪些类型？」。
 - **目标对象（Target Object）**：被增强的原始业务对象，对切面逻辑无感知。
-- **代理（Proxy）**：Spring 生成的增强对象，接口 `AopProxy`，有接口用 JDK 动态代理、无接口用 CGLIB。
+- **代理（Proxy）**：Spring 生成的增强对象，接口 `AopProxy`。原生 Spring 默认有接口用 JDK 动态代理、无接口用 CGLIB；Spring Boot 2.x 起默认 `proxyTargetClass=true`，统一走 CGLIB（详见「Spring AOP 有哪些实现方式？」）。
 - **织入（Weaving）**：将切面应用到目标对象并生成代理的过程。Spring AOP 采用**运行时织入**（AspectJ 支持编译时、类加载时织入）。
 
 **织入时机（源码定位）**：Spring AOP 的织入发生在 Bean 生命周期的 `postProcessAfterInitialization` 阶段：`AbstractAutoProxyCreator#wrapIfNecessary` 判断 Bean 是否匹配任何 `Advisor`（`Pointcut#matches`），匹配则 `createProxy` 生成代理替换原 Bean。因此：**非 Spring 管理的对象、私有方法、自调用都拦截不到**（详见「Spring AOP 在哪些场景下会失效？」）。
@@ -1329,19 +1399,27 @@ AOP（面向切面编程）把与业务无关的公共功能（日志、事务�
 
 #### 🔀 发散问题
 
-- **Q：代理具体怎么创建？** → JDK/CGLIB 选型与创建链路，见本文档「Spring AOP 有哪些实现方式？」。
-- **Q：失效场景完整清单？** → 自调用、非 public、final/static 等八类，见本文档「Spring AOP 在哪些场景下会失效？」。
-- **Q：通知有哪 5 种类型？** → Before/AfterReturning/AfterThrowing/After/Around，见本文档「Spring 通知有哪些类型？」。
+- **Q：代理具体怎么创建？**
 
-### 【中等】Spring AOP 有哪些实现方式？⭐⭐⭐⭐
+  → JDK/CGLIB 选型与创建链路，见本文档「Spring AOP 有哪些实现方式？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / AOP
+- **Q：失效场景完整清单？**
+
+  → 自调用、非 public、final/static 等八类，见本文档「Spring AOP 在哪些场景下会失效？」。
+
+- **Q：通知有哪 5 种类型？**
+
+  → Before/AfterReturning/AfterThrowing/After/Around，见本文档「Spring 通知有哪些类型？」。
+
+### 【困难】Spring AOP 有哪些实现方式？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / AOP
 
 #### 💎 关键结论
 
 Spring AOP 基于动态代理，两条路线：JDK 动态代理（有接口，`Proxy.newProxyInstance`）与 CGLIB（无接口，ASM 生成子类）。决策入口 `DefaultAopProxyFactory#createAopProxy`：强制 proxyTargetClass 或无接口用 CGLIB，否则 JDK。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：有接口 JDK，没接口 CGLIB，Boot 默认全 CGLIB
 - **关键词**：JdkDynamicAopProxy ／ ObjenesisCglibAopProxy ／ proxyTargetClass
@@ -1369,11 +1447,11 @@ Spring AOP 基于**动态代理**，主要分为两种实现方式。概念与�
 
 **方案权衡**
 
-| 维度         | JDK 动态代理                        | CGLIB                                                 |
-| :----------- | :---------------------------------- | :---------------------------------------------------- |
-| **生成速度** | 快（反射生成）                      | 慢约一个数量级（ASM 生成字节码）                      |
-| **调用性能** | JDK 8 前略慢，之后与 CGLIB 基本持平 | 快（FastClass 索引调用）                              |
-| **能力边界** | 仅限接口方法                        | 所有非 final 实例方法                                 |
+| 维度         | JDK 动态代理                        | CGLIB                                                |
+| :----------- | :---------------------------------- | :--------------------------------------------------- |
+| **生成速度** | 快（反射生成）                      | 慢约一个数量级（ASM 生成字节码）                     |
+| **调用性能** | JDK 8 前略慢，之后与 CGLIB 基本持平 | 快（FastClass 索引调用）                             |
+| **能力边界** | 仅限接口方法                        | 所有非 final 实例方法                                |
 | **适用边界** | 接口稳定、面向接口编程的项目        | 无接口、或按实现类注入的项目（SpringBoot 2.x+ 默认） |
 
 ```mermaid
@@ -1421,11 +1499,19 @@ graph TD
 
 #### 🔀 发散问题
 
-- **Q：代理失效的完整场景清单？** → 自调用、非 public 等八类，见本文档「Spring AOP 在哪些场景下会失效？」。
-- **Q：与 AspectJ 的能力边界差异？** → 织入时机与拦截范围，见本文档「Spring AOP 和 AspectJ 有什么区别？」。
-- **Q：拦截器链如何递归执行？** → ReflectiveMethodInvocation 职责链，见本文档「Spring 拦截链如何实现？」。
+- **Q：代理失效的完整场景清单？**
 
-### 【中等】Spring AOP 和 AspectJ 有什么区别？⭐⭐
+  → 自调用、非 public 等八类，见本文档「Spring AOP 在哪些场景下会失效？」。
+
+- **Q：与 AspectJ 的能力边界差异？**
+
+  → 织入时机与拦截范围，见本文档「Spring AOP 和 AspectJ 有什么区别？」。
+
+- **Q：拦截器链如何递归执行？**
+
+  → ReflectiveMethodInvocation 职责链，见本文档「Spring 拦截链如何实现？」。
+
+### 【中等】Spring AOP 和 AspectJ 有什么区别？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / AOP
 
@@ -1433,7 +1519,7 @@ graph TD
 
 Spring AOP 是轻量级运行时代理实现，只能拦截容器内 Bean 的公共方法，开箱即用；AspectJ 是完整 AOP 框架，支持编译时/类加载时织入，直接改字节码，可拦截构造器、字段、静态方法，性能更优但配置复杂。绝大多数业务用 Spring AOP 即可。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Spring 代理只切方法，AspectJ 字节码全覆盖
 - **关键词**：运行时织入 ／ 字节码织入 ／ 拦截范围
@@ -1466,18 +1552,23 @@ Spring AOP 与 AspectJ 定位截然不同：
 
 #### 🔀 发散问题
 
-- **Q：Spring AOP 的两种代理实现？** → JDK/CGLIB 选型，见本文档「Spring AOP 有哪些实现方式？」。
-- **Q：Spring AOP 拦不到的场景？** → 自调用、非 public 等，见本文档「Spring AOP 在哪些场景下会失效？」。
+- **Q：Spring AOP 的两种代理实现？**
 
-### 【中等】Spring AOP 在哪些场景下会失效？⭐⭐⭐
+  → JDK/CGLIB 选型，见本文档「Spring AOP 有哪些实现方式？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / AOP
+- **Q：Spring AOP 拦不到的场景？**
+
+  → 自调用、非 public 等，见本文档「Spring AOP 在哪些场景下会失效？」。
+
+### 【中等】Spring AOP 在哪些场景下会失效？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / AOP
 
 #### 💎 关键结论
 
 AOP 失效的本质是调用未经过代理对象，或代理无法拦截该方法。最高频的坑是同类自调用；其次是 private/final/static、非 Spring 管理对象、切点不匹配静默失效、未开启代理支持等。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：自调用、非公开、final/static、没托管、表达式没中、开关没开
 - **关键词**：自调用 ／ 代理拦截 ／ 静默失效
@@ -1504,23 +1595,30 @@ Spring AOP 基于动态代理实现，失效的本质是**调用未经过代理�
 
 - 【L3】自调用三种解法的代价：注入自身（`@Autowired private OrderService self`）最简洁，依赖 Spring 4.3+ 自注入支持；`AopContext.currentProxy()` 需 `exposeProxy=true` 且代码耦合 AOP API；拆分到另一个 Bean 最干净但有重构成本。优先拆分，次选自注入。
 - 【L3】同样的失效规律适用于 `@Transactional`、`@Async`、`@Cacheable` 等所有基于代理的注解（可参照本文档「Spring 事务在什么情况下会失效？」「@Async 什么时候会失效？」）。
+- 【L3】**AspectJ 织入是绕过"代理类失效"的根治方案**：编译期织入（ajc）或加载期织入（`-javaagent:aspectjweaver.jar` + `@EnableLoadTimeWeaving`）直接改字节码，自调用、private/final/static、非容器对象都能被拦截；Spring AOP 场景下若确需拦截自调用，`@EnableAspectJAutoProxy(exposeProxy = true)` + `AopContext.currentProxy()` 是不引入 AspectJ 的折中。
+- 【L3】`@Async` 与 `@Transactional` 叠加在同一方法时，两个切面都挂在同一条代理拦截链上、由 Order 决定先后；异步切面先把执行切到新线程，而事务上下文绑定在原线程 `ThreadLocal`，结果是事务不生效——这也是"AOP 生效了但语义失效"的典型形态。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：为什么只能拦 public 方法？** → 代理公共契约限制，见本文档「什么是 AOP？」。
-- **Q：事务注解的失效场景与本题有何异同？** → 同源但另有异常规则/引擎不支持等配置类失效，见本文档「Spring 事务在什么情况下会失效？」。
+- **Q：为什么只能拦 public 方法？**
 
-### 【中等】Spring 拦截链如何实现？⭐⭐
+  → 代理公共契约限制，见本文档「什么是 AOP？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / AOP
+- **Q：事务注解的失效场景与本题有何异同？**
+
+  → 同源但另有异常规则/引擎不支持等配置类失效，见本文档「Spring 事务在什么情况下会失效？」。
+
+### 【困难】Spring 拦截链如何实现？⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / AOP
 
 #### 💎 关键结论
 
 Spring 有三层拦截：Filter（Servlet 层，最外）、HandlerInterceptor（MVC 层，DispatcherServlet 内）、AOP 切面（方法级）。请求进入时 Filter 前半段 → preHandle 顺序 → Controller → postHandle 倒序 → afterCompletion 倒序 → Filter 后半段倒序。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Filter 包最外，拦截器在 MVC，AOP 切到方法级；前进顺序、回来倒序
 - **关键词**：Filter ／ HandlerInterceptor ／ AOP
@@ -1549,30 +1647,38 @@ Spring 拦截链本质是将多个拦截器串联成链（职责链模式），�
 ::: details
 
 - 【L3】方法级的 AOP 拦截器链由 `ReflectiveMethodInvocation#proceed` 递归推进，事务、日志等 Advisor 按 `@Order`/优先级排序后链式执行。
+- 【L3】洋葱模型的实现细节：`ReflectiveMethodInvocation` 持有 `interceptorsAndDynamicMethodMatchers` 列表与 `currentInterceptorIndex` 游标，`proceed()` 每次先把游标 +1——未到链尾就调用下一个 `MethodInterceptor#invoke(this)`（把自己传下去），到达链尾才反射调用目标方法。`@Around` 中 `proceed()` 之前的代码按链前进顺序执行、之后的代码按链回退顺序执行，天然形成正确嵌套，这也是"环绕通知能包住其余通知"的原因。
+- 【L3】`ExposeInvocationInterceptor` 是链上默认的第一个拦截器（优先级 `Ordered.HIGHEST_PRECEDENCE`），把当前 `MethodInvocation` 存入 ThreadLocal，供 `ExposeInvocationInterceptor.currentInvocation()` 在切面或事务代码中免传参获取当前调用上下文（如目标方法上的注解）。
+- 【L3】拦截器链的构建方是 `ReflectiveAspectJAdvisorFactory#getInterceptorsAndDynamicInterceptionAdvice`：把每个 Advisor 的 Advice 适配为对应的 `MethodInterceptor`（`AspectJMethodBeforeAdvice`→`MethodBeforeAdviceInterceptor`、`AspectJAroundAdvice`→`AspectJAroundAdvice` 本身即拦截器等），再按顺序组成链。
 - 【L3】Filter 与 Interceptor 的选择：需要操作 HTTP 报文/静态资源用 Filter；需要拿到 Handler 信息、访问容器 Bean 用 Interceptor。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：拦截器如何定义与注册？** → 实现 HandlerInterceptor + WebMvcConfigurer，见本文档「Spring MVC 中的拦截器是什么？如何定义一个拦截器？」。
-- **Q：方法级拦截的通知类型？** → 5 种通知，见本文档「Spring 通知有哪些类型？」。
+- **Q：拦截器如何定义与注册？**
+
+  → 实现 HandlerInterceptor + WebMvcConfigurer，见本文档「Spring MVC 中的拦截器是什么？如何定义一个拦截器？」。
+
+- **Q：方法级拦截的通知类型？**
+
+  → 5 种通知，见本文档「Spring 通知有哪些类型？」。
 
 ## 事件
 
-### 【中等】Spring 事件机制是什么？⭐⭐
+### 【困难】Spring 事件机制是什么？⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / 事件
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / 事件
 
 #### 💎 关键结论
 
 Spring 事件机制基于观察者模式，实现组件间解耦通信：发布者通过 ApplicationEventPublisher 发事件，监听器（ApplicationListener 或 @EventListener）接收处理。默认同步执行，@Async 可异步，@TransactionalEventListener 可绑定事务阶段。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
-- **口诀**：发事件、听事件，同步默认，事务阶段可挂钩
-- **关键词**：ApplicationEvent ／ ApplicationEventPublisher ／ ApplicationListener
-- **链路**：publishEvent → SimpleApplicationEventMulticaster → 监听器 onApplicationEvent
+- **口诀**：发事件、听事件，同步默认，事务阶段可挂钩；接口方式一类一事，注解方式一方法一事可加条件
+- **关键词**：ApplicationEvent ／ ApplicationEventPublisher ／ @EventListener ／ condition 过滤
+- **链路**：ApplicationListener（4.2 前）→ @EventListener（4.2+ 推荐）→ @TransactionalEventListener（事务阶段）
 
 #### 📖 核心知识
 
@@ -1637,37 +1743,7 @@ public class MyEventPublisher {
 
 **异步事件**：在 `@EventListener` 方法上添加 `@Async`，配合 `@EnableAsync` 即可实现异步事件处理，避免阻塞发布者。
 
-#### 🔬 扩展知识
-
-::: details
-
-- 【L3】默认情况下事件是**同步**执行的，监听器在发布者的线程中运行；广播器 `SimpleApplicationEventMulticaster` 默认无线程池，配置其 `taskExecutor` 可全局异步。
-- 【L3】`@TransactionalEventListener` 支持在事务的特定阶段（如 `AFTER_COMMIT`）触发监听器，常用于事务提交后异步处理（发通知、刷新缓存），避免"事务回滚但消息已发"。
-- 【L4】同步监听器抛异常会回卷到发布者，事务内监听器异常可能导致发布方事务回滚，需自行 try-catch 或改异步。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：两种监听方式怎么选？** → @EventListener 零侵入更推荐，见本文档「@EventListener 和 ApplicationListener 有什么区别？」。
-- **Q：@Async 如何开启异步？** → @EnableAsync + 线程池，见本文档「@Async 注解的原理是什么？」。
-- **Q：事件在启动流程中何时发布？** → refresh 完成后发 ContextRefreshedEvent，见本文档「Spring 是如何启动的？」。
-
-### 【中等】@EventListener 和 ApplicationListener 有什么区别？⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 事件
-
-#### 💎 关键结论
-
-ApplicationListener 需实现接口、一个类只能监听一种事件，耦合 Spring 接口；@EventListener 标注在任意 public 方法上，零侵入、一类可监听多种事件且支持 SpEL 条件过滤，Spring 4.2+ 推荐。
-
-#### ⚡记忆卡片
-
-- **口诀**：接口方式一类一事，注解方式一方法一事可加条件
-- **关键词**：接口实现 ／ 注解标注 ／ condition 过滤
-- **链路**：ApplicationListener（4.2 前）→ @EventListener（4.2+ 推荐）→ @TransactionalEventListener（事务阶段）
-
-#### 📖 核心知识
+**两种监听方式对比**
 
 | 维度         | `ApplicationListener` 接口 | `@EventListener` 注解                |
 | :----------- | :------------------------- | :----------------------------------- |
@@ -1679,14 +1755,36 @@ ApplicationListener 需实现接口、一个类只能监听一种事件，耦合
 
 **示例**：`@EventListener(condition = "#event.source == 'order'")` 可实现条件化监听。
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】默认情况下事件是**同步**执行的，监听器在发布者的线程中运行；广播器 `SimpleApplicationEventMulticaster` 默认无线程池，配置其 `taskExecutor` 可全局异步。
+- 【L3】多个监听器之间**默认不保证执行顺序**（按注册/发现顺序），需要顺序时用 `Ordered`/`@Order` 显式声明；但业务逻辑依赖监听器之间的先后顺序本身是坏味道，有顺序依赖应改为显式编排。
+- 【L3】`@TransactionalEventListener` 支持在事务的特定阶段（如 `AFTER_COMMIT`）触发监听器，常用于事务提交后异步处理（发通知、刷新缓存），避免"事务回滚但消息已发"。
+- 【L4】同步监听器抛异常会回卷到发布者，事务内监听器异常可能导致发布方事务回滚，需自行 try-catch 或改异步。
+- 【L4】`@TransactionalEventListener(AFTER_COMMIT)` 的异常语义：事务已提交，监听器抛异常**不会回滚已提交的数据**（且默认场景下异常只被记录，不会传播给发布方）——失败补偿要靠重试表/MQ 自行兜底。
+- 【L4】`@Async` 事件的代价：线程切换后脱离发布者的线程上下文（事务绑定在 `TransactionSynchronizationManager` 的 ThreadLocal 上），监听器读不到原事务未提交的数据；且进程内事件不持久化，服务宕机则待处理事件直接丢失。事件与 MQ 的边界在此：事件是**进程内**解耦（同 JVM、随进程消失），跨进程、需持久化与重试保障的必须走 MQ。
+
+:::
+
 #### 🔀 发散问题
 
-- **Q：事件机制的整体原理？** → 发布者/监听器/内置事件，见本文档「Spring 事件机制是什么？」。
-- **Q：SpEL 表达式还能用在哪？** → 缓存键、权限、条件装配，见本文档「什么是 SpEL？在 Spring 中有哪些常见应用？」。
+- **Q：SpEL 表达式还能用在哪？**
+
+  → 缓存键、权限、条件装配，见本文档「什么是 SpEL？在 Spring 中有哪些常见应用？」。
+
+- **Q：@Async 如何开启异步？**
+
+  → @EnableAsync + 线程池，见本文档「@Async 注解的原理是什么？」。
+
+- **Q：事件在启动流程中何时发布？**
+
+  → refresh 完成后发 ContextRefreshedEvent，见本文档「Spring 是如何启动的？」。
 
 ## 扩展点
 
-### 【困难】Spring 有哪些核心扩展点？⭐⭐⭐
+### 【困难】Spring 有哪些核心扩展点？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / 扩展点
 
@@ -1694,7 +1792,7 @@ ApplicationListener 需实现接口、一个类只能监听一种事件，耦合
 
 Spring 扩展点按执行时机分两大类：容器级（BeanDefinitionRegistryPostProcessor、BeanFactoryPostProcessor，实例化前改图纸）与 Bean 级（InstantiationAwareBeanPostProcessor、BeanPostProcessor、Aware、InitializingBean、DisposableBean，针对单 Bean 创建全程）。BeanPostProcessor 是最核心的扩展点，@Autowired 注入与 AOP 代理都靠它。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：容器级改图纸，Bean 级改成品；注册→工厂→实例化→属性→初始化→销毁
 - **关键词**：BeanFactoryPostProcessor ／ BeanPostProcessor ／ Aware
@@ -1751,6 +1849,7 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 - 【L3】`BeanPostProcessor` 自身实例化早于普通 Bean：容器在 `registerBeanPostProcessors` 阶段就把它们创建出来，因此 BPP 不应依赖普通业务 Bean（会触发提前初始化、破坏代理顺序）。
 - 【L3】`PropertyPlaceholderConfigurer`/`PropertySourcesPlaceholderConfigurer` 就是经典的 BeanFactoryPostProcessor，在实例化前替换 `${}` 占位符。
 - 【L4】`InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation` 返回非 null 会短路标准实例化流程，AOP 对 Infrastructure 类 Bean 的短路优化就走这里。
+- 【L4】扩展点选型论证（做 starter/中间件时的决策）：注册普通 Bean 用自动配置类 `@Bean`；需按注解/扫描**动态注册定义**用 `ImportBeanDefinitionRegistrar`（如 `@MapperScan`）；需**修改既有定义**（占位符解密、属性覆盖）用 `BeanFactoryPostProcessor`；需**增强/代理每个实例**（埋点、通用切面）用 `BeanPostProcessor`；对象构造逻辑复杂需向容器隐藏创建细节用 `FactoryBean`。判据是介入时机（定义期 vs 实例期）与作用粒度（容器级 vs 单 Bean）。
 
 :::
 
@@ -1779,9 +1878,17 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 
 #### 🔀 发散问题
 
-- **Q：两类处理器的一句话区别？** → 改图纸 vs 改成品，见本文档「BeanFactoryPostProcessor 和 BeanPostProcessor 有什么区别？」。
-- **Q：初始化回调的三种方式？** → @PostConstruct/InitializingBean/init-method，见本文档「InitializingBean 和 init-method 有什么区别？」。
-- **Q：扩展点在生命周期中的位置？** → 九步主线，见本文档「Spring Bean 的生命周期是怎样的？」。
+- **Q：两类处理器的一句话区别？**
+
+  → 改图纸 vs 改成品，见本文档「BeanFactoryPostProcessor 和 BeanPostProcessor 有什么区别？」。
+
+- **Q：初始化回调的三种方式？**
+
+  → @PostConstruct/InitializingBean/init-method，见本文档「InitializingBean 和 init-method 有什么区别？」。
+
+- **Q：扩展点在生命周期中的位置？**
+
+  → 九步主线，见本文档「Spring Bean 的生命周期是怎样的？」。
 
 ### 【中等】BeanFactoryPostProcessor 和 BeanPostProcessor 有什么区别？⭐⭐⭐
 
@@ -1791,7 +1898,7 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 
 一句话：BeanFactoryPostProcessor 改图纸（BeanDefinition），BeanPostProcessor 改成品（Bean 实例）。前者在实例化前、容器级对所有 Bean 生效，只能改配置不能造对象；后者在实例化后、Bean 级针对单个 Bean，可返回代理对象。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：BFPP 改图纸，BPP 改成品
 - **关键词**：BeanDefinition ／ Bean 实例 ／ 代理
@@ -1820,10 +1927,15 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 
 #### 🔀 发散问题
 
-- **Q：全部扩展点的执行顺序？** → 从 BDRPP 到 DisposableBean，见本文档「Spring 有哪些核心扩展点？」。
-- **Q：BPP 在生命周期哪两步执行？** → 初始化前后，见本文档「Spring Bean 的生命周期是怎样的？」。
+- **Q：全部扩展点的执行顺序？**
 
-### 【中等】InitializingBean 和 init-method 有什么区别？⭐
+  → 从 BDRPP 到 DisposableBean，见本文档「Spring 有哪些核心扩展点？」。
+
+- **Q：BPP 在生命周期哪两步执行？**
+
+  → 初始化前后，见本文档「Spring Bean 的生命周期是怎样的？」。
+
+### 【中等】InitializingBean 和 init-method 有什么区别？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 扩展点
 
@@ -1831,7 +1943,7 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 
 两者都在属性注入完成后执行初始化逻辑：InitializingBean 需实现接口、侵入性强，先执行；init-method 零侵入、POJO 可用，后执行。完整顺序：@PostConstruct → afterPropertiesSet → init-method，生产首选 @PostConstruct 或 init-method。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：接口先、配置后；@PostConstruct 最前面
 - **关键词**：afterPropertiesSet ／ initMethod ／ 执行顺序
@@ -1852,8 +1964,13 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 
 #### 🔀 发散问题
 
-- **Q：@PostConstruct 注解的定位？** → JSR-250 标准、侵入最低，见本文档「Spring 中的 @PostConstruct 和 @PreDestroy 注解的作用是什么？」。
-- **Q：初始化在整个生命周期中的位置？** → 第 6 步，见本文档「Spring Bean 的生命周期是怎样的？」。
+- **Q：@PostConstruct 注解的定位？**
+
+  → JSR-250 标准、侵入最低，见本文档「Spring 中的 @PostConstruct 和 @PreDestroy 注解的作用是什么？」。
+
+- **Q：初始化在整个生命周期中的位置？**
+
+  → 第 6 步，见本文档「Spring Bean 的生命周期是怎样的？」。
 
 ## 数据
 
@@ -1865,7 +1982,7 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 
 Spring 把各持久层技术的异常统一转换为 `DataAccessException` 体系（unchecked），屏蔽底层差异。常见子类：`DataIntegrityViolationException`（约束冲突）、`DuplicateKeyException`（主键/唯一键冲突）、`DataAccessResourceFailureException`（连接失败）、`DeadlockLoserDataAccessException`（死锁）等。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一树 DataAccessException，各库方言统一翻译
 - **关键词**：DataAccessException ／ 异常转换 ／ PersistenceExceptionTranslator
@@ -1898,8 +2015,13 @@ Spring DAO 异常体系要点：
 
 #### 🔀 发散问题
 
-- **Q：@Repository 注解还有什么额外价值？** → 异常翻译，见本文档「@Component, @Controller, @Repository, @Service 有何区别？」。
-- **Q：事务回滚默认只认哪些异常？** → RuntimeException/Error，见本文档「Spring 事务在什么情况下会失效？」。
+- **Q：@Repository 注解还有什么额外价值？**
+
+  → 异常翻译，见本文档「@Component, @Controller, @Repository, @Service 有何区别？」。
+
+- **Q：事务回滚默认只认哪些异常？**
+
+  → RuntimeException/Error，见本文档「Spring 事务在什么情况下会失效？」。
 
 ### 【中等】什么是 Spring 的事务管理？⭐⭐
 
@@ -1909,7 +2031,7 @@ Spring DAO 异常体系要点：
 
 Spring 支持声明式、编程式、注解式三种事务定义方式，屏蔽底层事务 API 差异。事务定义的五大属性：隔离级别、传播行为、回滚规则、只读标志、超时时间。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：隔离、传播、回滚、只读、超时
 - **关键词**：声明式事务 ／ PlatformTransactionManager ／ 五大属性
@@ -1938,8 +2060,13 @@ Spring 事务定义的属性有：
 
 #### 🔀 发散问题
 
-- **Q：@Transactional 背后怎么工作？** → AOP 代理 + TransactionInterceptor，见本文档「@Transactional 的实现原理是什么？」。
-- **Q：声明式与编程式怎么选？** → 方法级边界 vs 精确控制，见本文档「声明式事务和编程式事务有什么区别？」。
+- **Q：@Transactional 背后怎么工作？**
+
+  → AOP 代理 + TransactionInterceptor，见本文档「@Transactional 的实现原理是什么？」。
+
+- **Q：声明式与编程式怎么选？**
+
+  → 方法级边界 vs 精确控制，见本文档「声明式事务和编程式事务有什么区别？」。
 
 ### 【中等】Spring 事务支持哪些隔离级别？⭐
 
@@ -1949,7 +2076,7 @@ Spring 事务定义的属性有：
 
 Spring 支持 5 种隔离级别：DEFAULT（跟随数据库）、READ_UNMITTED、READ_COMMITTED、REPEATABLE_READ、SERIALIZABLE。隔离级别越高并发问题越少但性能越低，生产多数用数据库默认（常为 READ_COMMITTED）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：默读未、读已、可重、串行，层层加码
 - **关键词**：DEFAULT ／ READ_COMMITTED ／ REPEATABLE_READ
@@ -1965,18 +2092,23 @@ Spring 支持 5 种隔离级别：DEFAULT（跟随数据库）、READ_UNMITTED�
 
 #### 🔀 发散问题
 
-- **Q：与隔离级别并列的传播行为有哪些？** → 7 种传播行为，见本文档「Spring 事务支持哪些传播行为？」。
-- **Q：隔离级别在注解里怎么配？** → @Transactional(isolation=...)，见本文档「@Transactional 的实现原理是什么？」。
+- **Q：与隔离级别并列的传播行为有哪些？**
 
-### 【中等】Spring 事务支持哪些传播行为？⭐⭐⭐⭐⭐
+  → 7 种传播行为，见本文档「Spring 事务支持哪些传播行为？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Spring / 数据
+- **Q：隔离级别在注解里怎么配？**
+
+  → @Transactional(isolation=...)，见本文档「@Transactional 的实现原理是什么？」。
+
+### 【困难】Spring 事务支持哪些传播行为？⭐⭐⭐⭐⭐
+
+> 🎯 目标等级：L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：Spring / 数据
 
 #### 💎 关键结论
 
 传播行为共 7 种（Propagation 枚举），定义事务方法被调用时如何复用/新建/挂起事务。高频三选：REQUIRED（共享同生共死）、REQUIRES_NEW（挂起外层独立提交）、NESTED（savepoint 内层可独立回滚）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：必选（REQUIRED）、支持、强制，另起（REQUIRES_NEW）、不支持、从不，嵌套（NESTED）
 - **关键词**：REQUIRED ／ REQUIRES_NEW ／ NESTED
@@ -2011,6 +2143,23 @@ Spring 事务传播行为共 7 种，定义在 `Propagation` 枚举中。本题�
 | **底层机制**   | 事务传播     | 挂起 + 新事务                        | JDBC savepoint                   |
 | **适用边界**   | 默认选择     | 日志/审计等必须独立提交的操作        | 批量处理中单条失败不影响整体     |
 
+**业务选型决策表**
+
+| 业务场景                              | 推荐传播行为                        | 决策理由                                                        |
+| :------------------------------------ | :---------------------------------- | :-------------------------------------------------------------- |
+| 下单 + 扣库存必须同时成功/失败        | REQUIRED                            | 共享事务，任一失败整体回滚                                      |
+| 审计日志/操作记录：主流程失败也要留痕 | REQUIRES_NEW                        | 独立提交，不受外层回滚影响                                      |
+| 批量导入：单条失败不影响其他          | NESTED 或 外层无事务 + REQUIRES_NEW | NESTED 省连接但受限于 savepoint 支持；REQUIRES_NEW 稳定但占连接 |
+| 复杂查询报表：不需要事务开销          | SUPPORTS / NOT_SUPPORTED            | 避免长事务占用连接与锁                                          |
+| 工具方法：强制要求调用方已在事务中    | MANDATORY                           | 防误用，无事务快速失败                                          |
+
+**选型决策要点**
+
+- **审计日志用 REQUIRES_NEW 的注意**：内层异常若向外抛，会打断外层主流程。若审计失败不应影响业务，内层自行 catch；若必须阻断，让异常上抛。
+- **REQUIRES_NEW 异常被外层吞掉**：外层 catch 住内层异常继续执行，内层已回滚但外层照常提交，造成"以为写了其实没写"的数据不一致。catch 后必须有显式处理（重抛或补偿）。
+- **批量导入用 NESTED 的坑**：JTA 事务管理器不支持 savepoint；大量 savepoint 在部分数据库上有性能开销。更稳的替代：外层不开事务，逐条 REQUIRES_NEW + 失败记录入错误表。
+- **长事务警示**：REQUIRED 默认传播容易把 HTTP 调用、发 MQ 等慢操作卷进事务，连接与行锁被长期占用。耗时操作应移出事务边界（`TransactionTemplate` 缩小范围）或用 NOT_SUPPORTED 挂起。
+
 ::: details 失效/边界场景
 
 - **NESTED 不支持**：JTA 事务管理器或不支持 savepoint 的驱动下抛 `NestedTransactionNotSupportedException`；部分连接池对 savepoint 支持也有差异。
@@ -2029,65 +2178,11 @@ Spring 事务传播行为共 7 种，定义在 `Propagation` 枚举中。本题�
 
 :::
 
-#### 🔬 扩展知识
-
-::: details 拓展追问（L3/L4）
-
-- 【L3】`REQUIRES_NEW` 的"挂起"在源码层到底挂起了什么？`AbstractPlatformTransactionManager#suspend` 调用 `TransactionSynchronizationManager` 解绑当前线程绑定的连接资源与同步器，封装进 `SuspendedResourcesHolder`；数据库连接并未归还连接池，只是从线程上下文摘除，所以外层连接仍被占用。
-- 【L3】`NESTED` 与 `REQUIRES_NEW` 在外层回滚时表现有何不同？NESTED 是外层事务的一部分，外层回滚时保存点内的修改一并回滚；REQUIRES_NEW 已独立提交，外层回滚不影响它。需要"主流程失败则附属操作也撤销"用 NESTED，需要"附属操作无论如何都要落库"用 REQUIRES_NEW。
-- 【L4】内层 REQUIRED 方法抛异常被外层 catch 住，为什么外层提交还会报 `UnexpectedRollbackException`？内层与外层共享同一物理事务，内层异常时 `AbstractPlatformTransactionManager#processRollback` 会把全局事务标记为 rollback-only；外层 catch 后尝试提交，发现标记已置位，只能回滚并抛异常。要避免就改用 REQUIRES_NEW 隔离，或内层不抛异常而是返回错误码。
-- 【L4】场景题——下单主流程（REQUIRED）中调"发放新人券"，要求发券失败不回滚订单、但订单回滚时已发的券必须撤销。方案：发券用 `REQUIRES_NEW` 保证自身失败不影响订单；同时在订单事务中注册 `TransactionSynchronization#afterCompletion`（或 `@TransactionalEventListener`），订单回滚时补偿撤销已发的券，券服务实现幂等撤销接口；更彻底的做法是把发券改为订单提交后异步消费（AFTER_COMMIT 触发），代价是引入消息可靠性（重试+幂等）问题。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：真实业务如何选型？** → 场景决策表与坑，见本文档「Spring 事务传播行为有什么用？」。
-- **Q：传播行为为什么会失效？** → 自调用绕过拦截器，见本文档「Spring 事务在什么情况下会失效？」。
-- **Q：事务提交后再发通知怎么做？** → TransactionSynchronization/AFTER_COMMIT，见本文档「@Transactional 的实现原理是什么？」。
-
-### 【中等】Spring 事务传播行为有什么用？⭐⭐⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / 数据
-
-#### 💎 关键结论
-
-传播行为用于定义多个事务方法相互调用时的事务边界控制，解决"事务如何传递"。选型看两点：失败是否要连带回滚（决定共享还是独立）、是否要占用新连接（决定 REQUIRES_NEW 还是 NESTED）。
-
-#### ⚡记忆卡片
-
-- **口诀**：同生共死 REQUIRED，独立落库 REQUIRES_NEW，单条失败 NESTED，慢调用挂起 NOT_SUPPORTED
-- **关键词**：事务边界 ／ 回滚独立性 ／ 长事务
-- **链路**：业务语义 → 回滚范围要求 → 传播行为选型 → createTransactionIfNecessary 分支
-
-#### 📖 核心知识
-
-Spring 事务传播行为用于**定义多个事务方法相互调用时的事务边界控制**，解决“事务如何传递”的问题。七种传播行为的语义定义见上一题，本题聚焦真实业务场景下的选型决策与坑。
-
-**典型业务场景决策表**
-
-| 业务场景                              | 推荐传播行为                        | 决策理由                                                        |
-| :------------------------------------ | :---------------------------------- | :-------------------------------------------------------------- |
-| 下单 + 扣库存必须同时成功/失败        | REQUIRED                            | 共享事务，任一失败整体回滚                                      |
-| 审计日志/操作记录：主流程失败也要留痕 | REQUIRES_NEW                        | 独立提交，不受外层回滚影响                                      |
-| 批量导入：单条失败不影响其他          | NESTED 或 外层无事务 + REQUIRES_NEW | NESTED 省连接但受限于 savepoint 支持；REQUIRES_NEW 稳定但占连接 |
-| 复杂查询报表：不需要事务开销          | SUPPORTS / NOT_SUPPORTED            | 避免长事务占用连接与锁                                          |
-| 工具方法：强制要求调用方已在事务中    | MANDATORY                           | 防误用，无事务快速失败                                          |
-
-**决策要点与坑**
-
-- **审计日志用 REQUIRES_NEW 的注意**：内层异常若向外抛，会打断外层主流程。若审计失败不应影响业务，要么内层自行 catch，要么外层显式处理；反过来，若审计失败必须阻断业务，就让异常上抛。
-- **REQUIRES_NEW 异常被外层吞掉**：外层 catch 住内层异常继续执行，内层事务已回滚但外层浑然不觉照常提交，造成"以为写了其实没写"的数据不一致。要么重抛，要么内层返回明确的成功/失败标志。
-- **批量导入用 NESTED 的坑**：JTA 事务管理器不支持 savepoint（抛 `NestedTransactionNotSupportedException`）；大量 savepoint 在部分数据库上还有性能开销。更稳的替代：外层方法不开事务，逐条 REQUIRES_NEW + 失败记录入错误表重放。
-- **长事务警示**：REQUIRED 默认传播容易把 HTTP 调用、发 MQ 等慢操作卷进事务，连接与行锁被长期占用。耗时操作应移出事务边界（编程式 `TransactionTemplate` 缩小范围）或用 NOT_SUPPORTED 挂起。
-
-**源码定位**：选型是否正确，最终体现在 `TransactionAspectSupport#createTransactionIfNecessary` 的分支走向：加入现有事务（复用 `TransactionStatus`）、挂起后新建（`suspend` + `getTransaction`）、或建保存点（`createSavepoint`）。排查传播行为问题时，断点这三个分支最快。
-
 ::: details 踩坑案例：REQUIRES_NEW 异常被吞导致积分静默丢失（资损）
 
-- **现象**：支付系统资损告警：部分订单状态为"支付成功"，但对应积分记录缺失，客服收到用户投诉。
-- **排查**：下单方法（REQUIRED）内先扣款再调积分方法（REQUIRES_NEW）。日志显示积分方法曾批量抛超时异常，但下单方法 catch 后只打了 warn 日志继续提交。
-- **根因**：积分事务独立回滚，异常被外层吞掉，外层提交成功；代码既没有重抛也没有补偿，积分静默丢失。
+- **现象**：支付系统资损告警：部分订单状态为"支付成功"，但对应积分记录缺失。
+- **排查**：下单方法（REQUIRED）内先扣款再调积分方法（REQUIRES_NEW）。积分方法曾抛超时异常，但下单方法 catch 后只打了 warn 日志继续提交。
+- **根因**：积分事务独立回滚，异常被外层吞掉，外层照常提交；代码既没有重抛也没有补偿，积分静默丢失。
 - **修复**：① 积分失败记录入补偿表，定时任务重试发放；② 改造为订单提交后异步发放（`@TransactionalEventListener(AFTER_COMMIT)`）；③ 代码规范：catch REQUIRES_NEW 方法异常必须有显式处理分支（重抛或入补偿），禁止只打日志。
 
 :::
@@ -2096,28 +2191,40 @@ Spring 事务传播行为用于**定义多个事务方法相互调用时的事�
 
 ::: details 拓展追问（L3/L4）
 
+- 【L3】`REQUIRES_NEW` 的"挂起"在源码层到底挂起了什么？`AbstractPlatformTransactionManager#suspend` 调用 `TransactionSynchronizationManager` 解绑当前线程绑定的连接资源与同步器，封装进 `SuspendedResourcesHolder`；数据库连接并未归还连接池，只是从线程上下文摘除，所以外层连接仍被占用。
+- 【L3】`NESTED` 与 `REQUIRES_NEW` 在外层回滚时表现有何不同？NESTED 是外层事务的一部分，外层回滚时保存点内的修改一并回滚；REQUIRES_NEW 已独立提交，外层回滚不影响它。需要"主流程失败则附属操作也撤销"用 NESTED，需要"附属操作无论如何都要落库"用 REQUIRES_NEW。
 - 【L3】什么时候该用 `NOT_SUPPORTED` 而不是直接不开事务？当方法必然运行在某个事务上下文中（如被公共入口包裹），但内部是耗时的查询/外部调用，用 NOT_SUPPORTED 挂起外层事务可避免连接被长时间占用；若调用方本来就没事务，两者效果相同。判断标准是"是否会拖长外层事务"。
 - 【L3】`MANDATORY` 这种"报错型"传播行为有什么实际价值？它是防御性契约：工具方法声明"我必须在事务中被调用"，一旦被无事务上下文误调，第一次调用就快速失败，而不是静默执行导致数据不一致。适合底层资金/账务类方法。
 - 【L3】为什么"查询方法用 SUPPORTS"能减少事务开销？SUPPORTS 在无事务时以非事务方式执行，不会触发 `DataSourceTransactionManager#doBegin` 的获取连接、关 autoCommit 等开销；若用 REQUIRED 则每次查询都开一个空事务。高并发读接口上这个差异会累积成可观的连接占用。
+- 【L4】内层 REQUIRED 方法抛异常被外层 catch 住，为什么外层提交还会报 `UnexpectedRollbackException`？内层与外层共享同一物理事务，内层异常时 `AbstractPlatformTransactionManager#processRollback` 会把全局事务标记为 rollback-only；外层 catch 后尝试提交，发现标记已置位，只能回滚并抛异常。要避免就改用 REQUIRES_NEW 隔离，或内层不抛异常而是返回错误码。
+- 【L4】场景题——下单主流程（REQUIRED）中调"发放新人券"，要求发券失败不回滚订单、但订单回滚时已发的券必须撤销。方案：发券用 `REQUIRES_NEW` 保证自身失败不影响订单；同时在订单事务中注册 `TransactionSynchronization#afterCompletion`（或 `@TransactionalEventListener`），订单回滚时补偿撤销已发的券，券服务实现幂等撤销接口；更彻底的做法是把发券改为订单提交后异步消费（AFTER_COMMIT 触发），代价是引入消息可靠性（重试+幂等）问题。
 - 【L4】场景题——账户转账要求转账记录无论成败必须写入审计表（合规），但审计表偶发超时拖慢转账链路。应急：审计方法加 `timeout` + 失败降级写本地日志保主链路。长期：审计改 `REQUIRES_NEW` 独立提交；审计写失败不阻断转账，失败记录写本地补偿表（与转账同库同事务确保不丢），后台任务重试写入审计表。权衡：REQUIRES_NEW 多占一个连接需评估连接池容量；异步审计存在"转账成功、审计延迟可见"窗口，需与合规方确认。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：7 种传播行为的完整语义？** → 定义表与源码定位，见本文档「Spring 事务支持哪些传播行为？」。
-- **Q：长事务怎么缩小边界？** → TransactionTemplate 编程式，见本文档「Spring 事务在什么情况下会失效？」。
-- **Q：AFTER_COMMIT 异步发放怎么实现？** → 事务同步器，见本文档「@Transactional 的实现原理是什么？」。
+- **Q：传播行为为什么会失效？**
 
-### 【中等】Spring 事务在什么情况下会失效？⭐⭐⭐⭐
+  → 自调用绕过拦截器，见本文档「Spring 事务在什么情况下会失效？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / 数据
+- **Q：长事务怎么缩小边界？**
+
+  → TransactionTemplate 编程式，见本文档「Spring 事务在什么情况下会失效？」。
+
+- **Q：事务提交后再发通知怎么做？**
+
+  → TransactionSynchronization/AFTER_COMMIT，见本文档「@Transactional 的实现原理是什么？」。
+
+### 【困难】Spring 事务在什么情况下会失效？⭐⭐⭐⭐⭐
+
+> 🎯 目标等级：L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / 数据
 
 #### 💎 关键结论
 
 事务失效分两类：调用未经过代理（自调用、非 public、final/static、非托管 Bean，拦截器根本没执行）与配置/环境不当（异常类型不匹配、异常被吞、引擎不支持事务、事务管理器配错、传播行为误用）。最高频：自调用 + checked 异常不回滚。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：绕代理、吞异常、checked 不回滚、引擎不支持、管理器没指对
 - **关键词**：TransactionInterceptor ／ rollbackFor ／ 自调用
@@ -2133,6 +2240,8 @@ Spring 事务失效的本质分两类：**调用未经过代理**（拦截器根
 - **非 public 方法**：`AbstractFallbackTransactionAttributeSource#computeTransactionAttribute` 对非 public 方法直接返回 null，等于无事务。
 - **方法被 final 或 static 修饰**：CGLIB 无法重写 final 方法，static 方法不属于实例调用，代理拦不到。
 - **Bean 未被 Spring 管理**：手动 new 的对象没有任何代理。
+- **`@Transactional` 标注在接口上**：Spring 官方明确建议标注在实现类/实现方法上——使用 CGLIB 代理（Spring Boot 2.x 起 `spring.aop.proxy-target-class` 默认 `true`）时，接口上的注解不会被继承，事务静默失效；仅 JDK 动态代理 + 接口调用时可能生效，不可依赖。
+- **多线程调用**：事务上下文（连接）由 `TransactionSynchronizationManager` 绑定在当前线程的 ThreadLocal 上；事务方法内用 `new Thread`/线程池执行的数据库操作**不共享外层事务**——各线程独立连接、独立提交，外层回滚无法撤销子线程已提交的写入。跨线程一致性需自行设计（如收集子任务结果后统一处理，或改用支持事务传播的编排）。
 
 **二、配置/环境类失效**
 
@@ -2173,19 +2282,27 @@ Spring 事务失效的本质分两类：**调用未经过代理**（拦截器根
 
 #### 🔀 发散问题
 
-- **Q：失效的同源问题在 AOP 里长什么样？** → 自调用、非 public 等同样绕过代理，见本文档「Spring AOP 在哪些场景下会失效？」。
-- **Q：@Async 叠加 @Transactional 为什么失效？** → 线程切换导致 ThreadLocal 事务丢失，见本文档「@Transactional 的实现原理是什么？」。
-- **Q：传播行为误用有哪些典型？** → 传染回滚与连接放大，见本文档「Spring 事务支持哪些传播行为？」。
+- **Q：失效的同源问题在 AOP 里长什么样？**
 
-### 【中等】@Transactional 的实现原理是什么？⭐⭐⭐⭐
+  → 自调用、非 public 等同样绕过代理，见本文档「Spring AOP 在哪些场景下会失效？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / 数据
+- **Q：@Async 叠加 @Transactional 为什么失效？**
+
+  → 线程切换导致 ThreadLocal 事务丢失，见本文档「@Transactional 的实现原理是什么？」。
+
+- **Q：传播行为误用有哪些典型？**
+
+  → 传染回滚与连接放大，见本文档「Spring 事务支持哪些传播行为？」。
+
+### 【困难】@Transactional 的实现原理是什么？⭐⭐⭐⭐
+
+> 🎯 目标等级：L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / 数据
 
 #### 💎 关键结论
 
 @Transactional 基于 Spring AOP 动态代理：@EnableTransactionManagement 注册 Advisor + 属性解析器 + TransactionInterceptor 三件套；调用时解析注解属性 → 按传播行为创建事务 → 执行业务 → 正常提交/异常按 rollbackOn 回滚；资源由 TransactionSynchronizationManager 用 ThreadLocal 绑定线程。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：三件套注册、拦截器开合事务、ThreadLocal 绑连接
 - **关键词**：TransactionInterceptor ／ AnnotationTransactionAttributeSource ／ TransactionSynchronizationManager
@@ -2258,19 +2375,27 @@ completeTransactionAfterThrowing(txInfo, ex);
 
 #### 🔀 发散问题
 
-- **Q：失效场景完整清单？** → 代理拦截类 + 配置环境类，见本文档「Spring 事务在什么情况下会失效？」。
-- **Q：传播行为在这条链路的哪一步生效？** → createTransactionIfNecessary 分支，见本文档「Spring 事务支持哪些传播行为？」。
-- **Q：编程式事务怎么写？** → TransactionTemplate 两种写法，见本文档「声明式事务和编程式事务有什么区别？」。
+- **Q：失效场景完整清单？**
 
-### 【中等】声明式事务和编程式事务有什么区别？⭐
+  → 代理拦截类 + 配置环境类，见本文档「Spring 事务在什么情况下会失效？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 数据
+- **Q：传播行为在这条链路的哪一步生效？**
+
+  → createTransactionIfNecessary 分支，见本文档「Spring 事务支持哪些传播行为？」。
+
+- **Q：编程式事务怎么写？**
+
+  → TransactionTemplate 两种写法，见本文档「声明式事务和编程式事务有什么区别？」。
+
+### 【中等】声明式事务和编程式事务有什么区别？⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 数据
 
 #### 💎 关键结论
 
 声明式事务用 @Transactional/XML，低侵入、方法级粒度，适合绝大多数场景；编程式事务用 TransactionTemplate/平台事务管理器 API，侵入高但可在方法内任意位置控制，适合精细控制事务边界。优先声明式，需要精细控制时用编程式。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：声明管方法，编程管代码块
 - **关键词**：@Transactional ／ TransactionTemplate ／ 粒度
@@ -2307,10 +2432,23 @@ try {
 
 **推荐**：优先使用声明式事务，仅在需要精细控制时使用编程式事务。
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】**大事务治理是编程式事务的主战场**：声明式的事务边界 = 整个方法，方法内混入 RPC、发 MQ、循环批处理等慢操作时，连接与行锁被长期占用，高峰期直接打满连接池。治理三板斧：拆分（慢操作移出事务方法）、异步化（`AFTER_COMMIT` 后再做）、`TransactionTemplate` 收缩边界（只把纯数据库操作圈进事务）——第三种就是编程式在 P8 语境下的真实用途，而非"写法不同"这么简单。
+
+:::
+
 #### 🔀 发散问题
 
-- **Q：声明式事务底层原理？** → AOP 代理 + TransactionInterceptor，见本文档「@Transactional 的实现原理是什么？」。
-- **Q：什么时候必须用编程式？** → 事务内含慢调用需缩小边界，见本文档「Spring 事务在什么情况下会失效？」。
+- **Q：声明式事务底层原理？**
+
+  → AOP 代理 + TransactionInterceptor，见本文档「@Transactional 的实现原理是什么？」。
+
+- **Q：什么时候必须用编程式？**
+
+  → 事务内含慢调用需缩小边界，见本文档「Spring 事务在什么情况下会失效？」。
 
 ### 【中等】Spring 中的 JPA 和 Hibernate 有什么区别？⭐⭐
 
@@ -2320,7 +2458,7 @@ try {
 
 JPA 是 ORM 规范（标准接口与注解，如 EntityManager、@Entity），Hibernate 是其具体实现，也是 Spring 默认集成的 JPA 提供者。用 JPA 规范可与实现解耦便于切换；用 Hibernate 原生 API 可用其特有功能（二级缓存、HQL 扩展）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：JPA 是规范，Hibernate 是实现；规范可换，实现有绝活
 - **关键词**：ORM 规范 ／ JPA 提供者 ／ 解耦
@@ -2341,8 +2479,13 @@ JPA（Java Persistence API）是 ORM 规范，定义了一套标准接口和注�
 
 #### 🔀 发散问题
 
-- **Q：Spring 的 DAO 层异常如何处理？** → DataAccessException 统一体系，见本文档「Spring DAO 有哪些异常？」。
-- **Q：JPA/Hibernate 的事务由谁管？** → Spring 声明式事务，见本文档「什么是 Spring 的事务管理？」。
+- **Q：Spring 的 DAO 层异常如何处理？**
+
+  → DataAccessException 统一体系，见本文档「Spring DAO 有哪些异常？」。
+
+- **Q：JPA/Hibernate 的事务由谁管？**
+
+  → Spring 声明式事务，见本文档「什么是 Spring 的事务管理？」。
 
 ## MVC
 
@@ -2354,7 +2497,7 @@ JPA（Java Persistence API）是 ORM 规范，定义了一套标准接口和注�
 
 Spring MVC 是 Spring 的 Web 模块，基于 MVC 分层（Model/View/Controller），核心是前端控制器 DispatcherServlet 统一接收请求并协调处理，配合注解映射替代传统 Servlet 配置，实现 Web 层关注点分离。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：M 装数据、V 渲染、C 协调，DispatcherServlet 总控
 - **关键词**：DispatcherServlet ／ MVC 分层 ／ @RequestMapping
@@ -2390,18 +2533,23 @@ Spring MVC 的引入使 Web 层关注点分离，代码简洁且易于维护。
 
 #### 🔀 发散问题
 
-- **Q：请求处理的完整源码主线？** → doDispatch 七步，见本文档「Spring MVC 如何工作？」。
-- **Q：核心组件有哪些？** → HandlerMapping/HandlerAdapter/ViewResolver 等，见本文档「Spring MVC 有哪些核心组件？」。
+- **Q：请求处理的完整源码主线？**
 
-### 【中等】Spring MVC 如何工作？⭐⭐⭐⭐
+  → doDispatch 七步，见本文档「Spring MVC 如何工作？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / MVC
+- **Q：核心组件有哪些？**
+
+  → HandlerMapping/HandlerAdapter/ViewResolver 等，见本文档「Spring MVC 有哪些核心组件？」。
+
+### 【困难】Spring MVC 如何工作？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：Spring / MVC
 
 #### 💎 关键结论
 
 Spring MVC 的核心是 DispatcherServlet（前端控制器），主线 doDispatch：HandlerMapping 定位 Handler → 拦截器 preHandle → HandlerAdapter 参数解析并调用 Controller → 视图渲染或 @ResponseBody 序列化 → 异常经 HandlerExceptionResolver → afterCompletion 收尾。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：映射、适配、拦截、渲染、异常、收尾
 - **关键词**：DispatcherServlet ／ HandlerMapping ／ HandlerAdapter
@@ -2473,9 +2621,17 @@ graph TD
 
 #### 🔀 发散问题
 
-- **Q：九大组件里哪些最核心？** → HandlerMapping/HandlerAdapter/ViewResolver 等清单，见本文档「Spring MVC 有哪些核心组件？」。
-- **Q：拦截器三回调的执行顺序？** → preHandle 顺序、postHandle/afterCompletion 倒序，见本文档「Spring 拦截链如何实现？」。
-- **Q：异常在第 6 步如何处理？** → HandlerExceptionResolver 链，见本文档「Spring MVC 如何处理异常？」。
+- **Q：九大组件里哪些最核心？**
+
+  → HandlerMapping/HandlerAdapter/ViewResolver 等清单，见本文档「Spring MVC 有哪些核心组件？」。
+
+- **Q：拦截器三回调的执行顺序？**
+
+  → preHandle 顺序、postHandle/afterCompletion 倒序，见本文档「Spring 拦截链如何实现？」。
+
+- **Q：异常在第 6 步如何处理？**
+
+  → HandlerExceptionResolver 链，见本文档「Spring MVC 如何处理异常？」。
 
 ### 【中等】Spring MVC 有哪些核心组件？⭐⭐
 
@@ -2485,7 +2641,7 @@ graph TD
 
 Spring MVC 核心组件围绕 DispatcherServlet 展开：HandlerMapping 做 URL→处理器映射，HandlerAdapter 调用处理器并处理返回结果，ViewResolver/View 负责视图渲染，HandlerInterceptor 提供前后置拦截。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：前端控制器总协调，映射、适配、视图、拦截四配套
 - **关键词**：HandlerMapping ／ HandlerAdapter ／ ViewResolver
@@ -2514,8 +2670,13 @@ Spring MVC 的核心组件围绕 `DispatcherServlet` 展开工作：
 
 #### 🔀 发散问题
 
-- **Q：这些组件在请求链路中如何协作？** → doDispatch 七步，见本文档「Spring MVC 如何工作？」。
-- **Q：视图解析器具体怎么工作？** → 逻辑名→视图对象，见本文档「Spring MVC 中的视图解析器有什么作用？」。
+- **Q：这些组件在请求链路中如何协作？**
+
+  → doDispatch 七步，见本文档「Spring MVC 如何工作？」。
+
+- **Q：视图解析器具体怎么工作？**
+
+  → 逻辑名→视图对象，见本文档「Spring MVC 中的视图解析器有什么作用？」。
 
 ### 【中等】Spring MVC 中的 Controller 是什么？⭐⭐
 
@@ -2525,7 +2686,7 @@ Spring MVC 的核心组件围绕 `DispatcherServlet` 展开工作：
 
 Controller 是控制层组件，负责接收解析请求参数、调用 Service、返回视图或数据。由 DispatcherServlet 经 HandlerMapping 定位、HandlerAdapter 执行；@Controller 用于传统 MVC，@RestController 组合 @ResponseBody 默认返回数据，适合前后端分离。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：接参数、调 Service、返结果；Rest 是 Controller 加 ResponseBody
 - **关键词**：@Controller ／ @RestController ／ @RequestMapping
@@ -2547,8 +2708,13 @@ Controller 核心职责与工作方式：
 
 #### 🔀 发散问题
 
-- **Q：请求如何路由到 Controller？** → HandlerMapping 路由表，见本文档「Spring MVC 如何工作？」。
-- **Q：@ResponseBody 具体做什么？** → 返回值序列化为响应体，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
+- **Q：请求如何路由到 Controller？**
+
+  → HandlerMapping 路由表，见本文档「Spring MVC 如何工作？」。
+
+- **Q：@ResponseBody 具体做什么？**
+
+  → 返回值序列化为响应体，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
 
 ### 【中等】Spring MVC 中如何处理表单提交？⭐⭐
 
@@ -2558,7 +2724,7 @@ Controller 核心职责与工作方式：
 
 表单提交靠参数绑定与返回值处理两侧机制：入参用 @RequestParam/@PathVariable/@RequestBody/@ModelAttribute 自动取值转型；返回值 String 作视图名、ModelAndView 携带模型、POJO/ResponseEntity 经 HttpMessageConverter 序列化为 JSON/XML。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：入参四注解绑定，出参三形态返回
 - **关键词**：@RequestParam ／ @ModelAttribute ／ HttpMessageConverter
@@ -2587,8 +2753,13 @@ Controller 核心职责与工作方式：
 
 #### 🔀 发散问题
 
-- **Q：@RequestBody 的序列化链路？** → HttpMessageConverter 选型，见本文档「Spring MVC 如何工作？」。
-- **Q：路径变量怎么提取？** → @PathVariable，见本文档「Spring 中的 @PathVariable 注解的作用是什么？」。
+- **Q：@RequestBody 的序列化链路？**
+
+  → HttpMessageConverter 选型，见本文档「Spring MVC 如何工作？」。
+
+- **Q：路径变量怎么提取？**
+
+  → @PathVariable，见本文档「Spring 中的 @PathVariable 注解的作用是什么？」。
 
 ### 【中等】Spring MVC 中的视图解析器有什么作用？⭐⭐
 
@@ -2598,7 +2769,7 @@ Controller 核心职责与工作方式：
 
 视图解析器（ViewResolver）把控制器返回的逻辑视图名解析为具体 View 对象，解耦控制器与视图技术：控制器只返逻辑名（如 "userList"），前缀后缀等配置统一管理，多个解析器可链式顺序尝试，最终由 DispatcherServlet 调用视图渲染响应。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：逻辑名进、视图对象出，前后缀一配就解耦
 - **关键词**：ViewResolver ／ 逻辑视图名 ／ 链式解析
@@ -2619,8 +2790,13 @@ Spring MVC 中的视图解析器（ViewResolver）用于将控制器返回的逻
 
 #### 🔀 发散问题
 
-- **Q：视图解析在请求链路的哪一步？** → doDispatch 结果处理阶段，见本文档「Spring MVC 如何工作？」。
-- **Q：不走视图解析的返回方式？** → @ResponseBody 序列化，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
+- **Q：视图解析在请求链路的哪一步？**
+
+  → doDispatch 结果处理阶段，见本文档「Spring MVC 如何工作？」。
+
+- **Q：不走视图解析的返回方式？**
+
+  → @ResponseBody 序列化，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
 
 ### 【中等】Spring MVC 中的拦截器是什么？如何定义一个拦截器？⭐⭐
 
@@ -2630,7 +2806,7 @@ Spring MVC 中的视图解析器（ViewResolver）用于将控制器返回的逻
 
 HandlerInterceptor 是 Spring MVC 层的请求拦截机制，在 Controller 前后插入权限校验、日志、登录检查等逻辑。定义：实现接口重写 preHandle/postHandle/afterCompletion，再在 WebMvcConfigurer#addInterceptors 中注册并指定路径。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：前中后三回调，注册配路径；能拿 Bean 和 Handler，Filter 做不到
 - **关键词**：HandlerInterceptor ／ preHandle ／ WebMvcConfigurer
@@ -2691,8 +2867,13 @@ public class WebConfig implements WebMvcConfigurer {
 
 #### 🔀 发散问题
 
-- **Q：Filter/拦截器/AOP 三层拦截的执行顺序？** → 完整链路，见本文档「Spring 拦截链如何实现？」。
-- **Q：拦截器属于哪类核心组件？** → 九大组件之一，见本文档「Spring MVC 有哪些核心组件？」。
+- **Q：Filter/拦截器/AOP 三层拦截的执行顺序？**
+
+  → 完整链路，见本文档「Spring 拦截链如何实现？」。
+
+- **Q：拦截器属于哪类核心组件？**
+
+  → 九大组件之一，见本文档「Spring MVC 有哪些核心组件？」。
 
 ### 【中等】Spring MVC 中的国际化是如何实现？⭐⭐
 
@@ -2702,7 +2883,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 国际化由 LocaleResolver 与 MessageSource 协作：前者解析用户区域信息（Session/Cookie/Accept-Language 头），后者按区域加载对应资源文件（messages_en.properties 等）提供文本，实现三步：定义资源文件、配置 LocaleResolver、配置 MessageSource。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：解析区域 LocaleResolver，取文案 MessageSource
 - **关键词**：LocaleResolver ／ MessageSource ／ 资源文件
@@ -2732,8 +2913,13 @@ Spring MVC 国际化基于 `LocaleResolver` 与 `MessageSource` 协作实现：
 
 #### 🔀 发散问题
 
-- **Q：MessageSource 属于哪层能力？** → ApplicationContext 叠加的能力，见本文档「BeanFactory 和 ApplicationContext 有什么区别？」。
-- **Q：LocaleChangeInterceptor 属于哪类拦截？** → MVC 拦截器，见本文档「Spring MVC 中的拦截器是什么？如何定义一个拦截器？」。
+- **Q：MessageSource 属于哪层能力？**
+
+  → ApplicationContext 叠加的能力，见本文档「BeanFactory 和 ApplicationContext 有什么区别？」。
+
+- **Q：LocaleChangeInterceptor 属于哪类拦截？**
+
+  → MVC 拦截器，见本文档「Spring MVC 中的拦截器是什么？如何定义一个拦截器？」。
 
 ### 【中等】Spring MVC 如何处理异常？⭐⭐
 
@@ -2743,7 +2929,7 @@ Spring MVC 国际化基于 `LocaleResolver` 与 `MessageSource` 协作实现：
 
 Spring MVC 通过 HandlerExceptionResolver 机制集中处理异常：局部 @ExceptionHandler、全局 @ControllerAdvice + @ExceptionHandler、@ResponseStatus/ResponseStatusException 指定状态码、SimpleMappingExceptionResolver 映射视图。优先级：局部 > 全局 > @ResponseStatus > 容器级。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：局部、全局、注解、容器四级处理
 - **关键词**：@ExceptionHandler ／ @ControllerAdvice ／ HandlerExceptionResolver
@@ -2771,10 +2957,15 @@ Spring MVC 通过 **HandlerExceptionResolver** 机制集中处理异常，将异
 
 #### 🔀 发散问题
 
-- **Q：@ExceptionHandler 注解本身怎么用？** → 标注异常处理方法，见本文档「Spring 中的 @ExceptionHandler 注解的作用是什么？」。
-- **Q：异常处理在请求链路的哪一步？** → doDispatch 第 6 步，见本文档「Spring MVC 如何工作？」。
+- **Q：@ExceptionHandler 注解本身怎么用？**
 
-### 【中等】Spring MVC 父子容器是什么知道吗？⭐⭐
+  → 标注异常处理方法，见本文档「Spring 中的 @ExceptionHandler 注解的作用是什么？」。
+
+- **Q：异常处理在请求链路的哪一步？**
+
+  → doDispatch 第 6 步，见本文档「Spring MVC 如何工作？」。
+
+### 【困难】Spring MVC 父子容器是什么知道吗？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / MVC
 
@@ -2782,7 +2973,7 @@ Spring MVC 通过 **HandlerExceptionResolver** 机制集中处理异常，将异
 
 父子容器分层隔离：父容器由 ContextLoaderListener 加载，管业务层全局 Bean（Service/DAO/数据源/事务）；子容器由每个 DispatcherServlet 创建，管 Web 层组件。访问规则单向：子可见父、父不可见子，保证 Controller 能调 Service 而业务层不依赖 Web 层。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：父管子容器管 Web，子见父、父不见子
 - **关键词**：ContextLoaderListener ／ DispatcherServlet ／ 单向可见
@@ -2808,18 +2999,23 @@ Spring MVC 父子容器通过分层隔离实现 Bean 管理：
 
 #### 🔀 发散问题
 
-- **Q：子容器由谁创建？** → DispatcherServlet 的 onRefresh，见本文档「Spring MVC 如何工作？」。
-- **Q：容器层次与 IoC 容器的关系？** → ApplicationContext 体系，见本文档「BeanFactory 和 ApplicationContext 有什么区别？」。
+- **Q：子容器由谁创建？**
 
-### 【中等】Spring WebFlux 是什么？它与 Spring MVC 有何不同？⭐⭐
+  → DispatcherServlet 的 onRefresh，见本文档「Spring MVC 如何工作？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / MVC
+- **Q：容器层次与 IoC 容器的关系？**
+
+  → ApplicationContext 体系，见本文档「BeanFactory 和 ApplicationContext 有什么区别？」。
+
+### 【中等】Spring WebFlux 是什么？它与 Spring MVC 有何不同？⭐⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / MVC
 
 #### 💎 关键结论
 
 WebFlux 是 Spring 5 引入的响应式 Web 框架，基于 Reactor 非阻塞 I/O，适合高并发 I/O 密集场景。与 MVC 的核心区别：响应式编程模型（Mono/Flux）、事件循环少量线程、可跑在 Netty/Undertow、适合延迟敏感异步链路；MVC 一线程一请求、依赖 Servlet 容器。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：MVC 一线程一请求，WebFlux 事件循环非阻塞
 - **关键词**：Reactor ／ Mono·Flux ／ 非阻塞
@@ -2839,24 +3035,33 @@ Spring WebFlux 是 Spring 5 引入的响应式 Web 框架，基于 Reactor 实�
 ::: details
 
 - 【L3】响应式的收益在"全链路非阻塞"才体现：只要中间有一环阻塞（如 JDBC 驱动），事件循环线程被占住，性能优势荡然无存；数据库需配 R2DBC。
+- 【L3】事件循环线程模型：Reactor Netty 默认启动与 CPU 核数相当的少量 event loop 线程（`LoopResources.DEFAULT_IO_WORKER_COUNT`，下限 4），一个线程服务成千上万连接；因此**阻塞调用会污染 event loop**——不可避免的阻塞操作必须用 `publishOn(Schedulers.boundedElastic())` 切到弹性线程池隔离，否则该线程上所有连接一起卡死。
+- 【L3】背压（Backpressure）是 Mono/Flux 实现的 Reactive Streams 规范核心：消费方通过 `request(n)` 控制生产速率，防止慢消费者被快生产者压垮——这是 Servlet "一次读全量" 模型不具备的语义。
 - 【L3】选型经验：CPU 密集用 MVC，I/O 密集且团队能接受响应式心智模型才上 WebFlux；Spring Cloud Gateway 基于 WebFlux 是典型成功案例。
+- 【L4】WebFlux 不必然比 MVC 快：低并发或 CPU 密集场景下，操作符装配与异步调度开销反而使其慢于 MVC；收益只在高并发 IO 密集场景兑现（少量线程支撑海量连接，上下文切换与线程内存占用大幅下降）。拿"响应式=高性能"当普适结论是选型误判的常见根源。
+- 【L4】JDK 21 虚拟线程的替代性冲击：虚拟线程让 MVC 的"一请求一线程"模型获得接近非阻塞的吞吐（阻塞时自动让出载体线程），Spring Boot 3.2+ 配 `spring.threads.virtual.enabled=true` 即可启用，**无需把代码改写成响应式风格**。对多数业务系统，这直接削弱了 WebFlux 的选型理由；WebFlux 的剩余优势集中在背压语义、流式处理与函数式编排。选型结论：默认 MVC（+虚拟线程），网关、流式管道或全链路响应式团队才选 WebFlux。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：MVC 的请求处理主线？** → doDispatch 七步，见本文档「Spring MVC 如何工作？」。
-- **Q：异步化在 MVC 体系里的轻量方案？** → @Async 线程池异步，见本文档「@Async 注解的原理是什么？」。
+- **Q：MVC 的请求处理主线？**
 
-### 【中等】什么是 Restful 风格的接口？⭐⭐
+  → doDispatch 七步，见本文档「Spring MVC 如何工作？」。
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / MVC
+- **Q：异步化在 MVC 体系里的轻量方案？**
+
+  → @Async 线程池异步，见本文档「@Async 注解的原理是什么？」。
+
+### 【中等】什么是 Restful 风格的接口？⭐⭐⭐
+
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / MVC
 
 #### 💎 关键结论
 
 RESTful 是基于 HTTP 的架构风格：一切皆资源，URI 唯一标识，用 HTTP 标准方法（GET/POST/PUT/DELETE）操作资源，无状态通信、统一接口、可缓存。典型特征：JSON 交换、状态码表达结果、URL 符合资源语义（如 /users/1）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：资源用 URI 指，动作用动词（HTTP 方法）表，结果看状态码
 - **关键词**：资源 ／ HTTP 方法 ／ 无状态
@@ -2871,14 +3076,21 @@ RESTful 是一种基于 HTTP 协议的软件架构风格，核心思想是将一
 ::: details
 
 - 【L3】Spring MVC 落地 RESTful 的标配：`@RestController` + `@GetMapping/@PostMapping` + `@PathVariable`，异常用状态码语义（400/401/404/500）而非全部 200 + 错误字段。
-- 【L4】REST 的成熟度模型（Richardson）：L0 单 URI + POST、L1 资源化、L2 HTTP 方法 + 状态码、L3 HATEOAS；实际项目做到 L2 即可。
+- 【L3】HTTP 方法的精确语义：`PUT` 幂等且是**全量替换**，`PATCH` 非幂等且只做部分更新（补丁格式有 `JSON Patch`（RFC 6902）与 `JSON Merge Patch`（RFC 7396）两种），`POST` 非幂等。`201 Created` 必须携带指向新资源的 `Location` 头；删除成功无返回体用 `204 No Content`；乐观锁冲突用 `409 Conflict`；语法正确但业务语义校验失败用 `422 Unprocessable Entity`（与 400 的参数格式错误区分）；限流用 `429 Too Many Requests` 且应带 `Retry-After` 头。
+- 【L4】REST 成熟度模型（Richardson）：Level 0 把 HTTP 当传输管道（单 URI + 全 POST）→ Level 1 资源化 URI → Level 2 正确使用 HTTP 动词与状态码 → Level 3 HATEOAS（响应里带链接驱动状态转移）。绝大多数所谓 RESTful API 实际只到 Level 2；Level 3 的 HATEOAS 在实践中收益低、客户端与服务端链接结构耦合重，通常不做——能给出这个选型判断，才是"理解 REST"与"背过 REST"的区别。
+- 【L4】业务错误不应用 HTTP 500 表达：500 会触发 SRE 告警与网关/客户端重试，业务性失败（余额不足、状态不允许）应映射为 4xx 或 200 + 统一业务码，HTTP 状态码只承载协议层语义。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：@PathVariable 如何提取资源 ID？** → 路径变量绑定，见本文档「Spring 中的 @PathVariable 注解的作用是什么？」。
-- **Q：REST 接口的返回怎么序列化？** → @ResponseBody + HttpMessageConverter，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
+- **Q：@PathVariable 如何提取资源 ID？**
+
+  → 路径变量绑定，见本文档「Spring 中的 @PathVariable 注解的作用是什么？」。
+
+- **Q：REST 接口的返回怎么序列化？**
+
+  → @ResponseBody + HttpMessageConverter，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
 
 ## 注解
 
@@ -2890,7 +3102,7 @@ RESTful 是一种基于 HTTP 协议的软件架构风格，核心思想是将一
 
 Spring 注解按职责分四类： stereotype 注册 Bean（@Component/@Service/@Controller/@Repository）、注入依赖（@Autowired/@Qualifier）、Java 配置（@Configuration/@Bean/@ComponentScan）、AOP 切面（@Aspect/@Around 等）。面试先报分类，再挑 2-3 个展开。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：四型注册、装配注入、Java 配置、切面环绕
 - **关键词**：@Component ／ @Autowired ／ @Configuration+@Bean ／ @Aspect
@@ -2918,8 +3130,13 @@ Spring 注解按职责分四类： stereotype 注册 Bean（@Component/@Service/
 
 #### 🔀 发散问题
 
-- **Q：@Autowired 如何消除多实现歧义？** → 配合 @Qualifier 按名匹配，见本文档「@Qualifier 注解有什么作用」。
-- **Q：@Bean 和 @Component 分工有何不同？** → 方法级 vs 类级注册，见本文档「@Bean 和@Component 有什么区别？」。
+- **Q：@Autowired 如何消除多实现歧义？**
+
+  → 配合 @Qualifier 按名匹配，见本文档「@Qualifier 注解有什么作用」。
+
+- **Q：@Bean 和 @Component 分工有何不同？**
+
+  → 方法级 vs 类级注册，见本文档「@Bean 和@Component 有什么区别？」。
 
 ### 【简单】@Bean 和@Component 有什么区别？⭐⭐
 
@@ -2929,7 +3146,7 @@ Spring 注解按职责分四类： stereotype 注册 Bean（@Component/@Service/
 
 @Bean 标注在方法上，由方法返回值显式构建并注册 Bean，适合第三方类；@Component 标注在类上，由组件扫描自动注册，适合自研类。两者最终效果相同，只是注册入口不同。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Bean 标方法、Component 标类，第三方用方法、自研靠扫描
 - **关键词**：方法级 ／ 类级 ／ 第三方库
@@ -2943,8 +3160,13 @@ Spring 注解按职责分四类： stereotype 注册 Bean（@Component/@Service/
 
 #### 🔀 发散问题
 
-- **Q：组件扫描由谁触发？** → @ComponentScan 指定扫描包，见本文档「Spring Bean 注册有几种方式？」。
-- **Q：@Configuration 与 @Component 有何不同？** → CGLIB 代理保证 @Bean 单例语义，见本文档「@Configuration 和 @Component 有什么区别？」。
+- **Q：组件扫描由谁触发？**
+
+  → @ComponentScan 指定扫描包，见本文档「Spring Bean 注册有几种方式？」。
+
+- **Q：@Configuration 与 @Component 有何不同？**
+
+  → CGLIB 代理保证 @Bean 单例语义，见本文档「@Configuration 和 @Component 有什么区别？」。
 
 ### 【简单】@Component, @Controller, @Repository, @Service 有何区别？⭐⭐
 
@@ -2954,7 +3176,7 @@ Spring 注解按职责分四类： stereotype 注册 Bean（@Component/@Service/
 
 四者本质都是 @Component 的派生注解，功能上可互换，但语义分层不同：@Component 通用、@Controller 标识 Web 层、@Service 标识业务层、@Repository 标识持久层并额外获得持久化异常翻译。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一个基类三特化，控制、服务、仓库各管一层
 - **关键词**：构造型注解 ／ 分层语义 ／ 异常翻译
@@ -2969,8 +3191,13 @@ Spring 注解按职责分四类： stereotype 注册 Bean（@Component/@Service/
 
 #### 🔀 发散问题
 
-- **Q：Repository 的异常翻译对应什么机制？** → Spring 统一的 DataAccessException 层次，见本文档「Spring DAO 有哪些异常？」。
-- **Q：这些注解如何被扫描注册？** → 组件扫描 + 注解解析，见本文档「Spring Bean 注册有几种方式？」。
+- **Q：Repository 的异常翻译对应什么机制？**
+
+  → Spring 统一的 DataAccessException 层次，见本文档「Spring DAO 有哪些异常？」。
+
+- **Q：这些注解如何被扫描注册？**
+
+  → 组件扫描 + 注解解析，见本文档「Spring Bean 注册有几种方式？」。
 
 ### 【简单】@Autowired 注解有什么用？⭐⭐
 
@@ -2980,7 +3207,7 @@ Spring 注解按职责分四类： stereotype 注册 Bean（@Component/@Service/
 
 @Autowired 是 Spring 的依赖注入注解，默认按类型匹配自动装配 Bean；同类型多个候选时可配合 @Qualifier 指定名称，支持字段、Setter 与构造器三种位置。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：先按类型找，多个再按名，required 可放宽
 - **关键词**：按类型装配 ／ AutowiredAnnotationBeanPostProcessor ／ @Qualifier
@@ -3005,8 +3232,21 @@ public class Employee {
 
 #### 🔀 发散问题
 
-- **Q：多个同类型 Bean 怎么办？** → @Qualifier 指定名称或 @Primary 声明优先级，见本文档「@Qualifier 注解有什么作用」。
-- **Q：@Autowired 与 @Resource 有何差异？** → 按类型 vs 按名称，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
+- **Q：多个同类型 Bean 怎么办？**
+
+  → @Qualifier 指定名称或 @Primary 声明优先级，见本文档「@Qualifier 注解有什么作用」。
+
+- **Q：@Autowired 与 @Resource 有何差异？**
+
+  → 按类型 vs 按名称，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
+
+- **Q：Spring 5.x 之后为什么推荐构造器注入而非字段注入？构造器注入在不可变性保障上有什么优势？**
+
+  → 构造器注入能保证依赖在对象创建时就完成注入，使 Bean 处于完全初始化状态，避免 NPE。配合 `final` 关键字可将依赖字段声明为不可变，确保对象创建后依赖不会被篡改。此外，构造器注入使依赖关系显式化，便于单元测试时直接通过构造器传入 Mock 对象，无需依赖反射或容器。
+
+- **Q：@Autowired(required = false) 和 @Nullable 在语义和实际行为上有什么区别？**
+
+  → `@Autowired(required = false)` 表示该依赖不是必须的，容器中找不到时注入 null 而不报错。`@Nullable` 是 JSR-305 注解，标注在参数或字段上告诉 Spring 允许值为 null，但它本身不控制注入行为——仍需配合 `@Autowired` 使用。两者可组合使用：`@Autowired(required = false)` 控制是否必须存在，`@Nullable` 提供语义上的空安全声明。
 
 ### 【简单】@Qualifier 注解有什么作用⭐⭐
 
@@ -3016,7 +3256,7 @@ public class Employee {
 
 @Qualifier 与 @Autowired 配合使用：当容器中存在多个同类型 Bean 时，通过指定 Bean 名称（或自定义限定符）消除歧义，精确注入所需实例。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：类型选一族，名字定一个
 - **关键词**：消除歧义 ／ 按名注入 ／ 自定义限定符
@@ -3030,8 +3270,13 @@ public class Employee {
 
 #### 🔀 发散问题
 
-- **Q：不加 @Qualifier 时的默认裁决顺序？** → 类型 → @Primary → 字段名兜底，见本文档「Spring 中的 @Primary 注解的作用是什么？」。
-- **Q：按名称注入还能用什么？** → @Resource 默认按名，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
+- **Q：不加 @Qualifier 时的默认裁决顺序？**
+
+  → 类型 → @Primary → 字段名兜底，见本文档「Spring 中的 @Primary 注解的作用是什么？」。
+
+- **Q：按名称注入还能用什么？**
+
+  → @Resource 默认按名，见本文档「@Autowired、@Resource、@Inject 有什么区别？」。
 
 ### 【简单】Spring 中的 @Primary 注解的作用是什么？⭐⭐
 
@@ -3041,7 +3286,7 @@ public class Employee {
 
 @Primary 标注在多个同类型 Bean 中的一个上，声明其为自动装配时的优先候选，解决按类型注入的歧义；与 @Qualifier 的区别是"全局默认首选"vs"单点显式指定"。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Primary 定默认，Qualifier 点单点
 - **关键词**：优先注入 ／ 歧义裁决 ／ 全局首选
@@ -3055,8 +3300,13 @@ public class Employee {
 
 #### 🔀 发散问题
 
-- **Q：单点注入处如何覆盖 @Primary？** → 用 @Qualifier 显式指名，见本文档「@Qualifier 注解有什么作用」。
-- **Q：@Primary 常与什么场景搭配？** → 多数据源、多缓存管理器配置，见本文档「Spring 中的 @Profile 注解的作用是什么？」。
+- **Q：单点注入处如何覆盖 @Primary？**
+
+  → 用 @Qualifier 显式指名，见本文档「@Qualifier 注解有什么作用」。
+
+- **Q：@Primary 常与什么场景搭配？**
+
+  → 多数据源、多缓存管理器配置，见本文档「Spring 中的 @Profile 注解的作用是什么？」。
 
 ### 【简单】Spring 中的 @Value 注解的作用是什么？⭐⭐
 
@@ -3066,7 +3316,7 @@ public class Employee {
 
 @Value 用于将外部配置属性（`${...}` 占位符）或 SpEL 表达式（`#{...}`）注入到 Bean 的字段、方法参数或构造函数参数中，是轻量配置注入的首选。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：`${}` 取值、`#{}` 算值，字段参数都能注
 - **关键词**：属性注入 ／ 占位符 ／ SpEL
@@ -3080,8 +3330,13 @@ public class Employee {
 
 #### 🔀 发散问题
 
-- **Q：属性文件怎么加载进 Environment？** → @PropertySource 指定路径，见本文档「Spring 中的 @PropertySource 注解的作用是什么？」。
-- **Q：`#{}` 与 `${}` 有何区别？** → 一个算值一个取值，见本文档「什么是 SpEL？在 Spring 中有哪些常见应用？」。
+- **Q：属性文件怎么加载进 Environment？**
+
+  → @PropertySource 指定路径，见本文档「Spring 中的 @PropertySource 注解的作用是什么？」。
+
+- **Q：`#{}` 与 `${}` 有何区别？**
+
+  → 一个算值一个取值，见本文档「什么是 SpEL？在 Spring 中有哪些常见应用？」。
 
 ### 【中等】什么是 SpEL？在 Spring 中有哪些常见应用？⭐⭐
 
@@ -3091,7 +3346,7 @@ public class Employee {
 
 SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法用 `#{...}` 包裹，与取配置值的 `${...}` 区分。它贯穿注解体系：缓存键、权限控制、条件事件、条件装配都靠它求值。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：井大括算值、美元大括取值、井参数名引参数
 - **关键词**：表达式语言 ／ `#{}` vs `${}` ／ 运行时求值
@@ -3099,7 +3354,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 📖 核心知识
 
-**SpEL（Spring Expression Language）**是 Spring 提供的表达式语言，支持在运行时查询和操作对象图，语法以 `#{...}` 包裹，与取配置值的占位符 `${...}` 区分。
+**SpEL**（Spring Expression Language）是 Spring 提供的表达式语言，支持在运行时查询和操作对象图，语法以 `#{...}` 包裹，与取配置值的占位符 `${...}` 区分。
 
 **核心能力**
 
@@ -3126,15 +3381,20 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 ::: details
 
 - 【L3】SpEL 由 `SpelExpressionParser` 解析为 `Expression` 对象，配合 `StandardEvaluationContext` 求值；生产高频路径可用 `SimpleEvaluationContext` 限制能力面。
-- 【L4】Spring 6 引入编译器（AOT/解释执行混合模式），对重复求值的表达式可编译为字节码提升性能。
+- 【L4】SpEL 自 Spring 4.1 起提供编译器模式（`SpelCompilerMode.IMMEDIATE/MIXED`），可对重复求值的表达式编译为字节码提升性能，但仅支持部分操作；IMMEDIATE 模式遇到不支持的操作会直接抛异常，MIXED 模式则静默回退解释执行，生产开启前需评估表达式覆盖面。
 - 【安全】不要把用户输入直接作为 SpEL 表达式求值，存在 SpEL 注入风险（历史上 Spring Cloud Function 曾因此出过漏洞）。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：@Value 里如何混合配置与计算？** → `${}` 取值后再 `#{}` 算，见本文档「Spring 中的 @Value 注解的作用是什么？」。
-- **Q：SpEL 在事件中的典型用法？** → @EventListener 的 condition 属性，见本文档「@EventListener 和 ApplicationListener 有什么区别？」。
+- **Q：@Value 里如何混合配置与计算？**
+
+  → `${}` 取值后再 `#{}` 算，见本文档「Spring 中的 @Value 注解的作用是什么？」。
+
+- **Q：SpEL 在事件中的典型用法？**
+
+  → @EventListener 的 condition 属性，见本文档「Spring 事件机制是什么？」。
 
 ### 【简单】Spring 中的 @Profile 注解的作用是什么？⭐⭐
 
@@ -3144,7 +3404,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @Profile 指定 Bean 或配置类仅在特定环境（dev/test/prod）激活时生效，配合 `spring.profiles.active` 激活，实现同一套代码的多环境隔离。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一个注解分环境，激活哪个装哪个
 - **关键词**：环境隔离 ／ profiles.active ／ 条件注册
@@ -3158,18 +3418,23 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 🔀 发散问题
 
-- **Q：不同环境的配置值如何隔离？** → 各环境配置文件 + @Value 读取，见本文档「Spring 中的 @Value 注解的作用是什么？」。
-- **Q：更通用的条件装配怎么做？** → @Conditional 按条件注册，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
+- **Q：不同环境的配置值如何隔离？**
+
+  → 各环境配置文件 + @Value 读取，见本文档「Spring 中的 @Value 注解的作用是什么？」。
+
+- **Q：更通用的条件装配怎么做？**
+
+  → @Conditional 按条件注册，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
 
 ### 【简单】Spring 中的 @PostConstruct 和 @PreDestroy 注解的作用是什么？⭐⭐
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
 
 #### 💎 关键结论
 
 @PostConstruct 在依赖注入完成后执行初始化逻辑，@PreDestroy 在容器销毁 Bean 前执行清理逻辑，两者是生命周期回调的注解式写法，优先于 init-method/destroy-method。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：注入完成建、销毁之前拆
 - **关键词**：生命周期回调 ／ 初始化 ／ 销毁清理
@@ -3180,22 +3445,28 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 - **@PostConstruct**：指定 Bean **初始化后**（依赖注入完成后）执行的方法。
 - **@PreDestroy**：指定 Bean **销毁前**执行的方法，常用于释放连接、关闭线程等资源。
 - 二者都用于管理 Bean 生命周期中的自定义行为；执行优先级高于 XML 的 init-method/destroy-method。
+- 机理：由 `CommonAnnotationBeanPostProcessor` 在 `postProcessBeforeInitialization` 阶段执行回调，因此 @PostConstruct 早于 `InitializingBean#afterPropertiesSet` 与 init-method；AOP 代理在其后的 `postProcessAfterInitialization` 才生成，@PostConstruct 里调用本类其他被代理增强的方法（如 @Transactional）不会生效。
 - 注意：这两个注解属于 JSR-250（jakarta.annotation，Spring 6/SpringBoot 3 基线），需保证类路径上有对应依赖。
 
 #### 🔀 发散问题
 
-- **Q：与 InitializingBean 谁先执行？** → 注解回调先于接口方法，见本文档「InitializingBean 和 init-method 有什么区别？」。
-- **Q：回调在生命周期哪个环节？** → 属性填充之后、Bean 可用之前，见本文档「Spring Bean 的生命周期是怎样的？」。
+- **Q：与 InitializingBean 谁先执行？**
 
-### 【简单】Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？⭐⭐⭐
+  → 注解回调先于接口方法，见本文档「InitializingBean 和 init-method 有什么区别？」。
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / 注解
+- **Q：回调在生命周期哪个环节？**
+
+  → 属性填充之后、Bean 可用之前，见本文档「Spring Bean 的生命周期是怎样的？」。
+
+### 【简单】Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？⭐⭐
+
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：Spring / 注解
 
 #### 💎 关键结论
 
 @RequestBody 把 HTTP 请求体经 HttpMessageConverter 反序列化为方法参数；@ResponseBody 把返回值直接序列化为响应体（常为 JSON）。两者是 REST 接口收发的核心，@RestController 等价于 @Controller + @ResponseBody。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Body 一进一出，Converter 双向翻译
 - **关键词**：HttpMessageConverter ／ JSON 序列化 ／ @RestController
@@ -3217,10 +3488,28 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 :::
 
+#### ⚠️ 常见误区
+
+::: details
+
+常见误区：
+
+- ❌ "加了 @RequestBody 就能收到前端参数" → 前端以 `application/x-www-form-urlencoded` 提交而方法用 @RequestBody（只认 JSON 等已注册媒体类型）时抛 `HttpMediaTypeNotSupportedException`（415）；表单参数应直接用实体绑定或 @RequestParam 接收，@RequestBody 与 @RequestParam 一个读请求体一个读查询串，不能互相顶替。
+- ❌ "@RequestBody 什么请求都能用" → GET 携带请求体不被多数客户端/网关/代理支持，@RequestBody 只应用于确有请求体的方法（POST/PUT/PATCH）；且请求体流只能读取一次，一个方法最多只能有一个 @RequestBody 参数。
+- ❌ "`LocalDateTime` 字段反序列化莫名报 400" → Java 8 时间类型需要 `jackson-datatype-jsr310` 模块并配合 `@JsonFormat` 或全局 ObjectMapper 配置，缺省时 Jackson 无法解析 ISO 之外的常见格式。
+- ❌ "字段名对不上会报错" → JSON 字段名与 Java 属性名不一致时，Jackson 默认**静默置 null 而不抛异常**，是接口联调最隐蔽的坑；需要 fail-fast 时开启 `FAIL_ON_UNKNOWN_PROPERTIES` 或严格 DTO 校验。
+
+:::
+
 #### 🔀 发散问题
 
-- **Q：参数校验如何配合请求体？** → @Valid/@Validated 触发校验，见本文档「Spring 中的 @Validated 和 @Valid 注解有什么区别？」。
-- **Q：返回体里的路径变量怎么取？** → @PathVariable 绑定 URI 变量，见本文档「Spring 中的 @PathVariable 注解的作用是什么？」。
+- **Q：参数校验如何配合请求体？**
+
+  → @Valid/@Validated 触发校验，见本文档「Spring 中的 @Validated 和 @Valid 注解有什么区别？」。
+
+- **Q：返回体里的路径变量怎么取？**
+
+  → @PathVariable 绑定 URI 变量，见本文档「Spring 中的 @PathVariable 注解的作用是什么？」。
 
 ### 【简单】Spring 中的 @PathVariable 注解的作用是什么？⭐⭐
 
@@ -3230,7 +3519,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @PathVariable 将 URL 路径中的动态变量（如 `/user/{id}` 中的 id）绑定到控制器方法参数，是 RESTful 接口提取资源标识符的标准方式。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：花括占位、注解取值，路径即参数
 - **关键词**：URI 变量 ／ RESTful ／ 类型转换
@@ -3244,8 +3533,13 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 🔀 发散问题
 
-- **Q：取查询参数用什么注解？** → @RequestParam 或 @RequestHeader，见本文档「Spring 中的 @RequestHeader 和 @CookieValue 注解的作用是什么？」。
-- **Q：REST 风格如何设计 URL？** → 资源名词 + HTTP 动词，见本文档「什么是 Restful 风格的接口？」。
+- **Q：取查询参数用什么注解？**
+
+  → @RequestParam 或 @RequestHeader，见本文档「Spring 中的 @RequestHeader 和 @CookieValue 注解的作用是什么？」。
+
+- **Q：REST 风格如何设计 URL？**
+
+  → 资源名词 + HTTP 动词，见本文档「什么是 Restful 风格的接口？」。
 
 ### 【简单】Spring 中的 @ModelAttribute 注解的作用是什么？⭐⭐
 
@@ -3255,7 +3549,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @ModelAttribute 有两个用途：标注方法参数时把请求参数绑定到模型对象（表单接收）；标注方法时向模型添加公共数据（如枚举下拉项），供视图渲染使用，是传统 MVC 表单场景的常用注解。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：标参收表单，标方填公共
 - **关键词**：模型绑定 ／ 表单提交 ／ 公共数据
@@ -3269,18 +3563,23 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 🔀 发散问题
 
-- **Q：JSON 请求体用什么接收？** → @RequestBody 反序列化，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
-- **Q：表单提交的整体处理思路？** → 命令对象绑定 + 校验，见本文档「Spring MVC 中如何处理表单提交？」。
+- **Q：JSON 请求体用什么接收？**
+
+  → @RequestBody 反序列化，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
+
+- **Q：表单提交的整体处理思路？**
+
+  → 命令对象绑定 + 校验，见本文档「Spring MVC 中如何处理表单提交？」。
 
 ### 【简单】Spring 中的 @ExceptionHandler 注解的作用是什么？⭐⭐
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
 
 #### 💎 关键结论
 
 @ExceptionHandler 标注控制器方法作为特定异常的处理器，配合 @ControllerAdvice/@RestControllerAdvice 可实现全局统一异常处理，返回自定义错误响应。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一注解兼一异常，Advice 升全局
 - **关键词**：异常处理 ／ @ControllerAdvice ／ 统一响应
@@ -3292,10 +3591,24 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 - 仅在所在控制器内生效；配合 `@ControllerAdvice` 标注的类可实现**全局异常处理**。
 - 按异常类型就近匹配（子类优先），常与 @ResponseBody/@RestControllerAdvice 组合返回统一 JSON 错误码。
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】全局异常处理要区分参数校验家族抛出的三种异常：`MethodArgumentNotValidException`（@RequestBody + @Valid 校验失败）、`BindException`（表单/查询参数对象绑定校验失败）、`ConstraintViolationException`（Service 方法级校验，由类上 @Validated + `MethodValidationPostProcessor` 触发）。三者的错误信息结构不同，@ExceptionHandler 必须分开写，只兜住一种会导致另两种直接漏成 500。
+- 【L4】兜底 `Exception` 处理器应记录日志并返回 500，而业务异常要映射为 4xx 或统一业务码，避免业务失败触发监控误告警与上游重试。
+
+:::
+
 #### 🔀 发散问题
 
-- **Q：指定异常对应的 HTTP 状态码？** → @ResponseStatus 声明，见本文档「Spring 中的 @ResponseStatus 注解的作用是什么？」。
-- **Q：MVC 异常处理的整体机制？** → HandlerExceptionResolver 体系，见本文档「Spring MVC 如何处理异常？」。
+- **Q：指定异常对应的 HTTP 状态码？**
+
+  → @ResponseStatus 声明，见本文档「Spring 中的 @ResponseStatus 注解的作用是什么？」。
+
+- **Q：MVC 异常处理的整体机制？**
+
+  → HandlerExceptionResolver 体系，见本文档「Spring MVC 如何处理异常？」。
 
 ### 【简单】Spring 中的 @ResponseStatus 注解的作用是什么？⭐⭐
 
@@ -3305,7 +3618,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @ResponseStatus 标注在异常类或控制器方法上，声明应返回的 HTTP 状态码（及 reason），由框架自动设置响应状态，免去手动操作 HttpServletResponse。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：标异常定码，标方法定成功态
 - **关键词**：HTTP 状态码 ／ 声明式 ／ reason
@@ -3319,8 +3632,13 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 🔀 发散问题
 
-- **Q：需要返回错误体怎么办？** → @ExceptionHandler 自定义响应结构，见本文档「Spring 中的 @ExceptionHandler 注解的作用是什么？」。
-- **Q：状态码在 REST 中怎么规范使用？** → 资源动词与状态码对应，见本文档「什么是 Restful 风格的接口？」。
+- **Q：需要返回错误体怎么办？**
+
+  → @ExceptionHandler 自定义响应结构，见本文档「Spring 中的 @ExceptionHandler 注解的作用是什么？」。
+
+- **Q：状态码在 REST 中怎么规范使用？**
+
+  → 资源动词与状态码对应，见本文档「什么是 Restful 风格的接口？」。
 
 ### 【简单】Spring 中的 @RequestHeader 和 @CookieValue 注解的作用是什么？⭐⭐
 
@@ -3330,7 +3648,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @RequestHeader 把 HTTP 请求头的值绑定到方法参数（如取 Token、Accept-Language）；@CookieValue 把指定 Cookie 的值绑定到方法参数，两者都支持默认值与 required 控制。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Header 取头、Cookie 取饼，默认值兑底
 - **关键词**：请求头绑定 ／ Cookie 绑定 ／ defaultValue
@@ -3344,8 +3662,13 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 🔀 发散问题
 
-- **Q：取 URL 路径变量用什么？** → @PathVariable，见本文档「Spring 中的 @PathVariable 注解的作用是什么？」。
-- **Q：会话级数据怎么取？** → @SessionAttribute，见本文档「Spring 中的 @SessionAttribute 注解的作用是什么？」。
+- **Q：取 URL 路径变量用什么？**
+
+  → @PathVariable，见本文档「Spring 中的 @PathVariable 注解的作用是什么？」。
+
+- **Q：会话级数据怎么取？**
+
+  → @SessionAttribute，见本文档「Spring 中的 @SessionAttribute 注解的作用是什么？」。
 
 ### 【简单】Spring 中的 @SessionAttribute 注解的作用是什么？⭐⭐
 
@@ -3355,7 +3678,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @SessionAttribute 将当前 HTTP 会话中存储的指定模型属性绑定到控制器方法参数，方便在请求间共享数据，只读取不写入，写入仍需显式操作 HttpSession。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：会话取值只读，写入还得靠 Session
 - **关键词**：会话属性 ／ 请求间共享 ／ 只读绑定
@@ -3369,18 +3692,23 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 🔀 发散问题
 
-- **Q：无状态场景下如何替代 Session？** → JWT/Token 经请求头传递，见本文档「Spring 中的 @RequestHeader 和 @CookieValue 注解的作用是什么？」。
-- **Q：参数绑定体系的整体图景？** → HandlerAdapter 的参数解析器链，见本文档「Spring MVC 有哪些核心组件？」。
+- **Q：无状态场景下如何替代 Session？**
+
+  → JWT/Token 经请求头传递，见本文档「Spring 中的 @RequestHeader 和 @CookieValue 注解的作用是什么？」。
+
+- **Q：参数绑定体系的整体图景？**
+
+  → HandlerAdapter 的参数解析器链，见本文档「Spring MVC 有哪些核心组件？」。
 
 ### 【简单】Spring 中的 @Validated 和 @Valid 注解有什么区别？⭐⭐
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
 
 #### 💎 关键结论
 
 两者都触发参数校验：@Valid 是 JSR 标准注解，支持字段级联校验；@Validated 是 Spring 扩展，额外支持分组校验但无法级联。新增/更新等需不同规则的场景必须用 @Validated 分组。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Valid 标准能级联，Validated 分组不级联
 - **关键词**：JSR-303 ／ 分组校验 ／ 级联校验
@@ -3393,24 +3721,29 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 - **来源**：@Valid 是 Java Bean Validation 规范（JSR-303）的标准注解；@Validated 是 Spring 框架提供的注解，是对 @Valid 的扩展封装。
 - **分组校验**：@Validated 支持校验分组（通过 `groups` 属性指定），允许同一对象在不同场景下执行不同校验规则；@Valid 不支持分组。
 - **应用位置**：@Valid 可用于字段、方法参数、方法返回值等，支持级联校验；@Validated 只能用在类、方法、方法参数上，不能用于字段，因此无法直接触发级联校验。
-- **内部机制**：@Validated 由 Spring 的 `MethodValidationPostProcessor` 处理，最终仍使用 Validator 实现校验。
+- **内部机制**：两者生效路径不同——Controller 入参上的校验由 MVC 参数解析器（如 `RequestResponseBodyMethodProcessor`）调用 Validator 触发，失败抛 `MethodArgumentNotValidException`；方法级校验（类上标 `@Validated` 的 Service 方法）由 `MethodValidationPostProcessor` 生成代理拦截，失败抛 `ConstraintViolationException`。两种异常在全局异常处理中要分开编写。
 
-**使用场景**：当需要根据操作（如新增、更新）执行不同校验规则时，必须使用 @Validated 配合分组接口。
+**使用场景**：当需要根据操作（如新增、更新）执行不同校验规则时，必须使用 @Validated 配合分组接口。分组校验遇到嵌套对象时需 `@ConvertGroup` 把分组转换传递到级联目标，否则嵌套属性不会按指定分组执行校验。
 
 #### 🔀 发散问题
 
-- **Q：校验失败的异常在哪统一处理？** → @ExceptionHandler 捕获并返回错误信息，见本文档「Spring 中的 @ExceptionHandler 注解的作用是什么？」。
-- **Q：校验常配合哪种参数接收方式？** → @RequestBody 接收 JSON 实体，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
+- **Q：校验失败的异常在哪统一处理？**
+
+  → @ExceptionHandler 捕获并返回错误信息，见本文档「Spring 中的 @ExceptionHandler 注解的作用是什么？」。
+
+- **Q：校验常配合哪种参数接收方式？**
+
+  → @RequestBody 接收 JSON 实体，见本文档「Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？」。
 
 ### 【简单】Spring 中的 @Conditional 注解的作用是什么？⭐⭐
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
 
 #### 💎 关键结论
 
 @Conditional 根据自定义 Condition 的判断结果决定是否注册 Bean 或配置类，是条件化装配的基石，SpringBoot 的自动配置体系正是建立在它的派生注解之上。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：条件为真才装配，自动配置全靠它
 - **关键词**：条件装配 ／ Condition 接口 ／ 派生注解
@@ -3422,20 +3755,34 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 - 条件逻辑实现于 `Condition#matches(ConditionContext, AnnotatedTypeMetadata)`，可读取环境、类路径、已注册 Bean 等信息。
 - 常见派生：@ConditionalOnClass、@ConditionalOnMissingBean、@ConditionalOnProperty 等，是 SpringBoot 自动配置的核心机制。
 
+#### 🔬 扩展知识
+
+::: details
+
+- 【L3】条件注解在 `ConfigurationClassPostProcessor` 解析配置类阶段求值（`@ConditionalOnBean/@ConditionalOnMissingBean` 属于 REGISTER_BEAN 阶段，延迟到注册 BeanDefinition 时判断）；`OnClassCondition` 用 ASM 读取类字节码元数据而非真正加载类，避免依赖类缺失时抛 `NoClassDefFoundError`。
+- 【L4】`@ConditionalOnMissingBean` 的语义是「到此为止还没注册过」，对配置类的处理顺序极其敏感——自定义 starter 最常见的翻车点就是业务方的 Bean 在自动配置之后注册，导致 `OnMissingBean` 判定失败、容器里出现重复 Bean；需用 `@AutoConfigureBefore/@AutoConfigureAfter/@AutoConfigureOrder` 显式控制自动配置顺序。
+
+:::
+
 #### 🔀 发散问题
 
-- **Q：按环境维度条件化用什么？** → @Profile 按 profile 隔离，见本文档「Spring 中的 @Profile 注解的作用是什么？」。
-- **Q：条件装配在设计模式上属于什么？** → 策略/模板思想的体现，见本文档「Spring 中用到了哪些设计模式？」。
+- **Q：按环境维度条件化用什么？**
+
+  → @Profile 按 profile 隔离，见本文档「Spring 中的 @Profile 注解的作用是什么？」。
+
+- **Q：条件装配在设计模式上属于什么？**
+
+  → 策略/模板思想的体现，见本文档「Spring 中用到了哪些设计模式？」。
 
 ### 【简单】Spring 中的 @Cacheable 和 @CacheEvict 注解的作用是什么？⭐⭐
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
+> 🎯 目标等级：L2 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
 
 #### 💎 关键结论
 
 @Cacheable 把方法结果存入缓存，相同参数再次调用直接返回缓存值；@CacheEvict 在数据变更时移除缓存条目。两者配合实现声明式缓存：读走缓存、写后失效。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：读存缓存、写清缓存，key 用 SpEL
 - **关键词**：声明式缓存 ／ 缓存失效 ／ CacheManager
@@ -3446,11 +3793,17 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 - **@Cacheable**：将方法结果存入缓存，后续相同参数调用直接返回缓存值；key 可用 SpEL（如 `key = "#id"`）。
 - **@CacheEvict**：从缓存中移除指定条目，常用于更新/删除操作后保证一致性。
 - 两者共同实现 Spring 声明式缓存管理，底层由 `CacheManager` 适配本地缓存或 Redis 等实现；另有 @CachePut 强制更新缓存。
+- 缓存注解基于 AOP 代理拦截（`AnnotationCacheOperationSource` 解析 + `CacheInterceptor` 执行），同类内部自调用不经过代理，缓存注解不生效——与 @Transactional/@Async 失效是同一机理，解法也相同（拆类、注入自身代理或 `AopContext.currentProxy()`）。
 
 #### 🔀 发散问题
 
-- **Q：缓存 key 里的 SpEL 怎么写？** → `#参数名` 引用方法参数，见本文档「什么是 SpEL？在 Spring 中有哪些常见应用？」。
-- **Q：声明式机制的共同原理？** → 都是 AOP 代理拦截，见本文档「Spring AOP 有哪些实现方式？」。
+- **Q：缓存 key 里的 SpEL 怎么写？**
+
+  → `#参数名` 引用方法参数，见本文档「什么是 SpEL？在 Spring 中有哪些常见应用？」。
+
+- **Q：声明式机制的共同原理？**
+
+  → 都是 AOP 代理拦截，见本文档「Spring AOP 有哪些实现方式？」。
 
 ### 【简单】Spring 中的 @Lazy 注解的作用是什么？⭐⭐
 
@@ -3460,7 +3813,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @Lazy 让单例 Bean 延迟到首次使用时才初始化，可优化启动速度；标在注入点上则注入代理占位，还能打破某些循环依赖场景。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：不急用就先不建，首调才初始化
 - **关键词**：延迟初始化 ／ 启动优化 ／ 代理占位
@@ -3474,8 +3827,13 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 🔀 发散问题
 
-- **Q：默认单例是何时创建的？** → 容器启动时预实例化，见本文档「Spring Bean 支持哪些作用域？」。
-- **Q：@Lazy 与三级缓存都能破循环依赖？** → 机制不同，见本文档「Spring 如何解决循环依赖？」。
+- **Q：默认单例是何时创建的？**
+
+  → 容器启动时预实例化，见本文档「Spring Bean 支持哪些作用域？」。
+
+- **Q：@Lazy 与三级缓存都能破循环依赖？**
+
+  → 机制不同，见本文档「Spring 如何解决循环依赖？」。
 
 ### 【简单】Spring 中的 @PropertySource 注解的作用是什么？⭐⭐
 
@@ -3485,7 +3843,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @PropertySource 把指定 properties 文件加载进 Spring Environment，之后可用 @Value 或 Environment 读取，是 Java 配置时代引入外部配置文件的标准方式。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Source 指文件，Value 来取值
 - **关键词**：Environment ／ 属性源 ／ 配置加载
@@ -3495,37 +3853,18 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 - @PropertySource 用于加载指定属性文件（如 .properties）中的配置项到 Spring Environment 中，使属性值可通过 @Value 或 Environment 读取。
 - 示例：`@PropertySource("classpath:app.properties")`，支持 `ignoreResourceNotFound` 容错。
+- 坑点：默认的 `DefaultPropertySourceFactory` 只解析 `.properties`；要加载 `.yml` 必须自定义 `PropertySourceFactory`（内部用 `YamlPropertiesFactoryBean` 解析），否则启动即报解析错误。
 - SpringBoot 中 application.properties/yml 由框架自动加载，通常无需再手写 @PropertySource。
 
 #### 🔀 发散问题
 
-- **Q：加载后的值怎么注入？** → @Value 占位符，见本文档「Spring 中的 @Value 注解的作用是什么？」。
-- **Q：多环境配置文件如何切换？** → @Profile 指定环境，见本文档「Spring 中的 @Profile 注解的作用是什么？」。
+- **Q：加载后的值怎么注入？**
 
-### 【简单】Spring 中的 @EventListener 注解的作用是什么？⭐⭐
+  → @Value 占位符，见本文档「Spring 中的 @Value 注解的作用是什么？」。
 
-> 🎯 目标等级：L1 ｜ ⏱ 建议用时：5 min ｜ 🏷 标签：Spring / 注解
+- **Q：多环境配置文件如何切换？**
 
-#### 💎 关键结论
-
-@EventListener 把普通方法标记为事件监听器，发布对应类型事件时容器自动回调，无需实现接口；还支持 condition 条件过滤与 @Async 异步执行。
-
-#### ⚡记忆卡片
-
-- **口诀**：方法即监听，参数定事件
-- **关键词**：注解式监听 ／ 条件过滤 ／ 异步事件
-- **链路**：发布事件 → 按参数类型匹配 @EventListener 方法 → 回调执行
-
-#### 📖 核心知识
-
-- @EventListener 将方法标记为事件监听器，当应用发布对应类型的事件时，Spring 容器自动调用该方法。
-- 监听的事件类型由**方法参数**推断，一个方法可监听多个事件类型。
-- 支持 `condition`（SpEL 条件过滤）；配合 @Async 可异步处理事件。
-
-#### 🔀 发散问题
-
-- **Q：与接口式监听器有何差异？** → 注解式更灵活，见本文档「@EventListener 和 ApplicationListener 有什么区别？」。
-- **Q：事件机制的底层模型？** → 观察者模式 + ApplicationEventMulticaster，见本文档「Spring 事件机制是什么？」。
+  → @Profile 指定环境，见本文档「Spring 中的 @Profile 注解的作用是什么？」。
 
 ### 【简单】Spring 中的 @Scheduled 注解的作用是什么？⭐⭐
 
@@ -3535,7 +3874,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @Scheduled 把方法标记为定时任务，支持固定延迟（fixedDelay）、固定速率（fixedRate）和 Cron 表达式三种调度方式，需 @EnableScheduling 开启，默认单线程调度需注意任务阻塞。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：延迟、速率、Cron 三选一，Enable 开启才生效
 - **关键词**：定时任务 ／ Cron ／ @EnableScheduling
@@ -3546,13 +3885,19 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 - @Scheduled 用于将方法标记为定时任务，支持**固定延迟**、**固定速率**或 **Cron 表达式**，由 Spring 容器自动调度执行。
 - fixedDelay：上次执行完成后间隔；fixedRate：按固定频率触发；cron：灵活的日历表达式。
 - 需在配置上开启 `@EnableScheduling`；默认调度线程池大小为 1，耗时任务建议自定义 TaskScheduler 防止相互阻塞。
+- 集群部署时 @Scheduled 会在每个实例上各自触发、造成任务重复执行，需要分布式锁或改用 ShedLock、XXL-JOB 等分布式调度方案收口。
 
 #### 🔀 发散问题
 
-- **Q：同为代理类注解，@Async 原理类似吗？** → 都是 AOP 代理拦截，见本文档「@Async 注解的原理是什么？」。
-- **Q：需要配置开关控制任务启停？** → @Conditional 条件装配，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
+- **Q：同为代理类注解，@Async 原理类似吗？**
 
-### 【中等】@Async 注解的原理是什么？⭐⭐
+  → 都是 AOP 代理拦截，见本文档「@Async 注解的原理是什么？」。
+
+- **Q：需要配置开关控制任务启停？**
+
+  → @Conditional 条件装配，见本文档「Spring 中的 @Conditional 注解的作用是什么？」。
+
+### 【中等】@Async 注解的原理是什么？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / 注解
 
@@ -3560,7 +3905,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 @Async 基于 AOP 代理实现异步：@EnableAsync 开启后，容器为带 @Async 的 Bean 创建代理，拦截方法调用并封装为任务提交给 TaskExecutor 线程池执行，调用方立即返回；同类内部调用绕过代理会失效。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：代理拦截、丢给线程池、内部调用就失效
 - **关键词**：TaskExecutor ／ AsyncAnnotationBeanPostProcessor ／ 代理拦截
@@ -3581,7 +3926,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 **关键点**：
 
 - 同类内部调用（`this.method()`）绕过代理，导致异步失效。
-- 未配置自定义线程池时默认使用 `SimpleAsyncTaskExecutor`（每次新建线程，不复用），生产环境需自定义线程池。
+- 线程池选择：原生 Spring 在容器中没有任何 `TaskExecutor` Bean 时回退到 `SimpleAsyncTaskExecutor`（每次新建线程、不复用，不适合生产）；Spring Boot 2.1+ 会自动配置 `applicationTaskExecutor`（`ThreadPoolTaskExecutor`）作为默认执行器；Boot 3.2 起可用 `spring.threads.virtual.enabled=true` 切换为虚拟线程执行器。生产环境仍建议按业务自定义线程池。
 - 可通过 `@Async("executorName")` 指定线程池实现业务隔离。
 
 #### 🔬 扩展知识
@@ -3589,27 +3934,32 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 ::: details
 
 - 【L3】@Async 与 @Transactional 同时使用时，事务上下文绑定在提交任务的线程（事务存于 TransactionSynchronizationManager 的 ThreadLocal），异步线程无法继承，需在异步方法内自行声明事务。
-- 【L4】Spring 6 支持通过 `TaskExecutor` 适配器集成虚拟线程（JDK 21+），高并发短任务可显著减少线程开销。
+- 【L4】Spring Framework 6.1 起提供原生虚拟线程支持（JDK 21+）：`SimpleAsyncTaskExecutor` 可开启虚拟线程模式，另有 `VirtualThreadTaskExecutor`；高并发短任务可显著减少平台线程开销，对以 @Async 为代表的"每任务一线程"模型是结构性替代。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：哪些写法会让 @Async 失效？** → 内部调用、私有方法等，见本文档「@Async 什么时候会失效？」。
-- **Q：同样是代理失效，事务失效的原因？** → 同源：自调用绕过代理，见本文档「Spring 事务在什么情况下会失效？」。
+- **Q：哪些写法会让 @Async 失效？**
 
-### 【中等】@Async 什么时候会失效？⭐⭐
+  → 内部调用、私有方法等，见本文档「@Async 什么时候会失效？」。
+
+- **Q：同样是代理失效，事务失效的原因？**
+
+  → 同源：自调用绕过代理，见本文档「Spring 事务在什么情况下会失效？」。
+
+### 【中等】@Async 什么时候会失效？如何解决？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / 注解
 
 #### 💎 关键结论
 
-@Async 失效根因只有一个：调用没经过代理。典型场景：同类内部调用、private/final/static 方法、手动 new 对象、忘加 @EnableAsync；其余如默认线程池不当、异常静默丢失属于"生效但行为不符预期"。
+@Async 失效根因只有一个：调用没经过代理。典型场景：同类内部调用、private/final/static 方法、手动 new 对象、忘加 @EnableAsync；其余如默认线程池不当、异常静默丢失属于"生效但行为不符预期"。解决内部调用失效的核心思路是让调用重新经过代理：推荐注入自身 Bean 或拆分异步方法到独立类。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
-- **口诀**：不过代理就不异步，四类方法拦不住
-- **关键词**：代理失效 ／ @EnableAsync ／ 异常静默
+- **口诀**：不过代理就不异步，绕回代理有四招
+- **关键词**：代理失效 ／ @EnableAsync ／ self 注入 ／ 拆分 Bean
 - **链路**：调用未经代理 → 直接执行目标方法 → 同步运行
 
 #### 📖 核心知识
@@ -3629,6 +3979,15 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 - **返回值类型错误**：声明 `void` 却需返回结果，或返回类型非 `Future` 导致数据错乱。
 - **事务传播失效**：异步方法内调用事务方法，事务绑定原线程，无法继承。
 
+**内部调用失效的解决方案**：
+
+- **注入自身 Bean**：在类中通过 `@Autowired` 注入自身实例（`private YourService self;`），使用 `self.asyncMethod()` 调用。注意自注入本质是对自身的循环引用：Spring Boot 2.6+ 默认 `spring.main.allow-circular-references=false`，直接自注入会导致启动失败，需配合 `@Lazy`（注入延迟代理、首次调用时才解析目标）使用，或显式打开循环引用开关。
+- **拆分异步方法到独立 Bean**：将带有 `@Async` 的方法定义在另一个 Spring 管理的组件中，通过依赖注入调用。架构层面最清晰，异步能力下沉到独立组件（如 XxxAsyncExecutor），与业务类解耦。
+- **使用 AopContext 获取当前代理**：在方法内通过 `((YourService) AopContext.currentProxy()).asyncMethod()` 调用。需在配置类或启动类上添加 `@EnableAspectJAutoProxy(exposeProxy = true)` 开启暴露代理。
+- **编程式获取 Bean**：实现 `ApplicationContextAware` 接口，从容器中获取 Bean 实例进行调用。
+
+推荐首选拆分到独立 Bean（结构最清晰）或注入自身（代码最简洁）。@Transactional、@Cacheable、方法级 @Validated 等所有基于代理的注解在自调用下同样失效，上述解法通用。
+
 #### 🔬 扩展知识
 
 ::: details
@@ -3640,47 +3999,9 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 #### 🔀 发散问题
 
-- **Q：内部调用失效怎么解？** → 注入自身或拆分类，见本文档「@Async 如何避免内部调用失效？」。
-- **Q：事务失效也有类似清单？** → 自调用、非 public、异常吞掉等，见本文档「Spring 事务在什么情况下会失效？」。
+- **Q：事务失效也有类似清单？**
 
-### 【中等】@Async 如何避免内部调用失效？⭐⭐
-
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：Spring / 注解
-
-#### 💎 关键结论
-
-本质是让调用重新经过代理：推荐注入自身 Bean 或拆分异步方法到独立类；也可用 AopContext.currentProxy() 获取代理或从 ApplicationContext 编程式取 Bean。首选拆分，结构最清晰。
-
-#### ⚡记忆卡片
-
-- **口诀**：绕回代理有四招，注入自身和拆类最可靠
-- **关键词**：self 注入 ／ 拆分 Bean ／ AopContext
-- **链路**：this 调用失效 → 改走代理对象 → 异步恢复生效
-
-#### 📖 核心知识
-
-@Async 基于 Spring AOP 代理实现，同一类内部方法直接调用（`this.method()`）会绕过代理，导致异步失效。解决方案如下：
-
-- **使用 AopContext 获取当前代理**：在方法内通过 `((YourService) AopContext.currentProxy()).asyncMethod()` 调用。需在配置类或启动类上添加 `@EnableAspectJAutoProxy(exposeProxy = true)` 开启暴露代理。
-- **注入自身 Bean**：在类中通过 `@Autowired` 注入自身实例（`private YourService self;`），使用 `self.asyncMethod()` 调用。
-- **拆分异步方法到独立 Bean**：将带有 `@Async` 的方法定义在另一个 Spring 管理的组件中，通过依赖注入调用。
-- **编程式获取 Bean**：实现 `ApplicationContextAware` 接口，从容器中获取 Bean 实例进行调用。
-
-推荐使用前两种方式（实践上拆分到独立 Bean 最清晰），需注意事务等其他代理机制可能受同样影响。
-
-#### 🔬 扩展知识
-
-::: details
-
-- 【L3】注入自身不会导致循环依赖问题：Spring 允许自注入（通过提前曝光的早期引用）；但需注意 self 若是代理对象，事务与异步行为一致走代理。
-- 【L4】架构层面：异步能力下沉到独立组件（如 XxxAsyncExecutor），与业务类解耦，是更彻底的治理方式。
-
-:::
-
-#### 🔀 发散问题
-
-- **Q：为什么内部调用会失效？** → 代理拦截机制决定的，见本文档「@Async 什么时候会失效？」。
-- **Q：事务自调用失效也这么解吗？** → 方案通用，见本文档「Spring 事务在什么情况下会失效？」。
+  → 自调用、非 public、异常吞掉等，见本文档「Spring 事务在什么情况下会失效？」。
 
 ## 资料
 

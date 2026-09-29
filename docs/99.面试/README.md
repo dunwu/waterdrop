@@ -30,6 +30,8 @@ index: false
 
 ## [DevOps 面试](DevOps面试.md) 💯
 
+## 📊 [面试题库 P8 级广度深度评估与修复报告]([面试题库]P8级广度深度评估与修复报告.md)
+
 ## 🚪 传送
 
 ◾ 💧 [钝悟的 IT 知识图谱](https://dunwu.github.io/waterdrop/) ◾ 🎯 [钝悟的博客](https://dunwu.github.io/blog/) ◾

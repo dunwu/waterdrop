@@ -24,7 +24,7 @@ permalink: /pages/8c23f138/
 
 七步链路：DNS 解析 → TCP 三次握手 → 发送 HTTP 请求 → 服务器处理 → 返回响应 → 浏览器渲染 → 四次挥手（Keep-Alive 则保持连接）。每一步都可深挖：DNS 缓存层级、TLS 握手、服务端请求链路、浏览器渲染管线。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：解析、握手、发请求、处理、响应、渲染、挥手
 - **关键词**：DNS ／ 三次握手 ／ 状态码 ／ 渲染 ／ 四次挥手
@@ -47,14 +47,23 @@ permalink: /pages/8c23f138/
 - 【L3】浏览器渲染管线：HTML → DOM 树，CSS → CSSOM，二者合成 Render 树，再布局（Layout）与绘制（Paint）；`<script>` 默认阻塞解析，`async`/`defer` 可改变加载行为。
 - 【L3】服务端链路展开即 Tomcat → Filter → DispatcherServlet → Interceptor → Controller，是 Web 框架面试题的标准纵深。
 - 【L4】现代优化：HTTP/2 多路复用减少连接数、`dns-prefetch`/`preconnect` 提前建连、CDN 就近访问、关键 CSS 内联与非关键 JS 延迟加载。
+- 【L4】HTTP 协议演进对后端架构的影响：HTTP/1.1 即使开持久连接仍有**队头阻塞**（同一连接上前一个慢响应拖住后续请求）；HTTP/2 多路复用消除了 HTTP 层的队头阻塞，但所有 Stream 仍共享一条 TCP 连接，**丢包触发的 TCP 重传会阻塞全部 Stream**（TCP 层队头阻塞残留）；HTTP/3 改用基于 UDP 的 QUIC，流与流之间独立丢包恢复，才真正解决。后端日常更常打交道的落点是：HTTP 客户端连接池（HttpClient/OkHttp 复用 keep-alive 连接，避免每次请求三次握手 + TLS 握手）与超时重试的幂等设计（见「GET 请求和 POST 请求的区别？」）。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：服务器处理请求的内部链路是什么？** → Filter → Interceptor → AOP → Controller，见本文档「过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？」。
-- **Q：响应状态码怎么读？** → 首位定类，见本文档「HTTP 常见状态码有哪些？」。
-- **Q：响应能否被浏览器缓存？** → 强缓存与协商缓存两级策略，见本文档「HTTP 缓存机制是如何工作的？」。
+- **Q：服务器处理请求的内部链路是什么？**
+
+  → Filter → Interceptor → AOP → Controller，见本文档「过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？」。
+
+- **Q：响应状态码怎么读？**
+
+  → 首位定类，见本文档「HTTP 常见状态码有哪些？」。
+
+- **Q：响应能否被浏览器缓存？**
+
+  → 强缓存与协商缓存两级策略，见本文档「HTTP 缓存机制是如何工作的？」。
 
 ### 【简单】GET 请求和 POST 请求的区别？⭐⭐
 
@@ -64,7 +73,7 @@ permalink: /pages/8c23f138/
 
 GET 与 POST 的核心差异在语义：GET 获取数据、幂等、参数在 URL；POST 提交数据、非幂等、参数在 Body。由此衍生出缓存、安全性、数据量限制等差异。注意 POST 也不是加密的，安全依赖 HTTPS 而非方法本身。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：GET 取、POST 送；GET 幂等可缓存，POST 提交不缓存
 - **关键词**：语义 ／ 幂等 ／ 参数位置 ／ URL 长度限制
@@ -87,12 +96,17 @@ GET 与 POST 的核心差异在语义：GET 获取数据、幂等、参数在 UR
 - **幂等性**：GET 天然幂等，多次请求结果一致；POST 重复提交会产生重复数据，故"防重复提交"通常针对 POST。
 - **数据量**：HTTP 规范并未限制 GET 长度，约 2KB 是浏览器/服务器的常见实现限制（不同实现约 2KB~8KB）；POST 理论无限制，实际受服务器配置约束。
 
-**扩展要点**：RESTful 设计中 PUT/DELETE 也是幂等方法，方法语义是 HTTP 规范层面的约定；HTTP/2、HTTP/3 下 GET/POST 在传输层已无差异，幂等性完全靠应用层接口设计保证。
+**扩展要点**：RESTful 设计中 PUT/DELETE 也是幂等方法，方法语义是 HTTP 规范层面的约定；HTTP/2、HTTP/3 下 GET/POST 在传输层已无差异，幂等性完全靠应用层接口设计保证。POST 若必须做到幂等（支付、下单场景），业界通行做法是客户端生成 `Idempotency-Key` 请求头、服务端按键去重（首次执行并记录结果，重试直接返回首次结果）——超时重试不会导致重复扣款。
 
 #### 🔀 发散问题
 
-- **Q：HTTP 常见状态码有哪些？** → GET 命中缓存返回 200 from cache，协商命中返回 304，见本文档「HTTP 常见状态码有哪些？」。
-- **Q：RESTful 接口如何使用方法语义？** → GET 查、POST 增、PUT 改、DELETE 删，见本文档「什么是 RESTful API？设计原则？」。
+- **Q：HTTP 常见状态码有哪些？**
+
+  → GET 命中缓存返回 200 from cache，协商命中返回 304，见本文档「HTTP 常见状态码有哪些？」。
+
+- **Q：RESTful 接口如何使用方法语义？**
+
+  → GET 查、POST 增、PUT 改、DELETE 删，见本文档「什么是 RESTful API？设计原则？」。
 
 ### 【简单】HTTP 常见状态码有哪些？⭐⭐
 
@@ -102,7 +116,7 @@ GET 与 POST 的核心差异在语义：GET 获取数据、幂等、参数在 UR
 
 状态码三位数字，首位定类：1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误。高频记牢：200 成功、301/302 重定向、304 缓存命中、401 未认证、403 无权限、404 不存在、500 服务端异常、502 网关错误、503 服务不可用。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：1 信 2 成 3 跳转，4 错客户 5 错服务
 - **关键词**：200 ／ 302 ／ 304 ／ 401 vs 403 ／ 502
@@ -125,8 +139,13 @@ GET 与 POST 的核心差异在语义：GET 获取数据、幂等、参数在 UR
 
 #### 🔀 发散问题
 
-- **Q：304 是怎么产生的？** → 协商缓存命中（ETag / Last-Modified 未变化），见本文档「HTTP 缓存机制是如何工作的？」。
-- **Q：401 之后用户如何重新认证？** → 取决于会话方案选型（Session/JWT/OAuth2），见本文档「Cookie / Session / Token / JWT 如何选型？」。
+- **Q：304 是怎么产生的？**
+
+  → 协商缓存命中（ETag / Last-Modified 未变化），见本文档「HTTP 缓存机制是如何工作的？」。
+
+- **Q：401 之后用户如何重新认证？**
+
+  → 取决于会话方案选型（Session/JWT/OAuth2），见本文档「Cookie / Session / Token / JWT 如何选型？」。
 
 ### 【中等】HTTP 缓存机制是如何工作的？⭐⭐⭐
 
@@ -136,7 +155,7 @@ GET 与 POST 的核心差异在语义：GET 获取数据、幂等、参数在 UR
 
 HTTP 缓存两级策略：先走强缓存（`Cache-Control` 有效期内直接用本地副本，不发请求）；过期后走协商缓存（带 `ETag`/`Last-Modified` 询问服务器，未变则返回 304 复用本地）。强缓存省请求，协商缓存省带宽。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：强缓存看 Cache-Control，协商缓存看 ETag，304 就是没变
 - **关键词**：max-age ／ Expires ／ If-None-Match ／ 304
@@ -183,8 +202,13 @@ graph TD
 
 #### 🔀 发散问题
 
-- **Q：304 状态码属于哪一类？** → 3xx 重定向类，协商缓存命中，见本文档「HTTP 常见状态码有哪些？」。
-- **Q：GET 请求与缓存的关系？** → GET 可被浏览器缓存、POST 默认不缓存，见本文档「GET 请求和 POST 请求的区别？」。
+- **Q：304 状态码属于哪一类？**
+
+  → 3xx 重定向类，协商缓存命中，见本文档「HTTP 常见状态码有哪些？」。
+
+- **Q：GET 请求与缓存的关系？**
+
+  → GET 可被浏览器缓存、POST 默认不缓存，见本文档「GET 请求和 POST 请求的区别？」。
 
 ### 【中等】什么是 RESTful API？设计原则？⭐⭐
 
@@ -194,7 +218,7 @@ graph TD
 
 REST 是一种架构风格：URL 用名词表示资源，HTTP 方法表达操作语义（GET 查/POST 增/PUT 改/DELETE 删），状态码表达结果，接口无状态。核心价值是语义清晰、可缓存、易扩展。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：名词当资源，动词变方法，状态码说话
 - **关键词**：资源 ／ HTTP 方法语义 ／ 无状态 ／ 状态码
@@ -231,8 +255,13 @@ REST 是一种架构风格：URL 用名词表示资源，HTTP 方法表达操作
 
 #### 🔀 发散问题
 
-- **Q：REST 的无状态要求与登录态怎么协调？** → 分布式场景选 JWT，见本文档「Cookie / Session / Token / JWT 如何选型？」。
-- **Q：方法语义与幂等性的关系？** → GET/PUT/DELETE 幂等、POST 非幂等，见本文档「GET 请求和 POST 请求的区别？」。
+- **Q：REST 的无状态要求与登录态怎么协调？**
+
+  → 分布式场景选 JWT，见本文档「Cookie / Session / Token / JWT 如何选型？」。
+
+- **Q：方法语义与幂等性的关系？**
+
+  → GET/PUT/DELETE 幂等、POST 非幂等，见本文档「GET 请求和 POST 请求的区别？」。
 
 ## Servlet
 
@@ -244,7 +273,7 @@ REST 是一种架构风格：URL 用名词表示资源，HTTP 方法表达操作
 
 Servlet 是运行在服务器端的 Java 程序，用于生成动态 Web 内容。狭义指 Servlet 接口，广义指任何实现该接口的类。它独立于平台与协议，由容器以"单实例多线程"方式服务请求，这是它战胜 CGI 的根本原因。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：接口定义、容器托管、单例多线程
 - **关键词**：Server Applet ／ Servlet 容器 ／ 独立于平台协议
@@ -274,10 +303,15 @@ Servlet 运行于支持 Java 的应用服务器中，独立于平台和协议，
 
 #### 🔀 发散问题
 
-- **Q：Servlet 和 JSP 的区别？** → JSP 本质就是 Servlet，编译后转为 Servlet 类；JSP 偏视图，Servlet 偏控制逻辑，见本文档「Servlet 和 JSP 的区别？」。
-- **Q：Servlet 实例是每次请求都新建吗？** → 不是。容器默认只创建一个实例，多线程并发调用 `service()`，这也是不能在 Servlet 中存可变请求状态的原因，见本文档「简述 Servlet 生命周期」。
+- **Q：Servlet 和 JSP 的区别？**
 
-### 【中等】简述 Servlet 生命周期⭐⭐⭐
+  → JSP 本质就是 Servlet，编译后转为 Servlet 类；JSP 偏视图，Servlet 偏控制逻辑，见本文档「Servlet 和 JSP 的区别？」。
+
+- **Q：Servlet 实例是每次请求都新建吗？**
+
+  → 不是。容器默认只创建一个实例，多线程并发调用 `service()`，这也是不能在 Servlet 中存可变请求状态的原因，见本文档「简述 Servlet 生命周期」。
+
+### 【中等】简述 Servlet 生命周期⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：JavaWeb / Servlet 生命周期
 
@@ -285,7 +319,7 @@ Servlet 运行于支持 Java 的应用服务器中，独立于平台和协议，
 
 Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`init()` 仅一次）→ 服务（`service()` 每请求一次）→ 销毁（`destroy()` 仅一次）→ 卸载。核心是"一次初始化、多次服务、一次销毁"，`service()` 被多线程并发调用。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：加载初始化，服务多次调，销毁只一回
 - **关键词**：init ／ service ／ destroy ／ 单实例多线程
@@ -318,15 +352,22 @@ Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`ini
 - 【L3】`init()` 的执行时机可由 `loadOnStartup` 控制：配置后容器启动即初始化（值越小越先），否则首次请求时才初始化。
 - 【L3】Servlet 3.0+ 的异步处理（`AsyncContext`）允许长耗时请求离开容器线程，避免线程池耗尽。
 - 【L4】Servlet 6.0（Jakarta EE 10）包名为 `jakarta.servlet`，生命周期模型本身未变；虚拟线程让"一请求一线程"模型重新具备高并发能力。
+- 【L4】**Servlet 3.0 异步（`AsyncContext`）与 Spring `@Async` 的线程模型差异**：`request.startAsync()` 会把容器线程**归还给 Tomcat 线程池**，业务移交自定义线程池执行，完成后调 `asyncContext.complete()` 由容器写回响应——省下的是容器线程；`@Async` 只是把业务方法挪到 Spring 线程池，**不改变 Servlet 请求的同步阻塞模型**，必须配合 `Callable`/`WebAsyncTask`/`DeferredResult` 返回值才能真正释放容器线程。混淆二者会出现"加了 @Async，Tomcat maxThreads 还是被打满"。
+- 【L4】**优雅停机与 `destroy()`**：`destroy()` 被调用时容器已停止派发新请求；Spring Boot 2.3+ 的 `server.shutdown=graceful` 在收到终止信号后先拒收新请求、等待在途请求完成（超时由 `spring.lifecycle.timeout-per-shutdown-phase` 控制，默认 30 秒）再关闭容器，配合 K8s 就绪探针摘流与 `preStop` 钩子，避免滚动发布期间产生 502。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：`service()` 与 `doGet()`/`doPost()` 是什么关系？** → `service()` 按请求方法分发到对应的 `doXxx()`，自定义方法需重写 `service()`。
-- **Q：过滤器在生命周期中的什么位置？** → Filter 在 Servlet 容器层、请求到达 Servlet 之前执行，见本文档「过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？」。
+- **Q：`service()` 与 `doGet()`/`doPost()` 是什么关系？**
 
-### 【中等】转发(forward)和重定向(redirect)有什么区别？⭐⭐⭐
+  → `service()` 按请求方法分发到对应的 `doXxx()`，自定义方法需重写 `service()`。
+
+- **Q：过滤器在生命周期中的什么位置？**
+
+  → Filter 在 Servlet 容器层、请求到达 Servlet 之前执行，见本文档「过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？」。
+
+### 【中等】转发(forward)和重定向(redirect)有什么区别？⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：JavaWeb / 请求流转
 
@@ -334,7 +375,7 @@ Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`ini
 
 转发是服务器内部的一次请求流转，地址栏不变、可共享 request 数据、效率高，但只能跳本应用；重定向是服务器让浏览器重新发起第二次请求，地址栏变化、数据不共享，但可跳任意 URL。登录成功后常用重定向防刷新重复提交。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：转发一次内部走，重定向两次地址变
 - **关键词**：RequestDispatcher ／ sendRedirect ／ 302 ／ request 共享
@@ -368,8 +409,13 @@ Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`ini
 
 #### 🔀 发散问题
 
-- **Q：重定向对应的状态码是什么？** → 302 临时重定向、301 永久重定向，见本文档「HTTP 常见状态码有哪些？」。
-- **Q：转发能共享的数据放在哪个作用域？** → request 作用域，四种作用域见本文档「JSP 的内置对象和作用域？」。
+- **Q：重定向对应的状态码是什么？**
+
+  → 302 临时重定向、301 永久重定向，见本文档「HTTP 常见状态码有哪些？」。
+
+- **Q：转发能共享的数据放在哪个作用域？**
+
+  → request 作用域，四种作用域见本文档「JSP 的内置对象和作用域？」。
 
 ### 【简单】Servlet 中如何获取用户提交的查询参数或表单数据？⭐
 
@@ -379,7 +425,7 @@ Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`ini
 
 三个 API 覆盖全部场景：`getParameter(name)` 取单个值，`getParameterValues(name)` 取同名多值（如复选框），`getParameterMap()` 取全部参数。注意参数读取前要先处理字符编码。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：单值 getParameter，多值加 s，全量 Map
 - **关键词**：getParameter ／ getParameterValues ／ getParameterMap
@@ -395,8 +441,13 @@ Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`ini
 
 #### 🔀 发散问题
 
-- **Q：这些参数方法属于哪个对象？** → HttpServletRequest，见本文档「Request 和 Response 的常用方法？」。
-- **Q：编码 Filter 应该放在链路什么位置？** → 最外层、参数解析之前，见本文档「过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？」。
+- **Q：这些参数方法属于哪个对象？**
+
+  → HttpServletRequest，见本文档「Request 和 Response 的常用方法？」。
+
+- **Q：编码 Filter 应该放在链路什么位置？**
+
+  → 最外层、参数解析之前，见本文档「过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？」。
 
 ### 【简单】Request 和 Response 的常用方法？⭐
 
@@ -406,7 +457,7 @@ Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`ini
 
 request 侧以"读"为主：取参数、属性、请求头、方法、URI、Session、Cookie；response 侧以"写"为主：设内容类型、响应头、状态码、重定向、输出流。分清 parameter（客户端提交的参数）与 attribute（服务端设置的属性）是高频考点。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：request 读进来，response 写出去；parameter 属客户端，attribute 属服务端
 - **关键词**：getParameter ／ getAttribute ／ setHeader ／ sendRedirect
@@ -440,8 +491,13 @@ request 侧以"读"为主：取参数、属性、请求头、方法、URI、Sess
 
 #### 🔀 发散问题
 
-- **Q：request 里的 Session 是怎么来的？** → `getSession()` 背后是 SessionID 匹配机制，见本文档「Cookie 和 Session 的区别是什么？」。
-- **Q：`sendRedirect` 的底层原理？** → 返回 302 + Location 头，见本文档「转发(forward)和重定向(redirect)有什么区别？」。
+- **Q：request 里的 Session 是怎么来的？**
+
+  → `getSession()` 背后是 SessionID 匹配机制，见本文档「Cookie 和 Session 的区别是什么？」。
+
+- **Q：`sendRedirect` 的底层原理？**
+
+  → 返回 302 + Location 头，见本文档「转发(forward)和重定向(redirect)有什么区别？」。
 
 ### 【简单】Servlet 和 JSP 的区别？⭐
 
@@ -451,7 +507,7 @@ request 侧以"读"为主：取参数、属性、请求头、方法、URI、Sess
 
 JSP 本质就是 Servlet——JSP 编译后生成 `.java` 再编译为 `.class`。分工上 JSP 侧重视图（View），Servlet 侧重控制逻辑（Controller），这是 MVC 分层的基本常识。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：JSP 即 Servlet，视图归 JSP，控制归 Servlet
 - **关键词**：编译转换 ／ 视图 ／ 控制逻辑
@@ -466,8 +522,13 @@ JSP 本质就是 Servlet——JSP 编译后生成 `.java` 再编译为 `.class`�
 
 #### 🔀 发散问题
 
-- **Q：什么是 Servlet？** → Servlet 是运行于容器的服务器端程序，JSP 最终也会被转换为 Servlet 运行，见本文档「什么是 Servlet？」。
-- **Q：JSP 有哪些内置对象？** → 九大内置对象、四种作用域，见本文档「JSP 的内置对象和作用域？」。
+- **Q：什么是 Servlet？**
+
+  → Servlet 是运行于容器的服务器端程序，JSP 最终也会被转换为 Servlet 运行，见本文档「什么是 Servlet？」。
+
+- **Q：JSP 有哪些内置对象？**
+
+  → 九大内置对象、四种作用域，见本文档「JSP 的内置对象和作用域？」。
 
 ### 【简单】JSP 的内置对象和作用域？⭐
 
@@ -477,7 +538,7 @@ JSP 本质就是 Servlet——JSP 编译后生成 `.java` 再编译为 `.class`�
 
 JSP 有九大内置对象（request/response/session/application/pageContext/out/config/page/exception），无需声明直接使用。四种作用域由小到大：page → request → session → application，决定数据的可见范围与生命周期。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：九大对象免声明，作用域从小到大 page/request/session/application
 - **关键词**：九大内置对象 ／ 四种作用域 ／ pageContext ／ application
@@ -508,8 +569,13 @@ JSP 有九大内置对象（request/response/session/application/pageContext/out
 
 #### 🔀 发散问题
 
-- **Q：request 作用域的数据如何在转发中共享？** → forward 共享 request 数据，见本文档「转发(forward)和重定向(redirect)有什么区别？」。
-- **Q：session 对象背后的机制？** → SessionID + 服务端存储，见本文档「Cookie 和 Session 的区别是什么？」。
+- **Q：request 作用域的数据如何在转发中共享？**
+
+  → forward 共享 request 数据，见本文档「转发(forward)和重定向(redirect)有什么区别？」。
+
+- **Q：session 对象背后的机制？**
+
+  → SessionID + 服务端存储，见本文档「Cookie 和 Session 的区别是什么？」。
 
 ### 【简单】JSP 中动态 INCLUDE 和静态 INCLUDE 的区别？⭐
 
@@ -519,7 +585,7 @@ JSP 有九大内置对象（request/response/session/application/pageContext/out
 
 静态 INCLUDE（`<%@ include %>`）是"先合并再编译"——翻译期把源码并入当前页一起编译，不检查包含文件变化、不能传参；动态 INCLUDE（`<jsp:include>`）是"先编译再合并"——运行时调用目标页面输出，会检查文件变化、可传参。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：静态合并早，动态调用晚；动态能传参，静态不查变
 - **关键词**：翻译期合并 ／ 运行时包含 ／ 传参 ／ 变化检查
@@ -539,10 +605,15 @@ JSP 有九大内置对象（request/response/session/application/pageContext/out
 
 #### 🔀 发散问题
 
-- **Q：JSP 为什么最终会被编译成 Servlet？** → JSP 本质就是 Servlet，见本文档「Servlet 和 JSP 的区别？」。
-- **Q：动态包含的底层机制？** → 与 `RequestDispatcher.include()` 相关，转发的区别见本文档「转发(forward)和重定向(redirect)有什么区别？」。
+- **Q：JSP 为什么最终会被编译成 Servlet？**
 
-### 【中等】过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？⭐⭐⭐⭐
+  → JSP 本质就是 Servlet，见本文档「Servlet 和 JSP 的区别？」。
+
+- **Q：动态包含的底层机制？**
+
+  → 与 `RequestDispatcher.include()` 相关，转发的区别见本文档「转发(forward)和重定向(redirect)有什么区别？」。
+
+### 【困难】过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：JavaWeb / 请求链路
 
@@ -550,7 +621,7 @@ JSP 有九大内置对象（request/response/session/application/pageContext/out
 
 三者都是拦截机制，但分属不同容器、作用于请求链路的不同位置：**Filter 在外层（Servlet 容器）、Interceptor 在中层（Spring MVC）、AOP 在最内层（Bean 方法）**。记忆：Filter 管"请求进来"，Interceptor 管"调用哪个方法"，AOP 管"方法怎么执行"——能在外层解决的不要放内层。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Filter 管进门、Interceptor 管找人、AOP 管办事
 - **关键词**：Servlet 规范 ／ DispatcherServlet ／ HandlerMethod ／ 切点表达式
@@ -616,6 +687,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 - 【L3】**Filter 为什么不能直接 @Autowired 注入 Spring Bean？** Filter 由 Servlet 容器创建和初始化，在 Spring Boot 内嵌容器中其启动时机早于 Spring 上下文完全就绪，此时 Bean 尚未注册，直接注入会拿到 null。标准解法是用 `FilterRegistrationBean` 注册（让 Spring 接管 Filter 实例的生命周期），或在 Filter 内部延迟从 ApplicationContext 获取 Bean。
 - 【L3】**Controller 抛异常后，postHandle 和 afterCompletion 还会执行吗？** `postHandle` 不会（只在 Controller 正常返回后调用），但 `afterCompletion` 会执行——资源清理必须放 `afterCompletion`；另注意视图渲染发生在 postHandle 与 afterCompletion 之间。
 - 【L4】**权限切面用 Spring AOP 还是 AspectJ？** Spring AOP 是运行时代理，零构建侵入，Web 场景足够；AspectJ 是编译期/加载期字节码织入，能拦私有方法和构造器但构建复杂度高。Spring AOP 拦不到私有方法的根因：代理依赖"外部调用经过代理对象"，私有方法对外不可见、无法经由代理入口进入。
+- 【L4】**Trace 上下文如何随拦截链传递？** 分布式追踪的 TraceId 通常在最外层 Filter 写入 MDC（底层 `ThreadLocal`）并在请求结束时清理，有两处高频断点：① 业务提交线程池 / `@Async` 后 `ThreadLocal` 不跨线程，需换用 `TransmittableThreadLocal`（阿里 TTL）或 `TaskDecorator` 在任务提交时显式捕获-恢复上下文；② Servlet 3.0 异步下 Filter 的 `doFilter` 在业务完成前就返回，写在 `finally` 里的 MDC 清理会提前执行、后续日志丢失 TraceId——Trace 生命周期应挂在 `AsyncListener` 的 `onComplete`/`onTimeout` 上，而非 Filter 出口。
 
 :::
 
@@ -652,12 +724,17 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 #### 🔀 发散问题
 
-- **Q：登录检查应该放 Filter 还是 Interceptor？** → 需要读 Session 用 Interceptor 示例更直观；纯 Token 校验放 Filter 或网关，机制见本文档「Cookie 和 Session 的区别是什么？」。
-- **Q：AOP 的代理机制细节？** → JDK 动态代理与 CGLIB 的选择属 Spring 范畴，核心结论：接口用 JDK 代理、类用 CGLIB，自调用绕过代理导致增强失效。
+- **Q：登录检查应该放 Filter 还是 Interceptor？**
+
+  → 需要读 Session 用 Interceptor 示例更直观；纯 Token 校验放 Filter 或网关，机制见本文档「Cookie 和 Session 的区别是什么？」。
+
+- **Q：AOP 的代理机制细节？**
+
+  → JDK 动态代理与 CGLIB 的选择属 Spring 范畴，核心结论：接口用 JDK 代理、类用 CGLIB，自调用绕过代理导致增强失效。
 
 ## Web 会话
 
-### 【中等】Cookie 和 Session 的区别是什么？⭐⭐⭐⭐
+### 【中等】Cookie 和 Session 的区别是什么？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：JavaWeb / 会话管理
 
@@ -665,7 +742,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 本质区别是"状态由谁保管"：Cookie 把状态放客户端，Session 放服务端。二者常配合使用——Session 依赖 Cookie 传递 SessionID。Cookie 方便但暴露，Session 安全但要解决服务端存储与分布式共享问题。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Cookie 存客户端，Session 存服务端，SessionID 靠 Cookie 传
 - **关键词**：状态归属 ／ 4KB ／ HttpOnly ／ SessionID ／ 分布式共享
@@ -736,8 +813,13 @@ Cookie 与 Session 是"无状态 HTTP 协议如何维持状态"的两种经典�
 
 #### 🔀 发散问题
 
-- **Q：Cookie 里的登录态如何选型？** → 单体选 Session，分布式选 JWT，见本文档「Cookie / Session / Token / JWT 如何选型？」。
-- **Q：SessionID 被盗与 CSRF 利用 Cookie 有什么关系？** → SameSite 属性是两者共同的防线，见本文档「什么是 CSRF 攻击？如何防御？」。
+- **Q：Cookie 里的登录态如何选型？**
+
+  → 单体选 Session，分布式选 JWT，见本文档「Cookie / Session / Token / JWT 如何选型？」。
+
+- **Q：SessionID 被盗与 CSRF 利用 Cookie 有什么关系？**
+
+  → SameSite 属性是两者共同的防线，见本文档「什么是 CSRF 攻击？如何防御？」。
 
 ### 【中等】如果禁用了 Cookie 怎么办？⭐⭐
 
@@ -747,7 +829,7 @@ Cookie 与 Session 是"无状态 HTTP 协议如何维持状态"的两种经典�
 
 禁用 Cookie 后问题本质是"sessionId/身份凭证没地方放了"。两条路：每次请求显式携带 SessionID 参数（URL 拼接或 POST 提交），或者干脆改用 Token 机制——服务端签发字符串令牌，客户端每次请求带上，App 与前后端分离场景的主流选择。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Cookie 没了就显式带，参数 SessionID 或 Token 顶上
 - **关键词**：SessionID 参数 ／ URL 重写 ／ Token ／ 令牌
@@ -793,15 +875,15 @@ Header 最安全：不进浏览器历史、不被 Referer 泄露、日志中通�
 **Token 机制的主流标准是什么？**
 JWT（JSON Web Token，RFC 7519），详见本文档『什么是 JWT？JWT 的原理和结构是什么？』。
 
-### 【中等】分布式 Session 有哪些实现方案？⭐⭐
+### 【困难】分布式 Session 有哪些实现方案？⭐⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：分布式协同 / 分布式 Session
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：分布式协同 / 分布式 Session
 
 #### 💎 关键结论
 
-分布式下单机 Session 失效，三种解法：粘性 Session（LB 把同一用户固定到一台机器，简单但宕机丢全部）、Session 复制（节点间互相同步，无死角但内存和带宽开销大）、集中存储（Session 放 Redis/DB，主流方案，推荐 Spring Session + Redis）。
+分布式下单机 Session 失效，三种解法：粘性 Session（LB 把同一用户固定到一台机器，简单但宕机丢全部）、Session 复制（节点间互相同步，无死角但内存和带宽开销大）、集中存储（Session 放 Redis/DB，主流方案，推荐 Spring Session + Redis）。此外还有第四条路——Token/JWT 无状态方案，干脆取消服务端 Session，代价是无法主动失效，需黑名单或"短过期 + Refresh Token"补偿。这是架构决策题：必须按"是否要立即失效、是否跨端、部署规模"给出量化权衡，而不是罗列方案。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：粘性绑机器、复制全同步、集中存 Redis
 - **关键词**：粘性 Session ／ Session 复制 ／ 缓存共享 ／ Spring Session
@@ -841,6 +923,21 @@ Session 复制共享（Session Replication）**在服务器节点之间进行 Se
 
 ![](https://raw.githubusercontent.com/dunwu/images/master/cs/design/architecture/MultiNode-SpringSession.jpg)
 
+**第四条路：Token/JWT 无状态方案（取消服务端 Session）**
+
+登录时服务端签发带签名的 Token，客户端每次请求携带，服务端只做本地验签、不存会话——"Session 共享"问题被连根消除。代价是丧失主动失效能力，需补偿：短过期 Access Token + 可服务端吊销的 Refresh Token，必要时叠加黑名单/版本号（详见本文档「Cookie / Session / Token / JWT 如何选型？」）。
+
+**四种方案的量化权衡**：
+
+| 方案                  | 可用性代价                                     | 性能代价                                                                 | 扩缩容 / 故障表现                                                | 适用边界                                      |
+| :-------------------- | :--------------------------------------------- | :----------------------------------------------------------------------- | :--------------------------------------------------------------- | :-------------------------------------------- |
+| **粘性 Session**      | 节点故障丢该节点全部会话                       | 无额外开销                                                               | Nginx `ip_hash` 在扩缩容时重哈希，大批用户被路由到新节点即丢会话 | 小规模、可容忍重登录的过渡期                  |
+| **Session 复制**      | 无单点                                         | Tomcat 组播全量同步，网络放大 O(N²)；每节点存全量 Session，内存放大 N 倍 | 新节点加入触发全量同步风暴                                       | 小集群（一般不超过 4~5 个节点）               |
+| **集中存储（Redis）** | Redis 成为全站鉴权单点，需主从 + 哨兵/集群兜底 | 每请求多一跳网络 + 序列化，约 0.5~1ms                                    | 不受扩缩容影响，天然适配弹性伸缩                                 | 主流默认选择（Spring Session 零侵入）         |
+| **Token/JWT 无状态**  | 无会话存储依赖                                 | 本地验签零远程调用，性能最好                                             | 不受扩缩容影响                                                   | 跨端/微服务；"立即失效"是硬需求时需黑名单补偿 |
+
+**决策要点**（依次回答三个问题）：① 要不要"立即全局失效"（冻结账号、踢人下线）——要，则集中式 Session 或 JWT + 黑名单；② 是否跨端（App/小程序）或跨公司——是，则倾向 Token/JWT；③ 部署规模是否已多节点弹性伸缩——是，则排除粘性与复制。
+
 #### 🔬 扩展知识
 
 ::: details
@@ -878,7 +975,7 @@ Redis 用主从 + 哨兵 / 集群保证可用性；极端情况下 Session 集�
 
 JWT 是"自包含的签名凭证"：Header.Payload.Signature 三段 Base64 用点拼接，服务端不存会话，拿到 Token 用密钥验签即可确认身份。好处是无状态易扩展，代价是 Payload 不加密（别放敏感信息）且无法主动失效。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：三段式、验签不查库、载荷不加密
 - **关键词**：Header ／ Payload ／ Signature ／ RFC 7519 ／ 无状态认证
@@ -927,7 +1024,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
 
 ::: details
 
-【L3】验签的安全细节：服务端必须显式指定期望算法再验签，不能信任 Header 中的 `alg` 字段——历史上著名的 `alg: none` 攻击就是利用库默认信任 Header，把签名算法改成 none 绕过验签；此外 HS256（对称）与 RS256（非对称）混用的"密钥混淆攻击"也源于同类信任问题。
+【L3】验签的安全细节：服务端必须显式指定期望算法再验签，不能信任 Header 中的 `alg` 字段——历史上著名的 `alg: none` 攻击就是利用库默认信任 Header，把签名算法改成 none 绕过验签；此外 HS256（对称）与 RS256（非对称）混用的"密钥混淆攻击"也源于同类信任问题。其利用方式：攻击者拿到服务端 RSA **公钥**（公钥本就可分发），把 Token 的 `alg` 改为 HS256，用公钥字符串作为 HMAC 密钥重新签名；若服务端验签时未锁定算法、同一份密钥既当 RSA 公钥又当 HMAC secret 使用，验签就会"合法"通过。防御与 `alg: none` 同源：验签时锁定算法白名单（如仅允许 RS256），且 HMAC 密钥与 RSA 密钥绝不复用。
 
 【L4】Payload 的标准声明（Claims）值得记几个：`sub`（主体）、`iat`（签发时间）、`exp`（过期时间）、`iss`（签发者）、`aud`（受众）。多服务网关场景下，`iss`/`aud` 校验能防止"A 服务签发的 Token 被拿去调 B 服务"的横向滥用。
 
@@ -952,15 +1049,15 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
 **JWT 和 OAuth 2.0 是什么关系？**
 OAuth 2.0 是授权框架，其颁发的 Access Token 可以用 JWT 格式承载（也可以是不透明字符串）；二者是"协议"与"令牌格式"的关系，不是同一层概念。
 
-### 【中等】JWT Token 如何续签？如何解决无法主动失效的问题？⭐⭐
+### 【困难】JWT Token 如何续签？如何解决无法主动失效的问题？⭐⭐⭐⭐
 
-> 🎯 目标等级：L2 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：分布式协同 / JWT 续签与失效
+> 🎯 目标等级：L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：分布式协同 / JWT 续签与失效
 
 #### 💎 关键结论
 
 JWT 无状态的代价是"签发即生效到过期"。续签主流用双 Token：短期 Access 走业务、长期 Refresh 走换发，Refresh 存服务端可随时作废。主动失效靠黑名单（Redis 记已登出 Token，TTL 设为剩余有效期）或用户维度版本号，本质是"用少量状态换回控制权"。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：Access 短命跑业务，Refresh 长命换新衣，黑名单管失效
 - **关键词**：双 Token ／ Access Token ／ Refresh Token ／ 黑名单 ／ 版本号
@@ -1039,7 +1136,7 @@ public boolean isValid(String token) {
 用 Token 版本号方案：用户维度维护版本号，签发时写入，校验时比对；改密时版本号 +1，所有旧版本 Token 集体失效，比逐个拉黑高效。
 
 **双 Token 的时长怎么定？**
-常见配置：Access 15~~30 分钟（覆盖一次连续操作），Refresh 7~~30 天（覆盖免登录周期）；金融类应用会进一步缩短并叠加设备绑定。
+常见配置：Access 15~30 分钟（覆盖一次连续操作），Refresh 7~30 天（覆盖免登录周期）；金融类应用会进一步缩短并叠加设备绑定。
 
 ### 【困难】Cookie / Session / Token / JWT 如何选型？⭐⭐⭐⭐
 
@@ -1049,7 +1146,7 @@ public boolean isValid(String token) {
 
 一句话原则：**单体求稳选 Session，分布式求扩展选 JWT，开放场景走标准协议**。JWT 自包含、本地验签、无服务端状态，但无法主动失效；Session 可即时踢人冻结，但需集中存储。选型看三件事：要不要立即失效、是否跨端、是否对外开放。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：单体 Session 稳，分布式 JWT 快，开放平台 OAuth2
 - **关键词**：状态归属 ／ 主动失效 ／ 本地验签 ／ RS256 ／ 黑名单
@@ -1153,9 +1250,17 @@ public boolean isValid(String token) {
 
 #### 🔀 发散问题
 
-- **Q：JWT 如何做刷新与主动失效？** → 双 Token 轮换 + 黑名单/版本号，见本文档「JWT 如何实现刷新与主动失效？」。
-- **Q：对外开放授权走什么协议？** → OAuth 2.0 授权码模式 + PKCE，见本文档「OAuth 2.0 有哪些授权模式？授权码模式流程是怎样的？」。
-- **Q：Cookie 和 Session 的机制差异？** → 状态由谁保管，见本文档「Cookie 和 Session 的区别是什么？」。
+- **Q：JWT 如何做刷新与主动失效？**
+
+  → 双 Token 轮换 + 黑名单/版本号，见本文档「JWT 如何实现刷新与主动失效？」。
+
+- **Q：对外开放授权走什么协议？**
+
+  → OAuth 2.0 授权码模式 + PKCE。
+
+- **Q：Cookie 和 Session 的机制差异？**
+
+  → 状态由谁保管，见本文档「Cookie 和 Session 的区别是什么？」。
 
 ### 【中等】JWT 如何实现刷新与主动失效？⭐⭐⭐⭐
 
@@ -1165,7 +1270,7 @@ public boolean isValid(String token) {
 
 JWT 无状态，服务端不能直接让它失效。刷新靠双 Token：短效 Access Token + 长效 Refresh Token，且 Refresh Token 必须轮换。主动失效靠服务端状态补偿：黑名单（精确到单个 Token）或版本号（一刀切作废该用户全部 Token）。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：短访问、长刷新、一次轮换；登出拉黑、改密升版
 - **关键词**：Access/Refresh ／ Rotation ／ jti 黑名单 ／ 版本号
@@ -1248,8 +1353,13 @@ JWT 是无状态的，服务端无法直接让它失效，刷新与失效机制�
 
 #### 🔀 发散问题
 
-- **Q：为什么不干脆全用 Session？** → 分布式与跨端场景 Session 受限，选型见本文档「Cookie / Session / Token / JWT 如何选型？」。
-- **Q：Refresh Token 被盗与 XSS 是什么关系？** → XSS 是 Token 泄漏的主要通道，防御见本文档「什么是 XSS 攻击？如何防御？」。
+- **Q：为什么不干脆全用 Session？**
+
+  → 分布式与跨端场景 Session 受限，选型见本文档「Cookie / Session / Token / JWT 如何选型？」。
+
+- **Q：Refresh Token 被盗与 XSS 是什么关系？**
+
+  → XSS 是 Token 泄漏的主要通道，防御见本文档「什么是 XSS 攻击？如何防御？」。
 
 ## Web 安全
 
@@ -1261,7 +1371,7 @@ JWT 是无状态的，服务端无法直接让它失效，刷新与失效机制�
 
 XSS 是攻击者向页面注入恶意脚本，在用户浏览器中执行，窃取 Cookie、劫持会话或操作用户数据。防御核心是"永远不要信任用户输入"：输出编码是第一防线，HttpOnly 保护敏感 Cookie，CSP 兜底。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：输入过滤、输出转义、HttpOnly、CSP 兜底
 - **关键词**：反射型 ／ 存储型 ／ DOM 型 ／ 输出编码
@@ -1296,8 +1406,13 @@ XSS 是攻击者向页面注入恶意脚本，在用户浏览器中执行，窃�
 
 #### 🔀 发散问题
 
-- **Q：XSS 窃取 Cookie 怎么防？** → HttpOnly 使 JS 无法读取，机制见本文档「Cookie 和 Session 的区别是什么？」。
-- **Q：XSS 和 CSRF 的区别？** → XSS 是注入脚本执行，CSRF 是冒用登录态发请求，见本文档「什么是 CSRF 攻击？如何防御？」。
+- **Q：XSS 窃取 Cookie 怎么防？**
+
+  → HttpOnly 使 JS 无法读取，机制见本文档「Cookie 和 Session 的区别是什么？」。
+
+- **Q：XSS 和 CSRF 的区别？**
+
+  → XSS 是注入脚本执行，CSRF 是冒用登录态发请求，见本文档「什么是 CSRF 攻击？如何防御？」。
 
 ### 【中等】什么是 CSRF 攻击？如何防御？⭐⭐⭐
 
@@ -1307,7 +1422,7 @@ XSS 是攻击者向页面注入恶意脚本，在用户浏览器中执行，窃�
 
 CSRF 是攻击者诱导用户在已登录的站点上执行非预期操作（转账、改密码）。本质是浏览器自动携带 Cookie，服务器无法区分请求是否出自用户本意。防御三板斧：SameSite Cookie、CSRF Token、敏感操作二次验证。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：冒用登录态，SameSite 断携带，Token 验身份
 - **关键词**：自动携带 Cookie ／ CSRF Token ／ SameSite ／ Referer
@@ -1340,8 +1455,13 @@ CSRF 是攻击者诱导用户在已登录的站点上执行非预期操作（转
 
 #### 🔀 发散问题
 
-- **Q：CSRF 利用的是 Cookie 的什么特性？** → 浏览器自动携带，见本文档「Cookie 和 Session 的区别是什么？」。
-- **Q：CSRF 与 CORS 有什么关系？** → CORS 的凭证配置不当会放大 CSRF 风险，见本文档「什么是 CORS 跨域？如何解决？」。
+- **Q：CSRF 利用的是 Cookie 的什么特性？**
+
+  → 浏览器自动携带，见本文档「Cookie 和 Session 的区别是什么？」。
+
+- **Q：CSRF 与 CORS 有什么关系？**
+
+  → CORS 的凭证配置不当会放大 CSRF 风险，见本文档「什么是 CORS 跨域？如何解决？」。
 
 ### 【中等】什么是 CORS 跨域？如何解决？⭐⭐⭐
 
@@ -1351,7 +1471,7 @@ CSRF 是攻击者诱导用户在已登录的站点上执行非预期操作（转
 
 跨域是浏览器同源策略（协议+域名+端口相同才同源）拦截了 JS 的跨源请求。首选 CORS：服务器返回 `Access-Control-Allow-Origin` 授权；生产环境常用 Nginx 反向代理统一同域。JSONP 已过时，WebSocket 不受同源限制。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：同源三要素，CORS 开白名单，代理绕过去
 - **关键词**：同源策略 ／ Access-Control-Allow-Origin ／ 预检 OPTIONS ／ 反向代理
@@ -1389,16 +1509,22 @@ public class CorsConfig implements WebMvcConfigurer {
 
 ::: details
 
-- 【L3】**简单请求 vs 预检请求**：方法为 GET/HEAD/POST 且只含简单请求头时直接发送；否则先发 OPTIONS 预检（`Access-Control-Request-Method` 等），服务端用 `Access-Control-Allow-*` 响应，`maxAge` 可缓存预检结果。
+- 【L3】**简单请求 vs 预检请求**：方法为 GET/HEAD/POST、只含简单请求头（`Accept`/`Accept-Language`/`Content-Language` 等），且 `Content-Type` 仅限 `application/x-www-form-urlencoded`、`multipart/form-data`、`text/plain` 三种时才是简单请求、直接发送；否则（如 `Content-Type: application/json`、携带 `Authorization` 等自定义头、PUT/DELETE 方法）先发 OPTIONS 预检（带 `Access-Control-Request-Method`/`Access-Control-Request-Headers`），服务端用 `Access-Control-Allow-*` 响应，浏览器按 `Access-Control-Max-Age`（Spring 配置的 `maxAge`）缓存预检结果，有效期内同请求不再发预检。
 - 【L3】开启凭证（`allowCredentials(true)` / `withCredentials`）时，`Access-Control-Allow-Origin` 不能为通配符 `*`，必须是具体来源。
 - 【L4】同源策略禁止的是"读取跨源响应"，`<script>`/`<img>` 等标签仍可跨源加载资源——这是 JSONP 的历史由来；服务端之间的调用也不受同源策略限制。
+- 【L4】**预检被网关鉴权拦截是高频生产事故**：OPTIONS 预检由浏览器自动发出，**不携带业务登录态**（无 Cookie、无 Authorization 头）；若网关或安全 Filter 对未认证请求一刀切返回 401/302，预检失败，浏览器直接判定跨域请求失败。症状是"本地直连后端正常，走网关全部跨域报错"。正确做法：在网关/Filter 层显式放行 OPTIONS，或由该层直接应答 CORS 响应头，再进入鉴权链。
 
 :::
 
 #### 🔀 发散问题
 
-- **Q：跨域实时通信选什么方案？** → WebSocket 不受同源策略限制，见本文档「什么是 WebSocket？与 HTTP 的区别？」。
-- **Q：CORS 应该放 Filter 还是拦截器处理？** → Filter 最早拦截、适合全局 CORS，见本文档「过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？」。
+- **Q：跨域实时通信选什么方案？**
+
+  → WebSocket 不受同源策略限制，见本文档「什么是 WebSocket？与 HTTP 的区别？」。
+
+- **Q：CORS 应该放 Filter 还是拦截器处理？**
+
+  → Filter 最早拦截、适合全局 CORS，见本文档「过滤器(Filter)、拦截器(Interceptor)、AOP 的区别？」。
 
 ## WebSocket
 
@@ -1410,7 +1536,7 @@ public class CorsConfig implements WebMvcConfigurer {
 
 WebSocket 是全双工协议：单个 TCP 连接上双向实时通信。它借 HTTP 握手（Upgrade 请求 + 101 响应）建立后切换协议，帧头仅 2~14 字节，远轻于每次请求携带完整 Header 的 HTTP 轮询，是聊天、推送、行情类场景的标配。
 
-#### ⚡记忆卡片
+#### ⚡ 记忆卡片
 
 - **口诀**：一次握手，双向长连；帧头极小，推送随心
 - **关键词**：全双工 ／ Upgrade ／ 101 ／ ws://、wss://
@@ -1447,8 +1573,13 @@ WebSocket 是全双工协议：单个 TCP 连接上双向实时通信。它借 H
 
 #### 🔀 发散问题
 
-- **Q：WebSocket 握手阶段和 HTTP 是什么关系？** → 握手复用 HTTP（101 状态码切换协议），见本文档「HTTP 常见状态码有哪些？」。
-- **Q：跨域场景下 WebSocket 可用吗？** → WebSocket 不受同源策略限制，是跨域实时通信方案之一，见本文档「什么是 CORS 跨域？如何解决？」。
+- **Q：WebSocket 握手阶段和 HTTP 是什么关系？**
+
+  → 握手复用 HTTP（101 状态码切换协议），见本文档「HTTP 常见状态码有哪些？」。
+
+- **Q：跨域场景下 WebSocket 可用吗？**
+
+  → WebSocket 不受同源策略限制，是跨域实时通信方案之一，见本文档「什么是 CORS 跨域？如何解决？」。
 
 ## 参考资料
 
