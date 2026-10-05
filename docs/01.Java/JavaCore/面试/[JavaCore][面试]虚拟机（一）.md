@@ -61,8 +61,15 @@ Java 程序的执行流程经历了从编译到字节码的生成，再到类加
 
 ::: details
 
-- 【L3】javac 编译过程内部分为 4 个阶段：解析（词法/语法分析生成 AST）、输入符号表、注解处理（APT）、语义分析与字节码生成（脱糖，如泛型擦除、自动装箱在此完成）。
-- 【L3】方法调用对应不同字节码指令：`invokestatic`（静态方法）、`invokevirtual`（虚方法）、`invokespecial`（构造器/私有方法）、`invokeinterface`（接口方法）、`invokedynamic`（JDK 7+，Lambda 等动态调用）。
+- 【L3】javac 编译过程内部分为 4 个阶段
+
+  解析（词法/语法分析生成 AST）、输入符号表、注解处理（APT）、语义分析与字节码生成（脱糖，如泛型擦除、自动装箱在此完成）。
+
+- 【L3】方法调用对应不同字节码指令
+
+  `invokestatic`（静态方法）、`invokevirtual`（虚方法）、`invokespecial`（构造器/私有方法）、`invokeinterface`（接口方法）、
+  `invokedynamic`（JDK 7+，Lambda 等动态调用）。
+
 - 【L4】HotSpot 默认采用混合模式（解释 + JIT）；`-Xint` 可强制纯解释执行，`-Xcomp` 可强制纯编译执行（启动变慢，生产基本不用）。
 
 :::
@@ -70,8 +77,6 @@ Java 程序的执行流程经历了从编译到字节码的生成，再到类加
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “Java 是纯解释型语言” → Java 采用解释 + JIT 混合模式，热点代码会被编译为机器码直接执行。
 - ❌ “解析一定在类加载阶段完成” → 解析可以延迟到运行期间首次使用时才进行（动态绑定），这也是方法重写运行时多态的基础。
@@ -124,16 +129,19 @@ JVM 主要由类加载子系统、运行时数据区、执行引擎、本地方�
 
 ::: details
 
-- 【L3】JVM 规范与实现分离：HotSpot 是主流实现，另有 OpenJ9、GraalVM 等实现；只要符合规范，字节码在不同实现上行为一致。
-- 【L4】HotSpot 的执行引擎默认混合模式：启动时解释执行，C1 快速编译热点方法，C2 再做深度优化，分层编译 JDK 8+ 默认开启。
+- 【L3】JVM 规范与实现分离
+
+  HotSpot 是主流实现，另有 OpenJ9、GraalVM 等实现；只要符合规范，字节码在不同实现上行为一致。
+
+- 【L4】HotSpot 的执行引擎默认混合模式
+
+  启动时解释执行，C1 快速编译热点方法，C2 再做深度优化，分层编译 JDK 8+ 默认开启。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “GC 属于执行引擎的编译部分” → GC 是独立子系统，负责回收堆内存，与解释器、JIT 是并列组件而非编译动作。
 - ❌ “本地方法栈和虚拟机栈是同一个东西” → 虚拟机栈为 Java 方法服务，本地方法栈为 Native 方法服务；只是在 HotSpot 中把二者合二为一了。
@@ -247,8 +255,13 @@ System.out.println(User.CONST); // 不触发 User 类初始化
 
 ::: details
 
-- 【L3】《JVM 规范》规定的初始化触发条件：遇到 new、getstatic、putstatic、invokevirtual 指令；反射调用；子类初始化前先初始化父类；虚拟机启动时的主类；JDK 7+ 的 invokedynamic 动态语言支持。
+- 【L3】《JVM 规范》规定的初始化触发条件
+
+  遇到 new、getstatic、putstatic、invokevirtual 指令；反射调用；子类初始化前先初始化父类；虚拟机启动时的主类；
+  JDK 7+ 的 invokedynamic 动态语言支持。
+
 - 【L3】`Class.forName(name)` 默认会执行初始化，而 `ClassLoader.loadClass()` 只完成加载阶段不初始化，二者是常考的区分点。
+
 - 【L4】接口初始化不要求父接口先完成初始化（与类不同）；但接口中定义了 default 方法时，实现类初始化会触发该接口初始化。
 
 :::
@@ -256,8 +269,6 @@ System.out.println(User.CONST); // 不触发 User 类初始化
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “类被加载了就是被初始化了” → 加载与初始化是不同阶段，`loadClass()` 只加载不执行 `<clinit>`，静态块不会运行。
 - ❌ “访问 static final 常量会触发类加载” → 编译期常量已内联进调用者常量池，不触发定义类初始化。
@@ -312,17 +323,20 @@ System.out.println(User.CONST); // 不触发 User 类初始化
 
 ::: details
 
-- 【L3】对象头的 Mark Word 在 64 位 JVM 中占 8 字节，按锁状态复用同一块空间存不同信息：无锁态存哈希码与 GC 分代年龄，轻量级锁存指向栈中锁记录（Lock Record）的指针，重量级锁存指向监视器（ObjectMonitor）的指针，GC 标记时又整体复用——synchronized 的锁升级本质上就是 Mark Word 状态位的变迁。
-- 【L3】压缩指针（`-XX:+UseCompressedOops`，堆小于 32GB 时默认开启）把普通对象指针从 8 字节压到 4 字节；一旦堆超过约 32GB，压缩指针自动失效、指针回到 8 字节，对象普遍变大导致「可用容量」不升反降。因此生产上大堆服务要么刻意把堆控制在 30GB 左右，要么整体评估大内存 + 低延迟收集器方案。
-- 【L4】`-XX:PretenureSizeThreshold` 只对 Serial/ParNew 收集器生效；G1 下大对象由 `G1HeapRegionSize` 决定——大小达到 Region 一半及以上的对象被视为巨型对象（Humongous Object），直接分配在老年代的连续 Humongous Region 中。
+- 【L3】对象头的 Mark Word 在 64 位 JVM 中占 8 字节，按锁状态复用同一块空间存不同信息：无锁态存哈希码与 GC 分代年龄，轻量级锁存指向栈中锁记录（Lock Record）的指针，
+  重量级锁存指向监视器（ObjectMonitor）的指针，GC 标记时又整体复用——synchronized 的锁升级本质上就是 Mark Word 状态位的变迁。
+
+- 【L3】压缩指针（`-XX:+UseCompressedOops`，堆小于 32GB 时默认开启）把普通对象指针从 8 字节压到 4 字节；一旦堆超过约 32GB，压缩指针自动失效、指针回到 8 字节，
+  对象普遍变大导致「可用容量」不升反降。因此生产上大堆服务要么刻意把堆控制在 30GB 左右，要么整体评估大内存 + 低延迟收集器方案。
+
+- 【L4】`-XX:PretenureSizeThreshold` 只对 Serial/ParNew 收集器生效；G1 下大对象由 `G1HeapRegionSize` 决定——
+  大小达到 Region 一半及以上的对象被视为巨型对象（Humongous Object），直接分配在老年代的连续 Humongous Region 中。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “所有对象都分配在堆上” → 经 JIT 逃逸分析判定不逃逸的对象可能被标量替换拆解后分配到栈上（等效栈上分配），不进入堆。
 - ❌ “堆越大越好” → 超过 32GB 会失去压缩指针，单位引用的内存开销上升，有效容量可能反而下降。
@@ -404,8 +418,11 @@ System.out.println(User.CONST); // 不触发 User 类初始化
 Java 的 `new` 关键字同时完成了内存分配和对象初始化，而 C++ 将这两个步骤解耦：
 
 - **Java `new`**：`new User()` 一步完成内存分配（堆上）+ 零值初始化 + 构造函数调用。
+
 - **C++ `new`**：`new User()` 调用 `operator new` 分配内存，然后调用构造函数。
-- **C++ placement new**：`new (buffer) User()` 在已分配的内存上构造对象，不分配新内存。这在 C++ 中用于内存池、共享内存等场景。Java 中没有 placement new 的等价物——Java 的对象创建始终在堆上（或 TLAB 内），无法在自定义内存地址上构造对象。
+
+- **C++ placement new**：`new (buffer) User()` 在已分配的内存上构造对象，不分配新内存。这在 C++ 中用于内存池、共享内存等场景。Java 中没有 placement new 的等价物——
+  Java 的对象创建始终在堆上（或 TLAB 内），无法在自定义内存地址上构造对象。
 
 ```cpp
 // C++ placement new：在预分配的内存上构造对象
@@ -417,8 +434,12 @@ User* u = new (buffer) User("张三");  // 不分配新内存，仅在 buffer �
 
 Go 的逃逸分析与 Java 的 TLAB 机制代表了两种不同的内存分配优化策略：
 
-- **Java TLAB（Thread Local Allocation Buffer）**：每个线程在 Eden 区预分配一块私有缓冲区，线程在 TLAB 内分配对象无需同步。但对象**始终分配在堆上**（TLAB 是 Eden 的一部分），是否逃逸由 JIT 逃逸分析决定后续优化（如标量替换）。
-- **Go 逃逸分析**：Go 编译器在**编译期**进行逃逸分析，自动决定对象分配在**栈上还是堆上**。如果编译器判断对象不会逃逸出当前 goroutine 的栈帧，则直接在栈上分配——这与 Java 的"标量替换等效栈上分配"有本质区别：Go 是真正的栈上分配完整对象。
+- **Java TLAB（Thread Local Allocation Buffer）**：每个线程在 Eden 区预分配一块私有缓冲区，线程在 TLAB 内分配对象无需同步。
+
+  但对象**始终分配在堆上**（TLAB 是 Eden 的一部分），是否逃逸由 JIT 逃逸分析决定后续优化（如标量替换）。
+
+- **Go 逃逸分析**：Go 编译器在**编译期**进行逃逸分析，自动决定对象分配在**栈上还是堆上**。如果编译器判断对象不会逃逸出当前 goroutine 的栈帧，则直接在栈上分配——
+  这与 Java 的"标量替换等效栈上分配"有本质区别：Go 是真正的栈上分配完整对象。
 
 ```go
 // Go 逃逸分析示例
@@ -446,8 +467,6 @@ func processUser() {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “构造方法负责分配内存” → 内存分配与零值初始化在构造方法之前就已完成，构造方法只负责按程序员定义的逻辑赋初值。
 - ❌ “零值初始化多余，反正字段会显式赋值” → 零值保证实例字段未显式赋值时也有安全的默认值（0/false/null），是语言语义的一部分。
@@ -502,16 +521,18 @@ JVM 通过类加载子系统加载 `.class` 文件到内存：
 ::: details
 
 - 【L3】解析不一定在加载阶段完成，可以延迟到运行期首次使用时才进行（运行时绑定），这是方法重写动态分派的基础。
+
 - 【L3】初始化执行的是 `<clinit>()` 方法（由静态变量赋值语句与静态块合并生成），JVM 保证 `<clinit>` 的线程安全：多线程下只有一个线程执行初始化，其余线程会阻塞等待。
-- 【L4】类卸载条件非常苛刻：该类所有实例已被回收、加载它的 ClassLoader 已被回收、其 Class 对象无任何引用；三者缺一不可，因此 JDK 内置类几乎不会被卸载。
+
+- 【L4】类卸载条件非常苛刻
+
+  该类所有实例已被回收、加载它的 ClassLoader 已被回收、其 Class 对象无任何引用；三者缺一不可，因此 JDK 内置类几乎不会被卸载。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “静态变量的显式赋值在准备阶段完成” → 准备阶段只赋默认值（0/null），显式赋值和静态块在初始化阶段的 `<clinit>` 中执行；但 `static final` 编译期常量在编译期就分配值。
 - ❌ “类加载完就一定不会被卸载” → 满足“无实例 + ClassLoader 被回收 + 无 Class 引用”三条件时类会被卸载，热部署场景正是利用这一点。
@@ -642,8 +663,14 @@ public abstract class ClassLoader {
 
 ::: details
 
-- 【L3】双亲委派核心逻辑在 `ClassLoader.loadClass()`：先 `findLoadedClass()` 查缓存，再委托 `parent.loadClass()`，失败才调用自身 `findClass()`；自定义类加载器只需重写 `findClass()` 即可，无需破坏委派规则。
-- 【L3】JDK 9+ 引入模块化后，Extension ClassLoader 更名为 Platform ClassLoader，原扩展机制被模块路径取代；Bootstrap ClassLoader 加载 `java.base` 等核心模块。
+- 【L3】双亲委派核心逻辑在 `ClassLoader.loadClass()`
+
+  先 `findLoadedClass()` 查缓存，再委托 `parent.loadClass()`，失败才调用自身 `findClass()`；
+  自定义类加载器只需重写 `findClass()` 即可，无需破坏委派规则。
+
+- 【L3】JDK 9+ 引入模块化后，Extension ClassLoader 更名为 Platform ClassLoader，原扩展机制被模块路径取代；
+  Bootstrap ClassLoader 加载 `java.base` 等核心模块。
+
 - 【L4】类的“身份” = 全限定名 + 加载它的 ClassLoader 实例；两个不同加载器加载同名类会产生两个不同 Class 对象，`instanceof` 判断会失败——这是应用隔离与热部署的基础。
 
 :::
@@ -652,15 +679,17 @@ public abstract class ClassLoader {
 
 ::: details
 
-生产环境单台 Tomcat 常部署多个 webapp，每个 webapp 拥有独立的 `WebAppClassLoader`，优先加载自身 `WEB-INF/classes` 与 `WEB-INF/lib` 下的类，两个应用可同时使用 Spring 4.3 与 Spring 5.3 等不同版本互不冲突。若重新部署时旧 ClassLoader 未被彻底回收，旧应用的类元数据会残留在 Metaspace：在每天发布数十次的高频部署环境下，若未显式设置 `-XX:MaxMetaspaceSize`（生产常见配 256 MB），Metaspace 持续增长最终会触发 `OutOfMemoryError: Metaspace`。
+生产环境单台 Tomcat 常部署多个 webapp，每个 webapp 拥有独立的 `WebAppClassLoader`，优先加载自身 `WEB-INF/classes` 与 `WEB-INF/lib` 下的类，
+两个应用可同时使用 Spring 4.3 与 Spring 5.3 等不同版本互不冲突。
+
+若重新部署时旧 ClassLoader 未被彻底回收，旧应用的类元数据会残留在 Metaspace：在每天发布数十次的高频部署环境下，若未显式设置 `-XX:MaxMetaspaceSize`（生产常见配 256 MB），
+Metaspace 持续增长最终会触发 `OutOfMemoryError: Metaspace`。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “双亲委派是 JVM 的强制约束” → 它是推荐的最佳实践而非强制规则，可以通过重写 `loadClass()` 或线程上下文类加载器破坏（SPI、Tomcat 场景）。
 - ❌ “Bootstrap ClassLoader 是 Java 实现的” → Bootstrap 由 C++ 实现、是 JVM 自身的一部分，`String.class.getClassLoader()` 返回 null。
@@ -744,7 +773,10 @@ Tomcat 的 `WebAppClassLoader` 加载策略：
 Go 是编译型语言，不存在运行时的类加载机制：
 
 - **编译期链接**：Go 程序在编译时将所有依赖静态链接为单一二进制文件，所有类型信息在编译期已完全确定。Go 没有 `.class` 文件、没有 ClassLoader、没有双亲委派。
-- **接口的隐式实现**：Go 的接口是鸭子类型（structural typing），无需显式声明 `implements`，编译期检查类型是否满足接口，运行时通过 `interface` 的 `itab` 表进行动态分发——这比 Java 的类加载+反射更轻量。
+
+- **接口的隐式实现**：Go 的接口是鸭子类型（structural typing），无需显式声明 `implements`，编译期检查类型是否满足接口，运行时通过 `interface` 的 `itab` 表进行动态分发——
+  这比 Java 的类加载+反射更轻量。
+
 - **plugin 包（有限动态性）**：Go 1.8+ 提供了 `plugin` 包，支持在运行时加载 `.so` 动态库，这是 Go 最接近 Java 类加载的机制，但功能非常有限（仅 Linux 支持，且 API 简陋）。
 
 **Rust：编译期链接 + trait 系统**
@@ -752,8 +784,11 @@ Go 是编译型语言，不存在运行时的类加载机制：
 Rust 同样没有运行时类加载，但其 trait 系统提供了比 Go 更丰富的多态能力：
 
 - **编译期单态化（Monomorphization）**：Rust 的泛型在编译期为每个具体类型生成独立代码，零运行时开销，与 Java 的类型擦除形成鲜明对比。
+
 - **trait 对象（动态分发）**：`dyn Trait` 通过 vtable 实现运行时多态，类似 Java 的接口调用，但无需类加载。
+
 - **无反射**：Rust 没有内置的运行时反射机制（`std::any::Any` 只提供有限的类型判断），所有类型信息在编译期处理。
+
 - **过程宏（Procedural Macros）**：Rust 通过编译期代码生成（宏）实现类似 Java 注解处理器（APT）的功能，但发生在编译期而非运行时。
 
 **JPMS（Java Platform Module System）与双亲委派的演进**
@@ -761,9 +796,13 @@ Rust 同样没有运行时类加载，但其 trait 系统提供了比 Go 更丰�
 JDK 9 引入的 JPMS 模块化系统在双亲委派之上增加了一层模块级隔离：
 
 - **模块化类加载**：JPMS 在双亲委派模型上叠加了模块可见性控制。即使类加载器能找到类，如果模块未 `exports` 或 `opens`，也无法访问。
+
 - **与双亲委派的关系**：JPMS 并未替代双亲委派，而是在其基础上增加了"模块路径"（Module Path）的概念，Boot Layer 的类加载器在委派前先检查模块的可读性。
+
 - **对破坏场景的影响**：
+
   - SPI 机制在 JPMS 中通过 `provides...with` 和 `uses` 关键字声明，比 ServiceLoader 更规范。
+
   - 强封装使得反射访问内部 API 受限（`--add-opens` 参数可临时开放）。
 
 | 维度       | Java（双亲委派）     | Go                   | Rust                | JPMS（JDK 9+）        |
@@ -780,15 +819,16 @@ JDK 9 引入的 JPMS 模块化系统在双亲委派之上增加了一层模块�
 
 ::: details
 
-JDBC 是生产系统中最典型的 SPI 破坏案例：`DriverManager` 由 Bootstrap 加载，而 MySQL 驱动 `com.mysql.cj.Driver`（mysql-connector-j 8.x jar）位于 classpath，只能由应用类加载器加载。若线程上下文类加载器未被正确设置（如自定义线程池未传递 TCCL），`ServiceLoader` 发现不了驱动，HikariCP 连接池初始化时会直接报 `No suitable driver found`，导致服务启动失败。
+JDBC 是生产系统中最典型的 SPI 破坏案例：`DriverManager` 由 Bootstrap 加载，
+而 MySQL 驱动 `com.mysql.cj.Driver`（mysql-connector-j 8.x jar）位于 classpath，只能由应用类加载器加载。
+
+若线程上下文类加载器未被正确设置（如自定义线程池未传递 TCCL），`ServiceLoader` 发现不了驱动，HikariCP 连接池初始化时会直接报 `No suitable driver found`，导致服务启动失败。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “Tomcat 完全打破了双亲委派” → `WebAppClassLoader` 仍会把 `java.*` 等核心类委托给 Bootstrap 加载以防伪造，只是对 `WEB-INF` 下的类调换了加载顺序。
 - ❌ “SPI 破坏双亲委派是设计缺陷” → 这是为解决“基础类回调用户实现类”的必要妥协，通过线程上下文类加载器实现，是标准机制而非漏洞。
@@ -870,10 +910,18 @@ JDK7 和 JDK8 的 JVM 的内存区域划分有所不同，如下图所示：
 
 ::: details
 
-- 【L3】版本布局演进：JDK 6 及以前方法区由永久代实现，字符串常量池、静态变量都在永久代；JDK 7 已将字符串常量池与静态变量移至堆（运行时常量池仍留在永久代）；JDK 8 彻底移除永久代，类元数据与运行时常量池改存于本地内存的元空间（JEP 122）。
+- 【L3】版本布局演进：JDK 6 及以前方法区由永久代实现，字符串常量池、静态变量都在永久代；JDK 7 已将字符串常量池与静态变量移至堆（运行时常量池仍留在永久代）；JDK 8 彻底移除永久代，
+  类元数据与运行时常量池改存于本地内存的元空间（JEP 122）。
+
 - 【L3】虚拟机栈大小由 `-Xss` 指定，HotSpot 在 Linux x64 默认 1 MB；栈越小可支持的方法调用深度越浅，越容易触发 `StackOverflowError`。
+
 - 【L3】元空间默认无上限（受物理内存限制）；直接内存未设置 `-XX:MaxDirectMemorySize` 时默认等于 `-Xmx`。
-- 【L4】容器化适配：JDK 8u191 / JDK 10 起默认开启 `-XX:+UseContainerSupport`，JVM 感知 cgroup（v1/v2）的内存与 CPU 配额来计算默认堆（`MaxRAMPercentage` 默认 25%），生产容器推荐用 `-XX:MaxRAMPercentage` 按 limit 比例设堆而非写死 `-Xmx`；同时须区分容器 OOMKilled（内核 SIGKILL、退出码 137、无 JVM OOM 日志）与 JVM `OutOfMemoryError` 两类故障——前者是进程 RSS（堆 + 元空间 + 线程栈 + 直接内存 + CodeCache）超出容器 limit，需为堆外预留空间。
+
+- 【L4】容器化适配：JDK 8u191 / JDK 10 起默认开启 `-XX:+UseContainerSupport`，
+  JVM 感知 cgroup（v1/v2）的内存与 CPU 配额来计算默认堆（`MaxRAMPercentage` 默认 25%），生产容器推荐用 `-XX:MaxRAMPercentage` 按 limit 比例设堆而非写死 `-Xmx`；
+  同时须区分容器 OOMKilled（内核 SIGKILL、退出码 137、无 JVM OOM 日志）与 JVM `OutOfMemoryError` 两类故障——
+  前者是进程 RSS（堆 + 元空间 + 线程栈 + 直接内存 + CodeCache）超出容器 limit，需为堆外预留空间。
+
 - 【L4】跨语言内存布局对比：
 
 **Go 的内存布局**
@@ -881,8 +929,11 @@ JDK7 和 JDK8 的 JVM 的内存区域划分有所不同，如下图所示：
 Go 的内存模型与 JVM 有显著差异，其设计哲学是"简单、可控"，没有 JVM 那样复杂的分代结构：
 
 - **栈可动态增长**：Go 的 goroutine 初始栈只有 ~2KB，运行时根据需要自动扩缩容（通过栈拷贝机制），与 JVM 固定大小的线程栈（`-Xss`）完全不同。每个 goroutine 的栈是动态的，可以增长到 1GB。
+
 - **无方法区/元空间概念**：Go 是编译型语言，程序的类型信息在编译期已确定并嵌入二进制文件，运行时无需维护类元数据区域。Go 的 `reflect` 包在运行时提供有限的类型信息，但这些信息分散在堆和全局数据段中。
+
 - **堆**：Go 的堆统一管理所有动态分配的对象，不区分新生代/老年代。Go 的 GC 是并发三色标记清扫，没有分代假设。
+
 - **无直接内存概念**：Go 没有 JVM 的 Direct Memory 概念，但可通过 `unsafe` 包或 cgo 操作堆外内存。
 
 **Rust 的内存布局**
@@ -890,7 +941,9 @@ Go 的内存模型与 JVM 有显著差异，其设计哲学是"简单、可控"�
 Rust 代表了"零成本抽象"的内存管理范式，没有 GC，依靠所有权系统在编译期保证内存安全：
 
 - **栈 + 堆 + 无 GC**：Rust 默认在栈上分配（类似 C++），只有通过 `Box<T>`、`Vec<T>`、`Arc<T>` 等智能指针才会在堆上分配。对象的生命周期由所有权和借用规则在编译期确定，运行时无需 GC。
+
 - **编译期内存管理**：Rust 的 `Drop` trait 提供确定性析构（类似 C++ 的 RAII），当对象离开作用域时立即释放内存，无需等待 GC 周期。
+
 - **无运行时内存区域划分**：Rust 编译后直接生成机器码，没有 JVM 那样的运行时数据区（程序计数器、虚拟机栈等均由操作系统管理）。
 
 | 维度          | JVM (HotSpot)      | Go                     | Rust                 |
@@ -907,7 +960,10 @@ Rust 代表了"零成本抽象"的内存管理范式，没有 GC，依靠所有�
 
 ::: details
 
-网关服务部署在 4C8G 容器，参数 `-Xms4g -Xmx4g -Xss512k`：业务线程 800 个时线程栈共占用约 400 MB（800 × 512 KB）。曾因线程池采用无界创建，高峰期线程数飙升至 3000+，超出操作系统进程数限制，抛出 `OutOfMemoryError: unable to create new native thread`，服务无法受理新请求；改为核心线程 200、有界队列的 `ThreadPoolExecutor` 后恢复。
+网关服务部署在 4C8G 容器，参数 `-Xms4g -Xmx4g -Xss512k`：业务线程 800 个时线程栈共占用约 400 MB（800 × 512 KB）。
+
+曾因线程池采用无界创建，高峰期线程数飙升至 3000+，超出操作系统进程数限制，抛出 `OutOfMemoryError: unable to create new native thread`，服务无法受理新请求；
+改为核心线程 200、有界队列的 `ThreadPoolExecutor` 后恢复。
 
 :::
 
@@ -929,8 +985,6 @@ Rust 代表了"零成本抽象"的内存管理范式，没有 GC，依靠所有�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “程序计数器存方法返回地址” → 程序计数器记录当前执行的字节码指令地址；方法返回地址是栈帧的组成部分。
 - ❌ “方法区就是永久代” → 永久代只是 JDK 7 及之前方法区的具体实现，JDK 8+ 用元空间（本地内存）实现方法区。
@@ -1095,26 +1149,44 @@ JVM 发生 **OutOfMemoryError（OOM）** 的原因多种多样，主要与内存
 
 ::: details
 
-- 【L3】排查工具链：启动参数加 `-XX:+HeapDumpOnOutOfMemoryError` 自动生成堆转储；`jmap -histo:live <pid>` 看 TOP 对象，MAT 的 Dominator Tree / Leak Suspects 定位对象保留链；`jstat -gc <pid>` 观察各区容量与 GC 频率。
-- 【L4】完整排查链路（而非单个命令）：监控告警确认现象（RSS / 堆曲线、GC 频率与停顿）→ 区分故障域（JVM 抛 OOM 有异常日志 vs 容器 OOMKilled 无 JVM 日志、退出码 137）→ 保留现场（`-XX:+HeapDumpOnOutOfMemoryError` 或 `jmap -dump:live,format=b,file=heap.hprof <pid>`）→ MAT 看 Dominator Tree / Leak Suspects 找最大保留链 → 结合 GC 日志（JDK 9+ 用 `-Xlog:gc*`）判断是「泄漏」（Full GC 后老年代基线持续抬升）还是「容量不足」（锯齿稳定但峰值顶到上限）→ 顺引用链定位到业务代码行 → 修复（流式处理 / 关资源 / 修缓存策略 / 调参扩容）→ 压测验证堆曲线恢复稳定锯齿。
+- 【L3】排查工具链：启动参数加 `-XX:+HeapDumpOnOutOfMemoryError` 自动生成堆转储；`jmap -histo:live <pid>` 看 TOP 对象，
+  MAT 的 Dominator Tree / Leak Suspects 定位对象保留链；`jstat -gc <pid>` 观察各区容量与 GC 频率。
+
+- 【L4】完整排查链路（而非单个命令）：监控告警确认现象（RSS / 堆曲线、GC 频率与停顿）→ 区分故障域（JVM 抛 OOM 有异常日志 vs 容器 OOMKilled 无 JVM 日志、退出码 137）→
+   保留现场（`-XX:+HeapDumpOnOutOfMemoryError` 或 `jmap -dump:live,format=b,file=heap.hprof <pid>`）→
+   MAT 看 Dominator Tree / Leak Suspects 找最大保留链 →
+   结合 GC 日志（JDK 9+ 用 `-Xlog:gc*`）判断是「泄漏」（Full GC 后老年代基线持续抬升）还是「容量不足」（锯齿稳定但峰值顶到上限）→ 顺引用链定位到业务代码行 →
+   修复（流式处理 / 关资源 / 修缓存策略 / 调参扩容）→ 压测验证堆曲线恢复稳定锯齿。
+
 - 【L4】跨语言 OOM 场景对比：
 
 **Go 的 OOM 场景**
 
 Go 没有 Metaspace/PermGen 概念，也没有 CodeCache，但有其独特的 OOM 风险：
 
-- **goroutine 栈泄漏**：每个 goroutine 初始栈 ~2KB，但可动态增长到 1GB。如果 goroutine 泄漏（如 channel 阻塞未关闭），栈内存会持续增长导致 OOM。这是 Go 特有的 OOM 场景，与 Java 的线程泄漏类似但更隐蔽——goroutine 非常轻量，泄漏更难察觉。
-- **slice 无限增长**：Go 的 slice 底层是动态数组，append 操作会自动扩容。如果代码逻辑导致 slice 无限 append（如循环中持续追加数据而不清理），会耗尽堆内存。Go 没有类似 JVM 的大对象直接进老年代的机制，所有对象统一在堆中分配。
+- **goroutine 栈泄漏**：每个 goroutine 初始栈 ~2KB，但可动态增长到 1GB。如果 goroutine 泄漏（如 channel 阻塞未关闭），栈内存会持续增长导致 OOM。这是 Go 特有的 OOM 场景，
+  与 Java 的线程泄漏类似但更隐蔽——goroutine 非常轻量，泄漏更难察觉。
+
+- **slice 无限增长**：Go 的 slice 底层是动态数组，append 操作会自动扩容。如果代码逻辑导致 slice 无限 append（如循环中持续追加数据而不清理），会耗尽堆内存。
+
+  Go 没有类似 JVM 的大对象直接进老年代的机制，所有对象统一在堆中分配。
+
 - **cgo 内存泄漏**：通过 cgo 调用 C 代码分配的内存不受 Go GC 管理，必须手动释放。类似 JVM 的 JNI 内存泄漏。
+
 - **无元空间 OOM**：Go 的类型信息在编译期确定，运行时不存在类似 Metaspace 的 OOM。
 
 **Rust 的 OOM 场景**
 
 Rust 的 OOM 行为与 JVM/Go 有本质不同——Rust 默认在分配失败时 **panic 而非返回 OOM 错误**：
 
-- **Box/Arc 分配失败 → panic**：`Box::new()`、`Arc::new()`、`Vec::push()` 等标准库分配在 OOM 时直接 panic（`abort`），不会像 Java 抛出 `OutOfMemoryError`。这是因为 Rust 将 OOM 视为不可恢复错误。
+- **Box/Arc 分配失败 → panic**：`Box::new()`、`Arc::new()`、`Vec::push()` 等标准库分配在 OOM 时直接 panic（`abort`），
+  不会像 Java 抛出 `OutOfMemoryError`。这是因为 Rust 将 OOM 视为不可恢复错误。
+
 - **编译期避免**：Rust 的所有权系统和 RAII 机制在编译期就确定了内存的分配和释放时机，大幅减少了运行时内存泄漏的可能。`no_std` 环境下甚至完全无堆分配。
-- **fallible allocation（实验性）**：Rust 的 `alloc` crate 提供了 `try_reserve` 等 fallible API，允许在 OOM 时返回 `AllocError` 而非 panic，但标准库 `Vec`、`Box` 等默认未使用。
+
+- **fallible allocation（实验性）**：Rust 的 `alloc` crate 提供了 `try_reserve` 等 fallible API，允许在 OOM 时返回 `AllocError` 而非 panic，
+  但标准库 `Vec`、`Box` 等默认未使用。
+
 - **无 GC 意味着无 GC overhead 类 OOM**：Rust 没有 GC，不会出现 Java 的 "GC overhead limit exceeded"。
 
 | OOM 场景            | JVM                              | Go                       | Rust                 |
@@ -1132,7 +1204,8 @@ Rust 的 OOM 行为与 JVM/Go 有本质不同——Rust 默认在分配失败时
 
 ::: details
 
-某导出服务一次性将数百万条记录查询进内存，堆使用率 2 分钟内从 30% 升至 100% 并抛出 `Java heap space`；由于启动参数已配置 `-XX:+HeapDumpOnOutOfMemoryError`，直接获得堆转储，MAT 分析发现单个 `List` 保留约 1.2 GB；改为流式分页读取（每批 2000 条）后恢复，全程约 10 分钟定位完成。
+某导出服务一次性将数百万条记录查询进内存，堆使用率 2 分钟内从 30% 升至 100% 并抛出 `Java heap space`；
+由于启动参数已配置 `-XX:+HeapDumpOnOutOfMemoryError`，直接获得堆转储，MAT 分析发现单个 `List` 保留约 1.2 GB；改为流式分页读取（每批 2000 条）后恢复，全程约 10 分钟定位完成。
 
 :::
 
@@ -1151,8 +1224,6 @@ Rust 的 OOM 行为与 JVM/Go 有本质不同——Rust 默认在分配失败时
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “OOM 一定是内存泄漏” → 也可能是 `-Xmx` 设置过小、一次性超大对象、线程数过多；先看具体 OOM 类型定位区域再下结论。
 - ❌ “StackOverflowError 是一种 OOM” → SOF 是栈深度超出 `-Xss` 限制，与 `OutOfMemoryError` 是不同的错误类型；只有虚拟机栈申请扩展内存失败时才会抛 OOM。
@@ -1210,7 +1281,9 @@ Rust 的 OOM 行为与 JVM/Go 有本质不同——Rust 默认在分配失败时
 
 ::: details
 
-- 【L3】字符串常量池（StringTable）在 JDK 7 已从永久代移入堆；此后 `intern()` 对堆中已存在的字符串不再拷贝副本进池，只是把池中登记为对该堆对象的引用——这是经典面试题「`new String("a") + new String("b")` 后调用 `intern()` 再与字面量 `"ab"` 做 `==` 比较，JDK 6 与 JDK 7+ 结果不同」的根源。
+- 【L3】字符串常量池（StringTable）在 JDK 7 已从永久代移入堆；此后 `intern()` 对堆中已存在的字符串不再拷贝副本进池，只是把池中登记为对该堆对象的引用——
+  这是经典面试题「`new String("a") + new String("b")` 后调用 `intern()` 再与字面量 `"ab"` 做 `==` 比较，JDK 6 与 JDK 7+ 结果不同」的根源。
+
 - 【L3】StringTable 是固定大小的哈希表（`-XX:StringTableSize`，默认 65536 个桶）；海量字符串场景下桶冲突成链会拖慢 `intern()` 与字面量驻留查找，可调大该参数缓解。
 
 :::
@@ -1218,8 +1291,6 @@ Rust 的 OOM 行为与 JVM/Go 有本质不同——Rust 默认在分配失败时
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “`new String("abc")` 一定创建 2 个对象” → 只有当 `"abc"` 尚未入池时才创建 2 个（池内对象 + 堆内对象）；若池中已有 `"abc"`，则只创建堆内 1 个对象。
 - ❌ “intern() 总会把字符串复制进常量池” → JDK 7+ 常量池在堆中，intern() 对堆内已存在的字符串只登记引用、不做拷贝。
@@ -1269,9 +1340,17 @@ Java 8 用元空间替代永久代，解决了 PermGen 固定大小易导致内�
 
 ::: details
 
-- 【L3】元空间由两部分组成：类元数据空间与压缩类指针空间（Compressed Class Space，默认 1 GB，可用 `-XX:CompressedClassSpaceSize` 调整）。
-- 【L3】版本演进：JDK 7 已将字符串常量池、静态变量从永久代移至堆；JDK 8（JEP 122）才彻底移除永久代、引入元空间。
-- 【L4】为什么不是把永久代变大：永久代与堆的 GC、字符串常量池、内部符号耦合很深，大小上限难以预测；移除它简化了 GC 与内存管理，也为字符串去重等特性铺路。
+- 【L3】元空间由两部分组成
+
+  类元数据空间与压缩类指针空间（Compressed Class Space，默认 1 GB，可用 `-XX:CompressedClassSpaceSize` 调整）。
+
+- 【L3】版本演进
+
+  JDK 7 已将字符串常量池、静态变量从永久代移至堆；JDK 8（JEP 122）才彻底移除永久代、引入元空间。
+
+- 【L4】为什么不是把永久代变大
+
+  永久代与堆的 GC、字符串常量池、内部符号耦合很深，大小上限难以预测；移除它简化了 GC 与内存管理，也为字符串去重等特性铺路。
 
 :::
 
@@ -1279,7 +1358,8 @@ Java 8 用元空间替代永久代，解决了 PermGen 固定大小易导致内�
 
 ::: details
 
-Java 8 之前，Tomcat 7 上频繁重新部署 webapp 常抛 `OutOfMemoryError: PermGen space`，需把 `-XX:MaxPermSize` 调到 256 MB 并重启 Tomcat 才能缓解；升级 Java 8 后元空间动态扩展，此类故障基本消失，运维统一改为显式设置 `-XX:MaxMetaspaceSize=256m` 作为安全上限并纳入监控。
+Java 8 之前，Tomcat 7 上频繁重新部署 webapp 常抛 `OutOfMemoryError: PermGen space`，需把 `-XX:MaxPermSize` 调到 256 MB 并重启 Tomcat 才能缓解；
+升级 Java 8 后元空间动态扩展，此类故障基本消失，运维统一改为显式设置 `-XX:MaxMetaspaceSize=256m` 作为安全上限并纳入监控。
 
 :::
 
@@ -1298,8 +1378,6 @@ Java 8 之前，Tomcat 7 上频繁重新部署 webapp 常抛 `OutOfMemoryError: 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “元空间默认无上限，生产不用设置” → 默认仅受物理内存限制，若存在类加载器泄漏会吃光系统内存，生产建议显式设置 `-XX:MaxMetaspaceSize` 并监控。
 - ❌ “字符串常量池也移到了元空间” → 恰好相反：字符串常量池在 JDK 7 就从永久代移入堆，元空间只存类元数据。
@@ -1345,7 +1423,9 @@ Java 8 之前，Tomcat 7 上频繁重新部署 webapp 常抛 `OutOfMemoryError: 
 
 ::: details
 
-- 【L3】HotSpot 默认混合模式：`-Xint` 可强制纯解释、`-Xcomp` 可强制纯编译，常用于对比实验；生产上依赖 JIT 对热点代码的编译优化提升吞吐。
+- 【L3】HotSpot 默认混合模式
+
+  `-Xint` 可强制纯解释、`-Xcomp` 可强制纯编译，常用于对比实验；生产上依赖 JIT 对热点代码的编译优化提升吞吐。
 
 > 📚 延伸阅读：[基本功 | Java 即时编译器原理解析及实践](https://tech.meituan.com/2020/10/22/java-jit-practice-in-meituan.html)
 
@@ -1386,8 +1466,13 @@ Java 字节码（Java Bytecode）是 Java 源代码编译后生成的中间代�
 
 ::: details
 
-- 【L3】Java 字节码是基于栈的指令集：操作数在操作数栈上出入，指令由 1 字节操作码 + 可选操作数组成；这与 x86 等基于寄存器的指令集是两种设计取向。
-- 【L3】字节码的可操控性催生了字节码增强生态：ASM（底层、高性能）、Javassist（源码级 API）、ByteBuddy（现代 DSL），支撑 AOP、探针、Mock 等能力。
+- 【L3】Java 字节码是基于栈的指令集
+
+  操作数在操作数栈上出入，指令由 1 字节操作码 + 可选操作数组成；这与 x86 等基于寄存器的指令集是两种设计取向。
+
+- 【L3】字节码的可操控性催生了字节码增强生态
+
+  ASM（底层、高性能）、Javassist（源码级 API）、ByteBuddy（现代 DSL），支撑 AOP、探针、Mock 等能力。
 
 > 📚 延伸阅读：[美团 - 字节码增强技术探索](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
 
@@ -1614,7 +1699,9 @@ Google V8 引擎的编译管线与 HotSpot 有惊人的结构相似性：
 .NET Core 的 RyuJIT 也采用分层编译，但比 HotSpot 更进一步：
 
 - **ReadyToRun（R2R）**：预编译到中间格式，部署时 JIT 只需少量编译，兼顾启动速度
+
 - **Dynamic PGO**：Runtime 收集 profiling 数据，动态反馈给 JIT 重新编译热点
+
 - **区别**：.NET 更强调「提前编译」（AOT via NativeAOT），JVM 更依赖运行时 JIT
 
 **（3）Go —— 为什么没有 JIT？**
@@ -1622,7 +1709,9 @@ Google V8 引擎的编译管线与 HotSpot 有惊人的结构相似性：
 Go 完全不使用 JIT，所有代码在编译期直接生成静态机器码。原因：
 
 - Go 编译速度极快（全量 AOT），无需 JIT 加速启动
+
 - 静态编译产物无运行时依赖，部署简单
+
 - 代价：无法利用运行时 profiling 做推测优化，纯静态优化的天花板低于 JIT 的动态优化
 
 **（4）GraalVM —— JIT 的演进方向**
@@ -1642,15 +1731,16 @@ GraalVM 用 Java 重写了 JIT 编译器（Graal JIT），可同时用于 JVM �
 
 ::: details
 
-大型 Spring 应用方法数可达数万，JIT 持续编译下 CodeCache（默认 240 MB）使用率不断攀升。曾有服务运行数日后出现 `CodeCache is full`，JIT 停止编译、全部回退解释执行，接口吞吐从约 12000 QPS 降至不足 1000 QPS；后续将 `-XX:ReservedCodeCacheSize` 调至 512 MB 并开启 `-XX:+PrintCodeCache` 纳入监控，同类故障未再出现。
+大型 Spring 应用方法数可达数万，JIT 持续编译下 CodeCache（默认 240 MB）使用率不断攀升。
+
+曾有服务运行数日后出现 `CodeCache is full`，JIT 停止编译、全部回退解释执行，接口吞吐从约 12000 QPS 降至不足 1000 QPS；
+后续将 `-XX:ReservedCodeCacheSize` 调至 512 MB 并开启 `-XX:+PrintCodeCache` 纳入监控，同类故障未再出现。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “Java 代码最终都会被 JIT 编译成机器码” → 只有热点代码才会被编译，冷代码全程解释执行；编译阈值未达到前也是解释执行。
 - ❌ “JIT 编译后的机器码永久有效” → 类加载变化、Uncommon Trap 等推测失败会触发去优化，机器码被丢弃并回退解释执行。
@@ -1771,6 +1861,7 @@ public void test() {
 通过 `-XX:+PrintGC` 观察 GC 次数：启用逃逸分析后，短生命周期、未逃逸的对象不会进入堆，GC 次数会明显减少。
 
 - 【L3】逃逸分析在 C2 编译阶段进行，与方法内联强相关：内联后方法边界消失，逃逸分析的判定范围更大，优化机会更多。
+
 - 【L4】与 Go 对比：Go 在编译期做逃逸分析，直接决定对象分配在栈还是堆；Java 在 JIT 运行时做，主要用于标量替换与锁消除，不做真正的栈上分配。
 
 :::
@@ -1779,15 +1870,16 @@ public void test() {
 
 ::: details
 
-排查某接口服务 GC 频率时做过对照实验：用 `-XX:-DoEscapeAnalysis` 关闭逃逸分析后，每 10 秒 Young GC 次数从约 15 次升至约 50 次，P99 耗时从 30 ms 升至 45 ms，证明标量替换使循环内大量临时对象免入堆。该参数 JDK 1.7+ 默认开启，生产无需额外配置。
+排查某接口服务 GC 频率时做过对照实验：用 `-XX:-DoEscapeAnalysis` 关闭逃逸分析后，每 10 秒 Young GC 次数从约 15 次升至约 50 次，P99 耗时从 30 ms 升至 45 ms，
+证明标量替换使循环内大量临时对象免入堆。
+
+该参数 JDK 1.7+ 默认开启，生产无需额外配置。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “HotSpot 实现了真正的栈上分配” → HotSpot 通过标量替换（对象拆为标量存寄存器/局部变量表）实现等效效果，并非整个对象放进栈帧。
 - ❌ “开启逃逸分析后对象就不进堆了” → 只有无逃逸对象才被优化；全局逃逸对象（被返回、被静态字段引用、跨线程访问）仍在堆上分配。
@@ -1855,11 +1947,21 @@ Java 9 引入 **AOT（Ahead of Time Compilation，提前编译）**。AOT 模式
 
 ::: details
 
-- 【L3】版本演进：`jaotc` 于 JDK 9 作为实验特性引入（基于 Graal 编译器），JDK 16 标记为废弃，JDK 17 移除；当前主流 AOT 方案是 GraalVM Native Image 与 Spring 6 / Spring Boot 3 的 AOT 处理。
-- 【L3】Spring AOT 的思路：在编译期生成 Bean 初始化代码替代运行时反射，并预注册反射 / 代理需求（hints），使应用可跑在原生镜像上。
-- 【L4】AOT 与 JIT 并非对立：GraalVM 同时支持两者，云原生方向是“AOT 保启动速度 + JIT 保峰值性能”互补。
+- 【L3】版本演进
+
+  `jaotc` 于 JDK 9 作为实验特性引入（基于 Graal 编译器），JDK 16 标记为废弃，JDK 17 移除；
+  当前主流 AOT 方案是 GraalVM Native Image 与 Spring 6 / Spring Boot 3 的 AOT 处理。
+
+- 【L3】Spring AOT 的思路
+
+  在编译期生成 Bean 初始化代码替代运行时反射，并预注册反射 / 代理需求（hints），使应用可跑在原生镜像上。
+
+- 【L4】AOT 与 JIT 并非对立
+
+  GraalVM 同时支持两者，云原生方向是“AOT 保启动速度 + JIT 保峰值性能”互补。
 
 > 📚 延伸阅读：
+
 >
 > - [基于静态编译构建微服务应用](https://mp.weixin.qq.com/s/4haTyXUmh8m-dBQaEzwDJw)
 > - [走向 Native 化：Spring&Dubbo AOT 技术示例与原理讲解](https://cn.dubbo.apache.org/zh-cn/blog/2023/06/28/走向-native-化 springdubbo-aot-技术示例与原理讲解/)

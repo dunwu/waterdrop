@@ -61,8 +61,6 @@ ES 是基于 Lucene 的分布式搜索与分析引擎，面向文档、JSON 存�
 
 ::: details
 
-常见误区：
-
 - ❌ "ES 是实时数据库，写入立刻可查" → ES 是 **NRT（Near Real-Time）**。写入先进内存 buffer 与 translog，默认每 `refresh_interval`（1s）才 refresh 生成新 segment 进入 filesystem cache，此时才可被搜索。
 - ❌ "1 秒才可见说明数据可能丢" → **可见性与持久性是两件事**。可见性靠 refresh（segment 进 filesystem cache），持久性靠 translog（默认 `index.translog.durability=request`，每次请求 fsync），节点宕机重启后可用 translog 重放未 flush 的写入。
 - ❌ "ES 和 Solr 只是 API 风格不同" → 二者同源于 Lucene，差异在分布式能力的内建程度、生态（Kibana/Beats/Logstash）与运维模型，选型时应按「是否需要开箱即用的分片副本管理与可观测性生态」判断。
@@ -143,7 +141,11 @@ ES 经历了 1.0→5.0→6.0→7.0→8.0 五个里程碑版本，关键变化是
 
 ::: details
 
-- 【L3】7.0 的集群协调重写是版本升级中最容易被忽略的破坏性变更：**7.0 之前**防止脑裂依赖手工配置 `discovery.zen.minimum_master_nodes`，公式为 `(master 候选节点数 / 2) + 1`；**7.0 起**该参数已废弃，配置了也会被忽略，改为由集群自动维护 voting configuration（基于 Raft 思想的自研协议），多数派为 `⌊N/2⌋+1`。
+- 【L3】7.0 的集群协调重写是版本升级中最容易被忽略的破坏性变更
+
+  **7.0 之前**防止脑裂依赖手工配置 `discovery.zen.minimum_master_nodes`，
+  公式为 `(master 候选节点数 / 2) + 1`；**7.0 起**该参数已废弃，配置了也会被忽略，改为由集群自动维护 voting configuration（基于 Raft 思想的自研协议），多数派为 `⌊N/2⌋+1`。
+
 - 【L4】版本选择上，7.x 与 8.x 的 mapping 不完全兼容（8.x 移除了大量 7.x 已废弃的 API 与 `_type` 残留语法），跨大版本升级必须先走 reindex 或升级助手，不能原地滚动升级跨两个大版本。
 
 :::
@@ -180,6 +182,7 @@ Elastic Stack 通常被用来作为日志采集、检索、可视化的解决方
 ::: details
 
 - 【L3】Beats 家族包括 Filebeat（日志文件）、Metricbeat（系统指标）、Packetbeat（网络数据）、Heartbeat（健康检查）等，可直接写入 ES 或经 Logstash 处理。
+
 - 【L4】Elastic Agent（8.x）整合了多种 Beats 能力，支持 Fleet 集中管理，是未来采集层的统一方案。
 
 > 📚 延伸阅读：[Elastic 官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
@@ -374,9 +377,22 @@ ES 自动推断 `count` 字段类型为 `long`。
 ::: details
 
 - 【L3】动态映射可通过 `dynamic_templates` 自定义规则，例如将所有字符串字段默认映射为 keyword，避免 text 类型的额外开销。
-- 【L4】动态映射可设置为 `strict`，遇到未定义字段时直接拒绝写入，防止 mapping 爆炸（mapping explosion）。三种取值：`dynamic: true`（默认，自动为新字段建 mapping）、`dynamic: false`（新字段不索引但仍保留在 `_source` 中，查不到也不报错）、`dynamic: strict`（新字段直接写入失败并抛错）。
-- 【L4】mapping 爆炸的真实危害不在磁盘而在**集群元数据**：mapping 属于 cluster state，字段无限膨胀会让 cluster state 变大，master 每次发布元数据都要全集群同步，表现为「集群整体变慢甚至不可用」。防护手段：`index.mapping.total_fields.limit`（默认 1000）、`index.mapping.depth.limit`（默认 20）、`index.mapping.nested_fields.limit`；对「用户自定义标签」这类字段名不可控的场景应改用 **`flattened` 类型**——整个对象作为一个字段索引，所有叶子值统一按 keyword 处理，字段数不再随 key 增长，代价是不支持数值范围查询与部分聚合。
-- 【L4】聚合报 `Fielddata is disabled` 的根因是对 `text` 字段做聚合/排序：`text` 分词后没有可用的列存，若强行开启 `fielddata` 会把该字段全部 term 载入 JVM 堆，是 OOM 的常见来源；正解是聚合 `字段.keyword` 子字段（走 doc values 列存）。
+
+- 【L4】动态映射可设置为 `strict`，遇到未定义字段时直接拒绝写入，防止 mapping 爆炸（mapping explosion）。三种取值：`dynamic: true`（默认，
+  自动为新字段建 mapping）、`dynamic: false`（新字段不索引但仍保留在 `_source` 中，查不到也不报错）、`dynamic: strict`（新字段直接写入失败并抛错）。
+
+- 【L4】mapping 爆炸的真实危害不在磁盘而在**集群元数据**
+
+  mapping 属于 cluster state，字段无限膨胀会让 cluster state 变大，master 每次发布元数据都要全集群同步，
+  表现为「集群整体变慢甚至不可用」。
+
+  防护手段：`index.mapping.total_fields.limit`（默认 1000）、`index.mapping.depth.limit`（默认 20）、`index.mapping.nested_fields.limit`；
+  对「用户自定义标签」这类字段名不可控的场景应改用 **`flattened` 类型**——整个对象作为一个字段索引，所有叶子值统一按 keyword 处理，字段数不再随 key 增长，代价是不支持数值范围查询与部分聚合。
+
+- 【L4】聚合报 `Fielddata is disabled` 的根因是对 `text` 字段做聚合/排序
+
+  `text` 分词后没有可用的列存，若强行开启 `fielddata` 会把该字段全部 term 载入 JVM 堆，
+  是 OOM 的常见来源；正解是聚合 `字段.keyword` 子字段（走 doc values 列存）。
 
 > 📚 延伸阅读：[Elasticsearch 官方文档之 Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
 
@@ -385,8 +401,6 @@ ES 自动推断 `count` 字段类型为 `long`。
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "动态映射可以替代静态映射" → 字段类型由**首次写入的值**决定，首次写错就永久错：首个值是 `"123"`（字符串）得到 `text` + `keyword`，之后写入数字 `456` 会因类型冲突写入失败；反之首个值是数字得到 `long`，之后写 `"abc"` 同样报错。生产环境建议静态映射优先，或至少 `dynamic: strict`。
 - ❌ "Mapping 可以修改已有字段类型" → 已有字段的类型不可修改，只能重新创建索引（reindex），并配合索引别名做零停机切换。
@@ -430,8 +444,15 @@ Elasticsearch 中的别名可用于更轻松地管理和使用索引。别名允
 
 ::: details
 
-- 【L3】别名支持 `filter` 和 `routing` 参数，可创建带过滤条件的别名（类似视图，典型用途是多租户隔离：每个租户一个绑定 `tenant_id` 过滤条件的别名，避免应用层漏加条件导致越权读取），或指定路由以缩小查询范围。
-- 【L4】写入路由由 `is_write_index` 控制：一个别名可以挂多个读索引，但**写入目标索引只能有一个**（多个索引都标 `is_write_index: true` 会写入报错）。按时间滚动的日志场景常配合索引模板 + ILM，让别名始终指向当前写入索引。
+- 【L3】别名支持 `filter` 和 `routing` 参数，可创建带过滤条件的别名（类似视图，典型用途是多租户隔离：每个租户一个绑定 `tenant_id` 过滤条件的别名，避免应用层漏加条件导致越权读取），
+  或指定路由以缩小查询范围。
+
+- 【L4】写入路由由 `is_write_index` 控制
+
+  一个别名可以挂多个读索引，但**写入目标索引只能有一个**（多个索引都标 `is_write_index: true` 会写入报错）。
+
+  按时间滚动的日志场景常配合索引模板 + ILM，让别名始终指向当前写入索引。
+
 - 【L4】别名下挂 50 个索引、每个 5 分片时，一次查询会产生 250 次 query+fetch，需警惕读放大。
 
 > 📚 延伸阅读：[Elasticsearch 官方文档之别名](https://www.elastic.co/guide/en/elasticsearch/reference/current/aliases.html)
@@ -507,10 +528,25 @@ object 打平存储会丢失对象边界，导致跨对象误匹配；nested 每
 ::: details
 
 - 【L3】nested 对象数量默认上限为 10000（`index.mapping.nested_objects.limit`），滥用 nested 会导致文档数膨胀、聚合性能下降。
-- 【L3】**nested 的实现原理**：每个数组元素被索引为一个独立的隐藏 Lucene 文档，与父文档存放在同一 segment 的同一 block 内；查询时用 `nested` query 把条件限定在单个子文档内匹配，取回结果时由 block join（`ToParentBlockJoinQuery`）把子文档的命中关联回父文档。
-- 【L4】**nested 的三项代价**（必答的权衡）：① **文档数放大**——1 个业务文档 + N 个隐藏子文档，`_count`、`hits.total` 与聚合结果都会被放大，对 nested 字段聚合必须用 `nested` agg，要回到父层再套 `reverse_nested`；② **更新放大**——Lucene segment 不可变，改动任一子文档都要重建整个父文档 block 并把旧文档标记删除；③ **不能直接对 nested 字段做全局排序/聚合**，必须先 `nested` agg。
+
+- 【L3】**nested 的实现原理**
+
+  每个数组元素被索引为一个独立的隐藏 Lucene 文档，与父文档存放在同一 segment 的同一 block 内；查询时用 `nested` query 把条件限定在单个子文档内匹配，
+  取回结果时由 block join（`ToParentBlockJoinQuery`）把子文档的命中关联回父文档。
+
+- 【L4】**nested 的三项代价**（必答的权衡）
+
+  ① **文档数放大**——1 个业务文档 + N 个隐藏子文档，`_count`、`hits.total` 与聚合结果都会被放大，
+  对 nested 字段聚合必须用 `nested` agg，要回到父层再套 `reverse_nested`；② **更新放大**——Lucene segment 不可变，改动任一子文档都要重建整个父文档 block 并把旧文档标记删除；
+  ③ **不能直接对 nested 字段做全局排序/聚合**，必须先 `nested` agg。
+
 - 【L4】对于只需精确匹配”数组内对象组合关系”的场景才用 nested，否则 object 即可。大量嵌套对象可考虑 flatten 或 parent-child 关系替代。
-- 【L4】**第三种选择 `join`（parent-child）**：父子文档独立存储、可独立更新，代价是查询需要额外的 join 阶段（明显慢于 nested），且父子文档必须落在同一分片（靠 routing 约束）。选型结论：**子文档少且与父文档一起更新 → nested；子文档多且需要频繁独立更新 → join；两者都不合适 → 反范式化冗余字段，或把组合条件下沉到业务层预处理。**
+
+- 【L4】**第三种选择 `join`（parent-child）**
+
+  父子文档独立存储、可独立更新，代价是查询需要额外的 join 阶段（明显慢于 nested），且父子文档必须落在同一分片（靠 routing 约束）。选型结论：
+
+  **子文档少且与父文档一起更新 → nested；子文档多且需要频繁独立更新 → join；两者都不合适 → 反范式化冗余字段，或把组合条件下沉到业务层预处理。**
 
 :::
 
@@ -520,9 +556,13 @@ object 打平存储会丢失对象边界，导致跨对象误匹配；nested 每
 
 **故障**：某电商平台商品搜索，过滤条件”品牌=Nike 且 尺码=42”返回了大量不匹配的商品（如 Adidas 的 42 码、Nike 的 40 码）。
 
-**排查**：`attributes` 字段用了 `object` 类型，`{brand: “Nike”, size: “42”}` 和 `{brand: “Adidas”, size: “42”}` 被打平为 `brand: [“Nike”, “Adidas”]`、`size: [“42”, “42”]`，查询 `brand=Nike AND size=42` 跨对象误匹配。
+**排查**：`attributes` 字段用了 `object` 类型，
+`{brand: “Nike”, size: “42”}` 和 `{brand: “Adidas”, size: “42”}` 被打平为 `brand: [“Nike”, “Adidas”]`、`size: [“42”, “42”]`，
+查询 `brand=Nike AND size=42` 跨对象误匹配。
 
-**修复**：`attributes` 改为 `nested` 类型，查询改用 `nested query`。改造后写入延迟增加约 30%（每个嵌套对象生成独立 Lucene 文档），但搜索结果准确率从 72% 提升到 100%。（**30% 与 72%→100% 为示意值，非官方基准**；写入放大的实际幅度取决于单文档的嵌套对象数量。）
+**修复**：`attributes` 改为 `nested` 类型，查询改用 `nested query`。改造后写入延迟增加约 30%（每个嵌套对象生成独立 Lucene 文档），但搜索结果准确率从 72% 提升到 100%。
+
+（**30% 与 72%→100% 为示意值，非官方基准**；写入放大的实际幅度取决于单文档的嵌套对象数量。）
 
 **教训**：凡是需要精确匹配”数组内对象组合关系”的场景（标签组合、多规格筛选），必须用 `nested`，`object` 的打平存储会丢对象边界。
 
@@ -531,8 +571,6 @@ object 打平存储会丢失对象边界，导致跨对象误匹配；nested 每
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “object 类型可以精确匹配数组内的对象组合” → object 打平后会丢失对象边界，必须用 nested 才能保证同对象内匹配。
 - ❌ “nested 没有性能代价” → 每个嵌套对象占一个独立 Lucene 文档，写入和查询开销显著增加。
@@ -748,9 +786,19 @@ query 上下文会计算相关性评分，filter 上下文不评分、可缓存�
 ::: details
 
 - 【L3】bool 查询中的 `filter` 子句就是 filter context，而 `must` 子句是 query context。filter 结果会被缓存在 node query cache 中，重复查询时直接命中缓存。
-- 【L3】**缓存的是 per-segment 的位图（Roaring Bitmap）**：因为 segment 不可变，缓存的 bitset 不会失效，可跨查询长期复用；但 **segment merge 生成的新 segment 需要重建缓存**，这是「大规模合并后查询短时变慢」的原因之一。node query cache 默认占堆 10%，且只缓存使用频次达标的 filter，避免为一次性查询付出缓存代价。
+
+- 【L3】**缓存的是 per-segment 的位图（Roaring Bitmap）**
+
+  因为 segment 不可变，缓存的 bitset 不会失效，可跨查询长期复用；
+  但 **segment merge 生成的新 segment 需要重建缓存**，这是「大规模合并后查询短时变慢」的原因之一。node query cache 默认占堆 10%，且只缓存使用频次达标的 filter，
+  避免为一次性查询付出缓存代价。
+
 - 【L4】`constant_score` 可将任意 query 包装为 filter context，统一返回固定分数，适用于纯过滤场景。
-- 【L4】**性能结论：能用 filter 就不用 query**——不算分省掉 BM25 的 CPU 开销，可缓存省掉重复的倒排表求交。落地准则：**精确匹配类条件（状态、类型、时间范围、ID、租户）一律放 filter，只有全文检索与需要按相关性排序的条件才放 must。**
+
+- 【L4】**性能结论
+
+  能用 filter 就不用 query**——不算分省掉 BM25 的 CPU 开销，可缓存省掉重复的倒排表求交。落地准则：**精确匹配类条件（状态、类型、时间范围、ID、租户）一律放 filter，
+  只有全文检索与需要按相关性排序的条件才放 must。**
 
 > 📚 延伸阅读：[Elasticsearch 官方文档之查询和过滤上下文](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html)
 
@@ -790,6 +838,7 @@ ES 通过 [**Suggester**](https://www.elastic.co/guide/en/elasticsearch/referenc
 ::: details
 
 - 【L3】Completion Suggester 基于 FST 数据结构，全量加载到内存，查询延迟在毫秒级，是生产环境自动补全的首选方案。
+
 - 【L4】Search as You Type（8.x）是新的字段类型，原生支持前缀、中缀和子词匹配，无需单独配置 Completion Suggester。
 
 > 📚 延伸阅读：[Elasticsearch 官方文档之推荐查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
@@ -842,10 +891,25 @@ ES 默认限制 `from + size` 不超过 10000（`index.max_result_window`）。
 
 ::: details
 
-- 【L3】**search_after 免疫深分页的原因**：利用上一页最后一条的排序值作为下次查询起点，每个分片只需扫描 size 条，代价与页深无关；代价是只能向后翻页、必须指定全局排序，且**排序字段必须包含唯一 tie-breaker**（通常是 `_shard_doc` 或 `_id`），否则排序值相同的记录在翻页时会丢失或重复。
-- 【L4】**PIT（Point in Time，7.10+）**：为 search_after 提供一致性快照视图，解决翻页期间数据变更导致的结果不一致/重复/丢失问题；scroll 同样基于快照但已弃用，新方案一律用 search_after + PIT。
-- 【L4】**scroll 并非一无是处**：它创建索引快照，适合**全量导出与离线批处理**（快照期间的写入不可见，但换来稳定的遍历语义）；不适合面向用户的实时分页——scroll context 常驻堆内存、并发数受 `search.max_open_scroll_context` 限制，7.x 起官方明确不推荐用于分页。
-- 【L4】**深分页本质是产品问题**：主流搜索引擎普遍只暴露前若干页，正解是**用更精确的过滤条件与更好的排序把用户真正要的结果推到前几页**，而不是支持无限翻页；导出类需求应走 scroll/PIT 的异步任务 + 结果文件下载，而非同步分页接口。
+- 【L3】**search_after 免疫深分页的原因**
+
+  利用上一页最后一条的排序值作为下次查询起点，每个分片只需扫描 size 条，代价与页深无关；代价是只能向后翻页、必须指定全局排序，
+  且**排序字段必须包含唯一 tie-breaker**（通常是 `_shard_doc` 或 `_id`），否则排序值相同的记录在翻页时会丢失或重复。
+
+- 【L4】**PIT（Point in Time，7.10+）**
+
+  为 search_after 提供一致性快照视图，解决翻页期间数据变更导致的结果不一致/重复/丢失问题；scroll 同样基于快照但已弃用，
+  新方案一律用 search_after + PIT。
+
+- 【L4】**scroll 并非一无是处**
+
+  它创建索引快照，适合**全量导出与离线批处理**（快照期间的写入不可见，但换来稳定的遍历语义）；不适合面向用户的实时分页——scroll context 常驻堆内存、
+  并发数受 `search.max_open_scroll_context` 限制，7.x 起官方明确不推荐用于分页。
+
+- 【L4】**深分页本质是产品问题**
+
+  主流搜索引擎普遍只暴露前若干页，正解是**用更精确的过滤条件与更好的排序把用户真正要的结果推到前几页**，而不是支持无限翻页；导出类需求应走 scroll/PIT 的异步任务 + 结果文件下载，
+  而非同步分页接口。
 
 :::
 
@@ -853,7 +917,8 @@ ES 默认限制 `from + size` 不超过 10000（`index.max_result_window`）。
 
 ::: details
 
-某电商平台商品搜索结果页，运营要求支持跳到第 10000 页（每页 20 条）。5 个分片下 from=200000 时，协调节点需汇总 100 万条数据，内存和 GC 压力极大。改为 search_after + PIT 后，每页查询耗时稳定在 50ms 以内（**示意值，非官方基准**），且结果一致性得到保证。
+某电商平台商品搜索结果页，运营要求支持跳到第 10000 页（每页 20 条）。5 个分片下 from=200000 时，协调节点需汇总 100 万条数据，内存和 GC 压力极大。改为 search_after + PIT 后，
+每页查询耗时稳定在 50ms 以内（**示意值，非官方基准**），且结果一致性得到保证。
 
 **架构结论**：该需求最终应回到产品层——搜索结果页只开放有限页数（配合过滤条件收敛），第 10000 页的诉求走异步导出任务（scroll/PIT 遍历后落地文件），而不是让在线查询接口承担深翻页。
 
@@ -873,8 +938,6 @@ ES 默认限制 `from + size` 不超过 10000（`index.max_result_window`）。
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "调大 index.max_result_window 就能解决深分页" → 只是把问题延后，查询内存和 CPU 开销线性增长，正确做法是用 search_after 游标式翻页。
 - ❌ "scroll 和 search_after 一样" → scroll 基于快照，不适合实时请求且长期占用上下文资源，已被官方弃用。
@@ -961,18 +1024,27 @@ Elasticsearch 支持 [`cardinality`](https://www.elastic.co/guide/en/elasticsear
 ::: details
 
 - 【L3】对于 terms 聚合的海量数据场景，可设置 `shard_size` 参数扩大每个分片的计算范围，牺牲性能提高精准度。
+
 - 【L4】对于日志场景的近似去重，可结合 rollup 预处理或 data stream + ILM 分层汇总，避免实时对原始数据做全量聚合。
-- 【L4】`composite` 聚合是**唯一能拿到全量分桶结果**的方式：通过 after key 分页遍历，代价是自身不做 top-N 排序，需要业务侧汇总；适合离线跑全量维度统计。
-- 【L4】预聚合/物化：用 `transform` 或定时任务把明细预聚合成汇总表写入独立索引，大盘查询走汇总表，明细只保留短期。
-- 【L4】**架构结论**：ES 的定位是检索 + 轻量实时聚合。超大规模的精确全局聚合（多维 OLAP、精确 UV、跨月对账）应下沉到 ClickHouse/Doris/Spark 等列存引擎，ES 侧只保留检索与实时性要求高的小范围聚合。
+
+- 【L4】`composite` 聚合是**唯一能拿到全量分桶结果**的方式
+
+  通过 after key 分页遍历，代价是自身不做 top-N 排序，需要业务侧汇总；适合离线跑全量维度统计。
+
+- 【L4】预聚合/物化
+
+  用 `transform` 或定时任务把明细预聚合成汇总表写入独立索引，大盘查询走汇总表，明细只保留短期。
+
+- 【L4】**架构结论**
+
+  ES 的定位是检索 + 轻量实时聚合。超大规模的精确全局聚合（多维 OLAP、精确 UV、跨月对账）应下沉到 ClickHouse/Doris/Spark 等列存引擎，
+  ES 侧只保留检索与实时性要求高的小范围聚合。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "`terms` 聚合返回的就是全局准确的 top-N" → 各分片先截断 top-N 再归并，结果是近似值，误差上界见 `doc_count_error_upper_bound`。
 - ❌ "`cardinality` 可以精确去重" → 底层是 HyperLogLog++，`precision_threshold` 以上为近似，相对误差约 1-6%。
@@ -1018,7 +1090,9 @@ Elasticsearch 支持 [`cardinality`](https://www.elastic.co/guide/en/elasticsear
 
 ::: details
 
-- 【L3】分析在索引和搜索时都会执行：索引时对文档文本分析后写入倒排索引，搜索时对查询字符串分析后查找倒排索引。两次分析必须使用相同的分析器才能匹配。
+- 【L3】分析在索引和搜索时都会执行
+
+  索引时对文档文本分析后写入倒排索引，搜索时对查询字符串分析后查找倒排索引。两次分析必须使用相同的分析器才能匹配。
 
 :::
 
@@ -1135,9 +1209,15 @@ POST _analyze
 ::: details
 
 - 【L3】自定义分析器可以组合内置的 Character Filters + Tokenizer + Token Filters，例如中文分词场景常用 IK 分词器 + synonym + lowercase。
+
 - 【L3】`keyword` 字段不分词，但可以用 `normalizer` 做大小写折叠、去重音等字符级规范化，解决「精确匹配因大小写不一致查不到」的问题。
+
 - 【L4】分析器可以在索引级别和字段级别分别配置。索引时和搜索时可以使用不同的分析器（search_analyzer），例如搜索时用同义词分析器提升召回率。
-- 【L4】同义词过滤器的时机权衡：配置在**索引时**，词库更新必须重建索引（reindex）才能生效；配置在**搜索时**（只对 `search_analyzer` 生效），改词即时生效，代价是每次查询多做一次同义词展开、且多词项展开会影响相关性评分的准确性。
+
+- 【L4】同义词过滤器的时机权衡
+
+  配置在**索引时**，词库更新必须重建索引（reindex）才能生效；配置在**搜索时**（只对 `search_analyzer` 生效），改词即时生效，代价是每次查询多做一次同义词展开、
+  且多词项展开会影响相关性评分的准确性。
 
 > 📚 延伸阅读：[Elasticsearch 官方文档之分析器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer-anatomy.html)
 
@@ -1146,8 +1226,6 @@ POST _analyze
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "standard 分析器适合中文" → standard 按 Unicode 文本分割，对中文是单字分词，效果很差，需要专用中文分词器。
 - ❌ "分析器只在索引时执行" → 索引和搜索时都会执行分析，两次分析必须一致才能匹配。
@@ -1194,17 +1272,22 @@ POST _analyze
 ::: details
 
 - 【L3】IK 分词器提供 `ik_smart`（粗粒度）和 `ik_max_word`（细粒度）两种模式。建议索引时用 `ik_max_word`，搜索时用 `ik_smart`，提高召回率和精确度的平衡。
+
 - 【L3】需要拼音/首字母搜索（输入 `ms` 命中「秒杀」）时，可叠加 analysis-pinyin 插件为字段建拼音子字段，与 IK 主字段配合做多路召回。
+
 - 【L4】IK 支持热更新词库，通过 HTTP 接口加载自定义词典，无需重启 ES。适合需要频繁更新业务词的场景。
-- 【L4】**热更新词库不回溯存量数据**：新词只对更新后写入的文档生效，存量文档仍按旧词库切分的词项存储，要让新词命中旧文档必须 reindex（或 update_by_query 触发重新分析）。这是「词库加了新词却仍然搜不到」这类生产问题的首要排查点。
+
+- 【L4】**热更新词库不回溯存量数据**
+
+  新词只对更新后写入的文档生效，存量文档仍按旧词库切分的词项存储，要让新词命中旧文档必须 reindex（或 update_by_query 触发重新分析）。
+
+  这是「词库加了新词却仍然搜不到」这类生产问题的首要排查点。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "IK 词库加了新词，存量文档立刻能按新词搜到" → 热更新只影响此后写入的文档，存量文档需要 reindex 重新分析。
 - ❌ "分词越细越好，索引和搜索都用 `ik_max_word`" → `ik_max_word` 产生大量冗余词项，索引膨胀且召回噪声多；常见组合是索引 `ik_max_word` + 搜索 `ik_smart`。
@@ -1266,8 +1349,6 @@ Elasticsearch 的逻辑存储被设计为层级结构：
 
 ::: details
 
-常见误区：
-
 - ❌ "ES 为所有字段建立倒排索引" → 倒排索引面向文本词项；数值/日期字段使用 BKD 树（Lucene 6.0 起的点值数据结构），范围查询的效率来自 BKD 树而非倒排索引。
 
 :::
@@ -1311,8 +1392,15 @@ Elasticsearch 的物理存储天然使用分布式设计：
 
 ::: details
 
-- 【L3】Segment 不可变的收益：读写无锁竞争、对 OS page cache 与 CPU cache 友好、可安全构建 FST 等压缩结构。代价：删除只是在 live docs 中标记，更新是「旧文档标删 + 写入新文档」，磁盘空间与查询性能要等 segment merge 后才回收。
-- 【L3】写入链路三个动作的分工：`refresh`（默认 1s）生成新 segment 进入文件系统缓存，文档从此刻可被搜到——这就是「近实时」的来源；`flush` 将 translog 落盘并提交 Lucene Index，保证宕机不丢数据；后台 `merge` 持续合并小 segment、物理清除已标删文档。
+- 【L3】Segment 不可变的收益
+
+  读写无锁竞争、对 OS page cache 与 CPU cache 友好、可安全构建 FST 等压缩结构。代价：删除只是在 live docs 中标记，更新是「旧文档标删 + 写入新文档」，
+  磁盘空间与查询性能要等 segment merge 后才回收。
+
+- 【L3】写入链路三个动作的分工
+
+  `refresh`（默认 1s）生成新 segment 进入文件系统缓存，文档从此刻可被搜到——这就是「近实时」的来源；`flush` 将 translog 落盘并提交 Lucene Index，
+  保证宕机不丢数据；后台 `merge` 持续合并小 segment、物理清除已标删文档。
 
 :::
 
@@ -1370,6 +1458,7 @@ graph TB
 ::: details
 
 - 【L3】倒排索引由 Term Dictionary、Term Index（FST）、Posting List 三部分组成，详见本文档「ES 如何实现倒排索引？」。
+
 - 【L4】正排索引在 ES 中以 Doc Values 形式存在，用于聚合和排序，与倒排索引互补。
 
 :::
@@ -1391,8 +1480,6 @@ graph TB
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "倒排索引和 B+ 树索引一样" → 倒排索引基于词项字典序 + FST 前缀压缩，B+ 树基于有序键值，适用场景不同。
 - ❌ "倒排索引只能做精确匹配" → 配合分析器分词和模糊查询，可实现全文搜索、短语搜索、模糊匹配等。
@@ -1434,6 +1521,7 @@ Trie（字典树/前缀树）是一种树状数据结构，用于有效检索键
 ::: details
 
 - 【L3】Lucene 的 Term Index 使用 FST（Finite State Transducer）而非纯 Trie，FST 复用前缀和后缀压缩空间，查询复杂度 O(len(prefix))。
+
 - 【L4】FST 构建后不可修改，这也是 Lucene Segment 不允许修改的根本原因。
 
 :::
@@ -1475,8 +1563,11 @@ ES 每个 Shard 对应一个 Lucene Index，Lucene Index 分解为多个 Segment
 ::: details
 
 - 【L3】**Posting List 压缩与求交加速**：
+
   - **FOR（Frame of Reference）编码**：文档 ID 单调递增，分块后存储相邻 ID 的增量（delta），大幅降低空间占用。
+
   - **Roaring Bitmap**：多条件查询时对多个 Posting List 求交/求并，自动在数组、位图、RLE 三种存储结构间切换，兼顾内存与计算性能。
+
 - 【L4】Term Index（FST）常驻内存 + Posting List 压缩，使得绝大多数查询不必全量读取磁盘上的 Term Dictionary，这是 ES 查询快于直接扫描磁盘的关键。
 
 :::
@@ -1485,15 +1576,15 @@ ES 每个 Shard 对应一个 Lucene Index，Lucene Index 分解为多个 Segment
 
 ::: details
 
-某日志索引含 10 亿文档、5000 万唯一词项。Term Index（FST）约 200MB 常驻内存，Term Dictionary 在磁盘上按块存储。典型 term 查询只需读取 FST + 1-2 个磁盘块，延迟 < 1ms。多条件 AND 查询时，Roaring Bitmap 将多个 Posting List 的求交运算从 O(N) 降到 O(N/64)，整体查询耗时 < 10ms。
+某日志索引含 10 亿文档、5000 万唯一词项。Term Index（FST）约 200MB 常驻内存，Term Dictionary 在磁盘上按块存储。典型 term 查询只需读取 FST + 1-2 个磁盘块，延迟 < 1ms。
+
+多条件 AND 查询时，Roaring Bitmap 将多个 Posting List 的求交运算从 O(N) 降到 O(N/64)，整体查询耗时 < 10ms。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Term Dictionary 全量加载到内存" → 只有 Term Index（FST）常驻内存，Term Dictionary 在磁盘上按需读取。
 - ❌ "Posting List 未压缩" → 使用 FOR 编码压缩文档 ID，Roaring Bitmap 加速位图运算，实际存储远小于原始数据。
@@ -1538,7 +1629,10 @@ ES 处理删除请求时，不会立即从磁盘物理删除文件：
 ::: details
 
 - 【L3】更新操作实际上是“删除旧文档 + 写入新文档”，两者都在 Segment 合并时才真正执行物理操作。
-- 【L3】已删除文档在被合并清理前仍占磁盘、并在查询时被 live docs 过滤（有额外开销）；`index.merge.policy.deletes_pct_allowed` 控制已删除文档占比阈值，超过后 merge 策略会优先回收删除文档。
+
+- 【L3】已删除文档在被合并清理前仍占磁盘、并在查询时被 live docs 过滤（有额外开销）；`index.merge.policy.deletes_pct_allowed` 控制已删除文档占比阈值，
+  超过后 merge 策略会优先回收删除文档。
+
 - 【L4】频繁 force_merge 会影响写入性能，建议在低峰期执行。对于日志场景，可结合 ILM 策略在 warm 阶段自动执行 force_merge。
 
 :::
@@ -1595,6 +1689,7 @@ ES 通过副本机制实现高可用，参考 [PacificA 算法](https://www.micr
 ::: details
 
 - 【L3】`allocate_stale_primary` 可将旧副本提升为主分片，但会造成数据丢失，仅在紧急恢复时慎用。
+
 - 【L4】写一致性通过 `wait_for_active_shards` 控制，默认 1（主分片可用即可），对丢数敏感的场景可调高。
 
 > 📚 延伸阅读：[ES 官方文档之高可用](https://www.elastic.co/guide/en/elasticsearch/reference/current/high-availability.html)
@@ -1604,8 +1699,6 @@ ES 通过副本机制实现高可用，参考 [PacificA 算法](https://www.micr
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "ES 写入保证强一致性" → ES 默认可用性优先，写入只确认主分片，副本异步复制，存在不一致窗口。
 
@@ -1662,7 +1755,10 @@ graph TB
 
 ::: details
 
-- 【L3】为什么 ES 没有直接照搬 Raft？ Raft 的日志复制模型适合小量状态同步，而 ES 集群状态（全量 mapping、分片分配表）体积大，不适合逐条日志复制。ES 只借鉴了选主与 quorum 提交思想，集群状态分发仍采用 master 发布 + 确认机制。
+- 【L3】为什么 ES 没有直接照搬 Raft？
+
+  Raft 的日志复制模型适合小量状态同步，而 ES 集群状态（全量 mapping、分片分配表）体积大，不适合逐条日志复制。ES 只借鉴了选主与 quorum 提交思想，集群状态分发仍采用 master 发布 + 确认机制。
+
 - 【L4】7.0+ 集群状态变更需多数 master-eligible 节点确认后才算提交，保证 master 切换时元数据不丢。
 
 :::
@@ -1670,8 +1766,6 @@ graph TB
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "ES 7.0+ 仍然需要配置 minimum_master_nodes" → 7.0+ 已移除该配置，quorum 由集群自动维护。
 - ❌ "任何节点都可以发起选主" → 只有 master-eligible 节点才能参与选主。
@@ -1712,7 +1806,10 @@ graph TB
 ::: details
 
 - 【L3】脑裂恢复后，以多数派的 Master 为准，少数派的数据可能丢失。7.0+ 的 voting configuration 机制进一步保证了元数据一致性。
-- 【L4】7.x+ 缩减 master-eligible 节点前，应先用 voting configuration exclusions API（`POST _cluster/voting_config_exclusions?node_ids=...`）将其移出投票配置，否则 voting configuration 仍要求已下线节点投票，可能导致集群选不出 Master。
+
+- 【L4】7.x+ 缩减 master-eligible 节点前，
+  应先用 voting configuration exclusions API（`POST _cluster/voting_config_exclusions?node_ids=...`）将其移出投票配置，
+  否则 voting configuration 仍要求已下线节点投票，可能导致集群选不出 Master。
 
 :::
 
@@ -1884,7 +1981,9 @@ PUT <index>/_doc/<id>?routing=routing_key
 ::: details
 
 - 【L3】自定义 routing 可用于数据亲和性场景（如用户数据写入同一分片），但需注意热点分片问题。
+
 - 【L3】路由哈希使用固定种子的 Murmur3（而非 Java `String.hashCode`），保证同一 `_routing` 值在不同节点、不同版本间路由结果一致。
+
 - 【L4】Split API（7.0+）支持将索引拆分为更多分片，解决了主分片数不可增加的问题（但需提前在 settings 中预留 split 数）。
 
 :::
@@ -1927,6 +2026,7 @@ PUT <index>/_doc/<id>?routing=routing_key
 ::: details
 
 - 【L3】分片过多会导致 Master 压力增大、查询延迟增加（协调节点需汇总更多分片结果）；分片过少则无法充分利用集群资源。
+
 - 【L4】对于时间序列数据（日志），可结合 ILM 策略和 Rollover 机制自动管理分片大小，见本文档「ES 如何实现索引生命周期管理（ILM）？」。
 
 > 📚 延伸阅读：[ES 官方博客 - 分片数指南](https://www.elastic.co/cn/blog/how-many-shards-should-i-have-in-my-elasticsearch-cluster)
@@ -1947,8 +2047,6 @@ PUT <index>/_doc/<id>?routing=routing_key
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "分片越多越好" → 分片过多增加 Master 管理负担、查询延迟和文件句柄开销。
 - ❌ "分片大小无所谓" → 单分片超过 50GB 会导致恢复和 Merge 性能下降。
@@ -2013,6 +2111,7 @@ graph TB
 ::: details
 
 - 【L3】Query 阶段每个分片返回 from+size 条，深分页时协调节点需汇总 (from+size)*分片数 条，这是深分页问题的根源，见本文档「ES 为什么会有深分页问题？」。
+
 - 【L4】Prefer 参数可控制查询优先路由到主分片或副本，`_primary` 强制读主分片（该取值 7.0 起已废弃；且读到最新数据仍以已 refresh 为前提）。
 
 :::
@@ -2036,8 +2135,6 @@ graph TB
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "ES 搜索是单次请求" → 实际是 Query + Fetch 两阶段，协调节点需要两次网络交互。
 - ❌ "同一节点的多个分片会合并查询" → 不会合并，N 个分片发生 N 次请求。
@@ -2084,8 +2181,13 @@ ES 写入流程为：路由到主分片 → 写 Index Buffer + Translog → Refr
 
 ::: details
 
-- 【L3】**近实时与持久性的本质**：写入到可搜索的延迟 = refresh 间隔（默认 1 秒）；写完立即要读需 `refresh=true`，但频繁 refresh 有性能代价。
-- 【L4】**Translog 之于 Segment 类似 MySQL 的 redo log**：宕机时未 flush 的 Segment 通过重放 Translog 恢复。`index.translog.durability` 默认 `request`（每次写 fsync），调为 `async` 可提吞吐但宕机丢最近 5 秒数据。
+- 【L3】**近实时与持久性的本质**
+
+  写入到可搜索的延迟 = refresh 间隔（默认 1 秒）；写完立即要读需 `refresh=true`，但频繁 refresh 有性能代价。
+
+- 【L4】**Translog 之于 Segment 类似 MySQL 的 redo log**：
+
+  宕机时未 flush 的 Segment 通过重放 Translog 恢复。`index.translog.durability` 默认 `request`（每次写 fsync），调为 `async` 可提吞吐但宕机丢最近 5 秒数据。
 
 > 📚 延伸阅读：[ES 从入门到实践之存储流程](https://www.itshujia.com/read/elasticsearch/359.html)
 
@@ -2095,13 +2197,16 @@ ES 写入流程为：路由到主分片 → 写 Index Buffer + Translog → Refr
 
 ::: details
 
-某日志集群日增 500 万文档，默认 Refresh=1s、Translog durability=request。在批量写入时将 refresh_interval 调为 30s、translog 调为 async，写入吞吐从 5000 doc/s 提升到 20000 doc/s，代价是宕机可能丢失最近 5 秒数据。
+某日志集群日增 500 万文档，默认 Refresh=1s、Translog durability=request。在批量写入时将 refresh_interval 调为 30s、translog 调为 async，
+写入吞吐从 5000 doc/s 提升到 20000 doc/s，代价是宕机可能丢失最近 5 秒数据。
 
 **故障**：某订单索引写入吞吐突然从 15000 doc/s 跌至 2000 doc/s，写入延迟 P99 超过 5s。
 
 **排查**：Translog 达到 512MB 默认阈值触发频繁 Flush，每次 Flush 都要 fsync 刷盘；同时 Segment Merge 与 Flush 争抢磁盘 I/O，形成瓶颈。
 
-**修复**：`index.translog.durability` 改为 `async`、`index.translog.flush_threshold_size` 调为 1GB、`index.merge.scheduler.max_thread_count` 限制为 3，写入吞吐恢复到 18000 doc/s。
+**修复**：`index.translog.durability` 改为 `async`、`index.translog.flush_threshold_size` 调为 1GB、
+`index.merge.scheduler.max_thread_count` 限制为 3，
+写入吞吐恢复到 18000 doc/s。
 
 **教训**：高写入场景下，Translog 默认配置（每次 fsync + 512MB 阈值）是写入性能的第一瓶颈，需根据业务容忍度调整。
 
@@ -2121,8 +2226,6 @@ ES 写入流程为：路由到主分片 → 写 Index Buffer + Translog → Refr
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "ES 写入立即可以搜索" → 需等待 Refresh（默认 1s）后才可搜索，近实时非实时。
 - ❌ "Translog 不重要" → Translog 是宕机恢复的关键，关闭或丢失会导致数据丢失。
@@ -2200,9 +2303,18 @@ ES 通过乐观并发控制（_seq_no + _primary_term）、写一致性（wait_f
 
 ::: details
 
-- 【L3】**丢数场景**：主分片写成功但副本未同步时宕机（副本重建期间数据丢失）；`translog.durability: async` 时宕机丢失未刷盘写入（默认 `request` 级别不会丢）。
-- 【L4】**重复场景**：不指定 `_id`（自动生成 ID）时客户端超时重试会产生重复文档；解法是指定业务唯一 `_id`，写入天然幂等。
-- 【L4】**ES 与 DB 的数据同步链路**：双写（实现简单，但两边无原子性、代码侵入）vs binlog 订阅（Canal / Flink CDC，异步解耦、秒级延迟）；同步延迟期间需业务兜底——写入携带版本号/时间戳防旧数据覆盖新数据，关键读走 DB 或延迟重试，定期对账补偿。
+- 【L3】**丢数场景**
+
+  主分片写成功但副本未同步时宕机（副本重建期间数据丢失）；`translog.durability: async` 时宕机丢失未刷盘写入（默认 `request` 级别不会丢）。
+
+- 【L4】**重复场景**
+
+  不指定 `_id`（自动生成 ID）时客户端超时重试会产生重复文档；解法是指定业务唯一 `_id`，写入天然幂等。
+
+- 【L4】**ES 与 DB 的数据同步链路**
+
+  双写（实现简单，但两边无原子性、代码侵入）vs binlog 订阅（Canal / Flink CDC，异步解耦、秒级延迟）；同步延迟期间需业务兜底——
+  写入携带版本号/时间戳防旧数据覆盖新数据，关键读走 DB 或延迟重试，定期对账补偿。
 
 :::
 
@@ -2210,15 +2322,14 @@ ES 通过乐观并发控制（_seq_no + _primary_term）、写一致性（wait_f
 
 ::: details
 
-某订单系统写入 ES 后立即查询订单状态，偶发查不到刚写入的订单。分析发现是近实时机制（refresh 1s 延迟）导致。改为写入时设置 `refresh=wait_for`，查询时设置 `preference=_primary`，彻底解决一致性问题。
+某订单系统写入 ES 后立即查询订单状态，偶发查不到刚写入的订单。分析发现是近实时机制（refresh 1s 延迟）导致。改为写入时设置 `refresh=wait_for`，查询时设置 `preference=_primary`，
+彻底解决一致性问题。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "ES 写入后立即可以读到" → 近实时机制下默认 1 秒后才可搜索，需主动 refresh。
 - ❌ "ES 是强一致性的" → ES 是最终一致性，副本异步复制，存在不一致窗口。
@@ -2257,7 +2368,10 @@ ES 查询快的核心原因是倒排索引 + FST 常驻内存 + 分片并行查�
 
 ::: details
 
-- 【L3】ES 查询优化的多层次：FST 内存索引（微秒级） → Posting List 压缩解码（毫秒级） → 分片并行（水平扩展） → filter 缓存（重复查询零开销）。
+- 【L3】ES 查询优化的多层次
+
+  FST 内存索引（微秒级） → Posting List 压缩解码（毫秒级） → 分片并行（水平扩展） → filter 缓存（重复查询零开销）。
+
 - 【L4】对于高频查询，可结合 `routing` 将相关数据集中到同一分片，减少跨分片查询开销。
 
 > 📚 延伸阅读：[ES 查询性能优化](https://cloud.tencent.com/developer/article/1922613)
@@ -2350,7 +2464,10 @@ ES JVM 内存不超过 32GB（利用 Compressed Oops），Xms 和 Xmx 设置相�
 
 ::: details
 
-- 【L3】**Compressed Oops**：Java 对象按 8 字节对齐，指针使用偏移量而非真实地址，可寻址最大 32GB。超过 32GB 后指针占用翻倍，性能下降。
+- 【L3】**Compressed Oops**
+
+  Java 对象按 8 字节对齐，指针使用偏移量而非真实地址，可寻址最大 32GB。超过 32GB 后指针占用翻倍，性能下降。
+
 - 【L4】ES 7.x 支持 G1 GC，对于大堆（>8GB）可考虑切换，减少 GC 停顿时间。
 
 > 📚 延伸阅读：[A Heap of Trouble](https://www.elastic.co/blog/a-heap-of-trouble)
@@ -2371,8 +2488,6 @@ ES JVM 内存不超过 32GB（利用 Compressed Oops），Xms 和 Xmx 设置相�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "内存越大越好" → 超过 32GB 后 Compressed Oops 失效，实际性能反而下降。
 - ❌ "Xms 和 Xmx 可以不同" → 不同会导致运行时内存重新分配，产生 GC 停顿。
@@ -2432,6 +2547,7 @@ ES 主机优化包括关闭 swap、合理设置堆内存、调整文件句柄数
 ::: details
 
 - 【L3】结合 ILM（Index Lifecycle Management）策略可自动化冷热分离和索引清理，见本文档「ES 如何实现索引生命周期管理（ILM）？」。
+
 - 【L4】对于搜索型索引，可使用 `searchable_snapshots`（可搜索快照）将冷数据存储在廉价存储（如 S3）上，降低成本。
 
 :::
@@ -2515,7 +2631,10 @@ graph TB
 
 ::: details
 
-- 【L3】**num_candidates** 控制搜索精度与性能的平衡：值越大结果越精确但速度越慢，建议设为 k 的 10-100 倍。
+- 【L3】**num_candidates** 控制搜索精度与性能的平衡
+
+  值越大结果越精确但速度越慢，建议设为 k 的 10-100 倍。
+
 - 【L4】ES 8.x 支持 **quantized kNN**（量化向量），将 float32 压缩为 int8，内存占用降 75%，精度损失极小。
 
 > 📚 延伸阅读：[Elasticsearch kNN Search](https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html)
@@ -2526,15 +2645,14 @@ graph TB
 
 ::: details
 
-某电商平台使用 ES 8.x 实现商品图片搜索：10 亿商品向量（768 维），16 节点集群，kNN 查询 P99 < 50ms。通过 `num_candidates=200`、`k=20` 配置，召回率达 95%+，日均处理 500 万次向量搜索请求。
+某电商平台使用 ES 8.x 实现商品图片搜索：10 亿商品向量（768 维），16 节点集群，kNN 查询 P99 < 50ms。通过 `num_candidates=200`、`k=20` 配置，召回率达 95%+，
+日均处理 500 万次向量搜索请求。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "kNN 是精确搜索" → kNN 基于 HNSW 是近似搜索（ANN），不是暴力遍历的精确 KNN，存在精度损失。
 - ❌ "向量维度越高越好" → 维度增加会导致 HNSW 索引膨胀和查询变慢，应根据场景选择合适的维度（常用 128-1024）。
@@ -2629,6 +2747,7 @@ graph LR
 ::: details
 
 - 【L3】ILM 策略通过 `index.lifecycle.name` 绑定到索引，配合 Index Template 可自动应用到新创建的索引。
+
 - 【L4】ES 8.x 引入了 **Searchable Snapshots**，可在 Cold 阶段将数据存储在 S3/HDFS 等廉价存储上，保持可搜索能力。
 
 > 📚 延伸阅读：[Index Lifecycle Management](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-lifecycle-management.html)
@@ -2639,15 +2758,14 @@ graph LR
 
 ::: details
 
-某日志平台日均写入 50GB 日志数据，使用 ILM 策略：Hot 阶段 7 天 Rollover、Warm 阶段 Shrink 到 1 分片并 Force Merge、Cold 阶段 30 天后迁入低成本存储（7.x 为冻结、8.x 为可搜索快照）、90 天自动删除。存储成本显著下降，运维基本零人工干预。
+某日志平台日均写入 50GB 日志数据，使用 ILM 策略：Hot 阶段 7 天 Rollover、Warm 阶段 Shrink 到 1 分片并 Force Merge、Cold 阶段 30 天后迁入低成本存储（7.x 为冻结、
+8.x 为可搜索快照）、90 天自动删除。存储成本显著下降，运维基本零人工干预。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "ILM 可以修改主分片数" → Shrink 只能减少分片数（且必须是原分片数的因子），不能增加。
 - ❌ "Warm 阶段索引不可写也不可读" → Warm 阶段索引不可写但可正常查询，只是资源占用被压缩。
@@ -2699,7 +2817,10 @@ POST _bulk
 
 ::: details
 
-- 【L3】**关闭 `_source`**：如果不需要 reindex 和高亮，可关闭以节省存储；**调大 indexing buffer**：`indices.memory.index_buffer_size: 20%`。
+- 【L3】**关闭 `_source`**
+
+  如果不需要 reindex 和高亮，可关闭以节省存储；**调大 indexing buffer**：`indices.memory.index_buffer_size: 20%`。
+
 - 【L4】对于超大规模初始加载（如数据迁移），可临时将 `number_of_replicas` 设为 0、`refresh_interval` 设为 `-1`，完成后恢复。
 
 :::
@@ -2708,15 +2829,14 @@ POST _bulk
 
 ::: details
 
-某数据平台日常写入吐量 10 万 docs/s，通过以下优化提升到 80 万 docs/s：Bulk size 调整为 5000 条/批、refresh_interval 设为 30s、translog 改为 async、写入期间副本数设为 0。集群 6 节点，日写入量 50GB。
+某数据平台日常写入吐量 10 万 docs/s，通过以下优化提升到 80 万 docs/s：Bulk size 调整为 5000 条/批、refresh_interval 设为 30s、translog 改为 async、
+写入期间副本数设为 0。集群 6 节点，日写入量 50GB。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Bulk 批量越大越好" → 过大的 Bulk 会导致单次请求占用过多内存，建议 5-15MB 或 500-1000 条/批。
 - ❌ "异步 Translog 没有风险" → 异步刷盘在节点崩溃时可能丢失最近一次刷盘间隔内的数据。
@@ -2766,7 +2886,9 @@ Doc Values 是索引时预构建的列式存储（磁盘、堆外），适用于
 ::: details
 
 - 【L3】Doc Values 采用列式存储，每个字段一个文件，对聚合/排序场景非常高效，但不支持 text 字段（因为 text 会被分词，无法列式存储）。
-- 【L4】高频聚合的 keyword 字段可开启 **eager_global_ordinals**，在 refresh 时即预先构建全局序号表（global ordinals），避免首次聚合承担构建开销（自早期版本即支持，并非 8.x 新增）。
+
+- 【L4】高频聚合的 keyword 字段可开启 **eager_global_ordinals**，在 refresh 时即预先构建全局序号表（global ordinals），避免首次聚合承担构建开销（自早期版本即支持，
+  并非 8.x 新增）。
 
 :::
 
@@ -2781,8 +2903,6 @@ Doc Values 是索引时预构建的列式存储（磁盘、堆外），适用于
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Doc Values 和 Fielddata 是一样的" → 存储位置、构建时机、OOM 风险完全不同，Doc Values 是堆外磁盘存储，Fielddata 是堆内存加载。
 - ❌ "text 字段也可以开启 Doc Values" → Doc Values 不支持 text 类型，text 字段只能用 Fielddata，建议改为 keyword。

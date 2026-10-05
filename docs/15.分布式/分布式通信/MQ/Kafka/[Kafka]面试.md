@@ -58,23 +58,28 @@ permalink: /pages/d8357cc5/
 
 #### 🔬 扩展知识
 
-**【L3】Kafka 的版本演进关键节点**
-
 ::: details
 
+- 【L3】Kafka 的版本演进关键节点
+
 - 0.9 版本引入全新 Consumer API，位移改存内部主题 `__consumer_offsets`，取代旧版基于 ZooKeeper 的存储。
+
 - 0.11 版本引入幂等 Producer 与事务机制，为 Exactly-Once 语义打下基础。
+
 - 2.8 版本预览 KRaft 模式（去 ZooKeeper），3.3 生产可用，4.0 彻底移除 ZooKeeper 支持。
+
 - 定位演进：从「发布订阅消息队列」演进为「事件流平台」（消息 + 存储 + 流计算一体化）。
 
 :::
 
-**【L4】事件流平台的三层能力**
-
 ::: details
 
+- 【L4】事件流平台的三层能力
+
 - **发布/订阅**：Producer/Consumer API，支持回放（按 Offset 重读历史数据，这是与传统 MQ 的关键差异）。
+
 - **存储**：分区日志 + 副本，数据可长期保留而非消费即弃。
+
 - **处理**：Kafka Streams / ksqlDB 提供流处理能力，Connect 提供与外部系统的数据集成。
 
 :::
@@ -195,11 +200,35 @@ Kafka 用删除保留近期流水，用压缩保留各键的最新状态。两�
 
 ::: details
 
-- 【L3】**Cleaner 的可清理范围**：`min.cleanable.dirty.ratio` 衡量是否值得清理，`min.compaction.lag.ms` 限制过早清理，`max.compaction.lag.ms` 限制等待进入可清理状态的时间；后者不保证在资源不足时按时完成物理清除。Cleaner 利用污浊区域建立的最新 offset 映射，也会重写相关干净段以淘汰旧值，而不只清理边界之后的数据。以 Kafka 3.9 为例，默认脏数据比例阈值为 0.5；Broker 的 `log.retention.hours=168`（7 天）、`log.retention.check.interval.ms=300000`（5 分钟）、`log.segment.bytes=1073741824`（1 GiB），实际以 Topic 覆盖和部署配置为准，不能据此承诺准点回收。
-- 【L3】**墓碑保留窗口**：`delete.retention.ms` 给重建状态的消费者留下看到墓碑的机会（Kafka 3.9 默认 86400000 毫秒，即 24 小时）；墓碑满足淘汰条件后仍要等后续清理，不能理解为从写入起定时精准删除。全量扫描若慢于有效保留窗口，可能漏掉删除事件；已经维护状态的消费者尤其要监控落后时间。
-- 【L3】**可观测与资源权衡**：压缩消耗 CPU、磁盘读写、去重映射内存及临时文件空间。结合键更新频率调整 Cleaner，关注 `kafka.log:type=LogCleanerManager` 等指标、清理积压、耗时、消费 lag 和磁盘余量；清理速度低于写入速度时，仅缩短保留时间未必能及时止损。
-- 【L4】**内部状态日志**：`__consumer_offsets`、`__transaction_state` 使用 compact，Kafka Connect 偏移存储、Kafka Streams changelog 也广泛依赖压缩。它们需要从保留状态恢复，而非重放所有中间事件；仅 compact 且没有墓碑时最新值才不会因时间自动淘汰，混用 delete 后不再保证永久可读。
-- 【L4】**管理操作与恢复边界**：需要删除整个主题时使用 `kafka-topics.sh --bootstrap-server <broker> --delete --topic <topic_name>`，并确认 `delete.topic.enable` 和权限；截断旧数据用受支持的 DeleteRecords 管理接口。不要把直接删除 `log.dirs` 下文件当作常规清理。`offsets.retention.minutes` 管的是消费组位移保留，不能恢复已被删除的业务日志；回溯窗口要调整业务 Topic 的 retention。
+- 【L3】**Cleaner 的可清理范围**
+
+  `min.cleanable.dirty.ratio` 衡量是否值得清理，`min.compaction.lag.ms` 限制过早清理，
+  `max.compaction.lag.ms` 限制等待进入可清理状态的时间；后者不保证在资源不足时按时完成物理清除。Cleaner 利用污浊区域建立的最新 offset 映射，也会重写相关干净段以淘汰旧值，而不只清理边界之后的数据。
+
+  以 Kafka 3.9 为例，默认脏数据比例阈值为 0.5；Broker 的 `log.retention.hours=168`（7 天）、`log.retention.check.interval.ms=300000`（5 分钟）、
+  `log.segment.bytes=1073741824`（1 GiB），实际以 Topic 覆盖和部署配置为准，不能据此承诺准点回收。
+
+- 【L3】**墓碑保留窗口**
+
+  `delete.retention.ms` 给重建状态的消费者留下看到墓碑的机会（Kafka 3.9 默认 86400000 毫秒，即 24 小时）；墓碑满足淘汰条件后仍要等后续清理，
+  不能理解为从写入起定时精准删除。全量扫描若慢于有效保留窗口，可能漏掉删除事件；已经维护状态的消费者尤其要监控落后时间。
+
+- 【L3】**可观测与资源权衡**
+
+  压缩消耗 CPU、磁盘读写、去重映射内存及临时文件空间。结合键更新频率调整 Cleaner，关注 `kafka.log:type=LogCleanerManager` 等指标、清理积压、耗时、
+  消费 lag 和磁盘余量；清理速度低于写入速度时，仅缩短保留时间未必能及时止损。
+
+- 【L4】**内部状态日志**
+
+  `__consumer_offsets`、`__transaction_state` 使用 compact，Kafka Connect 偏移存储、
+  Kafka Streams changelog 也广泛依赖压缩。它们需要从保留状态恢复，而非重放所有中间事件；仅 compact 且没有墓碑时最新值才不会因时间自动淘汰，混用 delete 后不再保证永久可读。
+
+- 【L4】**管理操作与恢复边界**
+
+  需要删除整个主题时使用 `kafka-topics.sh --bootstrap-server <broker> --delete --topic <topic_name>`，
+  并确认 `delete.topic.enable` 和权限；截断旧数据用受支持的 DeleteRecords 管理接口。不要把直接删除 `log.dirs` 下文件当作常规清理。
+
+  `offsets.retention.minutes` 管的是消费组位移保留，不能恢复已被删除的业务日志；回溯窗口要调整业务 Topic 的 retention。
 
 > 📚 延伸阅读：[Kafka 官方文档 - Log Compaction](https://kafka.apache.org/documentation/#compaction)
 
@@ -208,8 +237,6 @@ Kafka 用删除保留近期流水，用压缩保留各键的最新状态。两�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “压缩就是消息体压缩，或者写入时按 Key 覆盖” → Compaction 是后台去掉键的旧版本，与 Gzip/Snappy 编码压缩不同；消费者仍可能读到多个版本。
 - ❌ “墓碑是 key=null，保留时间一到便立即清除” → 墓碑必须有 Key 且 value 为 null；可清理条件与实际清理完成之间存在异步延迟。
@@ -257,18 +284,29 @@ Kafka 先按起始偏移量找日志段，再用稀疏索引定位段内位置�
 
 ::: details
 
-- 【L3】**紧凑布局与稀疏间隔**：offset 索引项由 4 字节相对 offset 和 4 字节 position 构成；时间索引项为 8 字节时间戳加 4 字节相对 offset。例如设置 `index.interval.bytes=4096`，大致每累积 4 KiB 数据增加索引项，实际插入受记录批次边界影响。间隔越小，定位后的扫描通常越短，但索引大小和维护成本越高。
-- 【L3】**查找成本须算扫描**：设段数为 S、段内索引项数为 I、需扫描记录量为 K，offset 定位可概括为 O(log S + log I + K)。压缩造成的 offset 空洞要跳到下一条存活记录；时间戳乱序、跨段查找也可能扩大扫描范围，不能承诺所有时间查询都是固定的“两次二分”。
-- 【L3】**恢复检查的边界**：索引不像消息记录那样逐条带 CRC，恢复依赖结构、范围等检查及日志扫描重建；并非任意位损坏都必然被立即识别。修复应在受控停机或恢复流程中操作，保留原始日志并考虑重建带来的启动 IO。
-- 【L4】**不是全量索引，也不是只打开活跃段**：Kafka 的典型消费是顺序拉取，不应简单归为“写多读少”；给每条消息建稠密索引会增加空间和写路径工作，但不必然与数据同量级。MMAP 的按需缺页加载不等于只为活跃段建立映射，冷段回放仍可能产生磁盘 IO。
+- 【L3】**紧凑布局与稀疏间隔**
+
+  offset 索引项由 4 字节相对 offset 和 4 字节 position 构成；时间索引项为 8 字节时间戳加 4 字节相对 offset。
+
+  例如设置 `index.interval.bytes=4096`，大致每累积 4 KiB 数据增加索引项，实际插入受记录批次边界影响。间隔越小，定位后的扫描通常越短，但索引大小和维护成本越高。
+
+- 【L3】**查找成本须算扫描**
+
+  设段数为 S、段内索引项数为 I、需扫描记录量为 K，offset 定位可概括为 O(log S + log I + K)。压缩造成的 offset 空洞要跳到下一条存活记录；时间戳乱序、
+  跨段查找也可能扩大扫描范围，不能承诺所有时间查询都是固定的“两次二分”。
+
+- 【L3】**恢复检查的边界**
+
+  索引不像消息记录那样逐条带 CRC，恢复依赖结构、范围等检查及日志扫描重建；并非任意位损坏都必然被立即识别。修复应在受控停机或恢复流程中操作，保留原始日志并考虑重建带来的启动 IO。
+
+- 【L4】**不是全量索引，也不是只打开活跃段**：Kafka 的典型消费是顺序拉取，不应简单归为“写多读少”；给每条消息建稠密索引会增加空间和写路径工作，但不必然与数据同量级。MMAP 的按需缺页加载不等于只为活跃段建立映射，
+  冷段回放仍可能产生磁盘 IO。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “二分索引能直接返回每一条消息，复杂度总是 O(1)” → 稀疏索引只给扫描起点，还需读日志并定位记录；总成本包括顺序扫描和 IO。
 - ❌ “索引坏了随时删，数据肯定安全” → 索引可再生的前提是日志完整并进入合适的恢复流程；不要在线操作正在映射的文件。
@@ -331,20 +369,23 @@ Kafka 生产者用一个 `ProducerRecord` 对象来抽象一条要发送的消�
 
 #### 🔬 扩展知识
 
-**【L3】缓冲区结构与阻塞行为**
-
 ::: details
 
-- 批次缓冲由 `RecordAccumulator` 管理，按「分区」分组攒批，总内存受 `buffer.memory`（默认 32MB）限制；缓冲区满时 `send()` 会阻塞，超过 `max.block.ms` 抛异常，这是生产端限流的天然背压点。
+- 【L3】缓冲区结构与阻塞行为
+
+- 批次缓冲由 `RecordAccumulator` 管理，按「分区」分组攒批，总内存受 `buffer.memory`（默认 32MB）限制；缓冲区满时 `send()` 会阻塞，超过 `max.block.ms` 抛异常，
+  这是生产端限流的天然背压点。
+
 - 批次触发发送有两个条件：批大小达到 `batch.size`（默认 16KB）或等待超过 `linger.ms`（默认 0），高吞吐场景常配套调大两者。
 
 :::
 
-**【L4】元数据缓存的失效与更新**
-
 ::: details
 
+- 【L4】元数据缓存的失效与更新
+
 - 当发送遇到 `NOT_LEADER_OR_FOLLOWER` 等错误时，Producer 会刷新元数据重新定位分区 Leader，而不是盲目重试旧地址；`metadata.max.age.ms`（默认 5 分钟）控制元数据的定期刷新。
+
 - 这也是为什么 `bootstrap.servers` 只是初始入口：Producer 最终会与分区 Leader 所在 Broker 直连，集群扩缩容对客户端基本透明。
 
 :::
@@ -405,21 +446,24 @@ Kafka 消费者从属于消费者群组，**一个群组里的 Consumer 订阅�
 
 #### 🔬 扩展知识
 
-**【L3】点对点与发布订阅的统一**
-
 ::: details
 
+- 【L3】点对点与发布订阅的统一
+
 - 传统 MQ 里点对点（队列）和发布订阅（广播）是两种模型；Kafka 用消费者组把两者统一：一个组内多消费者是点对点分摊，多个组各自消费全量消息就是广播。
+
 - 每个组独立维护自己的消费进度（存在内部主题 `__consumer_offsets`），组间互不影响，新增下游系统只需新建一个组从头/从尾消费，不改生产端。
 
 :::
 
-**【L4】静态成员与再均衡代价**
-
 ::: details
 
+- 【L4】静态成员与再均衡代价
+
 - 0.9 新 Consumer API 后位移不再存 ZooKeeper，而是存 `__consumer_offsets`，提交位移成为消费者端可靠性设计的核心动作。
-- 成员频繁上下线会反复触发 rebalance（全组停消费）；可通过 `group.instance.id` 静态成员、调大 `session.timeout.ms` 缓解，详见本文档『Kafka 分区再均衡如何工作？如何减少触发与影响？』。
+
+- 成员频繁上下线会反复触发 rebalance（全组停消费）；可通过 `group.instance.id` 静态成员、调大 `session.timeout.ms` 缓解，
+  详见本文档『Kafka 分区再均衡如何工作？如何减少触发与影响？』。
 
 :::
 
@@ -462,20 +506,25 @@ Kafka 消费者通过 `pull` 模式来获取消息，但是获取消息时并不
 
 #### 🔬 扩展知识
 
-**【L3】为什么选 pull 而不是 push？**
-
 ::: details
 
-- push 模式下 Broker 无法感知消费者处理能力，推快了会把消费者打爆（堆积/崩溃）；pull 让消费者按自身能力控制拉取速率，天然背压，也便于回溯（把 offset 往回拨即可重读）。
-- 代价是空轮询与延迟：Broker 用 `fetch.min.bytes`（默认 1B）+ `fetch.max.wait.ms`（默认 500ms）折中“攒够再返回”，消费端用 `max.poll.records`（默认 500）控制单批条数。
+- 【L3】为什么选 pull 而不是 push？
+
+  push 模式下 Broker 无法感知消费者处理能力，推快了会把消费者打爆（堆积/崩溃）；
+  pull 让消费者按自身能力控制拉取速率，天然背压，也便于回溯（把 offset 往回拨即可重读）。
+
+- 代价是空轮询与延迟：Broker 用 `fetch.min.bytes`（默认 1B）+ `fetch.max.wait.ms`（默认 500ms）折中“攒够再返回”，
+  消费端用 `max.poll.records`（默认 500）控制单批条数。
 
 :::
 
-**【L4】心跳与 poll 的分离**
-
 ::: details
 
-- 0.10.1 起心跳从 poll 中拆出，由独立后台线程发送；`session.timeout.ms` 控制心跳超时，而 `max.poll.interval.ms`（默认 5 分钟）控制两次 poll 的最大间隔，处理太慢同样会被踢出组触发 rebalance。
+- 【L4】心跳与 poll 的分离
+
+- 0.10.1 起心跳从 poll 中拆出，由独立后台线程发送；`session.timeout.ms` 控制心跳超时，而 `max.poll.interval.ms`（默认 5 分钟）控制两次 poll 的最大间隔，
+  处理太慢同样会被踢出组触发 rebalance。
+
 - 这两个超时参数是消费端稳定性调优的核心：前者防网络/短暂故障误判，后者防慢处理连环踢出。
 
 :::
@@ -520,20 +569,23 @@ Kafka 的数据结构采用三级结构，即：主题（Topic）、分区（Par
 
 #### 🔬 扩展知识
 
-**【L3】分区数的双重约束**
-
 ::: details
 
+- 【L3】分区数的双重约束
+
 - 分区数决定消费端最大并行度（组内消费者数上限），也决定生产端批量写入的并行度；但分区不是越多越好，每个分区占用文件句柄、内存与 Leader 选举开销，单 Broker 建议控制在数千分区量级以内。
+
 - 分区数只能增不能减：缩分区需要跨日志重排 offset 与重分布副本，Kafka 不提供该能力，所以建 Topic 时应按未来 1~2 年峰值一次性规划。
 
 :::
 
-**【L4】分区与顺序、热点的关系**
-
 ::: details
 
-- Kafka 只保证分区内有序；需要局部有序时用 Key 哈希把相关消息路到同一分区。开幂等后 `max.in.flight.requests.per.connection≤5` 仍保序，详见《MQ面试》『如何保证 MQ 消息的顺序性？』。
+- 【L4】分区与顺序、热点的关系
+
+- Kafka 只保证分区内有序；需要局部有序时用 Key 哈希把相关消息路到同一分区。开幂等后 `max.in.flight.requests.per.connection≤5` 仍保序，
+  详见《MQ面试》『如何保证 MQ 消息的顺序性？』。
+
 - 分区键选低基数字段（如地区码）会造成热点分区；选高基数字段（user_id、order_id）才能分散，详见本文档『Kafka 如何处理数据倾斜问题？』。
 
 :::
@@ -585,20 +637,22 @@ Kafka 通过分区实现生产、消费的负载均衡。
 
 #### 🔬 扩展知识
 
-**【L3】粘性分区器为什么成为无 Key 消息的默认**
-
 ::: details
 
+- 【L3】粘性分区器为什么成为无 Key 消息的默认
+
 - 纯轮询每条消息换分区，批次永远攒不大；粘性分区器（2.4+ 默认）把一个批次尽量塞进同一分区直到 `batch.size` 填满再切换，既保均衡又提高攒批效率，减少 Broker 端请求次数。
+
 - 注意：粘性只影响无 Key 消息；有 Key 消息仍走哈希，同 Key 同分区的顺序语义不变。
 
 :::
 
-**【L4】消费端策略的选择陷阱**
-
 ::: details
 
+- 【L4】消费端策略的选择陷阱
+
 - Range 按主题独立分配，订阅多主题时前几个消费者会系统性多拿分区，造成热点；跨主题订阅场景应改用 RoundRobin 或 Sticky。
+
 - Sticky/CooperativeSticky 在 rebalance 时尽量保留旧分配，显著减少分区迁移带来的重复消费与状态重建开销，生产推荐 Co-operative 粘性策略（增量再均衡）。
 
 :::
@@ -645,11 +699,35 @@ A：策略只是路由规则，落地对象是分区本身——每个分区是�
 
 ::: details
 
-- 【L3】**存活与处理进度是两条线**：经典 Java 消费者自 0.10.1 起用后台线程发送心跳；`heartbeat.interval.ms`（Kafka 3.9 经典协议默认 3000 毫秒）应明显小于 `session.timeout.ms`，为重试留余量。单纯调大心跳间隔反而减少重试机会；会话超时可按网络抖动、GC 和 Broker 允许范围适度放宽，但会延迟故障接管。`max.poll.interval.ms` 限制处理循环的 poll 间隔，即使心跳正常也可能超时；普通动态成员需重新入组，静态成员的最终分区释放还受会话超时约束。
-- 【L3】**阻断慢处理循环并交接位点**：处理慢 → poll 超时 → 再均衡 → 已处理未提交的数据重拉 → 处理更慢。应减小 `max.poll.records`、优化下游，必要时按实测批次耗时放宽 `max.poll.interval.ms`；异步处理须限制在途任务并保序，不能跨过未完成记录提交。`onPartitionsRevoked` 中对撤销分区提交已连续处理完成的下一 offset，必要时同步提交；所有权已丢失的 `onPartitionsLost` 不应再假定能安全提交，失败要记录并靠幂等承接重放。
-- 【L3】**静态成员的前提**：Kafka 2.3 引入 `group.instance.id`，需绑定稳定且唯一的部署身份。只有原身份在会话过期前回来、订阅与组状态兼容等条件成立时，短暂重启才可能保留分配；45 秒不是万能超时。重复身份会触发 fencing（经典协议可见 `FENCED_INSTANCE_ID`），不是部署两个同名实例来抢占旧实例。
-- 【L4】**协议升级不能偷换概念**：经典组启用 Cooperative 要确认客户端支持，通过 `partition.assignment.strategy` 按兼容策略进行滚动迁移；仅改一个成员的配置不保证全组立即切换。新 `consumer` 协议采用不同的成员协调和服务端分配机制，不能套用本题的客户端群主、JoinGroup/SyncGroup 或经典心跳参数结论，须按目标版本单独评估。
-- 【L4】**提交失败不等于数据丢失**：未提交成功的已处理记录通常会重放，造成重复；先提交后处理，或异步处理时跳过未完成记录提交，才可能让后续消费者跳过业务处理。提交成功的位点持久化仍依赖 `__consumer_offsets` 的副本可靠性；再均衡本身不是删除日志的操作。
+- 【L3】**存活与处理进度是两条线**
+
+  经典 Java 消费者自 0.10.1 起用后台线程发送心跳；
+  `heartbeat.interval.ms`（Kafka 3.9 经典协议默认 3000 毫秒）应明显小于 `session.timeout.ms`，为重试留余量。单纯调大心跳间隔反而减少重试机会；会话超时可按网络抖动、
+  GC 和 Broker 允许范围适度放宽，但会延迟故障接管。`max.poll.interval.ms` 限制处理循环的 poll 间隔，即使心跳正常也可能超时；普通动态成员需重新入组，静态成员的最终分区释放还受会话超时约束。
+
+- 【L3】**阻断慢处理循环并交接位点**
+
+  处理慢 → poll 超时 → 再均衡 → 已处理未提交的数据重拉 → 处理更慢。应减小 `max.poll.records`、优化下游，
+  必要时按实测批次耗时放宽 `max.poll.interval.ms`；异步处理须限制在途任务并保序，不能跨过未完成记录提交。`onPartitionsRevoked` 中对撤销分区提交已连续处理完成的下一 offset，必要时同步提交；
+  所有权已丢失的 `onPartitionsLost` 不应再假定能安全提交，失败要记录并靠幂等承接重放。
+
+- 【L3】**静态成员的前提**
+
+  Kafka 2.3 引入 `group.instance.id`，需绑定稳定且唯一的部署身份。只有原身份在会话过期前回来、订阅与组状态兼容等条件成立时，短暂重启才可能保留分配；45 秒不是万能超时。
+
+  重复身份会触发 fencing（经典协议可见 `FENCED_INSTANCE_ID`），不是部署两个同名实例来抢占旧实例。
+
+- 【L4】**协议升级不能偷换概念**
+
+  经典组启用 Cooperative 要确认客户端支持，通过 `partition.assignment.strategy` 按兼容策略进行滚动迁移；仅改一个成员的配置不保证全组立即切换。
+
+  新 `consumer` 协议采用不同的成员协调和服务端分配机制，不能套用本题的客户端群主、JoinGroup/SyncGroup 或经典心跳参数结论，须按目标版本单独评估。
+
+- 【L4】**提交失败不等于数据丢失**
+
+  未提交成功的已处理记录通常会重放，造成重复；先提交后处理，或异步处理时跳过未完成记录提交，才可能让后续消费者跳过业务处理。
+
+  提交成功的位点持久化仍依赖 `__consumer_offsets` 的副本可靠性；再均衡本身不是删除日志的操作。
 
 :::
 
@@ -657,19 +735,29 @@ A：策略只是路由规则，落地对象是分区本身——每个分区是�
 
 ::: details
 
-**容量推演，非生产实测**：8 个实例消费 64 分区，假设均匀流量共 2.5 万条/秒。Eager 一轮全组暂停 10～20 秒，将增加约 25～50 万条 lag；若恢复后的净追赶能力只有 556 条/秒，50 万条约需 15 分钟追平。频繁重启会叠加暂停，不能只盯单轮耗时。
+**容量推演，非生产实测**：8 个实例消费 64 分区，假设均匀流量共 2.5 万条/秒。
 
-**处置与验算**：迁移到 Cooperative，假设同样暂停 20 秒但只影响 8 个分区，则增量积压约为 `25000 × 20 × 8/64 = 62500` 条；实际结果取决于分区倾斜和交接耗时，不承诺必然“秒级恢复、万级以内”。使用稳定 `group.instance.id`，只有重启与重入组耗时的高分位加余量小于会话窗口时，才考虑例如 `session.timeout.ms=45000` 的测试配置；超时越大，真正故障时这些分区闲置越久。错峰重启并限制发布并发，先修复慢处理再扩容。
+Eager 一轮全组暂停 10～20 秒，将增加约 25～50 万条 lag；若恢复后的净追赶能力只有 556 条/秒，50 万条约需 15 分钟追平。
 
-**验证指标**：联合观察客户端 rebalance 次数、`rebalance-latency-avg/max`、`failed-rebalance-total`（名称以客户端版本为准）、poll 间隔、提交失败、分区撤销量和 lag；经典组反复在 `Stable/PreparingRebalance` 间切换要排查原因。比较变更前后单轮暂停、迁移分区数和追平时间，不能用“没报错”代替验证。
+频繁重启会叠加暂停，不能只盯单轮耗时。
+
+**处置与验算**：迁移到 Cooperative，假设同样暂停 20 秒但只影响 8 个分区，则增量积压约为 `25000 × 20 × 8/64 = 62500` 条；
+
+实际结果取决于分区倾斜和交接耗时，不承诺必然“秒级恢复、万级以内”。
+
+使用稳定 `group.instance.id`，只有重启与重入组耗时的高分位加余量小于会话窗口时，才考虑例如 `session.timeout.ms=45000` 的测试配置；超时越大，真正故障时这些分区闲置越久。
+
+错峰重启并限制发布并发，先修复慢处理再扩容。
+
+**验证指标**：联合观察客户端 rebalance 次数、`rebalance-latency-avg/max`、`failed-rebalance-total`（名称以客户端版本为准）、poll 间隔、提交失败、分区撤销量和 lag；
+
+经典组反复在 `Stable/PreparingRebalance` 间切换要排查原因。比较变更前后单轮暂停、迁移分区数和追平时间，不能用“没报错”代替验证。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “再均衡永远全组停，Sticky 就是增量协议” → 全组撤销是 Eager 行为；Sticky 只保持分配黏性，Cooperative 才缩小撤销范围，但也不能承诺所有调用都完全无暂停。
 - ❌ “调大心跳间隔就能降低误判，心跳正常就不会离组” → 必须分别评估会话失活与 poll 超时，调大心跳间隔本身不是降低误判的方法。
@@ -734,30 +822,42 @@ ISR 是一个动态集合：Follower 落后 Leader 超过 `replica.lag.time.max.
 
 #### 🔬 扩展知识
 
-**【L3】ISR 收缩与 acks=all 的联动失效**
-
 ::: details
 
-- `acks=all` 的“all”指当时 ISR 全部副本；若 `min.insync.replicas=1`（默认）且 ISR 收缩到只剩 Leader，acks=all 退化为写单副本，Leader 宕机即丢。所以 acks=all 必须与 `min.insync.replicas≥2` 配套，详见《MQ面试》『如何保证 MQ 消息不丢失？』。
+- 【L3】ISR 收缩与 acks=all 的联动失效
+
+- `acks=all` 的“all”指当时 ISR 全部副本；若 `min.insync.replicas=1`（默认）且 ISR 收缩到只剩 Leader，acks=all 退化为写单副本，Leader 宕机即丢。
+
+  所以 acks=all 必须与 `min.insync.replicas≥2` 配套，详见《MQ面试》『如何保证 MQ 消息不丢失？』。
+
 - ISR 收缩还可能触发 Producer 端重试风暴：写入被拒后重试叠加元数据刷新，进一步压垮集群，形成恶性循环。
 
 :::
 
-**【L4】LEO 与 HW：ISR 收缩为什么会牵动数据可见性与丢失**
-
 ::: details
 
-- 每个副本各自维护 **LEO（Log End Offset，下一条待写消息的 offset）**；**HW（High Watermark）取 ISR 中最小的 LEO**，消费者只能读到 HW 之前的消息，Leader 收到 Fetch 请求时据此推进 HW。ISR 收缩会改变「最小 LEO」的参与者集合，直接影响消息可见时点。
-- 早期版本（0.11 之前）Follower 重启后会按 HW 截断（truncate）本地日志再同步，存在著名的**竞态丢数据窗口**：刚当选的 Leader 与截断后的 Follower 可能永久丢掉已提交消息。0.11 引入 **Leader Epoch（KIP-101）**后，Follower 重启不再盲目按 HW 截断，而是向 Leader 查询该 epoch 的结束位点再决定截断位置，修复了这类丢失。
-- 这也解释了「为什么 HW 之前的消息才算已提交」：acks=all 的提交语义 = 消息进入 ISR 全体副本日志且 HW 越过它；一旦允许 unclean 选举，新 Leader 的日志可能不含这些「已提交」消息，HW 语义被破坏，即表现为丢数据。
+- 【L4】LEO 与 HW
+
+  ISR 收缩为什么会牵动数据可见性与丢失
+
+- 每个副本各自维护 **LEO（Log End Offset，下一条待写消息的 offset）**；**HW（High Watermark）取 ISR 中最小的 LEO**，消费者只能读到 HW 之前的消息，
+  Leader 收到 Fetch 请求时据此推进 HW。ISR 收缩会改变「最小 LEO」的参与者集合，直接影响消息可见时点。
+
+- 早期版本（0.11 之前）Follower 重启后会按 HW 截断（truncate）本地日志再同步，存在著名的**竞态丢数据窗口**：刚当选的 Leader 与截断后的 Follower 可能永久丢掉已提交消息。
+
+  0.11 引入 **Leader Epoch（KIP-101）**后，Follower 重启不再盲目按 HW 截断，而是向 Leader 查询该 epoch 的结束位点再决定截断位置，修复了这类丢失。
+
+- 这也解释了「为什么 HW 之前的消息才算已提交」：acks=all 的提交语义 = 消息进入 ISR 全体副本日志且 HW 越过它；一旦允许 unclean 选举，新 Leader 的日志可能不含这些「已提交」消息，HW 语义被破坏，
+  即表现为丢数据。
 
 :::
 
-**【L4】定位 ISR 抖动的排查顺序**
-
 ::: details
 
+- 【L4】定位 ISR 抖动的排查顺序
+
 - 先看范围：单 Broker 上的分区集体收缩 → 该 Broker 自身问题（磁盘/GC/网卡）；跨 Broker 零散收缩 → 网络或流量突增。
+
 - 再看指标：Follower 的 `ReplicaFetcherManager` 拉取延迟、磁盘 util、GC 日志、`replica.lag.time.max.ms` 命中次数；最后看 Leader 端写入速率是否突增导致复制追不上。
 
 :::
@@ -766,17 +866,20 @@ ISR 是一个动态集合：Follower 落后 Leader 超过 `replica.lag.time.max.
 
 ::: details
 
-**场景（推演）**：某集群 3 副本、`min.insync.replicas=2`，某台 Broker 磁盘老化，写入延迟 P99 从 5ms 恶化到 80ms，其上数百个 Follower 持续落后超 30s 被踢出 ISR，`UnderReplicatedPartitions` 持续 > 200；期间若叠加另一台 Broker 重启，部分分区 ISR 仅剩 1，Producer 报 `NotEnoughReplicas`，写入被拒约 2 分钟。
+**场景（推演）**：某集群 3 副本、`min.insync.replicas=2`，某台 Broker 磁盘老化，写入延迟 P99 从 5ms 恶化到 80ms，其上数百个 Follower 持续落后超 30s 被踢出 ISR，
+`UnderReplicatedPartitions` 持续 > 200；期间若叠加另一台 Broker 重启，部分分区 ISR 仅剩 1，Producer 报 `NotEnoughReplicas`，写入被拒约 2 分钟。
 
-**处置**：① 短期调大该慢盘 Broker 的 `replica.lag.time.max.ms` 到 60s 减少抖动踢出；② 用 `kafka-reassign-partitions` 把热点分区副本迁到健康盘；③ 建立磁盘延迟与 UnderReplicated 联动告警，磁盘 P99 > 50ms 即预警。（数据为推演示例，非真实生产数据）
+**处置**：① 短期调大该慢盘 Broker 的 `replica.lag.time.max.ms` 到 60s 减少抖动踢出；
+
+② 用 `kafka-reassign-partitions` 把热点分区副本迁到健康盘；
+
+③ 建立磁盘延迟与 UnderReplicated 联动告警，磁盘 P99 > 50ms 即预警。（数据为推演示例，非真实生产数据）
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “ISR 收缩只是告警，不影响业务” → 错。它直接降低 `acks=all` 的保障副本数，叠加 `min.insync.replicas` 不满足时写入直接被拒，且 Leader 宕机时可选新主变少。
 - ❌ “把 `replica.lag.time.max.ms` 调到很大就能根治” → 错。只是把“踢出”推迟了，真正落后太多的副本依然选不得主；治本要解决磁盘/网络/GC 瓶颈。
@@ -829,20 +932,23 @@ A：设成等于副本数时，任一副本挂掉即无法满足写入条件，�
 
 #### 🔬 扩展知识
 
-**【L3】MirrorMaker 2 的关键改进**
-
 ::: details
 
-- MM2（2.4 起内置）基于 Kafka Connect 框架重写：自动同步 Topic 与配置、支持 Active-Active 双向复制（Topic 名加源集群前缀防循环复制）、提供 offset 转换工具（把源集群位点映射到目标集群，切换消费组时不重消费/不漏消费）。
+- 【L3】MirrorMaker 2 的关键改进
+
+- MM2（2.4 起内置）基于 Kafka Connect 框架重写：自动同步 Topic 与配置、支持 Active-Active 双向复制（Topic 名加源集群前缀防循环复制）、
+  提供 offset 转换工具（把源集群位点映射到目标集群，切换消费组时不重消费/不漏消费）。
+
 - 跨机房容灾切换时，用 MM2 的 `__consumer_offsets` 内部主题映射能力尽量接近“无缝切流”，但仍需接受秒级~分钟级复制延迟带来的少量重复或延迟窗口。
 
 :::
 
-**【L4】复制链路的顺序与幂等边界**
-
 ::: details
 
+- 【L4】复制链路的顺序与幂等边界
+
 - MM 保证同分区内顺序（源分区 → 目标分区内有序），但目标集群的 offset 与源集群不一致，跨集群对账不能直接用 offset。
+
 - 故障恢复后 MM 从自身位点继续（断点续传），但极端情况下可能重复复制，下游消费仍需幂等。
 
 :::
@@ -893,11 +999,31 @@ Controller 负责元数据和分区选主，不转发业务消息。故障恢复
 
 ::: details
 
-- 【L3】**epoch 是 fencing 令牌，不是数据副本位点**：ZK 的 controller epoch 由 `/controller_epoch` 维护，控制请求的新旧由接收端校验；不存在用于此目的的普通内部 Topic `__controller_epoch`。分区 leader epoch、控制器任期与消费 offset 各司其职，`__consumer_offsets` 也不是 Controller 恢复的元数据仓库。
-- 【L3】**恢复耗时拆解**：故障检测、Controller 选举、状态恢复、事件队列排队、分区选举及 Broker/客户端感知都会贡献耗时。ZK 全量加载受元数据规模影响，KRaft 热备能减少重复重建，但备用节点落后、磁盘慢或队列阻塞仍会拖慢切换；应监控活动 Controller 数、离线分区、事件队列等待和元数据复制进度。
-- 【L3】**重新选 Leader 不等于重建副本**：Controller 按既有副本分配恢复分区服务，也执行显式提交的副本迁移任务；Broker 宕机不会自动在任意空闲 Broker 上补足副本数或完成全局负载均衡。需要修复故障 Broker，或由管理操作、外部运维系统发起重分配并等待复制追平。
-- 【L4】**控制面失效不是数据面绝对无感**：若仅控制器角色短暂缺失，健康存量分区通常仍能读写；创建 Topic、分区 Leader 重选等操作会阻塞。ZK 兼任 Controller 的 Broker 整机宕机时，其承载的业务分区也会故障；KRaft 长期失去多数派后也无法持续完成控制面推进，不能外推成无限期正常服务。
-- 【L4】**角色与版本**：KRaft 在 2.8 预览、3.3 生产可用，4.0 移除 ZK 模式；Controller 可以 combined 或 separated 部署，生产通常分离以隔离数据 IO 和故障域。Raft 元数据共识不是把普通业务分区复制统一改成 Raft，也不提供固定“亚秒级恢复”承诺。
+- 【L3】**epoch 是 fencing 令牌，不是数据副本位点**：ZK 的 controller epoch 由 `/controller_epoch` 维护，控制请求的新旧由接收端校验；
+  不存在用于此目的的普通内部 Topic `__controller_epoch`。分区 leader epoch、控制器任期与消费 offset 各司其职，
+  `__consumer_offsets` 也不是 Controller 恢复的元数据仓库。
+
+- 【L3】**恢复耗时拆解**
+
+  故障检测、Controller 选举、状态恢复、事件队列排队、分区选举及 Broker/客户端感知都会贡献耗时。ZK 全量加载受元数据规模影响，KRaft 热备能减少重复重建，但备用节点落后、
+  磁盘慢或队列阻塞仍会拖慢切换；应监控活动 Controller 数、离线分区、事件队列等待和元数据复制进度。
+
+- 【L3】**重新选 Leader 不等于重建副本**
+
+  Controller 按既有副本分配恢复分区服务，也执行显式提交的副本迁移任务；Broker 宕机不会自动在任意空闲 Broker 上补足副本数或完成全局负载均衡。
+
+  需要修复故障 Broker，或由管理操作、外部运维系统发起重分配并等待复制追平。
+
+- 【L4】**控制面失效不是数据面绝对无感**
+
+  若仅控制器角色短暂缺失，健康存量分区通常仍能读写；创建 Topic、分区 Leader 重选等操作会阻塞。ZK 兼任 Controller 的 Broker 整机宕机时，
+  其承载的业务分区也会故障；KRaft 长期失去多数派后也无法持续完成控制面推进，不能外推成无限期正常服务。
+
+- 【L4】**角色与版本**
+
+  KRaft 在 2.8 预览、3.3 生产可用，4.0 移除 ZK 模式；Controller 可以 combined 或 separated 部署，生产通常分离以隔离数据 IO 和故障域。
+
+  Raft 元数据共识不是把普通业务分区复制统一改成 Raft，也不提供固定“亚秒级恢复”承诺。
 
 :::
 
@@ -905,17 +1031,21 @@ Controller 负责元数据和分区选主，不转发业务消息。故障恢复
 
 ::: details
 
-**故障演练推演，非生产实测**：ZK 集群有 3 台 Broker、某 Topic 共 60 分区且 3 副本，假设 Leader 均匀分布，兼任 Controller 的 Broker 宕机，约 20 个 Leader 分区需要选主，其余 40 个通常可继续工作。先等待 ZK 会话失效和新 Controller 恢复，再验证这 20 个分区是否有存活 ISR 可接管；不能把整段中断归结为 Controller 选举，也不能把选主完成当成副本数恢复。
+**故障演练推演，非生产实测**：
 
-**KRaft 对照**：独立部署 3 个 Controller，失去 1 个仍有 2 个构成多数派，失去 2 个则无法提交元数据变更。演练分别记录检测耗时、当选到状态就绪耗时、离线分区恢复耗时以及客户端重试量；若发现副本欠冗余，修复 Broker 或执行受控重分配，不预设恢复必然少于 1 秒。
+ZK 集群有 3 台 Broker、某 Topic 共 60 分区且 3 副本，假设 Leader 均匀分布，兼任 Controller 的 Broker 宕机，约 20 个 Leader 分区需要选主，其余 40 个通常可继续工作。
+
+先等待 ZK 会话失效和新 Controller 恢复，再验证这 20 个分区是否有存活 ISR 可接管；不能把整段中断归结为 Controller 选举，也不能把选主完成当成副本数恢复。
+
+**KRaft 对照**：独立部署 3 个 Controller，失去 1 个仍有 2 个构成多数派，失去 2 个则无法提交元数据变更。
+
+演练分别记录检测耗时、当选到状态就绪耗时、离线分区恢复耗时以及客户端重试量；若发现副本欠冗余，修复 Broker 或执行受控重分配，不预设恢复必然少于 1 秒。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “Controller 是永远独立部署的进程，宕机也绝不影响消息” → ZK 模式由 Broker 兼任，整机故障会同时影响该机的数据分区；KRaft 也可配置合并角色。
 - ❌ “一断开 ZK 连接，临时节点就立即删除” → 临时节点绑定会话，要区分短暂断连与会话关闭、过期，错误等同会低估故障检测时间。
@@ -985,20 +1115,24 @@ Kafka 高可用 = 数据冗余（多副本） + 自动容灾（Leader 自动切�
 
 #### 🔬 扩展知识
 
-**【L3】高可用配置的“铁三角”**
-
 ::: details
 
-- `replication.factor=3` + `min.insync.replicas=2` + `unclean.leader.election.enable=false`（0.11+ 默认）是业务 Topic 的标准答案：容忍单副本故障不丢数据，且只从 ISR 选主。
+- 【L3】高可用配置的“铁三角”
+
+- `replication.factor=3` + `min.insync.replicas=2` + `unclean.leader.election.enable=false`（0.11+ 默认）是业务 Topic 的标准答案：
+
+  容忍单副本故障不丢数据，且只从 ISR 选主。
+
 - 跨机架部署（`broker.rack`）把故障域从机器提升到机柜：单机架断电时仍能凑齐 min.insync.replicas。
 
 :::
 
-**【L4】消费端与生产端的高可用盲区**
-
 ::: details
 
+- 【L4】消费端与生产端的高可用盲区
+
 - 服务端高可用不等于端到端高可用：生产端不开 acks=all/重试会丢，消费端自动提交会丢/重，两端配置需配套，详见《MQ面试》『如何保证 MQ 消息不丢失？』。
+
 - KRaft 模式（3.3 生产可用）进一步消除了 ZK 集群这个外部单点：元数据由 Controller Quorum 的 Raft 多数派保障，整套系统自包含。
 
 :::
@@ -1007,7 +1141,9 @@ Kafka 高可用 = 数据冗余（多副本） + 自动容灾（Leader 自动切�
 
 ::: details
 
-**场景（推演）**：某集群 5 台 Broker、核心 Topic 3 副本，某台 Broker 宕机：Controller 在秒级内感知（ZK 临时节点失效/KRaft 心跳超时），将其上约 200 个 Leader 分区在其余 Broker 的 ISR 中重新选主，生产端短暂报 `NOT_LEADER_OR_FOLLOWER` 后自动刷新元数据重连，业务中断约 10~30s；副本分配不会自动改变，宕机 Broker 上的 Follower 副本不会被自动补建到其他 Broker，需修复该 Broker，或人工执行 `kafka-reassign-partitions` 重分配并等待复制追平。
+**场景（推演）**：某集群 5 台 Broker、核心 Topic 3 副本，某台 Broker 宕机：Controller 在秒级内感知（ZK 临时节点失效/KRaft 心跳超时），
+将其上约 200 个 Leader 分区在其余 Broker 的 ISR 中重新选主，生产端短暂报 `NOT_LEADER_OR_FOLLOWER` 后自动刷新元数据重连，业务中断约 10~30s；副本分配不会自动改变，
+宕机 Broker 上的 Follower 副本不会被自动补建到其他 Broker，需修复该 Broker，或人工执行 `kafka-reassign-partitions` 重分配并等待复制追平。
 
 **关键点**：选主只从 ISR 出，数据零丢失；若同时挂两台且某分区 ISR 不足 min.insync.replicas，该分区拒写但不丢数据。（数据为推演示例，非真实生产数据）
 
@@ -1016,8 +1152,6 @@ Kafka 高可用 = 数据冗余（多副本） + 自动容灾（Leader 自动切�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “Kafka 多副本是同步复制，所以强一致” → 错。Follower 是异步拉取复制，Kafka 用 ISR + HW 界定“已提交”，而非强同步；同步程度由 acks 与 min.insync.replicas 配置决定。
 - ❌ “Broker 宕机后副本数自动恢复原样” → 错。Controller 只按既有副本分配重新选主，不会自动在其他 Broker 上补建副本；期间该分区容错能力下降，需尽快修复故障 Broker，或人工执行 `kafka-reassign-partitions` 并等待复制追平。
@@ -1080,20 +1214,22 @@ ZooKeeper 在 Kafka 中扮演着**核心的协调者角色**，主要负责集�
 
 #### 🔬 扩展知识
 
-**【L3】ZooKeeper 两个关键特性为什么被 Kafka 看中**
-
 ::: details
 
+- 【L3】ZooKeeper 两个关键特性为什么被 Kafka 看中
+
 - 客户端会话结束时，ZooKeeper 就会删除临时节点——这提供了“故障即感知”的能力，Broker 宕机无需心跳探测框架，临时节点自动消失即是信号。
+
 - 客户端注册监听它关心的节点，当节点状态发生变化（数据变化、子节点增减变化）时，ZooKeeper 服务会通知客户端——Controller 与各 Broker 靠 watch 实现元数据变更的推送。
 
 :::
 
-**【L4】ZK 模式的扩展性天花板**
-
 ::: details
 
+- 【L4】ZK 模式的扩展性天花板
+
 - ZK 写路径需要 Quorum 确认且串行，分区数到数十万级时元数据操作（扩分区、Leader 切换）明显变慢；watch 数量与节点数也制约集群规模。
+
 - 这正是 KRaft 的动机：元数据变成 Kafka 自己的追加日志 + Raft 复制，支持百万级分区，详见本文档『Kafka 为什么弃用 ZooKeeper？KRaft 如何工作与迁移？』。
 
 :::
@@ -1134,11 +1270,35 @@ KRaft 把元数据改成多数派提交的日志，减少外部依赖并改善�
 
 ::: details
 
-- 【L3】**元数据日志不是普通业务 Topic**：`__cluster_metadata` 由 KRaft 专用控制面维护，不能当成可由 Producer 随意写入的业务主题。日志提供有序的状态变更记录，回放可重建状态、辅助诊断；快照和日志保留意味着它也不是无限期业务审计仓库。
-- 【L3】**热备缩短恢复，但不与规模完全解耦**：备用 Controller 持续跟进已提交记录，接管时通常不必像 ZK Controller 那样重新全量读树；冷启动、落后追赶及大快照加载仍有成本。元数据多数派不可用会阻止新变更提交，即使已有分区暂时还能读写，也必须尽快恢复控制面。
-- 【L4】**版本与迁移前置条件**：Kafka 2.8 引入 KRaft 预览，3.3 的生产可用针对 KRaft 模式本身；3.4 初期提供 ZK→KRaft 迁移能力，不能据此认定所有 3.4+ 版本都适合生产迁移；3.5 废弃 ZK 模式，4.0 移除其支持。存量集群可选 **3.9 最新维护版本作为迁移桥接版本**，先升级并按该版本要求统一 Broker 协议与 `metadata.version`，在同等规模环境演练，再考虑升级 4.x；不能把仍运行 ZK 的集群直接升级到 4.0。
-- 【L4】**迁移流程与工具链**：以 3.9 的静态 quorum 迁移路径为例，先备份 ZK 元数据和配置、确认集群健康；部署独立 Controller，使用原 `cluster.id` 初始化其新元数据目录，配置唯一 `node.id`、`controller.quorum.voters`、监听器及安全参数，启用 `zookeeper.metadata.migration.enable=true` 并连接原 ZK。再让 ZK Broker 按迁移要求滚动重启、交接控制权，完成全量元数据导入并进入双写；随后逐台把 Broker 转为 KRaft，保留原 Broker 身份与业务日志目录。用 `kafka-storage.sh` 初始化**新 Controller** 存储，不能借迁移重格式化已有 Broker 数据；用 `kafka-metadata-quorum.sh` 检查 quorum、复制位点与 lag，配合迁移状态指标及 `kafka-metadata-shell.sh` 排查快照，并把旧 ZK 监控/脚本改为支持 KRaft 的管理工具。
-- 【L4】**回滚的不可逆边界**：过渡期活动 Controller 将元数据变更同步写回 ZK，以保留回退路径。回退前必须尚未 finalization、ZK 与双写状态完好、目标版本与特性兼容、原配置及数据可用，并遵循该版本规定的停止/恢复顺序；不是随时切回旧配置。确认所有 Broker 已迁移且观察验证通过后，才在 Controller 上关闭迁移并完成定稿；**定稿后不再支持回退 ZK**，也不能通过随意降低 `metadata.version` 补救。最终退役 ZK 前，应完成 ACL、认证、运维工具、故障演练和回滚预案验收。
+- 【L3】**元数据日志不是普通业务 Topic**
+
+  `__cluster_metadata` 由 KRaft 专用控制面维护，不能当成可由 Producer 随意写入的业务主题。日志提供有序的状态变更记录，回放可重建状态、辅助诊断；
+  快照和日志保留意味着它也不是无限期业务审计仓库。
+
+- 【L3】**热备缩短恢复，但不与规模完全解耦**：备用 Controller 持续跟进已提交记录，接管时通常不必像 ZK Controller 那样重新全量读树；冷启动、落后追赶及大快照加载仍有成本。元数据多数派不可用会阻止新变更提交，
+  即使已有分区暂时还能读写，也必须尽快恢复控制面。
+
+- 【L4】**版本与迁移前置条件**
+
+  Kafka 2.8 引入 KRaft 预览，3.3 的生产可用针对 KRaft 模式本身；3.4 初期提供 ZK→KRaft 迁移能力，不能据此认定所有 3.4+ 版本都适合生产迁移；
+  3.5 废弃 ZK 模式，4.0 移除其支持。存量集群可选 **3.9 最新维护版本作为迁移桥接版本**，先升级并按该版本要求统一 Broker 协议与 `metadata.version`，在同等规模环境演练，再考虑升级 4.x；
+  不能把仍运行 ZK 的集群直接升级到 4.0。
+
+- 【L4】**迁移流程与工具链**
+
+  以 3.9 的静态 quorum 迁移路径为例，先备份 ZK 元数据和配置、确认集群健康；部署独立 Controller，使用原 `cluster.id` 初始化其新元数据目录，
+  配置唯一 `node.id`、`controller.quorum.voters`、监听器及安全参数，启用 `zookeeper.metadata.migration.enable=true` 并连接原 ZK。
+
+  再让 ZK Broker 按迁移要求滚动重启、交接控制权，完成全量元数据导入并进入双写；随后逐台把 Broker 转为 KRaft，保留原 Broker 身份与业务日志目录。
+
+  用 `kafka-storage.sh` 初始化**新 Controller** 存储，不能借迁移重格式化已有 Broker 数据；用 `kafka-metadata-quorum.sh` 检查 quorum、复制位点与 lag，
+  配合迁移状态指标及 `kafka-metadata-shell.sh` 排查快照，并把旧 ZK 监控/脚本改为支持 KRaft 的管理工具。
+
+- 【L4】**回滚的不可逆边界**
+
+  过渡期活动 Controller 将元数据变更同步写回 ZK，以保留回退路径。回退前必须尚未 finalization、ZK 与双写状态完好、目标版本与特性兼容、原配置及数据可用，
+  并遵循该版本规定的停止/恢复顺序；不是随时切回旧配置。确认所有 Broker 已迁移且观察验证通过后，才在 Controller 上关闭迁移并完成定稿；**定稿后不再支持回退 ZK**，
+  也不能通过随意降低 `metadata.version` 补救。最终退役 ZK 前，应完成 ACL、认证、运维工具、故障演练和回滚预案验收。
 
 > 📚 延伸阅读：[Kafka 官方文档 - KRaft](https://kafka.apache.org/documentation/#kraft)；[Confluent 迁移指南（发行版版本与工具须区分）](https://docs.confluent.io/platform/current/installation/migrate-zk-kraft.html)
 
@@ -1147,8 +1307,6 @@ KRaft 把元数据改成多数派提交的日志，减少外部依赖并改善�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “ZooKeeper 最多 7 个节点，所以 Kafka 规模被固定上限卡死” → 这是把常见部署建议误当算法或分区硬上限；真正要评估元数据处理、传播、内存与故障恢复成本。
 - ❌ “KRaft 靠并行日志写入，天然保证百万分区与亚秒恢复” → 仍有单个活动 Controller 对变更排序，多数派复制也消耗资源；性能须用实际拓扑、负载和恢复路径验证。
@@ -1221,20 +1379,23 @@ acks 是生产者的“可靠性总开关”：0 不等确认最快但可能丢�
 
 #### 🔬 扩展知识
 
-**【L3】acks=all 的性能代价到底在哪**
-
 ::: details
 
+- 【L3】acks=all 的性能代价到底在哪
+
 - acks=all 的确认时间取决于 ISR 中最慢的 Follower：端到端延迟从 acks=1 的约 5ms 级升到约 15~30ms 级（经验值，与网络/磁盘相关），吞吐下降约 30%~50%。
+
 - 代价换的是“多副本页缓存同时存在”的持久性；若某 Broker 磁盘/网络变慢，会直接拖慢所有 acks=all 的写入，需按 Topic 分级承担代价而非全集群一刀切。
 
 :::
 
-**【L4】acks 与幂等、在飞请求的联动**
-
 ::: details
 
-- 开启 `enable.idempotence=true` 会强制 `acks=all`、`retries=Integer.MAX_VALUE`，且 `max.in.flight.requests.per.connection≤5` 仍保序——幂等把“可靠 + 保序 + 重试去重”打包了。
+- 【L4】acks 与幂等、在飞请求的联动
+
+- 开启 `enable.idempotence=true` 会强制 `acks=all`、`retries=Integer.MAX_VALUE`，
+  且 `max.in.flight.requests.per.connection≤5` 仍保序——幂等把“可靠 + 保序 + 重试去重”打包了。
+
 - `acks=0/1` 下多在飞请求 + 重试可能乱序；顺序敏感场景要么开幂等，要么把 `max.in.flight.requests.per.connection` 降到 1（吞吐约降 50%）。
 
 :::
@@ -1242,8 +1403,6 @@ acks 是生产者的“可靠性总开关”：0 不等确认最快但可能丢�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “acks=all 就绝对不丢” → 错。ISR 收缩到只剩 Leader 且 min.insync.replicas=1 时，acks=all 退化为写单副本；必须配套 `min.insync.replicas≥2` 与禁 unclean 选主。
 - ❌ “acks=1 和 acks=all 只是等得久一点” → 错。两者丢数据的失效路径不同：acks=1 在 Leader 切换窗口丢，acks=all 的退化丢发生在 ISR 收缩时，防护配置也不同。
@@ -1318,13 +1477,16 @@ producer.initTransactions();  // 初始化事务
 
 #### 🔬 扩展知识
 
-**【L3】幂等的去重原理与边界**
-
 ::: details
 
+- 【L3】幂等的去重原理与边界
+
 - 原理：Broker 为每个 Producer 会话分配 PID，每条消息带分区级递增 SeqNum，按 `<PID, 分区, SeqNum>` 判重，重复批次直接丢弃。
+
 - 开启幂等后自动强制 `acks=all`、`retries=Integer.MAX_VALUE`、`max.in.flight.requests.per.connection≤5`，因此在飞重试也不会乱序。
+
 - Kafka 3.0 起 `enable.idempotence` 默认为 `true`：默认配置即为「幂等 + acks=all」，但 PID 仍只在单会话内有效，不改变下面的边界。
+
 - 边界：只防同一会话内的重试重复；Producer 重启后 PID 变化，跨进程重发仍会重复，需业务唯一键兜底。
 
 :::
@@ -1389,9 +1551,9 @@ Kafka 的写入路径是「网络 → 页缓存 → 磁盘」，消费读取路�
 
 #### 🔬 扩展知识
 
-**【L3】量化视角：每个设计到底贡献了多少性能**
-
 ::: details
+
+- 【L3】量化视角：每个设计到底贡献了多少性能
 
 **方案权衡：高吞吐配置 vs 低延迟配置**
 
@@ -1404,25 +1566,36 @@ Kafka 的写入路径是「网络 → 页缓存 → 磁盘」，消费读取路�
 **各机制的量化贡献（经验值，推演参考）**
 
 - **顺序写**：磁盘顺序写带宽可达数百 MB/s，与内存同一数量级；随机写受寻址限制仅数 MB/s，差距达百倍。
+
 - **页缓存**：写入先落 PageCache（内存速度，亚毫秒级），由 OS 异步刷盘；若强制 `flush.messages=1` 每条 fsync，吞吐从百万级跌至万级。
+
 - **零拷贝**：消费路径从 4 次拷贝 + 4 次上下文切换降为 1 次 DMA 拷贝 + 2 次切换，CPU 占用下降约 50% 以上。
+
 - **批量 + 压缩**：`batch.size` 从默认 16KB 调到 1MB、`linger.ms=100ms`，吞吐可提升 3~5 倍；LZ4 压缩进一步节省约 50% 带宽。
+
 - **分区并行**：吞吐随分区数近似线性扩展，单机 100 分区量级可达百万条/秒；但分区过多（单机数千）会使选主、元数据、文件句柄开销显著上升。
 
 **失效场景：Kafka 什么时候会变慢**
 
 - **消费“冷数据”击穿页缓存**：消费者回溯数天前的数据时，读请求全部命中磁盘随机读，零拷贝优势消失，吞吐可能跌至热数据的 1/10。
+
 - **分区数与消费者数失衡**：单消费者订阅过多分区，poll 循环串行处理，拉取延迟叠加。
+
 - **压缩算法选择不当**：Gzip 压缩比高但 CPU 开销大，CPU 受限机器上换 LZ4/Zstd 吞吐可提升数倍。
+
 - **磁盘 IO 争抢**：副本同步、日志压缩（compaction）、消费读三者共享磁盘带宽，高峰期互相踩踏。
 
 :::
 
-**【L4】batch 参数配套调优的深层逻辑**
-
 ::: details
 
-`batch.size` 是批次字节上限，`linger.ms` 是攒批等待上限，两者谁先触发谁生效：只调大 batch.size 而 linger.ms=0，低流量时批次永远攒不满即发出，形同虚设；只调大 linger.ms 而 batch.size 太小，批次很快装满提前发送，白等。高吞吐推荐 `batch.size=1MB` + `linger.ms=50~100ms` 配套，同时预留 `buffer.memory`（默认 32MB，建议翻倍）防阻塞。
+- 【L4】batch 参数配套调优的深层逻辑
+
+  `batch.size` 是批次字节上限，`linger.ms` 是攒批等待上限，两者谁先触发谁生效：只调大 batch.size 而 linger.ms=0，低流量时批次永远攒不满即发出，形同虚设；
+
+  只调大 linger.ms 而 batch.size 太小，批次很快装满提前发送，白等。
+
+  高吞吐推荐 `batch.size=1MB` + `linger.ms=50~100ms` 配套，同时预留 `buffer.memory`（默认 32MB，建议翻倍）防阻塞。
 
 :::
 
@@ -1435,17 +1608,29 @@ Kafka 的写入路径是「网络 → 页缓存 → 磁盘」，消费读取路�
 **踩坑案例：一次“磁盘正常但 Kafka 变慢 10 倍”的排查**（案例为推演示例，用于说明失效链路）
 
 - **现象**：集群写入 TPS 从 30 万跌至 3 万，Producer 端报 `Request timed out`，但磁盘 util 只有 40%。
+
 - **排查**：Broker 指标显示 PageCache 命中率从 95% 跌至 20%；同期上线了一个新消费组在回溯 3 天前的存量数据。
+
 - **根因**：回溯消费把冷数据批量载入页缓存，挤掉了写入链路的热点缓存，写入从内存速度退化为磁盘速度——典型的“读写互相踩踏”。
+
 - **修复**：回溯任务迁到独立集群（或错峰低限速运行）；主集群按“实时写入 vs 离线回溯”职责拆分；建立 PageCache 命中率与生产延迟的联动告警。
 
 **场景题：不加机器把单机写入从 20 万 TPS 提到 80 万**
 
 **场景**：日志采集链路要求单机写入从 20 万 TPS 提升到 80 万 TPS，预算不允许加机器。从哪些维度榨取性能？
 
-- **应急处理**：先确认当前瓶颈：Producer 端看 `record-send-rate` 与请求排队（`buffer.memory` 是否满）、Broker 端看磁盘 util 与 PageCache 命中率、网络带宽是否打满，避免盲目调参。
+**应急处理**：
+
+先确认当前瓶颈：Producer 端看 `record-send-rate` 与请求排队（`buffer.memory` 是否满）、Broker 端看磁盘 util 与 PageCache 命中率、网络带宽是否打满，避免盲目调参。
+
 - **根因分析**：日志场景单条小（约 200B）、容忍秒级延迟，典型的“攒批收益最大”场景；若当前 `linger.ms=0`、`batch.size=16KB`（默认），则请求次数是吞吐的直接上限。
-- **长期方案**：按收益排序逐项落地：① `linger.ms=100ms` + `batch.size=1MB`，减少请求次数（预期吞吐 ×3~5）；② 端到端 LZ4 压缩，带宽降约 50%；③ 分区数从 32 提到 128 并同步扩消费者，释放并行度；④ 确认 `acks=1`（日志可接受），避免副本同步延迟叠加；⑤ 磁盘换 NVMe 或多盘 `log.dirs` 分散 IO。每步上线后压测验证，避免一次性全改无法归因。
+
+- **长期方案**：按收益排序逐项落地：① `linger.ms=100ms` + `batch.size=1MB`，减少请求次数（预期吞吐 ×3~5）；
+
+  ② 端到端 LZ4 压缩，带宽降约 50%；③ 分区数从 32 提到 128 并同步扩消费者，释放并行度；④ 确认 `acks=1`（日志可接受），避免副本同步延迟叠加；
+
+  ⑤ 磁盘换 NVMe 或多盘 `log.dirs` 分散 IO。每步上线后压测验证，避免一次性全改无法归因。
+
 - **权衡**：攒批引入约 100ms 的额外延迟，日志链路完全可接受；若同样的配置用在交易消息上则不可接受——性能调优的第一步永远是确认业务的延迟容忍度，而不是背参数。
 
 :::
@@ -1453,8 +1638,6 @@ Kafka 的写入路径是「网络 → 页缓存 → 磁盘」，消费读取路�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “Kafka 快是因为数据不落盘，都在内存里” → 数据最终一定落盘，快的原因是顺序写 + 页缓存让落盘动作被 OS 异步化，而不是不持久化。
 - ❌ “为了安全应该每条消息都 fsync” → 强制 `flush.messages=1` 会把吞吐从百万级拉到万级；Kafka 用 `acks=all` 多副本冗余替代昂贵的同步刷盘，单机页缓存丢失风险靠多机对冲。
@@ -1568,8 +1751,17 @@ A：`send()` 会阻塞直到超时（`max.block.ms`，默认 60s）后抛异常�
 
 ::: details
 
-- 【L3】**Lag 的计算与倾斜的联动**：消费 lag = 分区的高水位（HW）− 消费组已提交 offset，用 `kafka-consumer-groups.sh --describe` 可看分区级 lag。热点分区倾斜时，即便总吞吐够，单个热点分区的 lag 也会持续增长——而分区是消费并行度的最小单位，**加消费者无法摊薄单分区内的积压**。
-- 【L3】**热点分区积压的 Kafka 特有处置**：临时扩消费者受「消费者数 ≤ 分区数」上限约束，对单分区热点无效；紧急时可将流量转发到**分区数更多的临时 Topic** 扩并行度追赶（追赶完再切回），或对非核心消息按 offset 跳过、降低单条处理成本（批量落库/异步化）。长期治理靠分区键重新设计（高基数键/加盐），注意加盐会牺牲同键全局有序，需下游归并。通用积压处置矩阵见《MQ面试》『如何处理 MQ 消息积压？』。
+- 【L3】**Lag 的计算与倾斜的联动**
+
+  消费 lag = 分区的高水位（HW）− 消费组已提交 offset，用 `kafka-consumer-groups.sh --describe` 可看分区级 lag。热点分区倾斜时，
+  即便总吞吐够，单个热点分区的 lag 也会持续增长——而分区是消费并行度的最小单位，**加消费者无法摊薄单分区内的积压**。
+
+- 【L3】**热点分区积压的 Kafka 特有处置**
+
+  临时扩消费者受「消费者数 ≤ 分区数」上限约束，对单分区热点无效；紧急时可将流量转发到**分区数更多的临时 Topic** 扩并行度追赶（追赶完再切回），
+  或对非核心消息按 offset 跳过、降低单条处理成本（批量落库/异步化）。长期治理靠分区键重新设计（高基数键/加盐），注意加盐会牺牲同键全局有序，需下游归并。
+
+  通用积压处置矩阵见《MQ面试》『如何处理 MQ 消息积压？』。
 
 :::
 
@@ -1631,12 +1823,14 @@ Kafka 采用 **多线程池 + 事件驱动** 模型，核心线程组分工如�
 
 #### 🔬 扩展知识
 
-**【L3】请求全流程中的关键调优参数**
-
 ::: details
 
+- 【L3】请求全流程中的关键调优参数
+
 - `num.network.threads`（Processor 数，默认 3）：网络 IO 密集时可调大，一般不超过 CPU 核数。
+
 - `num.io.threads`（Handler 数，默认 8）：磁盘 IO 密集时调大，低延迟场景可翻倍。
+
 - `queued.max.requests`：RequestChannel 队列上限，满了 Processor 会背压暂停读请求，是 Broker 端的天然限流点。
 
 :::
@@ -1766,9 +1960,9 @@ A：优先堆插入/弹出是 O(logN)，且每次触发都要堆调整；时间�
 
 #### 🔬 扩展知识
 
-**【L3】吞吐、延迟与可靠的参数对照**
-
 ::: details
+
+- 【L3】吞吐、延迟与可靠的参数对照
 
 吞吐和延迟是一对矛盾：攒批本质是“用等待换合并”，等待时间就是延迟；不攒批则请求次数多、协议开销大，吞吐上不去。只能在业务容忍度内选一个偏向，或按 Topic 分级不同配置。
 
@@ -1782,13 +1976,16 @@ A：优先堆插入/弹出是 O(logN)，且每次触发都要堆调整；时间�
 
 :::
 
-**【L3】硬件优化的性价比**
-
 ::: details
 
+- 【L3】硬件优化的性价比
+
 - **磁盘**：SSD/NVMe 显著提升 I/O；多盘 `log.dirs` 分散 IO。
+
 - **内存**：扩大 PageCache 命中热数据，多数场景下性价比最高。
+
 - **网络**：确保高带宽，网络打满时才需要升带宽。
+
 - **Broker 配套**：`log.retention` 适当调大减少日志频繁清理开销；socket 缓冲区调大提升网络传输效率。
 
 :::
@@ -1856,16 +2053,22 @@ Consumer → 从消息体解析 OSS 路径 → 下载实际数据 → 处理
 
 ::: details
 
-- 【L3】Kafka 压缩（Compression）：如果大消息是文本/JSON，可在 Producer 端开启 Snappy/LZ4/Zstd 压缩（`compression.type`），Broker 端不解压直接存储，Consumer 端解压。压缩比通常 3~10x，但 CPU 开销增加。
-- 【L4】`max.request.size` 与 `batch.size` 的关系：`max.request.size` 是单次请求上限（含多条消息的 batch），`batch.size` 是单个分区的批大小。如果单条消息 > `batch.size`，该消息会独占一个 batch；如果 > `max.request.size`，直接报 `RecordTooLargeException`。
+- 【L3】Kafka 压缩（Compression）
+
+  如果大消息是文本/JSON，可在 Producer 端开启 Snappy/LZ4/Zstd 压缩（`compression.type`），Broker 端不解压直接存储，
+  Consumer 端解压。压缩比通常 3~10x，但 CPU 开销增加。
+
+- 【L4】`max.request.size` 与 `batch.size` 的关系
+
+  `max.request.size` 是单次请求上限（含多条消息的 batch），`batch.size` 是单个分区的批大小。
+
+  如果单条消息 > `batch.size`，该消息会独占一个 batch；如果 > `max.request.size`，直接报 `RecordTooLargeException`。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "只改 Producer 的 max.request.size 就行" → Broker 和 Consumer 端也必须同步调整，否则 Broker 拒绝写入或 Consumer 拉取失败。
 - ❌ "大消息压缩就能解决" → 压缩能减小体积但不解决根本问题（GC、IO 放大），超过 1MB 的消息建议直接外置。
@@ -1950,17 +2153,26 @@ try {
 
 ::: details
 
-- 【L3】事务协调器的故障恢复：Producer 重启后，用相同的 `transactional.id` 重新注册，协调器检查是否有未完成事务——有则强制 abort（因为 Producer 可能丢失了部分发送上下文），Producer 重新 beginTransaction。
-- 【L3】Epoch 的作用：防止「僵尸 Producer」——旧 Producer 假死未 abort 事务，新 Producer 用相同 `transactional.id` 注册后 Epoch 递增，旧 Producer 的后续写操作被 Broker 拒绝（Epoch 不匹配）。
-- 【L4】事务的性能开销：每次 commit/abort 需协调器向所有涉及分区写入控制消息（commit/abort marker），分区数越多开销越大。生产建议：① 单个事务涉及的分区数控制在 100 以内；② `transaction.timeout.ms` 设合理值（默认 60s），超时自动 abort。
+- 【L3】事务协调器的故障恢复
+
+  Producer 重启后，用相同的 `transactional.id` 重新注册，协调器检查是否有未完成事务——有则强制 abort（因为 Producer 可能丢失了部分发送上下文），
+  Producer 重新 beginTransaction。
+
+- 【L3】Epoch 的作用
+
+  防止「僵尸 Producer」——旧 Producer 假死未 abort 事务，新 Producer 用相同 `transactional.id` 注册后 Epoch 递增，
+  旧 Producer 的后续写操作被 Broker 拒绝（Epoch 不匹配）。
+
+- 【L4】事务的性能开销
+
+  每次 commit/abort 需协调器向所有涉及分区写入控制消息（commit/abort marker），分区数越多开销越大。生产建议：① 单个事务涉及的分区数控制在 100 以内；
+  ② `transaction.timeout.ms` 设合理值（默认 60s），超时自动 abort。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "开了事务就不用幂等" → 事务依赖幂等，`transactional.id` 隐含 `enable.idempotence=true`，两者不是替代关系。
 - ❌ "read_committed 完全没有延迟" → `read_committed` 需等待事务的 COMMIT 标记写入后才能投递，大事务（跨多分区、写入量大）会导致消费延迟增加。
@@ -2051,12 +2263,16 @@ env.addSource(source)
 
 #### 🔬 扩展知识
 
-**【L3】Exactly-Once 链路的实现细节**
-
 ::: details
 
+- 【L3】Exactly-Once 链路的实现细节
+
 - Flink Sink 用两阶段提交：checkpoint 开始时预提交（pre-commit）事务，checkpoint 成功后才 commit；失败则 abort 并从上个 checkpoint 重放。
-- 必须保证 `transaction.timeout.ms` 大于 checkpoint 间隔 + 最大重启延迟，否则悬挂事务被 Broker 主动 abort、已预提交数据丢失；同时它不能超过 Broker 端上限 `transaction.max.timeout.ms`（默认 15 分钟；Producer 侧 `transaction.timeout.ms` 默认仅 1 分钟，Flink 精确一次场景通常需显式调大）。
+
+- 必须保证 `transaction.timeout.ms` 大于 checkpoint 间隔 + 最大重启延迟，否则悬挂事务被 Broker 主动 abort、已预提交数据丢失；
+  同时它不能超过 Broker 端上限 `transaction.max.timeout.ms`（默认 15 分钟；Producer 侧 `transaction.timeout.ms` 默认仅 1 分钟，
+  Flink 精确一次场景通常需显式调大）。
+
 - 消费端配合 `isolation.level=read_committed` 才能避免下游读到未提交事务的数据。
 
 :::

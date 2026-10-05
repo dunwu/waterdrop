@@ -44,10 +44,22 @@ permalink: /pages/8c23f138/
 
 ::: details
 
-- 【L3】浏览器渲染管线：HTML → DOM 树，CSS → CSSOM，二者合成 Render 树，再布局（Layout）与绘制（Paint）；`<script>` 默认阻塞解析，`async`/`defer` 可改变加载行为。
+- 【L3】浏览器渲染管线
+
+  HTML → DOM 树，CSS → CSSOM，二者合成 Render 树，再布局（Layout）与绘制（Paint）；`<script>` 默认阻塞解析，`async`/`defer` 可改变加载行为。
+
 - 【L3】服务端链路展开即 Tomcat → Filter → DispatcherServlet → Interceptor → Controller，是 Web 框架面试题的标准纵深。
-- 【L4】现代优化：HTTP/2 多路复用减少连接数、`dns-prefetch`/`preconnect` 提前建连、CDN 就近访问、关键 CSS 内联与非关键 JS 延迟加载。
-- 【L4】HTTP 协议演进对后端架构的影响：HTTP/1.1 即使开持久连接仍有**队头阻塞**（同一连接上前一个慢响应拖住后续请求）；HTTP/2 多路复用消除了 HTTP 层的队头阻塞，但所有 Stream 仍共享一条 TCP 连接，**丢包触发的 TCP 重传会阻塞全部 Stream**（TCP 层队头阻塞残留）；HTTP/3 改用基于 UDP 的 QUIC，流与流之间独立丢包恢复，才真正解决。后端日常更常打交道的落点是：HTTP 客户端连接池（HttpClient/OkHttp 复用 keep-alive 连接，避免每次请求三次握手 + TLS 握手）与超时重试的幂等设计（见「GET 请求和 POST 请求的区别？」）。
+
+- 【L4】现代优化
+
+  HTTP/2 多路复用减少连接数、`dns-prefetch`/`preconnect` 提前建连、CDN 就近访问、关键 CSS 内联与非关键 JS 延迟加载。
+
+- 【L4】HTTP 协议演进对后端架构的影响
+
+  HTTP/1.1 即使开持久连接仍有**队头阻塞**（同一连接上前一个慢响应拖住后续请求）；HTTP/2 多路复用消除了 HTTP 层的队头阻塞，
+  但所有 Stream 仍共享一条 TCP 连接，**丢包触发的 TCP 重传会阻塞全部 Stream**（TCP 层队头阻塞残留）；HTTP/3 改用基于 UDP 的 QUIC，流与流之间独立丢包恢复，才真正解决。
+
+  后端日常更常打交道的落点是：HTTP 客户端连接池（HttpClient/OkHttp 复用 keep-alive 连接，避免每次请求三次握手 + TLS 握手）与超时重试的幂等设计（见「GET 请求和 POST 请求的区别？」）。
 
 :::
 
@@ -194,8 +206,11 @@ graph TD
 ::: details
 
 - 【L3】`Cache-Control` 的 `no-store`（完全不缓存）与 `no-cache`（跳过强缓存、但仍走协商缓存）含义不同；`no-cache` 并非"不缓存"。
+
 - 【L3】`Last-Modified` 是秒级精度且无法感知"改了但内容没变"的场景，故 `ETag` 优先级更高、更精确。
+
 - 【L4】多副本部署时 ETag 必须一致（如用内容哈希或版本号生成），否则请求打到不同节点会频繁返回 200 而非 304。
+
 - 【L4】用户按 F5 刷新会跳过强缓存（带上条件请求头），Ctrl+F5 会强制绕过所有缓存——排查"缓存不生效"时要先区分操作方式。
 
 :::
@@ -247,8 +262,14 @@ REST 是一种架构风格：URL 用名词表示资源，HTTP 方法表达操作
 
 ::: details
 
-- 【L3】PUT 与 PATCH：PUT 是全量替换（幂等），PATCH 是局部更新（通常不要求幂等）。
-- 【L3】REST 的无状态与认证方案直接相关：JWT 天然契合，Session 则破坏无状态性。
+- 【L3】PUT 与 PATCH
+
+  PUT 是全量替换（幂等），PATCH 是局部更新（通常不要求幂等）。
+
+- 【L3】REST 的无状态与认证方案直接相关
+
+  JWT 天然契合，Session 则破坏无状态性。
+
 - 【L4】分页/过滤/排序惯例用查询参数（`?page=1&sort=createdAt,desc`）；HATEOAS（响应中携带后续操作链接）是 REST 成熟度模型的顶层，实践中很少完整落地。
 
 :::
@@ -349,11 +370,24 @@ Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`ini
 
 ::: details
 
-- 【L3】`init()` 的执行时机可由 `loadOnStartup` 控制：配置后容器启动即初始化（值越小越先），否则首次请求时才初始化。
+- 【L3】`init()` 的执行时机可由 `loadOnStartup` 控制
+
+  配置后容器启动即初始化（值越小越先），否则首次请求时才初始化。
+
 - 【L3】Servlet 3.0+ 的异步处理（`AsyncContext`）允许长耗时请求离开容器线程，避免线程池耗尽。
+
 - 【L4】Servlet 6.0（Jakarta EE 10）包名为 `jakarta.servlet`，生命周期模型本身未变；虚拟线程让"一请求一线程"模型重新具备高并发能力。
-- 【L4】**Servlet 3.0 异步（`AsyncContext`）与 Spring `@Async` 的线程模型差异**：`request.startAsync()` 会把容器线程**归还给 Tomcat 线程池**，业务移交自定义线程池执行，完成后调 `asyncContext.complete()` 由容器写回响应——省下的是容器线程；`@Async` 只是把业务方法挪到 Spring 线程池，**不改变 Servlet 请求的同步阻塞模型**，必须配合 `Callable`/`WebAsyncTask`/`DeferredResult` 返回值才能真正释放容器线程。混淆二者会出现"加了 @Async，Tomcat maxThreads 还是被打满"。
-- 【L4】**优雅停机与 `destroy()`**：`destroy()` 被调用时容器已停止派发新请求；Spring Boot 2.3+ 的 `server.shutdown=graceful` 在收到终止信号后先拒收新请求、等待在途请求完成（超时由 `spring.lifecycle.timeout-per-shutdown-phase` 控制，默认 30 秒）再关闭容器，配合 K8s 就绪探针摘流与 `preStop` 钩子，避免滚动发布期间产生 502。
+
+- 【L4】**Servlet 3.0 异步（`AsyncContext`）与 Spring `@Async` 的线程模型差异**
+
+  `request.startAsync()` 会把容器线程**归还给 Tomcat 线程池**，
+  业务移交自定义线程池执行，完成后调 `asyncContext.complete()` 由容器写回响应——省下的是容器线程；`@Async` 只是把业务方法挪到 Spring 线程池，**不改变 Servlet 请求的同步阻塞模型**，
+  必须配合 `Callable`/`WebAsyncTask`/`DeferredResult` 返回值才能真正释放容器线程。混淆二者会出现"加了 @Async，Tomcat maxThreads 还是被打满"。
+
+- 【L4】**优雅停机与 `destroy()`**
+
+  `destroy()` 被调用时容器已停止派发新请求；Spring Boot 2.3+ 的 `server.shutdown=graceful` 在收到终止信号后先拒收新请求、
+  等待在途请求完成（超时由 `spring.lifecycle.timeout-per-shutdown-phase` 控制，默认 30 秒）再关闭容器，配合 K8s 就绪探针摘流与 `preStop` 钩子，避免滚动发布期间产生 502。
 
 :::
 
@@ -402,8 +436,13 @@ Servlet 生命周期由容器管理，五个阶段：加载 → 初始化（`ini
 
 ::: details
 
-- 【L3】`RequestDispatcher` 还有 `include()`：将目标资源输出包含进当前响应，与 `forward()`（替换响应输出、要求响应未提交）不同。
-- 【L4】301 与 302 的差别在浏览器是否缓存跳转：301 会被浏览器长期缓存；307/308 保证重定向后请求方法不变（302 历史上会把 POST 变为 GET）。
+- 【L3】`RequestDispatcher` 还有 `include()`
+
+  将目标资源输出包含进当前响应，与 `forward()`（替换响应输出、要求响应未提交）不同。
+
+- 【L4】301 与 302 的差别在浏览器是否缓存跳转
+
+  301 会被浏览器长期缓存；307/308 保证重定向后请求方法不变（302 历史上会把 POST 变为 GET）。
 
 :::
 
@@ -684,10 +723,28 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 ::: details
 
-- 【L3】**Filter 为什么不能直接 @Autowired 注入 Spring Bean？** Filter 由 Servlet 容器创建和初始化，在 Spring Boot 内嵌容器中其启动时机早于 Spring 上下文完全就绪，此时 Bean 尚未注册，直接注入会拿到 null。标准解法是用 `FilterRegistrationBean` 注册（让 Spring 接管 Filter 实例的生命周期），或在 Filter 内部延迟从 ApplicationContext 获取 Bean。
-- 【L3】**Controller 抛异常后，postHandle 和 afterCompletion 还会执行吗？** `postHandle` 不会（只在 Controller 正常返回后调用），但 `afterCompletion` 会执行——资源清理必须放 `afterCompletion`；另注意视图渲染发生在 postHandle 与 afterCompletion 之间。
-- 【L4】**权限切面用 Spring AOP 还是 AspectJ？** Spring AOP 是运行时代理，零构建侵入，Web 场景足够；AspectJ 是编译期/加载期字节码织入，能拦私有方法和构造器但构建复杂度高。Spring AOP 拦不到私有方法的根因：代理依赖"外部调用经过代理对象"，私有方法对外不可见、无法经由代理入口进入。
-- 【L4】**Trace 上下文如何随拦截链传递？** 分布式追踪的 TraceId 通常在最外层 Filter 写入 MDC（底层 `ThreadLocal`）并在请求结束时清理，有两处高频断点：① 业务提交线程池 / `@Async` 后 `ThreadLocal` 不跨线程，需换用 `TransmittableThreadLocal`（阿里 TTL）或 `TaskDecorator` 在任务提交时显式捕获-恢复上下文；② Servlet 3.0 异步下 Filter 的 `doFilter` 在业务完成前就返回，写在 `finally` 里的 MDC 清理会提前执行、后续日志丢失 TraceId——Trace 生命周期应挂在 `AsyncListener` 的 `onComplete`/`onTimeout` 上，而非 Filter 出口。
+- 【L3】**Filter 为什么不能直接 @Autowired 注入 Spring Bean？**
+
+  Filter 由 Servlet 容器创建和初始化，在 Spring Boot 内嵌容器中其启动时机早于 Spring 上下文完全就绪，此时 Bean 尚未注册，直接注入会拿到 null。
+
+  标准解法是用 `FilterRegistrationBean` 注册（让 Spring 接管 Filter 实例的生命周期），或在 Filter 内部延迟从 ApplicationContext 获取 Bean。
+
+- 【L3】**Controller 抛异常后，postHandle 和 afterCompletion 还会执行吗？**
+
+  `postHandle` 不会（只在 Controller 正常返回后调用），但 `afterCompletion` 会执行——资源清理必须放 `afterCompletion`；
+  另注意视图渲染发生在 postHandle 与 afterCompletion 之间。
+
+- 【L4】**权限切面用 Spring AOP 还是 AspectJ？**
+
+  Spring AOP 是运行时代理，零构建侵入，Web 场景足够；AspectJ 是编译期/加载期字节码织入，能拦私有方法和构造器但构建复杂度高。Spring AOP 拦不到私有方法的根因：代理依赖"外部调用经过代理对象"，
+  私有方法对外不可见、无法经由代理入口进入。
+
+- 【L4】**Trace 上下文如何随拦截链传递？**
+
+  分布式追踪的 TraceId 通常在最外层 Filter 写入 MDC（底层 `ThreadLocal`）并在请求结束时清理，有两处高频断点：① 业务提交线程池 / `@Async` 后 `ThreadLocal` 不跨线程，
+  需换用 `TransmittableThreadLocal`（阿里 TTL）或 `TaskDecorator` 在任务提交时显式捕获-恢复上下文；
+  ② Servlet 3.0 异步下 Filter 的 `doFilter` 在业务完成前就返回，写在 `finally` 里的 MDC 清理会提前执行、后续日志丢失 TraceId——
+  Trace 生命周期应挂在 `AsyncListener` 的 `onComplete`/`onTimeout` 上，而非 Filter 出口。
 
 :::
 
@@ -695,7 +752,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 ::: details 路径白名单失误导致越权漏洞
 
-某系统被安全团队通报越权漏洞：普通用户能调用管理员接口。排查：① 权限逻辑在 Interceptor 里，基于路径白名单放行 `/open/**`；② 新同学新加的一批接口恰好以 `/open` 开头但实际是管理功能，被静默放行，且无任何报错——**基于路径名单的权限控制，一次配置失误就是全面裸奔**。修复：改为白名单思路——默认全部接口需鉴权，只有标注 `@PermitAll` 注解的方法才放行，校验逻辑从 Interceptor 换成绑定注解的 AOP 切面，漏配从"静默放行"变为"默认拒绝"，此后未再出现越权。
+某系统被安全团队通报越权漏洞：普通用户能调用管理员接口。排查：① 权限逻辑在 Interceptor 里，基于路径白名单放行 `/open/**`；② 新同学新加的一批接口恰好以 `/open` 开头但实际是管理功能，被静默放行，
+且无任何报错——**基于路径名单的权限控制，一次配置失误就是全面裸奔**。修复：改为白名单思路——默认全部接口需鉴权，只有标注 `@PermitAll` 注解的方法才放行，校验逻辑从 Interceptor 换成绑定注解的 AOP 切面，
+漏配从"静默放行"变为"默认拒绝"，此后未再出现越权。
 
 :::
 
@@ -704,8 +763,14 @@ public class LoginInterceptor implements HandlerInterceptor {
 **场景**：安全合规要求对所有 POST/PUT 请求记录完整请求体审计日志，但请求体流只能读一次。这个功能应该放在哪一层实现？如何避免影响后续 Controller 的参数解析？
 
 1. **应急处理**：直接在 Filter 里读 InputStream 会导致流被耗尽，Controller 解析参数直接报 400——这是该需求第一版最常见的线上事故。
+
 2. **根因分析**：`ServletRequest` 的输入流是一次性的，要"既记录又让下游继续用"，必须缓存请求体并包装 Request 对象。
-3. **长期方案**：放在 **Filter 层**实现（最外层，能覆盖所有 POST/PUT，且早于 Spring 参数解析）：用 `ContentCachingRequestWrapper` 或自定义 `HttpServletRequestWrapper` 先把 body 读入 byte[]，重写 `getInputStream()` 返回可重复读的流，再用包装对象 `chain.doFilter`。为什么不放 Interceptor：Interceptor 执行时参数解析可能已消费完 body，为时已晚。
+
+3. **长期方案**：放在 **Filter 层**实现（最外层，能覆盖所有 POST/PUT，且早于 Spring 参数解析）：
+
+  用 `ContentCachingRequestWrapper` 或自定义 `HttpServletRequestWrapper` 先把 body 读入 byte[]，重写 `getInputStream()` 返回可重复读的流，
+  再用包装对象 `chain.doFilter`。为什么不放 Interceptor：Interceptor 执行时参数解析可能已消费完 body，为时已晚。
+
 4. **权衡**：① body 缓存增加内存占用，大请求体接口（文件上传、超过 10MB）应排除在审计之外或只记录摘要，否则有 OOM 风险；② 密码、身份证号等敏感字段必须脱敏后再落日志；③ 审计日志建议异步写入，避免阻塞主链路。
 
 :::
@@ -713,8 +778,6 @@ public class LoginInterceptor implements HandlerInterceptor {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Interceptor 就是 Filter 的另一种写法" → 二者归属不同容器：Filter 属 Servlet 规范、早于 Spring；Interceptor 在 DispatcherServlet 内部，能拿到 HandlerMethod。
 - ❌ "权限校验配好路径白名单就安全了" → 路径名单一次配置失误就是全面裸奔，应默认拒绝、注解放行。
@@ -774,9 +837,19 @@ Cookie 与 Session 是"无状态 HTTP 协议如何维持状态"的两种经典�
 
 ::: details
 
-- 【L3】**Session 超时为什么默认 30 分钟？** 30 分钟是安全性与体验的经验折中（Tomcat 默认值）。容器采用滑动过期——每次访问重置计时器；若业务要求绝对过期（如"无论是否活跃，8 小时后必须重新登录"），需自行记录创建时间实现。
-- 【L3】**SessionID 会被暴力猜解吗？** Tomcat 用 `SecureRandom` 生成至少 128 位随机数（默认 16 字节、32 个十六进制字符），暴力猜解理论上不可行。真实事故多源于随机源配置错误，或 SessionID 经由 URL、日志泄漏。
-- 【L4】**浏览器禁用 Cookie 后 Session 还能工作吗？** 可用 URL 重写（`response.encodeURL`）把 SessionID 拼进 URL，但会暴露在地址栏、Referer 与日志中，安全性更差，如今基本淘汰——无 Cookie 场景（App、小程序）应直接改用 Token 方案。
+- 【L3】**Session 超时为什么默认 30 分钟？**
+
+  30 分钟是安全性与体验的经验折中（Tomcat 默认值）。容器采用滑动过期——每次访问重置计时器；若业务要求绝对过期（如"无论是否活跃，8 小时后必须重新登录"），需自行记录创建时间实现。
+
+- 【L3】**SessionID 会被暴力猜解吗？**
+
+  Tomcat 用 `SecureRandom` 生成至少 128 位随机数（默认 16 字节、32 个十六进制字符），暴力猜解理论上不可行。真实事故多源于随机源配置错误，或 SessionID 经由 URL、日志泄漏。
+
+- 【L4】**浏览器禁用 Cookie 后 Session 还能工作吗？**
+
+  可用 URL 重写（`response.encodeURL`）把 SessionID 拼进 URL，但会暴露在地址栏、Referer 与日志中，安全性更差，如今基本淘汰——无 Cookie 场景（App、
+  小程序）应直接改用 Token 方案。
+
 - 【L4】大规模场景可用 Redis Hash 维护 `session:{userId}` 用户 → Session 的反向索引，冻结账号时直接删 key，全局生效延迟可控制在 1 秒内。
 
 :::
@@ -785,7 +858,8 @@ Cookie 与 Session 是"无状态 HTTP 协议如何维持状态"的两种经典�
 
 ::: details K8s 双节点部署导致随机登出
 
-把老系统从单机迁到 2 节点的 K8s 集群，次日大量用户反馈"随机被登出"。排查发现网关日志中同一用户的请求被轮询打到两个 Pod，A 节点有 Session、B 节点没有。根因：Tomcat 默认 Session 存在 JVM 内存中，负载均衡轮询导致请求漂移。修复：引入 Spring Session + Redis 集中存储 Session，超时设为 30 分钟，上线后问题消失。复盘结论：多实例部署下 Session 必须外置，否则扩缩容和滚动发布都会引发同类故障。
+把老系统从单机迁到 2 节点的 K8s 集群，次日大量用户反馈"随机被登出"。排查发现网关日志中同一用户的请求被轮询打到两个 Pod，A 节点有 Session、B 节点没有。根因：Tomcat 默认 Session 存在 JVM 内存中，
+负载均衡轮询导致请求漂移。修复：引入 Spring Session + Redis 集中存储 Session，超时设为 30 分钟，上线后问题消失。复盘结论：多实例部署下 Session 必须外置，否则扩缩容和滚动发布都会引发同类故障。
 
 :::
 
@@ -794,17 +868,19 @@ Cookie 与 Session 是"无状态 HTTP 协议如何维持状态"的两种经典�
 **场景**：管理后台系统，安全审计要求"被冻结账号的用户必须立即全局登出"，当前是原生 Tomcat Session（单机、内存存储），如何设计？
 
 1. **应急处理**：单机下可遍历 `SessionManager` 找到目标用户的 Session 并 `invalidate`，但遍历全量 Session 是 O(N) 操作，且该手段在多机部署下完全失效。
+
 2. **根因分析**：内存 Session 没有集中管理面，更缺少"按用户反查 Session"的索引能力，无法定点清除。
+
 3. **长期方案**：迁移到 Spring Session + Redis，以 `session:{userId}` 维护用户 → Session 集合的反向索引；冻结账号时直接删除对应 key，全局生效延迟在 1 秒内。
-4. **权衡**：若系统正在改造为无状态 JWT，则需引入黑名单机制（详见本文档「JWT 如何实现刷新与主动失效？」）；Session + Redis 天然支持主动失效，这正是 Session 相对 JWT 的核心优势——**"立即失效"是硬需求时，选型应偏向 Session 或"JWT + 黑名单"**。
+
+4. **权衡**：若系统正在改造为无状态 JWT，则需引入黑名单机制（详见本文档「JWT 如何实现刷新与主动失效？」）；Session + Redis 天然支持主动失效，这正是 Session 相对 JWT 的核心优势——
+  **"立即失效"是硬需求时，选型应偏向 Session 或"JWT + 黑名单"**。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Session 比 Cookie 安全，所以 Session 绝对安全" → Cookie 属性缺失照样失守：缺 **HttpOnly**，XSS 可通过 `document.cookie` 窃取 SessionID（会话劫持）；缺 **SameSite**，跨站请求自动携带 Cookie，给 CSRF 敞开大门；缺 **Secure**，SessionID 在 HTTP 明文链路上被中间人截获；此外还有 **Session 固定攻击**——攻击者预设 SessionID 诱导受害者登录，若登录后服务端不更换 SessionID，攻击者即可冒用身份。
 - ❌ "禁用 Cookie 后 Session 完全不能工作" → 可用 URL 重写传递 SessionID，但安全性更差，基本被淘汰。
@@ -850,17 +926,17 @@ Token 的意思是"令牌"，是服务端生成的一串字符串，作为客户
 
 ::: details
 
-【L3】URL 携带 SessionID 的历史方案叫"URL 重写"（如 Tomcat 的 `;jsessionid=`），它的问题是 sessionId 会出现在浏览器历史、Referer 头和服务端日志中，泄露风险高，现代应用基本弃用，转而使用 Header 携带 Token（`Authorization: Bearer xxx`）。
+- 【L3】URL 携带 SessionID 的历史方案叫"URL 重写"（如 Tomcat 的 `;jsessionid=`），它的问题是 sessionId 会出现在浏览器历史、Referer 头和服务端日志中，泄露风险高，
+现代应用基本弃用，转而使用 Header 携带 Token（`Authorization: Bearer xxx`）。
 
-【L4】Token 机制与 Session 的本质差异在"状态存哪"：Session 是有状态（服务端存会话），Token 可做成无状态（如 JWT，服务端只验签不存储）。无状态带来水平扩展的便利，也带来"无法主动失效"的新问题，详见本文档『JWT Token 如何续签？如何解决无法主动失效的问题？』。
+- 【L4】Token 机制与 Session 的本质差异在"状态存哪"：Session 是有状态（服务端存会话），Token 可做成无状态（如 JWT，服务端只验签不存储）。无状态带来水平扩展的便利，也带来"无法主动失效"的新问题，
+详见本文档『JWT Token 如何续签？如何解决无法主动失效的问题？』。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "禁用 Cookie 后登录功能直接不可用" → 会话凭证只是换传递通道（参数 / Header），认证机制本身不受影响。
 - ❌ "Token 和 Session 是竞争关系，选一个就行" → Token 是凭证的载体形式，Session 是状态的存储方式，两者维度不同；"Token + 服务端存储"本质上就是 Session 的变体。
@@ -942,17 +1018,18 @@ Session 复制共享（Session Replication）**在服务器节点之间进行 Se
 
 ::: details
 
-【L3】Spring Session 是缓存共享方案的工程标配：它通过 Servlet Filter 拦截请求，把 HttpSession 透明地重定向到 Redis（JDBC、Hazelcast 也可），业务代码继续用原生 Session API，几乎零侵入。配合 Redis 的过期机制，Session 超时管理也一并交给存储层。
+- 【L3】Spring Session 是缓存共享方案的工程标配：它通过 Servlet Filter 拦截请求，把 HttpSession 透明地重定向到 Redis（JDBC、Hazelcast 也可），
+业务代码继续用原生 Session API，几乎零侵入。配合 Redis 的过期机制，Session 超时管理也一并交给存储层。
 
-【L4】粘性 Session 在云原生环境基本绝迹：K8s 滚动发布时 Pod 频繁销毁重建，"绑定节点"的前提不存在；Session 复制则受限于节点数（N 个节点的全量同步是 O(N²) 通信），一般超过 4~5 个节点就不适用。这两个方案更多是面试中"为什么演进到集中存储"的论证素材。
+- 【L4】粘性 Session 在云原生环境基本绝迹：K8s 滚动发布时 Pod 频繁销毁重建，"绑定节点"的前提不存在；Session 复制则受限于节点数（N 个节点的全量同步是 O(N²) 通信），一般超过 4~5 个节点就不适用。
+
+这两个方案更多是面试中"为什么演进到集中存储"的论证素材。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "粘性 Session 最简单，先用它顶着" → 节点宕机即丢该节点全部用户的登录态，发布 / 扩缩容同样会触发，生产中故障面太大。
 - ❌ "Session 复制到所有节点，就绝对不丢了" → 同步是异步广播，切换瞬间仍可能读到旧状态；且节点越多同步开销越大，规模化后不可行。
@@ -1024,17 +1101,19 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
 
 ::: details
 
-【L3】验签的安全细节：服务端必须显式指定期望算法再验签，不能信任 Header 中的 `alg` 字段——历史上著名的 `alg: none` 攻击就是利用库默认信任 Header，把签名算法改成 none 绕过验签；此外 HS256（对称）与 RS256（非对称）混用的"密钥混淆攻击"也源于同类信任问题。其利用方式：攻击者拿到服务端 RSA **公钥**（公钥本就可分发），把 Token 的 `alg` 改为 HS256，用公钥字符串作为 HMAC 密钥重新签名；若服务端验签时未锁定算法、同一份密钥既当 RSA 公钥又当 HMAC secret 使用，验签就会"合法"通过。防御与 `alg: none` 同源：验签时锁定算法白名单（如仅允许 RS256），且 HMAC 密钥与 RSA 密钥绝不复用。
+- 【L3】验签的安全细节：服务端必须显式指定期望算法再验签，不能信任 Header 中的 `alg` 字段——历史上著名的 `alg: none` 攻击就是利用库默认信任 Header，把签名算法改成 none 绕过验签；
+此外 HS256（对称）与 RS256（非对称）混用的"密钥混淆攻击"也源于同类信任问题。其利用方式：攻击者拿到服务端 RSA **公钥**（公钥本就可分发），把 Token 的 `alg` 改为 HS256，
+用公钥字符串作为 HMAC 密钥重新签名；若服务端验签时未锁定算法、同一份密钥既当 RSA 公钥又当 HMAC secret 使用，验签就会"合法"通过。防御与 `alg: none` 同源：验签时锁定算法白名单（如仅允许 RS256），
+且 HMAC 密钥与 RSA 密钥绝不复用。
 
-【L4】Payload 的标准声明（Claims）值得记几个：`sub`（主体）、`iat`（签发时间）、`exp`（过期时间）、`iss`（签发者）、`aud`（受众）。多服务网关场景下，`iss`/`aud` 校验能防止"A 服务签发的 Token 被拿去调 B 服务"的横向滥用。
+- 【L4】Payload 的标准声明（Claims）值得记几个：`sub`（主体）、`iat`（签发时间）、`exp`（过期时间）、`iss`（签发者）、`aud`（受众）。多服务网关场景下，
+`iss`/`aud` 校验能防止"A 服务签发的 Token 被拿去调 B 服务"的横向滥用。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "JWT 是加密的，Payload 放密码、手机号没关系" → Payload 只是 Base64 编码，复制出来在线就能解码；JWT 保证的是完整性（防篡改），不是机密性。
 - ❌ "签名能防止 Token 被伪造，所以密钥写在前端代码里也行" → 密钥只能在服务端；HS256 的密钥一旦泄露（如打进前端包），任何人可伪造合法 Token。
@@ -1108,21 +1187,22 @@ public boolean isValid(String token) {
 
 ::: details
 
-【L3】Refresh Token 应存储在服务端（如 Redis），原因：
+- 【L3】Refresh Token 应存储在服务端（如 Redis），原因：
 
 1. **可主动失效**：用户登出或修改密码时，删除 Refresh Token，强制重新登录。
+
 2. **单设备登录**：每个 Refresh Token 绑定设备，实现单端登录控制。
+
 3. **旋转机制**：每次刷新时生成新的 Refresh Token 并废弃旧的，防止 Refresh Token 被盗用。
 
-【L4】黑名单方案的存储成本可以控制：只存 Token 的哈希 + 剩余 TTL（如代码所示），而非全量 Token；由于 TTL 与 Token 过期时间对齐，黑名单条目会自动清理，Redis 内存占用上界 ≈ "单位时间内登出用户数 × 平均剩余有效期"。这就是"黑名单没有想象中昂贵"的原因。
+- 【L4】黑名单方案的存储成本可以控制：只存 Token 的哈希 + 剩余 TTL（如代码所示），而非全量 Token；由于 TTL 与 Token 过期时间对齐，黑名单条目会自动清理，
+Redis 内存占用上界 ≈ "单位时间内登出用户数 × 平均剩余有效期"。这就是"黑名单没有想象中昂贵"的原因。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "把 Access Token 有效期设长一点，就不用续签了" → 有效期越长泄露损失面越大；正确方向是缩短 Access 有效期 + 完善续签链路。
 - ❌ "用了黑名单，JWT 就等于 Session 了，不如直接用 Session" → 黑名单只覆盖"提前失效"这一个诉求，条目有 TTL 自动过期，远轻于全量 Session 存储；JWT 无状态扩展的主优势仍在。
@@ -1204,9 +1284,19 @@ public boolean isValid(String token) {
 
 ::: details
 
-- 【L3】**JWT 为什么无法主动失效？** 验签只依赖签名和时间，不查询服务端状态。加黑名单确实引入了状态，但开销本质不同：黑名单只存少量"被注销 Token"的 `jti` 与剩余有效期，而 Session 要存所有在线用户的全量数据，属于"小状态"折中而非倒退。
-- 【L3】**HS256 与 RS256 怎么选？** HS256 是对称算法，签名与验签共享同一密钥，只适合单一系统自签自验；RS256 是非对称算法，私钥签名、公钥验签，公钥可分发给任意资源服务器——微服务和开放平台必须用 RS256，否则密钥分发到任何一个下游都意味着全线沦陷。
-- 【L4】**Token 为什么不存 localStorage？** localStorage 可被任何 JS 读取，一旦存在 XSS 漏洞 Token 即被窃取；HttpOnly Cookie 天然免疫 JS 读取。业界主流：Access Token 放内存（JS 变量），Refresh Token 放 HttpOnly Cookie，并配合 SameSite 防 CSRF。
+- 【L3】**JWT 为什么无法主动失效？**
+
+  验签只依赖签名和时间，不查询服务端状态。加黑名单确实引入了状态，但开销本质不同：黑名单只存少量"被注销 Token"的 `jti` 与剩余有效期，而 Session 要存所有在线用户的全量数据，属于"小状态"折中而非倒退。
+
+- 【L3】**HS256 与 RS256 怎么选？**
+
+  HS256 是对称算法，签名与验签共享同一密钥，只适合单一系统自签自验；RS256 是非对称算法，私钥签名、公钥验签，公钥可分发给任意资源服务器——微服务和开放平台必须用 RS256，否则密钥分发到任何一个下游都意味着全线沦陷。
+
+- 【L4】**Token 为什么不存 localStorage？**
+
+  localStorage 可被任何 JS 读取，一旦存在 XSS 漏洞 Token 即被窃取；HttpOnly Cookie 天然免疫 JS 读取。业界主流：Access Token 放内存（JS 变量），
+  Refresh Token 放 HttpOnly Cookie，并配合 SameSite 防 CSRF。
+
 - 【L4】多机时钟不同步会导致 `exp` 校验误判，验签需容忍 `leeway`（一般 30~60 秒）。
 
 > 📚 延伸阅读：[JWT.io](https://jwt.io/)
@@ -1217,7 +1307,8 @@ public boolean isValid(String token) {
 
 ::: details HS256 密钥泄漏导致全平台连环 401
 
-开放接口最初为追求"服务端零状态"，全量采用 HS256 签名的 JWT。一次某合作方密钥泄漏需要紧急停用其凭证，却发现整条链路没有任何失效手段，只好紧急更换全局签名密钥——**导致所有合作方 Token 同时失效**，全平台 401 连环报警，连夜通知各家重新换 Token。复盘结论：① 改用 RS256，换密钥只影响签发方（私钥），验签方公钥可平滑过渡；② 增加 `kid`（密钥 ID）支持多密钥并存切换；③ 预留黑名单通道应对紧急吊销。
+开放接口最初为追求"服务端零状态"，全量采用 HS256 签名的 JWT。一次某合作方密钥泄漏需要紧急停用其凭证，却发现整条链路没有任何失效手段，只好紧急更换全局签名密钥——**导致所有合作方 Token 同时失效**，
+全平台 401 连环报警，连夜通知各家重新换 Token。复盘结论：① 改用 RS256，换密钥只影响签发方（私钥），验签方公钥可平滑过渡；② 增加 `kid`（密钥 ID）支持多密钥并存切换；③ 预留黑名单通道应对紧急吊销。
 
 :::
 
@@ -1226,20 +1317,25 @@ public boolean isValid(String token) {
 **场景**：公司有三套系统——内部 OA（单体，要求即时冻结账号）、电商 App（前后端分离、多端）、开放平台（对外授权数据给第三方）。领导要求"统一登录体系"，作为架构师如何选型？
 
 1. **现状分析**：三套系统各自维护登录，重复建设、安全水位参差，且无法做到"一处冻结、处处生效"。
+
 2. **根因分析**：问题本质是单一认证协议无法同时满足"强管控、跨端、开放"三种诉求，必须把身份层与凭证层解耦。
+
 3. **长期方案**：建设统一认证中心（SSO），对外签发 JWT（RS256 + OIDC）：
+
    - 开放平台：标准 JWT，第三方用公钥离线验签；
+
    - 电商 App：双 Token（Access 15 分钟 / Refresh 7 天）+ 设备标识；
+
    - 内部 OA 的"即时冻结"：在 JWT 中携带用户状态版本号，网关高频（缓存 TTL 1~5 秒）校验 Redis 中的最新版本，冻结可在 5 秒内全局生效。
-4. **权衡**：全集中式 Session 也能覆盖前两个场景，但每个服务都要查 Redis，且开放平台的跨公司场景天然走不通；"无状态 JWT + 最小化状态（版本号/黑名单）"的混合架构是统一认证中心的最优解，也是可支撑百万级日活的成熟实践。
+
+4. **权衡**：全集中式 Session 也能覆盖前两个场景，但每个服务都要查 Redis，且开放平台的跨公司场景天然走不通；"无状态 JWT + 最小化状态（版本号/黑名单）"的混合架构是统一认证中心的最优解，
+  也是可支撑百万级日活的成熟实践。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "JWT 可以随时作废，和 Session 一样能踢人" → JWT 签发后在有效期内始终合法，只能靠黑名单/版本号补偿，存在最长一个有效期窗口的风险。
 - ❌ "JWT Payload 是加密的，可以放手机号、身份证号" → Payload 只是 Base64 编码，解码即明文，敏感信息绝不能放。
@@ -1310,9 +1406,18 @@ JWT 是无状态的，服务端无法直接让它失效，刷新与失效机制�
 
 ::: details
 
-- 【L3】**轮换机制下收到已作废的旧 Refresh Token，是用户重放还是攻击？** 严格做法（OAuth 2.0 安全建议）：一旦检测到已作废的 Refresh Token 被复用，立即作废该用户整条刷新链并强制重新登录——宁可误伤合法用户也要保安全。宽松做法：给旧 Token 设 10~30 秒宽限期容忍网络延迟，适合低风险业务。
-- 【L4】**黑名单 Redis 宕机怎么降级？** 两派选择：① 可用性优先——跳过黑名单校验但记录告警，依赖 Access Token 短有效期（15 分钟）兜底；② 安全优先——直接拒绝鉴权，适合支付级系统。这必须是事先想清楚的显式选择，而不是意外行为。
-- 【L4】并发刷新竞态：多个前端请求同时发现过期并发起刷新，轮换机制下合法用户的第二个刷新请求会因旧 Refresh Token 已作废而被误判为攻击——需要前端串行化刷新或服务端宽限期配合。
+- 【L3】**轮换机制下收到已作废的旧 Refresh Token，是用户重放还是攻击？**
+
+  严格做法（OAuth 2.0 安全建议）：一旦检测到已作废的 Refresh Token 被复用，立即作废该用户整条刷新链并强制重新登录——宁可误伤合法用户也要保安全。宽松做法：给旧 Token 设 10~30 秒宽限期容忍网络延迟，
+  适合低风险业务。
+
+- 【L4】**黑名单 Redis 宕机怎么降级？**
+
+  两派选择：① 可用性优先——跳过黑名单校验但记录告警，依赖 Access Token 短有效期（15 分钟）兜底；② 安全优先——直接拒绝鉴权，适合支付级系统。这必须是事先想清楚的显式选择，而不是意外行为。
+
+- 【L4】并发刷新竞态
+
+  多个前端请求同时发现过期并发起刷新，轮换机制下合法用户的第二个刷新请求会因旧 Refresh Token 已作废而被误判为攻击——需要前端串行化刷新或服务端宽限期配合。
 
 :::
 
@@ -1320,7 +1425,10 @@ JWT 是无状态的，服务端无法直接让它失效，刷新与失效机制�
 
 ::: details "登出不等于失效"导致的退款盗用
 
-支付系统收到用户投诉："我昨天明明退出登录了，今天账上却出现 3 笔我没操作的退款"。排查：① 访问日志显示请求来自异地 IP，但 Token 完全合法；② 时间线显示用户在公共电脑上 18:00 退出登录，退出只是前端清了本地存储，并未调用服务端登出接口，而 Access Token 要到 18:20 才过期；③ 公共电脑上的恶意程序早已通过 XSS 拿到了 Token。根因：**登出不等于失效**——无状态 JWT 不会因为客户端删除而作废，剩余 20 分钟有效期成了盗用窗口。修复：① 登出接口必须把当前 Token 的 `jti` 写入 Redis 黑名单；② Access Token 有效期从 20 分钟缩短到 10 分钟；③ 敏感操作增加"签发时间超过 5 分钟需二次验证"的校验。修复后同类事故不再发生。
+支付系统收到用户投诉："我昨天明明退出登录了，今天账上却出现 3 笔我没操作的退款"。排查：① 访问日志显示请求来自异地 IP，但 Token 完全合法；② 时间线显示用户在公共电脑上 18:00 退出登录，退出只是前端清了本地存储，
+并未调用服务端登出接口，而 Access Token 要到 18:20 才过期；③ 公共电脑上的恶意程序早已通过 XSS 拿到了 Token。根因：**登出不等于失效**——无状态 JWT 不会因为客户端删除而作废，
+剩余 20 分钟有效期成了盗用窗口。修复：① 登出接口必须把当前 Token 的 `jti` 写入 Redis 黑名单；② Access Token 有效期从 20 分钟缩短到 10 分钟；
+③ 敏感操作增加"签发时间超过 5 分钟需二次验证"的校验。修复后同类事故不再发生。
 
 :::
 
@@ -1329,21 +1437,27 @@ JWT 是无状态的，服务端无法直接让它失效，刷新与失效机制�
 **场景**：App 要求支持"多设备登录互踢"（同一账号只允许一台设备在线，新登录踢掉旧设备），现有无状态 JWT 方案没有设备概念，如何改造？
 
 1. **应急处理**：纯无状态方案无法实现互踢。先与产品明确需求边界——是"立即踢下线"还是"下次请求时失效"？后者无需长连接，成本低得多，通常可接受。
+
 2. **根因分析**：互踢要求服务端知道"用户当前有哪些设备在线、哪台是最新的"，无状态 JWT 不携带这些信息，必须引入设备维度的服务端状态。
+
 3. **长期方案**：
+
    - JWT 中增加 `device_id` 声明（设备指纹）；
+
    - Redis 维护 Hash：`user:{uid}:device` → 最新 Refresh Token 的 `jti`；
+
    - 新登录时覆盖该记录；旧设备刷新或鉴权时，发现自身 Token 的 `jti` 与 Redis 最新记录不一致即返回 401，自然被踢下线；
+
    - 若要求立即下线，配合推送（APNs/FCM）或 WebSocket 通知旧设备退出。
-4. **权衡**：每次鉴权多一次 Redis 读取（约 0.5~1ms），可接受，这是视频会员类业务的标准做法；若进一步要求"登录设备管理列表"，则需完整存储设备 Session，本质上回到 Session 模式——是否值得取决于产品诉求，不要过度设计。
+
+4. **权衡**：每次鉴权多一次 Redis 读取（约 0.5~1ms），可接受，这是视频会员类业务的标准做法；若进一步要求"登录设备管理列表"，则需完整存储设备 Session，本质上回到 Session 模式——
+  是否值得取决于产品诉求，不要过度设计。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "前端清除本地 Token 就算登出了" → 无状态 JWT 不会因客户端删除而作废，登出必须把 `jti` 写入服务端黑名单。
 - ❌ "Access Token 有效期拉长到 1 天可以减少刷新频率" → 黑名单只影响后续请求，已泄漏 Token 的盗用窗口等于剩余有效期，不能为省刷新而放大风险窗口。
@@ -1398,8 +1512,13 @@ XSS 是攻击者向页面注入恶意脚本，在用户浏览器中执行，窃�
 
 ::: details
 
-- 【L3】输出编码要分上下文：HTML 正文、HTML 属性、JavaScript 字符串、URL 参数的转义规则各不相同，现代框架（React/Vue）默认转义，但 `dangerouslySetInnerHTML`/`v-html` 是高危入口。
+- 【L3】输出编码要分上下文
+
+  HTML 正文、HTML 属性、JavaScript 字符串、URL 参数的转义规则各不相同，现代框架（React/Vue）默认转义，
+  但 `dangerouslySetInnerHTML`/`v-html` 是高危入口。
+
 - 【L3】富文本场景（允许部分 HTML）应使用 DOMPurify 等白名单净化器，服务端与客户端各做一次。
+
 - 【L4】存储型 XSS 的杀伤力在于"一次注入、所有访问者中招"，可结合 CSRF 形成组合攻击；CSP 3 的 nonce/hash 机制可禁止内联脚本，大幅收窄攻击面。
 
 :::
@@ -1447,8 +1566,12 @@ CSRF 是攻击者诱导用户在已登录的站点上执行非预期操作（转
 
 ::: details
 
-- 【L3】SameSite 三种取值：`Strict` 完全禁止跨站携带；`Lax`（现代浏览器默认）允许顶层导航 GET 携带；`None` 必须同时声明 `Secure`。
+- 【L3】SameSite 三种取值
+
+  `Strict` 完全禁止跨站携带；`Lax`（现代浏览器默认）允许顶层导航 GET 携带；`None` 必须同时声明 `Secure`。
+
 - 【L3】CSRF 攻击通常用表单自动提交或 `<img>` 发起——无法携带自定义请求头，这正是"自定义请求头校验"能防御 CSRF 的原因。
+
 - 【L4】前后端分离 + JWT 放 Authorization 头的方案天然免疫传统 CSRF（浏览器不会自动附加该头），但 Cookie 存 Token 的方案仍需防护。
 
 :::
@@ -1509,10 +1632,23 @@ public class CorsConfig implements WebMvcConfigurer {
 
 ::: details
 
-- 【L3】**简单请求 vs 预检请求**：方法为 GET/HEAD/POST、只含简单请求头（`Accept`/`Accept-Language`/`Content-Language` 等），且 `Content-Type` 仅限 `application/x-www-form-urlencoded`、`multipart/form-data`、`text/plain` 三种时才是简单请求、直接发送；否则（如 `Content-Type: application/json`、携带 `Authorization` 等自定义头、PUT/DELETE 方法）先发 OPTIONS 预检（带 `Access-Control-Request-Method`/`Access-Control-Request-Headers`），服务端用 `Access-Control-Allow-*` 响应，浏览器按 `Access-Control-Max-Age`（Spring 配置的 `maxAge`）缓存预检结果，有效期内同请求不再发预检。
+- 【L3】**简单请求 vs 预检请求**
+
+  方法为 GET/HEAD/POST、只含简单请求头（`Accept`/`Accept-Language`/`Content-Language` 等），
+  且 `Content-Type` 仅限 `application/x-www-form-urlencoded`、`multipart/form-data`、`text/plain` 三种时才是简单请求、直接发送；
+  否则（如 `Content-Type: application/json`、携带 `Authorization` 等自定义头、
+  PUT/DELETE 方法）先发 OPTIONS 预检（带 `Access-Control-Request-Method`/`Access-Control-Request-Headers`），
+  服务端用 `Access-Control-Allow-*` 响应，浏览器按 `Access-Control-Max-Age`（Spring 配置的 `maxAge`）缓存预检结果，有效期内同请求不再发预检。
+
 - 【L3】开启凭证（`allowCredentials(true)` / `withCredentials`）时，`Access-Control-Allow-Origin` 不能为通配符 `*`，必须是具体来源。
+
 - 【L4】同源策略禁止的是"读取跨源响应"，`<script>`/`<img>` 等标签仍可跨源加载资源——这是 JSONP 的历史由来；服务端之间的调用也不受同源策略限制。
-- 【L4】**预检被网关鉴权拦截是高频生产事故**：OPTIONS 预检由浏览器自动发出，**不携带业务登录态**（无 Cookie、无 Authorization 头）；若网关或安全 Filter 对未认证请求一刀切返回 401/302，预检失败，浏览器直接判定跨域请求失败。症状是"本地直连后端正常，走网关全部跨域报错"。正确做法：在网关/Filter 层显式放行 OPTIONS，或由该层直接应答 CORS 响应头，再进入鉴权链。
+
+- 【L4】**预检被网关鉴权拦截是高频生产事故**
+
+  OPTIONS 预检由浏览器自动发出，**不携带业务登录态**（无 Cookie、无 Authorization 头）；
+  若网关或安全 Filter 对未认证请求一刀切返回 401/302，预检失败，浏览器直接判定跨域请求失败。症状是"本地直连后端正常，走网关全部跨域报错"。正确做法：在网关/Filter 层显式放行 OPTIONS，
+  或由该层直接应答 CORS 响应头，再进入鉴权链。
 
 :::
 
@@ -1565,9 +1701,15 @@ WebSocket 是全双工协议：单个 TCP 连接上双向实时通信。它借 H
 
 ::: details
 
-- 【L3】生产环境需要应用层心跳（ping/pong 帧）：链路中间的 LB/防火墙会杀掉空闲连接，心跳用于保活与检测半开连接。
+- 【L3】生产环境需要应用层心跳（ping/pong 帧）
+
+  链路中间的 LB/防火墙会杀掉空闲连接，心跳用于保活与检测半开连接。
+
 - 【L3】WebSocket 不内置断线重连与消息补偿，需客户端实现指数退避重连；`wss://`（TLS）在生产环境是强制要求。
-- 【L4】服务端推送的替代方案 SSE（Server-Sent Events）：基于 HTTP、单向推送、自动重连，适合"只推不收"场景；双向交互才需要 WebSocket。
+
+- 【L4】服务端推送的替代方案 SSE（Server-Sent Events）
+
+  基于 HTTP、单向推送、自动重连，适合"只推不收"场景；双向交互才需要 WebSocket。
 
 :::
 

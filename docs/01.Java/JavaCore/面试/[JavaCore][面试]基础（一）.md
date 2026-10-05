@@ -44,8 +44,15 @@ Java 的核心优势是**跨平台**与**自动内存管理**：源码编译为�
 
 ::: details
 
-- 【L3】Java 的"跨平台"是有边界的：平台无关的是字节码而非 JVM 本身，每个操作系统需要对应的 JVM 实现；且涉及 JNI 本地库、文件系统/网络行为差异时仍需适配。JIT 还会依据运行时 Profile 做热点优化，这是纯 AOT 语言不具备的。
-- 【L4】横向对比：C# 同样依赖 CLR 虚拟机层实现跨平台；Go/Rust 直接编译为机器码，靠交叉编译分发各平台产物；GraalVM Native Image 为 Java 提供 AOT 能力，以牺牲运行时优化换取毫秒级启动与更低内存，是云原生场景的新方向。
+- 【L3】Java 的"跨平台"是有边界的
+
+  平台无关的是字节码而非 JVM 本身，每个操作系统需要对应的 JVM 实现；且涉及 JNI 本地库、文件系统/网络行为差异时仍需适配。JIT 还会依据运行时 Profile 做热点优化，
+  这是纯 AOT 语言不具备的。
+
+- 【L4】横向对比
+
+  C# 同样依赖 CLR 虚拟机层实现跨平台；Go/Rust 直接编译为机器码，靠交叉编译分发各平台产物；GraalVM Native Image 为 Java 提供 AOT 能力，
+  以牺牲运行时优化换取毫秒级启动与更低内存，是云原生场景的新方向。
 
 :::
 
@@ -216,8 +223,14 @@ int exitCode = process.waitFor(); // 等待子进程结束
 
 ::: details
 
-- 【L3】**流阻塞是最常见的坑**：子进程的 stdout/stderr 缓冲区写满后会阻塞子进程，Java 侧若不持续读取输出流，`waitFor()` 可能永久挂起。解法是消费流、`redirectErrorStream(true)` 或 `inheritIO()`。
-- 【L3】**命令注入风险**：命令参数若来自用户输入且拼接为单字符串，可能被注入恶意命令；应使用参数数组形式并严格校验输入。
+- 【L3】**流阻塞是最常见的坑**
+
+  子进程的 stdout/stderr 缓冲区写满后会阻塞子进程，Java 侧若不持续读取输出流，`waitFor()` 可能永久挂起。解法是消费流、
+  `redirectErrorStream(true)` 或 `inheritIO()`。
+
+- 【L3】**命令注入风险**
+
+  命令参数若来自用户输入且拼接为单字符串，可能被注入恶意命令；应使用参数数组形式并严格校验输入。
 
 > 📚 延伸阅读：[Java 调用外部程序实战](https://blog.csdn.net/m0_46487331/article/details/128827908)
 
@@ -257,8 +270,14 @@ int exitCode = process.waitFor(); // 等待子进程结束
 
 ::: details
 
-- 【L3】并发模型对比：Go 的 goroutine 由运行时以 M:N 模型调度到 OS 线程，栈初始仅约 2KB 可动态增长；Java 在 21 引入虚拟线程（JEP 444）后同样具备 M:N 轻量调度能力，二者在"海量轻量并发"上已趋同。
-- 【L4】资源清理哲学对比：C++ 靠 RAII 析构函数确定性释放；Java 无析构函数，靠 `try-with-resources` + GC；Go 靠 `defer` 语句显式延迟释放，介于两者之间。
+- 【L3】并发模型对比
+
+  Go 的 goroutine 由运行时以 M:N 模型调度到 OS 线程，栈初始仅约 2KB 可动态增长；Java 在 21 引入虚拟线程（JEP 444）后同样具备 M:N 轻量调度能力，
+  二者在"海量轻量并发"上已趋同。
+
+- 【L4】资源清理哲学对比
+
+  C++ 靠 RAII 析构函数确定性释放；Java 无析构函数，靠 `try-with-resources` + GC；Go 靠 `defer` 语句显式延迟释放，介于两者之间。
 
 :::
 
@@ -333,9 +352,19 @@ int exitCode = process.waitFor(); // 等待子进程结束
 
 ::: details
 
-- 【L3】为什么 8、11、17、21 被反复强调？它们是 **LTS（长期支持）版本**，商业发行版只对 LTS 提供长期补丁，企业升级基本沿 LTS 路线走。
-- 【L4】发布节奏演进：Java 9 之前按特性打包、动辄数年一版；Java 10 起改为**每 6 个月固定发布**（JEP 322 Time-Based Release），特性以预览（Preview）→ 孵化（Incubator）→ 转正的方式渐进落地，这也是很多特性跨多个版本出现的原因。
-- 【L4】版本演进还包括**语法层看不见的 JVM 行为变化**：JDK 15 起偏向锁默认禁用并被废弃（JEP 374）——偏向撤销需到达安全点、代价高，而现代应用锁竞争激烈时收益递减；「无锁→偏向锁→轻量级锁→重量级锁」的经典锁升级心智模型在 JDK 15+ 需要修正。
+- 【L3】为什么 8、11、17、21 被反复强调？
+
+  它们是 **LTS（长期支持）版本**，商业发行版只对 LTS 提供长期补丁，企业升级基本沿 LTS 路线走。
+
+- 【L4】发布节奏演进
+
+  Java 9 之前按特性打包、动辄数年一版；Java 10 起改为**每 6 个月固定发布**（JEP 322 Time-Based Release），
+  特性以预览（Preview）→ 孵化（Incubator）→ 转正的方式渐进落地，这也是很多特性跨多个版本出现的原因。
+
+- 【L4】版本演进还包括**语法层看不见的 JVM 行为变化**
+
+  JDK 15 起偏向锁默认禁用并被废弃（JEP 374）——偏向撤销需到达安全点、代价高，而现代应用锁竞争激烈时收益递减；
+  「无锁→偏向锁→轻量级锁→重量级锁」的经典锁升级心智模型在 JDK 15+ 需要修正。
 
 :::
 
@@ -594,9 +623,16 @@ public class User implements Serializable {
 
 ::: details
 
-- 【L3】`ArrayList` 的 `elementData` 加了 `transient` 却能正常序列化，看似矛盾，实则因为它重写了 `writeObject`：手动遍历 `[0, size)` 区间逐个写出元素，`transient` 只是阻止默认机制把整个数组（含大量 null 容量）写出去。
+- 【L3】`ArrayList` 的 `elementData` 加了 `transient` 却能正常序列化，看似矛盾，实则因为它重写了 `writeObject`：手动遍历 `[0, size)` 区间逐个写出元素，
+  `transient` 只是阻止默认机制把整个数组（含大量 null 容量）写出去。
+
 - 【L4】`transient` 是 JDK 原生序列化专属；JSON 序列化框架（Jackson、Fastjson 等）不识别它，需要各自的注解（如 Jackson 的 `@JsonIgnore`）。
-- 【L4】**序列化是安全边界而不只是存储细节**：`ObjectInputStream` 反序列化时会解析流中指定的任意类并调用其构造/`readObject` 逻辑，攻击者可用类路径上现成的"gadget 链"（如利用常见库中实现了 `Serializable` 且 `readObject` 有副作用的类）触发远程代码执行。防线是 JDK 9 引入的序列化过滤（JEP 290，`ObjectInputFilter`）：按类名/包名/深度白名单拦截；更根本的做法是对外边界禁用 JDK 原生序列化，改用 JSON/Protobuf 等数据格式。`transient` 只能防"敏感字段被带出"，防不了反序列化攻击。
+
+- 【L4】**序列化是安全边界而不只是存储细节**
+
+  `ObjectInputStream` 反序列化时会解析流中指定的任意类并调用其构造/`readObject` 逻辑，
+  攻击者可用类路径上现成的"gadget 链"（如利用常见库中实现了 `Serializable` 且 `readObject` 有副作用的类）触发远程代码执行。防线是 JDK 9 引入的序列化过滤（JEP 290，
+  `ObjectInputFilter`）：按类名/包名/深度白名单拦截；更根本的做法是对外边界禁用 JDK 原生序列化，改用 JSON/Protobuf 等数据格式。`transient` 只能防"敏感字段被带出"，防不了反序列化攻击。
 
 :::
 
@@ -690,8 +726,18 @@ System.out.println(l << 70);  // 等效左移 6 位（70%64=6），输出 -64
 
 ::: details
 
-- 【L3】**为什么这样设计？** ① 硬件对齐：CPU 执行移位指令时实际只使用指定位数的低 5 位（int）或低 6 位（long），Java 的取模规则与硬件行为一致，直接映射到 CPU 指令无需额外检查；② 与 C/C++ 移位行为兼容；③ 保证结果确定，避免无效大位数移位（如 `x << 1000`）产生未定义行为。
-- 【L4】**位运算的典型应用**：`HashMap` 的 hash 扰动函数 `(h = key.hashCode()) ^ (h >>> 16)` 用无符号右移把高位信息混入低位；容量计算用 `n << 1` 代替乘 2。注意：对负数 `x >> 1` 并不总等于 `x / 2`（如 `-3 >> 1 = -2` 而 `-3 / 2 = -1`），因为右移是向下取整、除法是向零取整。
+- 【L3】**为什么这样设计？**
+
+  ① 硬件对齐：CPU 执行移位指令时实际只使用指定位数的低 5 位（int）或低 6 位（long），Java 的取模规则与硬件行为一致，直接映射到 CPU 指令无需额外检查；
+
+  ② 与 C/C++ 移位行为兼容；
+
+  ③ 保证结果确定，避免无效大位数移位（如 `x << 1000`）产生未定义行为。
+
+- 【L4】**位运算的典型应用**
+
+  `HashMap` 的 hash 扰动函数 `(h = key.hashCode()) ^ (h >>> 16)` 用无符号右移把高位信息混入低位；
+  容量计算用 `n << 1` 代替乘 2。注意：对负数 `x >> 1` 并不总等于 `x / 2`（如 `-3 >> 1 = -2` 而 `-3 / 2 = -1`），因为右移是向下取整、除法是向零取整。
 
 :::
 
@@ -1080,8 +1126,14 @@ class Cat extends Animal {
 
 ::: details
 
-- 【L3】**字节码层面的分界**：重载的各版本在 class 中是不同的方法描述符（参数列表不同），编译期按实参静态类型确定目标，属静态分派；重写通过 `invokevirtual` 指令在运行时查对象的虚方法表（vtable）按实际类型分派，属动态分派。
-- 【L4】**横向对比 C++**：C++ 中父子类同名不同参的方法构成"隐藏"而非重载（子类作用域遮蔽父类同名方法），需 `using` 声明才能找回；Java 的重载可以跨父子类存在，语义更宽松。
+- 【L3】**字节码层面的分界**
+
+  重载的各版本在 class 中是不同的方法描述符（参数列表不同），编译期按实参静态类型确定目标，属静态分派；
+  重写通过 `invokevirtual` 指令在运行时查对象的虚方法表（vtable）按实际类型分派，属动态分派。
+
+- 【L4】**横向对比 C++**
+
+  C++ 中父子类同名不同参的方法构成"隐藏"而非重载（子类作用域遮蔽父类同名方法），需 `using` 声明才能找回；Java 的重载可以跨父子类存在，语义更宽松。
 
 :::
 
@@ -1401,9 +1453,22 @@ String html = """
 
 ::: details
 
-- 【L3】**lambda 不是匿名内部类**：`javac` 把 lambda 体编译为类中的私有合成方法（如 `lambda$main$0`），运行期通过 `invokedynamic` 指令调用 `LambdaMetafactory.metafactory` 动态生成实现类并缓存 `CallSite`——首次调用有生成成本，后续调用开销接近普通方法调用，避免了“每个 lambda 一个类文件”导致的类数量膨胀与元空间压力。匿名内部类则仍会生成独立的 class 文件，这是二者的本质区别。
-- 【L3】**字符串拼接的脱糖有版本分界**：JDK 8 及以前，变量拼接编译为 `StringBuilder.append` 链；JDK 9 起（JEP 280）改为 `invokedynamic` + `StringConcatFactory`，拼接策略交给运行时决定，纯常量拼接仍可在编译期直接折叠成一个字符串。循环内累积拼接场景仍建议显式使用 `StringBuilder`。
-- 【L3】**泛型并非完全的语法糖**：类型擦除发生在编译期，但桥接方法、协变返回等由编译器补齐，且运行时通过反射仍能获取字段/方法签名上的泛型信息（`getGenericType`），把泛型称为“纯语法糖”并不严谨。
+- 【L3】**lambda 不是匿名内部类**
+
+  `javac` 把 lambda 体编译为类中的私有合成方法（如 `lambda$main$0`），
+  运行期通过 `invokedynamic` 指令调用 `LambdaMetafactory.metafactory` 动态生成实现类并缓存 `CallSite`——首次调用有生成成本，后续调用开销接近普通方法调用，
+  避免了“每个 lambda 一个类文件”导致的类数量膨胀与元空间压力。匿名内部类则仍会生成独立的 class 文件，这是二者的本质区别。
+
+- 【L3】**字符串拼接的脱糖有版本分界**
+
+  JDK 8 及以前，变量拼接编译为 `StringBuilder.append` 链；
+  JDK 9 起（JEP 280）改为 `invokedynamic` + `StringConcatFactory`，拼接策略交给运行时决定，纯常量拼接仍可在编译期直接折叠成一个字符串。
+
+  循环内累积拼接场景仍建议显式使用 `StringBuilder`。
+
+- 【L3】**泛型并非完全的语法糖**
+
+  类型擦除发生在编译期，但桥接方法、协变返回等由编译器补齐，且运行时通过反射仍能获取字段/方法签名上的泛型信息（`getGenericType`），把泛型称为“纯语法糖”并不严谨。
 
 :::
 
@@ -1452,16 +1517,20 @@ public static void addAge(User user) {
 
 ::: details
 
-- 【L3】"对象传引用"的错觉来源：Java 把引用（堆对象地址）也当作"值"来拷贝传递，两个引用指向同一对象，所以"改内容"两边可见；但"换指向"只改副本，实参不变。判断标准：形参重新赋值能否影响实参——不能，就是值传递。
-- 【L4】横向对比：C++ 的引用参数（`void f(int &x)`）是真正的引用传递；C# 提供 `ref`/`out` 关键字显式实现类似语义；Java 若需"输出参数"效果，通常用返回值、容器（数组/AtomicReference）或可变对象包装。
+- 【L3】"对象传引用"的错觉来源
+
+  Java 把引用（堆对象地址）也当作"值"来拷贝传递，两个引用指向同一对象，所以"改内容"两边可见；但"换指向"只改副本，实参不变。判断标准：形参重新赋值能否影响实参——不能，就是值传递。
+
+- 【L4】横向对比
+
+  C++ 的引用参数（`void f(int &x)`）是真正的引用传递；C# 提供 `ref`/`out` 关键字显式实现类似语义；Java 若需"输出参数"效果，通常用返回值、
+  容器（数组/AtomicReference）或可变对象包装。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Java 中对象作为参数是引用传递" → 传递的是引用地址的副本，形参重新赋值不影响实参，不符合引用传递定义。
 - ❌ "方法里改了对象，说明是引用传递" → 能改内容是因为两个副本指向同一堆对象，这是值传递（传的值恰好是地址）的正常表现。
@@ -1603,8 +1672,13 @@ int b = a;   //拆箱
 
 ::: details
 
-- 【L3】装箱不等于 new 对象：`valueOf` 会先查缓存，`Integer` 等包装类对 -128~127 区间的值复用缓存对象，这直接影响 `==` 比较结果，见本文档「包装类型的缓存机制了解么？」。
-- 【L4】性能视角：每次装箱都在堆上分配（或复用缓存）对象，包装对象比基本类型多 12~16 字节对象头开销；高频计算路径上应优先基本类型，避免隐式装箱引发 GC 压力。
+- 【L3】装箱不等于 new 对象
+
+  `valueOf` 会先查缓存，`Integer` 等包装类对 -128~127 区间的值复用缓存对象，这直接影响 `==` 比较结果，见本文档「包装类型的缓存机制了解么？」。
+
+- 【L4】性能视角
+
+  每次装箱都在堆上分配（或复用缓存）对象，包装对象比基本类型多 12~16 字节对象头开销；高频计算路径上应优先基本类型，避免隐式装箱引发 GC 压力。
 
 > 📚 延伸阅读：[深入剖析 Java 中的装箱和拆箱](https://www.cnblogs.com/dolphin0520/p/3780005.html)
 
@@ -1749,9 +1823,12 @@ private static class IntegerCache {
 }
 ```
 
-关键细节：参数名是 `-XX:AutoBoxCacheMax`，但实际读取的系统属性是 `java.lang.Integer.IntegerCache.high`；且仅影响 `Integer`，`Long`/`Short`/`Byte` 的上限**固定为 127 不可调**。
+关键细节：参数名是 `-XX:AutoBoxCacheMax`，但实际读取的系统属性是 `java.lang.Integer.IntegerCache.high`；
 
-- 【L3】**缓存的堆内结构**：缓存是一个静态 final 数组，在类加载的 `<clinit>` 阶段一次性分配。以默认 `IntegerCache` 为例：high=127、low=-128 → 分配 256 个 `Integer` 对象；开启指针压缩时每个为 12 字节对象头 + 4 字节数据 = 16 字节，合计约 4 KB，对堆几乎无感知。
+且仅影响 `Integer`，`Long`/`Short`/`Byte` 的上限**固定为 127 不可调**。
+
+- 【L3】**缓存的堆内结构**：缓存是一个静态 final 数组，在类加载的 `<clinit>` 阶段一次性分配。以默认 `IntegerCache` 为例：high=127、
+  low=-128 → 分配 256 个 `Integer` 对象；开启指针压缩时每个为 12 字节对象头 + 4 字节数据 = 16 字节，合计约 4 KB，对堆几乎无感知。
 
 :::
 
@@ -1776,8 +1853,6 @@ private static class IntegerCache {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "`Integer i1 = 40; i1 == i2` 为 true，说明 == 可以比较包装类的值" → 只是命中了缓存、两个引用指向同一对象；换个数值（如 400）结果就变 false，`==` 比较的始终是引用。
 - ❌ "`-XX:AutoBoxCacheMax` 能调大所有包装类的缓存" → 只对 `Integer` 生效，`Long`/`Short`/`Byte` 上限固定 127。
@@ -1837,8 +1912,15 @@ public static Long valueOf(long l) {
 
 ::: details
 
-- 【L3】两种正确的比较姿势：① `a.equals(b)`（`Integer.equals` 先 instanceof 判型再比较内部 int 值）；② 先拆箱再比较基本类型 `a.intValue() == b.intValue()`，但需先判空，否则 NPE。
-- 【L4】同类陷阱：`String` 的 `==` 同样比较引用——字面量进字符串常量池会复用，`"a" == "a"` 为 true，但 `new String("a") == new String("a")` 为 false，本质与包装类缓存是同一种"池化复用"设计。
+- 【L3】两种正确的比较姿势
+
+  ① `a.equals(b)`（`Integer.equals` 先 instanceof 判型再比较内部 int 值）；
+  ② 先拆箱再比较基本类型 `a.intValue() == b.intValue()`，但需先判空，否则 NPE。
+
+- 【L4】同类陷阱
+
+  `String` 的 `==` 同样比较引用——字面量进字符串常量池会复用，`"a" == "a"` 为 true，但 `new String("a") == new String("a")` 为 false，
+  本质与包装类缓存是同一种"池化复用"设计。
 
 :::
 
@@ -1942,16 +2024,20 @@ System.out.println(sum);  // 10000.000000018848（非精确 10000.0）
 
 ::: details
 
-- 【L3】**有效数字定量估算**：float 尾数 24bit（含隐含位）≈ 十进制 7 位有效数字；double 53bit ≈ 15~16 位。超过有效位数的小数部分必然被舍入——这是判断"会不会丢"的实用尺子。
-- 【L4】**横向对比**：C# 内置 `decimal`（128 位十进制浮点）专为金融设计；MySQL 提供 `DECIMAL` 精确类型；Java 选择不在语言层内置 decimal，由 `BigDecimal` 类库承担，代价是对象分配与运算开销（慢 100-300 倍）。
+- 【L3】**有效数字定量估算**
+
+  float 尾数 24bit（含隐含位）≈ 十进制 7 位有效数字；double 53bit ≈ 15~16 位。超过有效位数的小数部分必然被舍入——这是判断"会不会丢"的实用尺子。
+
+- 【L4】**横向对比**
+
+  C# 内置 `decimal`（128 位十进制浮点）专为金融设计；MySQL 提供 `DECIMAL` 精确类型；Java 选择不在语言层内置 decimal，由 `BigDecimal` 类库承担，
+  代价是对象分配与运算开销（慢 100-300 倍）。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "精度丢失是运算时才发生的" → 存储阶段就已舍入，`float a = 0.1f` 此刻 a 就不是精确的 0.1。
 - ❌ "用 double 代替 float 就不会丢精度" → 只是有效位数更多（约 15 位 vs 7 位），0.1 依然无法精确表示，金融场景同样不能用 double。
@@ -2047,16 +2133,22 @@ long total = price1 + price2;  // 498 分 = 4.98 元，精确不丢精度
 
 ::: details
 
-- 【L3】**性能代价定量**：`BigDecimal` 运算比基本类型 `double` 慢约 **100-300 倍**（对象分配 + 高精度运算）；高并发场景避免大量创建，考虑用 `long` 放大单位。比较时用 `compareTo()` 不用 `equals()`：`equals()` 同时比较值和 scale（`2.0` ≠ `2.00`），`compareTo()` 只比较值。
-- 【L4】**从 double 构造的正确姿势**：`BigDecimal.valueOf(0.1)` 内部经由 `Double.toString` 转换，得到的是精确的 0.1；而 `new BigDecimal(0.1)` 直接用 double 的二进制近似值构造，结果略大于 0.1。两者差异正是"误差在构造前还是构造时引入"的分界。
+- 【L3】**性能代价定量**
+
+  `BigDecimal` 运算比基本类型 `double` 慢约 **100-300 倍**（对象分配 + 高精度运算）；高并发场景避免大量创建，考虑用 `long` 放大单位。
+
+  比较时用 `compareTo()` 不用 `equals()`：`equals()` 同时比较值和 scale（`2.0` ≠ `2.00`），`compareTo()` 只比较值。
+
+- 【L4】**从 double 构造的正确姿势**
+
+  `BigDecimal.valueOf(0.1)` 内部经由 `Double.toString` 转换，得到的是精确的 0.1；
+  而 `new BigDecimal(0.1)` 直接用 double 的二进制近似值构造，结果略大于 0.1。两者差异正是"误差在构造前还是构造时引入"的分界。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "`new BigDecimal(0.1)` 和字符串构造一样精确" → double 的 0.1 本身是近似值，误差在传入前已存在；应使用字符串构造或 `BigDecimal.valueOf`。
 - ❌ "`equals` 可以比较 BigDecimal 大小" → `equals` 连带 scale 比较，`2.0` 与 `2.00` 判不等；数值比较用 `compareTo`。
@@ -2172,8 +2264,16 @@ test(null);   // 输出 "Integer"：重载解析第一阶段（不装箱/拆箱�
 
 ::: details
 
-- 【L3】**三元运算符为什么会拆箱**：当三元表达式两个分支分别是包装类型和基本类型时，按 JLS 条件表达式类型推导规则，整个表达式类型被定为基本类型，包装类型分支会被强制拆箱——分支值为 `null` 时就 NPE。规避：两个分支保持同类型（都用包装类）。
-- 【L4】**现代规避手段**：Java 8 起用 `Optional` 显式表达"可能为空"，避免 `null` 包装类参与算术；Kotlin 的可空类型在编译期阻止此类误用；Project Valhalla 的特化泛型计划从根本上消除集合场景的装箱开销。
+- 【L3】**三元运算符为什么会拆箱**
+
+  当三元表达式两个分支分别是包装类型和基本类型时，按 JLS 条件表达式类型推导规则，整个表达式类型被定为基本类型，包装类型分支会被强制拆箱——分支值为 `null` 时就 NPE。规避：
+
+  两个分支保持同类型（都用包装类）。
+
+- 【L4】**现代规避手段**
+
+  Java 8 起用 `Optional` 显式表达"可能为空"，避免 `null` 包装类参与算术；Kotlin 的可空类型在编译期阻止此类误用；
+  Project Valhalla 的特化泛型计划从根本上消除集合场景的装箱开销。
 
 :::
 
@@ -2245,8 +2345,15 @@ try {
 
 ::: details
 
-- 【L3】**为什么 Java 不检测溢出**：固定位宽补码运算直接映射 CPU 整数指令，回绕是位宽截断的自然结果、零额外开销；若每次运算都检测溢出需额外比较与跳转指令，代价过高。这是性能优先的设计取舍（与 C 语义一致）。
-- 【L4】**横向对比**：Rust debug 模式下溢出默认 panic，并提供 `checked_add`/`wrapping_add` 显式选择；Swift 用 `&+` 显式允许溢出；C/C++ 中有符号整数溢出属于未定义行为。Java 的"静默回绕"行为确定但需开发者自行防护。
+- 【L3】**为什么 Java 不检测溢出**
+
+  固定位宽补码运算直接映射 CPU 整数指令，回绕是位宽截断的自然结果、零额外开销；若每次运算都检测溢出需额外比较与跳转指令，代价过高。这是性能优先的设计取舍（与 C 语义一致）。
+
+- 【L4】**横向对比**
+
+  Rust debug 模式下溢出默认 panic，并提供 `checked_add`/`wrapping_add` 显式选择；Swift 用 `&+` 显式允许溢出；C/C++ 中有符号整数溢出属于未定义行为。
+
+  Java 的"静默回绕"行为确定但需开发者自行防护。
 
 :::
 
@@ -2313,18 +2420,36 @@ Throwable
 
 ::: details
 
-- 【L3】**JVM 层：异常表（Exception Table）**。每个方法的字节码都包含异常表，记录 `try-catch` 块的范围映射：`try { a = 1; } catch (Exception e) { a = 2; }` 对应 `from 0 to 4 target 7 type Exception`（字节码偏移 0~3 抛出 Exception 则跳转到 7）。这体现 JVM 的"零成本异常"哲学：无异常时无额外开销；但一旦抛出，`Throwable.fillInStackTrace()` 需遍历调用栈构建 `StackTraceElement[]`，单次抛异常约 50-100 μs，比正常流程（约 0.001 μs）慢 5 万~10 万倍。**优化策略**：不用异常做流程控制；高频异常可重写 `fillInStackTrace()` 为空实现或复用静态异常实例（代价是栈信息错乱）。
-- 【L3】**异常风暴 → Full GC 因果链**：高频异常 → 大量 `StackTraceElement[]` 分配 → 年轻代快速填满 → 晋升老年代 → 触发 Full GC。生产案例：某系统日志框架 Bug 导致每秒 10 万次 NPE，每次 `fillInStackTrace()` 分配约 2KB，每秒 200MB 对象分配，3 秒一次 Full GC，CPU 打满。
-- 【L3】**JEP 358 Helpful NPE（JDK 14 引入）**：NPE message 中嵌入具体变量名，如 `Cannot invoke "X.c" because "a.b" is null`；JVM 通过字节码分析定位 null 变量。JDK 14 中默认关闭，需 `-XX:+ShowCodeDetailsInExceptionMessages` 显式开启；JDK 15 起默认开启，无需改代码。
-- 【L4】**横向对比**：checked exception 是 Java 独有的编译期强制机制，C#/C++/Kotlin 均无受检异常；争议在于它强迫调用链层层声明 throws，现代 Java 实践中业务层多用非受检异常 + 全局异常处理器。
+- 【L3】**JVM 层
+
+  异常表（Exception Table）**。每个方法的字节码都包含异常表，记录 `try-catch` 块的范围映射：
+
+  `try { a = 1; } catch (Exception e) { a = 2; }` 对应 `from 0 to 4 target 7 type Exception`（字节码偏移 0~3 抛出 Exception 则跳转到 7）。
+
+  这体现 JVM 的"零成本异常"哲学：无异常时无额外开销；但一旦抛出，`Throwable.fillInStackTrace()` 需遍历调用栈构建 `StackTraceElement[]`，单次抛异常约 50-100 μs，
+  比正常流程（约 0.001 μs）慢 5 万~10 万倍。**优化策略**：不用异常做流程控制；高频异常可重写 `fillInStackTrace()` 为空实现或复用静态异常实例（代价是栈信息错乱）。
+
+- 【L3】**异常风暴 → Full GC 因果链**
+
+  高频异常 → 大量 `StackTraceElement[]` 分配 → 年轻代快速填满 → 晋升老年代 → 触发 Full GC。生产案例：
+
+  某系统日志框架 Bug 导致每秒 10 万次 NPE，每次 `fillInStackTrace()` 分配约 2KB，每秒 200MB 对象分配，3 秒一次 Full GC，CPU 打满。
+
+- 【L3】**JEP 358 Helpful NPE（JDK 14 引入）**
+
+  NPE message 中嵌入具体变量名，如 `Cannot invoke "X.c" because "a.b" is null`；
+  JVM 通过字节码分析定位 null 变量。JDK 14 中默认关闭，需 `-XX:+ShowCodeDetailsInExceptionMessages` 显式开启；JDK 15 起默认开启，无需改代码。
+
+- 【L4】**横向对比**
+
+  checked exception 是 Java 独有的编译期强制机制，C#/C++/Kotlin 均无受检异常；争议在于它强迫调用链层层声明 throws，
+  现代 Java 实践中业务层多用非受检异常 + 全局异常处理器。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "catch 住 Error 就能恢复" → OOM、StackOverflow 发生时 JVM 状态已不可靠，捕获后继续运行风险极高，正确做法是预防为主（容量规划、限制递归深度）。
 - ❌ "用异常做流程控制很优雅" → 抛异常成本比正常分支高 5 万倍以上，且混淆真实错误信号；未找到等场景应用返回值或 `Optional`。
@@ -2523,7 +2648,11 @@ public static int f(int value) {
 
 ::: details
 
-- 【L3】**字节码实现演进**：早期 javac 按官方文档描述用 `jsr` 指令跳转执行 finally；现代 javac 不再生成 `jsr`，而是将 finally 块字节码**复制**到每个正常/异常出口，效果等价：返回值先暂存、finally 执行后再恢复。这也解释了 finally 中修改局部变量不影响已暂存的返回值（除非直接 return）。
+- 【L3】**字节码实现演进**
+
+  早期 javac 按官方文档描述用 `jsr` 指令跳转执行 finally；现代 javac 不再生成 `jsr`，而是将 finally 块字节码**复制**到每个正常/异常出口，效果等价：
+
+  返回值先暂存、finally 执行后再恢复。这也解释了 finally 中修改局部变量不影响已暂存的返回值（除非直接 return）。
 
 :::
 
@@ -2667,8 +2796,14 @@ catch (IOException e) {
 
 ::: details
 
-- 【L3】**编译后原理与异常压制**：编译器生成等价于"finally 调 close"的代码；关键改进是当 try 体与 `close()` 都抛异常时，`close` 的异常通过 `addSuppressed()` 挂载到主异常上，用 `getSuppressed()` 可取回——而老写法中 finally 的异常会直接覆盖原异常，丢失根因。
-- 【L4】**版本演进**：Java 7 引入 try-with-resources；Java 9 起允许直接使用已声明的 effectively final 变量，无需在括号内重复声明。
+- 【L3】**编译后原理与异常压制**
+
+  编译器生成等价于"finally 调 close"的代码；关键改进是当 try 体与 `close()` 都抛异常时，`close` 的异常通过 `addSuppressed()` 挂载到主异常上，
+  用 `getSuppressed()` 可取回——而老写法中 finally 的异常会直接覆盖原异常，丢失根因。
+
+- 【L4】**版本演进**
+
+  Java 7 引入 try-with-resources；Java 9 起允许直接使用已声明的 effectively final 变量，无需在括号内重复声明。
 
 :::
 
@@ -2770,7 +2905,16 @@ catch (IOException e) {
 
 ::: details
 
-- 【L3】**finalize 为什么被废弃？** ① 执行时机不可控：对象从"可回收"到 `finalize()` 实际执行可能间隔数秒甚至更久；② 性能代价巨大：覆盖了 `finalize()` 的对象需要两次 GC 才能回收（先进 `Finalizer` 队列）；③ 可能导致 OOM：Finalizer 线程优先级低，队列积压时未回收对象持续占内存；④ 安全风险：`finalize()` 中可能"复活"对象（重新赋值给静态变量）。
+- 【L3】**finalize 为什么被废弃？**
+
+  ① 执行时机不可控：对象从"可回收"到 `finalize()` 实际执行可能间隔数秒甚至更久；
+
+  ② 性能代价巨大：覆盖了 `finalize()` 的对象需要两次 GC 才能回收（先进 `Finalizer` 队列）；
+
+  ③ 可能导致 OOM：Finalizer 线程优先级低，队列积压时未回收对象持续占内存；
+
+  ④ 安全风险：`finalize()` 中可能"复活"对象（重新赋值给静态变量）。
+
 - 【L3】**替代方案：Cleaner API（JDK 9+）**，基于 `PhantomReference`，清理逻辑不持有 this 引用、避免复活：
 
 ```java
@@ -2799,15 +2943,14 @@ class ModernResource implements AutoCloseable {
 }
 ```
 
-- 【L4】**实际开发建议**：永远不要重写 `finalize()`；资源清理用 `try-with-resources`（实现 `AutoCloseable`）+ 显式 `close()`；堆外内存清理用 `Cleaner` + `PhantomReference`（如 Netty 的 `ByteBuf`）；维护老代码遇到 `finalize()` 逐步迁移到 `Cleaner`。
+- 【L4】**实际开发建议**：永远不要重写 `finalize()`；资源清理用 `try-with-resources`（实现 `AutoCloseable`）+ 显式 `close()`；
+  堆外内存清理用 `Cleaner` + `PhantomReference`（如 Netty 的 `ByteBuf`）；维护老代码遇到 `finalize()` 逐步迁移到 `Cleaner`。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "finalize 是 Java 的析构函数" → Java 没有析构函数：析构要求确定性时机，而 `finalize` 由 GC 触发、时机不可控；C++ 的 RAII 确定性释放在 Java 中对应的是 try-with-resources。
 - ❌ "三个词长得像，应该有关系" → 纯巧合：分别是关键字、语句块、方法，分属语法、异常处理、GC 三个毫不相关的领域。
@@ -2884,9 +3027,20 @@ if (obj instanceof String s && s.length() > 5) {
 
 ::: details
 
-- 【L3】**模式匹配演进（JDK 16 → 21）**：`instanceof` 模式匹配在 JDK 16 转正（JEP 394）；JDK 21 进一步转正 `switch` 类型模式匹配（JEP 441），把多类型分支从 if-else 链升级为声明式语法，并支持 `case Integer i when i > 100` 这类带守卫的模式。
-- 【L3】**与 `sealed` 的配合（JDK 17，JEP 409）**：`sealed` 显式限定许可子类集合，对 sealed 类型做 `switch` 模式匹配时编译器可进行穷尽性检查、无需编写 default 分支——把「漏掉某个类型分支」从线上事故变成编译错误，对领域建模（代数数据类型风格）影响显著。
-- 【L4】**开销的本质**：`instanceof` 对应字节码级类型检查指令，JIT 通常将其内联为类型指针比较或二级超类型缓存查找，浅继承层次下开销可忽略；但业务代码里散落的 `instanceof` 判断链，往往是「应该用多态/策略模式消除类型分支」的设计信号。
+- 【L3】**模式匹配演进（JDK 16 → 21）**
+
+  `instanceof` 模式匹配在 JDK 16 转正（JEP 394）；JDK 21 进一步转正 `switch` 类型模式匹配（JEP 441），
+  把多类型分支从 if-else 链升级为声明式语法，并支持 `case Integer i when i > 100` 这类带守卫的模式。
+
+- 【L3】**与 `sealed` 的配合（JDK 17，JEP 409）**
+
+  `sealed` 显式限定许可子类集合，对 sealed 类型做 `switch` 模式匹配时编译器可进行穷尽性检查、无需编写 default 分支——
+  把「漏掉某个类型分支」从线上事故变成编译错误，对领域建模（代数数据类型风格）影响显著。
+
+- 【L4】**开销的本质**
+
+  `instanceof` 对应字节码级类型检查指令，JIT 通常将其内联为类型指针比较或二级超类型缓存查找，浅继承层次下开销可忽略；但业务代码里散落的 `instanceof` 判断链，
+  往往是「应该用多态/策略模式消除类型分支」的设计信号。
 
 :::
 

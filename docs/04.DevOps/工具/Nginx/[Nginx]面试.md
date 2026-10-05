@@ -55,6 +55,7 @@ Nginx 是一个高性能、开源的 **Web 服务器**软件。但它更核心�
 ::: details
 
 - 【L3】Nginx 由 Igor Sysoev 于 2004 年发布，最初正是为解决 **C10K 问题**（单机 1 万并发连接）而设计；如今调优后单机可支撑数万并发连接。
+
 - 【L4】Nginx 生态还包括 Tengine（淘宝开源分支，增加健康检查、动态模块等能力）与 OpenResty（内嵌 LuaJIT，可用 Lua 扩展网关逻辑）。
 
 > 📚 延伸阅读：[Nginx 官方文档](https://nginx.org/en/docs/)
@@ -64,8 +65,6 @@ Nginx 是一个高性能、开源的 **Web 服务器**软件。但它更核心�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Nginx 只是一个静态文件服务器" → 静态服务只是其基础能力，生产环境中它更多承担反向代理、负载均衡、SSL 终止等接入层职责。
 - ❌ "Nginx 和 Apache 是同类替代品，功能完全对等" → 两者并发模型不同：Nginx 是事件驱动多进程，Apache 传统模式是每连接一进程/线程，选型要看场景而非简单替代。
@@ -158,9 +157,22 @@ Nginx 选多进程而非多线程，核心是稳定性：Worker 之间零共享�
 
 ::: details
 
-- 【L3】**epoll 相比 select/poll 强在哪里**：select/poll 每次调用都要把全部 fd 集合传入内核线性扫描，且 fd 上限低（select 默认 1024）；epoll 用红黑树管理 fd，通过回调将就绪事件放入就绪链表，`epoll_wait` 只返回就绪的连接，复杂度从 O(n) 降为 O(就绪数)。当 10 万连接中只有几百个活跃时，这个差异就是性能的分水岭。
-- 【L3】**热重载为什么不会丢连接**：reload 时 Master 先校验配置，然后启动一批新 Worker 处理新连接，旧 Worker 收到退出信号后不再接新连接，但继续处理存量连接直到完成或超时退出。新旧 Worker 并存过渡，所以服务不断、连接不丢；代价是若旧配置里有超长长连接，旧 Worker 会驻留很久，可用 `worker_shutdown_timeout` 限制。
-- 【L4】**Worker 数设为 CPU 核数的依据**：事件驱动的 Worker 主要在等待 I/O，CPU 密集时刻不多，核数即上限可避免不必要的进程切换。但两种情况要偏离：磁盘 I/O 重（静态文件服务大量读盘）时可适当多配配合 aio；SSL 卸载等 CPU 密集场景下 Worker 绑核（`worker_cpu_affinity`）比加数量更有效。
+- 【L3】**epoll 相比 select/poll 强在哪里**
+
+  select/poll 每次调用都要把全部 fd 集合传入内核线性扫描，且 fd 上限低（select 默认 1024）；epoll 用红黑树管理 fd，
+  通过回调将就绪事件放入就绪链表，`epoll_wait` 只返回就绪的连接，复杂度从 O(n) 降为 O(就绪数)。当 10 万连接中只有几百个活跃时，这个差异就是性能的分水岭。
+
+- 【L3】**热重载为什么不会丢连接**
+
+  reload 时 Master 先校验配置，然后启动一批新 Worker 处理新连接，旧 Worker 收到退出信号后不再接新连接，但继续处理存量连接直到完成或超时退出。
+
+  新旧 Worker 并存过渡，所以服务不断、连接不丢；代价是若旧配置里有超长长连接，旧 Worker 会驻留很久，可用 `worker_shutdown_timeout` 限制。
+
+- 【L4】**Worker 数设为 CPU 核数的依据**
+
+  事件驱动的 Worker 主要在等待 I/O，CPU 密集时刻不多，核数即上限可避免不必要的进程切换。但两种情况要偏离：
+
+  磁盘 I/O 重（静态文件服务大量读盘）时可适当多配配合 aio；SSL 卸载等 CPU 密集场景下 Worker 绑核（`worker_cpu_affinity`）比加数量更有效。
 
 > 📚 延伸阅读：[Nginx 开发从入门到精通](http://tengine.taobao.org/book/index.html) —— 淘宝技术团队
 
@@ -172,15 +184,27 @@ Nginx 选多进程而非多线程，核心是稳定性：Worker 之间零共享�
 
 **踩坑案例：同步子请求阻塞事件循环，全站 504**
 
-某团队在 OpenResty 里写了一个 `ngx.location.capture` 调用内网同步鉴权接口，平时鉴权接口 5ms 返回没暴露问题。某次鉴权服务发布超时（响应 3 秒），Nginx 单 Worker 的事件循环被同步等待阻塞，整台机器数万并发连接全部卡死，全站 504。排查：错误日志无异常但 `top` 显示 Worker 无 CPU 占用（在等待而非计算），结合鉴权服务变更记录定位；根因：同步子请求依赖无超时；修复：子请求加 200ms 超时 + 降级策略（鉴权失败时按默认策略放行/拒绝并告警），并把"下游依赖必须带超时"写入网关开发规范。
+某团队在 OpenResty 里写了一个 `ngx.location.capture` 调用内网同步鉴权接口，平时鉴权接口 5ms 返回没暴露问题。某次鉴权服务发布超时（响应 3 秒），
+Nginx 单 Worker 的事件循环被同步等待阻塞，整台机器数万并发连接全部卡死，全站 504。排查：错误日志无异常但 `top` 显示 Worker 无 CPU 占用（在等待而非计算），结合鉴权服务变更记录定位；根因：
+
+同步子请求依赖无超时；修复：子请求加 200ms 超时 + 降级策略（鉴权失败时按默认策略放行/拒绝并告警），并把"下游依赖必须带超时"写入网关开发规范。
 
 **场景题：8 万并发 502 排查**
 
 大促前压测，Nginx 网关在 8 万并发连接时开始出现大量 502，但后端应用 CPU 只有 40%，Nginx 机器 CPU 也只有 30%。
 
 - **应急处理**：先确认 502 的分布——是连不上后端（connect failed）还是后端响应超时；同时临时扩容 Nginx 实例分流，避免压测演变成真实故障。
-- **根因分析**：双端 CPU 都不高但 502 飙升，大概率不是算力瓶颈而是**连接/文件描述符层**的问题。按优先级排查：① `ulimit -n` 与 `worker_rlimit_nofile` 是否到顶（默认 1024/65535 未调时 8 万连接必然碰墙）；② `worker_connections` 是否小于实际连接数；③ 内核参数：`net.core.somaxconn`、后端 listen backlog 是否溢出（`netstat -s` 看 overflow 计数）；④ Nginx 到后端的连接是否未复用，每请求新建 TCP 导致端口耗尽（TIME_WAIT 堆积），应配 `keepalive` 长连接。
-- **长期方案**：① 容量基线：压测确定单机连接数上限（通常调优后 5~10 万），在 70% 水位触发扩容；② 把 fd 上限、somaxconn、keepalive 连接池纳入平台标准配置模板，避免每个团队重踩；③ 监控增加 `nginx_connections_active/waiting`、listen overflow、TIME_WAIT 计数等网关层指标。
+
+- **根因分析**：双端 CPU 都不高但 502 飙升，大概率不是算力瓶颈而是**连接/文件描述符层**的问题。按优先级排查：
+
+  ① `ulimit -n` 与 `worker_rlimit_nofile` 是否到顶（默认 1024/65535 未调时 8 万连接必然碰墙）；② `worker_connections` 是否小于实际连接数；③ 内核参数：
+
+  `net.core.somaxconn`、后端 listen backlog 是否溢出（`netstat -s` 看 overflow 计数）；④ Nginx 到后端的连接是否未复用，
+  每请求新建 TCP 导致端口耗尽（TIME_WAIT 堆积），应配 `keepalive` 长连接。
+
+- **长期方案**：① 容量基线：压测确定单机连接数上限（通常调优后 5~10 万），在 70% 水位触发扩容；② 把 fd 上限、somaxconn、keepalive 连接池纳入平台标准配置模板，避免每个团队重踩；
+  ③ 监控增加 `nginx_connections_active/waiting`、listen overflow、TIME_WAIT 计数等网关层指标。
+
 - **权衡**：无脑横向加 Nginx 实例能掩盖问题但治标不治本，且增加长连接均衡的复杂度；正确顺序是先消除配置层天花板（几乎零成本），再按实测容量规划横向扩展。
 
 :::
@@ -188,8 +212,6 @@ Nginx 选多进程而非多线程，核心是稳定性：Worker 之间零共享�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Worker 进程开得越多并发能力越强" → Worker 是 CPU 密集调度点，数量远超核数反而增加切换开销；默认 `worker_processes auto`（等于核数）已是合理基线，偏离需有压测依据。
 - ❌ "Nginx 什么都能干，CPU 密集计算放进去也行" → 事件循环被任何阻塞操作卡住都会拖垮该 Worker 上的全部连接，CPU 密集任务应交给后端或线程池。
@@ -309,6 +331,7 @@ server {
 ::: details
 
 - 【L3】配置改动后不要直接 `systemctl restart nginx`（会断开存量连接），标准流程是 `nginx -t` 校验通过后 `nginx -s reload` 热重载。
+
 - 【L4】多层代理场景下，后端拿到真实客户端 IP 需要解析 `X-Forwarded-For` 并配合可信代理列表（`real_ip` 模块的 `set_real_ip_from`），否则会被伪造头欺骗。
 
 > 📚 延伸阅读：[ngx_http_proxy_module 官方文档](https://nginx.org/en/docs/http/ngx_http_proxy_module.html)
@@ -319,8 +342,6 @@ server {
 
 ::: details
 
-常见误区：
-
 - ❌ "反向代理是在客户端配置的" → 反向代理部署在服务端入口，客户端无感知；正向代理才需要客户端（浏览器/系统）配置。
 - ❌ "proxy_pass 转发后后端看到的来源 IP 就是客户端 IP" → 默认后端看到的是 Nginx 的 IP，必须显式设置 `X-Real-IP`/`X-Forwarded-For` 等代理头传递真实来源。
 
@@ -330,7 +351,7 @@ server {
 
 - **Q：location 决定请求走哪个代理时按什么顺序匹配？**
 
-  → 精确 = > ^~ 前缀 > 正则 ~~/~~* > 最长普通前缀 > /，见本文档「Nginx 的 location 匹配规则是什么？」。
+  → 精确 = > ^~ 前缀 > 正则 ~/~* > 最长普通前缀 > /，见本文档「Nginx 的 location 匹配规则是什么？」。
 
 - **Q：代理到多台后端如何分发？**
 
@@ -351,7 +372,7 @@ location 匹配遵循"**先精确、再前缀、后正则**"：`=` 精确命中�
 #### ⚡ 记忆卡片
 
 - **口诀**：精确等号最优先，^~ 前缀挡正则，正则按序取第一，最长前缀来兜底
-- **关键词**：= ／ ^~ ／ ~~、~~*
+- **关键词**：= ／ ^~ ／ ~、~*
 - **链路**：`=` → 最长前缀（`^~` 终止）→ 正则按序 → 普通前缀 → `/`
 
 #### 📖 核心知识
@@ -378,7 +399,10 @@ location 匹配遵循"**先精确、再前缀、后正则**"：`=` 精确命中�
 
 ::: details
 
-- 【L3】内部跳转：`try_files` 与 rewrite `last` 会带着新 URI 重新走一遍 location 匹配，理解匹配流程是调试"请求到底进了哪个 location"的前提。
+- 【L3】内部跳转
+
+  `try_files` 与 rewrite `last` 会带着新 URI 重新走一遍 location 匹配，理解匹配流程是调试"请求到底进了哪个 location"的前提。
+
 - 【L4】`location` 内指令存在继承关系（子级未声明时继承父级），混用 `root`/`alias` 与正则捕获组时尤其容易踩坑。
 
 > 📚 延伸阅读：[ngx_http_core_module location 官方文档](https://nginx.org/en/docs/http/ngx_http_core_module.html#location)
@@ -388,8 +412,6 @@ location 匹配遵循"**先精确、再前缀、后正则**"：`=` 精确命中�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "正则匹配也是最长优先" → 正则按配置文件的书写顺序取第一个命中的，与长度无关。
 - ❌ "^~ 是一种正则" → `^~` 本质是前缀匹配修饰符，作用只是"该前缀命中后不再进入正则阶段"。
@@ -454,6 +476,7 @@ location /old-path {
 ::: details
 
 - 【L3】rewrite 指令分阶段执行（server 级 → location 选中 → location 级 → 尾部再匹配），配合 `last` 会重新走 location 匹配，调试时要意识到 URI 可能被改写多次。
+
 - 【L4】生产建议少用 `if`（官方文档称 "if is evil"），多数场景可用 `return`、`try_files`、`rewrite` 替代，避免不可预期的上下文行为。
 
 > 📚 延伸阅读：[ngx_http_rewrite_module 官方文档](https://nginx.org/en/docs/http/ngx_http_rewrite_module.html)
@@ -463,8 +486,6 @@ location /old-path {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "301 和 302 随便选" → 301 会被浏览器**永久缓存**，误用后即使服务端改回 302 用户仍走旧跳转；临时活动页应用 302（rewrite `redirect`）。
 - ❌ "return 只能跳转" → `return` 还可以直接返回状态码（如 403、444）或带响应体文本，常用于限流拒绝与快速短路。
@@ -599,9 +620,18 @@ upstream backend_servers {
 
 ::: details
 
-- 【L3】**一致性哈希为什么适合做缓存层，不适合做会话保持**：缓存层的键是 URL/商品 ID 这类稳定分布，节点变动只影响约 1/N 的键，缓存命中率损失可控；而会话保持的键是用户，用户数远大于节点数且分布不均，hash 均衡性差，且节点下线时会话直接丢失——会话应该存 Redis 而不是靠路由固定。
-- 【L3】**新节点直接加入 upstream 为何可能流量尖刺**：新节点连接池、JIT、本地缓存都是冷的，一上来就吃 1/N 流量容易被打崩或响应变慢。正确做法：先以小权重/低比例接入（或配合慢启动 slow start，Nginx Plus 支持 `slow_start` 参数），预热后再恢复正常权重；开源版可用分批 reload 模拟。
-- 【L4】**主动与被动健康检查怎么选**：被动（max_fails）零配置、无额外流量，但有盲区（无流量不探测、用真实用户试错）；主动探活定期发探针请求，能提前发现假死节点，代价是探针流量和配置复杂度。核心链路用主动 + 被动兜底，非核心链路被动即可。
+- 【L3】**一致性哈希为什么适合做缓存层，不适合做会话保持**：缓存层的键是 URL/商品 ID 这类稳定分布，节点变动只影响约 1/N 的键，缓存命中率损失可控；而会话保持的键是用户，用户数远大于节点数且分布不均，hash 均衡性差，
+  且节点下线时会话直接丢失——会话应该存 Redis 而不是靠路由固定。
+
+- 【L3】**新节点直接加入 upstream 为何可能流量尖刺**
+
+  新节点连接池、JIT、本地缓存都是冷的，一上来就吃 1/N 流量容易被打崩或响应变慢。正确做法：先以小权重/低比例接入（或配合慢启动 slow start，
+  Nginx Plus 支持 `slow_start` 参数），预热后再恢复正常权重；开源版可用分批 reload 模拟。
+
+- 【L4】**主动与被动健康检查怎么选**
+
+  被动（max_fails）零配置、无额外流量，但有盲区（无流量不探测、用真实用户试错）；主动探活定期发探针请求，能提前发现假死节点，代价是探针流量和配置复杂度。核心链路用主动 + 被动兜底，
+  非核心链路被动即可。
 
 > 📚 延伸阅读：[ngx_http_upstream_module 官方文档](https://nginx.org/en/docs/http/ngx_http_upstream_module.html)
 
@@ -613,24 +643,31 @@ upstream backend_servers {
 
 **踩坑案例：上云加 SLB 后 ip_hash 打崩单台后端**
 
-某业务从自建机房迁到云上加了一层 SLB，Nginx 配置没变仍是 `ip_hash` 做会话保持。上线后监控发现 5 台后端里只有 1 台在扛流量，其余 4 台几乎零请求，高峰期那台直接被打崩。排查：后端访问日志里客户端 IP 全是 SLB 的内网段；根因：多层代理后 ip_hash 退化为"固定打一台"；修复：会话迁移到 Redis 实现无状态化，负载策略改回加权轮询；并在接入规范中明确"存在多层代理时禁止使用 ip_hash"。
+某业务从自建机房迁到云上加了一层 SLB，Nginx 配置没变仍是 `ip_hash` 做会话保持。上线后监控发现 5 台后端里只有 1 台在扛流量，其余 4 台几乎零请求，高峰期那台直接被打崩。排查：
+
+后端访问日志里客户端 IP 全是 SLB 的内网段；根因：多层代理后 ip_hash 退化为"固定打一台"；修复：会话迁移到 Redis 实现无状态化，负载策略改回加权轮询；并在接入规范中明确"存在多层代理时禁止使用 ip_hash"。
 
 **场景题：故障节点反复进出 upstream 振荡**
 
 凌晨 2 点告警：某服务 5 台后端中有 1 台持续返回 500，Nginx 却在 max_fails=3 后把它摘除 30 秒又放回来，循环往复，期间部分用户持续看到错误页。
 
 - **应急处理（先止血）**：立即把故障节点从 upstream 手动下线（注释掉 + reload，或直接停掉该实例），摘除"反复进出"的振荡，把影响面降为零；同时确认其余 4 台容量充足。
-- **根因分析**：振荡的本质是**被动健康检查的固有缺陷**：节点假死/间歇性故障时，fail_timeout 到期后 Nginx 会重新试探，前几个真实用户请求充当探针，失败则再摘 30 秒——用户周期性看到错误。更深层要查该节点为什么间歇性 500（常见：内存泄漏后 GC 风暴、磁盘满导致写失败），这才是病根。
-- **长期方案**：① 故障节点替换重建，不现场缝补；② 引入主动健康检查（Tengine `check` 或网关层探活），提前剔除假死节点，不让真实用户当探针；③ 调大 `fail_timeout`（如 60s）+ 增加 `max_fails` 降低振荡频率；④ 业务层加客户端重试（幂等接口）+ 优雅降级，把单节点故障的用户感知降到最低。
-- **权衡**：把 fail_timeout 调得过长会导致误摘的健康节点恢复慢；主动探活有额外流量和配置成本。原则：核心链路宁可多花探针流量也要提前发现故障，非核心链路容忍被动检查的滞后；但无论哪种，节点自身故障的快速重建能力（容器化自动拉起）才是真正的底气。
+
+- **根因分析**：振荡的本质是**被动健康检查的固有缺陷**：节点假死/间歇性故障时，fail_timeout 到期后 Nginx 会重新试探，前几个真实用户请求充当探针，失败则再摘 30 秒——用户周期性看到错误。
+
+  更深层要查该节点为什么间歇性 500（常见：内存泄漏后 GC 风暴、磁盘满导致写失败），这才是病根。
+
+- **长期方案**：① 故障节点替换重建，不现场缝补；② 引入主动健康检查（Tengine `check` 或网关层探活），提前剔除假死节点，不让真实用户当探针；
+  ③ 调大 `fail_timeout`（如 60s）+ 增加 `max_fails` 降低振荡频率；④ 业务层加客户端重试（幂等接口）+ 优雅降级，把单节点故障的用户感知降到最低。
+
+- **权衡**：把 fail_timeout 调得过长会导致误摘的健康节点恢复慢；主动探活有额外流量和配置成本。原则：核心链路宁可多花探针流量也要提前发现故障，非核心链路容忍被动检查的滞后；但无论哪种，
+  节点自身故障的快速重建能力（容器化自动拉起）才是真正的底气。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "ip_hash 是会话保持的银弹" → 一旦客户端经过 SLB/CDN，`$remote_addr` 全是代理 IP，ip_hash 退化为固定打一台；会话保持的根本解法是会话外置 Redis 实现无状态化。
 - ❌ "配了 max_fails 就等于有健康检查" → 这只是**被动**检查，必须靠真实请求失败来触发计数；无流量的故障节点不会被发现，假死节点还会拿真实用户当探针。
@@ -744,7 +781,11 @@ server {
 
 ::: details
 
-- 【L3】限流键的选择决定语义：`$binary_remote_addr` 按 IP；多层代理后要按真实用户限流需解析 `X-Forwarded-For`（有伪造风险）；按接口维度可用 `$server_name$request_uri` 组合键。
+- 【L3】限流键的选择决定语义
+
+  `$binary_remote_addr` 按 IP；多层代理后要按真实用户限流需解析 `X-Forwarded-For`（有伪造风险）；
+  按接口维度可用 `$server_name$request_uri` 组合键。
+
 - 【L4】单机 zone 只在本实例内生效，多实例网关需要分布式限流：常见做法是 OpenResty + Redis 实现令牌桶/滑动窗口，或下沉到网关/服务网格层统一限流。
 
 > 📚 延伸阅读：[ngx_http_limit_req_module 官方文档](https://nginx.org/en/docs/http/ngx_http_limit_req_module.html)
@@ -754,8 +795,6 @@ server {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "加了 nodelay 就是不限流" → nodelay 只是让 burst 额度内的突发请求**立即处理**而非排队，超出 burst 的请求照样被拒绝，长期速率仍被 rate 约束。
 - ❌ "限流超限返回 429" → Nginx `limit_req` 默认返回 **503**（可通过 `limit_req_status` 改为 429 等），排查限流问题时先盯 503。
@@ -846,9 +885,18 @@ http {
 
 ::: details
 
-- 【L3】**OS 内核参数需同步调**：`net.core.somaxconn`（listen 队列）、`net.ipv4.tcp_tw_reuse`、系统级 `fs.file-max` 与 `ulimit -n`；只改 nginx.conf 不碰内核，高并发下照样碰墙。
-- 【L4】**磁盘 I/O 重时启用线程池**：`aio threads` + `thread_pool` 把阻塞磁盘读移出事件循环；`open_file_cache` 缓存静态文件的元信息减少重复 open/stat。
-- 【L4】**变更流程**：调优参数同样必须 `nginx -t` 校验后 `nginx -s reload` 生效，并用压测验证水位，避免拍脑袋设置。
+- 【L3】**OS 内核参数需同步调**
+
+  `net.core.somaxconn`（listen 队列）、`net.ipv4.tcp_tw_reuse`、系统级 `fs.file-max` 与 `ulimit -n`；
+  只改 nginx.conf 不碰内核，高并发下照样碰墙。
+
+- 【L4】**磁盘 I/O 重时启用线程池**
+
+  `aio threads` + `thread_pool` 把阻塞磁盘读移出事件循环；`open_file_cache` 缓存静态文件的元信息减少重复 open/stat。
+
+- 【L4】**变更流程**
+
+  调优参数同样必须 `nginx -t` 校验后 `nginx -s reload` 生效，并用压测验证水位，避免拍脑袋设置。
 
 > 📚 延伸阅读：[Nginx 官方文档 Tuning 相关](https://nginx.org/en/docs/)
 
@@ -860,8 +908,12 @@ http {
 
 大促前压测，Nginx 网关在 8 万并发连接时出现大量 502，但后端 CPU 仅 40%、Nginx 机器 CPU 仅 30%——双端算力都不饱和，说明瓶颈在**连接/fd 层**而非计算：
 
-- 排查顺序：① `ulimit -n` / `worker_rlimit_nofile` 是否到顶（默认 1024 未调时 8 万连接必然碰墙）；② `worker_connections` 是否小于实际连接数；③ `net.core.somaxconn` 与后端 listen backlog 是否溢出（`netstat -s` 看 overflow 计数）；④ Nginx 到后端是否未配 `keepalive` 长连接池，每请求新建 TCP 导致 TIME_WAIT 堆积、端口耗尽。
+- 排查顺序：① `ulimit -n` / `worker_rlimit_nofile` 是否到顶（默认 1024 未调时 8 万连接必然碰墙）；② `worker_connections` 是否小于实际连接数；
+  ③ `net.core.somaxconn` 与后端 listen backlog 是否溢出（`netstat -s` 看 overflow 计数）；④ Nginx 到后端是否未配 `keepalive` 长连接池，
+  每请求新建 TCP 导致 TIME_WAIT 堆积、端口耗尽。
+
 - 量化效果：逐项消除配置天花板后，单机从 8 万并发即报 502 提升到 10 万+ 连接稳定无错；随后以 70% 水位作为扩容线，并把 fd/somaxconn/keepalive 参数固化进平台标准配置模板。
+
 - 教训：横向加实例能掩盖问题但治标不治本，正确顺序是**先零成本消除配置天花板，再按实测容量规划扩展**。
 
 :::
@@ -869,8 +921,6 @@ http {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "worker_connections 越大越好" → 连接数受 fd 上限、内存与内核表约束，超过 `worker_rlimit_nofile` 和系统 fd 上限时配置形同虚设，还会放大 accept 风暴下的抖动。
 - ❌ "tcp_nopush 和 tcp_nodelay 互斥只能选一个" → 两者作用层面不同（前者配合 sendfile 合并满包发送，后者禁用 Nagle 降低小包延迟），Nginx 在 keepalive 连接上会同时应用，官方配置里两个都开。
@@ -992,9 +1042,17 @@ server {
 
 ::: details
 
-- 【L3】**OCSP Stapling**：配置 `ssl_stapling on` + `ssl_stapling_verify on`，由服务器代客户端向 CA 获取证书吊销状态，减少客户端额外请求、加快首访速度。
-- 【L3】**安全加固**：可加 `Strict-Transport-Security`（HSTS）头强制浏览器只走 HTTPS；禁用 SSLv3/TLS 1.0/1.1 等过时协议，规避 POODLE/BEAST 类攻击面。
-- 【L4】**证书续期自动化**：Let's Encrypt 场景用 certbot 定时续期，续期脚本末尾调用 `nginx -s reload` 加载新证书，避免证书过期事故。
+- 【L3】**OCSP Stapling**
+
+  配置 `ssl_stapling on` + `ssl_stapling_verify on`，由服务器代客户端向 CA 获取证书吊销状态，减少客户端额外请求、加快首访速度。
+
+- 【L3】**安全加固**
+
+  可加 `Strict-Transport-Security`（HSTS）头强制浏览器只走 HTTPS；禁用 SSLv3/TLS 1.0/1.1 等过时协议，规避 POODLE/BEAST 类攻击面。
+
+- 【L4】**证书续期自动化**
+
+  Let's Encrypt 场景用 certbot 定时续期，续期脚本末尾调用 `nginx -s reload` 加载新证书，避免证书过期事故。
 
 > 📚 延伸阅读：[ngx_http_ssl_module 官方文档](https://nginx.org/en/docs/http/ngx_http_ssl_module.html)
 
@@ -1003,8 +1061,6 @@ server {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "只配证书不限制协议版本就够了" → 不限 `ssl_protocols` 时老客户端可能协商到 TLS 1.0 等弱协议，必须显式只保留 TLS 1.2/1.3。
 - ❌ "HTTP/2 可以在明文 HTTP 上用" → 主流浏览器只在 TLS 上启用 HTTP/2，所以 h2 必须与 HTTPS 绑定。
@@ -1070,7 +1126,10 @@ server {
 
 ::: details
 
-- 【L3】缓存 key 决定命中粒度：默认按 scheme+方法+host+URI；带查询参数变化的接口要把关键参数纳入 key，否则不同用户互相污染缓存。
+- 【L3】缓存 key 决定命中粒度
+
+  默认按 scheme+方法+host+URI；带查询参数变化的接口要把关键参数纳入 key，否则不同用户互相污染缓存。
+
 - 【L4】`proxy_cache_use_stale` 允许后端故障时返回过期缓存兜底；`cache_lock` 防止缓存击穿时大量请求同时回源。
 
 > 📚 延伸阅读：[ngx_http_proxy_module proxy_cache 官方文档](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache)
@@ -1080,8 +1139,6 @@ server {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "expires 设长就能降低后端压力" → expires 只影响**浏览器**是否重复请求，降低后端压力要靠代理缓存或 CDN；且动态个性化接口不可随意缓存，会串用户数据。
 
@@ -1136,7 +1193,10 @@ graph LR
 
 ::: details
 
-- 【L3】备选方案对比：DNS 轮询（切换慢、依赖 TTL，只能算粗粒度容灾）；云 SLB/ALB（托管省心，成本与可控性换便利）；多活接入层（DNS + 多机房 VIP，适合跨地域容灾）。
+- 【L3】备选方案对比
+
+  DNS 轮询（切换慢、依赖 TTL，只能算粗粒度容灾）；云 SLB/ALB（托管省心，成本与可控性换便利）；多活接入层（DNS + 多机房 VIP，适合跨地域容灾）。
+
 - 【L4】Keepalived 需配置脚本检测 Nginx 进程存活（`vrrp_script`），否则会出现"Nginx 挂了但 VIP 不漂"的假活状态；脑裂场景可用仲裁或单播心跳缓解。
 
 > 📚 延伸阅读：[Keepalived 官方文档](https://www.keepalived.org/documentation.html)
@@ -1146,8 +1206,6 @@ graph LR
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "上了负载均衡后端就不会单点" → 负载均衡器自身也是单点，Nginx 入口层还需要 Keepalived/VIP 或云 SLB 解决自身高可用。
 - ❌ "两台 Nginx 配置手动保持一致就行" → 人工同步必然漂移，必须用 lsyncd/配置中心/Git 发布流保证两台配置一致，否则漂移后行为不一致。
@@ -1206,7 +1264,11 @@ nginx -s reopen                 # 重新打开日志文件（日志切割）
 
 ::: details
 
-- 【L3】**平滑升级二进制**：`SIGUSR2` 会用新二进制启动一套全新的 Master+Worker（新旧并存），验证无误后用 `SIGWINCH` 优雅关闭旧 Worker、`SIGQUIT` 退出旧 Master，实现可回滚的不停机升级。
+- 【L3】**平滑升级二进制**
+
+  `SIGUSR2` 会用新二进制启动一套全新的 Master+Worker（新旧并存），验证无误后用 `SIGWINCH` 优雅关闭旧 Worker、`SIGQUIT` 退出旧 Master，
+  实现可回滚的不停机升级。
+
 - 【L4】旧 Worker 上的超长长连接会拖慢 reload 收尾，可用 `worker_shutdown_timeout` 强制限时；日志切割依赖 `SIGUSR1`（reopen），配合 cron 实现每日切割。
 
 > 📚 延伸阅读：[Nginx 官方文档 - Controlling nginx](https://nginx.org/en/docs/control.html)
@@ -1216,8 +1278,6 @@ nginx -s reopen                 # 重新打开日志文件（日志切割）
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "改完配置直接 systemctl restart 最省事" → restart 会中断存量连接（长连接、上传中的请求全部断开），生产必须用 reload 热重载。
 - ❌ "reload 失败服务就挂了" → Master 先做配置语法校验，校验失败会拒绝加载、继续使用旧配置运行，这也是 `nginx -t` 作为第一道闸门的意义。
@@ -1247,7 +1307,7 @@ nginx -s reopen                 # 重新打开日志文件（日志切割）
 #### ⚡ 记忆卡片
 
 - **口诀**：查 Referer，白名单放行，非法 403
-- **关键词**：valid_referers ／ $invalid_referer ／ Referer
+- **关键词**：valid_referers ／ `$invalid_referer` ／ Referer
 - **链路**：请求携带 Referer → 白名单校验 → 非法则 403/替换图
 
 #### 📖 核心知识
@@ -1272,8 +1332,6 @@ location ~* \.(jpg|jpeg|png|gif|mp4)$ {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "配了 valid_referers 就彻底防盗链了" → Referer 可被客户端伪造或直接不携带，只能挡住普通盗链；强保护需配合签名 URL（带时间戳的访问令牌）或 Token 鉴权。
 - ❌ "白名单里不写 none 更安全" → 不写 none 会把直接访问图片 URL 的正常用户也 403，需按业务决定是否放行空 Referer。
@@ -1334,7 +1392,10 @@ server {
 
 ::: details
 
-- 【L3】`root` 与 `alias` 的路径拼接规则不同：root 会拼接 location 前缀，alias 会替换前缀，混用是 404 高发区。
+- 【L3】`root` 与 `alias` 的路径拼接规则不同
+
+  root 会拼接 location 前缀，alias 会替换前缀，混用是 404 高发区。
+
 - 【L4】静态资源进一步可推给 CDN 或 Nginx 代理缓存层，应用服务器完全不再接触静态流量。
 
 > 📚 延伸阅读：[Nginx 官方文档](https://nginx.org/en/docs/)
@@ -1344,8 +1405,6 @@ server {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "root 和 alias 是一回事" → 路径拼接规则不同：`alias` 替换 location 前缀，`root` 拼接完整 URI，目录错位会直接 404。
 - ❌ "动静分离只是省一点 CPU" → 本质是把高并发的静态流量从应用线程池里剥离，避免静态请求占用业务线程，高峰下吞吐差距是数量级的。
@@ -1457,10 +1516,25 @@ upstream backend {
 
 ::: details
 
-- 【L3】**somaxconn 与 listen backlog 的关系**：`listen()` 系统调用的 backlog 参数与 `somaxconn` 取**较小值**作为实际队列长度。Nginx 的 `listen` 指令支持 `backlog=N` 参数，需确保 N ≥ worker_connections，否则 Nginx 侧限制了队列长度。
-- 【L3】**tcp_max_syn_backlog 与 SYN Flood 防御**：半连接队列溢出是 SYN Flood 攻击的典型表现。除放大队列外，还应开启 `net.ipv4.tcp_syncookies = 1`（用 cookie 替代半连接存储，抗 SYN Flood），配合 `net.ipv4.tcp_max_syn_backlog` 双管齐下。
-- 【L4】**epoll 的 ET 与 LT 模式**：Nginx 默认使用 LT（水平触发）模式，安全且简单；ET（边缘触发）模式减少 epoll_wait 唤醒次数，但必须非阻塞 I/O + 循环读写直到 EAGAIN，Nginx 内部已处理，但若有自定义模块需注意。
-- 【L4】**so_keepalive 参数**：`listen` 指令支持 `so_keepalive=on`，开启 TCP 层面的 keepalive 探测，可提前发现死连接释放资源，但会增加网络开销，适合长连接场景。
+- 【L3】**somaxconn 与 listen backlog 的关系**
+
+  `listen()` 系统调用的 backlog 参数与 `somaxconn` 取**较小值**作为实际队列长度。
+
+  Nginx 的 `listen` 指令支持 `backlog=N` 参数，需确保 N ≥ worker_connections，否则 Nginx 侧限制了队列长度。
+
+- 【L3】**tcp_max_syn_backlog 与 SYN Flood 防御**
+
+  半连接队列溢出是 SYN Flood 攻击的典型表现。除放大队列外，
+  还应开启 `net.ipv4.tcp_syncookies = 1`（用 cookie 替代半连接存储，抗 SYN Flood），配合 `net.ipv4.tcp_max_syn_backlog` 双管齐下。
+
+- 【L4】**epoll 的 ET 与 LT 模式**
+
+  Nginx 默认使用 LT（水平触发）模式，安全且简单；ET（边缘触发）模式减少 epoll_wait 唤醒次数，但必须非阻塞 I/O + 循环读写直到 EAGAIN，
+  Nginx 内部已处理，但若有自定义模块需注意。
+
+- 【L4】**so_keepalive 参数**
+
+  `listen` 指令支持 `so_keepalive=on`，开启 TCP 层面的 keepalive 探测，可提前发现死连接释放资源，但会增加网络开销，适合长连接场景。
 
 > 📚 延伸阅读：[Nginx 官方文档 - Connection Processing Methods](https://nginx.org/en/docs/events.html)
 
@@ -1482,10 +1556,8 @@ upstream backend {
 
 ::: details
 
-常见误区：
-
 - ❌ "只改 nginx.conf 就够了" → 内核参数 `somaxconn`、`tcp_max_syn_backlog`、`fs.file-max` 不同步放大，高并发下照样碰墙，Nginx 配置层再大也接不住。
-- ❌ "worker_connections 设到 100 万就行" → 每连接至少 2~~10KB 内存，100 万连接单 Worker 需 2~~10GB，且受 fd 上限、内核 inode 表、内存带宽多重约束；盲目放大不如横向扩展。
+- ❌ "worker_connections 设到 100 万就行" → 每连接至少 2~10KB 内存，100 万连接单 Worker 需 2~10GB，且受 fd 上限、内核 inode 表、内存带宽多重约束；盲目放大不如横向扩展。
 - ❌ "tcp_tw_reuse 能解决所有 TIME_WAIT 问题" → `tcp_tw_reuse` 仅在**客户端侧**生效（Nginx 作为 upstream 客户端时），且依赖 `tcp_timestamps` 开启；服务端侧的 TIME_WAIT 要靠 `keepalive` 连接池复用减少新建。
 
 :::
@@ -1506,7 +1578,7 @@ upstream backend {
 
 #### 💎 关键结论
 
-百万级长连接场景下 Nginx 的瓶颈不在 CPU 而在**内存、连接追踪开销与队列管理**：每连接约 2~~10KB 内存（含 `ngx_connection_t` 结构体与缓冲区），百万连接需 2~~10GB；`keepalive_timeout` 过长导致空闲连接堆积、Worker 事件循环被大量非活跃 fd 拖慢；upstream 未配连接池时每次请求新建 TCP 导致 TIME_WAIT 爆炸。排查思路：`ss -s` 看连接分布 → `nginx -V` 确认编译参数 → 监控 `connections_active/waiting` → 逐步收紧超时与放大连接池。
+百万级长连接场景下 Nginx 的瓶颈不在 CPU 而在**内存、连接追踪开销与队列管理**：每连接约 2~10KB 内存（含 `ngx_connection_t` 结构体与缓冲区），百万连接需 2~10GB；`keepalive_timeout` 过长导致空闲连接堆积、Worker 事件循环被大量非活跃 fd 拖慢；upstream 未配连接池时每次请求新建 TCP 导致 TIME_WAIT 爆炸。排查思路：`ss -s` 看连接分布 → `nginx -V` 确认编译参数 → 监控 `connections_active/waiting` → 逐步收紧超时与放大连接池。
 
 #### ⚡ 记忆卡片
 
@@ -1521,9 +1593,9 @@ upstream backend {
 | 组件                       | 每连接内存     | 百万连接总计   |
 | :------------------------- | :------------- | :------------- |
 | `ngx_connection_t` 结构体  | ~200 bytes     | ~200 MB        |
-| 读写缓冲区（event buffer） | ~~4~~8 KB      | ~~4~~8 GB      |
-| 内核 socket 结构           | ~~1~~2 KB      | ~~1~~2 GB      |
-| **合计**                   | **~~5~~10 KB** | **~~5~~10 GB** |
+| 读写缓冲区（event buffer） | ~4~8 KB      | ~4~8 GB      |
+| 内核 socket 结构           | ~1~2 KB      | ~1~2 GB      |
+| **合计**                   | **~5~10 KB** | **~5~10 GB** |
 
 **瓶颈二：epoll 事件循环效率**
 
@@ -1568,10 +1640,10 @@ location /api/ {
 | 命令/指标                                                 | 用途                                         |
 | :-------------------------------------------------------- | :------------------------------------------- |
 | `ss -s`                                                   | 查看 TCP 连接总数、TIME_WAIT/CLOSE_WAIT 分布 |
-| `ss -tnp                                                  | grep nginx                                   | wc -l`                 | 统计 Nginx 进程持有的连接数 |
-| `nginx -V 2>&1                                            | grep -o 'connections'`                       | 确认编译时连接相关参数 |
+| `ss -tnp                                                  \| grep nginx                                   \| wc -l`                 | 统计 Nginx 进程持有的连接数 |
+| `nginx -V 2>&1                                            \| grep -o 'connections'`                       | 确认编译时连接相关参数 |
 | Stub Status: `connections active/reading/writing/waiting` | 实时监控连接分布                             |
-| `netstat -s                                               | grep -i "listen\|overflow\|drop"`            | 检测 listen 队列溢出   |
+| `netstat -s                                               \| grep -i "listen\|overflow\|drop"`            | 检测 listen 队列溢出   |
 | `/proc/<pid>/fd` 计数                                     | 查看 Worker 进程实际 fd 使用量               |
 | `top -p <pid>` 看 RES 内存                                | 监控 Worker 内存增长趋势                     |
 
@@ -1589,9 +1661,20 @@ location /api/ {
 
 ::: details
 
-- 【L3】**Stub Status 模块**：`stub_status` 指令暴露 `active/reading/writing/waiting` 四个指标，是监控 Nginx 连接状态的最小成本方案。`waiting` 高说明大量空闲 keepalive 连接占用资源，应收紧 `keepalive_timeout`。
-- 【L4】**连接追踪与 eBPF**：百万连接下传统 `strace` 性能开销不可接受，可用 eBPF（如 `bcc/tools/tcpaccept`、`tcpconnect`）零开销追踪连接建立/关闭事件，定位异常连接源。
-- 【L4】**Nginx 的 `reuseport` 参数**：`listen 80 reuseport` 让多个 Worker 各自 bind 同一端口，内核在 accept 层面负载均衡新连接到各 Worker，避免传统单 Worker accept 的惊群效应；百万连接下可显著降低 accept 锁竞争。
+- 【L3】**Stub Status 模块**
+
+  `stub_status` 指令暴露 `active/reading/writing/waiting` 四个指标，是监控 Nginx 连接状态的最小成本方案。
+
+  `waiting` 高说明大量空闲 keepalive 连接占用资源，应收紧 `keepalive_timeout`。
+
+- 【L4】**连接追踪与 eBPF**
+
+  百万连接下传统 `strace` 性能开销不可接受，可用 eBPF（如 `bcc/tools/tcpaccept`、`tcpconnect`）零开销追踪连接建立/关闭事件，定位异常连接源。
+
+- 【L4】**Nginx 的 `reuseport` 参数**
+
+  `listen 80 reuseport` 让多个 Worker 各自 bind 同一端口，内核在 accept 层面负载均衡新连接到各 Worker，
+  避免传统单 Worker accept 的惊群效应；百万连接下可显著降低 accept 锁竞争。
 
 > 📚 延伸阅读：[Nginx - Handling 1 Million Requests](https://engineering.chartbeat.com/2015/09/02/handling-1-million-requests/)
 
@@ -1603,7 +1686,10 @@ location /api/ {
 
 **踩坑案例：WebSocket 网关百万连接 OOM**
 
-某 IoT 平台的 Nginx WebSocket 网关在连接数增长到 80 万时频繁 OOM Kill。排查：每个 WebSocket 连接 Nginx 侧分配约 8KB 缓冲区（含收发 buffer），80 万连接 × 8KB ≈ 6.4GB，加上内核侧 socket 结构约 1.6GB，总内存消耗超 8GB，而机器只有 8GB 物理内存。根因：`keepalive_timeout` 设了 3600s（1 小时），大量设备断网后连接未正常关闭，空闲连接堆积不释放。修复：① `keepalive_timeout` 收紧到 120s + 应用层心跳检测 30s 无数据主动断开；② 扩容到 16GB 内存 + 两台 Nginx 分担；③ 增加 `stub_status` 监控 + `waiting` 连接数告警阈值。修复后稳定运行在 60 万连接，内存水位 60%。
+某 IoT 平台的 Nginx WebSocket 网关在连接数增长到 80 万时频繁 OOM Kill。排查：每个 WebSocket 连接 Nginx 侧分配约 8KB 缓冲区（含收发 buffer），
+80 万连接 × 8KB ≈ 6.4GB，加上内核侧 socket 结构约 1.6GB，总内存消耗超 8GB，而机器只有 8GB 物理内存。根因：`keepalive_timeout` 设了 3600s（1 小时），
+大量设备断网后连接未正常关闭，空闲连接堆积不释放。修复：① `keepalive_timeout` 收紧到 120s + 应用层心跳检测 30s 无数据主动断开；② 扩容到 16GB 内存 + 两台 Nginx 分担；
+③ 增加 `stub_status` 监控 + `waiting` 连接数告警阈值。修复后稳定运行在 60 万连接，内存水位 60%。
 
 **教训**：长连接场景的内存规划必须**按连接数 × 每连接内存**估算，且要预留空闲连接超时回收机制，否则断网/异常场景下的僵尸连接会慢慢吃光内存。
 
@@ -1612,8 +1698,6 @@ location /api/ {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "keepalive_timeout 越长性能越好" → 长超时让空闲连接长期占用内存与 fd，百万连接场景下是 OOM 的元凶；应根据业务心跳周期设置，通常 60~120s。
 - ❌ "upstream keepalive 是总连接数上限" → 它是**每个 Worker 的空闲连接池大小**，实际活跃连接可以远超此值；设得太小会导致频繁新建/关闭 TCP，设得太大会浪费内存。
@@ -1760,7 +1844,12 @@ server {
 
 ::: details
 
-生产案例：某电商平台移动端首页加载从 4.2s 优化到 1.1s。症状：移动端用户反馈首页白屏时间长，尤其在地铁等弱网环境下体验极差。排查：通过 Chrome DevTools 的 Network 面板发现首页 68 个资源在 HTTP/1.1 下受限于 6 连接并行，队头阻塞严重；且 TLS 1.2 需要 2-RTT 握手进一步放大延迟。根因：协议层瓶颈而非后端性能不足。修复：① 升级 TLS 1.3 + HTTP/2，启用 HPACK 头部压缩；② 关键 CSS 内联、非关键 JS 异步加载减少阻塞流；③ 后续引入 HTTP/3（QUIC），配置 `Alt-Svc` 头 + `reuseport`，弱网场景 P99 延迟从 2.1s 降至 380ms。教训：协议升级是零后端改造的前端性能红利，ROI 极高；但 HTTP/3 需确保 UDP 443 端口在 CDN 和防火墙层放行，否则静默降级到 HTTP/2。
+生产案例：某电商平台移动端首页加载从 4.2s 优化到 1.1s。症状：移动端用户反馈首页白屏时间长，尤其在地铁等弱网环境下体验极差。排查：
+
+通过 Chrome DevTools 的 Network 面板发现首页 68 个资源在 HTTP/1.1 下受限于 6 连接并行，队头阻塞严重；且 TLS 1.2 需要 2-RTT 握手进一步放大延迟。根因：协议层瓶颈而非后端性能不足。
+
+修复：① 升级 TLS 1.3 + HTTP/2，启用 HPACK 头部压缩；② 关键 CSS 内联、非关键 JS 异步加载减少阻塞流；③ 后续引入 HTTP/3（QUIC），配置 `Alt-Svc` 头 + `reuseport`，
+弱网场景 P99 延迟从 2.1s 降至 380ms。教训：协议升级是零后端改造的前端性能红利，ROI 极高；但 HTTP/3 需确保 UDP 443 端口在 CDN 和防火墙层放行，否则静默降级到 HTTP/2。
 
 :::
 
@@ -1768,9 +1857,21 @@ server {
 
 ::: details
 
-- 【L3】**Server Push 的兴衰**：HTTP/2 Server Push 设计初衷是服务器主动推送客户端可能需要的资源，但 Chrome 91+ 已弃用支持，原因是推送资源无法与缓存协调，常导致带宽浪费。替代方案：`preload` 链接头 + Service Worker 预缓存。
-- 【L4】**QUIC 的 Connection Migration 机制**：QUIC 使用 Connection ID（而非 IP:Port 四元组）标识连接，当客户端从 WiFi 切换到蜂窝网络时，只要携带相同 CID，服务器即可无缝续传。Nginx 通过 `quic` 模块自动处理 CID 分配与迁移，但需注意 `reuseport` 模式下 CID 路由需在同一 Worker 进程内保持一致。
-- 【L4】**gRPC 与 HTTP/2 的关系**：gRPC 强制使用 HTTP/2 作为传输层，Nginx 作为 gRPC 反向代理时需配置 `grpc_pass` 指令，并启用 HTTP/2；但 gRPC 的流式传输在 Nginx 层有缓冲行为，需通过 `grpc_buffer_size` 和 `grpc_read_timeout` 精细调优。
+- 【L3】**Server Push 的兴衰**
+
+  HTTP/2 Server Push 设计初衷是服务器主动推送客户端可能需要的资源，但 Chrome 91+ 已弃用支持，原因是推送资源无法与缓存协调，常导致带宽浪费。替代方案：
+
+  `preload` 链接头 + Service Worker 预缓存。
+
+- 【L4】**QUIC 的 Connection Migration 机制**
+
+  QUIC 使用 Connection ID（而非 IP:Port 四元组）标识连接，当客户端从 WiFi 切换到蜂窝网络时，只要携带相同 CID，
+  服务器即可无缝续传。Nginx 通过 `quic` 模块自动处理 CID 分配与迁移，但需注意 `reuseport` 模式下 CID 路由需在同一 Worker 进程内保持一致。
+
+- 【L4】**gRPC 与 HTTP/2 的关系**
+
+  gRPC 强制使用 HTTP/2 作为传输层，Nginx 作为 gRPC 反向代理时需配置 `grpc_pass` 指令，并启用 HTTP/2；
+  但 gRPC 的流式传输在 Nginx 层有缓冲行为，需通过 `grpc_buffer_size` 和 `grpc_read_timeout` 精细调优。
 
 > 📚 延伸阅读：[Nginx 官方 HTTP/3 文档](https://nginx.org/en/docs/http/ngx_http_v3_module.html)
 
@@ -1930,7 +2031,12 @@ server {
 
 ::: details
 
-生产案例：某内容平台大促期间源站被打垮，CDN 命中率从 92% 骤降到 45%。症状：大促开始后 10 分钟内，源站 Nginx 连接数飙升至 8 万，CPU 100%，大量 502 返回。排查：发现活动页面上线后缓存全部 miss，同时多个 CDN 节点同时回源同一热点 URL（缓存击穿），源站无法承受瞬时 10 倍流量。根因：① 活动页未做缓存预热；② 未启用回源收敛（`proxy_cache_lock`）；③ 热点资源 TTL 过短（仅 30s）。修复：① 紧急开启 `proxy_cache_lock on` + `proxy_cache_lock_timeout 5s`，相同 key 并发 miss 只回源一次；② 预热活动页静态资源到所有边缘节点（脚本批量请求）；③ 热点资源 TTL 调整为 1h + `proxy_cache_background_update on` 后台刷新。修复后命中率恢复到 97%，源站 QPS 从 10 万降至 3000。教训：大促前必须做缓存预热 + 回源收敛配置，热点资源的 TTL 应与业务更新频率匹配而非一刀切。
+生产案例：某内容平台大促期间源站被打垮，CDN 命中率从 92% 骤降到 45%。症状：大促开始后 10 分钟内，源站 Nginx 连接数飙升至 8 万，CPU 100%，大量 502 返回。排查：发现活动页面上线后缓存全部 miss，
+同时多个 CDN 节点同时回源同一热点 URL（缓存击穿），源站无法承受瞬时 10 倍流量。根因：① 活动页未做缓存预热；② 未启用回源收敛（`proxy_cache_lock`）；③ 热点资源 TTL 过短（仅 30s）。修复：
+
+① 紧急开启 `proxy_cache_lock on` + `proxy_cache_lock_timeout 5s`，相同 key 并发 miss 只回源一次；② 预热活动页静态资源到所有边缘节点（脚本批量请求）；
+③ 热点资源 TTL 调整为 1h + `proxy_cache_background_update on` 后台刷新。修复后命中率恢复到 97%，源站 QPS 从 10 万降至 3000。教训：大促前必须做缓存预热 + 回源收敛配置，
+热点资源的 TTL 应与业务更新频率匹配而非一刀切。
 
 :::
 
@@ -1938,9 +2044,22 @@ server {
 
 ::: details
 
-- 【L3】**Cache-Tag 批量失效**：传统按 URL 清除缓存效率极低，可通过响应头 `Cache-Tag: page-home, banner-spring` 标记资源，失效时通过 `PURGE` 请求 + Tag 批量清除。Nginx 原生不支持 Tag 清除，需借助 `lua-resty-nginx-cache` 或商业 CDN（Cloudflare、Fastly）的 Tag Purge API。
-- 【L4】**一致性哈希在 CDN 中的应用**：多级缓存架构中，L2 层使用一致性哈希将相同 URL 固定路由到同一 L2 节点，避免多个 L1 节点回源不同 L2 导致的缓存冗余（命中率从 85% 提升到 95%+）。Nginx 的 `upstream hash` 指令可实现。
-- 【L3】**边缘计算的安全边界**：在边缘执行 Lua/njs 脚本时，必须限制执行时间（`lua_socket_connect_timeout`）和内存使用，避免恶意请求导致边缘节点资源耗尽；同时边缘层不应直接访问数据库，仅做无状态逻辑。
+- 【L3】**Cache-Tag 批量失效**
+
+  传统按 URL 清除缓存效率极低，可通过响应头 `Cache-Tag: page-home, banner-spring` 标记资源，失效时通过 `PURGE` 请求 + Tag 批量清除。
+
+  Nginx 原生不支持 Tag 清除，需借助 `lua-resty-nginx-cache` 或商业 CDN（Cloudflare、Fastly）的 Tag Purge API。
+
+- 【L4】**一致性哈希在 CDN 中的应用**
+
+  多级缓存架构中，L2 层使用一致性哈希将相同 URL 固定路由到同一 L2 节点，避免多个 L1 节点回源不同 L2 导致的缓存冗余（命中率从 85% 提升到 95%+）。
+
+  Nginx 的 `upstream hash` 指令可实现。
+
+- 【L3】**边缘计算的安全边界**
+
+  在边缘执行 Lua/njs 脚本时，必须限制执行时间（`lua_socket_connect_timeout`）和内存使用，避免恶意请求导致边缘节点资源耗尽；同时边缘层不应直接访问数据库，
+  仅做无状态逻辑。
 
 > 📚 延伸阅读：[Nginx 官方 proxy_cache 文档](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache)
 
@@ -2109,7 +2228,12 @@ server {
 
 ::: details
 
-生产案例：某金融平台入口从纯 Nginx 改为 LVS + Nginx 分层后扛住 10 倍流量峰值。症状：每日交易高峰期 Nginx 入口层 CPU 持续 90%+，新建连接延迟飙升至 50ms，部分请求 504 超时。排查：Nginx 作为入口同时承担 SSL 卸载、L7 路由、限流、静态文件服务，单点瓶颈明显；且 SYN Flood 攻击时 Nginx 用户态处理直接被打满。根因：L7 层不应承担入口流量分发的职责，SSL 握手和连接管理的 CPU 开销挤占了业务路由资源。修复：① 入口层改为 LVS DR 模式（内核态转发，CPU 开销降低 80%）+ Keepalived 双机热备；② Nginx 下沉为 L7 层，专注 SSL 卸载与业务路由；③ LVS 层配置 SYN Cookie + 连接超时 15s 抗 DDoS。修复后入口 CPS 从 8 万提升到 60 万，Nginx CPU 降至 35%，P99 延迟稳定在 3ms 以内。教训：L4 和 L7 的职责边界必须清晰——L4 负责「流量分发」，L7 负责「内容路由」，混用会导致资源争抢和单点瓶颈。
+生产案例：某金融平台入口从纯 Nginx 改为 LVS + Nginx 分层后扛住 10 倍流量峰值。症状：每日交易高峰期 Nginx 入口层 CPU 持续 90%+，新建连接延迟飙升至 50ms，部分请求 504 超时。排查：
+
+Nginx 作为入口同时承担 SSL 卸载、L7 路由、限流、静态文件服务，单点瓶颈明显；且 SYN Flood 攻击时 Nginx 用户态处理直接被打满。根因：L7 层不应承担入口流量分发的职责，
+SSL 握手和连接管理的 CPU 开销挤占了业务路由资源。修复：① 入口层改为 LVS DR 模式（内核态转发，CPU 开销降低 80%）+ Keepalived 双机热备；② Nginx 下沉为 L7 层，专注 SSL 卸载与业务路由；
+③ LVS 层配置 SYN Cookie + 连接超时 15s 抗 DDoS。修复后入口 CPS 从 8 万提升到 60 万，Nginx CPU 降至 35%，P99 延迟稳定在 3ms 以内。教训：L4 和 L7 的职责边界必须清晰——
+L4 负责「流量分发」，L7 负责「内容路由」，混用会导致资源争抢和单点瓶颈。
 
 :::
 
@@ -2117,9 +2241,20 @@ server {
 
 ::: details
 
-- 【L4】**LVS 的 sh / sed / nq 调度算法**：除常见的 rr / wrr / lc / wlc 外，LVS 还支持 `sh`（源地址哈希，适合无 Cookie 的会话保持）、`sed`（最短期望延迟，根据实时延迟选最优节点）、`nq`（永不排队，新请求直接分发到空闲节点）等高级算法，在特定场景下比轮询更优。
-- 【L4】**DPDK 与 L4 负载均衡**：传统 LVS 基于内核网络栈，在 10Gbps+ 场景下中断开销显著；基于 DPDK 的用户态 L4 负载均衡（如 DPVS，美团开源）可绕过内核协议栈，单节点达到 200 万 CPS，适合超大规模入口。
-- 【L3】**L7 负载均衡的服务网格演进**：在 K8s 环境中，Envoy / Istio Sidecar 模式将 L7 负载均衡下沉到每个 Pod 旁路，实现去中心化的智能路由（灰度、熔断、重试），与传统 Nginx 集中式 L7 形成互补。
+- 【L4】**LVS 的 sh / sed / nq 调度算法**
+
+  除常见的 rr / wrr / lc / wlc 外，LVS 还支持 `sh`（源地址哈希，适合无 Cookie 的会话保持）、`sed`（最短期望延迟，
+  根据实时延迟选最优节点）、`nq`（永不排队，新请求直接分发到空闲节点）等高级算法，在特定场景下比轮询更优。
+
+- 【L4】**DPDK 与 L4 负载均衡**
+
+  传统 LVS 基于内核网络栈，在 10Gbps+ 场景下中断开销显著；基于 DPDK 的用户态 L4 负载均衡（如 DPVS，美团开源）可绕过内核协议栈，单节点达到 200 万 CPS，
+  适合超大规模入口。
+
+- 【L3】**L7 负载均衡的服务网格演进**
+
+  在 K8s 环境中，Envoy / Istio Sidecar 模式将 L7 负载均衡下沉到每个 Pod 旁路，实现去中心化的智能路由（灰度、熔断、重试），
+  与传统 Nginx 集中式 L7 形成互补。
 
 > 📚 延伸阅读：[LVS 官方网站](http://www.linuxvirtualserver.org/)
 

@@ -63,8 +63,6 @@ HBase 是构建在 HDFS 之上的**分布式、面向列族（Column Family）�
 
 ::: details
 
-常见误区：
-
 - ❌ 「HBase 是列式数据库，所以适合 OLAP 分析」→ HBase 是**列族存储**：同一列族的数据物理上存在一起（同一 Store、同一批 HFile），同一行的不同列族才分开存。这与列式分析数据库「同一列的所有行连续存放，用于全表扫描聚合与高压缩比」完全不是一回事。HBase 的强项是**按 RowKey 的点查与范围扫描**，全表聚合分析应交给 ClickHouse/Doris。
 - ❌ 「HBase 有索引」→ 只有 RowKey 这一条主键路径。HBase 靠 RowKey 字典序 + META 表定位 Region，靠布隆过滤器跳过无关 HFile，但**没有原生二级索引**，按非 RowKey 字段查询只能全表 Scan（或引入 Phoenix 的全局/本地索引）。
 
@@ -108,8 +106,6 @@ HDFS 擅长海量数据的批量顺序访问，但无法随机访问；传统关
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ 「MySQL 到千万行就不行了，所以要换 HBase」→ 不存在通用的行数阈值。MySQL 的性能取决于表结构、索引设计与硬件配置，配合合理分库分表可以支撑很大数据量。换 HBase 的真正理由不是「行数多」，而是「需要稀疏宽表 + 动态列 + 按 RowKey 的海量随机读写，且可以接受没有 JOIN、没有二级索引、没有跨行事务」。
 - ❌ 「HBase 是更快版的 MySQL」→ 两者能力集不重叠。HBase 换来了水平扩展与海量随机读写，代价是丢掉了 SQL、JOIN、二级索引与跨行事务；把它当 MySQL 用会在业务层付出巨额补偿成本。
@@ -166,8 +162,6 @@ HBase 适用于「实时随机访问超大数据集」的场景，典型用途�
 
 ::: details
 
-常见误区：
-
 - ❌ 「HBase 能做实时分析，所以实时数仓直接用它」→ HBase 只适合明细层的点查与范围扫描。真正的聚合分析（GROUP BY 全表、多维 OLAP）在 HBase 上是全表扫描，性能与成本都不可接受，必须由 ClickHouse/Doris 承担。
 - ❌ 「HBase 适合所有大数据量场景」→ 如果查询模式是「按非 RowKey 字段灵活检索」，HBase 会让你退化成全表 Scan，此时 Elasticsearch 才是正确选择。
 
@@ -215,8 +209,6 @@ HBase 无 Schema、基于 HDFS、仅支持行级事务，适合超大规模宽�
 
 ::: details
 
-常见误区：
-
 - ❌ 「HBase 无 Schema，所以建表很随意」→ 列族是 Schema 的一部分且**建表后修改代价极高**。列族数量直接决定 Store 数量，而每个 Store 独立 flush、独立 compaction，列族过多会成倍放大小文件与读放大。生产上列族应控制在 1-3 个。
 - ❌ 「仅支持 HDFS 意味着 HBase 不能单独部署」→ 单机测试模式可以跑在本地文件系统上，但生产部署的持久性与副本能力完全依赖 HDFS（或其他 Hadoop 兼容文件系统），HBase 自身不做数据冗余。
 - ❌ 「HBase 的行级事务等于没有事务保证」→ 单行 ACID 是真实可用的强保证：同一行的多列更新是原子的、读写不互相看见半成品（靠 MVCC）。它只是不跨行。业务上把需要原子性的字段设计到同一行，是 HBase 建模的核心技巧。
@@ -263,8 +255,6 @@ HDFS 是底层文件系统，擅长大文件一次写入多次读取；HBase 是
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ 「有了 HDFS 就不需要 HBase，直接读文件即可」→ HDFS 上没有索引，定位一条记录要扫整个文件（甚至跨 Block）。HBase 的价值正是用 Region 切分 + RowKey 字典序 + META 寻址 + 布隆过滤器，把「文件扫描」变成「文件内 Block 级定位」。
 - ❌ 「HBase 需要自己保证数据多副本」→ 副本完全由底层 HDFS 负责。HBase 的 Region 是单点服务的（一个 Region 同时只在一个 RegionServer 上），它保证的是可用性（故障后重新分配 + WAL 回放）而非冗余。
@@ -337,8 +327,6 @@ HDFS 是底层文件系统，擅长大文件一次写入多次读取；HBase 是
 
 ::: details
 
-常见误区：
-
 - ❌ 「HBase 是列式数据库，所以适合做 OLAP 分析」→ HBase 是**列族存储**，不是列式分析存储。同一列族内的列混在同一批 HFile 中，读取粒度是 Block 而非单列，全表聚合扫描性能与压缩比都远不如 Parquet/ClickHouse。HBase 的主场是按 RowKey 的点查与范围扫描。
 - ❌ 「列存一定比行存好」→ 列存对高频单行更新极不友好（一行数据分散在各列文件中，一次更新要触碰多个文件），所以 OLTP 系统仍然必须用行存。选型依据是查询模式（点查整行 vs 扫描聚合），不是「谁更先进」。
 - ❌ 「HBase 一行数据是连续存放的」→ 只有同一列族内的数据才物理相邻。跨列族读取一行，实际是从多个 Store 分别读再归并，这是**列族数量应当控制在 1-3 个**的物理原因。
@@ -383,8 +371,6 @@ HBase 表具备容量大、面向列、稀疏性、多版本和字节数组存�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ 「稀疏表所以可以随便加列，没有代价」→ 列**限定符**确实可以动态加，但列限定符名本身会存进每个 KeyValue。如果误把「值」放进了列名（例如给每个时间戳建一个列名），会导致列名爆炸，存储与内存开销急剧放大。
 - ❌ 「多版本是免费的」→ `VERSIONS` 调大会线性放大存储，且旧版本要等到 Major Compaction 才清理，在此之前读路径仍可能扫到它们。
@@ -443,8 +429,6 @@ HBase 是面向列族的数据库，核心层级为 Table → Row → Column Fam
 
 ::: details
 
-常见误区：
-
 - ❌ 「列族和列限定符都是 Schema，改起来一样」→ 列族属于 Schema，建表时必须定义，增删改代价极高（涉及表级 DDL 与 Region 重新分配）；列限定符不属于 Schema，写入时即可动态创建，零成本。混淆两者会导致「为每个新字段加一个列族」的灾难性建模。
 - ❌ 「HBase 逻辑模型和关系模型可以一一对应」→ 表对应表、行对应行、列族**不等于**表（虽然常被类比），但列限定符是动态的、Cell 是多版本的、没有类型系统。把关系模型直接映射到 HBase 通常会做出反范式的错误设计。
 - ❌ 「Timestamp 是写入时间，不能改」→ 可以由客户端显式指定。这在数据回补、乱序到达、以及用时间戳实现「按版本回溯」时很有用，但也意味着重复写入同一 Timestamp 会覆盖而非新增版本。
@@ -489,17 +473,26 @@ HBase 表通过 Row Key 范围被水平切分为多个 Region，Region 是分布
 
 ::: details
 
-- 【L3】分裂策略随版本演进：1.x 及更早默认 `IncreasingToUpperBoundRegionSplitPolicy`（阈值随同表 Region 数增长而放大，Region 越多阈值越大）；**HBase 2.0 起默认改为 `SteppingSplitPolicy`**——第一个 Region 只要达到 `2 × hbase.hregion.memstore.flush.size` 就分裂，之后才按 `hbase.hregion.max.filesize`（默认 10GB）判定。所以「2.x 仍是 IncreasingToUpperBound」是常见讹传。
-- 【L3】分裂时子 Region 初始只持有父 HFile 的**引用文件**（Reference File，指向父 HFile 的一半），真正的物理数据拆分延迟到后续 Compaction 完成；在 Compaction 结束前，子 Region 的读要跨引用文件寻址，**读性能会明显下降**。
-- 【L4】生产结论：必须**预分区**（建表时指定 `SPLITS` / `NUMREGIONS`）并关闭或调大自动分裂阈值，否则动态分裂会带来不可预测的抖动（Region 短暂不可用 + 引用文件读放大 + Master 重新分配）。详见本文档「HBase Region 分裂是如何工作的？」。
+- 【L3】分裂策略随版本演进
+
+  1.x 及更早默认 `IncreasingToUpperBoundRegionSplitPolicy`（阈值随同表 Region 数增长而放大，Region 越多阈值越大）；
+  **HBase 2.0 起默认改为 `SteppingSplitPolicy`**——第一个 Region 只要达到 `2 × hbase.hregion.memstore.flush.size` 就分裂，
+  之后才按 `hbase.hregion.max.filesize`（默认 10GB）判定。所以「2.x 仍是 IncreasingToUpperBound」是常见讹传。
+
+- 【L3】分裂时子 Region 初始只持有父 HFile 的**引用文件**（Reference File，指向父 HFile 的一半），真正的物理数据拆分延迟到后续 Compaction 完成；在 Compaction 结束前，
+  子 Region 的读要跨引用文件寻址，**读性能会明显下降**。
+
+- 【L4】生产结论
+
+  必须**预分区**（建表时指定 `SPLITS` / `NUMREGIONS`）并关闭或调大自动分裂阈值，否则动态分裂会带来不可预测的抖动（Region 短暂不可用 + 引用文件读放大 + Master 重新分配）。
+
+  详见本文档「HBase Region 分裂是如何工作的？」。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ 「一个 Region 可以横跨多个 RegionServer」→ 一个 Region 只会由一个 RegionServer 服务，这正是「单 Region 无法再水平拆分、只能靠分裂扩容」的原因，也是 RowKey 热点无法通过加机器解决的根因。
 - ❌ 「Region 分裂就是把 HFile 一分为二」→ 分裂瞬间只生成引用文件（逻辑切分），物理拆分发生在后续 Compaction；把两者混为一谈会误判分裂的耗时与读性能影响。
@@ -563,18 +556,33 @@ META 表是 HBase 中一张特殊的表，保存了所有 Region 的位置信息
 
 ::: details
 
-- 【L3】**读放大的来源与量化关系**：一次点查最坏要访问的 HFile 数量，等于该 Store 当前的 HFile 数量。**Store 内 HFile 越多，点查要归并的路数越多、读放大越严重**。`hbase.hstore.blockingStoreFiles`（默认 16）达到后，**该 Region 的写入会被阻塞直到 compaction 把文件数降下来**——这就是「集群写入突然全部变慢」的经典根因。缓解手段是 compaction（减少文件数）、布隆过滤器（跳过无关文件）、BlockCache（减少回盘）。
-- 【L3】**BlockCache 的两种实现**：`LruBlockCache`（默认，堆内）实现简单但大堆下 GC 压力大；`BucketCache`（堆外/off-heap，常与 LRU 组成 L1/L2 两级）把缓存放到堆外内存或 SSD，避免大堆 GC 停顿，是大内存 RegionServer 的正解。
-- 【L4】**布隆过滤器的边界**：它只对「读某个具体 RowKey」有效，**对 Scan 范围查询无效**（范围扫描无法用单个 RowKey 去探测）。且布隆过滤器是 **per-HFile** 的，其索引要加载进内存，列族很多或 HFile 很多时内存开销不可忽视。
-- 【L4】**Scan 与 Get 的读路径差异**：Get 是单行点查，能吃到布隆过滤器全部收益；Scan 需要维持游标与多路归并状态，`setCaching`（每次 RPC 拉多少行，默认 100）过小会导致 RPC 往返次数爆炸，过大则会拉高 RegionServer 内存与客户端延迟。
+- 【L3】**读放大的来源与量化关系**
+
+  一次点查最坏要访问的 HFile 数量，等于该 Store 当前的 HFile 数量。**Store 内 HFile 越多，点查要归并的路数越多、
+  读放大越严重**。`hbase.hstore.blockingStoreFiles`（默认 16）达到后，**该 Region 的写入会被阻塞直到 compaction 把文件数降下来**——这就是「集群写入突然全部变慢」的经典根因。
+
+  缓解手段是 compaction（减少文件数）、布隆过滤器（跳过无关文件）、BlockCache（减少回盘）。
+
+- 【L3】**BlockCache 的两种实现**
+
+  `LruBlockCache`（默认，堆内）实现简单但大堆下 GC 压力大；`BucketCache`（堆外/off-heap，
+  常与 LRU 组成 L1/L2 两级）把缓存放到堆外内存或 SSD，避免大堆 GC 停顿，是大内存 RegionServer 的正解。
+
+- 【L4】**布隆过滤器的边界**
+
+  它只对「读某个具体 RowKey」有效，**对 Scan 范围查询无效**（范围扫描无法用单个 RowKey 去探测）。且布隆过滤器是 **per-HFile** 的，其索引要加载进内存，
+  列族很多或 HFile 很多时内存开销不可忽视。
+
+- 【L4】**Scan 与 Get 的读路径差异**
+
+  Get 是单行点查，能吃到布隆过滤器全部收益；Scan 需要维持游标与多路归并状态，`setCaching`（每次 RPC 拉多少行，默认 100）过小会导致 RPC 往返次数爆炸，
+  过大则会拉高 RegionServer 内存与客户端延迟。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ 「读的时候先查 BlockCache，命中就不查 MemStore 了」→ MemStore 里是**尚未 flush 的最新数据**，任何读都必须扫它，否则读不到刚写入的数据。BlockCache 缓存的是 **HFile 的 Block**，它只作用于 StoreFile 这一路，不能替代 MemStore。
 - ❌ 「布隆过滤器能加速范围扫描」→ 布隆过滤器回答的是「某个具体 RowKey 是否可能在这个 HFile 里」，Scan 是一个 RowKey 区间，无法用它跳过文件。范围扫描的加速手段是 RowKey 设计 + `setStartRow/setStopRow` 收窄区间 + BlockCache。
@@ -629,18 +637,32 @@ graph TB
 
 ::: details
 
-- 【L3】**MemStore 的底层结构**：`ConcurrentSkipListMap`（并发跳表），**按 RowKey 有序**。有序是 LSM Tree 的关键——正因为内存中已排序，flush 时才能一次性顺序写出一个**有序且不可变**的 HFile，后续归并读也才可能高效。
-- 【L3】**两级 flush 阈值**：单个 MemStore 达到 `hbase.hregion.memstore.flush.size`（默认 128MB）触发该 Region 的 flush；同时 RegionServer 有**全局 MemStore 水位**（`hbase.regionserver.global.memstore.size` 默认占堆 0.4），到达下限水位会强制 flush 最大的那些 MemStore，到达上限水位则**直接阻塞写入**。所以「写入变慢」不一定和单个 Region 有关，可能是全局内存水位触顶。
-- 【L4】**WAL 的持久性语义**：WAL 先于 MemStore 写入，宕机后靠回放 WAL 恢复未 flush 的数据。`SyncableFSHLog` / asyncfs provider 决定 WAL 是否同步刷盘；客户端也可通过 `setDurability(SKIP_WAL)` 关掉 WAL 换吞吐，但**代价是 RegionServer 宕机时丢失这部分已确认的写**——只有在数据可从上游重放时才可用。
-- 【L4】**LSM Tree 的本质取舍**：HBase 写路径是纯顺序写（WAL 顺序 append + flush 顺序写 HFile），所以写极快；代价是**读要归并多个有序文件**，即读放大。按 RUM 猜想，读放大、写放大、空间放大三者不可兼得——**LSM 是牺牲读性能换写性能**，Compaction 就是在读放大与写放大之间做再平衡的手段。
+- 【L3】**MemStore 的底层结构**
+
+  `ConcurrentSkipListMap`（并发跳表），**按 RowKey 有序**。有序是 LSM Tree 的关键——正因为内存中已排序，
+  flush 时才能一次性顺序写出一个**有序且不可变**的 HFile，后续归并读也才可能高效。
+
+- 【L3】**两级 flush 阈值**
+
+  单个 MemStore 达到 `hbase.hregion.memstore.flush.size`（默认 128MB）触发该 Region 的 flush；
+  同时 RegionServer 有**全局 MemStore 水位**（`hbase.regionserver.global.memstore.size` 默认占堆 0.4），到达下限水位会强制 flush 最大的那些 MemStore，
+  到达上限水位则**直接阻塞写入**。所以「写入变慢」不一定和单个 Region 有关，可能是全局内存水位触顶。
+
+- 【L4】**WAL 的持久性语义**
+
+  WAL 先于 MemStore 写入，宕机后靠回放 WAL 恢复未 flush 的数据。`SyncableFSHLog` / asyncfs provider 决定 WAL 是否同步刷盘；
+  客户端也可通过 `setDurability(SKIP_WAL)` 关掉 WAL 换吞吐，但**代价是 RegionServer 宕机时丢失这部分已确认的写**——只有在数据可从上游重放时才可用。
+
+- 【L4】**LSM Tree 的本质取舍**
+
+  HBase 写路径是纯顺序写（WAL 顺序 append + flush 顺序写 HFile），所以写极快；代价是**读要归并多个有序文件**，即读放大。按 RUM 猜想，读放大、写放大、
+  空间放大三者不可兼得——**LSM 是牺牲读性能换写性能**，Compaction 就是在读放大与写放大之间做再平衡的手段。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ 「LSM Tree 读写都很快」→ 写快是真的（顺序写），读是**用归并 + 布隆过滤器 + BlockCache 硬撑回来的**，本质是牺牲读换写。说「读写都快」是对 LSM 的根本误解。
 - ❌ 「写 WAL 和写 MemStore 可以并行，谁先都行」→ 必须**先 WAL 后 MemStore**。若先写 MemStore，WAL 写失败时就出现了「内存里有、日志里没有」的数据，宕机即丢，破坏持久性承诺。
@@ -720,17 +742,28 @@ graph TB
 
 ::: details
 
-- 【L3】**ZooKeeper session timeout 是典型的参数权衡题**（`zookeeper.session.timeout`，默认 90s）：**调得太短**，RegionServer 一次较长的 GC 停顿就可能让 ZK 判定 session 过期，Master 把它的 Region 分给别人，而原 RS 恢复后仍在服务——造成**「Region 双活」，两个 RS 同时写同一 Region，数据损坏**；**调得太长**，真实故障要等很久才被发现，RTO 变差。这是「宁可慢，不可双活」的经典取舍，也解释了为什么 HBase 对 RegionServer 的 GC 停顿如此敏感。
-- 【L4】**RegionServer 宕机的完整恢复链路**：ZK session 超时 → Master 感知 → 把该 RS 的 Region 分配到其他 RS → 对其 WAL 做 **WAL Split**（按 Region 切分日志）→ 各 Region 在新 RS 上回放自己的 WAL 重建 MemStore → Region 上线。**WAL Split 是恢复耗时的大头**，Region 越多、WAL 越大，恢复越慢。
-- 【L4】**单 RegionServer 承载的 Region 数量是有上限的**：建议控制在几百到上千的量级。Region 过多会导致每个 MemStore 都占一份内存、flush 与 compaction 高度碎片化（产生大量小 HFile），进而放大读放大与 GC 压力。这也是「不要无脑预分区分成成千上万个 Region」的原因。
+- 【L3】**ZooKeeper session timeout 是典型的参数权衡题**（`zookeeper.session.timeout`，默认 90s）
+
+  **调得太短**，
+  RegionServer 一次较长的 GC 停顿就可能让 ZK 判定 session 过期，Master 把它的 Region 分给别人，而原 RS 恢复后仍在服务——造成**「Region 双活」，两个 RS 同时写同一 Region，
+  数据损坏**；**调得太长**，真实故障要等很久才被发现，RTO 变差。这是「宁可慢，不可双活」的经典取舍，也解释了为什么 HBase 对 RegionServer 的 GC 停顿如此敏感。
+
+- 【L4】**RegionServer 宕机的完整恢复链路**
+
+  ZK session 超时 → Master 感知 → 把该 RS 的 Region 分配到其他 RS →
+   对其 WAL 做 **WAL Split**（按 Region 切分日志）→ 各 Region 在新 RS 上回放自己的 WAL 重建 MemStore → Region 上线。**WAL Split 是恢复耗时的大头**，
+  Region 越多、WAL 越大，恢复越慢。
+
+- 【L4】**单 RegionServer 承载的 Region 数量是有上限的**
+
+  建议控制在几百到上千的量级。Region 过多会导致每个 MemStore 都占一份内存、
+  flush 与 compaction 高度碎片化（产生大量小 HFile），进而放大读放大与 GC 压力。这也是「不要无脑预分区分成成千上万个 Region」的原因。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ 「HMaster 是主节点，挂了集群就不能读写」→ HMaster 只管控制面（DDL、Region 分配、负载均衡、分裂）。它挂掉期间已有 Region 的读写完全正常，只是无法做管理操作。这与 MySQL 主库挂了不能写是两回事。
 - ❌ 「ZooKeeper 里存着 HBase 的数据或表结构」→ ZK 只存元信息的小 znode（meta 位置、master 选举、RS 临时节点、集群状态）。表结构在 HDFS，数据更在 HDFS。把 ZK 当元数据仓库会在容量规划上出错。
@@ -836,10 +869,20 @@ byte[] rowKey = Bytes.add(salt, Bytes.toBytes(dateStr), Bytes.toBytes(userId));
 ::: details
 
 - 【L3】RowKey 设计的第一准则是服务于最高频查询模式，而非单纯追求散列。例如“查询某用户最近 N 条记录”应设计为 `userId + 反转时间戳`，同一用户数据落在相邻区间可范围扫描，且时间倒序天然满足“最新在前”。
-- 【L3】加盐/哈希与范围扫描天然矛盾：打散后原始顺序丢失，无法按业务维度 range scan。折衷方案是“确定性散列前缀”（如 `userId % N` 作为桶前缀），扫描时并发查 N 个桶。
-- 【L4】RowKey 过长会直接侵蚀 BlockCache 效率：HFile 的 Data Index Block 存的是 RowKey，RowKey 越长单个 16KB 块容纳的索引项越少，定位 HFile 需要的索引层级越多，读放大越严重。
+
+- 【L3】加盐/哈希与范围扫描天然矛盾
+
+  打散后原始顺序丢失，无法按业务维度 range scan。折衷方案是“确定性散列前缀”（如 `userId % N` 作为桶前缀），扫描时并发查 N 个桶。
+
+- 【L4】RowKey 过长会直接侵蚀 BlockCache 效率
+
+  HFile 的 Data Index Block 存的是 RowKey，RowKey 越长单个 16KB 块容纳的索引项越少，定位 HFile 需要的索引层级越多，
+  读放大越严重。
+
 - 【L4】预分区的 splitKey 必须与 RowKey 分布规律对齐，否则预分区反而造成数据倾斜。
-- 【L4】🔴 **RowKey 设计错误无法在线修复**——这是本题最重要的结论。HBase 没有「重建索引」这种低成本手段：RowKey 是数据的物理排序键与 Region 切分依据，一旦设计错了（热点、无法扫描、过长），**唯一出路是重建表 + 全量迁移**（BulkLoad / `CopyTable` / Spark 作业重写）。因此设计阶段就必须用真实数据分布做压测验证，而不是上线后发现问题再改。
+
+- 【L4】🔴 **RowKey 设计错误无法在线修复**——这是本题最重要的结论。HBase 没有「重建索引」这种低成本手段：RowKey 是数据的物理排序键与 Region 切分依据，一旦设计错了（热点、无法扫描、过长），
+  **唯一出路是重建表 + 全量迁移**（BulkLoad / `CopyTable` / Spark 作业重写）。因此设计阶段就必须用真实数据分布做压测验证，而不是上线后发现问题再改。
 
 :::
 
@@ -849,15 +892,14 @@ byte[] rowKey = Bytes.add(salt, Bytes.toBytes(dateStr), Bytes.toBytes(userId));
 
 > ⚠️ 以下为教学示意场景，其中的量化数字为示意值，非官方基准或真实生产统计。
 
-某日志平台日写入量 50 亿条，原 RowKey 为纯时间戳导致单个 RegionServer 承担 80% 写入负载（热点）。改用 `userId % 16 取模前缀 + 反转时间戳 + userId` 后，写入负载均匀分散到 16 台 RegionServer，P99 写入延迟从 120ms 降至 15ms。
+某日志平台日写入量 50 亿条，原 RowKey 为纯时间戳导致单个 RegionServer 承担 80% 写入负载（热点）。改用 `userId % 16 取模前缀 + 反转时间戳 + userId` 后，
+写入负载均匀分散到 16 台 RegionServer，P99 写入延迟从 120ms 降至 15ms。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "使用自增 ID 作为 RowKey" → 导致写入热点，所有写入集中在一个 Region
 - ❌ "使用日期字符串作为 RowKey" → 导致同一日期数据集中写入同一 Region
@@ -927,11 +969,34 @@ graph TB
 
 ::: details
 
-- 【L3】文件选择策略：HBase 默认使用 ExploringCompactionPolicy；此外还有 FIFOCompactionPolicy（TTL 表直接删文件）、DateTieredCompactionPolicy（按时间窗口分层合并，适合时序数据）。
-- 【L3】Major Compaction 是唯一物理删除数据的时机：Delete Marker、超过 TTL 的数据、超过 `VERSIONS` 限制的旧版本，都只在 Major Compaction 时真正清理。“删除后磁盘空间没降”是正常现象。
-- 【L4】Major Compaction 风暴的危害：全集群同时触发会造成 IO 风暴、读写延迟飙升，甚至引发 RegionServer GC/OOM。**限流手段**：`hbase.hstore.compaction.throughput.lower.bound` / `upper.bound` 控制吞吐上下界；再配合 `hbase.hstore.compaction.throughput.offpeak`（off-peak 时段的更高限速）与 `hbase.offpeak.start.hour` / `hbase.offpeak.end.hour` 定义低峰时段，做到「低峰快跑、高峰慢跑」。
-- 【L4】**生产环境的硬性结论**：`hbase.hregion.majorcompaction` 必须设为 0 关闭自动触发，改由业务低峰期的定时任务或人工脚本执行。默认的「每 7 天自动一次」会让集群出现**周期性的、与业务无关的抖动**，且各 Region 的触发时刻分散在整周内，故障定位极其困难。
-- 【L4】Compaction 与写入阻塞的联动：写入速度长期高于 compaction 速度时，HFile 数会累积到 `blockingStoreFiles`（默认 16），此时该 Region **停止接受写入**。所以「compaction 跟不上」表现出的症状不是读变慢，而是**写直接卡住**。
+- 【L3】文件选择策略
+
+  HBase 默认使用 ExploringCompactionPolicy；此外还有 FIFOCompactionPolicy（TTL 表直接删文件）、
+  DateTieredCompactionPolicy（按时间窗口分层合并，适合时序数据）。
+
+- 【L3】Major Compaction 是唯一物理删除数据的时机
+
+  Delete Marker、超过 TTL 的数据、超过 `VERSIONS` 限制的旧版本，
+  都只在 Major Compaction 时真正清理。“删除后磁盘空间没降”是正常现象。
+
+- 【L4】Major Compaction 风暴的危害
+
+  全集群同时触发会造成 IO 风暴、读写延迟飙升，甚至引发 RegionServer GC/OOM。
+
+  **限流手段**：`hbase.hstore.compaction.throughput.lower.bound` / `upper.bound` 控制吞吐上下界；
+  再配合 `hbase.hstore.compaction.throughput.offpeak`（off-peak 时段的更高限速）与 `hbase.offpeak.start.hour` / `hbase.offpeak.end.hour` 定义低峰时段，
+  做到「低峰快跑、高峰慢跑」。
+
+- 【L4】**生产环境的硬性结论**
+
+  `hbase.hregion.majorcompaction` 必须设为 0 关闭自动触发，改由业务低峰期的定时任务或人工脚本执行。默认的「每 7 天自动一次」会让集群出现**周期性的、
+  与业务无关的抖动**，且各 Region 的触发时刻分散在整周内，故障定位极其困难。
+
+- 【L4】Compaction 与写入阻塞的联动
+
+  写入速度长期高于 compaction 速度时，HFile 数会累积到 `blockingStoreFiles`（默认 16），此时该 Region **停止接受写入**。
+
+  所以「compaction 跟不上」表现出的症状不是读变慢，而是**写直接卡住**。
 
 :::
 
@@ -941,15 +1006,15 @@ graph TB
 
 > ⚠️ 以下为教学示意场景，其中的量化数字为示意值，非官方基准或真实生产统计。
 
-某推荐系统 HBase 集群 200 台 RegionServer，单表 50TB 数据。自动 Major Compaction 导致每周一次 IO 风暴，P99 读延迟从 5ms 飙升至 200ms。改为禁用自动触发 + 凌晨低峰期手动执行 + 限流 50MB/s 后，IO 风暴消除，读延迟波动控制在 5~10ms。
+某推荐系统 HBase 集群 200 台 RegionServer，单表 50TB 数据。自动 Major Compaction 导致每周一次 IO 风暴，P99 读延迟从 5ms 飙升至 200ms。
+
+改为禁用自动触发 + 凌晨低峰期手动执行 + 限流 50MB/s 后，IO 风暴消除，读延迟波动控制在 5~10ms。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "删除数据后磁盘空间应该立刻减少" → 删除只是写入 Delete Marker，物理删除需等 Major Compaction
 - ❌ "Minor Compaction 也会清理删除标记" → Minor 只合并文件不清理过期数据
@@ -1001,18 +1066,27 @@ graph TB
 ::: details
 
 - 【L3】布隆过滤器的误判率（False Positive Rate）默认为 1%，可通过 `io.storefile.bloom.error.rate` 调整，误判率越低空间开销越大。
+
 - 【L3】布隆过滤器仅在查找单个 HFile 时起作用，对 MemStore 和 BlockCache 无效，因为内存中的数据可以直接判断存在性。
-- 【L4】🔴 **布隆过滤器对 Scan 范围查询无效**——这是最容易被忽略的边界。布隆过滤器回答的是「**某个具体 RowKey** 是否可能在这个 HFile 里」，而 Scan 是一个 RowKey **区间**，无法用单个 key 去探测，因此每个 HFile 都要老老实实参与归并。所以「加了布隆过滤器为什么 Scan 还是慢」的答案是：它本来就帮不上 Scan，Scan 的加速只能靠 RowKey 设计收窄区间、BlockCache 与 compaction 减少文件数。
-- 【L4】**布隆过滤器是 per-HFile 的**，且其位数组需要加载进内存（占用 BlockCache / 堆内存）才能发挥作用。这意味着：**HFile 越多、列族越多，布隆过滤器的总内存开销越大**。在小文件泛滥（compaction 跟不上）的集群上，布隆过滤器反而会加剧内存压力——这也是「保持 compaction 健康」的又一个理由。
-- 【L4】ROW 与 ROWCOL 的取舍：ROWCOL 把 `RowKey + 列` 一起放进位数组，对「固定读某几列的宽表」能进一步跳过 Block，但位数组规模随列数膨胀。列数极多或列名动态变化的表用 ROWCOL 会得不偿失，应保持 ROW。
+
+- 【L4】🔴 **布隆过滤器对 Scan 范围查询无效**——这是最容易被忽略的边界。布隆过滤器回答的是「**某个具体 RowKey** 是否可能在这个 HFile 里」，而 Scan 是一个 RowKey **区间**，
+  无法用单个 key 去探测，因此每个 HFile 都要老老实实参与归并。所以「加了布隆过滤器为什么 Scan 还是慢」的答案是：它本来就帮不上 Scan，Scan 的加速只能靠 RowKey 设计收窄区间、
+  BlockCache 与 compaction 减少文件数。
+
+- 【L4】**布隆过滤器是 per-HFile 的**，且其位数组需要加载进内存（占用 BlockCache / 堆内存）才能发挥作用。这意味着：**HFile 越多、列族越多，布隆过滤器的总内存开销越大**。
+
+  在小文件泛滥（compaction 跟不上）的集群上，布隆过滤器反而会加剧内存压力——这也是「保持 compaction 健康」的又一个理由。
+
+- 【L4】ROW 与 ROWCOL 的取舍
+
+  ROWCOL 把 `RowKey + 列` 一起放进位数组，对「固定读某几列的宽表」能进一步跳过 Block，但位数组规模随列数膨胀。列数极多或列名动态变化的表用 ROWCOL 会得不偿失，
+  应保持 ROW。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "布隆过滤器返回‘存在’则数据一定存在" → 布隆过滤器有一定误判率，“存在”只是可能存在，需进一步读取 HFile 确认。**它唯一能确定性回答的是「一定不存在」**。
 - ❌ "关闭布隆过滤器可以节省内存" → 节省的那点内存远不如因无效磁盘 IO 带来的性能损失。
@@ -1089,11 +1163,27 @@ RegionServer 的堆内存要在三块之间分配：
 
 ::: details
 
-- 【L3】两级 MemStore 水位：全局 MemStore 的**上限**是 `hbase.regionserver.global.memstore.size`（默认堆的 0.4）；达到 `hbase.regionserver.global.memstore.size.lower.limit`（默认为上限的 0.95）时会**强制 flush 占用最大的那些 MemStore**，真正触到 0.4 上限才**阻塞写入**。所以「写吞吐突降」要先分清是 lower limit 触发的强制 flush，还是上限触发的写入阻塞。
-- 【L3】MemStore 采用 active + snapshot 双缓冲：Flush 时 active 切换为 snapshot 落盘，新写入进入新的 active，读写不阻塞。
-- 【L4】读写一致性基于 MVCC（ReadPoint）：每次读写获取递增的 sequenceId，读请求只看到 sequenceId ≤ ReadPoint 的已提交写入。
+- 【L3】两级 MemStore 水位
+
+  全局 MemStore 的**上限**是 `hbase.regionserver.global.memstore.size`（默认堆的 0.4）；
+  达到 `hbase.regionserver.global.memstore.size.lower.limit`（默认为上限的 0.95）时会**强制 flush 占用最大的那些 MemStore**，
+  真正触到 0.4 上限才**阻塞写入**。所以「写吞吐突降」要先分清是 lower limit 触发的强制 flush，还是上限触发的写入阻塞。
+
+- 【L3】MemStore 采用 active + snapshot 双缓冲
+
+  Flush 时 active 切换为 snapshot 落盘，新写入进入新的 active，读写不阻塞。
+
+- 【L4】读写一致性基于 MVCC（ReadPoint）
+
+  每次读写获取递增的 sequenceId，读请求只看到 sequenceId ≤ ReadPoint 的已提交写入。
+
 - 【L4】WAL 默认每条写入都 sync（`Durability.SYNC_WAL`）；可容忍丢数的链路可用 `ASYNC_WAL`/`SKIP_WAL` 换吞吐。
-- 【L4】`blockCacheHitRatio` 低于 90% 通常意味着两种情况之一：读缓存内存不够，或者业务里存在大量 Scan（扫描会把冷数据灌进 BlockCache，把热数据挤出去）。HBase 提供 `setBlockCacheEnabled(false)` 让批量扫描类请求绕过 BlockCache，正是为了防这种缓存污染。
+
+- 【L4】`blockCacheHitRatio` 低于 90% 通常意味着两种情况之一
+
+  读缓存内存不够，或者业务里存在大量 Scan（扫描会把冷数据灌进 BlockCache，把热数据挤出去）。
+
+  HBase 提供 `setBlockCacheEnabled(false)` 让批量扫描类请求绕过 BlockCache，正是为了防这种缓存污染。
 
 :::
 
@@ -1103,17 +1193,19 @@ RegionServer 的堆内存要在三块之间分配：
 
 > ⚠️ 以下为教学示意场景，其中的量化数字为示意值，非官方基准或真实生产统计。
 
-某实时日志系统 HBase 集群写入吞吐从 20万/s 突降至 5万/s。排查发现 RegionServer 全局 MemStore 使用率触及水位，强制 Flush 与写入阻塞同时发生。处置方式是**成对调整**：把 `hbase.regionserver.global.memstore.size` 从 0.4 提到 0.5 的同时，**必须把 `hfile.block.cache.size` 从 0.4 降到 0.3**（两者之和仍 ≤ 0.8，否则 RegionServer 启动直接报错），并将 MemStore flush size 从 128MB 调至 256MB，之后写入吞吐恢复至 25万/s。
+某实时日志系统 HBase 集群写入吞吐从 20万/s 突降至 5万/s。排查发现 RegionServer 全局 MemStore 使用率触及水位，强制 Flush 与写入阻塞同时发生。处置方式是**成对调整**：
 
-🔴 这个案例的关键教训不是「调大 MemStore」，而是**堆内读缓存与写缓存是零和的**——只调一边必然启动失败或挤压另一边。真正要「两个都变大」，唯一出路是把缓存移到堆外（BucketCache + MemStoreChunkPool）。
+把 `hbase.regionserver.global.memstore.size` 从 0.4 提到 0.5 的同时，**必须把 `hfile.block.cache.size` 从 0.4 降到 0.3**（两者之和仍 ≤ 0.8，
+否则 RegionServer 启动直接报错），并将 MemStore flush size 从 128MB 调至 256MB，之后写入吞吐恢复至 25万/s。
+
+🔴 这个案例的关键教训不是「调大 MemStore」，而是**堆内读缓存与写缓存是零和的**——只调一边必然启动失败或挤压另一边。真正要「两个都变大」，
+唯一出路是把缓存移到堆外（BucketCache + MemStoreChunkPool）。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Flush 时会阻塞所有读写" → MemStore 采用双缓冲，Flush 时切换为 snapshot 落盘，新写入进入新 active，不阻塞
 - ❌ "写入成功后数据已经在 HFile 了" → 写入成功时数据在 WAL 和 MemStore 中，HFile 是后续 Flush 生成的
@@ -1162,8 +1254,13 @@ HBase 基于 MVCC + ReadPoint 机制保证并发读写一致性，每次写入�
 
 ::: details
 
-- 【L3】HBase 的 MVCC 实现比 MySQL 更轻量：MySQL MVCC 基于 Undo Log 维护历史版本，HBase 直接基于 sequenceId + MemStore 多版本排序实现，无需额外的回滚段。
-- 【L4】跨 RegionServer 重试场景的一致性问题：客户端重试可能请求到不同的 RegionServer，由于各 RegionServer 的 sequenceId 独立增长，单调读保证可能短暂打破，需要在业务层做幂等设计。
+- 【L3】HBase 的 MVCC 实现比 MySQL 更轻量
+
+  MySQL MVCC 基于 Undo Log 维护历史版本，HBase 直接基于 sequenceId + MemStore 多版本排序实现，无需额外的回滚段。
+
+- 【L4】跨 RegionServer 重试场景的一致性问题
+
+  客户端重试可能请求到不同的 RegionServer，由于各 RegionServer 的 sequenceId 独立增长，单调读保证可能短暂打破，需要在业务层做幂等设计。
 
 :::
 
@@ -1178,8 +1275,6 @@ HBase 基于 MVCC + ReadPoint 机制保证并发读写一致性，每次写入�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "HBase 支持完整的事务" → HBase 仅支持单行事务，不支持跨行/跨表事务。需要有限原子操作只能用 `checkAndPut`/`checkAndDelete`/`Increment`/`Append` 这些 CAS 原语，真正的跨行事务要引入 Tephra/Omid 等外部框架。
 - ❌ "并发写入会互相覆盖导致数据丢失" → 并发写入各有独立的 sequenceId，读取时按 sequenceId 过滤，不会丢失
@@ -1256,13 +1351,30 @@ graph TB
 
 ::: details
 
-- 【L3】WAL 拆分（Log Splitting）：宕机 RegionServer 的 WAL 文件中混杂多个 Region 的日志，必须按 Region 拆分成 recovered.edits 文件。HBase 2.x 默认使用 Procedure 框架驱动的 WAL Splitting，拆分速度直接影响 Region 恢复时间（RTO）。
+- 【L3】WAL 拆分（Log Splitting）
+
+  宕机 RegionServer 的 WAL 文件中混杂多个 Region 的日志，必须按 Region 拆分成 recovered.edits 文件。
+
+  HBase 2.x 默认使用 Procedure 框架驱动的 WAL Splitting，拆分速度直接影响 Region 恢复时间（RTO）。
+
 - 【L3】大集群上 WAL 拆分是宕机恢复的主要耗时环节，可通过 `hbase.wal.split.count.threshold` 等参数调优。
+
 - 【L4】🔴 **ZooKeeper session timeout 是典型的参数权衡题**（`zookeeper.session.timeout`，默认 90s）：
-  - **调得太短**：RegionServer 一次较长的 GC 停顿（大堆 + 非 G1 很容易出现秒级停顿）就会让 ZK 判定 session 过期，Master 立即把它的 Region 分配给别的 RS；而原 RS 从 GC 中恢复后并不知道自己已被判死，仍在继续服务 —— 于是出现 **「Region 双活」：两个 RegionServer 同时写同一个 Region，直接导致数据损坏**。这是 HBase 最严重的生产事故之一。
+
+  - **调得太短**：RegionServer 一次较长的 GC 停顿（大堆 + 非 G1 很容易出现秒级停顿）就会让 ZK 判定 session 过期，Master 立即把它的 Region 分配给别的 RS；
+    而原 RS 从 GC 中恢复后并不知道自己已被判死，仍在继续服务 —— 于是出现 **「Region 双活」：两个 RegionServer 同时写同一个 Region，直接导致数据损坏**。这是 HBase 最严重的生产事故之一。
+
   - **调得太长**：真实宕机要等很久才被发现，Region 长时间不可服务，RTO 变差。
-  - **正确的解法不是单方面调参**，而是「适度放宽 session timeout + 严格治理 GC 停顿」：堆控制在 16–32GB、用 G1、把大缓存移到堆外（BucketCache / MemStoreChunkPool）。**HBase 对 GC 停顿的敏感度，本质上来自它用 ZK session 做存活判定这件事。**
-- 【L4】**HMaster 主备不是数据面的高可用**：HMaster 挂掉完全不影响已有 Region 的读写（数据路径不经过 Master），只影响 DDL、Region 分配、负载均衡与分裂。真正决定数据面可用性的是 RegionServer 故障恢复速度（ZK session timeout + WAL Split 耗时）与 HDFS 三副本。
+
+  - **正确的解法不是单方面调参**，而是「适度放宽 session timeout + 严格治理 GC 停顿」：堆控制在 16–32GB、用 G1、把大缓存移到堆外（BucketCache / MemStoreChunkPool）。
+
+    **HBase 对 GC 停顿的敏感度，本质上来自它用 ZK session 做存活判定这件事。**
+
+- 【L4】**HMaster 主备不是数据面的高可用**
+
+  HMaster 挂掉完全不影响已有 Region 的读写（数据路径不经过 Master），只影响 DDL、Region 分配、负载均衡与分裂。
+
+  真正决定数据面可用性的是 RegionServer 故障恢复速度（ZK session timeout + WAL Split 耗时）与 HDFS 三副本。
 
 :::
 
@@ -1272,15 +1384,14 @@ graph TB
 
 > ⚠️ 以下为教学示意场景，其中的量化数字为示意值，非官方基准或真实生产统计。
 
-某生产集群 100 台 RegionServer，单台宕机后 WAL 拆分耗时 5 分钟，影响 200 个 Region 不可用。通过将 WAL Splitting 线程数从 2 调至 8，并启用 Distributed Log Splitting（HBase 1.x），WAL 拆分时间缩短至 1.5 分钟，Region 恢复时间降至 2 分钟。
+某生产集群 100 台 RegionServer，单台宕机后 WAL 拆分耗时 5 分钟，影响 200 个 Region 不可用。通过将 WAL Splitting 线程数从 2 调至 8，
+并启用 Distributed Log Splitting（HBase 1.x），WAL 拆分时间缩短至 1.5 分钟，Region 恢复时间降至 2 分钟。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "HMaster 宕机数据就丢了" → HMaster 只负责管理操作，数据读写由 RegionServer 处理，Master 短时宕机不影响数据读写
 - ❌ "RegionServer 宕机后数据无法恢复" → 通过 WAL 回放可恢复未 Flush 到 HFile 的数据，HDFS 多副本保证已 Flush 数据不丢失
@@ -1353,9 +1464,18 @@ graph TB
 
 ::: details
 
-- 【L3】分裂不搬数据：子 Region 初始只持有父 HFile 的引用文件（Reference File），真正数据拆分延迟到后续 Compaction 完成，引用全部消除后删除父文件。分裂本身很快，但引用未消除前会加重读路径的多文件查找。
-- 【L3】分裂会造成短暂不可用：父 Region 下线到子 Region 上线之间存在窗口期（秒级），落在该区间的请求会失败重试；客户端需配置合理的重试策略。
-- 【L4】预分区策略选择：RowKey 均匀散列时用 `HexStringSplit`/`UniformSplit`；RowKey 有业务前缀时自定义 splitKeys，并确保分布与写入分布匹配。
+- 【L3】分裂不搬数据
+
+  子 Region 初始只持有父 HFile 的引用文件（Reference File），真正数据拆分延迟到后续 Compaction 完成，引用全部消除后删除父文件。分裂本身很快，
+  但引用未消除前会加重读路径的多文件查找。
+
+- 【L3】分裂会造成短暂不可用
+
+  父 Region 下线到子 Region 上线之间存在窗口期（秒级），落在该区间的请求会失败重试；客户端需配置合理的重试策略。
+
+- 【L4】预分区策略选择
+
+  RowKey 均匀散列时用 `HexStringSplit`/`UniformSplit`；RowKey 有业务前缀时自定义 splitKeys，并确保分布与写入分布匹配。
 
 :::
 
@@ -1365,7 +1485,8 @@ graph TB
 
 > ⚠️ 以下为教学示意场景，其中的量化数字为示意值，非官方基准或真实生产统计。
 
-某用户行为表建表时未预分区，初始 1 个 Region。随着数据增长到 500GB，经历了 6 次自动分裂，每次分裂期间有 2~3 秒的写入失败。改为建表时预分区 64 个 Region（HexStringSplit），写入失败完全消除，各 Region 数据分布均匀。
+某用户行为表建表时未预分区，初始 1 个 Region。随着数据增长到 500GB，经历了 6 次自动分裂，每次分裂期间有 2~3 秒的写入失败。改为建表时预分区 64 个 Region（HexStringSplit），写入失败完全消除，
+各 Region 数据分布均匀。
 
 :::
 
@@ -1385,8 +1506,6 @@ admin.createTable(tableDesc, splitKeys);
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "分裂会立即将数据复制到两个子 Region" → 分裂只创建引用文件，真正数据拆分在后续 Compaction 完成
 - ❌ "分裂对业务完全透明无影响" → 父 Region 下线到子 Region 上线之间有秒级窗口期，请求会失败重试
@@ -1500,10 +1619,22 @@ graph TB
 
 ::: details
 
-- 【L3】热点 Region 治理：某 Region 读写量远超其他 Region（常见于预分区不均、RowKey 设计缺陷）。拆分热点 Region、Balancer 均衡、根治方案是重新设计 RowKey 散列。
-- 【L3】客户端超时与重试：`hbase.client.operation.timeout`、`hbase.client.retries.number` 需与业务 SLA 匹配；重试叠加会放大对集群的压力，雪崩场景下应结合熔断限流。
-- 【L4】GC 调优：RegionServer 堆内存通常 16~32GB，优先使用 G1 并控制停顿目标；MemStore + BlockCache 占用堆内存大，需监控 Old GC 频率，避免 Full GC 导致 ZooKeeper 会话超时。
-- 【L4】慢读排查：区分是 HFile 过多（读放大，需 Compaction）、BlockCache 命中率低、还是 Region 热点，三者治理手段完全不同。
+- 【L3】热点 Region 治理
+
+  某 Region 读写量远超其他 Region（常见于预分区不均、RowKey 设计缺陷）。拆分热点 Region、Balancer 均衡、根治方案是重新设计 RowKey 散列。
+
+- 【L3】客户端超时与重试
+
+  `hbase.client.operation.timeout`、`hbase.client.retries.number` 需与业务 SLA 匹配；重试叠加会放大对集群的压力，雪崩场景下应结合熔断限流。
+
+- 【L4】GC 调优
+
+  RegionServer 堆内存通常 16~32GB，优先使用 G1 并控制停顿目标；MemStore + BlockCache 占用堆内存大，需监控 Old GC 频率，
+  避免 Full GC 导致 ZooKeeper 会话超时。
+
+- 【L4】慢读排查
+
+  区分是 HFile 过多（读放大，需 Compaction）、BlockCache 命中率低、还是 Region 热点，三者治理手段完全不同。
 
 :::
 
@@ -1511,15 +1642,14 @@ graph TB
 
 ::: details
 
-某电商用户画像表 200 亿行数据，P99 读延迟 50ms。调优措施：(1) BlockCache 从 0.4 调至 0.5；(2) 开启 ROW 布隆过滤器；(3) Scan setCaching 从 10 调至 100；(4) 禁用自动 Major Compaction 改为凌晨手动执行。调优后 P99 读延迟降至 8ms，QPS 从 5万提升至 12万。
+某电商用户画像表 200 亿行数据，P99 读延迟 50ms。调优措施：(1) BlockCache 从 0.4 调至 0.5；(2) 开启 ROW 布隆过滤器；(3) Scan setCaching 从 10 调至 100；
+(4) 禁用自动 Major Compaction 改为凌晨手动执行。调优后 P99 读延迟降至 8ms，QPS 从 5万提升至 12万。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "堆内存越大越好" → 堆内存过大导致 GC 停顿时间过长，可能触发 ZooKeeper 会话超时，RegionServer 被踢出集群
 - ❌ "关闭 WAL 能大幅提升写入性能" → 写入性能提升有限（约 10%~20%），但宕机时会丢失未 Flush 数据
@@ -1584,17 +1714,26 @@ SELECT * FROM user_log WHERE action = 'login' AND log_date >= CURRENT_DATE() - 7
 
 ::: details
 
-- 【L3】全局索引 vs 本地索引的维护代价：全局索引是**独立的索引表**，写入路径由 RegionServer 侧的协处理器（coprocessor）钩子同步维护，每建一个全局索引就多一份写放大与故障面，适合读多写少的点查；本地索引（Phoenix 4.8+）与数据表同 Region 存储，写入开销小，但查询时要扇出到所有 Region 再归并，适合写多、查询本就范围化的场景。
-- 【L3】JOIN 性能有限的根因：Phoenix 没有分布式 shuffle 能力，大表 JOIN 主要靠把小表广播到各执行端做哈希连接，或对主键有序的表做跳跃归并；两张大表 JOIN 会退化为客户端侧的多轮扫描。这是它与 Presto/Doris 等 MPP 引擎的能力边界——Phoenix 定位是「HBase 上的 OLTP 风格 SQL 点查/短范围查询」，不是分析引擎。
-- 【L3】`SALT_BUCKETS` 与预分区：对单调主键（如时间戳前缀）加盐，把写入打散到多个 Region，等价于原生 HBase 的 RowKey 反转/加哈希前缀手法，但由 Phoenix 在 SQL 层透明处理。
+- 【L3】全局索引 vs 本地索引的维护代价
+
+  全局索引是**独立的索引表**，写入路径由 RegionServer 侧的协处理器（coprocessor）钩子同步维护，每建一个全局索引就多一份写放大与故障面，适合读多写少的点查；
+  本地索引（Phoenix 4.8+）与数据表同 Region 存储，写入开销小，但查询时要扇出到所有 Region 再归并，适合写多、查询本就范围化的场景。
+
+- 【L3】JOIN 性能有限的根因
+
+  Phoenix 没有分布式 shuffle 能力，大表 JOIN 主要靠把小表广播到各执行端做哈希连接，或对主键有序的表做跳跃归并；两张大表 JOIN 会退化为客户端侧的多轮扫描。
+
+  这是它与 Presto/Doris 等 MPP 引擎的能力边界——Phoenix 定位是「HBase 上的 OLTP 风格 SQL 点查/短范围查询」，不是分析引擎。
+
+- 【L3】`SALT_BUCKETS` 与预分区
+
+  对单调主键（如时间戳前缀）加盐，把写入打散到多个 Region，等价于原生 HBase 的 RowKey 反转/加哈希前缀手法，但由 Phoenix 在 SQL 层透明处理。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Phoenix 是部署在中间的 SQL 网关，多了一跳网络" → 厚客户端模式下 SQL 引擎内嵌在应用进程里，编译后直连 RegionServer，没有独立中转节点；Query Server 只是可选的瘦客户端通道。
 - ❌ "加二级索引没有副作用" → 全局索引在写入路径由协处理器同步维护，多个索引会成倍放大写延迟与失败面，索引表自身还要参与 Compaction。

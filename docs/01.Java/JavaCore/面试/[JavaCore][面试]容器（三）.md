@@ -84,9 +84,19 @@ stream.forEach(System.out::println);  // 此刻才执行全部流水线
 
 ::: details
 
-- 【L3】惰性求值实现原理：`filter`/`map` 等中间操作是 `AbstractPipeline` 的子类（无状态操作 StatelessOp / 有状态操作 StatefulOp），调用时只是把自己链入流水线并记录流标志位；只有终端操作从最后一个阶段起调用 `opWrapSink` 组装出 Sink 链后，数据才真正逐元素流动。
-- 【L3】纵向融合：流水线按“单个元素流经所有阶段”执行，而非“每个阶段处理全部元素”，一次遍历即可完成 filter + map + collect，避免中间集合与多次遍历。
-- 【L4】版本演进：Java 9 新增 `takeWhile` / `dropWhile` / `ofNullable`；Java 16 新增 `Stream.toList()`，返回不可修改 List，与 `Collectors.toList()` 返回可变 ArrayList 不等价。
+- 【L3】惰性求值实现原理
+
+  `filter`/`map` 等中间操作是 `AbstractPipeline` 的子类（无状态操作 StatelessOp / 有状态操作 StatefulOp），调用时只是把自己链入流水线并记录流标志位；
+  只有终端操作从最后一个阶段起调用 `opWrapSink` 组装出 Sink 链后，数据才真正逐元素流动。
+
+- 【L3】纵向融合
+
+  流水线按“单个元素流经所有阶段”执行，而非“每个阶段处理全部元素”，一次遍历即可完成 filter + map + collect，避免中间集合与多次遍历。
+
+- 【L4】版本演进
+
+  Java 9 新增 `takeWhile` / `dropWhile` / `ofNullable`；Java 16 新增 `Stream.toList()`，返回不可修改 List，
+  与 `Collectors.toList()` 返回可变 ArrayList 不等价。
 
 :::
 
@@ -247,10 +257,26 @@ long count = IntStream.range(0, 10_000_000)
 
 ::: details
 
-- 【L3】线程数控制：commonPool 并行度默认为 `Runtime.getRuntime().availableProcessors() - 1`，可用 JVM 参数 `-Djava.util.concurrent.ForkJoinPool.common.parallelism` 调整；发起调用的当前线程也会参与计算。
-- 【L3】拆分质量决定加速比：`ArrayList` 的 Spliterator 可 O(1) 均匀二分；`LinkedList`、IO 流拆分质量差；`sorted` 是有状态操作，并行下需汇聚全部数据再排序，开销显著。
-- 【L4】隔离方案：任务含阻塞调用时，可将并行流提交到自建 `ForkJoinPool` 执行（Java 8 起该行为成立），避免污染全局 commonPool；IO 密集型并发更推荐 `CompletableFuture` + 自定义线程池。
-- 【L4】容器化陷阱：commonPool 并行度取自 `availableProcessors()`。旧版 JDK（< 8u191）未感知 cgroup 配额时会读到宿主机核数，导致容器内并行流线程严重超配、上下文切换恶化；即使开启 `UseContainerSupport`，也建议结合容器 CPU limit 显式设置 `-Djava.util.concurrent.ForkJoinPool.common.parallelism`。另外 `ThreadLocal`/MDC 等线程绑定上下文（日志 traceId）跨 commonPool 线程会丢失，链路透传需显式处理。
+- 【L3】线程数控制
+
+  commonPool 并行度默认为 `Runtime.getRuntime().availableProcessors() - 1`，
+  可用 JVM 参数 `-Djava.util.concurrent.ForkJoinPool.common.parallelism` 调整；发起调用的当前线程也会参与计算。
+
+- 【L3】拆分质量决定加速比
+
+  `ArrayList` 的 Spliterator 可 O(1) 均匀二分；`LinkedList`、IO 流拆分质量差；`sorted` 是有状态操作，并行下需汇聚全部数据再排序，开销显著。
+
+- 【L4】隔离方案
+
+  任务含阻塞调用时，可将并行流提交到自建 `ForkJoinPool` 执行（Java 8 起该行为成立），避免污染全局 commonPool；
+  IO 密集型并发更推荐 `CompletableFuture` + 自定义线程池。
+
+- 【L4】容器化陷阱
+
+  commonPool 并行度取自 `availableProcessors()`。旧版 JDK（< 8u191）未感知 cgroup 配额时会读到宿主机核数，导致容器内并行流线程严重超配、上下文切换恶化；
+  即使开启 `UseContainerSupport`，也建议结合容器 CPU limit 显式设置 `-Djava.util.concurrent.ForkJoinPool.common.parallelism`。
+
+  另外 `ThreadLocal`/MDC 等线程绑定上下文（日志 traceId）跨 commonPool 线程会丢失，链路透传需显式处理。
 
 :::
 
@@ -258,15 +284,18 @@ long count = IntStream.range(0, 10_000_000)
 
 ::: details
 
-某风控服务内存中对千万级订单记录做 `filter + summingLong` 聚合：8 核机器上串行流耗时约 1.2s，`parallelStream` 降至约 0.25s（加速比约 4~5 倍，未达线性主因拆分合并开销与尾任务不均，具体数值以实际压测为准）。另一案例：批处理中误将含 100ms RPC 调用的逻辑放入并行流，commonPool 的 7 个工作线程全部阻塞，导致同 JVM 内其他接口的并行流任务排队劣化为准串行，后改为自定义线程池 + `CompletableFuture` 修复。
+某风控服务内存中对千万级订单记录做 `filter + summingLong` 聚合：
+
+8 核机器上串行流耗时约 1.2s，`parallelStream` 降至约 0.25s（加速比约 4~5 倍，未达线性主因拆分合并开销与尾任务不均，具体数值以实际压测为准）。
+
+另一案例：批处理中误将含 100ms RPC 调用的逻辑放入并行流，commonPool 的 7 个工作线程全部阻塞，
+导致同 JVM 内其他接口的并行流任务排队劣化为准串行，后改为自定义线程池 + `CompletableFuture` 修复。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “并行流一定比串行快” → 并行有拆分、合并与线程调度开销，数据量小（数千以内）或元素处理简单时串行往往更快。
 - ❌ “parallelStream 天然线程安全” → 流水线本身线程安全，但 lambda 中若捕获共享可变状态（如 `ArrayList::add`）会发生竞态丢数据，应改用 `collect` 收集结果。
@@ -379,17 +408,23 @@ Map<Long, String> map = users.stream()
 
 ::: details
 
-- 【L3】Collector 四要素：`supplier` 创建结果容器、`accumulator` 逐元素累积、`combiner` 合并并行分片结果、`finisher` 做最终转换；`characteristics`（CONCURRENT / UNORDERED / IDENTITY_FINISH）决定并行归并策略。
+- 【L3】Collector 四要素
+
+  `supplier` 创建结果容器、`accumulator` 逐元素累积、`combiner` 合并并行分片结果、`finisher` 做最终转换；
+  `characteristics`（CONCURRENT / UNORDERED / IDENTITY_FINISH）决定并行归并策略。
+
 - 【L3】toMap 双参版累加器走 `Map.merge`，value 为 null 时会抛 NPE，需换三参/四参重载或 forEach 手动 put，详见本文档「集合转 Map」。
-- 【L4】版本演进：Java 12 新增 `Collectors.teeing` 可同时跑两个收集器并合并结果；Java 16 的 `Stream.toList()` 可替代 `Collectors.toList()`（返回不可修改 List）。
+
+- 【L4】版本演进
+
+  Java 12 新增 `Collectors.teeing` 可同时跑两个收集器并合并结果；
+  Java 16 的 `Stream.toList()` 可替代 `Collectors.toList()`（返回不可修改 List）。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “toMap 遇到重复 key 会保留后值” → 双参版直接抛 `IllegalStateException`，需显式传入 merge 函数决定取舍。
 - ❌ “`toList()` 返回的 List 不可变” → `Collectors.toList()` 返回可变 ArrayList，只是规范不保证具体实现；需要不可变语义用 Java 16 的 `Stream.toList()` 或 `toUnmodifiableList()`（Java 10+）。

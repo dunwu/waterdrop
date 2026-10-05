@@ -79,8 +79,16 @@ Flink 采用 Master-Worker 架构：JobManager（Master）负责作业编排与�
 
 ::: details
 
-- 【L3】**算子链化条件**：两个算子可链化需满足：① 相同并行度；② 之间是 forward 操作（非 keyBy/broadcast/rebalance 等重分布）；③ 未被 `disableChaining()` 打断。链化后整个算子链在单线程执行，避免网络序列化和线程切换开销，吞吐提升约 2~5 倍。
-- 【L3】**数据交换模式**：One-to-One（forward/chaining）保持分区和顺序不变；Redistributing（keyBy/broadcast/rebalance）改变分区策略，仅保证每对输出/输入 SubTask 之间的顺序。keyBy 通过 Hash 分区实现，是网络 Shuffle 操作，开销较大。
+- 【L3】**算子链化条件**
+
+  两个算子可链化需满足：① 相同并行度；② 之间是 forward 操作（非 keyBy/broadcast/rebalance 等重分布）；③ 未被 `disableChaining()` 打断。
+
+  链化后整个算子链在单线程执行，避免网络序列化和线程切换开销，吞吐提升约 2~5 倍。
+
+- 【L3】**数据交换模式**
+
+  One-to-One（forward/chaining）保持分区和顺序不变；Redistributing（keyBy/broadcast/rebalance）改变分区策略，
+  仅保证每对输出/输入 SubTask 之间的顺序。keyBy 通过 Hash 分区实现，是网络 Shuffle 操作，开销较大。
 
 :::
 
@@ -131,8 +139,16 @@ Flink 支持三种集群部署模式：Session Cluster（共享长运行集群�
 
 ::: details
 
-- 【L3】**Kerberos 安全认证**：生产环境（尤其是 Hadoop 生态）需配置 Kerberos 认证。关键配置：`security.kerberos.login.keytab`（keytab 路径）、`security.kerberos.login.principal`（主体名）、`security.kerberos.login.contexts`（登录上下文，如 `Client,KafkaClient` 用于 ZK + Kafka 认证）。
-- 【L3】**类加载顺序**：`classloader.resolve-order` 控制用户代码 JAR 与 Flink 自带类的优先级。`child-first`（默认）= 用户 JAR 优先；`parent-first` = Flink classpath 优先。遇到 `ClassNotFoundException` 或类冲突时，优先检查此配置。
+- 【L3】**Kerberos 安全认证**
+
+  生产环境（尤其是 Hadoop 生态）需配置 Kerberos 认证。关键配置：`security.kerberos.login.keytab`（keytab 路径）、
+  `security.kerberos.login.principal`（主体名）、`security.kerberos.login.contexts`（登录上下文，
+  如 `Client,KafkaClient` 用于 ZK + Kafka 认证）。
+
+- 【L3】**类加载顺序**
+
+  `classloader.resolve-order` 控制用户代码 JAR 与 Flink 自带类的优先级。`child-first`（默认）= 用户 JAR 优先；
+  `parent-first` = Flink classpath 优先。遇到 `ClassNotFoundException` 或类冲突时，优先检查此配置。
 
 :::
 
@@ -199,9 +215,23 @@ Flink 使用 **Chandy-Lamport 算法**的变体实现分布式快照：JobManage
 
 ::: details
 
-- 【L3】**Barrier 对齐 vs 非对齐 Checkpoint**：Barrier 对齐要求多输入算子等待所有输入的 Barrier 到达，期间先到达侧的数据被缓存（反压传播）。数据倾斜或反压严重时，对齐时间可能远超快照时间。**非对齐 Checkpoint**（Flink 1.11+，`execution.checkpointing.unaligned.enabled=true`）允许 Barrier 超越数据记录，将未对齐的 in-flight 数据也纳入快照，大幅减少 Checkpoint 耗时（从分钟级降到秒级），但会增加状态存储大小。
-- 【L3】**增量 Checkpoint**：`state.backend.incremental=true` 开启后，每次 Checkpoint 只上传与上次差异的部分（类似 Git 增量提交），而非全量快照。对 TB 级状态，增量 Checkpoint 可将持久化 I/O 减少 80~90%。代价是恢复时需要从基础快照 + 所有增量合并，恢复时间略长。
-- 【L4】**Savepoint vs Checkpoint**：Savepoint 是手动触发的完整状态快照（类似数据库的全量备份），格式与 Flink 版本无关（可跨版本恢复），用于作业升级、扩缩容、A/B 测试。Checkpoint 是自动触发的轻量快照（增量、格式与版本绑定），仅用于故障恢复。生产环境：升级作业前必须取 Savepoint。
+- 【L3】**Barrier 对齐 vs 非对齐 Checkpoint**
+
+  Barrier 对齐要求多输入算子等待所有输入的 Barrier 到达，期间先到达侧的数据被缓存（反压传播）。数据倾斜或反压严重时，对齐时间可能远超快照时间。
+
+  **非对齐 Checkpoint**（Flink 1.11+，`execution.checkpointing.unaligned.enabled=true`）允许 Barrier 超越数据记录，
+  将未对齐的 in-flight 数据也纳入快照，大幅减少 Checkpoint 耗时（从分钟级降到秒级），但会增加状态存储大小。
+
+- 【L3】**增量 Checkpoint**
+
+  `state.backend.incremental=true` 开启后，每次 Checkpoint 只上传与上次差异的部分（类似 Git 增量提交），而非全量快照。对 TB 级状态，
+  增量 Checkpoint 可将持久化 I/O 减少 80~90%。代价是恢复时需要从基础快照 + 所有增量合并，恢复时间略长。
+
+- 【L4】**Savepoint vs Checkpoint**
+
+  Savepoint 是手动触发的完整状态快照（类似数据库的全量备份），格式与 Flink 版本无关（可跨版本恢复），用于作业升级、扩缩容、A/B 测试。
+
+  Checkpoint 是自动触发的轻量快照（增量、格式与版本绑定），仅用于故障恢复。生产环境：升级作业前必须取 Savepoint。
 
 :::
 
@@ -233,10 +263,10 @@ Flink 的状态分为 **Keyed State**（按 key 分片，每个 key 一个状态
 
 - **HashMapStateBackend**：内存访问 ns 级，受 JVM 堆限制（通常 < 10GB），Full GC 暂停可达 2~5s
 - **RocksDB**：读写 μs~ms 级，支持 TB 级状态，不影响 JVM GC（数据在 C++ 层）
-- **100GB 状态对比**：HashMap 需 ~~150GB JVM 堆 + Full GC 2~~5s + 全量 Checkpoint 3~~5min；RocksDB 仅需 2~~4GB 堆 + 增量 Checkpoint 30s~2min
+- **100GB 状态对比**：HashMap 需 ~150GB JVM 堆 + Full GC 2~5s + 全量 Checkpoint 3~5min；RocksDB 仅需 2~4GB 堆 + 增量 Checkpoint 30s~2min
 - **State TTL**：生产环境通常设置 24h，避免状态无限增长
 - **RocksDB block cache**：建议设为 TaskManager 总内存的 30%~50%
-- **增量 Checkpoint**：仅上传差异数据（约 5~~10GB/次），I/O 减少 80~~90%
+- **增量 Checkpoint**：仅上传差异数据（约 5~10GB/次），I/O 减少 80~90%
 
 #### 📖 核心知识
 
@@ -262,8 +292,8 @@ Flink 的状态分为 **Keyed State**（按 key 分片，每个 key 一个状态
 
 **量化对比**（以 100GB 状态、10 亿 key 的窗口聚合作业为例）：
 
-- HashMapStateBackend：需分配约 150GB JVM 堆（状态 + GC 预留），Full GC 暂停约 2~~5s，Checkpoint 耗时约 3~~5 分钟（全量）。
-- EmbeddedRocksDBStateBackend：JVM 堆仅需 2~~4GB（RocksDB 数据在堆外），无 GC 影响，增量 Checkpoint 耗时约 30s~~2min（仅上传差异，约 5~10GB）。
+- HashMapStateBackend：需分配约 150GB JVM 堆（状态 + GC 预留），Full GC 暂停约 2~5s，Checkpoint 耗时约 3~5 分钟（全量）。
+- EmbeddedRocksDBStateBackend：JVM 堆仅需 2~4GB（RocksDB 数据在堆外），无 GC 影响，增量 Checkpoint 耗时约 30s~2min（仅上传差异，约 5~10GB）。
 
 **状态清理策略**：
 
@@ -277,8 +307,16 @@ Flink 的状态分为 **Keyed State**（按 key 分片，每个 key 一个状态
 
 ::: details
 
-- 【L3】**RocksDB 性能优化**：MapState 和 ListState 对 RocksDB 有专门优化——MapState 的每个 key/value 是独立的 RocksDB 对象，可高效单独访问/更新；ListState 支持 append 操作无需反序列化整个列表。ValueState 在 RocksDB 下性能不如 MapState/ListState，大状态场景优先使用后者。
-- 【L3】**可查询状态（Queryable State）**：`flink-queryable-state-runtime` 模块允许外部系统（如 Dashboard、监控系统）直接查询 Flink 内部状态，无需通过 Sink 导出。适合实时监控场景，但会增加网络和 CPU 开销，生产环境按需开启。
+- 【L3】**RocksDB 性能优化**
+
+  MapState 和 ListState 对 RocksDB 有专门优化——MapState 的每个 key/value 是独立的 RocksDB 对象，可高效单独访问/更新；
+  ListState 支持 append 操作无需反序列化整个列表。ValueState 在 RocksDB 下性能不如 MapState/ListState，大状态场景优先使用后者。
+
+- 【L3】**可查询状态（Queryable State）**
+
+  `flink-queryable-state-runtime` 模块允许外部系统（如 Dashboard、监控系统）直接查询 Flink 内部状态，无需通过 Sink 导出。
+
+  适合实时监控场景，但会增加网络和 CPU 开销，生产环境按需开启。
 
 :::
 
@@ -308,7 +346,7 @@ Flink 通过 **Checkpoint + Source 可重放** 实现内部 Exactly-Once 语义�
 
 #### 📊 量化参考
 
-- **端到端 Exactly-Once 性能开销**：吞吐下降 10~~20%，延迟增加 1~~2 个 Checkpoint 间隔
+- **端到端 Exactly-Once 性能开销**：吞吐下降 10~20%，延迟增加 1~2 个 Checkpoint 间隔
 - **Kafka 事务超时**：`transaction.timeout.ms` 需 > Checkpoint 间隔的 3~5 倍
 - **消费者 isolation.level=read_committed**：读取延迟增加 5~10%
 - **故障恢复时间**：30s~2min（取决于状态大小和 Source 重放量）
@@ -335,15 +373,26 @@ Flink 通过 **Checkpoint + Source 可重放** 实现内部 Exactly-Once 语义�
 
 - 内部 Exactly-Once：Checkpoint 间隔 1 分钟，故障恢复时间约 30s~2min（取决于状态大小和 Source 重放量）。
 - 端到端 Exactly-Once（Kafka 事务 Sink）：Kafka 事务超时 `transaction.timeout.ms` 需 > Checkpoint 间隔 + 恢复时间，建议设为 Checkpoint 间隔的 3~5 倍。
-- 性能开销：开启端到端 Exactly-Once 后，吞吐下降约 10~~20%（事务提交延迟），延迟增加约 1~~2 个 Checkpoint 间隔（等待提交确认）。
+- 性能开销：开启端到端 Exactly-Once 后，吞吐下降约 10~20%（事务提交延迟），延迟增加约 1~2 个 Checkpoint 间隔（等待提交确认）。
 
 #### 🔬 扩展知识
 
 ::: details
 
-- 【L3】**At-Least-Once vs Exactly-Once 选型**：At-Least-Once 不需要 Barrier 对齐和事务 Sink，性能更高（吞吐提升约 20~30%），但可能产生重复数据。适合允许重复但不可丢失的场景（如日志收集）。Exactly-Once 适合金融交易、订单处理等不可重复不可丢失的场景。
-- 【L4】**Kafka 事务 Sink 的限制**：① Kafka Broker 需开启事务支持（`transactional.id.expiration.ms`）；② 事务超时需精心配置，过长导致故障恢复慢，过短导致 Checkpoint 未完成事务就过期；③ 消费者需设置 `isolation.level=read_committed` 才能读取已提交数据（增加约 5~10% 读取延迟）。
-- 【L4】**幂等写入替代方案**：某些场景可用幂等写入替代事务 Sink（如 Upsert 到数据库），简化实现。代价是依赖外部系统的幂等语义，且无法保证严格的 Exactly-Once 顺序。
+- 【L3】**At-Least-Once vs Exactly-Once 选型**
+
+  At-Least-Once 不需要 Barrier 对齐和事务 Sink，性能更高（吞吐提升约 20~30%），但可能产生重复数据。
+
+  适合允许重复但不可丢失的场景（如日志收集）。Exactly-Once 适合金融交易、订单处理等不可重复不可丢失的场景。
+
+- 【L4】**Kafka 事务 Sink 的限制**
+
+  ① Kafka Broker 需开启事务支持（`transactional.id.expiration.ms`）；② 事务超时需精心配置，过长导致故障恢复慢，
+  过短导致 Checkpoint 未完成事务就过期；③ 消费者需设置 `isolation.level=read_committed` 才能读取已提交数据（增加约 5~10% 读取延迟）。
+
+- 【L4】**幂等写入替代方案**
+
+  某些场景可用幂等写入替代事务 Sink（如 Upsert 到数据库），简化实现。代价是依赖外部系统的幂等语义，且无法保证严格的 Exactly-Once 顺序。
 
 :::
 
@@ -377,7 +426,7 @@ Watermark 是 Flink 衡量事件时间进展的机制，本质是一个时间标
 
 | 指标         | 数值                                                                | 备注                                                  |
 | :----------- | :------------------------------------------------------------------ | :---------------------------------------------------- |
-| 乱序容忍度   | 实时数仓常用 1~~10s，日志类场景 5~~30s                              | 按上游 P99 乱序程度设定，是延迟与正确性的总开关       |
+| 乱序容忍度   | 实时数仓常用 1~10s，日志类场景 5~30s                              | 按上游 P99 乱序程度设定，是延迟与正确性的总开关       |
 | 结果延迟增量 | ≈ 乱序容忍时长                                                      | 容忍 5s 乱序，窗口结果至少晚 5s 触发                  |
 | 迟到数据比例 | 无 Watermark 时乱序流迟到可达 1%~5%；设置后 Side Output 通常 < 0.1% | 配合 Allowed Lateness（再放 1~5min）可压到 0.01% 以下 |
 | 空闲分区超时 | withIdleness 常配 30~60s                                            | 某分区无数据会拖住全局 Watermark，必须设置防卡死      |
@@ -410,15 +459,24 @@ Watermark 是 Flink 衡量事件时间进展的机制，本质是一个时间标
 **量化参数**：
 
 - Watermark 传播有延迟：多算子流水线中，Watermark 取所有输入通道 Watermark 的最小值（类似 Barrier 对齐），算子并行度越高、数据倾斜越严重，Watermark 传播越慢。
-- 典型配置：乱序容忍 5~~30 秒（根据数据源网络延迟 P99），Allowed Lateness 设为窗口大小的 10~~20%。
+- 典型配置：乱序容忍 5~30 秒（根据数据源网络延迟 P99），Allowed Lateness 设为窗口大小的 10~20%。
 - Watermark 生成间隔：默认 200ms（`pipeline.max-parallelism` 相关），可配置 `watermark.interval`。
 
 #### 🔬 扩展知识
 
 ::: details
 
-- 【L3】**Watermark 空闲检测**：当某些 Source 分区无数据时，其 Watermark 不推进，导致整个作业的 Watermark 停滞（因为取最小值）。Flink 1.14+ 支持 **Watermark 空闲检测**（`WatermarkStrategy.withIdleness(Duration)`），超过指定时长无数据的分区被标记为空闲，不参与 Watermark 计算。
-- 【L3】**Session Window 与 Watermark 的交互**：Session Window 的关闭条件是「在 Watermark 时间超过最后一次数据时间 + gap 后触发」。如果 Watermark 推进缓慢（如数据稀疏），Session Window 可能长时间不关闭。生产环境建议配合 Processing-Time Timer 作为兜底触发。
+- 【L3】**Watermark 空闲检测**
+
+  当某些 Source 分区无数据时，其 Watermark 不推进，导致整个作业的 Watermark 停滞（因为取最小值）。
+
+  Flink 1.14+ 支持 **Watermark 空闲检测**（`WatermarkStrategy.withIdleness(Duration)`），超过指定时长无数据的分区被标记为空闲，不参与 Watermark 计算。
+
+- 【L3】**Session Window 与 Watermark 的交互**
+
+  Session Window 的关闭条件是「在 Watermark 时间超过最后一次数据时间 + gap 后触发」。
+
+  如果 Watermark 推进缓慢（如数据稀疏），Session Window 可能长时间不关闭。生产环境建议配合 Processing-Time Timer 作为兜底触发。
 
 :::
 
@@ -477,8 +535,15 @@ Flink 窗口将无界流切分为有界数据块进行计算。窗口由**分配
 
 ::: details
 
-- 【L3】**ProcessWindowFunction 的开销**：ProcessWindowFunction 缓存窗口内所有数据到状态后端，状态大小 = 窗口数据量 × 单条数据大小。对于高吞吐场景（如 10 万 events/s），1 分钟窗口的状态量约 600 万条，HashMapStateBackend 下可能占用数 GB 内存。建议优先使用 ReduceFunction/AggregateFunction 增量计算。
-- 【L3】**用 ProcessFunction 实现自定义窗口**：ProcessFunction 可通过 MapState + Timer 完全自定义窗口逻辑（类似重新实现 PseudoWindow）。优势是灵活控制窗口触发、迟到数据处理、状态清理时机。适合内置窗口无法满足的复杂业务逻辑。
+- 【L3】**ProcessWindowFunction 的开销**
+
+  ProcessWindowFunction 缓存窗口内所有数据到状态后端，状态大小 = 窗口数据量 × 单条数据大小。对于高吞吐场景（如 10 万 events/s），
+  1 分钟窗口的状态量约 600 万条，HashMapStateBackend 下可能占用数 GB 内存。建议优先使用 ReduceFunction/AggregateFunction 增量计算。
+
+- 【L3】**用 ProcessFunction 实现自定义窗口**
+
+  ProcessFunction 可通过 MapState + Timer 完全自定义窗口逻辑（类似重新实现 PseudoWindow）。优势是灵活控制窗口触发、
+  迟到数据处理、状态清理时机。适合内置窗口无法满足的复杂业务逻辑。
 
 :::
 
@@ -542,8 +607,16 @@ Flink 提供四层 API 抽象（从低到高）：ProcessFunction（最底层，
 
 ::: details
 
-- 【L3】**Table API 的 Dynamic Table 概念**：Table API 和 SQL 将数据视为**动态表（Dynamic Table）**——流数据持续更新动态表，查询结果也是动态表。动态表的变更通过 Changelog 流（Insert / Update / Delete）表达。这使得同一 SQL 查询可以无缝应用于批数据（静态表）和流数据（动态表），实现真正的批流统一。
-- 【L3】**CEP 模式匹配**：CEP 库通过 `Pattern.begin("start").where(...).next("middle").where(...).within(Time.minutes(5))` 定义事件序列模式，底层基于 NFA（非确定有限自动机）实现。适合检测时间窗口内的复杂事件序列（如「5 分钟内连续 3 次登录失败」）。
+- 【L3】**Table API 的 Dynamic Table 概念**
+
+  Table API 和 SQL 将数据视为**动态表（Dynamic Table）**——流数据持续更新动态表，查询结果也是动态表。
+
+  动态表的变更通过 Changelog 流（Insert / Update / Delete）表达。这使得同一 SQL 查询可以无缝应用于批数据（静态表）和流数据（动态表），实现真正的批流统一。
+
+- 【L3】**CEP 模式匹配**：
+
+  CEP 库通过 `Pattern.begin("start").where(...).next("middle").where(...).within(Time.minutes(5))` 定义事件序列模式，
+  底层基于 NFA（非确定有限自动机）实现。适合检测时间窗口内的复杂事件序列（如「5 分钟内连续 3 次登录失败」）。
 
 :::
 
@@ -609,8 +682,17 @@ Flink 通过**基于 Credit 的流控**实现背压：下游算子处理不过�
 
 ::: details
 
-- 【L3】**异步 I/O 缓解背压**：当瓶颈是外部系统 I/O（如数据库查询），使用 `AsyncDataStream.unorderedWait()` 将同步 I/O 改为异步。异步 I/O 允许算子在等待外部响应时继续处理其他数据，吞吐可提升 5~20 倍（取决于外部系统延迟和并发度）。
-- 【L3】**背压与 Checkpoint 的交互**：Checkpoint Barrier 对齐期间，算子会阻塞先到达侧的输入（类似背压）。反压严重时 Barrier 对齐时间大幅增加，可能导致 Checkpoint 超时。解决方案：开启非对齐 Checkpoint（`execution.checkpointing.unaligned.enabled=true`）。
+- 【L3】**异步 I/O 缓解背压**
+
+  当瓶颈是外部系统 I/O（如数据库查询），使用 `AsyncDataStream.unorderedWait()` 将同步 I/O 改为异步。
+
+  异步 I/O 允许算子在等待外部响应时继续处理其他数据，吞吐可提升 5~20 倍（取决于外部系统延迟和并发度）。
+
+- 【L3】**背压与 Checkpoint 的交互**
+
+  Checkpoint Barrier 对齐期间，算子会阻塞先到达侧的输入（类似背压）。反压严重时 Barrier 对齐时间大幅增加，可能导致 Checkpoint 超时。解决方案：
+
+  开启非对齐 Checkpoint（`execution.checkpointing.unaligned.enabled=true`）。
 
 :::
 

@@ -120,11 +120,11 @@ permalink: /pages/2643020f/
 
 #### 📊 量化参考
 
-- **7B 模型 FP16**：权重 14GB + KV Cache 1.07GB/请求（2048 tokens）+ 激活值 ~~2GB ≈ 总需 16~~17GB
+- **7B 模型 FP16**：权重 14GB + KV Cache 1.07GB/请求（2048 tokens）+ 激活值 ~2GB ≈ 总需 16~17GB
 - **量化效果**：INT8 权重减半至 7GB（质量损失极小），INT4 进一步减半至 3.5GB（质量损失较小）
 - **KV Cache 优化**：PagedAttention 消除碎片，显存利用率提升 2~4 倍；GQA 可将 KV Cache 缩小 8 倍
 - **A100 80GB**：可承载 7B FP16 模型 batch=8（2048 tokens），或 7B INT4 模型 batch=32
-- **FlashAttention**：相比标准 Attention，显存峰值降低 5~~20 倍（取决于序列长度），速度提升 2~~3 倍
+- **FlashAttention**：相比标准 Attention，显存峰值降低 5~20 倍（取决于序列长度），速度提升 2~3 倍
 
 #### 📖 核心知识
 
@@ -170,9 +170,17 @@ permalink: /pages/2643020f/
 
 ::: details 扩展知识
 
-- 【L3】FP8 训练与推理：H100 原生支持 FP8（E4M3/E5M2），权重和计算均使用 FP8，显存再减半，精度损失在可接受范围
-- 【L4】vLLM 的显存利用率优化：通过 `gpu_memory_utilization` 参数（默认 0.9）控制 KV Cache 预分配比例，剩余显存留给激活值和系统开销
-- 【L4】Prefix Caching 的显存收益：当多个请求共享相同前缀（如 System Prompt），KV Cache 前缀只存储一份，可节省 30-60% 的 KV Cache 显存
+- 【L3】FP8 训练与推理
+
+  H100 原生支持 FP8（E4M3/E5M2），权重和计算均使用 FP8，显存再减半，精度损失在可接受范围
+
+- 【L4】vLLM 的显存利用率优化
+
+  通过 `gpu_memory_utilization` 参数（默认 0.9）控制 KV Cache 预分配比例，剩余显存留给激活值和系统开销
+
+- 【L4】Prefix Caching 的显存收益
+
+  当多个请求共享相同前缀（如 System Prompt），KV Cache 前缀只存储一份，可节省 30-60% 的 KV Cache 显存
 
 :::
 
@@ -256,9 +264,17 @@ permalink: /pages/2643020f/
 
 ::: details 扩展知识
 
-- 【L3】KServe + S3 模型存储：KServe 的 StorageInitializer 支持从 S3/GCS 并行下载模型，配合 P2P 分发（如 Dragonfly）可加速大规模集群的模型分发
-- 【L3】模型权重的内存映射（mmap）：llama.cpp 使用 mmap 加载 GGUF 模型，避免一次性读入全部权重到内存，减少加载时间
-- 【L4】NVIDIA Triton 的模型仓库轮询机制：支持模型版本热切换，新模型版本就绪后原子切换流量，实现零停机更新
+- 【L3】KServe + S3 模型存储
+
+  KServe 的 StorageInitializer 支持从 S3/GCS 并行下载模型，配合 P2P 分发（如 Dragonfly）可加速大规模集群的模型分发
+
+- 【L3】模型权重的内存映射（mmap）
+
+  llama.cpp 使用 mmap 加载 GGUF 模型，避免一次性读入全部权重到内存，减少加载时间
+
+- 【L4】NVIDIA Triton 的模型仓库轮询机制
+
+  支持模型版本热切换，新模型版本就绪后原子切换流量，实现零停机更新
 
 :::
 
@@ -347,9 +363,17 @@ permalink: /pages/2643020f/
 
 ::: details 扩展知识
 
-- 【L3】显存超卖（Overcommit）：通过 CUDA MPS 的优先级机制，允许模型声明的显存总量超过物理显存，依赖实际使用率的统计复用
-- 【L4】GPU 虚拟化方案对比：NVIDIA vGPU（商业授权）vs MIG（免费但限 A100/H100）vs 开源方案（HAMi、GPU-Operator Time-Slicing）
-- 【L4】模型优先级调度：根据业务优先级（如在线推理 > 离线批处理）动态分配 GPU 时间片，实现 QoS 保障
+- 【L3】显存超卖（Overcommit）
+
+  通过 CUDA MPS 的优先级机制，允许模型声明的显存总量超过物理显存，依赖实际使用率的统计复用
+
+- 【L4】GPU 虚拟化方案对比
+
+  NVIDIA vGPU（商业授权）vs MIG（免费但限 A100/H100）vs 开源方案（HAMi、GPU-Operator Time-Slicing）
+
+- 【L4】模型优先级调度
+
+  根据业务优先级（如在线推理 > 离线批处理）动态分配 GPU 时间片，实现 QoS 保障
 
 :::
 
@@ -430,9 +454,19 @@ permalink: /pages/2643020f/
 
 ::: details 扩展知识
 
-- 【L3】Speculative Decoding 详解：小模型（Draft Model）自回归生成 K 个候选 Token，大模型（Target Model）一次前向传播并行验证所有 Token，接受正确的前 N 个。加速比 1.5-2.5x，且不改变输出分布
-- 【L3】吞吐量与延迟的矛盾：增大 Batch Size 提升吞吐量但增加排队延迟；需根据 SLA 约束找到最优 Batch Size
-- 【L4】Disaggregated Prefill-Decode：将 Prefill 和 Decode 分配到不同的 GPU 集群，Prefill 集群专注计算，Decode 集群专注带宽，各自独立扩缩容
+- 【L3】Speculative Decoding 详解
+
+  小模型（Draft Model）自回归生成 K 个候选 Token，大模型（Target Model）一次前向传播并行验证所有 Token，接受正确的前 N 个。
+
+  加速比 1.5-2.5x，且不改变输出分布
+
+- 【L3】吞吐量与延迟的矛盾
+
+  增大 Batch Size 提升吞吐量但增加排队延迟；需根据 SLA 约束找到最优 Batch Size
+
+- 【L4】Disaggregated Prefill-Decode
+
+  将 Prefill 和 Decode 分配到不同的 GPU 集群，Prefill 集群专注计算，Decode 集群专注带宽，各自独立扩缩容
 
 :::
 
@@ -521,9 +555,17 @@ permalink: /pages/2643020f/
 
 ::: details 扩展知识
 
-- 【L3】Copy-on-Write 在并行采样中的应用：多个候选序列共享相同的 KV Cache Block，仅在分叉点产生差异时才复制 Block，显存开销从 N 倍降至接近 1 倍
-- 【L4】PagedAttention 的 GPU Kernel 实现挑战：间接寻址导致显存访问不连续，需通过精心设计的 CUDA Kernel（如 Tile-based Attention）保证访存效率
-- 【L4】与 FlashAttention 的互补关系：FlashAttention 优化单次注意力计算的 IO 效率，PagedAttention 优化 KV Cache 的显存管理，两者可叠加使用
+- 【L3】Copy-on-Write 在并行采样中的应用
+
+  多个候选序列共享相同的 KV Cache Block，仅在分叉点产生差异时才复制 Block，显存开销从 N 倍降至接近 1 倍
+
+- 【L4】PagedAttention 的 GPU Kernel 实现挑战
+
+  间接寻址导致显存访问不连续，需通过精心设计的 CUDA Kernel（如 Tile-based Attention）保证访存效率
+
+- 【L4】与 FlashAttention 的互补关系
+
+  FlashAttention 优化单次注意力计算的 IO 效率，PagedAttention 优化 KV Cache 的显存管理，两者可叠加使用
 
 :::
 
@@ -619,9 +661,17 @@ LLaMA-70B 部署（8 × A100 80G，2 机 × 4 卡）：
 
 ::: details 扩展知识
 
-- 【L3】ZeRO（Zero Redundancy Optimizer）：训练时将优化器状态、梯度、参数分片到多 GPU，推理时类似思想可用于权重分片加载
-- 【L4】Megatron-LM 的 Sequence Parallelism：在 TP 基础上，将 LayerNorm 和 Dropout 的激活值也分片，进一步减少激活值显存
-- 【L4】通信优化：TP 的 All-Reduce 可用 Ring-All-Reduce 或 Recursive Halving-Doubling 优化；PP 可用 P2P 异步通信减少气泡
+- 【L3】ZeRO（Zero Redundancy Optimizer）
+
+  训练时将优化器状态、梯度、参数分片到多 GPU，推理时类似思想可用于权重分片加载
+
+- 【L4】Megatron-LM 的 Sequence Parallelism
+
+  在 TP 基础上，将 LayerNorm 和 Dropout 的激活值也分片，进一步减少激活值显存
+
+- 【L4】通信优化
+
+  TP 的 All-Reduce 可用 Ring-All-Reduce 或 Recursive Halving-Doubling 优化；PP 可用 P2P 异步通信减少气泡
 
 :::
 
@@ -705,8 +755,13 @@ LLaMA-70B 部署（8 × A100 80G，2 机 × 4 卡）：
 
 ::: details 扩展知识
 
-- 【L3】Intel AMX（Advanced Matrix Extensions）：第四代 Xeon 处理器内置的矩阵加速指令集，INT8/INT16 矩阵运算性能提升 4-8 倍
-- 【L3】Apple Silicon 统一内存架构：M 系列芯片的统一内存带宽高达 400 GB/s，CPU 推理性能接近中端 GPU
+- 【L3】Intel AMX（Advanced Matrix Extensions）
+
+  第四代 Xeon 处理器内置的矩阵加速指令集，INT8/INT16 矩阵运算性能提升 4-8 倍
+
+- 【L3】Apple Silicon 统一内存架构
+
+  M 系列芯片的统一内存带宽高达 400 GB/s，CPU 推理性能接近中端 GPU
 
 :::
 
@@ -789,9 +844,17 @@ LLaMA-70B 部署（8 × A100 80G，2 机 × 4 卡）：
 
 ::: details 扩展知识
 
-- 【L3】Semantic Cache：基于向量相似度缓存语义相近的请求结果，命中率可达 20-40%，显著降低 Token 成本
-- 【L3】AI 网关与 MCP（Model Context Protocol）的关系：MCP 标准化了模型与工具/数据的交互协议，AI 网关可作为 MCP 的接入层统一管理工具调用
-- 【L4】网关层的流式响应处理：SSE 流式响应需网关支持分块转发，同时实现实时的安全过滤和 Token 计数
+- 【L3】Semantic Cache
+
+  基于向量相似度缓存语义相近的请求结果，命中率可达 20-40%，显著降低 Token 成本
+
+- 【L3】AI 网关与 MCP（Model Context Protocol）的关系
+
+  MCP 标准化了模型与工具/数据的交互协议，AI 网关可作为 MCP 的接入层统一管理工具调用
+
+- 【L4】网关层的流式响应处理
+
+  SSE 流式响应需网关支持分块转发，同时实现实时的安全过滤和 Token 计数
 
 :::
 
@@ -877,8 +940,14 @@ LLaMA-70B 部署（8 × A100 80G，2 机 × 4 卡）：
 
 ::: details 扩展知识
 
-- 【L3】LiteLLM 的实现方式：Python 库，提供 `completion(model="openai/gpt-4", messages=[...])` 统一接口，内部通过 model 前缀识别 Provider 并调用对应 Adapter
-- 【L3】gRPC vs REST：自部署模型可使用 gRPC 提升网关到模型服务的通信效率，但对外仍保持 REST/SSE 兼容
+- 【L3】LiteLLM 的实现方式
+
+  Python 库，提供 `completion(model="openai/gpt-4", messages=[...])` 统一接口，
+  内部通过 model 前缀识别 Provider 并调用对应 Adapter
+
+- 【L3】gRPC vs REST
+
+  自部署模型可使用 gRPC 提升网关到模型服务的通信效率，但对外仍保持 REST/SSE 兼容
 
 :::
 
@@ -973,9 +1042,17 @@ routes:
 
 ::: details 扩展知识
 
-- 【L3】Router 模型（路由模型）：训练一个轻量模型专门做路由决策，输入请求特征，输出最优模型选择。训练数据来自历史请求的质量评分
-- 【L4】多目标优化：路由问题本质是多目标优化（质量 ↑ 成本 ↓ 延迟 ↓），可用 Pareto 最优或加权目标函数求解
-- 【L4】实时路由调整：根据模型服务的实时负载和延迟动态调整路由权重，避免某个模型过载
+- 【L3】Router 模型（路由模型）
+
+  训练一个轻量模型专门做路由决策，输入请求特征，输出最优模型选择。训练数据来自历史请求的质量评分
+
+- 【L4】多目标优化
+
+  路由问题本质是多目标优化（质量 ↑ 成本 ↓ 延迟 ↓），可用 Pareto 最优或加权目标函数求解
+
+- 【L4】实时路由调整
+
+  根据模型服务的实时负载和延迟动态调整路由权重，避免某个模型过载
 
 :::
 
@@ -1057,9 +1134,17 @@ routes:
 
 ::: details 扩展知识
 
-- 【L3】优雅降级与用户体验：流式响应中发生降级时，可向客户端发送特殊事件（如 `event: fallback`），客户端展示"正在使用备用模型"提示
-- 【L3】多区域 Fallback：同一模型在不同云区域部署，单区域故障时切换到其他区域
-- 【L4】降级决策的上下文传递：切换到小模型时，将大模型的中间结果（如已生成的部分回复）传递给小模型继续生成
+- 【L3】优雅降级与用户体验
+
+  流式响应中发生降级时，可向客户端发送特殊事件（如 `event: fallback`），客户端展示"正在使用备用模型"提示
+
+- 【L3】多区域 Fallback
+
+  同一模型在不同云区域部署，单区域故障时切换到其他区域
+
+- 【L4】降级决策的上下文传递
+
+  切换到小模型时，将大模型的中间结果（如已生成的部分回复）传递给小模型继续生成
 
 :::
 
@@ -1149,9 +1234,17 @@ SaaS 平台为不同客户分配 Token 配额。实现方案：(1) Redis 存储�
 
 ::: details 扩展知识
 
-- 【L3】分布式限流挑战：多网关节点需共享限流状态，使用 Redis + Lua 脚本或 Redis Cluster 实现原子操作
-- 【L3】动态限流：根据模型服务的实时负载动态调整限流阈值，负载高时降低 RPM/TPM 上限
-- 【L4】Token 成本预估：在请求路由前预估 Token 消耗（基于输入长度 + 历史平均输出长度），用于配额检查和路由决策
+- 【L3】分布式限流挑战
+
+  多网关节点需共享限流状态，使用 Redis + Lua 脚本或 Redis Cluster 实现原子操作
+
+- 【L3】动态限流
+
+  根据模型服务的实时负载动态调整限流阈值，负载高时降低 RPM/TPM 上限
+
+- 【L4】Token 成本预估
+
+  在请求路由前预估 Token 消耗（基于输入长度 + 历史平均输出长度），用于配额检查和路由决策
 
 :::
 
@@ -1229,8 +1322,13 @@ SaaS 平台为不同客户分配 Token 配额。实现方案：(1) Redis 存储�
 
 ::: details 扩展知识
 
-- 【L3】API 网关厂商的 AI 扩展：Kong、Apigee、AWS API Gateway 等都在增加 AI 网关能力，未来传统网关和 AI 网关可能融合
-- 【L3】AI 网关与 LLMOps 平台的关系：AI 网关是 LLMOps 的基础设施层，配合 Prompt 管理、评估、监控等模块构成完整的 LLMOps 平台
+- 【L3】API 网关厂商的 AI 扩展
+
+  Kong、Apigee、AWS API Gateway 等都在增加 AI 网关能力，未来传统网关和 AI 网关可能融合
+
+- 【L3】AI 网关与 LLMOps 平台的关系
+
+  AI 网关是 LLMOps 的基础设施层，配合 Prompt 管理、评估、监控等模块构成完整的 LLMOps 平台
 
 :::
 
@@ -1313,9 +1411,17 @@ SaaS 平台为不同客户分配 Token 配额。实现方案：(1) Redis 存储�
 
 ::: details 扩展知识
 
-- 【L3】OWASP LLM Top 10：Prompt 注入被列为 LLM 应用第一大安全风险，间接注入比直接注入更难防御
-- 【L3】多语言注入攻击：攻击者使用低资源语言（如祖鲁语）绕过英文为主的安全过滤器
-- 【L4】形式化验证：研究方向的"Prompt 防火墙"，对输入/输出进行形式化属性验证，确保不违反安全策略
+- 【L3】OWASP LLM Top 10
+
+  Prompt 注入被列为 LLM 应用第一大安全风险，间接注入比直接注入更难防御
+
+- 【L3】多语言注入攻击
+
+  攻击者使用低资源语言（如祖鲁语）绕过英文为主的安全过滤器
+
+- 【L4】形式化验证
+
+  研究方向的"Prompt 防火墙"，对输入/输出进行形式化属性验证，确保不违反安全策略
 
 :::
 
@@ -1403,9 +1509,17 @@ SaaS 平台为不同客户分配 Token 配额。实现方案：(1) Redis 存储�
 
 ::: details 扩展知识
 
-- 【L3】Guardrails AI / NeMo Guardrails：开源的输出安全框架，支持自定义 Colang 规则定义输出检查逻辑
-- 【L3】Watermarking（水印）：在模型输出中嵌入不可见水印，用于追踪 AI 生成内容的来源
-- 【L4】对抗性输出攻击：攻击者通过精心构造的输入诱导模型输出敏感信息，需通过红队测试覆盖此类场景
+- 【L3】Guardrails AI / NeMo Guardrails
+
+  开源的输出安全框架，支持自定义 Colang 规则定义输出检查逻辑
+
+- 【L3】Watermarking（水印）
+
+  在模型输出中嵌入不可见水印，用于追踪 AI 生成内容的来源
+
+- 【L4】对抗性输出攻击
+
+  攻击者通过精心构造的输入诱导模型输出敏感信息，需通过红队测试覆盖此类场景
 
 :::
 
@@ -1448,9 +1562,9 @@ SaaS 平台为不同客户分配 Token 配额。实现方案：(1) Redis 存储�
 #### 📊 量化参考
 
 - **TTFT（首 Token 延迟）**：7B 模型本地部署 P50 < 200ms，API 调用（GPT-4）P50 < 1s
-- **TPOT（Token 间延迟）**：7B 模型 A100 推理约 10~~20ms/token，API 调用约 30~~50ms/token
-- **Token 成本**：GPT-4 约 $0.03/1k input tokens + $0.06/1k output tokens，日均百万请求成本 $1000~5000
-- **Trace 采样**：生产环境 1%~~10% 采样率，异常 Trace 全量保留；全量采样存储成本约 10~~50GB/天
+- **TPOT（Token 间延迟）**：7B 模型 A100 推理约 10~20ms/token，API 调用约 30~50ms/token
+- **Token 成本**：GPT-4 约 \$0.03/1k input tokens + \$0.06/1k output tokens，日均百万请求成本 \$1000~5000
+- **Trace 采样**：生产环境 1%~10% 采样率，异常 Trace 全量保留；全量采样存储成本约 10~50GB/天
 - **可观测性工具**：Langfuse/LangSmith 提供 LLM 专用 Trace，Prometheus + Grafana 做 Metrics 监控
 
 #### 📖 核心知识
@@ -1515,9 +1629,17 @@ Trace: chat-request-abc123
 
 ::: details 扩展知识
 
-- 【L3】LLM-as-Judge：使用另一个 LLM 自动评估输出质量（如相关性、事实性、安全性），作为可观测性的质量指标
-- 【L4】OpenTelemetry Semantic Conventions for LLM：OTel 社区正在制定 LLM 相关的语义规范（Span 属性、Metric 名称），实现跨工具的互操作性
-- 【L4】Embedding 漂移检测：监控 Embedding 模型的输出分布变化，检测数据漂移（Data Drift）对检索质量的影响
+- 【L3】LLM-as-Judge
+
+  使用另一个 LLM 自动评估输出质量（如相关性、事实性、安全性），作为可观测性的质量指标
+
+- 【L4】OpenTelemetry Semantic Conventions for LLM
+
+  OTel 社区正在制定 LLM 相关的语义规范（Span 属性、Metric 名称），实现跨工具的互操作性
+
+- 【L4】Embedding 漂移检测
+
+  监控 Embedding 模型的输出分布变化，检测数据漂移（Data Drift）对检索质量的影响
 
 :::
 
@@ -1614,9 +1736,17 @@ Trace: chat-request-abc123
 
 ::: details 扩展知识
 
-- 【L3】自部署 vs API 的成本临界点：当日均 Token 消耗超过一定量（如 5000 万 tokens/日），自部署 70B 模型通常比 API 更经济
-- 【L3】Spot Instance 优化：使用云厂商的竞价实例（Spot Instance）部署推理服务，成本降低 60-90%，但需处理实例中断
-- 【L4】Token 成本预测：基于历史数据建立成本预测模型，预测未来月度成本并提前预警
+- 【L3】自部署 vs API 的成本临界点
+
+  当日均 Token 消耗超过一定量（如 5000 万 tokens/日），自部署 70B 模型通常比 API 更经济
+
+- 【L3】Spot Instance 优化
+
+  使用云厂商的竞价实例（Spot Instance）部署推理服务，成本降低 60-90%，但需处理实例中断
+
+- 【L4】Token 成本预测
+
+  基于历史数据建立成本预测模型，预测未来月度成本并提前预警
 
 :::
 
@@ -1708,9 +1838,17 @@ Trace: chat-request-abc123
 
 ::: details 扩展知识
 
-- 【L3】Shadow Mode（影子模式）：新版本模型与生产模型同时处理请求，但只返回生产模型的结果，新版本结果仅用于对比评估
-- 【L4】模型版本的依赖管理：模型版本可能与 Embedding 模型、向量数据库 Schema、Prompt 模板有依赖关系，需整体管理版本兼容性
-- 【L4】持续评估（Continuous Evaluation）：生产流量中持续采样进行自动评估，而非仅在发布时评估
+- 【L3】Shadow Mode（影子模式）
+
+  新版本模型与生产模型同时处理请求，但只返回生产模型的结果，新版本结果仅用于对比评估
+
+- 【L4】模型版本的依赖管理
+
+  模型版本可能与 Embedding 模型、向量数据库 Schema、Prompt 模板有依赖关系，需整体管理版本兼容性
+
+- 【L4】持续评估（Continuous Evaluation）
+
+  生产流量中持续采样进行自动评估，而非仅在发布时评估
 
 :::
 
@@ -1812,9 +1950,17 @@ Golden Dataset（500-2000 条）
 
 ::: details 扩展知识
 
-- 【L3】RAGAS 框架：专为 RAG 应用设计的评估框架，评估维度包括 Faithfulness（忠实度）、Answer Relevancy（回答相关性）、Context Precision（上下文精确率）
-- 【L3】评估数据集的构建方法：从生产日志中采样 + 人工标注、LLM 辅助生成 + 人工审核、对抗样本生成
-- 【L4】评估的评估（Meta-Evaluation）：验证评估指标本身是否可靠，评估者间一致性（Inter-Annotator Agreement）
+- 【L3】RAGAS 框架
+
+  专为 RAG 应用设计的评估框架，评估维度包括 Faithfulness（忠实度）、Answer Relevancy（回答相关性）、Context Precision（上下文精确率）
+
+- 【L3】评估数据集的构建方法
+
+  从生产日志中采样 + 人工标注、LLM 辅助生成 + 人工审核、对抗样本生成
+
+- 【L4】评估的评估（Meta-Evaluation）
+
+  验证评估指标本身是否可靠，评估者间一致性（Inter-Annotator Agreement）
 
 :::
 
@@ -1856,9 +2002,9 @@ Golden Dataset（500-2000 条）
 
 #### 📊 量化参考
 
-- **数据集规模**：核心场景 200~~500 条做回归测试，全面评估 1000~~5000 条覆盖边界+对抗样本
+- **数据集规模**：核心场景 200~500 条做回归测试，全面评估 1000~5000 条覆盖边界+对抗样本
 - **标注质量**：多人标注一致性（Fleiss Kappa）> 0.7 为合格，抽样审核准确率 > 95%
-- **LLM 辅助标注**：GPT-4 标注效率约 100~~200 条/小时，成本约 $0.03~~0.05/条，人工复核通过率约 80%
+- **LLM 辅助标注**：GPT-4 标注效率约 100~200 条/小时，成本约 \$0.03~0.05/条，人工复核通过率约 80%
 - **数据漂移检测**：生产数据与 Golden Dataset 分布差异（KL 散度）> 0.1 时触发更新，通常每月检测一次
 - **版本管理**：每次模型/Prompt 变更前必须跑回归测试，评估耗时 10~30 分钟/轮
 
@@ -1908,9 +2054,17 @@ Golden Dataset（500-2000 条）
 
 ::: details 扩展知识
 
-- 【L3】数据飞轮（Data Flywheel）：生产数据 → 评估发现问题 → 补充数据集 → 改进模型 → 生产数据质量提升 → 循环
-- 【L4】标注一致性度量：使用 Cohen's Kappa 或 Krippendorff's Alpha 衡量标注者间一致性，Kappa > 0.8 为优秀
-- 【L4】数据集的对抗性增强：使用 LLM 自动生成对抗样本（Prompt 注入、边界输入），扩大安全测试覆盖面
+- 【L3】数据飞轮（Data Flywheel）
+
+  生产数据 → 评估发现问题 → 补充数据集 → 改进模型 → 生产数据质量提升 → 循环
+
+- 【L4】标注一致性度量
+
+  使用 Cohen's Kappa 或 Krippendorff's Alpha 衡量标注者间一致性，Kappa > 0.8 为优秀
+
+- 【L4】数据集的对抗性增强
+
+  使用 LLM 自动生成对抗样本（Prompt 注入、边界输入），扩大安全测试覆盖面
 
 :::
 
@@ -2006,9 +2160,17 @@ Golden Dataset（500-2000 条）
 
 ::: details 扩展知识
 
-- 【L3】Snapshot Testing for LLM：将模型输出作为快照保存，后续运行对比输出变化，变化超过阈值则告警
-- 【L3】评估结果的统计显著性：使用 Bootstrap 或 McNemar 检验判断版本间的质量差异是否统计显著
-- 【L4】增量评估：只对变更影响范围内的用例重新评估，减少评估时间和成本
+- 【L3】Snapshot Testing for LLM
+
+  将模型输出作为快照保存，后续运行对比输出变化，变化超过阈值则告警
+
+- 【L3】评估结果的统计显著性
+
+  使用 Bootstrap 或 McNemar 检验判断版本间的质量差异是否统计显著
+
+- 【L4】增量评估
+
+  只对变更影响范围内的用例重新评估，减少评估时间和成本
 
 :::
 
@@ -2101,9 +2263,17 @@ Golden Dataset（500-2000 条）
 
 ::: details 扩展知识
 
-- 【L3】SLI/SLO/SLA 体系：SLI（指标定义）→ SLO（内部目标，比 SLA 更严格）→ SLA（对外承诺），如 SLI=TTFT，SLO=P99<1s，SLA=P99<2s
-- 【L4】质量 SLA 的 Error Budget：借鉴 SRE 的 Error Budget 思想，允许一定的质量波动空间，但超出预算时必须投入改进
-- 【L4】SLA 的动态调整：根据业务高峰期（如双十一）临时调整 SLA 阈值，或增加资源保障
+- 【L3】SLI/SLO/SLA 体系
+
+  SLI（指标定义）→ SLO（内部目标，比 SLA 更严格）→ SLA（对外承诺），如 SLI=TTFT，SLO=P99<1s，SLA=P99<2s
+
+- 【L4】质量 SLA 的 Error Budget
+
+  借鉴 SRE 的 Error Budget 思想，允许一定的质量波动空间，但超出预算时必须投入改进
+
+- 【L4】SLA 的动态调整
+
+  根据业务高峰期（如双十一）临时调整 SLA 阈值，或增加资源保障
 
 :::
 
@@ -2196,9 +2366,17 @@ Golden Dataset（500-2000 条）
 
 ::: details 扩展知识
 
-- 【L3】AIOps 告警智能化：使用 ML 模型分析告警模式，自动识别告警风暴的根因，减少人工排查时间
-- 【L3】质量监控的自动化：生产流量中持续采样，使用 LLM-as-Judge 自动评估，无需等待定期评估
-- 【L4】监控指标与 SLA 的关联：将监控指标直接映射到 SLA 项，实时计算 SLA 达标率和 Error Budget 消耗速度
+- 【L3】AIOps 告警智能化
+
+  使用 ML 模型分析告警模式，自动识别告警风暴的根因，减少人工排查时间
+
+- 【L3】质量监控的自动化
+
+  生产流量中持续采样，使用 LLM-as-Judge 自动评估，无需等待定期评估
+
+- 【L4】监控指标与 SLA 的关联
+
+  将监控指标直接映射到 SLA 项，实时计算 SLA 达标率和 Error Budget 消耗速度
 
 :::
 

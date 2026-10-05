@@ -100,7 +100,10 @@ Netty 是构建高性能网络应用的基石，凡是需要大量并发连接�
 ::: details
 
 - 【L3】Dubbo、gRPC-Java、RocketMQ 的 Remoting 层均基于 Netty 实现，说明 Netty 已成为 Java 分布式通信的事实标准。
-- 【L4】选型时需权衡：超低延迟场景关注 Netty 的 Epoll 传输（Linux 原生 epoll），跨平台场景用 NIO 传输。
+
+- 【L4】选型时需权衡
+
+  超低延迟场景关注 Netty 的 Epoll 传输（Linux 原生 epoll），跨平台场景用 NIO 传输。
 
 > 📚 延伸阅读：[面试鸭 - Netty 面试](https://www.mianshiya.com/bank/1804354610222800897)
 
@@ -151,6 +154,7 @@ Netty 在 NIO 的基础上，通过封装和优化，**提供了一个全面增�
 ::: details
 
 - 【L3】Netty 对空轮询 Bug 的规避方案（重建 Selector）是其稳定性的标志性设计，详见本文档对应题目。
+
 - 【L4】Netty 还支持 Linux Epoll 原生传输与 KQueue（macOS），在特定平台上比 JDK NIO 传输性能更高。
 
 > 📚 延伸阅读：[Netty 官方文档](https://netty.io/wiki/index.html)
@@ -244,7 +248,12 @@ serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
 ::: details
 
 - 【L3】Channel 与 EventLoop 的绑定是单向且终身的，Channel 关闭后解绑，但 EventLoop 生命周期远长于 Channel，这也是 Netty 避免线程创建销毁开销的原因。
-- 【L4】事件传播起点必须分清：Outbound 事件沿 tail→head 传播，`channel.write()` 从 Pipeline 尾部开始、遍历**所有** Outbound Handler，而 `ctx.write()` 从当前 Handler 节点开始向 head 方向传播，会**跳过**链上位于其后的 Outbound Handler；Inbound 事件沿 head→tail 传播，`ctx.fireChannelRead()` 只向后继 Inbound Handler 传递。编解码器写错起点（该用 ctx 时用了 channel）会导致消息被重复编解码或绕过关键 Handler。
+
+- 【L4】事件传播起点必须分清
+
+  Outbound 事件沿 tail→head 传播，`channel.write()` 从 Pipeline 尾部开始、遍历**所有** Outbound Handler，
+  而 `ctx.write()` 从当前 Handler 节点开始向 head 方向传播，会**跳过**链上位于其后的 Outbound Handler；Inbound 事件沿 head→tail 传播，
+  `ctx.fireChannelRead()` 只向后继 Inbound Handler 传递。编解码器写错起点（该用 ctx 时用了 channel）会导致消息被重复编解码或绕过关键 Handler。
 
 > 📚 延伸阅读：[Netty 官方文档 - User Guide](https://netty.io/wiki/index.html)
 
@@ -308,8 +317,13 @@ b.group(bossGroup, workerGroup)
 ::: details
 
 - 【L3】BossGroup 与 WorkerGroup 本质都是 EventLoopGroup，只是职责分工不同；连接数极大时 BossGroup 也可配置多线程。
+
 - 【L4】耗时业务若在 WorkerGroup 的 EventLoop 中执行，会阻塞同线程的其他 Channel，应投递到 DefaultEventExecutorGroup 业务线程池。
-- 【L4】这套线程模型直接塑造了上游 RPC 框架的设计：Dubbo 在 Netty 传输层之上通过 Dispatcher 把请求派发到独立业务线程池，gRPC-Java 同样将应用回调交给单独的 Executor 执行——共同原则是「IO 线程（EventLoop）永不阻塞，业务隔离靠外部线程池」。设计任何长连接中间件（网关、推送服务）时，IO 线程与业务线程的分层是第一道必答的架构决策。
+
+- 【L4】这套线程模型直接塑造了上游 RPC 框架的设计
+
+  Dubbo 在 Netty 传输层之上通过 Dispatcher 把请求派发到独立业务线程池，gRPC-Java 同样将应用回调交给单独的 Executor 执行——
+  共同原则是「IO 线程（EventLoop）永不阻塞，业务隔离靠外部线程池」。设计任何长连接中间件（网关、推送服务）时，IO 线程与业务线程的分层是第一道必答的架构决策。
 
 > 📚 延伸阅读：[面试鸭 - Netty 面试](https://www.mianshiya.com/bank/1804354610222800897)
 
@@ -366,8 +380,18 @@ EventLoop 是绑定 Selector 的单线程调度单元，主循环为：select �
 ::: details
 
 - 【L3】任务队列采用 MPSC（多生产者单消费者）无锁队列，任务数量超过阈值时 select 会改为非阻塞快速轮询，保证任务响应及时性。
-- 【L4】select 空转防护：Netty 在主循环中统计空轮询次数，达到阈值触发 Selector 重建，与空轮询 Bug 的规避机制直接关联。
-- 【L4】触发模式：JDK NIO 与 Netty 原生传输的 EpollEventLoop 使用的都是 epoll 的**水平触发（LT）**，而非边缘触发（ET）——「Netty 用 ET」是高频讹传。LT 语义下只要就绪事件未处理完，下次 `epoll_wait` 仍会返回，不会因一次没读干净而丢事件；ET 则要求一次性循环读到 `EAGAIN`，编程复杂度与丢事件风险都更高。Netty 选择 LT 与其「事件到了再处理、处理不完下轮继续」的 EventLoop 模型天然匹配。
+
+- 【L4】select 空转防护
+
+  Netty 在主循环中统计空轮询次数，达到阈值触发 Selector 重建，与空轮询 Bug 的规避机制直接关联。
+
+- 【L4】触发模式
+
+  JDK NIO 与 Netty 原生传输的 EpollEventLoop 使用的都是 epoll 的**水平触发（LT）**，而非边缘触发（ET）——「Netty 用 ET」是高频讹传。
+
+  LT 语义下只要就绪事件未处理完，下次 `epoll_wait` 仍会返回，不会因一次没读干净而丢事件；ET 则要求一次性循环读到 `EAGAIN`，编程复杂度与丢事件风险都更高。
+
+  Netty 选择 LT 与其「事件到了再处理、处理不完下轮继续」的 EventLoop 模型天然匹配。
 
 > 📚 延伸阅读：[Netty 官方文档](https://netty.io/wiki/index.html)
 
@@ -431,7 +455,10 @@ buf.readBytes(5);                    // 读，readerIndex 前移
 
 ::: details
 
-- 【L3】ByteBuf 按内存位置分堆内（Heap）与堆外（Direct）两类：堆外减少一次堆内到堆外的拷贝、不受 GC 直接管理，网络 I/O 场景优先使用堆外。
+- 【L3】ByteBuf 按内存位置分堆内（Heap）与堆外（Direct）两类
+
+  堆外减少一次堆内到堆外的拷贝、不受 GC 直接管理，网络 I/O 场景优先使用堆外。
+
 - 【L4】`markReaderIndex()`/`resetReaderIndex()` 支持读位置回退，解码器中常用于"数据不足时重置读指针等待后续报文"。
 
 > 📚 延伸阅读：[Netty 官方文档](https://netty.io/wiki/index.html)
@@ -498,7 +525,10 @@ ByteBuf 用引用计数而非 GC 管理生命周期，主要为及时回收堆�
 ::: details
 
 - 【L3】ADVANCED 级别在采样基础上额外记录 ByteBuf 的完整分配与访问调用栈，泄漏报告中可定位到具体代码行，是排查泄漏的首选调试级别。
-- 【L3】SIMPLE 级别的泄漏日志只有一行告警（典型形如 `LEAK: ByteBuf.release() was not called before it's garbage-collected`），不含访问轨迹——只能告诉你「有泄漏」，无法告诉你「谁泄漏的」。要定位到具体 Handler，必须升级到 ADVANCED/PARANOID 拿到 records（最近访问轨迹），再沿轨迹反查最后一个 touch 该 ByteBuf 的 Handler。
+
+- 【L3】SIMPLE 级别的泄漏日志只有一行告警（典型形如 `LEAK: ByteBuf.release() was not called before it's garbage-collected`），不含访问轨迹——
+  只能告诉你「有泄漏」，无法告诉你「谁泄漏的」。要定位到具体 Handler，必须升级到 ADVANCED/PARANOID 拿到 records（最近访问轨迹），再沿轨迹反查最后一个 touch 该 ByteBuf 的 Handler。
+
 - 【L4】堆外内存最终靠 Cleaner（PhantomReference）兜底回收，但时机不可控；引用计数主动释放才能避免堆外内存耗尽导致的 OOM（Direct buffer memory）。
 
 > 📚 延伸阅读：[Netty 官方文档](https://netty.io/wiki/index.html)
@@ -509,15 +539,15 @@ ByteBuf 用引用计数而非 GC 管理生命周期，主要为及时回收堆�
 
 ::: details
 
-某网关服务上线后堆外内存持续增长、数天后触发 Direct buffer memory 告警。排查时将 `-Dio.netty.leakDetection.level` 调到 ADVANCED，泄漏报告指向一个自定义鉴权 Handler：异常分支提前 return，既未 `fireChannelRead` 传递也未 `release`。修复方式是在异常路径用 try-finally 保证释放，上线后堆外内存曲线恢复平稳，告警消除。
+某网关服务上线后堆外内存持续增长、数天后触发 Direct buffer memory 告警。排查时将 `-Dio.netty.leakDetection.level` 调到 ADVANCED，泄漏报告指向一个自定义鉴权 Handler：
+
+异常分支提前 return，既未 `fireChannelRead` 传递也未 `release`。修复方式是在异常路径用 try-finally 保证释放，上线后堆外内存曲线恢复平稳，告警消除。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "ByteBuf 交给 GC 自动回收，不用手动 release" → 堆外内存不受 GC 直接管控，不主动 release 会堆积到 Cleaner 兜底才回收，高并发下极易 OOM。
 - ❌ "继承 SimpleChannelInboundHandler 后还要手动 release" → 该基类在 channelRead0 返回后会自动释放消息，再 release 会计数为负报错；需向下游传递时应 `retain()`。
@@ -580,6 +610,7 @@ buf.release();
 ::: details
 
 - 【L3】ChunkList 按内存使用率升序串联（q000、q025、q050、q075、q100、qInit），分配时从使用率合适的链表开始查找，释放时 Chunk 在链表间迁移，兼顾查找效率与碎片率。
+
 - 【L4】超过 Chunk 大小的分配请求会走非池化路径直接申请；可通过 `PooledByteBufAllocatorMetric` 观测 Arena 使用率、ThreadCache 命中率等指标做调优。
 
 > 📚 延伸阅读：[Netty 官方文档](https://netty.io/wiki/index.html)
@@ -590,15 +621,14 @@ buf.release();
 
 ::: details
 
-某消息中间件在万级 TPS 压测中发现 Young GC 频繁（每秒多次）。将分配器切换为 PooledByteBufAllocator 并优先使用堆外池化缓冲后：小规格 ByteBuf 分配基本命中 ThreadCache（无锁、纳秒级），GC 频率下降约一个数量级，端到端吞吐提升约 15%，P99 延迟明显收敛。前提是 Handler 严格 release，泄漏的内存无法归还池中。
+某消息中间件在万级 TPS 压测中发现 Young GC 频繁（每秒多次）。将分配器切换为 PooledByteBufAllocator 并优先使用堆外池化缓冲后：小规格 ByteBuf 分配基本命中 ThreadCache（无锁、
+纳秒级），GC 频率下降约一个数量级，端到端吞吐提升约 15%，P99 延迟明显收敛。前提是 Handler 严格 release，泄漏的内存无法归还池中。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "池化后不 release 也没关系，反正内存是复用的" → 泄漏的内存块永远无法归还池中，Arena 可用空间持续收缩，最终退化为直接分配甚至 OOM。
 - ❌ "池化能加速所有大小的内存分配" → 池化收益集中在中小规格；超过 Chunk 的申请走非池化路径，不存在复用收益。
@@ -657,7 +687,10 @@ graph TD
 ::: details
 
 - 【L3】串行化的代价是单 Channel 吞吐受限于单线程，因此耗时业务必须移出 EventLoop（投递业务线程池），否则拖累同线程全部 Channel。
-- 【L4】Netty 大量使用无锁结构：MPSC 任务队列、对象池 Recycler、FastThreadLocal 等，都是减少锁竞争与伪共享的工程手段。
+
+- 【L4】Netty 大量使用无锁结构
+
+  MPSC 任务队列、对象池 Recycler、FastThreadLocal 等，都是减少锁竞争与伪共享的工程手段。
 
 > 📚 延伸阅读：[面试鸭 - Netty 面试](https://www.mianshiya.com/bank/1804354610222800897)
 
@@ -728,8 +761,14 @@ channel.writeAndFlush(message);
 
 ::: details
 
-- 【L3】slice/duplicate 与原 ByteBuf **共享底层内存与引用计数**，只是各自维护独立的读写指针——对视图 release 会直接扣减原对象的计数；若视图需要独立生命周期，应使用 `retainedSlice()`/`retainedDuplicate()`（创建时自动 retain，用完各自 release）。共享期间任一方写数据会影响另一方。
-- 【L3】OS 级零拷贝还有 mmap 一路：Netty 没有内置 MappedByteBuf 抽象，可用 `FileChannel.map` 得到 `MappedByteBuffer`，再经 `Unpooled.wrappedBuffer` 包装成 ByteBuf 读写——适合大文件随机读写；与 FileRegion（sendfile，适合「读文件→发网络」的顺序转发）场景互补，两者不可互相替代。
+- 【L3】slice/duplicate 与原 ByteBuf **共享底层内存与引用计数**，只是各自维护独立的读写指针——对视图 release 会直接扣减原对象的计数；若视图需要独立生命周期，
+  应使用 `retainedSlice()`/`retainedDuplicate()`（创建时自动 retain，用完各自 release）。共享期间任一方写数据会影响另一方。
+
+- 【L3】OS 级零拷贝还有 mmap 一路
+
+  Netty 没有内置 MappedByteBuf 抽象，可用 `FileChannel.map` 得到 `MappedByteBuffer`，
+  再经 `Unpooled.wrappedBuffer` 包装成 ByteBuf 读写——适合大文件随机读写；与 FileRegion（sendfile，适合「读文件→发网络」的顺序转发）场景互补，两者不可互相替代。
+
 - 【L4】堆外内存做网络 I/O 时，Socket 发送无需再经历堆内→堆外的拷贝；若用堆内 ByteBuf，JDK 发送前会先拷到临时堆外缓冲。
 
 > 📚 延伸阅读：[Netty 官方文档](https://netty.io/wiki/index.html)
@@ -740,15 +779,14 @@ channel.writeAndFlush(message);
 
 ::: details
 
-某文件下载服务原实现为"读文件到堆内 → 写入 Channel"，单网卡吞吐约 200MB/s 且 CPU 拷贝开销高。改用 `FileRegion`（FileChannel.transferTo）后，数据经 DMA 从页缓存直达网卡，用户态拷贝从多次降为零，单机传输吞吐提升至约 300MB/s（提升约 40%~50%），同时 GC 压力显著下降。
+某文件下载服务原实现为"读文件到堆内 → 写入 Channel"，单网卡吞吐约 200MB/s 且 CPU 拷贝开销高。改用 `FileRegion`（FileChannel.transferTo）后，数据经 DMA 从页缓存直达网卡，
+用户态拷贝从多次降为零，单机传输吞吐提升至约 300MB/s（提升约 40%~50%），同时 GC 压力显著下降。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Netty 的零拷贝都是操作系统级 sendfile" → 只有 FileRegion 属于 OS 级零拷贝，CompositeByteBuf/slice/wrap 是应用层视图共享，概念要区分。
 - ❌ "slice 出来的 ByteBuf 是独立数据，改它不影响原 Buffer" → slice 与原 ByteBuf 共享底层存储，写操作会相互影响。
@@ -815,7 +853,10 @@ graph TD
 ::: details
 
 - 【L3】Bug 根源在 Linux 内核 epoll 的某些异常事件（如连接 RST）会使 epoll_wait 立即返回 0 个就绪事件，JDK Selector 陷入忙等；JDK 后续版本做了缓解但未根治。
-- 【L4】Netty 判定逻辑并非简单"返回 0 就计数"：它区分了无超时的 select、selectNow 探测与意外提前唤醒（unexpectedWakes），结合耗时综合判断，避免误伤正常的快速事件。
+
+- 【L4】Netty 判定逻辑并非简单"返回 0 就计数"
+
+  它区分了无超时的 select、selectNow 探测与意外提前唤醒（unexpectedWakes），结合耗时综合判断，避免误伤正常的快速事件。
 
 > 📚 延伸阅读：[Netty 官方文档](https://netty.io/wiki/index.html)
 
@@ -825,15 +866,14 @@ graph TD
 
 ::: details
 
-某线上网关偶发单实例 CPU 飙至 100%，线程栈显示 NioEventLoop 持续停在 select 循环。确认是 epoll 空轮询 Bug 触发后，Netty 的自动重建机制在计数达到阈值后重建 Selector 并迁移全部 Channel，服务毫秒级自愈、业务无感；后续通过监控 EventLoop 的 pendingTasks 与 CPU 指标提前预警该类异常。
+某线上网关偶发单实例 CPU 飙至 100%，线程栈显示 NioEventLoop 持续停在 select 循环。确认是 epoll 空轮询 Bug 触发后，
+Netty 的自动重建机制在计数达到阈值后重建 Selector 并迁移全部 Channel，服务毫秒级自愈、业务无感；后续通过监控 EventLoop 的 pendingTasks 与 CPU 指标提前预警该类异常。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Netty 修复了 JDK 的空轮询 Bug" → Netty 只是规避（检测 + 重建 Selector），JDK 层面的 Bug 并未被修复。
 - ❌ "重建 Selector 会丢失已建立的连接" → 重建过程会把旧 Selector 上的 Channel 全部重新注册到新 Selector，连接与业务状态不受影响。
@@ -914,8 +954,17 @@ p.addLast(new LengthFieldBasedFrameDecoder(
 ::: details
 
 - 【L3】ByteToMessageDecoder 内部用累积缓冲（cumulation）缓存半包数据，等凑齐一帧再解码；maxFrameLength 是防恶意大包打爆内存的关键防线，超限抛 TooLongFrameException。
-- 【L4】编解码需配套：解码用 LengthFieldBasedFrameDecoder，编码用 LengthFieldPrepender 补长度头，二者参数必须对齐，否则对端解析失败。
-- 【L3】lengthAdjustment 的配置计算：Netty 内部按「整帧长度 = lengthFieldOffset + lengthFieldLength + lengthAdjustment + 长度字段值」解析。若长度字段值表示的是**整帧长度**（把头部也算进去了），lengthAdjustment 必须负补偿为 `-(lengthFieldOffset + lengthFieldLength)`；若长度字段之后、消息体之前还有其他固定头字段，则需正补偿这些字段的字节数。算错这个参数的典型症状是每帧多读或少读几个字节，导致后续所有报文错位。
+
+- 【L4】编解码需配套
+
+  解码用 LengthFieldBasedFrameDecoder，编码用 LengthFieldPrepender 补长度头，二者参数必须对齐，否则对端解析失败。
+
+- 【L3】lengthAdjustment 的配置计算
+
+  Netty 内部按「整帧长度 = lengthFieldOffset + lengthFieldLength + lengthAdjustment + 长度字段值」解析。
+
+  若长度字段值表示的是**整帧长度**（把头部也算进去了），lengthAdjustment 必须负补偿为 `-(lengthFieldOffset + lengthFieldLength)`；若长度字段之后、消息体之前还有其他固定头字段，
+  则需正补偿这些字段的字节数。算错这个参数的典型症状是每帧多读或少读几个字节，导致后续所有报文错位。
 
 > 📚 延伸阅读：[面试鸭 - Netty 面试](https://www.mianshiya.com/bank/1804354610222800897)
 
@@ -925,15 +974,16 @@ p.addLast(new LengthFieldBasedFrameDecoder(
 
 ::: details
 
-某网关与第三方系统对接初期未定义消息边界，高峰期出现约 0.1% 的消息解析错乱（两条报文粘在一起被当成一条）。引入自定义协议 `[4 字节长度][消息体]` 并在 Pipeline 头部加 LengthFieldBasedFrameDecoder（maxFrameLength=1MB）后，解析错误率降为 0；同时编码侧用 LengthFieldPrepender 统一补长度头，双端对齐。
+某网关与第三方系统对接初期未定义消息边界，高峰期出现约 0.1% 的消息解析错乱（两条报文粘在一起被当成一条）。
+
+引入自定义协议 `[4 字节长度][消息体]` 并在 Pipeline 头部加 LengthFieldBasedFrameDecoder（maxFrameLength=1MB）后，解析错误率降为 0；
+同时编码侧用 LengthFieldPrepender 统一补长度头，双端对齐。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "TCP 会保证把一条消息完整送达" → TCP 是字节流协议，不感知应用层消息边界，粘包拆包必须由应用层协议解决。
 - ❌ "用 FixedLengthFrameDecoder 就能解决所有粘包" → 定长解码只适用于长度严格固定的协议，变长协议应优先使用长度域解码。
@@ -1013,7 +1063,10 @@ public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
 ::: details
 
 - 【L3】IdleStateHandler 的计时依赖 EventLoop 的定时任务调度，读写事件会重置对应计时器；连接假死（半开连接）只有靠应用层心跳才能发现，TCP KeepAlive 默认 2 小时探测一次，太慢。
-- 【L4】生产上可做连续失败容错：连续 N 次读空闲或心跳无响应再关闭连接，避免单次网络抖动误杀；重连可配合指数退避。
+
+- 【L4】生产上可做连续失败容错
+
+  连续 N 次读空闲或心跳无响应再关闭连接，避免单次网络抖动误杀；重连可配合指数退避。
 
 > 📚 延伸阅读：[Netty 官方文档](https://netty.io/wiki/index.html)
 
@@ -1060,8 +1113,13 @@ Netty 是设计模式的教科书：Pipeline/Handler 责任链，I/O 事件通�
 
 ::: details
 
-- 【L3】责任链是 Netty 最重要的模式：Inbound/Outbound 事件沿 Pipeline 双向传播，任意 Handler 可拦截、改写或终止事件，这是协议扩展能力的基础。
-- 【L4】Future/Promise 体系（ChannelFuture、Promise）也体现了观察者模式：操作结果异步通知监听器，避免阻塞等待。
+- 【L3】责任链是 Netty 最重要的模式
+
+  Inbound/Outbound 事件沿 Pipeline 双向传播，任意 Handler 可拦截、改写或终止事件，这是协议扩展能力的基础。
+
+- 【L4】Future/Promise 体系（ChannelFuture、Promise）也体现了观察者模式
+
+  操作结果异步通知监听器，避免阻塞等待。
 
 > 📚 延伸阅读：[面试鸭 - Netty 面试](https://www.mianshiya.com/bank/1804354610222800897)
 
@@ -1137,7 +1195,9 @@ b.option(ChannelOption.SO_BACKLOG, 1024);  // 连接队列大小
 ::: details
 
 - 【L3】内存泄漏可结合 ResourceLeakDetector 的 ADVANCED 级别拿到完整调用栈；连接假死可加"连续 N 次无响应再断连"的容错策略。
-- 【L4】EventLoop 阻塞的典型症状是"部分 Channel 集体变慢"（同一 EventLoop 绑定），可用线程栈 + pendingTasks 指标定位；连接拒绝还需区分半连接/全连接队列（tcp_max_syn_backlog、somaxconn）。
+
+- 【L4】EventLoop 阻塞的典型症状是"部分 Channel 集体变慢"（同一 EventLoop 绑定），可用线程栈 + pendingTasks 指标定位；
+  连接拒绝还需区分半连接/全连接队列（tcp_max_syn_backlog、somaxconn）。
 
 > 📚 延伸阅读：[面试鸭 - Netty 面试](https://www.mianshiya.com/bank/1804354610222800897)
 
@@ -1231,10 +1291,27 @@ public class BackpressureHandler extends ChannelInboundHandlerAdapter {
 
 ::: details
 
-- 【L3】`WriteBufferWaterMark` 与 `ChannelOutboundBuffer` 的关系：`ChannelOutboundBuffer` 是 Netty 写路径的核心数据结构，每个 pending 的写请求是一个 `Entry` 链表节点。`flushedEntry` / `unflushedEntry` / `tailEntry` 三指针管理状态。高水位判断直接检查 `totalPendingSize`（所有 Entry 的字节总和）。
-- 【L3】`setAutoRead(false)` 的底层效果：EventLoop 不再注册 `SelectionKey.OP_READ`，即不再从 Socket 读数据。TCP 层面，读窗口不再更新，对端发送窗口逐渐填满，自然减速——这是 TCP 原生的流控机制。
-- 【L4】高水位参数调优经验：推送场景建议 high = 1~4MB（按消息大小 × 缓冲条数），low = high / 2；low 与 high 差距太小会导致频繁在可写/不可写之间震荡（hysteresis 不足）；差距太大则背压响应迟钝。
-- 【L4】与 HTTP/2 的 `WINDOW_UPDATE` 对比：HTTP/2 在协议层有流控（connection-level + stream-level），Netty 的 WriteBufferWaterMark 在传输层，两者互补。HTTP/2 流控管的是「对端允许我发多少」，WriteBufferWaterMark 管的是「本地缓冲区积压了多少」。
+- 【L3】`WriteBufferWaterMark` 与 `ChannelOutboundBuffer` 的关系
+
+  `ChannelOutboundBuffer` 是 Netty 写路径的核心数据结构，
+  每个 pending 的写请求是一个 `Entry` 链表节点。`flushedEntry` / `unflushedEntry` / `tailEntry` 三指针管理状态。
+
+  高水位判断直接检查 `totalPendingSize`（所有 Entry 的字节总和）。
+
+- 【L3】`setAutoRead(false)` 的底层效果
+
+  EventLoop 不再注册 `SelectionKey.OP_READ`，即不再从 Socket 读数据。TCP 层面，读窗口不再更新，对端发送窗口逐渐填满，自然减速——
+  这是 TCP 原生的流控机制。
+
+- 【L4】高水位参数调优经验
+
+  推送场景建议 high = 1~4MB（按消息大小 × 缓冲条数），low = high / 2；low 与 high 差距太小会导致频繁在可写/不可写之间震荡（hysteresis 不足）；
+  差距太大则背压响应迟钝。
+
+- 【L4】与 HTTP/2 的 `WINDOW_UPDATE` 对比
+
+  HTTP/2 在协议层有流控（connection-level + stream-level），Netty 的 WriteBufferWaterMark 在传输层，
+  两者互补。HTTP/2 流控管的是「对端允许我发多少」，WriteBufferWaterMark 管的是「本地缓冲区积压了多少」。
 
 :::
 
@@ -1247,7 +1324,9 @@ public class BackpressureHandler extends ChannelInboundHandlerAdapter {
 **调优参数**：
 
 - `WriteBufferWaterMark(512KB, 2MB)`：high=2MB 给慢客户端 1000 条消息的缓冲空间；
+
 - `WriteTimeoutHandler(30s)`：写超时断开僵尸连接；
+
 - `BackpressureHandler`：不可写时关闭 autoRead，防止服务端继续接收慢客户端的请求。
 
 **效果**：OOM 事故归零，慢客户端被自动限速而非拖垮服务端。
@@ -1257,8 +1336,6 @@ public class BackpressureHandler extends ChannelInboundHandlerAdapter {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "write 是异步的，不用管背压" → 不关注背压，写缓冲区会无限增长直到 OOM，这是 Netty 生产环境内存溢出的首要原因。
 - ❌ "高水位设得越大越好" → 高水位只是报警阈值，设太大等于不设；应根据消息速率 × 可容忍延迟计算合理值。

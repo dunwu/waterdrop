@@ -266,16 +266,21 @@ ON DUPLICATE KEY UPDATE name=values(name), age=values(age);
 
 ::: details
 
-- 【L3】三种策略的性能对比：`INSERT IGNORE` 最快（直接忽略），`ON DUPLICATE KEY UPDATE` 次之（原地更新），`REPLACE INTO` 最慢（先删后插，可能触发外键级联）。高并发场景优先 `INSERT IGNORE` 或 `ON DUPLICATE KEY UPDATE`。
-- 【L3】`REPLACE INTO` 的陷阱：先删后插会生成新的自增 ID，且可能触发 DELETE 触发器，不适合有外键关联或依赖 ID 不变的场景。
+- 【L3】三种策略的性能对比
+
+  `INSERT IGNORE` 最快（直接忽略），`ON DUPLICATE KEY UPDATE` 次之（原地更新），`REPLACE INTO` 最慢（先删后插，可能触发外键级联）。
+
+  高并发场景优先 `INSERT IGNORE` 或 `ON DUPLICATE KEY UPDATE`。
+
+- 【L3】`REPLACE INTO` 的陷阱
+
+  先删后插会生成新的自增 ID，且可能触发 DELETE 触发器，不适合有外键关联或依赖 ID 不变的场景。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "应用层查重就够了" → 并发场景下查重与插入不是原子操作，必须靠唯一索引兜底。
 - ❌ "`REPLACE INTO` 和 `ON DUPLICATE KEY UPDATE` 一样" → `REPLACE` 是先删后插（新 ID），后者是原地更新（保留 ID）。
@@ -453,8 +458,14 @@ JOIN 用于多表联合查询，条件用 `ON` 而非 `WHERE`。主要分为**�
 
 ::: details
 
-- 【L3】**JOIN Buffer 机制**：当 JOIN 无法利用索引时，MySQL 使用 Join Buffer（内存）来缓存驱动表的数据，然后逐行与被驱动表匹配。Buffer 越大，单次能缓存的行越多，但受 `join_buffer_size` 限制。
-- 【L4】**反范式替代方案**：在订单表冗余用户名/商品名，避免 JOIN 用户表/商品表；或使用 ES 宽表方案，将多表数据异构到 ES 中查询。
+- 【L3】**JOIN Buffer 机制**
+
+  当 JOIN 无法利用索引时，MySQL 使用 Join Buffer（内存）来缓存驱动表的数据，然后逐行与被驱动表匹配。Buffer 越大，单次能缓存的行越多，
+  但受 `join_buffer_size` 限制。
+
+- 【L4】**反范式替代方案**
+
+  在订单表冗余用户名/商品名，避免 JOIN 用户表/商品表；或使用 ES 宽表方案，将多表数据异构到 ES 中查询。
 
 :::
 
@@ -462,7 +473,16 @@ JOIN 用于多表联合查询，条件用 `ON` 而非 `WHERE`。主要分为**�
 
 ::: details
 
-生产案例：某电商订单详情页（MySQL 8.0.33，4 核 16GB），核心查询为 5 表 JOIN：`orders JOIN order_items JOIN users JOIN products JOIN categories`，开发环境数据量 < 1 万时 P99 < 50ms。上线后大促期间 QPS 达 5000，P99 飙升至 8s，随后 MySQL 进程被 OOM Killer 终止（dmesg 记录 `Out of memory: Kill process mysqld`）。排查过程：`join_buffer_size` 被调大为 2MB（系统默认仅 256KB），无法利用索引的 JOIN 需分配 join buffer，5 表查询含 4 个 JOIN，单连接峰值内存 4 × 2MB = 8MB；5000 并发连接 × 8MB = 40GB，超过服务器 16GB 物理内存。同时 `SHOW ENGINE INNODB STATUS` 显示该查询在执行期间锁定了 5 张表共约 12000 行，导致其他写入操作排队等待，锁等待超时（`innodb_lock_wait_timeout=50s`）频发。根因：多表 JOIN 在高并发下 join buffer 内存线性膨胀 + 跨表行锁范围过大。修复：① 将 5 表反范式化为 2 张宽表（orders 冗余 user_name、product_name、category_name），消除 3 个 JOIN；② 应用层改为分步查询（先查 orders + order_items，再异步查 users/products 拼装），单查询内存占用降至 < 64KB；③ 热点商品数据（Top 1000 SKU）缓存至 Redis（命中率 95%），MySQL QPS 从 5000 降至 800。修复后 P99 恢复至 45ms，OOM 未再发生。
+生产案例：某电商订单详情页（MySQL 8.0.33，4 核 16GB），核心查询为 5 表 JOIN：`orders JOIN order_items JOIN users JOIN products JOIN categories`，
+开发环境数据量 < 1 万时 P99 < 50ms。上线后大促期间 QPS 达 5000，P99 飙升至 8s，
+随后 MySQL 进程被 OOM Killer 终止（dmesg 记录 `Out of memory: Kill process mysqld`）。排查过程：`join_buffer_size` 被调大为 2MB（系统默认仅 256KB），
+无法利用索引的 JOIN 需分配 join buffer，5 表查询含 4 个 JOIN，单连接峰值内存 4 × 2MB = 8MB；5000 并发连接 × 8MB = 40GB，超过服务器 16GB 物理内存。
+
+同时 `SHOW ENGINE INNODB STATUS` 显示该查询在执行期间锁定了 5 张表共约 12000 行，导致其他写入操作排队等待，锁等待超时（`innodb_lock_wait_timeout=50s`）频发。根因：
+
+多表 JOIN 在高并发下 join buffer 内存线性膨胀 + 跨表行锁范围过大。修复：① 将 5 表反范式化为 2 张宽表（orders 冗余 user_name、product_name、category_name），
+消除 3 个 JOIN；② 应用层改为分步查询（先查 orders + order_items，再异步查 users/products 拼装），单查询内存占用降至 < 64KB；
+③ 热点商品数据（Top 1000 SKU）缓存至 Redis（命中率 95%），MySQL QPS 从 5000 降至 800。修复后 P99 恢复至 45ms，OOM 未再发生。
 
 :::
 
@@ -509,8 +529,13 @@ JOIN 用于多表联合查询，条件用 `ON` 而非 `WHERE`。主要分为**�
 
 ::: details
 
-- 【L3】**DELETE 后磁盘空间为什么不释放？** → InnoDB 的 delete mark 只是标记删除，空间留给后续 INSERT 复用。要彻底回收需 `OPTIMIZE TABLE`（本质是重建表）。
-- 【L3】**MySQL 8.0 原子 DDL**：DROP/TRUNCATE 等 DDL 操作支持原子性，失败时元数据可回滚，避免了早期版本“半完成”状态的数据字典损坏问题。
+- 【L3】**DELETE 后磁盘空间为什么不释放？**
+
+  → InnoDB 的 delete mark 只是标记删除，空间留给后续 INSERT 复用。要彻底回收需 `OPTIMIZE TABLE`（本质是重建表）。
+
+- 【L3】**MySQL 8.0 原子 DDL**
+
+  DROP/TRUNCATE 等 DDL 操作支持原子性，失败时元数据可回滚，避免了早期版本“半完成”状态的数据字典损坏问题。
 
 :::
 
@@ -533,8 +558,6 @@ JOIN 用于多表联合查询，条件用 `ON` 而非 `WHERE`。主要分为**�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "TRUNCATE 比 DELETE 快是因为不写日志" → TRUNCATE 也会记录 binlog，只是不写 undo log，且通过删除重建表文件实现，避免了逐行操作的开销。
 - ❌ "DELETE 后磁盘空间立即释放" → InnoDB 的 delete mark 只是标记，空间由后续 INSERT 复用，需 `OPTIMIZE TABLE` 才能回收。
@@ -649,9 +672,17 @@ mysql> select * from test;
 
 ::: details
 
-- 【L3】`DECIMAL(M,D)` 存储空间如何计算？MySQL 将整数与小数部分按每 9 位数字打包为 4 字节存储，`DECIMAL(18,2)` 约占用 8 字节——与 `BIGINT` 空间相当，但其运算是软件模拟的定点运算，远慢于 CPU 原生整型指令。
-- 【L4】应用层对应类型是 Java `BigDecimal`，同样有坑：`equals` 会连带比较精度位（`1.0` 与 `1.00` 判定不等），应使用 `compareTo`；除不尽时抛 `ArithmeticException`，必须显式指定舍入模式。
-- 【L4】跨境多币种场景下“分”并不通用：日元无小数位、巴林第纳尔为三位小数。业界方案是按 ISO 4217 的 minor unit 维护各币种最小单位，或统一最大精度后由应用层换算。
+- 【L3】`DECIMAL(M,D)` 存储空间如何计算？
+
+  MySQL 将整数与小数部分按每 9 位数字打包为 4 字节存储，`DECIMAL(18,2)` 约占用 8 字节——与 `BIGINT` 空间相当。但其运算是软件模拟的定点运算，远慢于 CPU 原生整型指令。
+
+- 【L4】整型存分后，应用层用 Java `BigDecimal` 接有什么坑？
+
+  同样有坑：`equals` 会连带比较精度位（`1.0` 与 `1.00` 判定不等），应使用 `compareTo`；除不尽时抛 `ArithmeticException`，必须显式指定舍入模式。
+
+- 【L4】跨境多币种场景下还能统一按“分”存吗？
+
+  不能。日元无小数位、巴林第纳尔为三位小数。业界方案是按 ISO 4217 的 minor unit 维护各币种最小单位，或统一最大精度后由应用层换算。
 
 > 📚 延伸阅读：[MySQL 如何选择 float, double, decimal](http://blog.leanote.com/post/weibo-007/mysql_float_double_decimal)
 
@@ -660,8 +691,6 @@ mysql> select * from test;
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "`FLOAT(10,2)` 保留两位小数就不会丢精度" → `(M,D)` 只是显示与存储约束，精度在十进制转二进制存储时已丢失。
 - ❌ "`DECIMAL` 精确，金额就该用 `DECIMAL`" → 忽略了高并发下的计算成本，以及不同资金量级下精度定义无法统一的问题。
@@ -854,8 +883,13 @@ IPv4 用 `INT UNSIGNED`（4 字节）配合 `INET_ATON()`/`INET_NTOA()` 转换�
 
 ::: details
 
-- 【L3】**为什么严禁 UUID 做主键？** → UUID 是随机值，插入位置分散，频繁引发页分裂和碎片；且 UUID（16 字节）比 BIGINT（8 字节）大，二级索引都会多存一份主键，额外放大存储开销。
-- 【L3】**为什么尽量 NOT NULL？** → NULL 值会使索引、索引统计、比较运算都变复杂；且 NULL 列需要额外存储空间。可以用 0、空字符串等默认值替代。
+- 【L3】**为什么严禁 UUID 做主键？**
+
+  → UUID 是随机值，插入位置分散，频繁引发页分裂和碎片；且 UUID（16 字节）比 BIGINT（8 字节）大，二级索引都会多存一份主键，额外放大存储开销。
+
+- 【L3】**为什么尽量 NOT NULL？**
+
+  → NULL 值会使索引、索引统计、比较运算都变复杂；且 NULL 列需要额外存储空间。可以用 0、空字符串等默认值替代。
 
 :::
 
@@ -911,8 +945,13 @@ InnoDB 的聚簇索引按主键顺序组织数据，数据页（16KB）内的记
 
 ::: details
 
-- 【L3】**页合并非自动**：删除记录产生的空间碎片不会自动归还操作系统，需要 `OPTIMIZE TABLE` 或 `ALTER TABLE ... ENGINE=InnoDB` 重建表。
-- 【L3】**自增主键并非万能**：分库分表场景全局自增不可行，需用分布式 ID；高并发插入下自增锁（`innodb_autoinc_lock_mode`）也需关注。
+- 【L3】**页合并非自动**
+
+  删除记录产生的空间碎片不会自动归还操作系统，需要 `OPTIMIZE TABLE` 或 `ALTER TABLE ... ENGINE=InnoDB` 重建表。
+
+- 【L3】**自增主键并非万能**
+
+  分库分表场景全局自增不可行，需用分布式 ID；高并发插入下自增锁（`innodb_autoinc_lock_mode`）也需关注。
 
 :::
 
@@ -981,9 +1020,21 @@ ALTER TABLE users ADD INDEX idx_name(name), ALGORITHM=INPLACE, LOCK=NONE;
 
 ::: details
 
-- 【L3】**INSTANT 的限制**：只支持加列、加默认值、修改列默认值等少数操作，不支持加索引、修改列类型。8.0.12 引入时 INSTANT 加列只能追加到表末尾；8.0.29 起放宽为支持任意位置加列与 DROP COLUMN（仍有行数/列数等限制）。
-- 【L4】**MDL 锁雪崩（最高频的 DDL 生产事故）**：DDL 需要获取 MDL（元数据锁）写锁。若此时存在**未提交的长事务**持有该表的 MDL 读锁，DDL 会被阻塞；而后续该表的**所有读写请求**又排队阻塞在 DDL 的 MDL 写锁申请之后，连接池被迅速打满，形成雪崩。防护：DDL 前查 `information_schema.innodb_trx` 清理未提交长事务；给 DDL 会话设置较小的 `lock_wait_timeout` 快速失败；避开大事务/批量作业时间窗口执行。
-- 【L4】**gh-ost vs pt-online-schema-change 原理差异**：优先原生 Online DDL，不支持或表过大时用外部工具。pt-OSC 在源表上创建**触发器**，将增量写入同步到影子表，触发器叠加在业务写路径上、开销更高；gh-ost **不用触发器**，伪装成从库拉取 **binlog** 做增量回放，可按主库负载自动限流，cut-over 阶段仅有秒级锁窗口。
+- 【L3】**INSTANT 的限制**
+
+  只支持加列、加默认值、修改列默认值等少数操作，不支持加索引、修改列类型。8.0.12 引入时 INSTANT 加列只能追加到表末尾；
+  8.0.29 起放宽为支持任意位置加列与 DROP COLUMN（仍有行数/列数等限制）。
+
+- 【L4】**MDL 锁雪崩（最高频的 DDL 生产事故）**
+
+  DDL 需要获取 MDL（元数据锁）写锁。若此时存在**未提交的长事务**持有该表的 MDL 读锁，DDL 会被阻塞；
+  而后续该表的**所有读写请求**又排队阻塞在 DDL 的 MDL 写锁申请之后，连接池被迅速打满，形成雪崩。防护：DDL 前查 `information_schema.innodb_trx` 清理未提交长事务；
+  给 DDL 会话设置较小的 `lock_wait_timeout` 快速失败；避开大事务/批量作业时间窗口执行。
+
+- 【L4】**gh-ost vs pt-online-schema-change 原理差异**
+
+  优先原生 Online DDL，不支持或表过大时用外部工具。pt-OSC 在源表上创建**触发器**，将增量写入同步到影子表，
+  触发器叠加在业务写路径上、开销更高；gh-ost **不用触发器**，伪装成从库拉取 **binlog** 做增量回放，可按主库负载自动限流，cut-over 阶段仅有秒级锁窗口。
 
 :::
 
@@ -993,7 +1044,11 @@ ALTER TABLE users ADD INDEX idx_name(name), ALGORITHM=INPLACE, LOCK=NONE;
 
 **千万级表加索引**：使用 `ALGORITHM=INPLACE, LOCK=NONE`，1000 万行表加索引约需 2-5 分钟（SSD），期间业务读写不受影响。若用 COPY 模式，同样操作可能锁表 30 分钟以上。
 
-**故障：DDL 引发 MDL 锁雪崩打满连接池**：某电商订单表（8000 万行）执行 `ALTER TABLE ... ADD INDEX` 时，一个**未提交的长事务**正持有该表的 MDL 读锁，DDL 排队等待 MDL 写锁，后续该表的所有查询又全部阻塞在 DDL 之后，雪崩持续 45 分钟。期间应用连接池（HikariCP，max=200）全部阻塞在获取连接上，上游网关超时率飙升至 30%。kill 长事务后 DDL 才真正开始执行，业务压力下又中途 kill DDL 线程，已构建的索引回滚耗时 15 分钟，业务中断共计 1 小时。**教训**：① DDL 前先排查并清理未提交长事务（`information_schema.innodb_trx`），并为 DDL 会话设置 `lock_wait_timeout` 快速失败；② 显式指定 `ALGORITHM=INPLACE, LOCK=NONE`（5.6+ 加索引默认即 INPLACE，显式指定可防止误判与版本差异）；③ 大表 DDL 先在从库验证耗时；④ 生产环境推荐 gh-ost（基于 binlog 增量同步，无触发器，cut-over 仅秒级锁窗口）。
+**故障：DDL 引发 MDL 锁雪崩打满连接池**：某电商订单表（8000 万行）执行 `ALTER TABLE ... ADD INDEX` 时，一个**未提交的长事务**正持有该表的 MDL 读锁，DDL 排队等待 MDL 写锁，
+后续该表的所有查询又全部阻塞在 DDL 之后，雪崩持续 45 分钟。期间应用连接池（HikariCP，max=200）全部阻塞在获取连接上，上游网关超时率飙升至 30%。kill 长事务后 DDL 才真正开始执行，
+业务压力下又中途 kill DDL 线程，已构建的索引回滚耗时 15 分钟，业务中断共计 1 小时。**教训**：① DDL 前先排查并清理未提交长事务（`information_schema.innodb_trx`），
+并为 DDL 会话设置 `lock_wait_timeout` 快速失败；② 显式指定 `ALGORITHM=INPLACE, LOCK=NONE`（5.6+ 加索引默认即 INPLACE，显式指定可防止误判与版本差异）；
+③ 大表 DDL 先在从库验证耗时；④ 生产环境推荐 gh-ost（基于 binlog 增量同步，无触发器，cut-over 仅秒级锁窗口）。
 
 :::
 
@@ -1281,10 +1336,30 @@ Buffer Pool 是 MySQL InnoDB 存储引擎的核心组件，它是数据库系统
 
 ::: details
 
-- 【L3】**量化参数**：Buffer Pool 大小由 `innodb_buffer_pool_size` 控制，生产环境通常设为物理内存的 60~80%。以 32GB 内存的数据库服务器为例，Buffer Pool 设为 20~24GB，可缓存约 130~150 万个数据页（每页 16KB）。命中率通常应 > 99%，低于 95% 说明 Buffer Pool 过小或存在大量全表扫描。
-- 【L3】**LRU 改进**：InnoDB 对传统 LRU 做了改进——将 LRU 链表分为 young（约 5/8）和 old（约 3/8）两部分，新读入的页先进 old 区，在 old 区存活超过 `innodb_old_blocks_time`（默认 1000ms）后才移到 young 区，防止全表扫描的一次性读取冲掉热数据。
-- 【L4】**脏页刷新机制**：数据页在 Buffer Pool 中被修改后成为「脏页」，须刷盘持久化。四种触发时机：① redo log 空间不足、checkpoint 必须推进时强制刷脏（此时用户线程会被明显拖慢，表现为写入卡顿）；② Buffer Pool 空闲页不足、淘汰时需要干净页；③ 后台线程定期刷新（自适应刷脏按 redo 生成速度与脏页比例动态调节刷盘速率）；④ MySQL 正常关闭。相关参数：`innodb_max_dirty_pages_pct`（8.0 默认 90）控制脏页占比上限；`innodb_io_capacity` 告知 InnoDB 磁盘可用 IOPS——默认 200 是按早期机械盘设定的，SSD/NVMe 上严重偏低，会导致刷脏不足、脏页堆积后集中爆发刷新引发性能抖动，必须按磁盘实际 IOPS 设置。
-- 【L4】**生产踩坑：Buffer Pool 预热** — MySQL 重启后 Buffer Pool 为空，冷启动期间大量请求穿透到磁盘，QPS 可能从数万跌到数千，持续数分钟直到缓存预热完成。MySQL 5.6+ 支持 Buffer Pool Dump/Load（`innodb_buffer_pool_dump_at_shutdown=ON` + `innodb_buffer_pool_load_at_startup=ON`），重启时自动加载上次缓存的热数据页，预热时间从 5~10 分钟缩短到秒级。
+- 【L3】**量化参数**
+
+  Buffer Pool 大小由 `innodb_buffer_pool_size` 控制，生产环境通常设为物理内存的 60~80%。以 32GB 内存的数据库服务器为例，
+  Buffer Pool 设为 20~24GB，可缓存约 130~150 万个数据页（每页 16KB）。命中率通常应 > 99%，低于 95% 说明 Buffer Pool 过小或存在大量全表扫描。
+
+- 【L3】**LRU 改进**
+
+  InnoDB 对传统 LRU 做了改进——将 LRU 链表分为 young（约 5/8）和 old（约 3/8）两部分，新读入的页先进 old 区，
+  在 old 区存活超过 `innodb_old_blocks_time`（默认 1000ms）后才移到 young 区，防止全表扫描的一次性读取冲掉热数据。
+
+- 【L4】**脏页刷新机制**
+
+  数据页在 Buffer Pool 中被修改后成为「脏页」，须刷盘持久化。四种触发时机：① redo log 空间不足、checkpoint 必须推进时强制刷脏（此时用户线程会被明显拖慢，表现为写入卡顿）；
+  ② Buffer Pool 空闲页不足、淘汰时需要干净页；③ 后台线程定期刷新（自适应刷脏按 redo 生成速度与脏页比例动态调节刷盘速率）；④ MySQL 正常关闭。
+
+  相关参数：`innodb_max_dirty_pages_pct`（8.0 默认 90）控制脏页占比上限；`innodb_io_capacity` 告知 InnoDB 磁盘可用 IOPS——默认 200 是按早期机械盘设定的，
+  SSD/NVMe 上严重偏低，会导致刷脏不足、脏页堆积后集中爆发刷新引发性能抖动，必须按磁盘实际 IOPS 设置。
+
+- 【L4】**生产踩坑
+
+  Buffer Pool 预热** — MySQL 重启后 Buffer Pool 为空，冷启动期间大量请求穿透到磁盘，QPS 可能从数万跌到数千，持续数分钟直到缓存预热完成。
+
+  MySQL 5.6+ 支持 Buffer Pool Dump/Load（`innodb_buffer_pool_dump_at_shutdown=ON` + `innodb_buffer_pool_load_at_startup=ON`），
+  重启时自动加载上次缓存的热数据页，预热时间从 5~10 分钟缩短到秒级。
 
 :::
 
@@ -1292,7 +1367,11 @@ Buffer Pool 是 MySQL InnoDB 存储引擎的核心组件，它是数据库系统
 
 ::: details
 
-生产案例：某电商核心库（MySQL 5.7，64GB 内存），Buffer Pool 初始配置为 8GB（默认值未调整），大促期间 QPS 从 2 万骤降到 3000，监控显示 Buffer Pool 命中率仅 72%，大量磁盘 I/O。根因：数据量 40GB 远超 Buffer Pool 容量，热数据无法全部缓存。修复：`innodb_buffer_pool_size` 调整到 48GB（75% 物理内存），命中率恢复到 99.5%，QPS 回升到 2.5 万。教训：Buffer Pool 大小是 MySQL 性能调优的第一参数，必须根据数据量调整，不能用默认值。
+生产案例：某电商核心库（MySQL 5.7，64GB 内存），Buffer Pool 初始配置为 8GB（默认值未调整），大促期间 QPS 从 2 万骤降到 3000，监控显示 Buffer Pool 命中率仅 72%，大量磁盘 I/O。
+
+根因：数据量 40GB 远超 Buffer Pool 容量，热数据无法全部缓存。修复：`innodb_buffer_pool_size` 调整到 48GB（75% 物理内存），命中率恢复到 99.5%，QPS 回升到 2.5 万。教训：
+
+Buffer Pool 大小是 MySQL 性能调优的第一参数，必须根据数据量调整，不能用默认值。
 
 :::
 
@@ -1346,9 +1425,18 @@ Change Buffer 是 InnoDB 的关键优化机制，主要**用于提高非唯一�
 
 ::: details
 
-- 【L3】**归属与崩溃安全**：Change Buffer 是 Buffer Pool 的一部分，属 **InnoDB 存储引擎层**特性（不是 Server 层组件）；其记录的变更会同步写入 redo log，因此宕机后尚未合并的变更仍可通过崩溃恢复找回。
-- 【L3】**为什么唯一索引用不了**：插入前必须校验唯一性，而校验需要把目标索引页读进 Buffer Pool——「避免读盘」的前提不复存在，缓冲也就没有收益。
-- 【L3】**合并欠账**：写多读少场景下变更可能长期堆积；当该页第一次被读取或后台线程合并时，需要一次性应用全部积压变更，可能造成首读延迟尖刺；正常关闭时也会执行合并。
+- 【L3】**归属与崩溃安全**
+
+  Change Buffer 是 Buffer Pool 的一部分，属 **InnoDB 存储引擎层**特性（不是 Server 层组件）；其记录的变更会同步写入 redo log，
+  因此宕机后尚未合并的变更仍可通过崩溃恢复找回。
+
+- 【L3】**为什么唯一索引用不了**
+
+  插入前必须校验唯一性，而校验需要把目标索引页读进 Buffer Pool——「避免读盘」的前提不复存在，缓冲也就没有收益。
+
+- 【L3】**合并欠账**
+
+  写多读少场景下变更可能长期堆积；当该页第一次被读取或后台线程合并时，需要一次性应用全部积压变更，可能造成首读延迟尖刺；正常关闭时也会执行合并。
 
 :::
 
@@ -1424,9 +1512,19 @@ MySQL 日志分为 Server 层和引擎层两类：Server 层包括**错误日志
 
 ::: details
 
-- 【L3】**为什么 binlog 不能用于崩溃恢复**：binlog 是逻辑日志，且不保证包含未提交事务的完整物理页信息；崩溃恢复依赖 redo log 的物理重放。反之，redo log 是循环写的固定空间，无法长期保留做时间点恢复，两者互补。
-- 【L3】**一致性保证**：正因为两套日志各司其职，InnoDB 通过**两阶段提交**（redo log prepare → 写 binlog → redo log commit）保证二者逻辑一致，否则主从复制和崩溃恢复会出现数据不一致。
-- 【L4】**既然 redo log 已保证持久性，为什么还需要 binlog？** 一是历史原因：binlog 属于 Server 层，早于 InnoDB 存在（MyISAM 时代就用于复制）；二是功能差异：redo log 循环覆盖无法长期保留，不能支撑时间点恢复、增量订阅（CDC）等生态。
+- 【L3】**为什么 binlog 不能用于崩溃恢复**
+
+  binlog 是逻辑日志，且不保证包含未提交事务的完整物理页信息；崩溃恢复依赖 redo log 的物理重放。反之，redo log 是循环写的固定空间，无法长期保留做时间点恢复，
+  两者互补。
+
+- 【L3】**一致性保证**
+
+  正因为两套日志各司其职，InnoDB 通过**两阶段提交**（redo log prepare → 写 binlog → redo log commit）保证二者逻辑一致，
+  否则主从复制和崩溃恢复会出现数据不一致。
+
+- 【L4】**既然 redo log 已保证持久性，为什么还需要 binlog？**
+
+  一是历史原因：binlog 属于 Server 层，早于 InnoDB 存在（MyISAM 时代就用于复制）；二是功能差异：redo log 循环覆盖无法长期保留，不能支撑时间点恢复、增量订阅（CDC）等生态。
 
 :::
 
@@ -1434,15 +1532,18 @@ MySQL 日志分为 Server 层和引擎层两类：Server 层包括**错误日志
 
 ::: details
 
-**故障：非「双 1」配置导致主从数据差异**：某支付系统主库为提升写入吞吐，将 `innodb_flush_log_at_trx_commit` 设为 2（redo log 只写 OS cache、每秒 fsync）、`sync_binlog` 设为非 1。一笔支付事务提交后，binlog 已 fsync 并传给从库回放成功；随后主库所在主机掉电，未刷盘的 redo log 丢失了该事务的记录，重启后崩溃恢复将其回滚——主库缺数据、从库多数据，对账发现 3 笔交易主从不一致。**修复**：① 改为「双 1」配置（`innodb_flush_log_at_trx_commit=1` + `sync_binlog=1`），依靠两阶段提交的崩溃恢复规则（redo prepare + binlog 完整 → 提交；redo prepare + binlog 缺失 → 回滚）保证 crash-safe；② 开启组提交（Group Commit）合并多个事务的 fsync，缓解双 1 的写入吞吐代价；③ 部署半同步复制缩小主从 binlog 差距窗口。**教训**：双 1 会牺牲部分写入吞吐，但它是崩溃恢复后主从一致的底线；「redo 丢、binlog 在」的场景下从库多出的数据无法靠主库自愈，只能人工对账回补。
+**故障：非「双 1」配置导致主从数据差异**：某支付系统主库为提升写入吞吐，将 `innodb_flush_log_at_trx_commit` 设为 2（redo log 只写 OS cache、
+每秒 fsync）、`sync_binlog` 设为非 1。一笔支付事务提交后，binlog 已 fsync 并传给从库回放成功；随后主库所在主机掉电，未刷盘的 redo log 丢失了该事务的记录，重启后崩溃恢复将其回滚——主库缺数据、
+从库多数据，对账发现 3 笔交易主从不一致。**修复**：① 改为「双 1」配置（`innodb_flush_log_at_trx_commit=1` + `sync_binlog=1`），
+依靠两阶段提交的崩溃恢复规则（redo prepare + binlog 完整 → 提交；redo prepare + binlog 缺失 → 回滚）保证 crash-safe；
+② 开启组提交（Group Commit）合并多个事务的 fsync，缓解双 1 的写入吞吐代价；③ 部署半同步复制缩小主从 binlog 差距窗口。**教训**：双 1 会牺牲部分写入吞吐，
+但它是崩溃恢复后主从一致的底线；「redo 丢、binlog 在」的场景下从库多出的数据无法靠主库自愈，只能人工对账回补。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "redo log 可以替代 binlog 做主从复制" → redo log 是 InnoDB 私有、循环覆盖的物理日志，无法被 Server 层和从库通用解析，也无法长期保留。
 - ❌ "binlog 记录的就是 SQL 语句" → 仅 STATEMENT 格式如此；生产主流的 ROW 格式记录的是行变更的前后镜像。
@@ -1513,9 +1614,22 @@ WAL 是一种通用技术，被广泛应用于各种数据库，但实现各有�
 
 ::: details
 
-- 【L3】**收益为什么这么大**：一次事务可能修改多个表空间的多个数据页，若直接写数据页，是分散的随机写。机械盘随机 IOPS 只有约 100~200，而顺序写吞吐可达 100~200MB/s，差 2~3 个数量级；SSD 虽无寻道开销，但随机小写会加剧闪存 GC（垃圾回收）写放大。WAL 把持久化路径收敛为「日志顺序追加 + fsync」，数据页改由后台线程异步刷脏，随机写从提交关键路径上消失。
-- 【L3】**为什么「先写日志再延后写数据页」是安全的**：redo log 是物理日志，记录「某表空间某页某偏移做了什么修改」，且**先于脏页刷盘**（checkpoint 机制保证：页刷盘前其 redo 必已落盘）。崩溃后从最近 checkpoint 重放 redo，即可把未刷盘的页修改补齐——数据页晚写、漏写都能恢复。
-- 【L3】**三份日志的职责必须分清**：redo log 是 InnoDB 层**物理日志**，保证崩溃恢复（持久性）；binlog 是 Server 层**逻辑日志**（STATEMENT 记 SQL 原文 / ROW 记行变更 / MIXED 混合），用于归档与主从复制；undo log 是**逻辑日志**（记录反向操作），用于事务回滚与 MVCC 多版本读。面试答「WAL 就是 binlog」或混淆三者职责是典型减分点。
+- 【L3】**收益为什么这么大**
+
+  一次事务可能修改多个表空间的多个数据页，若直接写数据页，是分散的随机写。机械盘随机 IOPS 只有约 100~200，而顺序写吞吐可达 100~200MB/s，差 2~3 个数量级；
+  SSD 虽无寻道开销，但随机小写会加剧闪存 GC（垃圾回收）写放大。WAL 把持久化路径收敛为「日志顺序追加 + fsync」，数据页改由后台线程异步刷脏，随机写从提交关键路径上消失。
+
+- 【L3】**为什么「先写日志再延后写数据页」是安全的**
+
+  redo log 是物理日志，记录「某表空间某页某偏移做了什么修改」，且**先于脏页刷盘**（checkpoint 机制保证：页刷盘前其 redo 必已落盘）。
+
+  崩溃后从最近 checkpoint 重放 redo，即可把未刷盘的页修改补齐——数据页晚写、漏写都能恢复。
+
+- 【L3】**三份日志的职责必须分清**
+
+  redo log 是 InnoDB 层**物理日志**，保证崩溃恢复（持久性）；
+  binlog 是 Server 层**逻辑日志**（STATEMENT 记 SQL 原文 / ROW 记行变更 / MIXED 混合），用于归档与主从复制；undo log 是**逻辑日志**（记录反向操作），
+  用于事务回滚与 MVCC 多版本读。面试答「WAL 就是 binlog」或混淆三者职责是典型减分点。
 
 :::
 
@@ -1563,10 +1677,27 @@ Redo Log 由固定大小的文件组成（如 ib_logfile0、ib_logfile1），循
 
 ::: details
 
-- 【L3】**量化对比**：以 SSD 磁盘为例，`innodb_flush_log_at_trx_commit=1`（每次 fsync）的写入延迟约 0.1~0.5ms/次（SSD fsync 延迟），单线程写入吞吐约 2000~5000 TPS；`=2`（每秒 fsync）吞吐可提升到 1~3 万 TPS（批量 fsync），但崩溃可能丢 1 秒数据；`=0`（每秒 fsync）吞吐最高，但 MySQL 进程崩溃（非 OS 崩溃）也可能丢 1 秒数据。HDD 场景下 fsync 延迟约 5~15ms，`=1` 的吞吐仅 60-200 TPS，差距更显著。
-- 【L3】**组提交优化**：MySQL 5.6+ 引入组提交（Group Commit），多个事务的 fsync 合并为一次磁盘 IO，显著降低 `=1` 模式的性能损耗。高并发场景下，组提交可将 `=1` 的吞吐从 5000 TPS 提升到 2~3 万 TPS，接近 `=2` 的性能。
-- 【L3】**「双 1」组合**：redo 的 `innodb_flush_log_at_trx_commit=1` 通常与 binlog 的 `sync_binlog=1` 成对讨论，合称「双 1」——每次提交至少 2 次 fsync（redo 一次 + binlog 一次），最安全但提交开销最大；非双 1（如 `2` / `1000`）在掉电时分别丢最近约 1 秒或最近约 1000 个事务的日志。**组提交是救双 1 吞吐的正解**：把 N 个并发事务的 N 次 fsync 摊薄成 1 次，还可用 `binlog_group_commit_sync_delay` 主动等待一小段时间攒更大的组。
-- 【L4】**生产选型建议**：金融核心系统用 `=1` + 组提交（MySQL 5.6+）；通用业务用 `=2`（崩溃丢 1 秒数据可接受）；日志/监控类用 `=0`。
+- 【L3】**量化对比**
+
+  以 SSD 磁盘为例，`innodb_flush_log_at_trx_commit=1`（每次 fsync）的写入延迟约 0.1~0.5ms/次（SSD fsync 延迟），
+  单线程写入吞吐约 2000~5000 TPS；`=2`（每秒 fsync）吞吐可提升到 1~3 万 TPS（批量 fsync），但崩溃可能丢 1 秒数据；`=0`（每秒 fsync）吞吐最高，
+  但 MySQL 进程崩溃（非 OS 崩溃）也可能丢 1 秒数据。HDD 场景下 fsync 延迟约 5~15ms，`=1` 的吞吐仅 60-200 TPS，差距更显著。
+
+- 【L3】**组提交优化**
+
+  MySQL 5.6+ 引入组提交（Group Commit），多个事务的 fsync 合并为一次磁盘 IO，显著降低 `=1` 模式的性能损耗。高并发场景下，
+  组提交可将 `=1` 的吞吐从 5000 TPS 提升到 2~3 万 TPS，接近 `=2` 的性能。
+
+- 【L3】**「双 1」组合**
+
+  redo 的 `innodb_flush_log_at_trx_commit=1` 通常与 binlog 的 `sync_binlog=1` 成对讨论，合称「双 1」——
+  每次提交至少 2 次 fsync（redo 一次 + binlog 一次），最安全但提交开销最大；非双 1（如 `2` / `1000`）在掉电时分别丢最近约 1 秒或最近约 1000 个事务的日志。**组提交是救双 1 吞吐的正解**：
+
+  把 N 个并发事务的 N 次 fsync 摊薄成 1 次，还可用 `binlog_group_commit_sync_delay` 主动等待一小段时间攒更大的组。
+
+- 【L4】**生产选型建议**
+
+  金融核心系统用 `=1` + 组提交（MySQL 5.6+）；通用业务用 `=2`（崩溃丢 1 秒数据可接受）；日志/监控类用 `=0`。
 
 :::
 
@@ -1574,7 +1705,10 @@ Redo Log 由固定大小的文件组成（如 ib_logfile0、ib_logfile1），循
 
 ::: details
 
-生产案例：某支付系统 MySQL 5.6，`innodb_flush_log_at_trx_commit=1`，高峰期 TPS 仅 3000，数据库 CPU 80%+，瓶颈在 fsync。升级 MySQL 8.0 后启用组提交 + `innodb_flush_method=O_DIRECT`（绕过 OS 页缓存直接写磁盘，避免数据在 OS cache 与 Buffer Pool 中双份缓存），TPS 提升到 1.5 万，CPU 降到 40%。教训：刷盘策略的性能影响巨大，但安全与性能的取舍必须结合业务容忍度——支付场景不能降为 `=2`，只能靠组提交和硬件优化。
+生产案例：某支付系统 MySQL 5.6，`innodb_flush_log_at_trx_commit=1`，高峰期 TPS 仅 3000，数据库 CPU 80%+，瓶颈在 fsync。
+
+升级 MySQL 8.0 后启用组提交 + `innodb_flush_method=O_DIRECT`（绕过 OS 页缓存直接写磁盘，避免数据在 OS cache 与 Buffer Pool 中双份缓存），TPS 提升到 1.5 万，
+CPU 降到 40%。教训：刷盘策略的性能影响巨大，但安全与性能的取舍必须结合业务容忍度——支付场景不能降为 `=2`，只能靠组提交和硬件优化。
 
 :::
 
@@ -1631,9 +1765,25 @@ redo log 和 binlog 是两套独立日志，两份日志的写入无法原子完
 
 ::: details
 
-- 【L3】**性能代价**：两阶段提交将一次写操作拆为 redo prepare → binlog write+fsync → redo commit 三步，额外增加 1 次 binlog fsync 的磁盘 IO。SSD 场景下约增加 0.1~0.5ms 延迟，HDD 场景下约增加 5~15ms。MySQL 5.6+ 通过组提交（Group Commit）将多个事务的 binlog fsync 合并，高并发下性能损耗从 30~50% 降到 5~10%。
-- 【L3】**binlog 格式与两阶段提交的关系**：binlog 有三种格式——STATEMENT（记录 SQL 原文）、ROW（记录行变更）、MIXED（混合）。ROW 格式是两阶段提交的正确搭配（STATEMENT 有非确定性函数问题），也是 MySQL 5.7+ 的默认格式。
-- 【L4】**生产踩坑：两阶段提交与主从延迟** — 某系统 MySQL 5.6 使用两阶段提交，高峰期 binlog fsync 成为瓶颈，主库 TPS 从 2 万降到 8000，从库延迟从秒级涨到分钟级。根因：单线程 binlog fsync 串行化。修复：升级 MySQL 8.0 启用组提交 + `binlog_group_commit_sync_delay=0`（不等待组提交延迟，立即 fsync）+ `binlog_group_commit_sync_no_delay_count=0`，TPS 恢复到 1.8 万。
+- 【L3】**性能代价**
+
+  两阶段提交将一次写操作拆为 redo prepare → binlog write+fsync → redo commit 三步，额外增加 1 次 binlog fsync 的磁盘 IO。
+
+  SSD 场景下约增加 0.1~0.5ms 延迟，HDD 场景下约增加 5~15ms。MySQL 5.6+ 通过组提交（Group Commit）将多个事务的 binlog fsync 合并，
+  高并发下性能损耗从 30~50% 降到 5~10%。
+
+- 【L3】**binlog 格式与两阶段提交的关系**
+
+  binlog 有三种格式——STATEMENT（记录 SQL 原文）、ROW（记录行变更）、MIXED（混合）。
+
+  ROW 格式是两阶段提交的正确搭配（STATEMENT 有非确定性函数问题），也是 MySQL 5.7+ 的默认格式。
+
+- 【L4】**生产踩坑
+
+  两阶段提交与主从延迟** — 某系统 MySQL 5.6 使用两阶段提交，高峰期 binlog fsync 成为瓶颈，主库 TPS 从 2 万降到 8000，从库延迟从秒级涨到分钟级。根因：
+
+  单线程 binlog fsync 串行化。修复：升级 MySQL 8.0 启用组提交 + `binlog_group_commit_sync_delay=0`（不等待组提交延迟，
+  立即 fsync）+ `binlog_group_commit_sync_no_delay_count=0`，TPS 恢复到 1.8 万。
 
 :::
 
@@ -1657,15 +1807,16 @@ redo log 和 binlog 是两套独立日志，两份日志的写入无法原子完
 
 ::: details
 
-生产案例：某电商平台 MySQL 5.7 主从架构，运维人员误将 `sync_binlog` 设为 0（不刷盘）以提升性能。某次主库 OS 崩溃后，从库通过 binlog 恢复发现缺少最近 3 秒的事务（约 500 笔订单），而主库 redo log 中这些事务已 commit。根因：`sync_binlog=0` 时 binlog 写 OS 缓存但不 fsync，OS 崩溃导致缓存中 binlog 丢失，两阶段提交的 binlog 仲裁失效。修复：`sync_binlog=1`（每次事务提交都 fsync binlog）+ 开启组提交降低性能影响，崩溃后数据一致性得到保证。
+生产案例：某电商平台 MySQL 5.7 主从架构，运维人员误将 `sync_binlog` 设为 0（不刷盘）以提升性能。某次主库 OS 崩溃后，从库通过 binlog 恢复发现缺少最近 3 秒的事务（约 500 笔订单），
+而主库 redo log 中这些事务已 commit。根因：`sync_binlog=0` 时 binlog 写 OS 缓存但不 fsync，OS 崩溃导致缓存中 binlog 丢失，两阶段提交的 binlog 仲裁失效。
+
+修复：`sync_binlog=1`（每次事务提交都 fsync binlog）+ 开启组提交降低性能影响，崩溃后数据一致性得到保证。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "两阶段提交是为了保证主从数据一致" → 目的说反了因果。它保证的是**本机 redo log 与 binlog 两份日志的逻辑一致**，让崩溃恢复时事务不丢不错；主从复制消费 binlog，日志一致后主从一致只是下游结果。没有从库的单机 MySQL 同样需要两阶段提交。
 - ❌ "崩溃后 prepare 状态的事务一律回滚" → 时刻 ③（binlog 已写完整、redo 未 commit）崩溃时，恢复流程会按 XID 找到完整 binlog 并**提交**该事务，否则已发给下游的 binlog 就成了无中生有。
@@ -1777,10 +1928,23 @@ MySQL 复制基于 **binlog** 实现，异步复制由三个线程完成：
 
 ::: details
 
-- 【L3】**GTID 复制**（5.6+）：每个事务带全局唯一 ID，主从切换时新主自动识别未执行的 GTID 继续拉取，是现代 MySQL 高可用的标配。
-- 【L3】**并行复制演进**：5.6 前从库单线程回放 → 5.6 按库并行（同库内仍串行）→ 5.7 LOGICAL_CLOCK（按组提交并行）→ 5.7.22+/8.0 WRITESET（`binlog_transaction_dependency_tracking=WRITESET`，按行冲突判断，不冲突的事务即可并行，并行度最高）。
-- 【L3】**半同步的两种模式**：AFTER_SYNC（5.7 默认，无损复制）优于 AFTER_COMMIT（存在幻读窗口）。
-- 【L4】**半同步的两个坑**：① `rpl_semi_sync_master_timeout`（默认 10s）超时后**自动退化为异步**，退化窗口内的主库宕机仍会丢数据，且退化是静默的，必须监控 `Rpl_semi_sync_master_status`；② AFTER_SYNC 模式下主库在等从库 ACK 期间，事务停在引擎提交前，**后续事务的提交也会被拖住**——从库网卡一下，主库写入吞吐整体抖动。
+- 【L3】**GTID 复制**（5.6+）
+
+  每个事务带全局唯一 ID，主从切换时新主自动识别未执行的 GTID 继续拉取，是现代 MySQL 高可用的标配。
+
+- 【L3】**并行复制演进**
+
+  5.6 前从库单线程回放 → 5.6 按库并行（同库内仍串行）→ 5.7 LOGICAL_CLOCK（按组提交并行）→
+   5.7.22+/8.0 WRITESET（`binlog_transaction_dependency_tracking=WRITESET`，按行冲突判断，不冲突的事务即可并行，并行度最高）。
+
+- 【L3】**半同步的两种模式**
+
+  AFTER_SYNC（5.7 默认，无损复制）优于 AFTER_COMMIT（存在幻读窗口）。
+
+- 【L4】**半同步的两个坑**
+
+  ① `rpl_semi_sync_master_timeout`（默认 10s）超时后**自动退化为异步**，退化窗口内的主库宕机仍会丢数据，且退化是静默的，
+  必须监控 `Rpl_semi_sync_master_status`；② AFTER_SYNC 模式下主库在等从库 ACK 期间，事务停在引擎提交前，**后续事务的提交也会被拖住**——从库网卡一下，主库写入吞吐整体抖动。
 
 :::
 
@@ -1807,7 +1971,12 @@ MySQL 复制基于 **binlog** 实现，异步复制由三个线程完成：
 
 ::: details
 
-**故障：异步复制丢数据导致资金差异**：某互联网金融平台采用 1 主 2 从异步复制，主库 TPS ~5000。一次主库服务器断电重启后，发现从库比主库少了 47 个事务（约 2 秒的写入量），其中包含 3 笔转账确认（共 ¥85 万）。**排查**：主库崩溃时 binlog 已写入但尚未发送到从库，异步复制的 `rpl_semi_sync` 未开启，这 47 个事务的 binlog 事件还在主库的发送缓冲区中。**修复**：① 开启半同步复制（`rpl_semi_sync_master_wait_point=AFTER_SYNC`），确保至少 1 个从库确认收到 binlog 后才向客户端返回 commit 成功；② 开启 GTID 模式，故障转移时从库自动追平。**教训**：异步复制的丢数据窗口 = binlog 发送延迟（通常 1-3 秒），涉及资金的场景必须用半同步或 MGR。
+**故障：异步复制丢数据导致资金差异**：某互联网金融平台采用 1 主 2 从异步复制，主库 TPS ~5000。一次主库服务器断电重启后，发现从库比主库少了 47 个事务（约 2 秒的写入量），其中包含 3 笔转账确认（共 ¥85 万）。
+
+**排查**：主库崩溃时 binlog 已写入但尚未发送到从库，异步复制的 `rpl_semi_sync` 未开启，这 47 个事务的 binlog 事件还在主库的发送缓冲区中。**修复**：
+
+① 开启半同步复制（`rpl_semi_sync_master_wait_point=AFTER_SYNC`），确保至少 1 个从库确认收到 binlog 后才向客户端返回 commit 成功；② 开启 GTID 模式，
+故障转移时从库自动追平。**教训**：异步复制的丢数据窗口 = binlog 发送延迟（通常 1-3 秒），涉及资金的场景必须用半同步或 MGR。
 
 :::
 
@@ -1864,9 +2033,21 @@ MySQL 复制基于 **binlog** 实现，异步复制由三个线程完成：
 
 ::: details
 
-- 【L3】**延迟的根因链**：主库并发写、从库回放能力不足是本质矛盾。回放并行度演进：单线程（5.6 前）→ 按库并行（5.6，同库串行）→ LOGICAL_CLOCK（5.7，同组提交的事务可并行）→ **WRITESET（5.7.22+/8.0，`binlog_transaction_dependency_tracking=WRITESET`，只要修改的行不冲突即可并行，并行度与主库写入模式解耦）**。大事务/大表 DDL 是不可并行化的长尾，必须业务侧拆分。
-- 【L3】**摘除延迟从库**：读写分离中间件（如 ProxySQL）支持 `max_replica_lag`，从库延迟超过阈值自动从读流量池摘除，追平后回归——把「读到旧数据」的窗口从业务层兜底前移到路由层。
-- 【L4】**一致性手段的分层选型**：强一致读 → 强制走主（ShardingSphere HintManager / 中间件读写分离标记）；准实时 → 半同步复制 AFTER_SYNC（主库等至少一个从库 ACK 才返回，注意超时退化为异步的坑）；容忍秒级 → 异步 + 延迟监控告警。三档对应不同的提交延迟与丢数风险，P8 面试要能按业务场景分层论证而不是只答「走主库」。
+- 【L3】**延迟的根因链**
+
+  主库并发写、从库回放能力不足是本质矛盾。回放并行度演进：单线程（5.6 前）→ 按库并行（5.6，同库串行）→ LOGICAL_CLOCK（5.7，
+  同组提交的事务可并行）→ **WRITESET（5.7.22+/8.0，`binlog_transaction_dependency_tracking=WRITESET`，只要修改的行不冲突即可并行，并行度与主库写入模式解耦）**。
+
+  大事务/大表 DDL 是不可并行化的长尾，必须业务侧拆分。
+
+- 【L3】**摘除延迟从库**
+
+  读写分离中间件（如 ProxySQL）支持 `max_replica_lag`，从库延迟超过阈值自动从读流量池摘除，追平后回归——把「读到旧数据」的窗口从业务层兜底前移到路由层。
+
+- 【L4】**一致性手段的分层选型**
+
+  强一致读 → 强制走主（ShardingSphere HintManager / 中间件读写分离标记）；准实时 → 半同步复制 AFTER_SYNC（主库等至少一个从库 ACK 才返回，
+  注意超时退化为异步的坑）；容忍秒级 → 异步 + 延迟监控告警。三档对应不同的提交延迟与丢数风险，P8 面试要能按业务场景分层论证而不是只答「走主库」。
 
 :::
 
@@ -1889,7 +2070,15 @@ MySQL 复制基于 **binlog** 实现，异步复制由三个线程完成：
 
 ::: details
 
-生产案例：某电商平台（MySQL 8.0.32，主从架构 1 主 3 从）每日凌晨 00:00 执行日终结算批处理，单次批处理约 2 小时、涉及 800 万行 UPDATE。00:30 起监控告警 `Seconds_Behind_Master` 从正常值 < 1s 飙升至 35 分钟，业务侧反映用户转账后从库读取余额显示为 0。排查过程：`SHOW SLAVE STATUS` 确认 SQL thread 单线程回放，`relay-log` 堆积 12GB；进一步分析 binlog 发现结算事务为单一大事务（binlog event group 持续 2 小时），单线程 SQL thread 回放速度仅 2000 rows/s，远低于 master 写入速度 8000 rows/s。根因：单线程复制无法并行化大批量写入，且未限制批处理大小。修复：① 将批处理拆分为每批 1000 行 + sleep 100ms，写入峰值从 8000 rows/s 降至 3000 rows/s；② 从库配置 `slave_parallel_workers=8`，复制模式切换为 `LOGICAL_CLOCK`，回放吞吐提升约 4 倍；③ DDL 变更统一使用 `pt-online-schema-change` 避免元数据锁阻塞回放。修复后延迟稳定在 < 2s，结算窗口内不再触发告警。
+生产案例：某电商平台（MySQL 8.0.32，主从架构 1 主 3 从）每日凌晨 00:00 执行日终结算批处理，单次批处理约 2 小时、涉及 800 万行 UPDATE。
+
+00:30 起监控告警 `Seconds_Behind_Master` 从正常值 < 1s 飙升至 35 分钟，业务侧反映用户转账后从库读取余额显示为 0。
+
+排查过程：`SHOW SLAVE STATUS` 确认 SQL thread 单线程回放，`relay-log` 堆积 12GB；进一步分析 binlog 发现结算事务为单一大事务（binlog event group 持续 2 小时），
+单线程 SQL thread 回放速度仅 2000 rows/s，远低于 master 写入速度 8000 rows/s。根因：单线程复制无法并行化大批量写入，且未限制批处理大小。修复：
+
+① 将批处理拆分为每批 1000 行 + sleep 100ms，写入峰值从 8000 rows/s 降至 3000 rows/s；② 从库配置 `slave_parallel_workers=8`，
+复制模式切换为 `LOGICAL_CLOCK`，回放吞吐提升约 4 倍；③ DDL 变更统一使用 `pt-online-schema-change` 避免元数据锁阻塞回放。修复后延迟稳定在 < 2s，结算窗口内不再触发告警。
 
 :::
 
@@ -1932,10 +2121,25 @@ CDC 即实时捕获数据库中的数据变更（增删改），并同步到其�
 
 ::: details
 
-- 【L3】**正解是 binlog 订阅而非查询轮询**：Canal/Debezium 把自己**伪装成 MySQL slave**，向主库发送 dump 协议请求拉取 binlog。相比定时 `SELECT ... WHERE update_time > ?` 轮询：不漏删除事件（DELETE 后行已不在表里，轮询永远查不到）、不产生周期性全表扫描压力、延迟从分钟级降到秒级/毫秒级。
-- 【L3】**ROW 格式是 CDC 的前提**：STATEMENT 格式只记 SQL 原文，丢失变更前镜像（before image），下游无法知道「改之前是什么」；ROW 格式记录每行变更前后完整镜像。`binlog_row_image=FULL`（默认）给出全部列，`MINIMAL` 只给主键 + 变更列——下游若依赖旧值做缓存失效/审计，MINIMAL 会直接打断链路，选型时必须确认。
-- 【L4】**顺序性保证**：同一主键的变更必须有序消费（先 UPDATE 后 DELETE 反了就是数据错误）。工程做法是按主键 hash 分区投递 Kafka，保证同键单分区有序；全局有序则牺牲并行度。
-- 【L4】**全量 + 增量的衔接**：首次同步 = 一致性快照全量 + 从快照位点续读增量。Debezium/Flink CDC 用快照开始时的 binlog 位点（或 GTID）做衔接点，快照期间的变更在增量阶段重放收敛；衔接点选错会导致丢变更或重复变更（下游需幂等）。
+- 【L3】**正解是 binlog 订阅而非查询轮询**
+
+  Canal/Debezium 把自己**伪装成 MySQL slave**，向主库发送 dump 协议请求拉取 binlog。
+
+  相比定时 `SELECT ... WHERE update_time > ?` 轮询：不漏删除事件（DELETE 后行已不在表里，轮询永远查不到）、不产生周期性全表扫描压力、延迟从分钟级降到秒级/毫秒级。
+
+- 【L3】**ROW 格式是 CDC 的前提**
+
+  STATEMENT 格式只记 SQL 原文，丢失变更前镜像（before image），下游无法知道「改之前是什么」；
+  ROW 格式记录每行变更前后完整镜像。`binlog_row_image=FULL`（默认）给出全部列，`MINIMAL` 只给主键 + 变更列——下游若依赖旧值做缓存失效/审计，MINIMAL 会直接打断链路，选型时必须确认。
+
+- 【L4】**顺序性保证**
+
+  同一主键的变更必须有序消费（先 UPDATE 后 DELETE 反了就是数据错误）。工程做法是按主键 hash 分区投递 Kafka，保证同键单分区有序；全局有序则牺牲并行度。
+
+- 【L4】**全量 + 增量的衔接**
+
+  首次同步 = 一致性快照全量 + 从快照位点续读增量。Debezium/Flink CDC 用快照开始时的 binlog 位点（或 GTID）做衔接点，快照期间的变更在增量阶段重放收敛；
+  衔接点选错会导致丢变更或重复变更（下游需幂等）。
 
 :::
 
@@ -2031,22 +2235,52 @@ SQL 查询从 **FROM** 开始执行，每个步骤为下一步生成虚拟表。
 #### 🔬 扩展知识
 
 ::: details L3：优化器代价模型
-MySQL 优化器基于**代价模型（Cost Model）**选择执行计划，代价 = I/O 代价 + CPU 代价。I/O 代价评估从磁盘或 buffer pool 读取数据页的开销（磁盘 I/O 权重远大于内存访问）；CPU 代价评估行比较、排序、聚合等计算开销。8.0 的代价常数存放在 `mysql.server_cost` / `mysql.innodb_cost` 表中，可按环境校准。优化器依赖 `mysql.innodb_table_stats` 和 `mysql.innodb_index_stats` 中的统计信息（行数、索引基数、数据分布）来估算各路径代价。对于多表 JOIN，优化器评估不同表顺序的笛卡尔积代价，选择估算代价最低的路径——这也是为什么小表驱动大表通常更优。统计信息的准确性直接决定执行计划质量，`ANALYZE TABLE` 可手动刷新统计信息。
+
+MySQL 优化器基于**代价模型（Cost Model）**选择执行计划，代价 = I/O 代价 + CPU 代价。I/O 代价评估从磁盘或 buffer pool 读取数据页的开销（磁盘 I/O 权重远大于内存访问）；
+CPU 代价评估行比较、排序、聚合等计算开销。8.0 的代价常数存放在 `mysql.server_cost` / `mysql.innodb_cost` 表中，可按环境校准。
+
+优化器依赖 `mysql.innodb_table_stats` 和 `mysql.innodb_index_stats` 中的统计信息（行数、索引基数、数据分布）来估算各路径代价。对于多表 JOIN，优化器评估不同表顺序的笛卡尔积代价，
+选择估算代价最低的路径——这也是为什么小表驱动大表通常更优。统计信息的准确性直接决定执行计划质量，`ANALYZE TABLE` 可手动刷新统计信息。
+
 :::
 
 ::: details L3：统计信息来自采样，倾斜时必然失真
-InnoDB 的索引基数（cardinality）不是精确值，而是**采样估算**：默认对 20 个页采样（`innodb_stats_persistent_sample_pages`，8.0 可动态调整）。数据分布倾斜时（如 `status=1` 占 40% 行），采样结果与真实选择率偏差巨大 → 优化器选错索引。手段分层：`ANALYZE TABLE` 重采样（首选）→ `FORCE INDEX` 硬指定（治标，索引变更后是隐患）→ 改写 SQL 引导（如让 `ORDER BY` 与索引顺序对齐消除 filesort）→ **invisible index（8.0）**：想下线一个索引前先设为不可见，优化器不再使用但索引仍在维护，验证无回归后再真正删除——比直接 `DROP INDEX` 安全得多的灰度手段。
+
+InnoDB 的索引基数（cardinality）不是精确值，而是**采样估算**：默认对 20 个页采样（`innodb_stats_persistent_sample_pages`，8.0 可动态调整）。
+
+数据分布倾斜时（如 `status=1` 占 40% 行），采样结果与真实选择率偏差巨大 → 优化器选错索引。手段分层：`ANALYZE TABLE` 重采样（首选）→ `FORCE INDEX` 硬指定（治标，
+索引变更后是隐患）→ 改写 SQL 引导（如让 `ORDER BY` 与索引顺序对齐消除 filesort）→ **invisible index（8.0）**：想下线一个索引前先设为不可见，优化器不再使用但索引仍在维护，
+验证无回归后再真正删除——比直接 `DROP INDEX` 安全得多的灰度手段。
+
 :::
 
 ::: details L4：Handler API 与执行器交互
-执行器通过 **Handler API**（存储引擎接口层）与 InnoDB 交互，核心接口包括 `ha_open`（打开表）、`index_read`（索引扫描）、`general_fetch`（获取下一行）等。InnoDB 实现了 `ha_innodb.cc` 中约 200+ 个 Handler 方法，支持事务、行锁、MVCC 等特性；而 MyISAM 的 Handler 不支持事务但全表扫描更快。执行器在 Handler API 之上封装了 **Volcano 迭代器模型**——每个算子（扫描、JOIN、排序）实现 `open()`/`next()`/`close()` 接口，调用 `next()` 时数据像流水线一样逐行向上传递。MySQL 8.0 开始部分场景用**批量迭代器**替代逐行模式，减少函数调用开销，JOIN 场景吞吐提升 10%-30%。
+
+执行器通过 **Handler API**（存储引擎接口层）与 InnoDB 交互，核心接口包括 `ha_open`（打开表）、`index_read`（索引扫描）、`general_fetch`（获取下一行）等。
+
+InnoDB 实现了 `ha_innodb.cc` 中约 200+ 个 Handler 方法，支持事务、行锁、MVCC 等特性；而 MyISAM 的 Handler 不支持事务但全表扫描更快。
+
+执行器在 Handler API 之上封装了 **Volcano 迭代器模型**——每个算子（扫描、JOIN、排序）实现 `open()`/`next()`/`close()` 接口，调用 `next()` 时数据像流水线一样逐行向上传递。
+
+MySQL 8.0 开始部分场景用**批量迭代器**替代逐行模式，减少函数调用开销，JOIN 场景吞吐提升 10%-30%。
+
 :::
 
 #### 🏭 实战场景
 
 ::: details
 
-**故障：优化器选错索引导致全表扫描**：某订单系统查询 `SELECT * FROM orders WHERE status = 1 AND create_time > '2026-01-01' ORDER BY create_time DESC LIMIT 20`，表数据量 2000 万行，有 `idx_status` 和 `idx_create_time` 两个单列索引。线上 P99 延迟从 50ms 突然飙升至 2s。**排查**：`EXPLAIN` 显示优化器选择了 `idx_status`（因为 `status=1` 的区分度低，匹配 800 万行），回表 800 万行后内存排序取 Top 20。**根因**：前一天运营批量更新了 500 万条订单的 status，导致 `mysql.innodb_table_stats` 中的索引基数统计信息过期，优化器误判 `idx_status` 的选择率。**修复**：① `ANALYZE TABLE orders` 刷新统计信息，P99 恢复到 80ms；② 新建联合索引 `idx_status_time(status, create_time)` 彻底解决；③ 设置 `innodb_stats_persistent=ON` 持久化统计信息，避免重启后丢失。**教训**：数据分布剧烈变化后必须及时 `ANALYZE TABLE`，联合索引的区分度远高于单列索引。
+**故障：优化器选错索引导致全表扫描**：
+
+某订单系统查询 `SELECT * FROM orders WHERE status = 1 AND create_time > '2026-01-01' ORDER BY create_time DESC LIMIT 20`，
+表数据量 2000 万行，有 `idx_status` 和 `idx_create_time` 两个单列索引。线上 P99 延迟从 50ms 突然飙升至 2s。
+
+**排查**：`EXPLAIN` 显示优化器选择了 `idx_status`（因为 `status=1` 的区分度低，匹配 800 万行），回表 800 万行后内存排序取 Top 20。**根因**：
+
+前一天运营批量更新了 500 万条订单的 status，导致 `mysql.innodb_table_stats` 中的索引基数统计信息过期，优化器误判 `idx_status` 的选择率。**修复**：
+
+① `ANALYZE TABLE orders` 刷新统计信息，P99 恢复到 80ms；② 新建联合索引 `idx_status_time(status, create_time)` 彻底解决；
+③ 设置 `innodb_stats_persistent=ON` 持久化统计信息，避免重启后丢失。**教训**：数据分布剧烈变化后必须及时 `ANALYZE TABLE`，联合索引的区分度远高于单列索引。
 
 :::
 
@@ -2113,10 +2347,23 @@ graph TB
 
 ::: details
 
-- 【L3】**崩溃恢复规则**：redo log 处于 prepare 状态时，若 binlog 完整（含 Xid 事件）则提交事务，否则回滚——这正是两阶段提交保证两套日志一致的核心机制。
-- 【L3】**为什么 redo log 要分 prepare/commit 两步？** 若先 commit redo 再写 binlog，写 binlog 前崩溃会导致主库有数据而从库没有；反之亦然。两阶段让 binlog 充当崩溃恢复时的"仲裁者"。
-- 【L4】**WAL 的代价与组提交（group commit）**：为摊薄每次事务 fsync 的成本，MySQL 5.6+ 对 redo/binlog 均支持组提交，将多个事务的刷盘合并为一次。高并发下"双 1"配置的真实成本被组提交大幅摊薄。
-- 【L4】**undo log 不只是回滚**：MVCC 的一致性读视图依赖 undo log 构建历史版本链；长事务会导致 undo 膨胀、purge 延迟，进而拖垮整库性能。
+- 【L3】**崩溃恢复规则**
+
+  redo log 处于 prepare 状态时，若 binlog 完整（含 Xid 事件）则提交事务，否则回滚——这正是两阶段提交保证两套日志一致的核心机制。
+
+- 【L3】**为什么 redo log 要分 prepare/commit 两步？**
+
+  若先 commit redo 再写 binlog，写 binlog 前崩溃会导致主库有数据而从库没有；反之亦然。两阶段让 binlog 充当崩溃恢复时的"仲裁者"。
+
+- 【L4】**WAL 的代价与组提交（group commit）**
+
+  为摊薄每次事务 fsync 的成本，MySQL 5.6+ 对 redo/binlog 均支持组提交，将多个事务的刷盘合并为一次。
+
+  高并发下"双 1"配置的真实成本被组提交大幅摊薄。
+
+- 【L4】**undo log 不只是回滚**
+
+  MVCC 的一致性读视图依赖 undo log 构建历史版本链；长事务会导致 undo 膨胀、purge 延迟，进而拖垮整库性能。
 
 :::
 
@@ -2124,7 +2371,8 @@ graph TB
 
 ::: details
 
-**"双 1"配置的性能权衡**：`innodb_flush_log_at_trx_commit=1` + `sync_binlog=1` 是金融级标配，每次提交都强制 fsync，数据最安全但吞吐最低。常见误判是认为双 1 必然很慢——得益于组提交，SSD 上 QPS 依然可观；真正的瓶颈常出现在机械盘 + 高并发短事务场景。对性能敏感且可容忍秒级丢失的业务（如日志采集），可放宽为 `2 / 1000`，但需明确接受宕机丢数据的风险。
+**"双 1"配置的性能权衡**：`innodb_flush_log_at_trx_commit=1` + `sync_binlog=1` 是金融级标配，每次提交都强制 fsync，数据最安全但吞吐最低。常见误判是认为双 1 必然很慢——
+得益于组提交，SSD 上 QPS 依然可观；真正的瓶颈常出现在机械盘 + 高并发短事务场景。对性能敏感且可容忍秒级丢失的业务（如日志采集），可放宽为 `2 / 1000`，但需明确接受宕机丢数据的风险。
 
 :::
 
@@ -2148,8 +2396,6 @@ graph TB
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "更新流程 = 查询流程 + redo/binlog" → 漏掉了 undo log。没有 undo log，事务无法回滚，MVCC 也无从谈起。
 - ❌ "两阶段提交是把 redo log 写两次" → 实际是 prepare → commit 的状态流转，binlog 在两阶段之间写入，并作为崩溃恢复的仲裁依据。
@@ -2218,11 +2464,27 @@ graph TB
 #### 🔬 扩展知识
 
 ::: details L3：sort buffer 与 rowid 排序的取舍
-`sort_buffer_size`（默认 256KB，会话级）是排序操作的专用内存。排序数据量小于该值时在内存完成（`filesort` 但无需临时文件）；超出时 MySQL 将数据分批排序后写入临时文件（`/tmp` 目录），再做多路归并排序。MySQL 提供两种排序模式：**全字段排序**（将整行数据放入 sort buffer，排序后直接返回）和 **rowid 排序**（sort buffer 只存排序字段 + 主键，排序后再回表取数据）。优化器根据 `max_length_for_sort_data` 参数（默认 1024 字节）和估算行数自动选择——当行宽较大或数据量较多时倾向 rowid 排序以减少内存占用，但代价是额外的随机回表 I/O。生产调优建议：不要盲目调大 `sort_buffer_size`，优先通过索引消除排序操作。
+
+`sort_buffer_size`（默认 256KB，会话级）是排序操作的专用内存。排序数据量小于该值时在内存完成（`filesort` 但无需临时文件）；超出时 MySQL 将数据分批排序后写入临时文件（`/tmp` 目录），
+再做多路归并排序。MySQL 提供两种排序模式：**全字段排序**（将整行数据放入 sort buffer，排序后直接返回）和 **rowid 排序**（sort buffer 只存排序字段 + 主键，排序后再回表取数据）。
+
+优化器根据 `max_length_for_sort_data` 参数（默认 1024 字节）和估算行数自动选择——当行宽较大或数据量较多时倾向 rowid 排序以减少内存占用，但代价是额外的随机回表 I/O。生产调优建议：
+
+不要盲目调大 `sort_buffer_size`，优先通过索引消除排序操作。
+
 :::
 
 ::: details L4：并行排序与外部排序的底层实现
-InnoDB **索引构建**支持并行排序（`innodb_sort_threads`，5.6 引入，默认 4；8.0.27 起由 `innodb_ddl_threads` / `innodb_ddl_buffer_size` 接管并弃用该参数），将数据分成多个区间由不同线程并行排序后合并。查询侧的外部排序使用**多路归并算法**：每路在 sort buffer 中排好序后写入临时文件（默认每路约 sort_buffer_size 大小），最终用优先队列（堆）做多路归并，时间复杂度 O(N log K)，K 为路数。MySQL 8.0 还增加了**降序索引**（`CREATE INDEX ... (col DESC)`），避免排序时的反转操作；以及窗口函数（`ROW_NUMBER()`、`RANK()` 等）的专用排序算子，减少中间结果物化。对于超大排序（如 10GB 结果集），临时表空间（`innodb_temp_data_file_path`）放在独立 SSD 上可显著减少 I/O 瓶颈。
+
+InnoDB **索引构建**支持并行排序（`innodb_sort_threads`，5.6 引入，默认 4；
+8.0.27 起由 `innodb_ddl_threads` / `innodb_ddl_buffer_size` 接管并弃用该参数），将数据分成多个区间由不同线程并行排序后合并。查询侧的外部排序使用**多路归并算法**：
+
+每路在 sort buffer 中排好序后写入临时文件（默认每路约 sort_buffer_size 大小），最终用优先队列（堆）做多路归并，时间复杂度 O(N log K)，K 为路数。
+
+MySQL 8.0 还增加了**降序索引**（`CREATE INDEX ... (col DESC)`），避免排序时的反转操作；以及窗口函数（`ROW_NUMBER()`、`RANK()` 等）的专用排序算子，减少中间结果物化。
+
+对于超大排序（如 10GB 结果集），临时表空间（`innodb_temp_data_file_path`）放在独立 SSD 上可显著减少 I/O 瓶颈。
+
 :::
 
 #### 🔀 发散问题
@@ -2272,9 +2534,20 @@ InnoDB **索引构建**支持并行排序（`innodb_sort_threads`，5.6 引入�
 
 ::: details
 
-- 【L3】**MySQL 协议层**：MySQL 客户端/服务器协议本身支持逐行发送结果（COM_QUERY 响应是流式的），但多数驱动默认将全部结果攒到内存。开启流式需要驱动层配置。服务端按 `net_buffer_length`（默认 16KB）边读边发——缓冲区写满就发送给客户端，**服务端内存占用是有界的**，这正是「服务端不飙升」的机制保证。
-- 【L3】**JDBC 的两种流式姿势**：① `setFetchSize(Integer.MIN_VALUE)` 是 MySQL 驱动的真流式读取（逐行从网络拉），但**流式读取期间该连接被独占，不能复用**去执行其他语句，读完/关闭前连接不可还池；② `useCursorFetch=true` + 正常 `setFetchSize(N)` 走服务端游标分批拉取，连接可复用，代价是服务端要维护游标。选型要区分「一次性导出」与「在线高频查询」。
-- 【L3】**网络带宽瓶颈**：千万级结果集即使不 OOM，网络传输耗时也极大。生产环境应禁止无 WHERE 的全表扫描查询，通过分页或流式导出控制数据量。
+- 【L3】**MySQL 协议层**
+
+  MySQL 客户端/服务器协议本身支持逐行发送结果（COM_QUERY 响应是流式的），但多数驱动默认将全部结果攒到内存。开启流式需要驱动层配置。
+
+  服务端按 `net_buffer_length`（默认 16KB）边读边发——缓冲区写满就发送给客户端，**服务端内存占用是有界的**，这正是「服务端不飙升」的机制保证。
+
+- 【L3】**JDBC 的两种流式姿势**
+
+  ① `setFetchSize(Integer.MIN_VALUE)` 是 MySQL 驱动的真流式读取（逐行从网络拉），但**流式读取期间该连接被独占，不能复用**去执行其他语句，
+  读完/关闭前连接不可还池；② `useCursorFetch=true` + 正常 `setFetchSize(N)` 走服务端游标分批拉取，连接可复用，代价是服务端要维护游标。选型要区分「一次性导出」与「在线高频查询」。
+
+- 【L3】**网络带宽瓶颈**
+
+  千万级结果集即使不 OOM，网络传输耗时也极大。生产环境应禁止无 WHERE 的全表扫描查询，通过分页或流式导出控制数据量。
 
 :::
 
@@ -2354,8 +2627,15 @@ ANALYZE TABLE users;
 
 ::: details
 
-- 【L3】**常见执行计划问题**：索引失效（函数计算、隐式类型转换）、错误 JOIN 顺序（可用 `STRAIGHT_JOIN` 强制）、临时表/文件排序（关注 `Using temporary` / `Using filesort`）。
-- 【L3】**优化建议**：定期 `ANALYZE TABLE` 更新统计信息；避免在索引列上使用函数；使用覆盖索引减少回表；监控 `performance_schema` 中的 SQL 执行历史。
+- 【L3】**常见执行计划问题**
+
+  索引失效（函数计算、隐式类型转换）、错误 JOIN 顺序（可用 `STRAIGHT_JOIN` 强制）、
+  临时表/文件排序（关注 `Using temporary` / `Using filesort`）。
+
+- 【L3】**优化建议**
+
+  定期 `ANALYZE TABLE` 更新统计信息；避免在索引列上使用函数；使用覆盖索引减少回表；监控 `performance_schema` 中的 SQL 执行历史。
+
 - 【L4】MySQL 8.0 引入**直方图统计**（Histogram）和代价模型改进，大幅提升复杂查询的计划准确性。
 
 :::
@@ -2404,7 +2684,18 @@ ANALYZE TABLE users;
 
 ::: details
 
-生产案例：某社交平台（MySQL 8.0.34，`user_actions` 表 2000 万行，约 8GB），大促期间核心 API「用户行为列表」P99 延迟从 50ms 飙升至 2s，用户投诉页面加载卡顿。排查过程：开启慢查询日志（`long_query_time=1s`），`mysqldumpslow -s t -t 10` 发现 `SELECT * FROM user_actions WHERE action_type = 'login' AND DATE(action_time) = '2024-01-15'` 平均耗时 3-5s，每日执行约 8000 次。但此查询此前未被捕获——原 `long_query_time=5s`，该查询刚好在阈值边缘波动。EXPLAIN 显示 `type=ALL, rows=20M, Extra=Using where`，全表扫描。根因：`DATE(action_time)` 对列使用了函数，导致 `action_time` 列上的单列索引失效，优化器无法利用索引进行范围查找。修复：① 将 `DATE(action_time) = '2024-01-15'` 改写为范围条件 `action_time >= '2024-01-15 00:00:00' AND action_time < '2024-01-16 00:00:00'`，使索引可正常命中；② 新建复合索引 `idx_type_time(action_type, action_time)`，EXPLAIN 变为 `type=range, rows=18000, Extra=Using index condition`；③ 将 `long_query_time` 从 5s 降至 0.5s 以便更早发现潜在慢查询。优化后查询耗时从 4.2s 降至 8ms，API P99 恢复至 55ms。
+生产案例：某社交平台（MySQL 8.0.34，`user_actions` 表 2000 万行，约 8GB），大促期间核心 API「用户行为列表」P99 延迟从 50ms 飙升至 2s，用户投诉页面加载卡顿。排查过程：
+
+开启慢查询日志（`long_query_time=1s`），`mysqldumpslow -s t -t 10` 发现 `SELECT * FROM user_actions WHERE action_type = 'login' AND DATE(action_time) = '2024-01-15'` 平均耗时 3-5s，
+每日执行约 8000 次。但此查询此前未被捕获——原 `long_query_time=5s`，该查询刚好在阈值边缘波动。EXPLAIN 显示 `type=ALL, rows=20M, Extra=Using where`，全表扫描。
+
+根因：`DATE(action_time)` 对列使用了函数，导致 `action_time` 列上的单列索引失效，优化器无法利用索引进行范围查找。修复：
+
+① 将 `DATE(action_time) = '2024-01-15'` 改写为范围条件 `action_time >= '2024-01-15 00:00:00' AND action_time < '2024-01-16 00:00:00'`，
+使索引可正常命中；② 新建复合索引 `idx_type_time(action_type, action_time)`，
+EXPLAIN 变为 `type=range, rows=18000, Extra=Using index condition`；③ 将 `long_query_time` 从 5s 降至 0.5s 以便更早发现潜在慢查询。
+
+优化后查询耗时从 4.2s 降至 8ms，API P99 恢复至 55ms。
 
 :::
 
@@ -2578,11 +2869,25 @@ graph TB
 #### 🔬 扩展知识
 
 ::: details L3：Optimizer Trace 深度分析
-`OPTIMIZER_TRACE` 是比 EXPLAIN 更强大的诊断工具，能展示优化器的**完整决策过程**而非仅展示最终计划。开启方式：`SET optimizer_trace="enabled=on";` 执行查询后 `SELECT * FROM information_schema.optimizer_trace;`。输出为 JSON 格式，包含每个候选计划的代价估算、JOIN 顺序排列过程、索引选择理由。重点关注 `join_optimization` 阶段的 `rows_estimation`（行数估算来源）和 `chosen_plan`（最终选择及原因）。当 EXPLAIN 显示的索引选择不符合预期时，Optimizer Trace 是唯一能回答"为什么没选某个索引"的工具——它会展示被放弃索引的代价对比数值。
+
+`OPTIMIZER_TRACE` 是比 EXPLAIN 更强大的诊断工具，能展示优化器的**完整决策过程**而非仅展示最终计划。
+
+开启方式：`SET optimizer_trace="enabled=on";` 执行查询后 `SELECT * FROM information_schema.optimizer_trace;`。输出为 JSON 格式，
+包含每个候选计划的代价估算、JOIN 顺序排列过程、索引选择理由。重点关注 `join_optimization` 阶段的 `rows_estimation`（行数估算来源）和 `chosen_plan`（最终选择及原因）。
+
+当 EXPLAIN 显示的索引选择不符合预期时，Optimizer Trace 是唯一能回答"为什么没选某个索引"的工具——它会展示被放弃索引的代价对比数值。
+
 :::
 
 ::: details L4：Histogram 统计与代价计算细节
-MySQL 8.0 引入**直方图统计**（`ANALYZE TABLE ... UPDATE HISTOGRAM ON col;`），解决传统 `cardinality` 统计对非均匀分布数据估算不准的问题。直方图将列值按频率分桶（最多 255 个桶），记录每个值区间的累积频率。例如 `status` 列 99% 为 `'active'`、1% 为 `'deleted'`，传统统计认为两者等频导致误判，直方图则精确告知优化器 `'deleted'` 只返回极少行——从而选择索引扫描而非全表扫描。代价计算公式中，I/O cost = `pages_accessed × io_block_read_cost`（InnoDB 默认 1.0），CPU cost = `rows_examined × row_evaluate_cost`（默认 0.1）。当直方图将估算行数从 50000 修正为 500 时，索引代价从 5001.0 降至 51.0，远低于全表扫描的 20001.0，执行计划随之改变。
+
+MySQL 8.0 引入**直方图统计**（`ANALYZE TABLE ... UPDATE HISTOGRAM ON col;`），解决传统 `cardinality` 统计对非均匀分布数据估算不准的问题。
+
+直方图将列值按频率分桶（最多 255 个桶），记录每个值区间的累积频率。例如 `status` 列 99% 为 `'active'`、1% 为 `'deleted'`，传统统计认为两者等频导致误判，
+直方图则精确告知优化器 `'deleted'` 只返回极少行——从而选择索引扫描而非全表扫描。代价计算公式中，I/O cost = `pages_accessed × io_block_read_cost`（InnoDB 默认 1.0），
+CPU cost = `rows_examined × row_evaluate_cost`（默认 0.1）。当直方图将估算行数从 50000 修正为 500 时，索引代价从 5001.0 降至 51.0，远低于全表扫描的 20001.0，
+执行计划随之改变。
+
 :::
 
 #### 🔀 发散问题
@@ -2680,9 +2985,18 @@ ORDER BY staff_id, customer_id;
 
 ::: details
 
-- 【L3】**低版本避免 OR 查询**：MySQL 5.0 之前使用 OR 可能导致索引失效，可用 UNION 或子查询替代。高版本引入了索引合并（Index Merge），解决了这个问题。
-- 【L3】**「子查询必建临时表」已过时**：5.6+ 优化器会把多数 `IN` 子查询改写为半连接（semi-join），与 JOIN 走同一套代价评估，两者执行计划常常等价。「用 JOIN 替代子查询」的经验法则主要针对老版本与 `DEPENDENT SUBQUERY`（相关子查询逐行执行）场景，改造前先 `EXPLAIN` 确认。
-- 【L3】**覆盖索引实战**：对于 `SELECT name FROM test WHERE city='上海'`，建立联合索引 `(city, name)` 后，查询可直接从索引叶节点获取结果，无需回表。
+- 【L3】**低版本避免 OR 查询**
+
+  MySQL 5.0 之前使用 OR 可能导致索引失效，可用 UNION 或子查询替代。高版本引入了索引合并（Index Merge），解决了这个问题。
+
+- 【L3】**「子查询必建临时表」已过时**
+
+  5.6+ 优化器会把多数 `IN` 子查询改写为半连接（semi-join），与 JOIN 走同一套代价评估，
+  两者执行计划常常等价。「用 JOIN 替代子查询」的经验法则主要针对老版本与 `DEPENDENT SUBQUERY`（相关子查询逐行执行）场景，改造前先 `EXPLAIN` 确认。
+
+- 【L3】**覆盖索引实战**
+
+  对于 `SELECT name FROM test WHERE city='上海'`，建立联合索引 `(city, name)` 后，查询可直接从索引叶节点获取结果，无需回表。
 
 :::
 
@@ -2709,7 +3023,17 @@ ORDER BY staff_id, customer_id;
 
 ::: details
 
-生产案例：某 SaaS 订单系统（MySQL 8.0.35，订单表 5000 万行，约 15GB），开发环境查询 `SELECT * FROM orders WHERE user_id = 12345 AND status = 'PAID' AND create_time BETWEEN '2024-01-01' AND '2024-03-31'` 耗时 < 10ms（测试数据仅 1 万行）。上线 6 个月后生产环境同一查询耗时 8-15s，用户投诉订单列表页频繁超时。排查过程：EXPLAIN 显示 `type=ALL, rows=50M, Extra=Using where`，全表扫描。检查索引发现存在复合索引 `idx_user_time(user_id, create_time)`，但 `status` 列不在索引中，且 `status='PAID'` 的选择性为 30%（5000 万行中 1500 万为 PAID），无法有效过滤。根因：复合索引列顺序与查询条件不匹配，`status` 过滤只能在索引扫描后回表过滤，导致大量无效 IO。修复：重建复合索引为 `idx_user_status_time(user_id, status, create_time)`，将高选择性列 `status` 提前，同时该索引覆盖了查询所有列（覆盖索引），消除回表。优化后查询耗时从 12s 降至 5ms，逻辑读从 280 万降至 320，QPS 承载能力提升 20 倍。
+生产案例：某 SaaS 订单系统（MySQL 8.0.35，订单表 5000 万行，约 15GB），
+开发环境查询 `SELECT * FROM orders WHERE user_id = 12345 AND status = 'PAID' AND create_time BETWEEN '2024-01-01' AND '2024-03-31'` 耗时 < 10ms（测试数据仅 1 万行）。
+
+上线 6 个月后生产环境同一查询耗时 8-15s，用户投诉订单列表页频繁超时。排查过程：EXPLAIN 显示 `type=ALL, rows=50M, Extra=Using where`，全表扫描。
+
+检查索引发现存在复合索引 `idx_user_time(user_id, create_time)`，但 `status` 列不在索引中，且 `status='PAID'` 的选择性为 30%（5000 万行中 1500 万为 PAID），
+无法有效过滤。根因：复合索引列顺序与查询条件不匹配，`status` 过滤只能在索引扫描后回表过滤，导致大量无效 IO。修复：
+
+重建复合索引为 `idx_user_status_time(user_id, status, create_time)`，将高选择性列 `status` 提前，同时该索引覆盖了查询所有列（覆盖索引），消除回表。
+
+优化后查询耗时从 12s 降至 5ms，逻辑读从 280 万降至 320，QPS 承载能力提升 20 倍。
 
 :::
 
@@ -2780,11 +3104,30 @@ LIMIT 10;
 
 ::: details
 
-- 【L3】**游标分页的局限**：不支持跳页（如直接跳到第 500 页），适合”加载更多”场景（信息流、瀑布流）。如果需要随机跳页，只能用延迟关联方案。
-- 【L3】**延迟关联原理**：子查询只扫描覆盖索引取主键 ID，避免回表读取全部字段；外层查询通过主键 IN/JOIN 只回表 10 行，大幅减少 I/O。
-- 【L3】**量化对比**：以 1000 万行表（每行约 500 字节）为例，`LIMIT 1000000, 10` 原始查询需扫描 100 万行并回表读取全部字段，耗时约 5~15s；延迟关联方案子查询扫描覆盖索引（每行约 8 字节主键），仅回表 10 行，耗时约 50~200ms，性能提升 25~75 倍；游标分页 `WHERE id > last_id LIMIT 10` 直接定位，耗时约 1~5ms，性能最优但不支持跳页。
-- 【L4】**为什么不能一律用游标法**：游标法要求业务接受「只能翻页不能跳页」，且无法展示总页数/直接定位第 N 页。随机跳页需求（后台管理、搜索结果页）只能用延迟关联，并配合**业务侧限制最大页深**——搜索引擎是同样的取舍：ES 默认 `max_result_window=10000`（from+size 上限），Google 也只给前几十页，深层需求引导用户改查询条件而不是无限翻页。
-- 【L4】**生产踩坑**：某电商订单列表（5000 万行），用户翻到第 100 页（`LIMIT 2000, 20`）时查询耗时 8s+，数据库 CPU 飙到 90%。修复：前端改为游标分页（记录上一页最后一条 id），查询耗时稳定在 2ms 以内。对于必须跳页的后台管理系统，采用延迟关联 + 限制最大翻页数（如不超过 500 页）的组合策略。
+- 【L3】**游标分页的局限**
+
+  不支持跳页（如直接跳到第 500 页），适合”加载更多”场景（信息流、瀑布流）。如果需要随机跳页，只能用延迟关联方案。
+
+- 【L3】**延迟关联原理**
+
+  子查询只扫描覆盖索引取主键 ID，避免回表读取全部字段；外层查询通过主键 IN/JOIN 只回表 10 行，大幅减少 I/O。
+
+- 【L3】**量化对比**
+
+  以 1000 万行表（每行约 500 字节）为例，`LIMIT 1000000, 10` 原始查询需扫描 100 万行并回表读取全部字段，耗时约 5~15s；
+  延迟关联方案子查询扫描覆盖索引（每行约 8 字节主键），仅回表 10 行，耗时约 50~200ms，性能提升 25~75 倍；游标分页 `WHERE id > last_id LIMIT 10` 直接定位，耗时约 1~5ms，
+  性能最优但不支持跳页。
+
+- 【L4】**为什么不能一律用游标法**
+
+  游标法要求业务接受「只能翻页不能跳页」，且无法展示总页数/直接定位第 N 页。随机跳页需求（后台管理、搜索结果页）只能用延迟关联，并配合**业务侧限制最大页深**——搜索引擎是同样的取舍：
+
+  ES 默认 `max_result_window=10000`（from+size 上限），Google 也只给前几十页，深层需求引导用户改查询条件而不是无限翻页。
+
+- 【L4】**生产踩坑**
+
+  某电商订单列表（5000 万行），用户翻到第 100 页（`LIMIT 2000, 20`）时查询耗时 8s+，数据库 CPU 飙到 90%。修复：前端改为游标分页（记录上一页最后一条 id），
+  查询耗时稳定在 2ms 以内。对于必须跳页的后台管理系统，采用延迟关联 + 限制最大翻页数（如不超过 500 页）的组合策略。
 
 :::
 
@@ -2848,8 +3191,13 @@ LIMIT 10;
 
 ::: details
 
-- 【L3】**为什么 InnoDB 不跟 MyISAM 一样维护计数器？** 因为 MVCC 的存在，同一时刻多个事务看到的数据视图不同，“应该返回多少行”是不确定的。所以 InnoDB 必须在事务视图内实时遍历计数。
-- 【L3】**COUNT(\*) 的索引选择策略**：InnoDB 会自动选择最小的索引树遍历（普通索引树通常比主键索引树小），因此 COUNT(\*) 的实际成本比想象中低。
+- 【L3】**为什么 InnoDB 不跟 MyISAM 一样维护计数器？**
+
+  因为 MVCC 的存在，同一时刻多个事务看到的数据视图不同，“应该返回多少行”是不确定的。所以 InnoDB 必须在事务视图内实时遍历计数。
+
+- 【L3】**COUNT(\*) 的索引选择策略**
+
+  InnoDB 会自动选择最小的索引树遍历（普通索引树通常比主键索引树小），因此 COUNT(\*) 的实际成本比想象中低。
 
 :::
 
@@ -2904,9 +3252,17 @@ MySQL 性能优化分四个层次：**① SQL/索引层**（慢 SQL 定位、索
 
 ::: details
 
-- 【L3】**Buffer Pool 调优**：`innodb_buffer_pool_size` 建议设为物理内存的 70%-80%；多实例拆分减少锁竞争（`innodb_buffer_pool_instances`）。
-- 【L3】**连接池配置**：`max_connections` 不宜过大（通常 500-1000），过多连接反而增加上下文切换开销。
-- 【L4】**缓存策略**：热点数据用 Redis 缓存，注意缓存穿透/击穿/雪崩问题；缓存与数据库一致性是核心挑战。
+- 【L3】**Buffer Pool 调优**
+
+  `innodb_buffer_pool_size` 建议设为物理内存的 70%-80%；多实例拆分减少锁竞争（`innodb_buffer_pool_instances`）。
+
+- 【L3】**连接池配置**
+
+  `max_connections` 不宜过大（通常 500-1000），过多连接反而增加上下文切换开销。
+
+- 【L4】**缓存策略**
+
+  热点数据用 Redis 缓存，注意缓存穿透/击穿/雪崩问题；缓存与数据库一致性是核心挑战。
 
 :::
 
@@ -3015,8 +3371,13 @@ MySQL 8.0 是一次重大升级，核心特性包括：**原子 DDL**（DDL 不�
 
 ::: details
 
-- 【L3】**不可见索引的实战价值**：删除索引前，先设为 INVISIBLE 观察一段时间，确认无影响后再真正删除，避免“删了索引才发现影响核心业务”的惨剧。
-- 【L3】**CTE vs 子查询**：CTE 可读性更强，且支持递归查询（如组织架构树、BOM 物料清单），是替代临时表的优雅方案。
+- 【L3】**不可见索引的实战价值**
+
+  删除索引前，先设为 INVISIBLE 观察一段时间，确认无影响后再真正删除，避免“删了索引才发现影响核心业务”的惨剧。
+
+- 【L3】**CTE vs 子查询**
+
+  CTE 可读性更强，且支持递归查询（如组织架构树、BOM 物料清单），是替代临时表的优雅方案。
 
 :::
 
@@ -3115,11 +3476,30 @@ graph TB
 
 ::: details
 
-- 【L3】**MGR 的两种模式**：单主模式（Single-Primary，推荐）只有一个可写节点，多主模式（Multi-Primary）所有节点可写但冲突风险高——多主下冲突检测靠 write set（certification），两个节点改同一行时后到事务被回滚。生产环境几乎都用单主模式。一致性级别由 `group_replication_consistency` 可调（EVENTUAL / BEFORE / AFTER / BEFORE_AND_AFTER），按业务在性能与读己之写之间取舍。
-- 【L3】**InnoDB Cluster 组件**：MySQL Shell（管理工具）+ MySQL Router（应用层透明代理，自动路由）+ MGR（底层复制协议，Paxos 变体 XCom）。三者组合实现自动化的高可用管理。
-- 【L3】**选型演进**：MHA 已停止维护（依赖 SSH 互信、脑裂风险高）→ Orchestrator（拓扑管理 + 自动故障转移，GitHub 系方案）→ MGR/InnoDB Cluster（协议级多数派）→ 云厂商 RDS 高可用（主备 + VIP 漂移）。新建集群没有理由再选 MHA。
-- 【L4】**MGR vs 传统主从**：MGR 基于 Paxos 协议保证强一致性，原生支持自动故障转移；传统主从+半同步需要外部工具（MHA/Orchestrator）实现故障转移，且半同步在极端场景下可能退化为异步。
-- 【L4】**故障转移如何保证「不丢数据 + 不脑裂」**——三件套缺一不可：① **仲裁者**：投票成员必须是奇数且故障判定走多数派（MGR 原生；MHA 需 `secondary_check` 多路径探测模拟仲裁），避免网络分区两侧各自为政；② **fencing（隔离旧主，STONITH）**：提升新主前必须确保旧主停止写入——`SET read_only=1`、kill 连接、直接 shutdown 或网络隔离，只靠应用「自觉」必然脑裂；③ **流量切换的坑**：VIP 漂移对长连接不生效（连接池不重连就继续写旧主），DNS 切换受客户端 DNS 缓存 TTL 影响可能分钟级不收敛，必须配合连接池最大存活时间 + 旧主 fencing 兜底。
+- 【L3】**MGR 的两种模式**
+
+  单主模式（Single-Primary，推荐）只有一个可写节点，多主模式（Multi-Primary）所有节点可写但冲突风险高——多主下冲突检测靠 write set（certification），
+  两个节点改同一行时后到事务被回滚。生产环境几乎都用单主模式。一致性级别由 `group_replication_consistency` 可调（EVENTUAL / BEFORE / AFTER / BEFORE_AND_AFTER），
+  按业务在性能与读己之写之间取舍。
+
+- 【L3】**InnoDB Cluster 组件**
+
+  MySQL Shell（管理工具）+ MySQL Router（应用层透明代理，自动路由）+ MGR（底层复制协议，Paxos 变体 XCom）。三者组合实现自动化的高可用管理。
+
+- 【L3】**选型演进**
+
+  MHA 已停止维护（依赖 SSH 互信、脑裂风险高）→ Orchestrator（拓扑管理 + 自动故障转移，
+  GitHub 系方案）→ MGR/InnoDB Cluster（协议级多数派）→ 云厂商 RDS 高可用（主备 + VIP 漂移）。新建集群没有理由再选 MHA。
+
+- 【L4】**MGR vs 传统主从**
+
+  MGR 基于 Paxos 协议保证强一致性，原生支持自动故障转移；传统主从+半同步需要外部工具（MHA/Orchestrator）实现故障转移，且半同步在极端场景下可能退化为异步。
+
+- 【L4】**故障转移如何保证「不丢数据 + 不脑裂」**——三件套缺一不可
+
+  ① **仲裁者**：投票成员必须是奇数且故障判定走多数派（MGR 原生；MHA 需 `secondary_check` 多路径探测模拟仲裁），
+  避免网络分区两侧各自为政；② **fencing（隔离旧主，STONITH）**：提升新主前必须确保旧主停止写入——`SET read_only=1`、kill 连接、直接 shutdown 或网络隔离，只靠应用「自觉」必然脑裂；
+  ③ **流量切换的坑**：VIP 漂移对长连接不生效（连接池不重连就继续写旧主），DNS 切换受客户端 DNS 缓存 TTL 影响可能分钟级不收敛，必须配合连接池最大存活时间 + 旧主 fencing 兜底。
 
 :::
 
@@ -3127,9 +3507,16 @@ graph TB
 
 ::: details
 
-**典型生产架构**：中小规模业务采用「主从 + 半同步 + MHA」，3 节点（1 主 2 从），故障转移时间 ~30s。金融级业务采用 InnoDB Cluster（单主模式），3-5 节点，故障转移时间 ~10s，RPO=0。大规模场景（如电商）采用分库分表 + 中间件（ShardingSphere/MyCat），每个分片一套主从架构。
+**典型生产架构**：中小规模业务采用「主从 + 半同步 + MHA」，3 节点（1 主 2 从），故障转移时间 ~30s。金融级业务采用 InnoDB Cluster（单主模式），3-5 节点，故障转移时间 ~10s，RPO=0。
 
-**故障：MHA 故障转移脑裂**：某 SaaS 平台采用 MHA（1 主 2 从），主库与从库之间网络抖动 8 秒（交换机故障），MHA Manager 判定主库不可达，将从库 B 提升为新主。但原主库网络恢复后仍在接受写入（应用层连接池未刷新），形成双主脑裂，持续 12 秒。期间两库各写入约 300 条冲突数据（用户注册、订单创建）。**排查**：MHA 日志显示 `secondary_check` 只通过单一路径检测主库存活，网络恢复后 VIP 漂移未触发应用层重连。**修复**：① 配置 `secondary_check_script` 通过多条网络路径检测主库（至少 2 条独立路由）；② 故障转移前对原主执行 `SHUTDOWN` 或 `SET read_only=1`（MHA 3.2+ 支持）；③ 长期方案迁移到 MGR，Paxos 协议天然防脑裂。**教训**：MHA 的脑裂风险来自网络分区场景，多路径检测 + 原主隔离是必要的安全网。
+大规模场景（如电商）采用分库分表 + 中间件（ShardingSphere/MyCat），每个分片一套主从架构。
+
+**故障：MHA 故障转移脑裂**：某 SaaS 平台采用 MHA（1 主 2 从），主库与从库之间网络抖动 8 秒（交换机故障），MHA Manager 判定主库不可达，将从库 B 提升为新主。
+
+但原主库网络恢复后仍在接受写入（应用层连接池未刷新），形成双主脑裂，持续 12 秒。期间两库各写入约 300 条冲突数据（用户注册、订单创建）。**排查**：MHA 日志显示 `secondary_check` 只通过单一路径检测主库存活，
+网络恢复后 VIP 漂移未触发应用层重连。**修复**：① 配置 `secondary_check_script` 通过多条网络路径检测主库（至少 2 条独立路由）；
+② 故障转移前对原主执行 `SHUTDOWN` 或 `SET read_only=1`（MHA 3.2+ 支持）；③ 长期方案迁移到 MGR，Paxos 协议天然防脑裂。**教训**：MHA 的脑裂风险来自网络分区场景，
+多路径检测 + 原主隔离是必要的安全网。
 
 :::
 
@@ -3166,8 +3553,6 @@ graph TB
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "半同步复制 = 强一致性" → 半同步只保证至少一个从库收到 binlog，主库崩溃时仍可能丢失未确认的数据。
 - ❌ "MGR 可以替代所有主从架构" → MGR 对网络延迟敏感（要求节点间延迟 < 10ms），跨机房部署时性能下降明显。
@@ -3236,17 +3621,27 @@ innodb_max_undo_log_size = 1G      # 单个 undo 文件上限，超过则触发�
 
 ::: details
 
-- 【L3】undo log 的逻辑结构：每个事务的 undo log 组成一条链表（rollback segment），按修改顺序串联。MVCC 读时，从最新版本沿链表回溯，直到找到 `trx_id ≤ 读事务的 read_view` 的版本。
-- 【L3】MySQL 8.0 的变化：undo log 默认放在独立的 undo 表空间（`innodb_undo_tablespaces=2`），不再写入 ibdata1，且支持自动收缩（truncate，`innodb_undo_log_truncate=ON`）。MySQL 5.6 需手动配置 `innodb_undo_directory` 和 `innodb_undo_tablespaces`。
-- 【L3】**undo 积压的两个观测手段**：① `information_schema.INNODB_TRX` 按 `trx_started` 找长事务；② `SHOW ENGINE INNODB STATUS` 中的 **History list length**——未被 purge 的旧版本数量，持续攀升即说明有长事务的 ReadView 在阻止 purge 线程清理，是 undo 暴涨的前置告警指标。
+- 【L3】undo log 的逻辑结构
+
+  每个事务的 undo log 组成一条链表（rollback segment），按修改顺序串联。MVCC 读时，从最新版本沿链表回溯，
+  直到找到 `trx_id ≤ 读事务的 read_view` 的版本。
+
+- 【L3】MySQL 8.0 的变化
+
+  undo log 默认放在独立的 undo 表空间（`innodb_undo_tablespaces=2`），不再写入 ibdata1，
+  且支持自动收缩（truncate，`innodb_undo_log_truncate=ON`）。MySQL 5.6 需手动配置 `innodb_undo_directory` 和 `innodb_undo_tablespaces`。
+
+- 【L3】**undo 积压的两个观测手段**
+
+  ① `information_schema.INNODB_TRX` 按 `trx_started` 找长事务；
+  ② `SHOW ENGINE INNODB STATUS` 中的 **History list length**——未被 purge 的旧版本数量，持续攀升即说明有长事务的 ReadView 在阻止 purge 线程清理，
+  是 undo 暴涨的前置告警指标。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "undo log = redo log" → undo log 记录「修改前的旧值」（用于回滚），redo log 记录「修改后的新值」（用于崩溃恢复），方向相反。
 - ❌ "事务提交后 undo 立即删除" → undo 需等待所有可能引用它的 MVCC 读结束后才由 purge thread 清理，长事务会阻塞 purge。
@@ -3257,7 +3652,14 @@ innodb_max_undo_log_size = 1G      # 单个 undo 文件上限，超过则触发�
 
 ::: details
 
-生产案例：某金融系统（MySQL 8.0.30，InnoDB 引擎，数据量 500GB），凌晨 02:00 磁盘告警显示 undo 表空间目录占用达 200GB（磁盘使用率 85%）。排查过程：`SELECT * FROM information_schema.INNODB_TRX` 发现一个事务 `trx_started` 为 6 小时前，状态为 `RUNNING`，对应 SQL 为 `SELECT * FROM transactions FOR SHARE WHERE txn_date > '2023-01-01'`（报表查询，约 800 万行）。该长事务持有最早的 read view，导致 purge thread 无法清理 6 小时内所有其他事务产生的 undo 记录，undo 表空间以每小时 8GB 速度膨胀。根因：报表查询使用 `FOR SHARE` 加锁且未设超时，运行 6 小时未提交，阻塞 MVCC purge 链。修复：① 立即 KILL 该长事务，undo 空间在 30 分钟内由 purge thread 回收至 12GB；② 配置 `innodb_undo_tablespaces=2` 独立 undo 表空间，支持自动 truncate 回收；③ 设置 `innodb_max_purge_lag=500000` 当 pending undo 页数超过阈值时自动延迟写入事务以控制膨胀；④ 对所有报表查询添加 `SET max_execution_time=30000`（30s 超时），防止长事务再次出现。修复后 undo 表空间稳定在 15-20GB，磁盘使用率降至 42%。
+生产案例：某金融系统（MySQL 8.0.30，InnoDB 引擎，数据量 500GB），凌晨 02:00 磁盘告警显示 undo 表空间目录占用达 200GB（磁盘使用率 85%）。
+
+排查过程：`SELECT * FROM information_schema.INNODB_TRX` 发现一个事务 `trx_started` 为 6 小时前，状态为 `RUNNING`，
+对应 SQL 为 `SELECT * FROM transactions FOR SHARE WHERE txn_date > '2023-01-01'`（报表查询，约 800 万行）。该长事务持有最早的 read view，
+导致 purge thread 无法清理 6 小时内所有其他事务产生的 undo 记录，undo 表空间以每小时 8GB 速度膨胀。根因：报表查询使用 `FOR SHARE` 加锁且未设超时，运行 6 小时未提交，
+阻塞 MVCC purge 链。修复：① 立即 KILL 该长事务，undo 空间在 30 分钟内由 purge thread 回收至 12GB；② 配置 `innodb_undo_tablespaces=2` 独立 undo 表空间，
+支持自动 truncate 回收；③ 设置 `innodb_max_purge_lag=500000` 当 pending undo 页数超过阈值时自动延迟写入事务以控制膨胀；
+④ 对所有报表查询添加 `SET max_execution_time=30000`（30s 超时），防止长事务再次出现。修复后 undo 表空间稳定在 15-20GB，磁盘使用率降至 42%。
 
 :::
 
@@ -3345,9 +3747,18 @@ Keyring（物理安全）
 
 ::: details
 
-- 【L3】TDE 与列级加密的区别：TDE 加密整个表空间（磁盘级），列级加密（`AES_ENCRYPT()`）在应用层加密特定字段。TDE 不保护内存中的数据（Buffer Pool 中为明文），列级加密可保护到字段级但性能开销更大。
+- 【L3】TDE 与列级加密的区别
+
+  TDE 加密整个表空间（磁盘级），列级加密（`AES_ENCRYPT()`）在应用层加密特定字段。TDE 不保护内存中的数据（Buffer Pool 中为明文），列级加密可保护到字段级但性能开销更大。
+
 - 【L3】MySQL Enterprise Edition 的 Keyring 支持 OKV（Oracle Key Vault）后端，实现集中化密钥管理，适合金融级合规。
-- 【L4】**binlog/redo log 加密是独立开关**：TDE 只加密表空间数据页，binlog 加密要单独开 `binlog_encryption=ON`（8.0.14+），redo/undo 日志加密对应 `innodb_redo_log_encrypt` / `innodb_undo_log_encrypt`。**只开 TDE 不开 binlog 加密，binlog 文件与基于它的备份仍是明文**——拿到 binlog 就能还原全部变更，这是最常见的合规漏洞；主从场景从库 binlog 同样明文落盘，需逐台开启。
+
+- 【L4】**binlog/redo log 加密是独立开关**
+
+  TDE 只加密表空间数据页，binlog 加密要单独开 `binlog_encryption=ON`（8.0.14+），
+  redo/undo 日志加密对应 `innodb_redo_log_encrypt` / `innodb_undo_log_encrypt`。**只开 TDE 不开 binlog 加密，binlog 文件与基于它的备份仍是明文**——
+  拿到 binlog 就能还原全部变更，这是最常见的合规漏洞；主从场景从库 binlog 同样明文落盘，需逐台开启。
+
 - 【L4】AWS RDS 的加密方案底层基于 AWS KMS，原理类似 TDE 但密钥托管在云端，支持自动轮换。
 
 :::
@@ -3355,8 +3766,6 @@ Keyring（物理安全）
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "TDE 能防 SQL 注入" → TDE 只保护静态数据（磁盘上的文件），不保护传输中或内存中的数据。SQL 注入攻击发生在查询执行阶段，TDE 完全无效。
 - ❌ "开了 TDE 备份就不需要加密" → 物理备份（xtrabackup）导出的是密文，但如果 Keyring 文件一起被拷贝，攻击者可解密。Keyring 必须单独安全保管。
@@ -3414,10 +3823,20 @@ PreparedStatement 在数据库服务端预编译 SQL 模板，参数通过 `?` �
 
 ::: details
 
-- 【L3】MyBatis 的 `${}` 是字符串拼接（有注入风险），`#{}` 是 PreparedStatement 参数绑定（安全）。动态表名、列名、`ORDER BY` 排序字段等**标识符位置无法参数化**，此时必须用 `${}` + 白名单校验（枚举映射：前端传 `time` → 后端映射为 `create_time`，绝不透传原文）。
-- 【L3】**盲注绕过了「报错回显」防线**：时间盲注（`IF(cond, SLEEP(5), 0)` 用响应时间当信道）、布尔盲注（用返回条数/页面差异当信道）不依赖任何错误信息，靠 WAF 特征与「隐藏报错」都拦不住——所以纵深防御必须压到**最小权限层**（即使注入成功也拿不到 FILE/SUPER/DROP 权限，爆炸半径受限）。配套动作：错误信息不回显（全局异常处理统一返回，避免数据库报错泄漏表结构）。
-- 【L3】二阶注入（Second-Order Injection）：恶意数据先被安全存入数据库，取出后拼接到另一条 SQL 时触发。比存储型更隐蔽，因为"存入时没有报错"。
-- 【L4】ORM 框架（Hibernate/JPA）的 HQL/JPQL 同样支持参数绑定，但 Criteria API 的动态拼接场景仍需警惕。RASP（运行时应用自保护）可在 JDBC 调用层检测语义异常的 SQL，是 WAF 之后的又一层运行时兜底。
+- 【L3】MyBatis 的 `${}` 是字符串拼接（有注入风险），`#{}` 是 PreparedStatement 参数绑定（安全）。动态表名、列名、`ORDER BY` 排序字段等**标识符位置无法参数化**，
+  此时必须用 `${}` + 白名单校验（枚举映射：前端传 `time` → 后端映射为 `create_time`，绝不透传原文）。
+
+- 【L3】**盲注绕过了「报错回显」防线**
+
+  时间盲注（`IF(cond, SLEEP(5), 0)` 用响应时间当信道）、布尔盲注（用返回条数/页面差异当信道）不依赖任何错误信息，靠 WAF 特征与「隐藏报错」都拦不住——
+  所以纵深防御必须压到**最小权限层**（即使注入成功也拿不到 FILE/SUPER/DROP 权限，爆炸半径受限）。配套动作：错误信息不回显（全局异常处理统一返回，避免数据库报错泄漏表结构）。
+
+- 【L3】二阶注入（Second-Order Injection）
+
+  恶意数据先被安全存入数据库，取出后拼接到另一条 SQL 时触发。比存储型更隐蔽，因为"存入时没有报错"。
+
+- 【L4】ORM 框架（Hibernate/JPA）的 HQL/JPQL 同样支持参数绑定，但 Criteria API 的动态拼接场景仍需警惕。RASP（运行时应用自保护）可在 JDBC 调用层检测语义异常的 SQL，
+  是 WAF 之后的又一层运行时兜底。
 
 :::
 
@@ -3440,8 +3859,6 @@ PreparedStatement 在数据库服务端预编译 SQL 模板，参数通过 `?` �
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "用了 ORM 就不会有 SQL 注入" → ORM 的动态排序（`ORDER BY ${column}`）、动态表名仍可能拼接用户输入。
 - ❌ "过滤单引号就够了" → 宽字节注入（GBK 编码下 `%df'` 被解析为一个汉字 + 多余引号）可绕过单字符过滤。

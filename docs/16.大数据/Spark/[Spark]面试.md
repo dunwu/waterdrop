@@ -54,8 +54,16 @@ RDD 是最底层的分布式数据抽象（类型安全但无优化）；DataFra
 
 ::: details
 
-- 【L3】**Tungsten 项目**：Spark 1.4 引入，核心优化包括：① 显式内存管理（绕过 JVM GC，使用 `sun.misc.Unsafe` 直接操作堆外内存）；② 代码生成（Whole-Stage Code Generation，消除虚函数调用和虚拟内存间接寻址）；③ 二进制行格式（列式紧凑布局，CPU cache 友好）。这三项使 Spark SQL 性能接近手写 C++。
-- 【L3】**何时用 RDD 而非 DataFrame**：① 非结构化数据（如图片、文本流）无法表达 Schema；② 需要精细控制分区策略（如自定义 Partitioner）；③ 增量迁移旧代码。新项目中 DataFrame/Dataset 应作为默认选择。
+- 【L3】**Tungsten 项目**
+
+  Spark 1.4 引入，核心优化包括：① 显式内存管理（绕过 JVM GC，使用 `sun.misc.Unsafe` 直接操作堆外内存）；
+  ② 代码生成（Whole-Stage Code Generation，消除虚函数调用和虚拟内存间接寻址）；③ 二进制行格式（列式紧凑布局，CPU cache 友好）。这三项使 Spark SQL 性能接近手写 C++。
+
+- 【L3】**何时用 RDD 而非 DataFrame**
+
+  ① 非结构化数据（如图片、文本流）无法表达 Schema；② 需要精细控制分区策略（如自定义 Partitioner）；③ 增量迁移旧代码。
+
+  新项目中 DataFrame/Dataset 应作为默认选择。
 
 :::
 
@@ -88,7 +96,7 @@ Spark 采用 Master-Worker 架构：Driver 程序负责解析 SQL/DAG 编排，C
 | 指标               | 数值                                                                           | 备注                                                               |
 | :----------------- | :----------------------------------------------------------------------------- | :----------------------------------------------------------------- |
 | Executor 心跳      | 10s/次（spark.executor.heartbeatInterval）                                     | 超过 spark.network.timeout（默认 120s）未心跳判失联，Task 重新调度 |
-| 推荐 Executor 配比 | 单实例 4~~5 核 + 8~~16GB                                                       | 核数过多会加剧 HDFS 客户端线程争抢                                 |
+| 推荐 Executor 配比 | 单实例 4~5 核 + 8~16GB                                                       | 核数过多会加剧 HDFS 客户端线程争抢                                 |
 | 统一内存占比       | (堆内存 − 300MB 保留) × spark.memory.fraction(0.6)，storage/execution 初始各半 | 双方可互相借用，强制回收仅针对对方持有部分                         |
 | 本地化等待         | spark.locality.wait 默认 3s                                                    | PROCESS_LOCAL 无网络开销，本地化等级差可损失 10%~30% 吞吐          |
 | 与 MR 对比         | 官方经典基准：逻辑回归迭代 MR 110s → Spark 0.9s                                | 中间结果缓存在内存、不落 HDFS，是 10~100 倍差距的根源              |
@@ -135,8 +143,17 @@ Spark 采用 Master-Worker 架构：Driver 程序负责解析 SQL/DAG 编排，C
 
 ::: details
 
-- 【L3】**Driver 单点问题**：Driver 是单点进程，承载 DAG 编排和结果收集。当 collect() 返回大数据集时，Driver 内存可能 OOM。生产环境 collect 操作应限制数据量（`spark.driver.maxResultSize` 默认 1GB），大数据结果写回 HDFS/S3。
-- 【L3】**动态资源分配**：`spark.dynamicAllocation.enabled=true` 开启后，Cluster Manager 根据负载自动增减 Executor。空闲 Executor 超过 60s（`spark.dynamicAllocation.executorIdleTimeout`）被回收。适合负载波动大的批处理场景，但实时流处理建议关闭（避免频繁扩缩容引入延迟）。
+- 【L3】**Driver 单点问题**
+
+  Driver 是单点进程，承载 DAG 编排和结果收集。当 collect() 返回大数据集时，Driver 内存可能 OOM。
+
+  生产环境 collect 操作应限制数据量（`spark.driver.maxResultSize` 默认 1GB），大数据结果写回 HDFS/S3。
+
+- 【L3】**动态资源分配**
+
+  `spark.dynamicAllocation.enabled=true` 开启后，Cluster Manager 根据负载自动增减 Executor。
+
+  空闲 Executor 超过 60s（`spark.dynamicAllocation.executorIdleTimeout`）被回收。适合负载波动大的批处理场景，但实时流处理建议关闭（避免频繁扩缩容引入延迟）。
 
 :::
 
@@ -168,12 +185,12 @@ Spark Shuffle 是跨 Stage 数据重分布的机制，经历了 Hash Shuffle →
 
 #### 📊 量化参考
 
-- **Tungsten-Sort vs Hash Shuffle**：文件数减少 50~~70%，磁盘 I/O 提升 30~~50%
+- **Tungsten-Sort vs Hash Shuffle**：文件数减少 50~70%，磁盘 I/O 提升 30~50%
 - **Shuffle 缓冲区**：`spark.shuffle.file.buffer` 默认 32KB，调至 128KB 可减少 10~15% 磁盘 I/O
-- **Shuffle 压缩**：lz4 压缩减少 40~~60% 网络传输，zstd 压缩率更高但 CPU 开销增加 20~~30%
+- **Shuffle 压缩**：lz4 压缩减少 40~60% 网络传输，zstd 压缩率更高但 CPU 开销增加 20~30%
 - **100GB Shuffle 数据**：lz4 压缩后约 50~60GB，网络传输从 5min 降到 3min
 - **外部排序合并系数**：Reduce 端合并文件数 > 1000 时，合并开销可能抵消排序收益
-- **Shuffle 写盘速度**：SSD 约 200~~500MB/s，HDD 约 50~~100MB/s
+- **Shuffle 写盘速度**：SSD 约 200~500MB/s，HDD 约 50~100MB/s
 
 #### 📖 核心知识
 
@@ -193,7 +210,7 @@ Spark Shuffle 是跨 Stage 数据重分布的机制，经历了 Hash Shuffle →
 
 **量化参数**：
 
-- Shuffle 写盘缓冲区默认 32KB（`spark.shuffle.file.buffer`），增大到 64~~128KB 可减少磁盘 I/O 次数，性能提升约 5~~10%。
+- Shuffle 写盘缓冲区默认 32KB（`spark.shuffle.file.buffer`），增大到 64~128KB 可减少磁盘 I/O 次数，性能提升约 5~10%。
 - Shuffle 内存占比由 `spark.shuffle.memoryFraction`（1.x）或统一内存模型（2.x+）管理。Spark 2.x+ 统一内存模型中 Shuffle 可动态借用存储内存，上限为 `spark.memory.fraction`（默认 0.6）× JVM 堆。
 - 典型 ETL 作业中，Shuffle 耗时占总耗时的 **30~60%**，是首要优化目标。
 
@@ -201,9 +218,20 @@ Spark Shuffle 是跨 Stage 数据重分布的机制，经历了 Hash Shuffle →
 
 ::: details
 
-- 【L3】**Shuffle 调优三板斧**：① 减少 Shuffle 数据量（`mapSideCombine` 预聚合、过滤无效数据）；② 增大并行度（`spark.sql.shuffle.partitions` 默认 200，数据量大时调至 500~2000）；③ 增大缓冲区减少磁盘 I/O。
-- 【L3】**Shuffle spill（溢写）机制**：当内存缓冲区不足时，数据溢写到磁盘（`spark.local.dirs`），每次溢写产生一个临时文件。溢写次数过多意味着内存不足，应增大 `spark.executor.memory` 或减小 `spark.memory.fraction` 中 Shuffle 以外的占比。
-- 【L4】**Bypass Merge Sort Shuffle**：当 Reduce 分区数较小（`spark.shuffle.sort.bypassMergeThreshold` 默认 200）且无聚合/排序需求时，Spark 自动切换到 Bypass 模式——直接按 Partition 写独立文件再合并，避免排序开销。这是 Sort Shuffle 的内部优化分支。
+- 【L3】**Shuffle 调优三板斧**
+
+  ① 减少 Shuffle 数据量（`mapSideCombine` 预聚合、过滤无效数据）；② 增大并行度（`spark.sql.shuffle.partitions` 默认 200，
+  数据量大时调至 500~2000）；③ 增大缓冲区减少磁盘 I/O。
+
+- 【L3】**Shuffle spill（溢写）机制**
+
+  当内存缓冲区不足时，数据溢写到磁盘（`spark.local.dirs`），每次溢写产生一个临时文件。溢写次数过多意味着内存不足，
+  应增大 `spark.executor.memory` 或减小 `spark.memory.fraction` 中 Shuffle 以外的占比。
+
+- 【L4】**Bypass Merge Sort Shuffle**
+
+  当 Reduce 分区数较小（`spark.shuffle.sort.bypassMergeThreshold` 默认 200）且无聚合/排序需求时，
+  Spark 自动切换到 Bypass 模式——直接按 Partition 写独立文件再合并，避免排序开销。这是 Sort Shuffle 的内部优化分支。
 
 :::
 
@@ -268,8 +296,17 @@ Spark Shuffle 是跨 Stage 数据重分布的机制，经历了 Hash Shuffle →
 
 ::: details
 
-- 【L3】**AQE（Adaptive Query Execution）**：Spark 3.0 引入，运行时根据实际统计信息动态优化执行计划。核心能力：① 动态合并小分区（`spark.sql.adaptive.coalescePartitions.enabled`）；② 动态切换 Join 策略（Sort Merge → Broadcast）；③ 动态优化数据倾斜（`spark.sql.adaptive.skewJoin.enabled`，自动将倾斜分区拆分为子分区）。建议生产环境默认开启。
-- 【L3】**加盐的具体实现**：以 GroupBy 为例，第一轮 `df.withColumn("salt", rand() % 10).groupBy($"key", $"salt").agg(...)` 局部聚合为 10 份；第二轮 `.groupBy("key").agg(...)` 去盐全局聚合。盐的基数 = 热点 key 数据量 / 平均 key 数据量。
+- 【L3】**AQE（Adaptive Query Execution）**
+
+  Spark 3.0 引入，运行时根据实际统计信息动态优化执行计划。核心能力：
+
+  ① 动态合并小分区（`spark.sql.adaptive.coalescePartitions.enabled`）；② 动态切换 Join 策略（Sort Merge → Broadcast）；
+  ③ 动态优化数据倾斜（`spark.sql.adaptive.skewJoin.enabled`，自动将倾斜分区拆分为子分区）。建议生产环境默认开启。
+
+- 【L3】**加盐的具体实现**
+
+  以 GroupBy 为例，第一轮 `df.withColumn("salt", rand() % 10).groupBy($"key", $"salt").agg(...)` 局部聚合为 10 份；
+  第二轮 `.groupBy("key").agg(...)` 去盐全局聚合。盐的基数 = 热点 key 数据量 / 平均 key 数据量。
 
 :::
 
@@ -346,9 +383,22 @@ JVM 堆内存
 
 ::: details
 
-- 【L3】**缓存策略选型**：`MEMORY_ONLY` > `MEMORY_AND_DISK` > `DISK_ONLY`。`MEMORY_ONLY` 读取速度比 `MEMORY_AND_DISK` 快约 5~10 倍（避免磁盘 I/O）。若内存不够，优先降低存储内存占比而非降级为磁盘存储。
-- 【L3】**GC 调优**：Executor 频繁 Full GC 是内存不足的典型信号。关键参数：① `spark.executor.memory`（增大堆）；② `spark.memory.fraction`（调大统一区占比，默认 0.6，可调到 0.7~~0.8）；③ `spark.serializer`（使用 Kryo 序列化，比 Java 序列化快约 10 倍、体积小 3~~5 倍）。
-- 【L4】**堆外内存的代价**：`offHeap.enabled=true` 后 Shuffle 和存储都可使用堆外内存，绕过 GC，但需额外配置 `spark.memory.offHeap.size`。代价是调试困难（堆外内存泄漏不会在 heap dump 中显示），且部分第三方库不兼容。适合超大规模 Shuffle 场景（单 Executor Shuffle 数据 > 10GB）。
+- 【L3】**缓存策略选型**
+
+  `MEMORY_ONLY` > `MEMORY_AND_DISK` > `DISK_ONLY`。
+
+  `MEMORY_ONLY` 读取速度比 `MEMORY_AND_DISK` 快约 5~10 倍（避免磁盘 I/O）。若内存不够，优先降低存储内存占比而非降级为磁盘存储。
+
+- 【L3】**GC 调优**
+
+  Executor 频繁 Full GC 是内存不足的典型信号。关键参数：① `spark.executor.memory`（增大堆）；② `spark.memory.fraction`（调大统一区占比，
+  默认 0.6，可调到 0.7~0.8）；③ `spark.serializer`（使用 Kryo 序列化，比 Java 序列化快约 10 倍、体积小 3~5 倍）。
+
+- 【L4】**堆外内存的代价**
+
+  `offHeap.enabled=true` 后 Shuffle 和存储都可使用堆外内存，绕过 GC，但需额外配置 `spark.memory.offHeap.size`。
+
+  代价是调试困难（堆外内存泄漏不会在 heap dump 中显示），且部分第三方库不兼容。适合超大规模 Shuffle 场景（单 Executor Shuffle 数据 > 10GB）。
 
 :::
 
@@ -399,8 +449,14 @@ Catalyst 四阶段优化流程：
 
 ::: details
 
-- 【L3】**AQE 对 Catalyst 的增强**：Spark 3.x AQE 在物理计划执行阶段根据运行时统计信息动态调整：① 合并小分区（减少 Task 数，避免调度开销）；② 动态切换 Join 策略（运行时发现表实际大小后，Sort Merge → Broadcast）；③ 动态处理数据倾斜（自动拆分热点分区）。AQE 使 Catalyst 从「编译期静态优化」进化为「运行时自适应优化」。
-- 【L3】**查看执行计划**：`df.explain(true)` 或 `df.explain("extended")` 输出完整四阶段计划。生产调优时应关注 Physical Plan 中的 Join 策略和数据量估算是否准确。
+- 【L3】**AQE 对 Catalyst 的增强**
+
+  Spark 3.x AQE 在物理计划执行阶段根据运行时统计信息动态调整：① 合并小分区（减少 Task 数，避免调度开销）；② 动态切换 Join 策略（运行时发现表实际大小后，
+  Sort Merge → Broadcast）；③ 动态处理数据倾斜（自动拆分热点分区）。AQE 使 Catalyst 从「编译期静态优化」进化为「运行时自适应优化」。
+
+- 【L3】**查看执行计划**
+
+  `df.explain(true)` 或 `df.explain("extended")` 输出完整四阶段计划。生产调优时应关注 Physical Plan 中的 Join 策略和数据量估算是否准确。
 
 :::
 
@@ -446,15 +502,24 @@ Spark Streaming（DStream）是早期的微批流处理 API，以「时间批次
 **量化对比**（以 Kafka → 窗口聚合 → 写 HDFS 场景为例）：
 
 - DStream：批次间隔 5s，端到端延迟约 5~10s，吞吐约 10 万 events/s。
-- Structured Streaming（微批）：Trigger 1s，端到端延迟约 1~~3s，吞吐约 15~~20 万 events/s（Catalyst 优化）。
-- Structured Streaming（Continuous Processing）：端到端延迟约 1~~5ms，但吞吐降低约 30~~50%（实验性，不支持所有操作）。
+- Structured Streaming（微批）：Trigger 1s，端到端延迟约 1~3s，吞吐约 15~20 万 events/s（Catalyst 优化）。
+- Structured Streaming（Continuous Processing）：端到端延迟约 1~5ms，但吞吐降低约 30~50%（实验性，不支持所有操作）。
 
 #### 🔬 扩展知识
 
 ::: details
 
-- 【L3】**Watermark 机制**：Structured Streaming 通过 Watermark 解决乱序数据问题。`df.withWatermark("eventTime", "10 minutes")` 表示系统等待 10 分钟的迟到数据，超过 Watermark 的数据被丢弃。Watermark 过大会增加状态存储，过小会丢失迟到数据——需要根据业务 P99 延迟设置。
-- 【L3】**状态管理**：有状态聚合（如窗口计数）需要 Checkpoint 持久化状态到 HDFS/S3。状态大小直接影响 Checkpoint 耗时和恢复时间。生产建议：① 状态大小控制在 10GB 以内；② Checkpoint 间隔 = 批次间隔 × 10~20；③ 使用 RocksDB 状态后端（Spark 3.x）减少内存占用。
+- 【L3】**Watermark 机制**
+
+  Structured Streaming 通过 Watermark 解决乱序数据问题。
+
+  `df.withWatermark("eventTime", "10 minutes")` 表示系统等待 10 分钟的迟到数据，超过 Watermark 的数据被丢弃。Watermark 过大会增加状态存储，过小会丢失迟到数据——
+  需要根据业务 P99 延迟设置。
+
+- 【L3】**状态管理**
+
+  有状态聚合（如窗口计数）需要 Checkpoint 持久化状态到 HDFS/S3。状态大小直接影响 Checkpoint 耗时和恢复时间。生产建议：① 状态大小控制在 10GB 以内；
+  ② Checkpoint 间隔 = 批次间隔 × 10~20；③ 使用 RocksDB 状态后端（Spark 3.x）减少内存占用。
 
 :::
 

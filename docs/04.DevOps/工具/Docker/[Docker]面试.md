@@ -54,8 +54,15 @@ Docker 是开源**容器化平台**，把应用及其依赖打包成标准化、
 
 ::: details
 
-- 【L3】容器与虚拟机的本质区别：虚拟机通过 Hypervisor 模拟完整硬件，每个 VM 带独立 Guest OS；容器通过 Namespace 隔离 + Cgroups 限额，直接共享宿主机内核，因此启动从分钟级降到秒级、开销从 GB 级降到 MB 级。
-- 【L4】容器技术演进：Unix chroot（1979）→ FreeBSD Jail → LXC（2008）→ Docker（2013，以镜像模型与开发者体验破圈）→ OCI 标准（2015，镜像规范与运行时规范解耦，containerd/CRI-O 等运行时可替换 Docker）。
+- 【L3】容器与虚拟机的本质区别
+
+  虚拟机通过 Hypervisor 模拟完整硬件，每个 VM 带独立 Guest OS；容器通过 Namespace 隔离 + Cgroups 限额，直接共享宿主机内核，因此启动从分钟级降到秒级、
+  开销从 GB 级降到 MB 级。
+
+- 【L4】容器技术演进
+
+  Unix chroot（1979）→ FreeBSD Jail → LXC（2008）→ Docker（2013，以镜像模型与开发者体验破圈）→ OCI 标准（2015，镜像规范与运行时规范解耦，
+  containerd/CRI-O 等运行时可替换 Docker）。
 
 > 📚 延伸阅读：[Docker 官方文档](https://docs.docker.com/)
 
@@ -188,8 +195,16 @@ Docker 基于 **容器化技术** 和 **Linux 内核特性**（如 Namespace 隔
 
 ::: details
 
-- 【L3】Linux Namespace 共有 6 种（内核 4.x 后为 8 种）：PID（进程号）、NET（网络栈）、MNT（挂载点）、UTS（主机名）、IPC（进程间通信）、USER（用户与组），新版本还有 CGROUP 和 TIME。容器"看起来像独立主机"正是这几种命名空间叠加的效果。
-- 【L4】当前主流存储驱动是 **overlay2**：镜像只读层依次叠放，容器启动时在最上层加一个可写层，写操作通过 **Copy-on-Write（写时复制）** 落到可写层，删除用 whiteout 标记。分层 + 共享让多个容器可复用同一份基础层，磁盘与传输都省。
+- 【L3】Linux Namespace 共有 6 种（内核 4.x 后为 8 种）
+
+  PID（进程号）、NET（网络栈）、MNT（挂载点）、UTS（主机名）、IPC（进程间通信）、USER（用户与组），
+  新版本还有 CGROUP 和 TIME。容器"看起来像独立主机"正是这几种命名空间叠加的效果。
+
+- 【L4】当前主流存储驱动是 **overlay2**
+
+  镜像只读层依次叠放，容器启动时在最上层加一个可写层，写操作通过 **Copy-on-Write（写时复制）** 落到可写层，删除用 whiteout 标记。
+
+  分层 + 共享让多个容器可复用同一份基础层，磁盘与传输都省。
 
 > 📚 延伸阅读：[Docker 官方文档：Understand the underlying architecture](https://docs.docker.com/get-started/overview/)
 
@@ -240,8 +255,15 @@ Docker 安全是 **"最小权限"** 的实践。通过使用**最小镜像**、�
 
 ::: details
 
-- 【L3】纵深防御的第二层是内核安全策略：**Seccomp** 限制可用系统调用（Docker 默认 profile 拦截约 44 个危险系统调用）、**AppArmor/SELinux** 做强制访问控制；再配合 **userns-remap** 把容器内 root 映射为宿主机普通用户，即使提权成功也拿不到宿主权限。
-- 【L4】安全治理要流程化：镜像准入用 Trivy/Grype 扫描高危漏洞并卡 CI 门禁；基线核查用 `docker-bench-security` 对照 CIS Docker Benchmark（100+ 检查项）定期巡检；不可信代码场景升级到 gVisor/Kata 沙箱运行时。
+- 【L3】纵深防御的第二层是内核安全策略
+
+  **Seccomp** 限制可用系统调用（Docker 默认 profile 拦截约 44 个危险系统调用）、**AppArmor/SELinux** 做强制访问控制；
+  再配合 **userns-remap** 把容器内 root 映射为宿主机普通用户，即使提权成功也拿不到宿主权限。
+
+- 【L4】安全治理要流程化
+
+  镜像准入用 Trivy/Grype 扫描高危漏洞并卡 CI 门禁；基线核查用 `docker-bench-security` 对照 CIS Docker Benchmark（100+ 检查项）定期巡检；
+  不可信代码场景升级到 gVisor/Kata 沙箱运行时。
 
 > 📚 延伸阅读：[Docker 官方文档：Engine security](https://docs.docker.com/engine/security/)
 
@@ -322,11 +344,16 @@ Docker 安全是 **"最小权限"** 的实践。通过使用**最小镜像**、�
 
 **失效场景**：
 
-- **`--privileged` 直接击穿所有隔离**：特权容器拥有全部 Capabilities 和设备访问权，`mount /dev/sda1 /mnt` 一条命令就能拿到宿主机完整 root，Seccomp/AppArmor 都拦不住——所以特权容器必须全网扫描、逐个审批。
+- **`--privileged` 直接击穿所有隔离**：特权容器拥有全部 Capabilities 和设备访问权，`mount /dev/sda1 /mnt` 一条命令就能拿到宿主机完整 root，
+  Seccomp/AppArmor 都拦不住——所以特权容器必须全网扫描、逐个审批。
+
 - **挂载 docker.sock 等于交出宿主机**：容器内可通过 Docker API 启动一个挂载宿主根目录的特权容器，等价于直接 root，CI 系统里这是最高频的违规配置。
+
 - **补丁滞后时防御失效**：CVE-2019-5736（runc 逃逸）这类运行时漏洞，不升级 runc 时所有配置加固都拦不住。
 
-**量化参考**：Docker 默认 Seccomp 配置会拦截约 44 个危险系统调用；CIS Docker Benchmark 共有 100+ 检查项，可用 `docker-bench-security` 一键扫描；行业红线：生产环境特权容器数量应为 **0**。
+**量化参考**：Docker 默认 Seccomp 配置会拦截约 44 个危险系统调用；CIS Docker Benchmark 共有 100+ 检查项，可用 `docker-bench-security` 一键扫描；行业红线：
+
+生产环境特权容器数量应为 **0**。
 
 > 📚 延伸阅读：[CIS Docker Benchmark](https://www.cisecurity.org/benchmark/docker)
 
@@ -336,7 +363,10 @@ Docker 安全是 **"最小权限"** 的实践。通过使用**最小镜像**、�
 
 ::: details
 
-**踩坑案例**：某团队 CI 系统为了图方便，给构建容器挂载了 `/var/run/docker.sock`。一次安全演练中，红队通过一个含漏洞的构建脚本在容器内调用 Docker API，执行 `docker run --privileged -v /:/host` 拿到了宿主机完整控制权，前后只用了 3 分钟，横向打到了同机其他 6 个业务容器。排查：审计 docker.sock 挂载点与宿主机异常进程链；根因：CI 容器默认模板含危险挂载且无准入扫描；修复：全量排查存量容器挂载，CI 改用 rootless 构建（buildkit rootless 模式），并用准入策略（OPA/Kyverno）禁止特权容器与危险挂载上线。
+**踩坑案例**：某团队 CI 系统为了图方便，给构建容器挂载了 `/var/run/docker.sock`。一次安全演练中，红队通过一个含漏洞的构建脚本在容器内调用 Docker API，
+执行 `docker run --privileged -v /:/host` 拿到了宿主机完整控制权，前后只用了 3 分钟，横向打到了同机其他 6 个业务容器。排查：审计 docker.sock 挂载点与宿主机异常进程链；根因：
+
+CI 容器默认模板含危险挂载且无准入扫描；修复：全量排查存量容器挂载，CI 改用 rootless 构建（buildkit rootless 模式），并用准入策略（OPA/Kyverno）禁止特权容器与危险挂载上线。
 
 **场景题**：安全扫描发现某生产集群里有 12 个容器使用了 `--privileged`，其中 3 个是存储插件（确实需要），9 个是业务团队"当年部署报错加上试试就好了"留下的。你作为平台 SRE，如何在不影响业务的前提下完成整改？
 
@@ -344,17 +374,17 @@ Docker 安全是 **"最小权限"** 的实践。通过使用**最小镜像**、�
 
 **根因分析**：特权容器泛滥的根源不是开发者安全意识差，而是平台缺少准入控制——`--privileged` 能直接生效说明部署链路没有安全门禁；"报错加权限"的行为说明平台没有提供诊断支持，开发者只能用特权模式碰运气。
 
-**长期方案**：① 上线准入策略（Pod Security Admission restricted 级别或 OPA/Kyverno），默认拒绝特权容器，白名单需安全审批；② 存量 9 个容器逐个分析真实权限需求，用 `--cap-add=<具体能力>` 替换全特权，多数场景只需 1~2 个 capability；③ 把 `docker-bench-security` 纳入周度安全巡检，新增特权容器告警到安全群。
+**长期方案**：① 上线准入策略（Pod Security Admission restricted 级别或 OPA/Kyverno），默认拒绝特权容器，白名单需安全审批；② 存量 9 个容器逐个分析真实权限需求，
+用 `--cap-add=<具体能力>` 替换全特权，多数场景只需 1~2 个 capability；③ 把 `docker-bench-security` 纳入周度安全巡检，新增特权容器告警到安全群。
 
-**权衡**：一刀切立即禁用会导致业务部署失败、引发绕开平台的影子部署；逐容器分析又耗人力。正确的节奏是"新账不欠（准入拦截立即生效）+ 旧账限期还（存量按风险排序，2 周内清零）"，并给业务提供降权后的调试支持，把安全整改做成服务而不是对抗。
+**权衡**：一刀切立即禁用会导致业务部署失败、引发绕开平台的影子部署；逐容器分析又耗人力。正确的节奏是"新账不欠（准入拦截立即生效）+ 旧账限期还（存量按风险排序，2 周内清零）"，并给业务提供降权后的调试支持，
+把安全整改做成服务而不是对抗。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "容器和虚拟机一样是硬隔离" → 容器共享宿主机内核，隔离是"君子协定"；内核漏洞可直接穿透，多租户不可信代码应使用 gVisor/Kata 等沙箱运行时。
 - ❌ "只要配置加固就能挡住一切逃逸" → CVE-2019-5736（runc 逃逸）这类运行时漏洞，不升级 runc 时所有配置加固都拦不住，打补丁是防御前提。
@@ -489,8 +519,15 @@ docker run -d --cpus 1 -m 512m --name memory-limited nginx
 
 ::: details
 
-- 【L3】内存硬限制触发后果：容器内存超过 `-m` 上限时，内核的 OOM Killer 会杀掉容器内进程，容器表现为反复重启；因此 JVM 类应用还需让堆上限感知容器限额（`-XX:MaxRAMPercentage`），否则 JVM 按宿主机内存估算会被 OOM Kill。
-- 【L4】软限制与进程数限制：`--memory-reservation` 是尽力而为的软限制，仅在宿主机内存紧张时生效；`--pids-limit` 可防 fork 炸弹。cgroups v2 相比 v1 统一了控制器层级，是新一代发行版的默认方向。
+- 【L3】内存硬限制触发后果
+
+  容器内存超过 `-m` 上限时，内核的 OOM Killer 会杀掉容器内进程，容器表现为反复重启；因此 JVM 类应用还需让堆上限感知容器限额（`-XX:MaxRAMPercentage`），
+  否则 JVM 按宿主机内存估算会被 OOM Kill。
+
+- 【L4】软限制与进程数限制
+
+  `--memory-reservation` 是尽力而为的软限制，仅在宿主机内存紧张时生效；`--pids-limit` 可防 fork 炸弹。cgroups v2 相比 v1 统一了控制器层级，
+  是新一代发行版的默认方向。
 
 > 📚 延伸阅读：[Docker 官方文档：Resource constraints](https://docs.docker.com/config/containers/resource_constraints/)
 
@@ -534,8 +571,13 @@ Docker 镜像的多层结构基于联合文件系统实现，核心要点：
 
 ::: details
 
-- 【L3】主流存储驱动是 **overlay2**：lowerdir 叠放各只读层、upperdir 是容器可写层、merged 呈现统一文件系统视图。删除文件时在可写层写 whiteout 标记"遮住"下层文件，底层数据其实还在。
-- 【L4】分层带来的工程收益可量化：`docker history` 可查看每层的来源指令与体积；镜像推拉按层传输，本地已有的层直接跳过；构建时指令前缀未变即命中缓存——这也是"不常变的指令放前面"最佳实践的底层原因。
+- 【L3】主流存储驱动是 **overlay2**
+
+  lowerdir 叠放各只读层、upperdir 是容器可写层、merged 呈现统一文件系统视图。删除文件时在可写层写 whiteout 标记"遮住"下层文件，底层数据其实还在。
+
+- 【L4】分层带来的工程收益可量化
+
+  `docker history` 可查看每层的来源指令与体积；镜像推拉按层传输，本地已有的层直接跳过；构建时指令前缀未变即命中缓存——这也是"不常变的指令放前面"最佳实践的底层原因。
 
 > 📚 延伸阅读：[Docker 官方文档：About storage drivers](https://docs.docker.com/storage/storagedriver/)
 
@@ -671,7 +713,11 @@ Docker 多阶段构建的核心优势：
 
 ::: details
 
-- 【L3】进阶用法：`COPY --from=<阶段名或镜像>` 既能引用前序阶段，也能直接从外部镜像拷贝文件（如 `COPY --from=busybox /bin/true /`）；`FROM ... AS stage` 给阶段命名后可在后续阶段间跳跃引用，未最终引用的阶段产物不会进入成品镜像。
+- 【L3】进阶用法
+
+  `COPY --from=<阶段名或镜像>` 既能引用前序阶段，也能直接从外部镜像拷贝文件（如 `COPY --from=busybox /bin/true /`）；
+  `FROM ... AS stage` 给阶段命名后可在后续阶段间跳跃引用，未最终引用的阶段产物不会进入成品镜像。
+
 - 【L4】BuildKit 加持下各阶段可并行构建，配合 `--target` 参数可以只构建到指定阶段（如 CI 中只构建"测试阶段"的镜像），进一步压缩流水线时间。
 
 > 📚 延伸阅读：[Docker 官方文档：Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
@@ -736,8 +782,14 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ::: details
 
-- 【L3】体积对比量级：`node:18` 约 1GB，直接带 `node_modules` 的成品动辄数百 MB；换成 `nginx:alpine` + 静态产物后常见成品仅 20~50MB，拉取时间与存储成本同比例下降。
-- 【L4】Java/Go 场景变体：Go 可 `FROM scratch` + 静态编译二进制做到 10MB 级；Java 可用 `FROM eclipse-temurin:17-jre-alpine` 只留 JRE；配合 `--target` 还能从同一 Dockerfile 产出"调试镜像"与"生产镜像"。
+- 【L3】体积对比量级
+
+  `node:18` 约 1GB，直接带 `node_modules` 的成品动辄数百 MB；换成 `nginx:alpine` + 静态产物后常见成品仅 20~50MB，拉取时间与存储成本同比例下降。
+
+- 【L4】Java/Go 场景变体
+
+  Go 可 `FROM scratch` + 静态编译二进制做到 10MB 级；Java 可用 `FROM eclipse-temurin:17-jre-alpine` 只留 JRE；
+  配合 `--target` 还能从同一 Dockerfile 产出"调试镜像"与"生产镜像"。
 
 > 📚 延伸阅读：[Docker 官方文档：Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
 
@@ -802,8 +854,15 @@ CMD ["app.jar"]
 
 ::: details
 
-- 【L3】exec 格式与 shell 格式的差异：`CMD ["java","-jar","app.jar"]`（exec 格式）直接 exec 进程，PID 1 就是 java，能正确接收 SIGTERM；`CMD java -jar app.jar`（shell 格式）会套一层 `/bin/sh -c`，PID 1 是 sh，信号可能无法转发导致优雅停机失败、`docker stop` 等满超时才 kill。
-- 【L4】ADD 的两个正当用途：从构建上下文自动解压 tar 包（省去 RUN tar -xzf）、以及多阶段构建出现之前从远程 URL 拉文件（现在应改用 COPY + curl 或 `COPY --from`，以获得更好的缓存控制）。
+- 【L3】exec 格式与 shell 格式的差异
+
+  `CMD ["java","-jar","app.jar"]`（exec 格式）直接 exec 进程，PID 1 就是 java，能正确接收 SIGTERM；
+  `CMD java -jar app.jar`（shell 格式）会套一层 `/bin/sh -c`，PID 1 是 sh，信号可能无法转发导致优雅停机失败、`docker stop` 等满超时才 kill。
+
+- 【L4】ADD 的两个正当用途
+
+  从构建上下文自动解压 tar 包（省去 RUN tar -xzf）、以及多阶段构建出现之前从远程 URL 拉文件（现在应改用 COPY + curl 或 `COPY --from`，
+  以获得更好的缓存控制）。
 
 > 📚 延伸阅读：[Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
 
@@ -837,7 +896,7 @@ CMD ["app.jar"]
 
 | 指标               | 数值                                                           | 备注                                             |
 | :----------------- | :------------------------------------------------------------- | :----------------------------------------------- |
-| 镜像体积缩减       | Node.js 应用：node:latest 约 1GB → Alpine + 多阶段约 100~150MB | 缩减 80%~~90%，Go/Distroless 可压到 20~~30MB     |
+| 镜像体积缩减       | Node.js 应用：node:latest 约 1GB → Alpine + 多阶段约 100~150MB | 缩减 80%~90%，Go/Distroless 可压到 20~30MB     |
 | 构建缓存收益       | 指令排序合理时，日常构建从 5~10min 降至 30s 级                 | 依赖安装放前、源码 COPY 放后，只重跑失效层       |
 | 拉取耗时           | 10MB/s 带宽下 1GB 镜像约 100s，150MB 约 15s                    | 直接决定弹性扩容与故障漂移速度                   |
 | .dockerignore 收益 | 排除 node_modules/.git 后构建上下文从 GB 级降至 MB 级          | 上下文体积直接影响 build 上传阶段耗时            |
@@ -860,8 +919,16 @@ CMD ["app.jar"]
 
 ::: details
 
-- 【L3】缓存失效的精确规则：每条指令构建前先查"基础层 + 本指令内容"是否命中缓存，任一前置层失效则后续全失效；`COPY`/`ADD` 按**文件内容校验和**判断而非文件名，所以"先 COPY 依赖清单装依赖、再 COPY 全量代码"能让依赖层在代码频繁变动时依然命中。
-- 【L4】`RUN apt-get update` 与 `apt-get install` 拆成两条指令是经典坑：update 层命中旧缓存时会安装过期版本的包，必须合并为一条并清理 `/var/lib/apt/lists/*`。CI 中可用 `docker build --cache-from` 或 BuildKit 的外部缓存后端（registry cache）跨流水线复用缓存。
+- 【L3】缓存失效的精确规则
+
+  每条指令构建前先查"基础层 + 本指令内容"是否命中缓存，任一前置层失效则后续全失效；`COPY`/`ADD` 按**文件内容校验和**判断而非文件名，所以"先 COPY 依赖清单装依赖、
+  再 COPY 全量代码"能让依赖层在代码频繁变动时依然命中。
+
+- 【L4】`RUN apt-get update` 与 `apt-get install` 拆成两条指令是经典坑
+
+  update 层命中旧缓存时会安装过期版本的包，必须合并为一条并清理 `/var/lib/apt/lists/*`。
+
+  CI 中可用 `docker build --cache-from` 或 BuildKit 的外部缓存后端（registry cache）跨流水线复用缓存。
 
 > 📚 延伸阅读：[Docker 官方文档：Dockerfile best practices](https://docs.docker.com/build/building/best-practices/)
 
@@ -952,8 +1019,14 @@ docker run -d --log-opt max-size=100m --log-opt max-file=3 nginx
 
 ::: details
 
-- 【L3】卷的真实位置：`docker volume inspect` 返回的 `Mountpoint` 默认指向 `/var/lib/docker/volumes/<卷名>/_data`；卷被任何容器引用时无法删除（rm 报错），需先删容器或用 `docker volume rm -f`（慎用）。
-- 【L4】卷驱动可扩展：`--driver` 支持第三方插件卷（如 NFS、云盘驱动），实现跨主机共享存储；配合 `--label` 给卷打标，便于批量治理与成本核算。
+- 【L3】卷的真实位置
+
+  `docker volume inspect` 返回的 `Mountpoint` 默认指向 `/var/lib/docker/volumes/<卷名>/_data`；卷被任何容器引用时无法删除（rm 报错），
+  需先删容器或用 `docker volume rm -f`（慎用）。
+
+- 【L4】卷驱动可扩展
+
+  `--driver` 支持第三方插件卷（如 NFS、云盘驱动），实现跨主机共享存储；配合 `--label` 给卷打标，便于批量治理与成本核算。
 
 > 📚 延伸阅读：[Docker 官方文档：Manage data in Docker](https://docs.docker.com/storage/)
 
@@ -1005,7 +1078,11 @@ docker run -d -v my_volume:/data --name my_container my_image
 
 ::: details
 
-- 【L3】三种数据挂载方式对比：**named volume**（`-v 卷名:/data`，Docker 托管、推荐用于生产数据）、**bind mount**（`-v /宿主路径:/data`，直接挂宿主目录，适合开发时同步代码）、**tmpfs**（`--tmpfs /tmp`，仅内存、不落盘，适合临时敏感数据）。
+- 【L3】三种数据挂载方式对比
+
+  **named volume**（`-v 卷名:/data`，Docker 托管、推荐用于生产数据）、**bind mount**（`-v /宿主路径:/data`，直接挂宿主目录，适合开发时同步代码）、
+  **tmpfs**（`--tmpfs /tmp`，仅内存、不落盘，适合临时敏感数据）。
+
 - 【L4】容器内未挂载卷的路径写入的是可写层，容器删除即丢失；因此数据库类服务必须显式把数据目录（如 `/var/lib/mysql`）挂到卷上，否则"升级镜像 = 清空数据"。
 
 > 📚 延伸阅读：[Docker 官方文档：Volumes](https://docs.docker.com/storage/volumes/)
@@ -1050,8 +1127,15 @@ Docker 容器启动时间优化重点：
 
 ::: details
 
-- 【L3】先量化再优化：`docker run --rm 镜像` 配合 `time` 测冷启动；`docker events` / `systemd-analyze` 区分"镜像解包耗时"与"应用就绪耗时"——多数场景瓶颈在应用初始化（加载配置、建连接池），而非 Docker 本身。
-- 【L4】大规模场景进阶：镜像预热（在节点提前 `docker pull`，避免调度后现拉）、镜像 P2P 分发（如 Dragonfly）；Kubernetes 场景还可用 init container 并行预检、readiness probe 精确界定"就绪"。
+- 【L3】先量化再优化
+
+  `docker run --rm 镜像` 配合 `time` 测冷启动；`docker events` / `systemd-analyze` 区分"镜像解包耗时"与"应用就绪耗时"——
+  多数场景瓶颈在应用初始化（加载配置、建连接池），而非 Docker 本身。
+
+- 【L4】大规模场景进阶
+
+  镜像预热（在节点提前 `docker pull`，避免调度后现拉）、镜像 P2P 分发（如 Dragonfly）；Kubernetes 场景还可用 init container 并行预检、
+  readiness probe 精确界定"就绪"。
 
 > 📚 延伸阅读：[Docker 官方文档：About storage drivers](https://docs.docker.com/storage/storagedriver/)
 
@@ -1096,7 +1180,11 @@ Docker 容器间通信的核心方式：
 
 ::: details
 
-- 【L3】默认 bridge（docker0）的坑：不支持容器名 DNS 解析，容器间只能用 IP 或已废弃的 `--link` 通信；`docker network create` 创建的自定义 bridge 才自带服务发现——这是"容器间连不通"最常见的根因。
+- 【L3】默认 bridge（docker0）的坑
+
+  不支持容器名 DNS 解析，容器间只能用 IP 或已废弃的 `--link` 通信；`docker network create` 创建的自定义 bridge 才自带服务发现——
+  这是"容器间连不通"最常见的根因。
+
 - 【L4】跨主机通信的底层是 overlay 网络的 VXLAN 封装 + 内置 DNS 轮询，注意 MTU 要留足封装开销（如 1450）；生产集群则普遍交给 Kubernetes Service/CoreDNS 做服务发现。
 
 > 📚 延伸阅读：[Docker 官方文档：Networking overview](https://docs.docker.com/network/)
@@ -1147,8 +1235,14 @@ Docker 中环境变量的配置与管理方式：
 
 ::: details
 
-- 【L3】`ENV` 的双重作用：除了注入运行时环境，还会被后续 Dockerfile 指令引用（如 `WORKDIR $APP_HOME`），并在 `docker inspect` 中可见——所以密码、密钥类值绝不能写 `ENV`，镜像层会永久保留。
-- 【L4】密钥管理进阶：生产环境用 `.env` 文件 + 严格权限（chmod 600、不进 Git），Compose 支持 `env_file` 与变量插值；更高要求接 Vault/K8s Secret 等密钥管理系统，运行时再注入。
+- 【L3】`ENV` 的双重作用
+
+  除了注入运行时环境，还会被后续 Dockerfile 指令引用（如 `WORKDIR $APP_HOME`），并在 `docker inspect` 中可见——所以密码、密钥类值绝不能写 `ENV`，
+  镜像层会永久保留。
+
+- 【L4】密钥管理进阶
+
+  生产环境用 `.env` 文件 + 严格权限（chmod 600、不进 Git），Compose 支持 `env_file` 与变量插值；更高要求接 Vault/K8s Secret 等密钥管理系统，运行时再注入。
 
 > 📚 延伸阅读：[Docker 官方文档：Environment variables](https://docs.docker.com/reference/cli/docker/container/run/#env)
 
@@ -1194,8 +1288,13 @@ Docker Compose 的核心作用：
 
 ::: details
 
-- 【L3】能力边界：Compose 面向**单机**多容器，`depends_on` 只保证启动顺序、不保证依赖服务就绪（可用 `depends_on.condition: service_healthy` 配合健康检查）；需要跨节点高可用时应升级到 Swarm/Kubernetes。
-- 【L4】Compose 规范已捐赠给社区并演进为 `docker compose`（V2，CLI 插件）；多环境差异用 override 文件（`docker-compose.override.yml`）或 profiles 实现，避免为每套环境复制一份 yml。
+- 【L3】能力边界
+
+  Compose 面向**单机**多容器，`depends_on` 只保证启动顺序、不保证依赖服务就绪（可用 `depends_on.condition: service_healthy` 配合健康检查）；
+  需要跨节点高可用时应升级到 Swarm/Kubernetes。
+
+- 【L4】Compose 规范已捐赠给社区并演进为 `docker compose`（V2，CLI 插件）；多环境差异用 override 文件（`docker-compose.override.yml`）或 profiles 实现，
+  避免为每套环境复制一份 yml。
 
 > 📚 延伸阅读：[Docker 官方文档：Compose](https://docs.docker.com/compose/)
 
@@ -1242,8 +1341,15 @@ Jenkins 与 Docker 集成实现 CI/CD 的核心要点：
 
 ::: details
 
-- 【L3】安全红线：给 Jenkins 构建容器挂载 `/var/run/docker.sock` 是最高频的违规配置——等于交出宿主机控制权；生产 CI 应改用 rootless 构建（BuildKit rootless）或专用构建节点，并禁止特权容器。
-- 【L4】回滚与灰度的关键在**不可变镜像**：每次构建产出唯一标签（如 `app:build-123` 或 git SHA），部署/回滚只是切换标签指向；进阶可用动态 Agent（Jenkins Kubernetes 插件）按任务起容器，构建环境本身也容器化。
+- 【L3】安全红线
+
+  给 Jenkins 构建容器挂载 `/var/run/docker.sock` 是最高频的违规配置——等于交出宿主机控制权；
+  生产 CI 应改用 rootless 构建（BuildKit rootless）或专用构建节点，并禁止特权容器。
+
+- 【L4】回滚与灰度的关键在**不可变镜像**
+
+  每次构建产出唯一标签（如 `app:build-123` 或 git SHA），部署/回滚只是切换标签指向；
+  进阶可用动态 Agent（Jenkins Kubernetes 插件）按任务起容器，构建环境本身也容器化。
 
 > 📚 延伸阅读：[Jenkins 官方文档：Docker Pipeline](https://www.jenkins.io/doc/book/pipeline/docker/)
 
@@ -1360,9 +1466,19 @@ docker network disconnect my-network app3  # 断开连接
 
 ::: details
 
-- 【L3】失效场景一：默认 bridge 无内置 DNS。默认 `docker0` 网络不支持容器名解析，容器间只能用 IP/`--link` 通信；必须用 `docker network create` 自建网络才有服务发现，这是新手最常见的"容器间连不通"根因。
-- 【L3】失效场景二：host 模式端口冲突。多个容器都想绑 80 端口时直接启动失败，且宿主机防火墙规则对容器端口无隔离，安全面扩大。
-- 【L4】量化参考：单机 bridge 网络下，端口映射经 iptables NAT 转发，高并发（万级连接）时 iptables 规则遍历开销明显，大规模集群通常换用 IPVS 模式（规则查找从 O(n) 降为 O(1)）或 eBPF 方案（Cilium）。
+- 【L3】失效场景一
+
+  默认 bridge 无内置 DNS。默认 `docker0` 网络不支持容器名解析，容器间只能用 IP/`--link` 通信；必须用 `docker network create` 自建网络才有服务发现，
+  这是新手最常见的"容器间连不通"根因。
+
+- 【L3】失效场景二
+
+  host 模式端口冲突。多个容器都想绑 80 端口时直接启动失败，且宿主机防火墙规则对容器端口无隔离，安全面扩大。
+
+- 【L4】量化参考
+
+  单机 bridge 网络下，端口映射经 iptables NAT 转发，高并发（万级连接）时 iptables 规则遍历开销明显，
+  大规模集群通常换用 IPVS 模式（规则查找从 O(n) 降为 O(1)）或 eBPF 方案（Cilium）。
 
 > 📚 延伸阅读：[Docker 官方文档：Networking overview](https://docs.docker.com/network/)
 
@@ -1418,8 +1534,14 @@ Docker 网络模型基于隔离、互通和可扩展原则，利用 Linux 网络
 
 ::: details
 
-- 【L3】底层设备链路：每个容器有独立 netns，宿主机侧用 veth pair 一端插到容器 netns、一端挂到网桥（bridge）或做路由（ipvlan L3）；理解这条链路才能定位"丢包发生在哪一段"。
-- 【L4】插件生态：Libnetwork 的插件机制允许 Calico（BGP 路由 + NetworkPolicy）、Cilium（eBPF）等接管网络面，在 Kubernetes 场景提供加密、策略与可观测能力，比原生驱动更适合大规模多租户。
+- 【L3】底层设备链路
+
+  每个容器有独立 netns，宿主机侧用 veth pair 一端插到容器 netns、一端挂到网桥（bridge）或做路由（ipvlan L3）；理解这条链路才能定位"丢包发生在哪一段"。
+
+- 【L4】插件生态
+
+  Libnetwork 的插件机制允许 Calico（BGP 路由 + NetworkPolicy）、Cilium（eBPF）等接管网络面，在 Kubernetes 场景提供加密、策略与可观测能力，
+  比原生驱动更适合大规模多租户。
 
 > 📚 延伸阅读：[Docker 官方文档：Networking overview](https://docs.docker.com/network/)
 
@@ -1462,8 +1584,15 @@ bridge 配置四件套：`network create --driver bridge` 建自定义网络（*
 
 ::: details
 
-- 【L3】外部流量进容器的完整链路：宿主机 IP:端口 → iptables DNAT 改写为容器 IP:端口 → docker0 网桥转发到容器 veth。排查"外部访问不到容器服务"时，先查 iptables FORWARD 链与宿主防火墙，再看端口是否真在监听。
-- 【L4】默认 bridge 与自建网络的本质差异不只是 DNS：自建网络支持按项目隔离、可在创建时声明 MTU/子网（`--subnet`、`-o com.docker.network.driver.mtu`），且容器间通信策略可控；默认 bridge 上所有容器同网互通，无隔离可言。
+- 【L3】外部流量进容器的完整链路
+
+  宿主机 IP:端口 → iptables DNAT 改写为容器 IP:端口 → docker0 网桥转发到容器 veth。排查"外部访问不到容器服务"时，
+  先查 iptables FORWARD 链与宿主防火墙，再看端口是否真在监听。
+
+- 【L4】默认 bridge 与自建网络的本质差异不只是 DNS
+
+  自建网络支持按项目隔离、可在创建时声明 MTU/子网（`--subnet`、`-o com.docker.network.driver.mtu`），且容器间通信策略可控；
+  默认 bridge 上所有容器同网互通，无隔离可言。
 
 > 📚 延伸阅读：[Docker 官方文档：Bridge networks](https://docs.docker.com/network/drivers/bridge/)
 
@@ -1507,8 +1636,13 @@ Docker overlay 网络模式用于 Swarm 集群跨宿主机容器通信，核心�
 
 ::: details
 
-- 【L3】三个端口的分工：2377（TCP，集群管理 API）、7946（TCP/UDP，节点间通信与发现）、4789（UDP，VXLAN 数据面）；少开任一都会出现"服务建得出来但跨节点不通"的怪象。
-- 【L4】性能与兼容：VXLAN 封装增加 50 字节头部，物理 MTU 1500 时应把容器 MTU 设为 1450，否则大包触发分片或丢弃；追求性能可将物理网升级为 9000 巨帧并相应调整，但涉及交换机全局配置需单独评估。
+- 【L3】三个端口的分工
+
+  2377（TCP，集群管理 API）、7946（TCP/UDP，节点间通信与发现）、4789（UDP，VXLAN 数据面）；少开任一都会出现"服务建得出来但跨节点不通"的怪象。
+
+- 【L4】性能与兼容
+
+  VXLAN 封装增加 50 字节头部，物理 MTU 1500 时应把容器 MTU 设为 1450，否则大包触发分片或丢弃；追求性能可将物理网升级为 9000 巨帧并相应调整，但涉及交换机全局配置需单独评估。
 
 > 📚 延伸阅读：[Docker 官方文档：Overlay networks](https://docs.docker.com/network/drivers/overlay/)
 
@@ -1554,8 +1688,13 @@ Docker 容器编排常见工具及特点：
 
 ::: details
 
-- 【L3】选型决策维度：集群规模、服务复杂度（有无有状态服务/复杂网络策略）、团队技能栈、生态依赖（监控/网关/Service Mesh 几乎都绑定 K8s）；存量 Mesos 团队迁移成本需单独评估。
-- 【L4】趋势：Mesos 已退出主流，Docker Swarm 进入维护期，K8s 事实一统；新工具向更轻量演进（K3s/Nomad），Serverless 容器（Fargate/Knative）则进一步隐藏编排细节。
+- 【L3】选型决策维度
+
+  集群规模、服务复杂度（有无有状态服务/复杂网络策略）、团队技能栈、生态依赖（监控/网关/Service Mesh 几乎都绑定 K8s）；存量 Mesos 团队迁移成本需单独评估。
+
+- 【L4】趋势
+
+  Mesos 已退出主流，Docker Swarm 进入维护期，K8s 事实一统；新工具向更轻量演进（K3s/Nomad），Serverless 容器（Fargate/Knative）则进一步隐藏编排细节。
 
 > 📚 延伸阅读：[Docker 官方文档：Orchestration](https://docs.docker.com/get-started/orchestration/)
 
@@ -1600,8 +1739,14 @@ Docker 容器编排常见工具及特点：
 
 ::: details
 
-- 【L3】Swarm 的核心抽象：node（manager/worker 两种角色）、service（声明式服务，含副本数）、task（服务拆分到节点的运行单元）；manager 基于 Raft 选举，奇数个（3~5）容忍 (n-1)/2 节点故障。
-- 【L4】演进背景：Swarm 在 2016-2017 的编排大战中败给 Kubernetes，现处于维护状态；存量 Swarm 迁移 K8s 时，compose 文件可借助 kompose 工具辅助转换，但网络/存储模型需重新设计。
+- 【L3】Swarm 的核心抽象
+
+  node（manager/worker 两种角色）、service（声明式服务，含副本数）、task（服务拆分到节点的运行单元）；manager 基于 Raft 选举，
+  奇数个（3~5）容忍 (n-1)/2 节点故障。
+
+- 【L4】演进背景
+
+  Swarm 在 2016-2017 的编排大战中败给 Kubernetes，现处于维护状态；存量 Swarm 迁移 K8s 时，compose 文件可借助 kompose 工具辅助转换，但网络/存储模型需重新设计。
 
 > 📚 延伸阅读：[Docker 官方文档：Swarm mode](https://docs.docker.com/engine/swarm/)
 
@@ -1688,8 +1833,14 @@ Docker 容器编排常见工具及特点：
 
 ::: details
 
-- 【L3】容错数学：Raft 要求多数派存活，n 个 manager 容忍 ⌊(n-1)/2⌋ 个故障——3 个容忍 1 个、5 个容忍 2 个；manager 越多写入延迟越高，所以 5 个是上限而非越多越好。
-- 【L4】验证高可用的正确姿势：主动 `docker node update --availability drain` 或关机一台节点，观察副本是否在健康节点重建；同时用 `docker service ps` 检查任务历史，确认没有 Pending/Rejected 堆积。
+- 【L3】容错数学
+
+  Raft 要求多数派存活，n 个 manager 容忍 ⌊(n-1)/2⌋ 个故障——3 个容忍 1 个、5 个容忍 2 个；manager 越多写入延迟越高，所以 5 个是上限而非越多越好。
+
+- 【L4】验证高可用的正确姿势
+
+  主动 `docker node update --availability drain` 或关机一台节点，观察副本是否在健康节点重建；同时用 `docker service ps` 检查任务历史，
+  确认没有 Pending/Rejected 堆积。
 
 > 📚 延伸阅读：[Docker 官方文档：Swarm mode](https://docs.docker.com/engine/swarm/)
 
@@ -1734,8 +1885,15 @@ Docker 容器编排常见工具及特点：
 
 ::: details
 
-- 【L3】架构差异根源：Swarm 复用 Docker 引擎自身（manager/worker 都是 dockerd），所以轻；K8s 有独立的控制面（API Server/etcd/Scheduler/Controller Manager），声明式 API + 控制器循环（reconcile）支撑自愈与复杂编排，代价是运维复杂度。
-- 【L4】迁移视角：存量 Swarm 迁 K8s 时，service/compose 语义大部分可映射（K8s 1.24 后已移除 dockershim，但镜像/构建产物完全兼容）；迁移难点在网络模型（overlay → CNI）与存储（volume → PV/PVC）的重新设计。
+- 【L3】架构差异根源
+
+  Swarm 复用 Docker 引擎自身（manager/worker 都是 dockerd），所以轻；
+  K8s 有独立的控制面（API Server/etcd/Scheduler/Controller Manager），声明式 API + 控制器循环（reconcile）支撑自愈与复杂编排，代价是运维复杂度。
+
+- 【L4】迁移视角
+
+  存量 Swarm 迁 K8s 时，service/compose 语义大部分可映射（K8s 1.24 后已移除 dockershim，但镜像/构建产物完全兼容）；
+  迁移难点在网络模型（overlay → CNI）与存储（volume → PV/PVC）的重新设计。
 
 > 📚 延伸阅读：[Kubernetes 官方文档](https://kubernetes.io/docs/home/)
 
@@ -1797,8 +1955,14 @@ Docker 容器编排常见工具及特点：
 
 ::: details
 
-- 【L3】先测量再下手：`docker history 镜像` 逐层看体积来源，`docker image inspect` 看总大小；常见意外大头是包管理器缓存、调试工具、日志文件、被 COPY 进上下文的 `.git` 目录。
-- 【L4】进阶手段：BuildKit 的 `--mount=type=cache` 把依赖缓存移出镜像层；distroless 无 shell 与包管理器，需配合静态编译或多阶段调试；镜像仓库层去重后，共享基础层带来的实际存储收益比单镜像体积更重要。
+- 【L3】先测量再下手
+
+  `docker history 镜像` 逐层看体积来源，`docker image inspect` 看总大小；常见意外大头是包管理器缓存、调试工具、日志文件、被 COPY 进上下文的 `.git` 目录。
+
+- 【L4】进阶手段
+
+  BuildKit 的 `--mount=type=cache` 把依赖缓存移出镜像层；distroless 无 shell 与包管理器，需配合静态编译或多阶段调试；镜像仓库层去重后，
+  共享基础层带来的实际存储收益比单镜像体积更重要。
 
 > 📚 延伸阅读：[Docker 官方文档：Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
 
@@ -1808,15 +1972,16 @@ Docker 容器编排常见工具及特点：
 
 ::: details
 
-某团队 CI 流水线每次拉取 1.2GB 的业务镜像，高峰期 50 个构建任务并发拉镜像，仓库带宽打满、流水线平均排队 8 分钟。整改三步：① 基础镜像从 `openjdk:17` 换 `eclipse-temurin:17-jre-alpine`（470MB→80MB）；② 引入多阶段构建，编译工具链全部留在构建阶段，成品降到 ~50MB；③ .dockerignore 排除 `.git`/测试数据，构建上下文从 300MB 降到 20MB。结果：单镜像缩小 96%，拉取耗时从分钟级降到秒级，流水线排队基本消失，镜像仓库存储成本同比例下降。
+某团队 CI 流水线每次拉取 1.2GB 的业务镜像，高峰期 50 个构建任务并发拉镜像，仓库带宽打满、流水线平均排队 8 分钟。整改三步：
+
+① 基础镜像从 `openjdk:17` 换 `eclipse-temurin:17-jre-alpine`（470MB→80MB）；② 引入多阶段构建，编译工具链全部留在构建阶段，成品降到 ~50MB；
+③ .dockerignore 排除 `.git`/测试数据，构建上下文从 300MB 降到 20MB。结果：单镜像缩小 96%，拉取耗时从分钟级降到秒级，流水线排队基本消失，镜像仓库存储成本同比例下降。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "用 latest 标签构建省事" → latest 不可复现，基础镜像某天变胖或换大版本时镜像体积/行为静默漂移；应固定版本标签（如 `node:18-alpine`）。
 - ❌ "分层多一点没关系，反正能压缩" → 层是真实存储单元，后层删文件只是"遮住"前层，总体积不降反升；删除必须与安装在同一条 RUN 里。

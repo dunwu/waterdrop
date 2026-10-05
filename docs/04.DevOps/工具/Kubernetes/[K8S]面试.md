@@ -79,7 +79,10 @@ Kubernetes（K8s）是一个**开源的容器编排平台**，用于**自动化�
 
 ::: details
 
-- 【L3】K8s 的核心设计是**声明式 API + 控制器循环**：用户声明期望状态写入 etcd，控制器不断对比实际状态与期望状态并做出调谐（reconcile），这是自愈能力的来源。
+- 【L3】K8s 的核心设计是**声明式 API + 控制器循环**
+
+  用户声明期望状态写入 etcd，控制器不断对比实际状态与期望状态并做出调谐（reconcile），这是自愈能力的来源。
+
 - 【L4】生产集群通常将控制面组件容器化部署在 kube-system 命名空间，etcd 需 3 或 5 节点保证 raft 多数派；大规模集群还需关注 apiserver 与 etcd 的性能调优。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 组件概述](https://kubernetes.io/docs/concepts/overview/components/)
@@ -140,6 +143,7 @@ Pod 具有**临时性**，生命周期结束后会被销毁重建，其 IP 可�
 ::: details
 
 - 【L3】Pod 内有一个基础设施容器（pause 容器）持有网络命名空间，业务容器加入该命名空间，因此共享 IP；Pod IP 在 Pod 重建后会变化。
+
 - 【L4】Sidecar 模式（日志收集、代理、配置热加载）是 Pod 多容器设计的典型应用；1.28+ 引入原生 Sidecar 容器（init container + restartPolicy: Always），改善了启停顺序问题。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Pod](https://kubernetes.io/docs/concepts/workloads/pods/)
@@ -221,6 +225,7 @@ _注意：必须加 `--restart=Never` 才会创建独立 Pod，否则会默认�
 ::: details
 
 - 【L3】`kubectl apply` 是声明式操作，apiserver 会做准入校验并与现有对象做三方合并；可用 `kubectl apply --dry-run=client -o yaml` 先验证配置。
+
 - 【L4】`kubectl run` 可加 `--rm -it` 启动一次性调试 Pod（类似 docker run --rm），排查网络与配置问题很实用。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - kubectl 速查](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
@@ -348,6 +353,7 @@ Service 工作在 L4，解决集群内部的稳定访问与负载均衡；Ingres
 ::: details
 
 - 【L3】Service 基于 kube-proxy 的 iptables/IPVS 规则做四层转发；Ingress 本身只是规则对象，实际由 Ingress Controller（Nginx、Traefik 等）反向代理实现。
+
 - 【L4】Gateway API 是 Ingress 的演进方向，用 GatewayClass/Gateway/HTTPRoute 分离基础设施与路由职责，表达能力更强。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
@@ -414,6 +420,7 @@ kubectl rollout status deployment/my-app  # 查看实时状态
 ::: details
 
 - 【L3】`spec.strategy.type` 还可设为 `Recreate`（先全部删除再创建），仅用于无法多实例并存的应用，会有停机窗口。
+
 - 【L4】结合 `kubectl rollout pause/resume` 可先改多项配置再一次性生效，避免多次触发滚动；灰度发布可配合少量副本的新 Deployment 或流量切分实现。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Deployment 更新策略](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment)
@@ -479,6 +486,7 @@ kubectl rollout undo deployment/my-app --to-revision=1
 ::: details
 
 - 【L3】回滚本质是把指定 revision 的 ReplicaSet 模板重新设为期望状态，因此是一次新的滚动更新，也会遵循 maxSurge/maxUnavailable 节奏。
+
 - 【L4】若将 `revisionHistoryLimit` 设为 0，旧 ReplicaSet 会被立即清理，将失去回滚能力，生产环境不要这样做。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 回滚 Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#rolling-back-a-deployment)
@@ -538,7 +546,10 @@ kubectl rollout undo deployment/my-app --to-revision=1
 ::: details
 
 - 【L3】`kubectl rollout restart deployment/my-app` 不改配置即可重建全部 Pod，常用于 ConfigMap/Secret 变更后刷新。
-- 【L4】生产发布可结合 `kubectl rollout pause` 做分批灰度：先替换一小批观察指标，再 resume 全量推进。
+
+- 【L4】生产发布可结合 `kubectl rollout pause` 做分批灰度
+
+  先替换一小批观察指标，再 resume 全量推进。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 
@@ -661,6 +672,7 @@ Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编�
 ::: details
 
 - 【L3】Secret 默认仅 Base64 编码存储于 etcd，应开启 etcd 静态加密（EncryptionConfiguration）并用 RBAC 严格限制 get/list Secret 的权限。
+
 - 【L4】更高安全要求可对接外部密钥管理系统（如 HashiCorp Vault、云厂商 KMS），通过 External Secrets Operator 同步到集群。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Secret](https://kubernetes.io/docs/concepts/configuration/secret/)
@@ -714,7 +726,10 @@ Secret 用于存储密码、密钥、证书等敏感信息，默认 Base64 编�
 
 ::: details
 
-- 【L3】LimitRange 与 ResourceQuota 互补：前者为命名空间内单个 Pod/容器设置默认值与上下限，后者管总量。
+- 【L3】LimitRange 与 ResourceQuota 互补
+
+  前者为命名空间内单个 Pod/容器设置默认值与上下限，后者管总量。
+
 - 【L4】多租户集群可叠加 PriorityClass 与准入 Webhook，实现按优先级抢占与更细粒度的成本治理。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 资源配额](https://kubernetes.io/docs/concepts/policy/resource-quotas/)
@@ -832,6 +847,7 @@ Kubernetes 本身不提供内置的集中式日志解决方案，但其基础机
 ::: details
 
 - 【L3】kubelet 会轮转容器日志（`containerLogMaxSize`），节点磁盘压力时可能提前清理，日志必须尽快转走而非长期留在节点。
+
 - 【L4】大规模集群可选轻量采集器（Fluent Bit）+ Loki 降低存储成本，或改用 eBPF/无代理采集方案减少资源开销。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 日志架构](https://kubernetes.io/docs/concepts/cluster-administration/logging/)
@@ -962,7 +978,10 @@ PVC 引用 StorageClass 即可动态获取存储。
 
 ::: details
 
-- 【L3】accessModes 决定并发语义：ReadWriteOnce（单节点读写）、ReadWriteMany（多节点读写，需 NFS/CephFS 等支持）、ReadOnlyMany；云盘通常只支持 RWO。
+- 【L3】accessModes 决定并发语义
+
+  ReadWriteOnce（单节点读写）、ReadWriteMany（多节点读写，需 NFS/CephFS 等支持）、ReadOnlyMany；云盘通常只支持 RWO。
+
 - 【L4】回收策略 Retain 防误删但需手动清理，Delete 随 PVC 释放；数据库类负载建议 Retain + 备份兜底，并可结合卷快照与扩容能力。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 持久卷](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
@@ -1012,6 +1031,7 @@ Helm 作为 Kubernetes 包管理工具的核心作用：
 ::: details
 
 - 【L3】Helm 3 移除了服务端组件 Tiller，直接用 kubeconfig 权限与 apiserver 交互，简化了部署与权限模型。
+
 - 【L4】可用 `helm template` 本地渲染清单做 Code Review，或在 CI 中用 `helm lint` 校验 Chart 质量。
 
 > 📚 延伸阅读：[Helm 官方文档](https://helm.sh/docs/)
@@ -1063,7 +1083,10 @@ Helm 部署四步：加仓库 → 搜 Chart 并自定义 values → `helm instal
 
 ::: details
 
-- 【L3】`helm upgrade --install` 幂等写法：不存在则安装、存在则升级，适合 CI/CD 流水线。
+- 【L3】`helm upgrade --install` 幂等写法
+
+  不存在则安装、存在则升级，适合 CI/CD 流水线。
+
 - 【L4】多环境可用 `-f values-prod.yaml` 叠加多份 values 文件，配合 Git 仓库实现 GitOps 管理。
 
 > 📚 延伸阅读：[Helm 官方文档 - 使用 Helm](https://helm.sh/docs/intro/using_helm/)
@@ -1111,6 +1134,7 @@ K8s 安全分五层：API 入口防护（TLS+RBAC）、Pod 安全上下文与资
 ::: details
 
 - 【L3】Pod 安全准入（Pod Security Admission）已取代 PodSecurityPolicy，可按命名空间设置 privileged/baseline/restricted 三档标准。
+
 - 【L4】零信任方向可引入服务网格 mTLS 全覆盖 + 证书自动轮转，供应链层面用镜像签名（如 cosign）与准入校验。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 安全](https://kubernetes.io/docs/concepts/security/)
@@ -1165,6 +1189,7 @@ Kubernetes 中服务自动伸缩的核心要点：
 ::: details
 
 - 【L3】除水平伸缩（HPA）外，还有垂直伸缩 VPA（调整 requests/limits）和集群级伸缩 Cluster Autoscaler（节点不够时自动加节点）。
+
 - 【L4】HPA v2 支持多指标与 behavior 字段控制扩缩速率（如缩容冷却窗口），避免抖动；指标型伸缩存在滞后性，突发流量可结合预热副本或 KEDA 事件驱动伸缩。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - HPA](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
@@ -1234,13 +1259,24 @@ Kubernetes 中 Deployment 与 StatefulSet 的核心区别：
 ::: details
 
 - 【L3】**失效场景（面试加分点）**
-  - **PVC 不随 Pod 走**：StatefulSet 的 PVC 不会随 Pod 删除、缩容而自动删除，甚至 `kubectl delete statefulset` 后 PVC 依然保留。这是防误删数据的设计，但忘记清理就会变成“存储成本泄漏”，需手动清理或配置 `persistentVolumeClaimRetentionPolicy`（1.27 GA）。
+
+  - **PVC 不随 Pod 走**：StatefulSet 的 PVC 不会随 Pod 删除、缩容而自动删除，甚至 `kubectl delete statefulset` 后 PVC 依然保留。这是防误删数据的设计，
+    但忘记清理就会变成“存储成本泄漏”，需手动清理或配置 `persistentVolumeClaimRetentionPolicy`（1.27 GA）。
+
   - **滚动更新卡死**：StatefulSet 逆序逐个更新，若 db-0 的新版本 readinessProbe 始终失败，整个更新会停在 db-0，不像 Deployment 还能并行推进。
+
   - **反向失效**：用 Deployment + 共享 PVC 硬跑有状态应用，多副本并发写同一数据目录，直接导致数据损坏。
+
 - 【L4】**量化数据**
-  - Deployment 滚动更新默认 `maxSurge: 25%`、`maxUnavailable: 25%`，即 10 副本一次最多并行替换约 2~3 个 Pod；StatefulSet 严格串行，升级总时长 ≈ N × 单 Pod 就绪时间，10 副本数据库每实例就绪需 30 秒时全量滚动要 5 分钟以上。
-  - StatefulSet 缩容 / 删除耗时 ≈ N ×（`terminationGracePeriodSeconds` + 优雅退出时间），5 副本、宽限 60 秒的 ES 集群完整释放要 5 分钟以上，远慢于 Deployment 的并行终止。
-  - Headless Service 下 `db-0.db-headless.ns.svc.cluster.local` 的 DNS 解析为毫秒级，身份寻址不依赖额外组件，这是 ZooKeeper、Kafka 选择 Headless Service 的原因。
+
+  - Deployment 滚动更新默认 `maxSurge: 25%`、`maxUnavailable: 25%`，即 10 副本一次最多并行替换约 2~3 个 Pod；StatefulSet 严格串行，
+    升级总时长 ≈ N × 单 Pod 就绪时间，10 副本数据库每实例就绪需 30 秒时全量滚动要 5 分钟以上。
+
+  - StatefulSet 缩容 / 删除耗时 ≈ N ×（`terminationGracePeriodSeconds` + 优雅退出时间），5 副本、宽限 60 秒的 ES 集群完整释放要 5 分钟以上，
+    远慢于 Deployment 的并行终止。
+
+  - Headless Service 下 `db-0.db-headless.ns.svc.cluster.local` 的 DNS 解析为毫秒级，身份寻址不依赖额外组件，这是 ZooKeeper、
+    Kafka 选择 Headless Service 的原因。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
 
@@ -1253,19 +1289,32 @@ Kubernetes 中 Deployment 与 StatefulSet 的核心区别：
 **踩坑案例（生产事故）：MySQL 主从用 Deployment 部署导致主库“换人”**
 
 - **现象**：某团队把自建 MySQL 主从迁到 K8s，某天凌晨发现主库“换人”，新主数据落后 3 小时，业务写入出现缺口。
+
 - **排查**：该部署用的是 Deployment，节点故障后两个副本被随机重建；两者挂载同一个 NFS 共享卷，旧主重建后以从库身份连上新主，binlog 位点已经错乱。
+
 - **根因**：Deployment 无稳定身份、无有序语义，主从角色靠“谁先起来谁当主”判定，存在脑裂风险；共享存储破坏了实例级数据隔离。
-- **修复**：改为 StatefulSet + `volumeClaimTemplates` 每实例独立 PVC，引入 Orchestrator 做故障切换，readinessProbe 校验复制延迟（`Seconds_Behind_Master` 超过 30 秒即从读流量 Service 摘除）。
+
+- **修复**：改为 StatefulSet + `volumeClaimTemplates` 每实例独立 PVC，引入 Orchestrator 做故障切换，
+  readinessProbe 校验复制延迟（`Seconds_Behind_Master` 超过 30 秒即从读流量 Service 摘除）。
 
 **场景题：有状态中间件（如 Elasticsearch）从虚拟机迁到 K8s，如何设计 StatefulSet、存储与探针配置保证数据安全？**
 
-- **应急处理（迁移前兜底）**：先做全量快照（`elasticsearch snapshot` 备份到 S3/OSS 仓库），切换窗口内关闭分片自动分配（`cluster.routing.allocation.enable: none`），避免迁移期间触发分片迁移风暴。
+- **应急处理（迁移前兜底）**：先做全量快照（`elasticsearch snapshot` 备份到 S3/OSS 仓库），
+  切换窗口内关闭分片自动分配（`cluster.routing.allocation.enable: none`），避免迁移期间触发分片迁移风暴。
+
 - **核心风险**：ES 的数据安全依赖三点——每个节点数据目录独占、节点身份稳定（否则选主脑裂）、节点恢复数据期间不被误杀或误调度。
+
 - **长期方案**：
+
   - **StatefulSet 设计**：`serviceName` 指向 Headless Service；`podManagementPolicy: Parallel` 加速扩缩容（更新仍保持有序）；master 角色至少 3 副本。
+
   - **存储**：`volumeClaimTemplates` 为每个节点绑定独立云盘（ReadWriteOnce），StorageClass 指定 SSD 类型；PV 回收策略设为 `Retain` 防误删；严禁多 Pod 共享 NFS。
-  - **探针设计**：startupProbe 的 `failureThreshold × periodSeconds` 覆盖最长分片恢复时间（如 60 × 10 秒 = 10 分钟）；readinessProbe 调用 `/_cluster/health`，yellow 以上才接流量；livenessProbe 只检查进程自身存活且阈值放宽（`failureThreshold: 5`），防止 GC 停顿期间被误杀。
+
+  - **探针设计**：startupProbe 的 `failureThreshold × periodSeconds` 覆盖最长分片恢复时间（如 60 × 10 秒 = 10 分钟）；
+    readinessProbe 调用 `/_cluster/health`，yellow 以上才接流量；livenessProbe 只检查进程自身存活且阈值放宽（`failureThreshold: 5`），防止 GC 停顿期间被误杀。
+
   - **调度**：podAntiAffinity 或 `topologySpreadConstraints`（`maxSkew: 1`）把节点分散到不同可用区。
+
 - **权衡**：K8s 的自愈（故障自动重建）与有状态服务“别动我的数据”天然冲突，原则是“探针放宽、存储 Retain、备份兜底”；若团队没有存储插件运维经验，直接用云厂商托管 ES，自建与托管的长期成本差异常在一个数量级。
 
 :::
@@ -1273,8 +1322,6 @@ Kubernetes 中 Deployment 与 StatefulSet 的核心区别：
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “StatefulSet 更高级，重要服务都用它” → 无状态服务用 StatefulSet 只会徒增运维成本（PVC 清理、有序升级慢），选型看状态依赖而非重要性。
 - ❌ “Deployment + 共享 PVC 也能跑数据库” → 多副本并发写同一数据目录会直接损坏数据，有状态必须每实例独立 PVC。
@@ -1335,6 +1382,7 @@ Kubernetes 中 Ingress 资源的核心要点：
 ::: details
 
 - 【L3】证书可配合 cert-manager 自动签发与轮转；非 HTTP 协议（如 MySQL）可用 Ingress Controller 的 TCP/UDP 透传配置或单独 LoadBalancer。
+
 - 【L4】Ingress Controller 是集群入口单点，需多副本 + 反亲和分散 + HPA 应对流量高峰，并监控 P99 延迟。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Ingress 资源](https://kubernetes.io/docs/concepts/services-networking/ingress/)
@@ -1386,6 +1434,7 @@ Kubernetes 中 DaemonSet 的核心要点：
 ::: details
 
 - 【L3】日志采集、CNI 类 DaemonSet 通常需要 hostNetwork、特权或挂载宿主机目录，这也是安全加固时要重点审计的对象。
+
 - 【L4】DaemonSet 支持 RollingUpdate 与 OnDelete 更新策略；给关键系统 DaemonSet 配高 PriorityClass 与节点资源预留，避免被业务 Pod 挤掉。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
@@ -1474,13 +1523,26 @@ Service 四种基本类型：ClusterIP 集群内、NodePort 节点端口、LoadB
 
 ::: details
 
-- 【L3】**kube-proxy 实现深挖（面试重点）**：Service 的 L4 转发由各节点的 kube-proxy 落地，主流两种模式：
-  - **iptables 模式**：每个 Service 及其 Endpoint 会生成约 5 条规则（KUBE-SERVICES / KUBE-SVC / KUBE-SEP 链），规则数随 Service × Endpoint 数量**线性膨胀**。万级 Service 集群规则数可达数十万条，`iptables-save` 一次要十几秒，数据包匹配是 O(n) 线性遍历，高并发下转发延迟明显上升。
-  - **IPVS 模式**：内核专用模块，规则以哈希表存储，查找接近 O(1)，万级 Service 增量同步仅需毫秒级，还支持 rr、lc、sh 等 6 种负载均衡算法。**Service 数量超过 1000 的中大型集群应标配 IPVS**。
+- 【L3】**kube-proxy 实现深挖（面试重点）**
+
+  Service 的 L4 转发由各节点的 kube-proxy 落地，主流两种模式：
+
+  - **iptables 模式**：每个 Service 及其 Endpoint 会生成约 5 条规则（KUBE-SERVICES / KUBE-SVC / KUBE-SEP 链），
+    规则数随 Service × Endpoint 数量**线性膨胀**。万级 Service 集群规则数可达数十万条，`iptables-save` 一次要十几秒，数据包匹配是 O(n) 线性遍历，高并发下转发延迟明显上升。
+
+  - **IPVS 模式**：内核专用模块，规则以哈希表存储，查找接近 O(1)，万级 Service 增量同步仅需毫秒级，还支持 rr、lc、sh 等 6 种负载均衡算法。
+
+    **Service 数量超过 1000 的中大型集群应标配 IPVS**。
+
   - 量化参考：实测 5000 个 Service 时，iptables 模式 kube-proxy 全量同步规则约 11 秒，IPVS 模式小于 100ms；变更高峰期 iptables 模式的新建连接延迟可放大 2~3 倍。
+
 - 【L4】**失效场景**
-  - **长连接负载倾斜**：Service 默认按连接做负载均衡（iptables 随机、IPVS rr），gRPC、WebSocket 这类长连接服务会出现个别 Endpoint 承载 80% 流量的严重倾斜，需把均衡上移到 L7（Ingress / 服务网格）或客户端负载均衡。
+
+  - **长连接负载倾斜**：Service 默认按连接做负载均衡（iptables 随机、IPVS rr），gRPC、WebSocket 这类长连接服务会出现个别 Endpoint 承载 80% 流量的严重倾斜，
+    需把均衡上移到 L7（Ingress / 服务网格）或客户端负载均衡。
+
   - **NodePort 陷阱**：流量可能从任一节点进入后经 iptables 跨节点二次转发，多一跳 SNAT；且 30000-32767 端口段全集群共享，两个 Service 抢端口是常见事故。
+
   - **LoadBalancer 一直 Pending**：裸金属集群没有云厂商 LB 集成，LoadBalancer 类型 Service 会永久 Pending，需部署 MetalLB 等组件补齐。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Service](https://kubernetes.io/docs/concepts/services-networking/service/)
@@ -1494,16 +1556,28 @@ Service 四种基本类型：ClusterIP 集群内、NodePort 节点端口、LoadB
 **踩坑案例（生产事故）：iptables 模式在万级 Service 下拖垮新建连接**
 
 - **现象**：某集群 Service 数量涨到 8000 后，全集群 Pod 偶发 DNS 解析与新连接建立延迟 3~5 秒，且每次大规模发布 Service 变更时问题加剧。
-- **排查**：观察发现变更瞬间 kube-proxy CPU 飙高；`time iptables-save | wc -l` 耗时 12 秒、规则超 40 万条；conntrack 表还频繁报 `nf_conntrack: table full`（默认上限随内存约每 GB 65536 条）。
+
+- **排查**：观察发现变更瞬间 kube-proxy CPU 飙高；`time iptables-save | wc -l` 耗时 12 秒、规则超 40 万条；
+  conntrack 表还频繁报 `nf_conntrack: table full`（默认上限随内存约每 GB 65536 条）。
+
 - **根因**：kube-proxy 处于 iptables 模式，万级 Service 规模下每次变更都要全量重建规则，O(n) 匹配路径导致转发延迟，发布风暴放大了抖动。
+
 - **修复**：kube-proxy 切换 IPVS 模式（逐节点滚动切换），`nf_conntrack_max` 调大到 1048576，并对 Service 数量与规则同步耗时建立监控告警，发布期延迟抖动消失。
 
 **场景题：200 个 HTTP 微服务要对外暴露，只允许开放 80/443，怎么设计？**
 
 - **应急处理**：临时联调可用 NodePort 顶一下，但必须登记回收时间，并核查安全组规则，避免测试端口长期暴露公网。
-- **约束拆解**：端口只有 80/443、服务多达 200 个、协议清一色 HTTP(S)。NodePort 的 30000-32767 端口段不符合安全要求且数量不够；每服务一个 LoadBalancer 没有足够端口且成本不可接受——两个方案被约束直接排除。
-- **长期方案**：部署 Nginx Ingress Controller（至少 2 副本 + podAntiAffinity 分散到不同节点），前面挂 1 个 LoadBalancer 或 VIP 占用 80/443，通过 Ingress 按域名（`a.example.com`、`b.example.com`）和路径路由到各后端 Service；TLS 在 Ingress 层集中终结，证书放 Secret 并由 cert-manager 自动轮转；少量非 HTTP 协议（如 MySQL 3306）单独走 LoadBalancer 或 Ingress Controller 的 TCP 透传配置。
-- **权衡**：Ingress Controller 成为单点与流量瓶颈，必须以多副本 + HPA + P99 延迟监控兜底；若个别业务要求四层直通或极致延迟，可为其单独接受 LoadBalancer 成本。方案落地后先按 2 倍峰值压测再切生产流量。
+
+- **约束拆解**：端口只有 80/443、服务多达 200 个、协议清一色 HTTP(S)。NodePort 的 30000-32767 端口段不符合安全要求且数量不够；
+  每服务一个 LoadBalancer 没有足够端口且成本不可接受——两个方案被约束直接排除。
+
+- **长期方案**：部署 Nginx Ingress Controller（至少 2 副本 + podAntiAffinity 分散到不同节点），前面挂 1 个 LoadBalancer 或 VIP 占用 80/443，
+  通过 Ingress 按域名（`a.example.com`、`b.example.com`）和路径路由到各后端 Service；TLS 在 Ingress 层集中终结，证书放 Secret 并由 cert-manager 自动轮转；
+  少量非 HTTP 协议（如 MySQL 3306）单独走 LoadBalancer 或 Ingress Controller 的 TCP 透传配置。
+
+- **权衡**：Ingress Controller 成为单点与流量瓶颈，必须以多副本 + HPA + P99 延迟监控兜底；若个别业务要求四层直通或极致延迟，可为其单独接受 LoadBalancer 成本。
+
+  方案落地后先按 2 倍峰值压测再切生产流量。
 
 :::
 
@@ -1523,8 +1597,6 @@ Service 四种基本类型：ClusterIP 集群内、NodePort 节点端口、LoadB
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “ExternalName 也能给 Pod 做负载均衡” → ExternalName 只是 DNS CNAME 映射到外部域名，无 Pod 关联、无转发规则。
 - ❌ “裸金属集群 LoadBalancer 直接可用” → 没有云 LB 集成会永久 Pending，需 MetalLB 等实现。
@@ -1583,6 +1655,7 @@ Helm Charts 实现应用版本控制的核心机制：
 ::: details
 
 - 【L3】Chart 仓库（ChartMuseum、OCI 仓库）可按版本分发，CI 中可对同一 Chart 多版本并存发布与灰度。
+
 - 【L4】配合 GitOps 工具（Argo CD 等）时，Helm 版本与 Git 提交双重追溯，回滚可精确到提交粒度。
 
 > 📚 延伸阅读：[Helm 官方文档 - Chart 最佳实践](https://helm.sh/docs/chart_best_practices/)
@@ -1680,6 +1753,7 @@ spec:
 ::: details
 
 - 【L3】Job 的 restartPolicy 只能是 Never 或 OnFailure（不支持 Always）；`backoffLimit` 控制失败重试次数，超限后 Job 标记失败。
+
 - 【L4】CronJob 可配 `concurrencyPolicy`（Allow/Forbid/Replace）控制任务堆叠；`startingDeadlineSeconds` 错过调度窗口后放弃，避免任务堆积。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/)
@@ -1741,6 +1815,7 @@ Kubernetes 的作用是将 PVC（申请单）与合适的 PV（仓库）进行�
 ::: details
 
 - 【L3】绑定需同时满足容量、accessModes、storageClassName 等条件；PVC 与 PV 一对一绑定，Pod 删除后 PVC 与数据默认保留。
+
 - 【L4】云环境下可结合卷快照（VolumeSnapshot）与在线扩容（allowVolumeExpansion）做备份与容量治理。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 持久卷生命周期](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#lifecycle-of-a-volume-and-claim)
@@ -1842,7 +1917,10 @@ spec:
 ::: details
 
 - 【L3】出站限制会连带影响 DNS（默认 53 端口），配 egress 白名单时必须放行 CoreDNS，否则 Pod 解析全部失败。
-- 【L4】微隔离可自底向上推进：先 deny-all，再逐业务加白名单；Cilium 还支持基于 L7（HTTP 方法/路径）的策略。
+
+- 【L4】微隔离可自底向上推进
+
+  先 deny-all，再逐业务加白名单；Cilium 还支持基于 L7（HTTP 方法/路径）的策略。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 
@@ -1949,8 +2027,12 @@ spec:
 默认配置下，一个容器从探测失败到触发动作至少需要 3 × 10 = 30 秒。
 
 - 【L4】**失效场景**
-  - **readinessProbe 过激进引发滚动雪崩**：`periodSeconds: 1` + `failureThreshold: 1`，新 Pod 预热时接口瞬间超时，被全部摘出 Endpoints，流量压回旧 Pod → 旧 Pod 也被摘 → **Service 无可用 Endpoint，滚动更新雪崩**。
+
+  - **readinessProbe 过激进引发滚动雪崩**：`periodSeconds: 1` + `failureThreshold: 1`，新 Pod 预热时接口瞬间超时，被全部摘出 Endpoints，
+    流量压回旧 Pod → 旧 Pod 也被摘 → **Service 无可用 Endpoint，滚动更新雪崩**。
+
   - **liveness 的 timeoutSeconds 过短**：GC 或高负载下接口耗时 2 秒 > 默认超时 1 秒 → 判失败 → 重启 → 冷启动负载更重 → 反复被杀成 CrashLoopBackOff 正反馈环。
+
   - **liveness 探下游依赖**：探测路径检查 DB 连通性，DB 一抖动，该服务所有 Pod 同时被重启，把“局部故障”放大成“服务整体不可用”。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - Probe](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
@@ -1964,15 +2046,27 @@ spec:
 **踩坑案例（生产事故）：liveness 超时把慢启动 Java 服务杀成 CrashLoopBackOff**
 
 - **现象**：某 Java 服务每次发布后全部 Pod 进入 CrashLoopBackOff，发布系统自动回滚后恢复，被当作“坏版本”压下去，几周后再次发布复现。
-- **排查**：`kubectl describe pod` 看到重启原因是 Liveness probe failed；应用日志显示每次重启都发生在启动后 40 秒左右；探测接口 `/healthz` 平时 200ms 返回，但冷启动期间因缓存预热 + JIT 编译会超过 2 秒。
-- **根因**：livenessProbe 的 `timeoutSeconds` 用了默认 1 秒，`initialDelaySeconds` 只设了 15 秒，而真实启动需要 30~40 秒，冷启动探测超时后连续 3 次（`failureThreshold: 3`）即被杀；重启后缓存又是冷的，再次被杀，形成循环。
-- **修复**：增加 startupProbe（`failureThreshold: 30` × `periodSeconds: 10`，覆盖 5 分钟启动窗口），livenessProbe 的 `timeoutSeconds` 调到 3 秒，并把缓存预热逻辑挪到 readinessProbe 判定中，之后发布再未复现。
+
+- **排查**：`kubectl describe pod` 看到重启原因是 Liveness probe failed；应用日志显示每次重启都发生在启动后 40 秒左右；探测接口 `/healthz` 平时 200ms 返回，
+  但冷启动期间因缓存预热 + JIT 编译会超过 2 秒。
+
+- **根因**：livenessProbe 的 `timeoutSeconds` 用了默认 1 秒，`initialDelaySeconds` 只设了 15 秒，而真实启动需要 30~40 秒，
+  冷启动探测超时后连续 3 次（`failureThreshold: 3`）即被杀；重启后缓存又是冷的，再次被杀，形成循环。
+
+- **修复**：增加 startupProbe（`failureThreshold: 30` × `periodSeconds: 10`，覆盖 5 分钟启动窗口），
+  livenessProbe 的 `timeoutSeconds` 调到 3 秒，并把缓存预热逻辑挪到 readinessProbe 判定中，之后发布再未复现。
 
 **场景题：订单服务滚动更新期间间歇性 502，约每 3 分钟一次，怎么定位和解决？**
 
 - **应急处理**：先把 Deployment 的滚动参数改为 `maxSurge: 1、maxUnavailable: 0` 降低单批替换幅度，必要时暂停发布、回滚到上一版本止血。
-- **根因分析（三个最可疑点）**：① 新 Pod 的 readinessProbe 通过但预热未完成，满负载流量直接打进来；② 旧 Pod 被摘除 Endpoints 的同时收到 SIGTERM，在途请求被切断；③ 客户端长连接 / DNS 缓存仍指向已终止的旧 Pod。用 `kubectl get endpoints -w` 对照访问日志时间戳定位：502 集中在新 Pod Ready 后 1~2 秒内，是①；集中在旧 Pod 终止前最后几秒，是②。
-- **长期方案**：新 Pod 侧把预热完成纳入 readinessProbe（预热不完不接流量）；旧 Pod 侧加 `preStop: sleep 10` 覆盖 Endpoint 传播 + DNS 缓存窗口；滚动参数恢复默认 `maxSurge: 25%、maxUnavailable: 25%`，并配 PDB 保证最小可用副本数。
+
+- **根因分析（三个最可疑点）**：① 新 Pod 的 readinessProbe 通过但预热未完成，满负载流量直接打进来；② 旧 Pod 被摘除 Endpoints 的同时收到 SIGTERM，在途请求被切断；
+  ③ 客户端长连接 / DNS 缓存仍指向已终止的旧 Pod。用 `kubectl get endpoints -w` 对照访问日志时间戳定位：502 集中在新 Pod Ready 后 1~2 秒内，是①；集中在旧 Pod 终止前最后几秒，
+  是②。
+
+- **长期方案**：新 Pod 侧把预热完成纳入 readinessProbe（预热不完不接流量）；旧 Pod 侧加 `preStop: sleep 10` 覆盖 Endpoint 传播 + DNS 缓存窗口；
+  滚动参数恢复默认 `maxSurge: 25%、maxUnavailable: 25%`，并配 PDB 保证最小可用副本数。
+
 - **权衡**：`preStop` 会拉长整体滚动时长（每批多 10 秒左右），用发布速度换零中断，对核心无状态服务这笔交易值得；若服务预热特征明显，可进一步引入服务网格或 LB 的慢启动权重能力，让新实例流量逐步爬升。
 
 :::
@@ -1980,8 +2074,6 @@ spec:
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “liveness 探得越全越好，顺便探下游依赖” → 下游一抖动所有 Pod 同时被重启，局部故障放大成整体不可用；liveness 只探进程自身。
 - ❌ “timeoutSeconds 默认 1 秒够用” → GC/高负载下探测超时会被误判，慢接口必须调大，否则形成重启正反馈环。
@@ -2025,7 +2117,7 @@ spec:
 
 #### 📊 量化参考
 
-- **调度延迟**：1000 节点集群 P99 约 1~~5s，5000 节点大规模集群 P99 约 10~~30s
+- **调度延迟**：1000 节点集群 P99 约 1~5s，5000 节点大规模集群 P99 约 10~30s
 - **调度吞吐**：大规模集群约 100~300 Pod/s（取决于插件数量和打分复杂度）
 - **拓扑分散约束**：topologySpreadConstraints 均匀分布到可用区，maxSkew 默认 1
 - **反亲和性能开销**：比亲和性高 3~5 倍（需遍历所有已调度 Pod 匹配标签）
@@ -2081,12 +2173,20 @@ tolerations:
 ::: details
 
 - 【L3】**失效场景**
-  - **亲和性过严导致 Pending**：podAntiAffinity 硬约束 + `topologyKey: kubernetes.io/hostname`，集群只有 3 个节点却要 4 副本，第 4 个 Pod 永久 Pending，`kubectl describe` 报 `didn't match pod anti-affinity rules`。
+
+  - **亲和性过严导致 Pending**：podAntiAffinity 硬约束 + `topologyKey: kubernetes.io/hostname`，集群只有 3 个节点却要 4 副本，
+    第 4 个 Pod 永久 Pending，`kubectl describe` 报 `didn't match pod anti-affinity rules`。
+
   - **污点忘摘**：给节点打污点做维护，恢复后忘记清除，没有容忍度的业务 Pod 调度不上去，集群容量被隐性缩水。
+
   - **资源不匹配**：亲和规则全部满足，但 requests 超过节点剩余可分配资源，同样 Pending——排查时先看 describe 的 Events，别靠猜。
+
 - 【L4】**量化数据**
+
   - `preferred` 亲和的打分权重范围 1~100；`topologySpreadConstraints` 的 `maxSkew: 1` 表示任意两个拓扑域副本数差 ≤ 1。
+
   - kube-scheduler 在千节点规模集群的吞吐约 100 Pod/秒，单个 Deployment 一次扩容 500 副本时，全部绑定完成需 5~10 秒，期间 Pod 处于 Pending。
+
   - 节点不可达（unreachable）时，Pod 默认容忍 300 秒（`tolerationSeconds`）才会被驱逐重建，这是“节点故障后 Pod 迟迟不迁移”的量化解释。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 调度与驱逐](https://kubernetes.io/docs/concepts/scheduling-eviction/)
@@ -2100,14 +2200,21 @@ tolerations:
 **踩坑案例（调度倾斜引发节点 OOM）**
 
 - **现象**：某集群一个节点每天凌晨触发 OOM，节点上的 Pod 被批量驱逐到别的节点，引发连锁资源紧张。
+
 - **排查**：调度事件显示，一批离线计算 Pod 用 `preferred` 节点亲和（权重 100）倾向该节点的 `high-memory=true` 标签，且没设任何资源 limits，调度器按打分把它们全部堆到这一台。
+
 - **根因**：软亲和 + BestEffort QoS（无 requests/limits）+ 无分散约束三者叠加，凌晨批任务集中调度时单机内存被打穿，kubelet 按 QoS 顺序批量驱逐。
-- **修复**：批任务统一声明 requests = limits（升为 Guaranteed），加 `topologySpreadConstraints`（`maxSkew: 1`）与 Pod 反亲和限制单机堆叠数量，并用 ResourceQuota 限制命名空间内存总量。
+
+- **修复**：批任务统一声明 requests = limits（升为 Guaranteed），加 `topologySpreadConstraints`（`maxSkew: 1`）与 Pod 反亲和限制单机堆叠数量，
+  并用 ResourceQuota 限制命名空间内存总量。
 
 **场景题：3 个可用区部署 6 副本关键服务，要求每区至少 1 副本、尽量均匀、绝不调度到维护节点，怎么写配置？**
 
 - **应急处理**：若当前已有可用区故障，先 `kubectl cordon` 确认节点状态与现有 Pod 分布，确保剩余两个可用区能承接全部流量后再做变更。
-- **需求拆解**：要求分三层——可用区间均匀（打散约束）、避开维护节点（污点/容忍）、最低可用性保障（PDB）。注意 podAntiAffinity 表达不了“每个可用区至少 1 个”，它只能说“不要和别的副本同域”，必须用 topologySpreadConstraints。
+
+- **需求拆解**：要求分三层——可用区间均匀（打散约束）、避开维护节点（污点/容忍）、最低可用性保障（PDB）。注意 podAntiAffinity 表达不了“每个可用区至少 1 个”，它只能说“不要和别的副本同域”，
+  必须用 topologySpreadConstraints。
+
 - **长期方案**（关键配置）：
 
 ```yaml
@@ -2130,8 +2237,6 @@ topologySpreadConstraints:
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “podAntiAffinity 能保证均匀分布” → 反亲和是布尔判断“同或不同”，3 节点 3 副本分布成 2:1:0 也满足；均匀需 topologySpreadConstraints 的 maxSkew。
 - ❌ “满足亲和规则还 Pending，一定是亲和写错了” → 很可能是 requests 超过节点剩余可分配资源，先看 describe Events 再下结论。
@@ -2192,7 +2297,9 @@ RBAC 是基于角色的访问控制：用 Role/ClusterRole 定义权限规则，
 
 ::: details
 
-- 【L3】ClusterRole 也可通过 RoleBinding 在单个命名空间内复用，实现“一套规则多空间绑定”；Pod 内的权限来自其 ServiceAccount，默认 default SA 应关闭自动挂载（automountServiceAccountToken: false）。
+- 【L3】ClusterRole 也可通过 RoleBinding 在单个命名空间内复用，实现“一套规则多空间绑定”；Pod 内的权限来自其 ServiceAccount，
+  默认 default SA 应关闭自动挂载（automountServiceAccountToken: false）。
+
 - 【L4】可用 `kubectl auth can-i <verb> <resource> --as=<user>` 验证权限；审计日志能回溯“谁在什么时候做了什么”，是权限治理的闭环手段。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
@@ -2261,6 +2368,7 @@ Kubernetes 根据 Pod 的资源声明将其划分为三个 **QoS 等级**，决�
 ::: details
 
 - 【L3】同一 QoS 内部还会比较实际用量相对 requests 的超用比例，超用越多越先被驱逐；驱逐事件可通过 `kubectl get events` 与 Pod status.reason=Evicted 观察。
+
 - 【L4】PriorityClass + 抢占调度可实现“关键业务挤掉低优先级 Pod”；节点侧还可通过 kube-reserved/system-reserved 预留资源，减少驱逐发生。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - QoS 与驱逐](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/)
@@ -2334,6 +2442,7 @@ kubectl logs <pod-name> --previous # 上一次崩溃的容器日志（关键！�
 ::: details
 
 - 【L3】退出码 137 = 128 + SIGKILL(9)，多为内存超限或手工 kill；143 = SIGTERM 优雅退出；143 与 137 的区分能快速定位“被杀”还是“自杀”。
+
 - 【L4】镜像拉不下来（ImagePullBackOff）与配置缺失是高频根因，建议在 CI 阶段加启动自测与镜像签名验证，把问题左移。
 
 > 📚 延伸阅读：[Kubernetes 官方文档 - 应用调试](https://kubernetes.io/docs/tasks/debug/debug-application/)
@@ -2418,10 +2527,25 @@ Informer 是 client-go 对 List-Watch 的封装，解决了「多个 Controller 
 
 ::: details
 
-- 【L3】DeltaFIFO 的去重逻辑：同一 key 的多个 Delta 类型事件（Added → Modified → Modified）会被合并为一个 Sync 事件（携带最新状态）。但 Delete 事件不会被合并——确保删除操作不丢失。
-- 【L3】Indexer 的自定义索引：默认按 `namespace/name` 索引，但可注册自定义索引函数。例如按 Pod 的 `nodeName` 建索引，快速查询「某节点上的所有 Pod」。
-- 【L4】Informer 与 Operator 的关系：Operator 的核心是 Controller（reconcile loop），Controller 通过 Informer 感知 CRD 变化。每次事件触发 `Reconcile()` 方法，将当前状态向期望状态推进。这就是「声明式 API + Reconcile Loop」的实现基础。
-- 【L4】性能调优：大规模集群（> 5000 节点）中，Informer 的本地缓存可能占用大量内存。优化手段：① 使用 `TweakListOptions` 过滤不需要的资源（如只 Watch 特定 label）；② 使用 `SharedIndexInformer` 的 Resync 周期控制全量同步频率。
+- 【L3】DeltaFIFO 的去重逻辑
+
+  同一 key 的多个 Delta 类型事件（Added → Modified → Modified）会被合并为一个 Sync 事件（携带最新状态）。但 Delete 事件不会被合并——
+  确保删除操作不丢失。
+
+- 【L3】Indexer 的自定义索引
+
+  默认按 `namespace/name` 索引，但可注册自定义索引函数。例如按 Pod 的 `nodeName` 建索引，快速查询「某节点上的所有 Pod」。
+
+- 【L4】Informer 与 Operator 的关系
+
+  Operator 的核心是 Controller（reconcile loop），Controller 通过 Informer 感知 CRD 变化。
+
+  每次事件触发 `Reconcile()` 方法，将当前状态向期望状态推进。这就是「声明式 API + Reconcile Loop」的实现基础。
+
+- 【L4】性能调优
+
+  大规模集群（> 5000 节点）中，Informer 的本地缓存可能占用大量内存。优化手段：① 使用 `TweakListOptions` 过滤不需要的资源（如只 Watch 特定 label）；
+  ② 使用 `SharedIndexInformer` 的 Resync 周期控制全量同步频率。
 
 :::
 
@@ -2432,19 +2556,23 @@ Informer 是 client-go 对 List-Watch 的封装，解决了「多个 Controller 
 **某平台 Operator 开发中的 Informer 实践**：
 
 - **场景**：自定义 CRD `AppDeployment`，需要 Watch 其变化并自动创建 Deployment + Service；
+
 - **实现**：
+
   1. 用 `controller-runtime` 的 `Manager` 创建 SharedInformer；
+
   2. 注册 `Reconciler`，`Reconcile()` 方法读取 `AppDeployment` 当前状态，对比实际 Deployment 状态，差异部分 patch 修复；
+
   3. Informer 缓存 + 事件队列保证不丢事件、不重复处理；
-- **踩坑**：① 未设 `ResyncPeriod`，本地缓存与 API Server 长期不一致（极端情况下）；② `Reconcile()` 中直接 Update 全量对象导致冲突，改为 Patch + `resourceVersion` 乐观锁。
+
+- **踩坑**：① 未设 `ResyncPeriod`，本地缓存与 API Server 长期不一致（极端情况下）；② `Reconcile()` 中直接 Update 全量对象导致冲突，
+  改为 Patch + `resourceVersion` 乐观锁。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Watch 是轮询" → Watch 是长连接推送（HTTP chunked / WebSocket），不是定时拉取；轮询效率低且延迟高。
 - ❌ "Informer 缓存会一直与 API Server 一致" → 缓存是最终一致的，极端情况下可能短暂落后；Controller 的 Reconcile 必须能处理「缓存状态 ≠ 实际状态」的情况。

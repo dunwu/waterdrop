@@ -47,8 +47,10 @@ Hash 碰撞指不同 key 经哈希函数算出相同桶索引，无法彻底避�
 ::: details
 
 - 【L3】开放寻址的探测策略有线性探测、二次探测、双重哈希；负载因子越高碰撞越密集，这也是 ThreadLocalMap 在碰撞严重时扩容的原因。
+
 - 【L3】HashMap 的 hash() 用 `(h = key.hashCode()) ^ (h >>> 16)` 高低 16 位异或扰动，让小表的索引也能利用高位信息，进一步降低碰撞。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -98,17 +100,19 @@ HashMap 无锁、允许 null、性能更高，是绝大多数场景首选；Hash
 ::: details
 
 - 【L3】Hashtable 的锁是整个对象（全表锁），与 ConcurrentHashMap 的分段/桶级细粒度锁相比并发吞吐差距明显，对比详见本文档「ConcurrentHashMap 和 Hashtable 有什么区别？」。
+
 - 【L3】Hashtable 的 enumerator 不抛快速失败异常，但同样是弱一致的，并非强一致快照。
-  :::
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "Hashtable 线程安全，所以并发场景该用它" → 错，全表锁在高并发下串行化严重，现代代码应使用 ConcurrentHashMap。
 - ❌ "Hashtable 是 HashMap 的线程安全父类" → 错，两者无继承关系，Hashtable 继承已过时的 Dictionary，HashMap 继承 AbstractMap。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -177,9 +181,13 @@ public class HashSet<E> {
 
 ::: details
 
-- 【L3】HashSet 的去重依赖元素的 hashCode() 与 equals()：先比 hash 定位桶，再 equals 判等，两者必须同时正确重写。
+- 【L3】HashSet 的去重依赖元素的 hashCode() 与 equals()
+
+  先比 hash 定位桶，再 equals 判等，两者必须同时正确重写。
+
 - 【L3】LinkedHashSet 继承 HashSet，内部用 LinkedHashMap 构造，因此额外保持插入顺序。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -235,24 +243,35 @@ public class HashSet<E> {
 ::: details
 
 - 【L3】LinkedHashMap 用 accessOrder=true 时，每次 get() 会把节点移到链表尾部，重写 removeEldestEntry() 即可实现 LRU 缓存淘汰。
-- 【L3】TreeMap 支持丰富导航方法：firstKey()/lastKey()、ceilingKey()/floorKey()、higherKey()/lowerKey()，定位 O(log n)。
-- 【L4】三者均非线程安全：并发无序用 ConcurrentHashMap，并发有序用 ConcurrentSkipListMap。
-  :::
+
+- 【L3】TreeMap 支持丰富导航方法
+
+  firstKey()/lastKey()、ceilingKey()/floorKey()、higherKey()/lowerKey()，定位 O(log n)。
+
+- 【L4】三者均非线程安全
+
+  并发无序用 ConcurrentHashMap，并发有序用 ConcurrentSkipListMap。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
-某网关限流模块需按时间窗口聚合请求量，用 TreeMap<Long, AtomicInteger>（key 为窗口起始毫秒）存储 10 万个滑动窗口，借助 headMap(now).clear() 一次清理过期窗口，范围操作 O(log n + m)，比先 HashMap 存储再全量遍历过滤（O(n) 扫描 10 万条）快约 20 倍。
+
+某网关限流模块需按时间窗口聚合请求量，用 TreeMap<Long, AtomicInteger>（key 为窗口起始毫秒）存储 10 万个滑动窗口，
+
+借助 headMap(now).clear() 一次清理过期窗口，范围操作 O(log n + m)，比先 HashMap 存储再全量遍历过滤（O(n) 扫描 10 万条）快约 20 倍。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "LinkedHashMap 是线程安全的 LRU" → 错，它非线程安全，并发 LRU 需外部加锁或自实现（如加锁包装/Caffeine）。
 - ❌ "TreeMap 允许 null 键" → 错，自然顺序下 put null 键会抛 NPE，仅当 Comparator 显式容忍时才可能。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -360,26 +379,37 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent) {
 
 ::: details
 
-- 【L3】treeifyBin() 树化前先判断 table 长度：不足 64 时优先 resize() 扩容而非树化，避免小表过早树化浪费内存。
+- 【L3】treeifyBin() 树化前先判断 table 长度
+
+  不足 64 时优先 resize() 扩容而非树化，避免小表过早树化浪费内存。
+
 - 【L3】JDK 8 扩容迁移时每个桶拆成 lo/hi 两条链保序迁移，详见本文档「HashMap 的扩容（resize）源码分析」。
-- 【L4】与 ConcurrentHashMap 对比：后者同样 Node[]+链表/树，但 hash 用 spread() 且屏蔽符号位（内部用负数哈希做状态标记），并发控制为 CAS + 桶级 synchronized。
-  :::
+
+- 【L4】与 ConcurrentHashMap 对比
+
+  后者同样 Node[]+链表/树，但 hash 用 spread() 且屏蔽符号位（内部用负数哈希做状态标记），并发控制为 CAS + 桶级 synchronized。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
-某订单服务启动时一次性加载 500 万条商品映射到 HashMap，未预设容量导致从 16 连续扩容 18 次，启动阶段累计多次 Full GC、初始化耗时约 8s；改为 `new HashMap<>(8_000_000)`（内部 tableSizeFor 取整为 2 的幂 8388608）一次到位后，初始化耗时降至约 3s，启动期 Young GC 次数明显减少。
+
+某订单服务启动时一次性加载 500 万条商品映射到 HashMap，未预设容量导致从 16 连续扩容 18 次，启动阶段累计多次 Full GC、初始化耗时约 8s；
+
+改为 `new HashMap<>(8_000_000)`（内部 tableSizeFor 取整为 2 的幂 8388608）一次到位后，初始化耗时降至约 3s，启动期 Young GC 次数明显减少。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "链表长度到 8 就一定树化" → 错，还需数组长度 ≥ 64，否则 treeifyBin() 优先 resize() 扩容。
 - ❌ "容量 16 时 put 到第 12 个（刚达阈值）就扩容" → 错，threshold = 16 × 0.75 = 12，判断条件是插入后 `++size > threshold`（严格大于），即第 13 个元素插入时才触发扩容，且判断发生在插入之后。
 - ❌ "HashMap JDK 8 后并发也安全了" → 错，尾插法只消除了死循环，并发 put 覆盖丢失依然存在。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -427,24 +457,31 @@ JDK 8 四大改动：引入红黑树（链表 ≥8 且数组 ≥64 树化）；�
 ::: details
 
 - 【L3】JDK 8 的 TreeNode 继承 LinkedHashMap.Entry，节点体积约为普通 Node 的 2 倍，这是树化阈值不宜过小的内存考量。
+
 - 【L3】JDK 8 putVal() 合并了 JDK 7 的 addEntry()/createEntry() 逻辑，并将扩容判断统一放到插入完成后（`++size > threshold`）。
+
 - 【L4】JDK 7 的 transfer() 负责扩容迁移并逆序头插，正是它在并发下成环；JDK 8 的 resize() 内联了 lo/hi 双链保序迁移。
-  :::
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
-某电商商品缓存服务曾运行在 JDK 7，大促期间并发写 HashMap 触发扩容成环，应用线程 CPU 100% 卡死在 get() 链表遍历，只能重启恢复；升级 JDK 8 并替换为 ConcurrentHashMap 后，同类故障不再复现，且长链表桶被树化后热点桶查询从 O(n) 降到 O(log n)。
+
+某电商商品缓存服务曾运行在 JDK 7，大促期间并发写 HashMap 触发扩容成环，应用线程 CPU 100% 卡死在 get() 链表遍历，只能重启恢复；
+
+升级 JDK 8 并替换为 ConcurrentHashMap 后，同类故障不再复现，且长链表桶被树化后热点桶查询从 O(n) 降到 O(log n)。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "JDK 8 改尾插法后就线程安全了" → 错，尾插法只解决扩容成环，并发 put 的覆盖丢失、size 不准问题依旧存在。
 - ❌ "JDK 8 完全取消了 rehash" → 不准确，扩容仍需迁移节点，只是用 `hash & oldCap` 代替逐个重新计算哈希。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -510,23 +547,33 @@ if ((p = tab[i = (n - 1) & hash]) == null) {
 ::: details
 
 - 【L3】JDK 8 的 resize() 内部用 lo/hi 双链尾插迁移，结构上不再成环；但两个线程同时扩容仍会互相覆盖 table 引用导致整桶丢失。
-- 【L4】ConcurrentHashMap 的对应设计：空桶 CAS 插入、非空桶 synchronized 锁首节点、多线程协同扩容 transfer()，逐点击破上述问题，见本文档「ConcurrentHashMap 的底层实现原理是什么？」。
-  :::
+
+- 【L4】ConcurrentHashMap 的对应设计
+
+  空桶 CAS 插入、非空桶 synchronized 锁首节点、多线程协同扩容 transfer()，逐点击破上述问题，
+  见本文档「ConcurrentHashMap 的底层实现原理是什么？」。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
-某交易系统曾把 HashMap 用作本地汇率缓存，8 核机器上 32 线程并发写入，JDK 7 环境压测 30 分钟内出现 2 次线程卡在 get() 死循环、CPU 单核 100%，jstack 定位到 HashMap.getEntry() 环形链表；替换为 ConcurrentHashMap 后同样压测稳定跑满 4 小时无异常。
+
+某交易系统曾把 HashMap 用作本地汇率缓存，8 核机器上 32 线程并发写入，JDK 7 环境压测 30 分钟内出现 2 次线程卡在 get() 死循环、CPU 单核 100%，
+jstack 定位到 HashMap.getEntry() 环形链表；
+
+替换为 ConcurrentHashMap 后同样压测稳定跑满 4 小时无异常。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "JDK 8 改成尾插法，HashMap 就线程安全了" → 错，只是消除了死循环，并发覆盖丢失、size 不准依然存在。
 - ❌ "Collections.synchronizedMap() 与 ConcurrentHashMap 性能相当" → 错，前者是全表锁串行化，高并发吞吐远低于桶级锁的后者。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -589,24 +636,33 @@ if ((e.hash & oldCap) == 0) {
 ::: details
 
 - 【L3】resize() 中 threshold 同步翻倍，若新容量超过 MAXIMUM_CAPACITY（2^30）则不再扩容，仅把 threshold 调为 Integer.MAX_VALUE 硬扛。
+
 - 【L3】红黑树桶扩容时 TreeNode 同样按 hash & oldCap 拆链，若拆后节点数 ≤ 6 会用 untreeify() 退化回链表。
-- 【L4】JDK 7 的 transfer() 逆序头插是并发成环的根源：两线程交叉迁移使 A.next=B 与 B.next=A 同时成立；JDK 8 尾插保序从结构上消除。
-  :::
+
+- 【L4】JDK 7 的 transfer() 逆序头插是并发成环的根源
+
+  两线程交叉迁移使 A.next=B 与 B.next=A 同时成立；JDK 8 尾插保序从结构上消除。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
-某报表服务把 100 万条汇总数据放入未预设容量的 HashMap，运行中连续扩容 16 次（16 → 2097152），每次 resize 都伴随明显的 STW 抖动；按已知规模用 `new HashMap<>(1_400_000)` 预设后一次扩容到位，构建耗时从约 1.2s 降至约 0.4s，运行期无再扩容。
+
+某报表服务把 100 万条汇总数据放入未预设容量的 HashMap，运行中连续扩容 16 次（16 → 2097152），每次 resize 都伴随明显的 STW 抖动；
+
+按已知规模用 `new HashMap<>(1_400_000)` 预设后一次扩容到位，构建耗时从约 1.2s 降至约 0.4s，运行期无再扩容。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "扩容就是把所有元素重新哈希一遍" → JDK 8 不需要，用 hash & oldCap 一位判断迁移，复杂度仍是 O(n) 但免掉哈希计算。
 - ❌ "resize 只在插入时发生" → 对，触发点在 put 后 ++size > threshold；初始 table 为 null 时首次 put 也会经 resize() 懒初始化。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -657,17 +713,19 @@ if ((e.hash & oldCap) == 0) {
 ::: details
 
 - 【L3】源码注释中的泊松概率表给出了桶内 0~8 个元素的概率，长度 8 时约 6×10⁻⁸，注释原文说明链表长度几乎不会达到树化阈值，树化是为极端情况兜底。
+
 - 【L3】tableSizeFor() 保证容量恒为 2 的幂，配合默认 0.75 使 threshold 恒为整数，避免浮点比较误差。
-  :::
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "调高负载因子总能省内存" → 不全面，冲突概率与链表长度随之上升，查询退化；内存敏感场景更推荐用 initialCapacity 精准预设容量。
 - ❌ "0.75 是官方拍脑袋定的" → 错，源码注释有泊松分布推导支撑，与树化阈值 8 联动设计。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -718,17 +776,19 @@ if ((e.hash & oldCap) == 0) {
 ::: details
 
 - 【L3】TreeMap 树节点含左右子与父指针，内存开销明显高于 HashMap.Node，同规模下内存占用更高。
+
 - 【L3】先 HashMap 构建再 `new TreeMap<>(hashMap)` 一次转换，比构建期直接写 TreeMap 的逐次 O(log n) 插入总体更省。
-  :::
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "TreeMap 查询总是比 HashMap 慢，永远别用" → 不全面，需要有序/范围查询时 TreeMap 的 O(log n + m) 远优于 HashMap 全量遍历 O(n)。
 - ❌ "HashMap 也能按键有序遍历" → 错，HashMap 完全无序且扩容后顺序变化，有序需求请用 TreeMap 或 LinkedHashMap。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -777,24 +837,33 @@ if ((e.hash & oldCap) == 0) {
 ::: details
 
 - 【L3】Hashtable 的每个公开方法都加 this 锁，读也被阻塞；ConcurrentHashMap（JDK8+）的 get 完全无锁，volatile 保证可见性。
+
 - 【L3】Hashtable 的枚举器不抛 ConcurrentModificationException 但同样弱一致；CHM 的 keySet/entrySet 视图也支持弱一致迭代。
-- 【L4】版本演进：Hashtable（JDK 1.0）→ Collections.synchronizedMap（JDK 1.2）→ ConcurrentHashMap（JDK 1.5）→ JDK 8 重构为 CAS + 桶锁。
-  :::
+
+- 【L4】版本演进
+
+  Hashtable（JDK 1.0）→ Collections.synchronizedMap（JDK 1.2）→ ConcurrentHashMap（JDK 1.5）→ JDK 8 重构为 CAS + 桶锁。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
-某交易网关本地缓存 20 万条商户配置，原用 Hashtable 在 16 核机器上 64 线程压测约 5 万 QPS；替换为 JDK 8 ConcurrentHashMap（初始容量 262144）后同压测提升至 50 万+ QPS，RT P99 从约 30ms 降至约 3ms，锁竞争消失后 GC 停顿也明显减少。
+
+某交易网关本地缓存 20 万条商户配置，原用 Hashtable 在 16 核机器上 64 线程压测约 5 万 QPS；
+
+替换为 JDK 8 ConcurrentHashMap（初始容量 262144）后同压测提升至 50 万+ QPS，RT P99 从约 30ms 降至约 3ms，锁竞争消失后 GC 停顿也明显减少。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "Hashtable 更老所以更稳定，并发场景更安全" → 错，安全与稳定无关锁粒度，全表锁反而是吞吐瓶颈与死代码温床。
 - ❌ "ConcurrentHashMap 允许 null 值只是习惯问题" → 错，是刻意设计，避免并发下 get() 返回 null 的二义性，见本文档「ConcurrentHashMap 为什么 key 和 value 不能为 null？」。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -894,15 +963,23 @@ GET 完全无锁：定位桶后遍历链表/树，依赖 volatile 保证可见�
 ::: details
 
 - 【L3】initTable() 用 sizeCtl 的 CAS 保证 table 只初始化一次；扩容中 ForwardingNode（hash = MOVED）标记已迁移的桶，put 线程遇到会先协助迁移。
-- 【L3】get() 无锁的底气：val、next 均 volatile；树化桶的查找通过 TreeBin 维护的读写锁状态保证一致性。
-- 【L4】与 HashMap 对比：spread() 额外屏蔽符号位（保留负数哈希做状态标记，如 MOVED/TREEBIN）；size() 弱一致而非精确值。
-  :::
+
+- 【L3】get() 无锁的底气
+
+  val、next 均 volatile；树化桶的查找通过 TreeBin 维护的读写锁状态保证一致性。
+
+- 【L4】与 HashMap 对比
+
+  spread() 额外屏蔽符号位（保留负数哈希做状态标记，如 MOVED/TREEBIN）；size() 弱一致而非精确值。
+
+:::
 
 ::: details 硬件视角：False Sharing 与 @Contended 注解
 
 **（1）什么是 False Sharing（伪共享）？**
 
-现代 CPU 的缓存一致性以 Cache Line（64 字节）为最小单位。当两个线程分别修改位于**同一 Cache Line** 的不同变量时，即使这两个变量在逻辑上毫无关系，CPU 也会因为缓存一致性协议（MESI）而互相使对方的 Cache Line 失效，导致两个线程被迫频繁从 L3/主内存重新加载——这就是伪共享。
+现代 CPU 的缓存一致性以 Cache Line（64 字节）为最小单位。当两个线程分别修改位于**同一 Cache Line** 的不同变量时，
+即使这两个变量在逻辑上毫无关系，CPU 也会因为缓存一致性协议（MESI）而互相使对方的 Cache Line 失效，导致两个线程被迫频繁从 L3/主内存重新加载——这就是伪共享。
 
 ```
 同一 Cache Line（64 字节）：
@@ -915,7 +992,9 @@ GET 完全无锁：定位桶后遍历链表/树，依赖 volatile 保证可见�
 
 **（2）ConcurrentHashMap 的 CounterCell 如何避免？**
 
-`ConcurrentHashMap` 在 JDK 8 中使用 `CounterCell` 数组来分段统计 `size()`，避免全局 CAS 竞争。每个 `CounterCell` 仅一个 `long value` 字段（8 字节），若无填充，相邻 CounterCell 可能落在同一 Cache Line 引发伪共享。
+`ConcurrentHashMap` 在 JDK 8 中使用 `CounterCell` 数组来分段统计 `size()`，避免全局 CAS 竞争。
+
+每个 `CounterCell` 仅一个 `long value` 字段（8 字节），若无填充，相邻 CounterCell 可能落在同一 Cache Line 引发伪共享。
 
 ```java
 // ConcurrentHashMap 内部
@@ -926,9 +1005,11 @@ static final class CounterCell {
 }
 ```
 
-**`@Contended` 注解**告诉 JVM 在对象前后添加**填充字节（padding）**，确保每个 `CounterCell` 独占一个 Cache Line（64 字节），代价是内存从 8 字节膨胀到 64 字节，换来并发更新时无跨核心缓存颠簸。
+**`@Contended` 注解**告诉 JVM 在对象前后添加**填充字节（padding）**，
+确保每个 `CounterCell` 独占一个 Cache Line（64 字节），代价是内存从 8 字节膨胀到 64 字节，换来并发更新时无跨核心缓存颠簸。
 
-**JVM 启动参数**：`RestrictContended` 默认为 true，即 `@Contended` 默认只对 bootclasspath 中的 JDK 内部类生效；用户代码需显式加 `-XX:-RestrictContended` 启动 JVM 才会获得填充，`-XX:ContendedPaddingWidth` 可调填充宽度（默认 128 字节）。
+**JVM 启动参数**：`RestrictContended` 默认为 true，即 `@Contended` 默认只对 bootclasspath 中的 JDK 内部类生效；
+用户代码需显式加 `-XX:-RestrictContended` 启动 JVM 才会获得填充，`-XX:ContendedPaddingWidth` 可调填充宽度（默认 128 字节）。
 
 **（3）伪共享优化的其他应用**：
 
@@ -946,17 +1027,21 @@ static final class CounterCell {
 #### 🏭 实战场景
 
 ::: details
-某风控计数服务用 ConcurrentHashMap<String, LongAdder> 维护 200 万个设备指纹的实时计数，16 核机器 128 线程写入，桶级锁使锁冲突率维持在极低水平，写入吞吐约 40 万次/秒；此前 synchronizedMap 方案约 4 万次/秒，RT P99 由 80ms 降至 5ms 以内。
+
+某风控计数服务用 ConcurrentHashMap<String, LongAdder> 维护 200 万个设备指纹的实时计数，16 核机器 128 线程写入，桶级锁使锁冲突率维持在极低水平，写入吞吐约 40 万次/秒；
+
+此前 synchronizedMap 方案约 4 万次/秒，RT P99 由 80ms 降至 5ms 以内。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "ConcurrentHashMap 完全无锁" → 错，读无锁，但写非空桶仍用 synchronized 锁首节点，只是粒度到桶。
 - ❌ "size() 是精确值" → 错，size() 是弱一致的估算，统计期间可能有并发修改，见本文档「ConcurrentHashMap 的 size() 方法如何实现？」。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1031,18 +1116,22 @@ if (!map.containsKey("key")) {
 
 ::: details
 
-- 【L3】put 时的判空点在 putVal() 入口：key 或 value 为 null 直接抛 NullPointerException，属于快速失败而非静默行为。
+- 【L3】put 时的判空点在 putVal() 入口
+
+  key 或 value 为 null 直接抛 NullPointerException，属于快速失败而非静默行为。
+
 - 【L3】TreeMap 在自然顺序下也不允许 null 键（compareTo(null) 抛 NPE），但原因是比较而非并发。
-  :::
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "禁止 null 只是编码习惯约定" → 错，是刻意设计：并发下 containsKey + get 的组合也不是原子的，无法事后补救歧义。
 - ❌ "HashMap 允许 null 说明它设计更先进" → 不准确，是单线程语义下的取舍，代价是调用方需自行区分两种 null。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1106,19 +1195,29 @@ map.computeIfAbsent("key", k -> 1);
 ::: details
 
 - 【L3】JDK 8 中这些原子方法在桶级别加 synchronized 执行映射函数，保证同桶操作串行；映射函数应短小、无副作用——执行期间持有桶锁，同桶的其他写操作都会被阻塞。
-- 【L3】并发计数经典写法：`map.merge(key, 1L, Long::sum)`，配合 LongAdder 可进一步降低热点 key 的竞争。
-- 【L4】映射函数内再修改同一 map（递归更新）会被 JDK 8 源码检测到并抛 `IllegalStateException: Recursive update`；修改其他桶或其他 map 则可能形成交叉持锁等待导致死锁——两种故障模式要分清。
-- 【L4】语义细节差异：`putIfAbsent` 要求值提前构造好（key 已存在时白白构造）；`computeIfAbsent` 仅在缺失时才执行构造函数，适合昂贵对象；`compute` 无论 key 是否存在都会重算，且映射函数返回 null 表示移除条目；`merge` 面向新旧值合并，remapping 函数返回 null 时同样移除条目。
-  :::
+
+- 【L3】并发计数经典写法
+
+  `map.merge(key, 1L, Long::sum)`，配合 LongAdder 可进一步降低热点 key 的竞争。
+
+- 【L4】映射函数内再修改同一 map（递归更新）会被 JDK 8 源码检测到并抛 `IllegalStateException: Recursive update`；修改其他桶或其他 map 则可能形成交叉持锁等待导致死锁——
+  两种故障模式要分清。
+
+- 【L4】语义细节差异
+
+  `putIfAbsent` 要求值提前构造好（key 已存在时白白构造）；`computeIfAbsent` 仅在缺失时才执行构造函数，适合昂贵对象；`compute` 无论 key 是否存在都会重算，
+  且映射函数返回 null 表示移除条目；`merge` 面向新旧值合并，remapping 函数返回 null 时同样移除条目。
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "ConcurrentHashMap 线程安全，所以任意组合用法都安全" → 错，安全的是单个方法，check-then-act 组合仍有竞态。
 - ❌ "get + put 实现计数没问题" → 错，并发下会丢失更新，应用 merge(key, 1, Long::sum) 或 compute。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1196,7 +1295,11 @@ private final void addCount(long x, int check) {
 
 ::: details
 
-- 【L3】baseCount + CounterCell[] 与 LongAdder 的 Striped64 思路同源：低竞争时直接 CAS 基础计数，高竞争时按线程探测 hash 分散到 Cell，用空间膨胀换竞争下降；CounterCell 用 @Contended 填充消除伪共享，详见本文档「ConcurrentHashMap 的底层实现原理是什么？」的硬件视角扩展块。
+- 【L3】baseCount + CounterCell[] 与 LongAdder 的 Striped64 思路同源
+
+  低竞争时直接 CAS 基础计数，高竞争时按线程探测 hash 分散到 Cell，用空间膨胀换竞争下降；
+  CounterCell 用 @Contended 填充消除伪共享，详见本文档「ConcurrentHashMap 的底层实现原理是什么？」的硬件视角扩展块。
+
 - 【L3】sumCount() 无锁遍历整个 CounterCell[]，size() 是弱一致估算而非精确快照；高频热路径不应拿 size() 做精确计数或限流判断，需要精确值应另用 LongAdder/AtomicLong 维护。
 
 :::
@@ -1344,25 +1447,40 @@ Level 0:  Head → 10 → 20 → 30 → 40 → 50 → 60 → 70 → null
 
 ::: details
 
-- 【L3】删除采用逻辑删除：先 CAS 标记再冻结后继指针，避免并发下大范围重链；size() 不维护精确计数，遍历时允许并发修改。
-- 【L4】为什么数据库/中间件偏爱跳表而非红黑树：插入删除只影响局部节点、CAS 友好，红黑树旋转可能牵动多个节点难以并发；范围查询找到起点后沿底层链表直走，红黑树需中序遍历维护栈状态；实现也更简单（工程实现约 200 行 vs 红黑树 500+ 行）。
-- 【L4】工业应用：Redis ZSet、LevelDB/RocksDB MemTable、HBase MemStore（直接用 ConcurrentSkipListMap）、Lucene 倒排链跳跃表；Redis 跳表节点自带 level[] 数组、层数随机（平均 1/(1-p) 层），Java 版用 Index 节点挂载在数据节点上便于 CAS，核心算法一致但 Java 版因无锁并发更复杂。
-  :::
+- 【L3】删除采用逻辑删除
+
+  先 CAS 标记再冻结后继指针，避免并发下大范围重链；size() 不维护精确计数，遍历时允许并发修改。
+
+- 【L4】为什么数据库/中间件偏爱跳表而非红黑树
+
+  插入删除只影响局部节点、CAS 友好，红黑树旋转可能牵动多个节点难以并发；范围查询找到起点后沿底层链表直走，红黑树需中序遍历维护栈状态；
+  实现也更简单（工程实现约 200 行 vs 红黑树 500+ 行）。
+
+- 【L4】工业应用
+
+  Redis ZSet、LevelDB/RocksDB MemTable、HBase MemStore（直接用 ConcurrentSkipListMap）、Lucene 倒排链跳跃表；
+  Redis 跳表节点自带 level[] 数组、层数随机（平均 1/(1-p) 层），Java 版用 Index 节点挂载在数据节点上便于 CAS，核心算法一致但 Java 版因无锁并发更复杂。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
-HBase 的 MemStore 用 ConcurrentSkipListMap 存储写入缓冲，单 Region 承载数万 QPS 并发写入并保持 Cell 有序，flush 时直接顺序遍历刷盘；相比全局加锁的有序结构，写路径无全局锁竞争，读路径可无锁弱一致扫描。
+
+HBase 的 MemStore 用 ConcurrentSkipListMap 存储写入缓冲，单 Region 承载数万 QPS 并发写入并保持 Cell 有序，flush 时直接顺序遍历刷盘；
+
+相比全局加锁的有序结构，写路径无全局锁竞争，读路径可无锁弱一致扫描。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "跳表查询一定比红黑树慢" → 两者同为 O(log n)，跳表在并发与范围查询场景反而更优，复杂度常数差异有限。
 - ❌ "ConcurrentSkipListMap 的 size() 是精确值" → 错，size() 遍历计算且不精确，高频调 size() 的热路径需谨慎，O(n) 开销不可忽视。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1432,17 +1550,19 @@ map.put(key, "value2");
 ::: details
 
 - 【L3】开放寻址 + 引用判等使 IdentityHashMap 适合短生命周期的对象身份跟踪；JVM 内部类似场景还有 ClassValue 等按 Class 引用索引的结构。
+
 - 【L3】ThreadLocalMap 借用开放寻址思想但 Entry 的 key 是 ThreadLocal 弱引用，是独立实现，不等同于 IdentityHashMap。
-  :::
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "IdentityHashMap 是 HashMap 的高性能版" → 错，判等语义完全不同（== vs equals），误用会把逻辑相等的 key 当成不同 key。
 - ❌ "字符串常量当 key 一定去重" → 要小心常量池行为：字面量共享引用会覆盖，new String() 则是不同引用，行为取决于引用是否同一。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1539,24 +1659,31 @@ add/remove/contains 都是单个位运算，O(1) 且常数 <1ns；交/并/差集
 
 ::: details
 
-- 【L3】EnumSet 是抽象类，静态工厂 of()/noneOf()/allOf()/complementOf() 根据枚举规模返回 RegularEnumSet 或 JumboEnumSet；complementOf 直接按位取反实现补集。
+- 【L3】EnumSet 是抽象类，静态工厂 of()/noneOf()/allOf()/complementOf() 根据枚举规模返回 RegularEnumSet 或 JumboEnumSet；
+  complementOf 直接按位取反实现补集。
+
 - 【L4】与 HashMap 相比 EnumMap 不支持 null key（put null 键抛 NPE）但允许 null value；而 HashMap 两者都允许。
-  :::
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
-某网关将 HTTP 方法枚举映射到处理器，用 EnumMap<Method, Handler> 替代 HashMap，每请求路由少一次哈希计算与节点指针跳转，单机压测路由阶段耗时下降约 30%，且代码由字符串 key 换成枚举后编译期即可发现拼写错误。
+
+某网关将 HTTP 方法枚举映射到处理器，用 EnumMap<Method, Handler> 替代 HashMap，
+
+每请求路由少一次哈希计算与节点指针跳转，单机压测路由阶段耗时下降约 30%，且代码由字符串 key 换成枚举后编译期即可发现拼写错误。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-常见误区：
 
 - ❌ "EnumMap 允许 null 键" → 错，put null 键抛 NullPointerException，仅值允许为 null。
 - ❌ "自己用枚举 ordinal 建数组更灵活" → 不推荐，EnumMap 提供类型安全、迭代顺序与空值检查，手写数组容易越界且语义不清。
-  :::
+
+:::
 
 #### 🔀 发散问题
 

@@ -89,10 +89,23 @@ Dubbo 支持多种序列化协议，可通过协议上的 `serialization` 参数
 
 ::: details
 
-- 【L3】Hessian2 虽是 Dubbo2 默认，但短板明确：对 JDK 8 时间类型（`LocalDateTime`/`Instant`）需要额外适配、泛型擦除后集合元素类型易丢、枚举演进不友好（老版本消费端遇到新增枚举值会反序列化失败）。这也是 Dubbo 3 + Triple 更倾向 Protobuf 的原因之一。
-- 【L3】Kryo / FST 是 Java 专用：`Kryo` 实例**线程不安全**，必须用 `ThreadLocal` 持有或对象池复用，直接做成单例共享会在高并发下产生错乱的字节流；注册类（`register`）能明显减小体积并提速，但**两端的注册顺序必须完全一致**，否则按 ID 解出的类会错位。
-- 【L4】Protobuf / Protostuff 的兼容性锚点是**字段编号**而非字段名：删除字段必须用 `reserved` 保留编号，改字段类型等价于「删旧 + 加新」，否则跨版本混布时会静默解析出错误值——这类问题在灰度期最难定位。
-- 【L4】JDK 原生序列化除性能差、体积大之外还有安全问题：精心构造的 Gadget Chain 可在反序列化时触发任意代码执行（RCE）。JDK 9 起提供 JEP 290 反序列化过滤（`ObjectInputFilter`）；Dubbo 3.x 也在序列化层引入了类校验开关来缓解该风险。
+- 【L3】Hessian2 虽是 Dubbo2 默认，但短板明确：对 JDK 8 时间类型（`LocalDateTime`/`Instant`）需要额外适配、泛型擦除后集合元素类型易丢、
+  枚举演进不友好（老版本消费端遇到新增枚举值会反序列化失败）。这也是 Dubbo 3 + Triple 更倾向 Protobuf 的原因之一。
+
+- 【L3】Kryo / FST 是 Java 专用
+
+  `Kryo` 实例**线程不安全**，必须用 `ThreadLocal` 持有或对象池复用，直接做成单例共享会在高并发下产生错乱的字节流；
+  注册类（`register`）能明显减小体积并提速，但**两端的注册顺序必须完全一致**，否则按 ID 解出的类会错位。
+
+- 【L4】Protobuf / Protostuff 的兼容性锚点是**字段编号**而非字段名
+
+  删除字段必须用 `reserved` 保留编号，改字段类型等价于「删旧 + 加新」，否则跨版本混布时会静默解析出错误值——
+  这类问题在灰度期最难定位。
+
+- 【L4】JDK 原生序列化除性能差、体积大之外还有安全问题
+
+  精心构造的 Gadget Chain 可在反序列化时触发任意代码执行（RCE）。JDK 9 起提供 JEP 290 反序列化过滤（`ObjectInputFilter`）；
+  Dubbo 3.x 也在序列化层引入了类校验开关来缓解该风险。
 
 > 序列化协议之间的横向深度对比（IDL 约束、兼容纪律、安全性）见《RPC 面试》『常见序列化协议的深度对比？』，本题只覆盖 Dubbo 侧的选型口径。
 
@@ -101,8 +114,6 @@ Dubbo 支持多种序列化协议，可通过协议上的 `serialization` 参数
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "协议头里带了序列化 ID，所以两端随便配" → 协议头 Flag 低 5 位确实逐包携带序列化 ID，解码端按 ID 查 `Serialization` SPI；但**前提是两端 classpath 上都加载了对应扩展**。灰度从 Hessian2 切 Kryo 时，若消费者先升级而提供者没有 Kryo 扩展，请求会直接解码失败。
 - ❌ "Protobuf 一定优于 Hessian2" → Protobuf 需要 IDL 与字段编号纪律，存量 Java 接口改造成本高；Hessian2 免 IDL、对 Java 对象友好。选型看**跨语言诉求与接口演进纪律**，不看单一性能指标。
@@ -161,19 +172,30 @@ Dubbo 官方支持的协议如下：
 
 ::: details
 
-【L3】多协议发布时，Dubbo 通过 `Protocol` SPI 扩展点按 URL 的 protocol 参数分发到对应协议实现，一个 `ServiceConfig` 可遍历多个 `ProtocolConfig` 分别暴露。
+- 【L3】多协议发布时，Dubbo 通过 `Protocol` SPI 扩展点按 URL 的 protocol 参数分发到对应协议实现，一个 `ServiceConfig` 可遍历多个 `ProtocolConfig` 分别暴露。
 
-【L3】**协议选型的三条判据**（P8 必答的决策部分，纯枚举不足以得分）：
+- 【L3】**协议选型的三条判据**（P8 必答的决策部分，纯枚举不足以得分）：
 
 - **内网 Java-to-Java、小报文、高并发** → `dubbo`（Dubbo2 协议）：紧凑二进制 + 单一长连接 + NIO 异步，头部仅 16 字节，是这一场景的最优解。
+
 - **需要跨语言 / 流式（一元、客户端流、服务端流、双向流）/ 网关穿透 / Service Mesh 接入** → `tri`（Triple）：基于 HTTP/2 且兼容 gRPC，能被通用 HTTP 网关与 Mesh 边车识别。
+
 - **对外开放接口、便于 curl/浏览器调试** → `rest`（HTTP + JSON，基于 JAX-RS）：可观测性与联调成本最低，但性能最差，不适合内部主链路。
 
-【L4】**为什么 Dubbo2 协议穿不过网关**：它是私有二进制协议，靠魔数 `0xdabb` 定界、靠协议头里的序列化 ID 解码，HTTP 网关与 Mesh 边车无法解析其报文，也就无法做路由、鉴权、限流与协议转换。这不是"性能不够"的问题，而是**协议不在网关的语义空间内**——这正是 Dubbo3 推 Triple 的根本动因。
+- 【L4】**为什么 Dubbo2 协议穿不过网关**：
 
-【L4】Dubbo3 起协议选择向 Triple 收敛：Triple 兼容 gRPC、支持 Streaming，且能穿透网关与 Mesh 边车，是从 Dubbo2 协议迁移的主要方向。但**收敛不等于默认**——Dubbo 3.x 的默认协议仍是 `dubbo`，启用 Triple 需显式配置 `dubbo.protocol.name=tri`；两者也可在同一应用内并行暴露以支撑渐进迁移。
+  它是私有二进制协议，靠魔数 `0xdabb` 定界、靠协议头里的序列化 ID 解码，HTTP 网关与 Mesh 边车无法解析其报文，也就无法做路由、鉴权、限流与协议转换。
+
+  这不是"性能不够"的问题，而是**协议不在网关的语义空间内**——这正是 Dubbo3 推 Triple 的根本动因。
+
+- 【L4】Dubbo3 起协议选择向 Triple 收敛：
+
+  Triple 兼容 gRPC、支持 Streaming，且能穿透网关与 Mesh 边车，是从 Dubbo2 协议迁移的主要方向。
+
+  但**收敛不等于默认**——Dubbo 3.x 的默认协议仍是 `dubbo`，启用 Triple 需显式配置 `dubbo.protocol.name=tri`；两者也可在同一应用内并行暴露以支撑渐进迁移。
 
 > 📚 延伸阅读：
+
 >
 > - [Dubbo 官方文档之通信协议](https://cn.dubbo.apache.org/zh-cn/overview/what/core-features/protocols/)
 > - [Triple 协议开发任务](https://cn.dubbo.apache.org/zh-cn/overview/what/tasks/protocols/triple/)
@@ -191,8 +213,6 @@ Dubbo 官方支持的协议如下：
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Triple 是 Dubbo3 的默认协议" → Triple 是 Dubbo3 **主推**的下一代协议，**默认协议仍是 `dubbo`（Dubbo2 协议）**，需要显式配置 `dubbo.protocol.name=tri` 才启用。混淆"主推"与"默认"会导致误判升级成本与回滚方案。
 - ❌ "Dubbo2 协议也能挂在 HTTP 网关后面" → 私有二进制协议网关无法解析，必须改用 Triple 或在网关侧做协议转换（如网关以 Triple/REST 接入、再以 Dubbo2 协议回源）。
@@ -277,23 +297,29 @@ Dubbo2 协议 = 定长 16 字节协议头 + 不定长消息体，靠魔数 `0xda
 
 ::: details
 
-【L3】心跳在 Dubbo 协议中是一种特殊的 event 请求（Flag 置 0x20），共用同一报文结构，消费者/提供者按 `heartbeat` 参数周期互发，超过 `heartbeat.timeout` 未收到则触发重连或断开。
+- 【L3】心跳在 Dubbo 协议中是一种特殊的 event 请求（Flag 置 0x20），共用同一报文结构，消费者/提供者按 `heartbeat` 参数周期互发，超过 `heartbeat.timeout` 未收到则触发重连或断开。
 
-【L3】消费者到每个提供者地址默认建立 1 条连接，可用 `connections` 参数显式增加对单个提供者的连接数，适合大报文或需要更高吞吐的调用。
+- 【L3】消费者到每个提供者地址默认建立 1 条连接，可用 `connections` 参数显式增加对单个提供者的连接数，适合大报文或需要更高吞吐的调用。
 
-【L3】消息体有默认大小上限：`payload` 默认 8MB，编解码时校验，超限直接抛 `ExceededPayloadLimitException`。批量查询接口返回超大集合是常见触发场景——正确做法是分页或裁剪字段，而不是盲目调大 `payload`：大报文会长时间占用单一长连接的带宽，放大下面这条队头拥塞问题。
+- 【L3】消息体有默认大小上限：
 
-【L4】解码器依赖 Data Length 做完整性判断：先读满 16 字节头，再按体长读满 Body，未读满则等待后续字节，这是 TCP 粘包/拆包处理的标准做法。
+  `payload` 默认 8MB，编解码时校验，超限直接抛 `ExceededPayloadLimitException`。
 
-【L4】单一长连接的代价是队头拥塞：单连接上的大响应会占用带宽，影响同连接其它请求的时延，这也是 Dubbo3 转向基于 HTTP/2 多路复用的 Triple 协议的动因之一。
+  批量查询接口返回超大集合是常见触发场景——正确做法是分页或裁剪字段，而不是盲目调大 `payload`：大报文会长时间占用单一长连接的带宽，放大下面这条队头拥塞问题。
+
+- 【L4】解码器依赖 Data Length 做完整性判断：
+
+  先读满 16 字节头，再按体长读满 Body，未读满则等待后续字节，这是 TCP 粘包/拆包处理的标准做法。
+
+- 【L4】单一长连接的代价是队头拥塞：
+
+  单连接上的大响应会占用带宽，影响同连接其它请求的时延，这也是 Dubbo3 转向基于 HTTP/2 多路复用的 Triple 协议的动因之一。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "一条连接只能同时处理一个请求" → Dubbo 通过 Request ID 实现单连接多路复用，请求异步发出、响应按 ID 归位，并发度不受连接数限制。
 - ❌ "协议头里的序列化方式是固定死的" → 序列化 ID 每包携带在 Flag 低 5 位中，理论上支持逐包协商，两端能力允许时可切换序列化协议。
@@ -405,25 +431,36 @@ graph TD
 
 ::: details
 
-【L3】暴露流程支持延迟暴露（`delay` 参数）与多注册中心、多协议遍历发布：`doExportUrls` 会对每个注册中心 × 每个协议组合各执行一次 `doExportUrlsFor1Protocol`。
+- 【L3】暴露流程支持延迟暴露（`delay` 参数）与多注册中心、多协议遍历发布：
 
-【L3】`RegistryDirectory` 收到注册中心推送的地址变更通知后，会增量重建 `Invoker` 列表：新增地址创建新 Invoker，下线地址销毁对应 Invoker，实现无需重启的动态感知。
+  `doExportUrls` 会对每个注册中心 × 每个协议组合各执行一次 `doExportUrlsFor1Protocol`。
 
-【L3】注册时机是无损发布的关键：Dubbo 在 Spring 容器 refresh 完成后（`ContextRefreshedEvent` 触发 `DubboBootstrap.start()`）才把服务 URL 注册到注册中心。若在容器就绪前注册，会出现"地址已可被感知但 Bean 依赖未装配完"的窗口，发布初期部分调用报 NPE 或找不到服务；暴露侧完整的预热与放量机制见《RPC 面试》『如何实现 RPC 优雅启动？』。
+- 【L3】`RegistryDirectory` 收到注册中心推送的地址变更通知后，会增量重建 `Invoker` 列表：新增地址创建新 Invoker，下线地址销毁对应 Invoker，实现无需重启的动态感知。
 
-【L4】`ServiceConfig` 拿到的 `Protocol` 实际是一条 Wrapper 装饰链：真正的 `DubboProtocol` 被 `ProtocolFilterWrapper`（组装 Filter 链）、`ProtocolListenerWrapper`（export/refer 回调）等包装类层层包裹，再由 `RegistryProtocol` 完成注册与 configurators 订阅后委托内层协议暴露。装饰链的包裹顺序决定了横切逻辑的执行顺序，其识别与包装机制见本文档『Dubbo 的 SPI 扩展机制是如何设计的？』。
+- 【L3】注册时机是无损发布的关键：
 
-【L4】`injvm` 本地暴露与远程暴露可同时存在：同一 JVM 内的消费者默认优先走本地 `InjvmInvoker`，避免不必要的网络开销。
+  Dubbo 在 Spring 容器 refresh 完成后（`ContextRefreshedEvent` 触发 `DubboBootstrap.start()`）才把服务 URL 注册到注册中心。
 
-【L4】直连模式（`url` 参数或 `-D` 参数指定地址）会跳过 Registry 层直接 `Protocol.refer`，常用于本地联调与测试环境。
+  若在容器就绪前注册，会出现"地址已可被感知但 Bean 依赖未装配完"的窗口，发布初期部分调用报 NPE 或找不到服务；暴露侧完整的预热与放量机制见《RPC 面试》『如何实现 RPC 优雅启动？』。
+
+- 【L4】`ServiceConfig` 拿到的 `Protocol` 实际是一条 Wrapper 装饰链
+
+  真正的 `DubboProtocol` 被 `ProtocolFilterWrapper`（组装 Filter 链）、
+  `ProtocolListenerWrapper`（export/refer 回调）等包装类层层包裹，再由 `RegistryProtocol` 完成注册与 configurators 订阅后委托内层协议暴露。
+
+  装饰链的包裹顺序决定了横切逻辑的执行顺序，其识别与包装机制见本文档『Dubbo 的 SPI 扩展机制是如何设计的？』。
+
+- 【L4】`injvm` 本地暴露与远程暴露可同时存在：
+
+  同一 JVM 内的消费者默认优先走本地 `InjvmInvoker`，避免不必要的网络开销。
+
+- 【L4】直连模式（`url` 参数或 `-D` 参数指定地址）会跳过 Registry 层直接 `Protocol.refer`，常用于本地联调与测试环境。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "服务暴露就是启动一个端口" → 启动 Server 只是其中一步，完整流程还包括配置解析、Invoker 生成、Filter 链组装、注册中心注册与配置订阅。
 - ❌ "注册中心挂了消费者就无法调用了" → 引用完成后地址列表已缓存在消费者本地，注册中心宕机不影响存量调用，只是无法感知新的地址变化。
@@ -583,15 +620,26 @@ public interface LoadBalance {
 
 ::: details
 
-【L3】Monitor 是可选组件：统计先在内存汇总，再周期性上报，与调用链路解耦，不影响主流程可用性。
+- 【L3】Monitor 是可选组件：
 
-【L3】"每一层都可以剥离上层被复用"是 Dubbo 分层的关键收益：最小 RPC 只需 Protocol + Invoker + Exporter。
+  统计先在内存汇总，再周期性上报，与调用链路解耦，不影响主流程可用性。
 
-【L4】Dubbo3 引入了应用级服务发现：注册粒度从"接口级 URL"变为"应用 + 元数据"，大幅降低注册中心存储与推送压力。
+- 【L3】"每一层都可以剥离上层被复用"是 Dubbo 分层的关键收益：
 
-【L4】Service 和 Config 层是 API，其余各层均为 SPI，这一区分决定了用户可见的编程界面与可替换的内部实现的边界。
+  最小 RPC 只需 Protocol + Invoker + Exporter。
 
-【L4】一次远程调用自上而下穿越的完整层次是：Proxy（接口代理）→ Cluster（Router 裁剪地址 → LoadBalance 选址 → 容错包装）→ Filter 链 → Protocol → Exchange（封装 Request/Response、同步转异步）→ Transport → Serialize，响应沿原路对称返回，逐层解包后 complete 调用方 Future。能按这条路径逐层说出"每层职责 + 每层可替换的扩展点"，是「背过架构图」与「理解架构」的分水岭。
+- 【L4】Dubbo3 引入了应用级服务发现：
+
+  注册粒度从"接口级 URL"变为"应用 + 元数据"，大幅降低注册中心存储与推送压力。
+
+- 【L4】Service 和 Config 层是 API，其余各层均为 SPI，这一区分决定了用户可见的编程界面与可替换的内部实现的边界。
+
+- 【L4】一次远程调用自上而下穿越的完整层次是：
+
+  Proxy（接口代理）→ Cluster（Router 裁剪地址 → LoadBalance 选址 → 容错包装）→ Filter 链 → Protocol → Exchange（封装 Request/Response、
+  同步转异步）→ Transport → Serialize，响应沿原路对称返回，逐层解包后 complete 调用方 Future。
+
+  能按这条路径逐层说出"每层职责 + 每层可替换的扩展点"，是「背过架构图」与「理解架构」的分水岭。
 
 > 📚 延伸阅读：[Dubbo 框架设计](https://cn.dubbo.apache.org/zh-cn/docsv2.7/dev/design/)
 
@@ -600,8 +648,6 @@ public interface LoadBalance {
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Dubbo 有十层，每层都必须用上" → 各层单向依赖且可剥离复用，Cluster、Proxy 都是可选的透明化/集群能力。
 - ❌ "Registry 和 Monitor 是架构分层" → 二者是独立的部署拓扑节点，只是为了全局概览才用层的方式画在一起。
@@ -708,21 +754,28 @@ private UserService userService;
 
 ::: details
 
-【L3】除 failover/failfast/failsafe 外，Dubbo 还提供 failback（失败自动恢复重试）、forking（并行调用多个提供者）、broadcast（广播调用）等集群容错策略，可按接口读写特性分别配置。
+- 【L3】除 failover/failfast/failsafe 外，Dubbo 还提供 failback（失败自动恢复重试）、forking（并行调用多个提供者）、broadcast（广播调用）等集群容错策略，
+  可按接口读写特性分别配置。
 
-【L4】Mock 降级（`mock` 参数）与 Cluster 容错是两层防线：容错决定"失败后怎么重试/切换"，Mock 决定"彻底失败后返回什么兜底结果"。
+- 【L4】Mock 降级（`mock` 参数）与 Cluster 容错是两层防线：
 
-【L4】注册中心容错的最后一环是本地快照：Dubbo 会把订阅到的地址列表写入消费者本地缓存文件，进程重启时即使注册中心不可用，也能用快照启动并继续调用；极端场景还可用 `dubbo-resolve.properties` 指定直连地址。所以"注册中心全挂"不等于"调用不可用"，真正受损的是地址变更感知与新实例上线传播——这也是「注册中心选型应 AP 优先」的根本依据，详见《RPC 面试》『如何实现一个注册中心？』。
+  容错决定"失败后怎么重试/切换"，Mock 决定"彻底失败后返回什么兜底结果"。
 
-【L4】本题与服务治理侧的分工：本题给出架构级容错地图（冗余/检测/容错/限流/隔离五层）；限流、熔断、降级的规则体系与故障检测、集群容错的参数化落地，见《Dubbo 面试之服务治理》对应专题。
+- 【L4】注册中心容错的最后一环是本地快照：
+
+  Dubbo 会把订阅到的地址列表写入消费者本地缓存文件，进程重启时即使注册中心不可用，也能用快照启动并继续调用；极端场景还可用 `dubbo-resolve.properties` 指定直连地址。
+
+  所以"注册中心全挂"不等于"调用不可用"，真正受损的是地址变更感知与新实例上线传播——这也是「注册中心选型应 AP 优先」的根本依据，详见《RPC 面试》『如何实现一个注册中心？』。
+
+- 【L4】本题与服务治理侧的分工：
+
+  本题给出架构级容错地图（冗余/检测/容错/限流/隔离五层）；限流、熔断、降级的规则体系与故障检测、集群容错的参数化落地，见《Dubbo 面试之服务治理》对应专题。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "重试次数设得越大越可靠" → 重试会放大下游压力且非幂等接口重试会产生脏数据，需结合接口幂等性和超时预算设置 retries。
 - ❌ "注册中心高可用就够了" → 注册中心只解决服务发现，调用链路上的节点故障、网络抖动仍需集群容错与限流降级覆盖。
@@ -793,19 +846,28 @@ Dubbo 作为一款高性能的 Java RPC 框架，在性能优化方面做了许�
 
 ::: details
 
-【L3】服务预热（warmup）：记录提供者启动时间，按运行时长以**平方曲线**放大权重（`ww = (int)(Math.pow(uptime / (double) warmup, 2) * weight)`，并夹逼在 1 与配置权重之间），让刚启动、JIT 未热身的实例先只承接极少量流量，随运行时长平滑放量；`warmup` 默认 10 分钟。注意不是线性放大——线性曲线在启动初期放量过快，冷实例仍会被打穿；下限取 1 而非 0，是为了保留极少量流量触发 JIT 与缓存加载。同口径见《RPC 面试》『如何实现 RPC 优雅启动？』。
+- 【L3】服务预热（warmup）
 
-【L4】结果缓存（cache）提供 lru、threadlocal、jcache 等策略，适合读多写少且容忍短暂不一致的接口，但会引入内存与一致性代价，需按接口开启而非全局开启。
+  记录提供者启动时间，按运行时长以**平方曲线**放大权重（`ww = (int)(Math.pow(uptime / (double) warmup, 2) * weight)`，
+  并夹逼在 1 与配置权重之间），让刚启动、JIT 未热身的实例先只承接极少量流量，随运行时长平滑放量；
 
-【L4】谈"优化"前先量化瓶颈分布：RPC 框架侧的 CPU 开销通常集中在序列化编解码、线程调度与上下文切换两处，压测时必须把编解码 CPU 占比与报文体积单独量出，而不是笼统观察"性能变好"；连接数则按「并发在途请求数 ÷ 单连接可承载并发」估算（单条 TCP 吞吐受带宽 × RTT 与 TCP 窗口限制，内网低 RTT 场景单连接通常够用）。完整的容量规划方法见《RPC 面试》『如何设计一个 RPC 框架？』。
+  `warmup` 默认 10 分钟。注意不是线性放大——线性曲线在启动初期放量过快，冷实例仍会被打穿；下限取 1 而非 0，是为了保留极少量流量触发 JIT 与缓存加载。
+
+  同口径见《RPC 面试》『如何实现 RPC 优雅启动？』。
+
+- 【L4】结果缓存（cache）提供 lru、threadlocal、jcache 等策略，适合读多写少且容忍短暂不一致的接口，但会引入内存与一致性代价，需按接口开启而非全局开启。
+
+- 【L4】谈"优化"前先量化瓶颈分布：
+
+  RPC 框架侧的 CPU 开销通常集中在序列化编解码、线程调度与上下文切换两处，压测时必须把编解码 CPU 占比与报文体积单独量出，而不是笼统观察"性能变好"；
+
+  连接数则按「并发在途请求数 ÷ 单连接可承载并发」估算（单条 TCP 吞吐受带宽 × RTT 与 TCP 窗口限制，内网低 RTT 场景单连接通常够用）。完整的容量规划方法见《RPC 面试》『如何设计一个 RPC 框架？』。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "线程池越大吞吐越高" → 线程数超过 CPU 与下游承载能力后，上下文切换与排队反而拖垮吞吐，应结合压测确定拐点。
 - ❌ "结果缓存可以全局开启" → 缓存有一致性与内存代价，应只对读多写少的幂等接口开启。
@@ -985,23 +1047,29 @@ notifyService.listen("topic1", new Listener() {
 
 ::: details
 
-【L3】`RpcContext.getFuture()` 是 Dubbo 2.6 及之前的旧式异步写法，2.7 起推荐接口返回 `CompletableFuture`；泛化调用可通过 `RpcContext.getServiceContext().getFuture()` 获取。
+- 【L3】`RpcContext.getFuture()` 是 Dubbo 2.6 及之前的旧式异步写法，2.7 起推荐接口返回 `CompletableFuture`；
 
-【L4】服务端也可用 `AsyncContext`（`RpcContext.startAsync()`）把同步接口实现转成异步处理，先释放 Dubbo 线程再自行 complete，适合服务端慢逻辑不阻塞业务线程池的场景。
+  泛化调用可通过 `RpcContext.getServiceContext().getFuture()` 获取。
 
-【L4】`CompletableFuture` 回调默认在 IO 线程或公共线程池执行，回调逻辑中不应执行耗时阻塞操作，必要时应用 `thenApplyAsync` 等切换到自定义线程池。
+- 【L4】服务端也可用 `AsyncContext`（`RpcContext.startAsync()`）把同步接口实现转成异步处理，先释放 Dubbo 线程再自行 complete，适合服务端慢逻辑不阻塞业务线程池的场景。
 
-【L4】异步调用的底座是 requestId → Future 的全局映射表：Dubbo 用 `DefaultFuture` 维护 `Map<Long, DefaultFuture>`，响应到达后按协议头 Request ID 找到 Future 并 complete；`TimeoutCheckTask` 周期扫描已超时的 Future，以超时异常 complete 并从表中摘除。若这套清理失效，映射表会单调增长直至 OOM——泄漏形态与排查手法详见《RPC 面试》『如何实现 RPC 异步调用？』。
+- 【L4】`CompletableFuture` 回调默认在 IO 线程或公共线程池执行，回调逻辑中不应执行耗时阻塞操作，必要时应用 `thenApplyAsync` 等切换到自定义线程池。
 
-【L4】客户端超时放弃后，服务端仍可能把迟到的响应写回：此时本地 Future 已被摘除，响应会被直接丢弃，日志中出现"找不到对应 Future"类记录多属正常现象，不要误判为故障；真正要排查的是服务端为什么处理得比超时还慢。
+- 【L4】异步调用的底座是 requestId → Future 的全局映射表：
+
+  Dubbo 用 `DefaultFuture` 维护 `Map<Long, DefaultFuture>`，响应到达后按协议头 Request ID 找到 Future 并 complete；
+
+  `TimeoutCheckTask` 周期扫描已超时的 Future，以超时异常 complete 并从表中摘除。若这套清理失效，映射表会单调增长直至 OOM——泄漏形态与排查手法详见《RPC 面试》『如何实现 RPC 异步调用？』。
+
+- 【L4】客户端超时放弃后，服务端仍可能把迟到的响应写回：
+
+  此时本地 Future 已被摘除，响应会被直接丢弃，日志中出现"找不到对应 Future"类记录多属正常现象，不要误判为故障；真正要排查的是服务端为什么处理得比超时还慢。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "异步调用就没有超时控制了" → 异步同样受 timeout 约束，超时后 Future 会以异常 complete，需对超时时间合理设置（建议比同步调用略长）。
 - ❌ "回调里做什么都行" → 回调运行在网络/回调线程上，阻塞操作会拖慢整个处理链，耗时逻辑应转交业务线程池。
@@ -1173,21 +1241,36 @@ Dubbo 框架的线程模型与以上这五种行为息息相关，Dubbo 协议 P
 
 ::: details
 
-【L3】默认 Dispatcher 是 all：除 sent 与响应序列化外全部进业务线程池，安全性最高；direct 适合极简处理逻辑（如网关转发），能省一次线程切换但业务必须非阻塞。其背后是 Reactor 分工：IO 线程（Netty EventLoop）只应做读写与编解码，业务处理放到业务线程池；由于业务逻辑耗时通常远大于切换开销，all 是默认且最安全的选择。EventLoop 与 Channel 的一对一固定绑定关系、以及"在 IO 线程做阻塞调用会拖垮该 EventLoop 名下全部连接"的雪崩机制，权威版本见《Netty 面试》。
+- 【L3】默认 Dispatcher 是 all：
 
-【L4】业务线程池打满时的快速拒绝是防雪崩的最后一道闸：all 策略下线程与队列都满时，Dubbo 直接中止请求，返回 `SERVER_THREADPOOL_EXHAUSTED_ERROR`（协议头 Status=100）并附线程池状态快照，让调用方立刻感知过载、触发容错或限流。注意 Dubbo 默认 `fixed` 线程池（200 线程）的队列容量为 0（`SynchronousQueue`），这是刻意设计——无界队列会把过载伪装成不断增长的延迟，上游持续重试，最终把整条链路拖垮；正确做法是快速失败 + 调用方降级，而不是加大队列。
+  除 sent 与响应序列化外全部进业务线程池，安全性最高；direct 适合极简处理逻辑（如网关转发），能省一次线程切换但业务必须非阻塞。
 
-【L4】连接风暴场景下的 connection 策略：大规模集群滚动发布或网络抖动恢复时会瞬间产生大量 connected/disconnected 事件，若与请求消息共用业务线程池，建连事件可能挤占请求处理能力；connection 策略把连接事件隔离到独立线程池，适合实例数多、发布频繁的场景。
+  其背后是 Reactor 分工：IO 线程（Netty EventLoop）只应做读写与编解码，业务处理放到业务线程池；由于业务逻辑耗时通常远大于切换开销，all 是默认且最安全的选择。
 
-【L4】消费端老模型的问题本质是"同步等待 + 独立回调线程池"双重线程占用，网关类高并发场景下线程数爆炸；ThreadlessExecutor 通过"谁等待谁处理"消除了多余线程池，具体问题讨论参见 [Need a limited Threadpool in consumer side #2013](https://github.com/apache/dubbo/issues/2013)。
+  EventLoop 与 Channel 的一对一固定绑定关系、以及"在 IO 线程做阻塞调用会拖垮该 EventLoop 名下全部连接"的雪崩机制，权威版本见《Netty 面试》。
+
+- 【L4】业务线程池打满时的快速拒绝是防雪崩的最后一道闸：
+
+  all 策略下线程与队列都满时，Dubbo 直接中止请求，返回 `SERVER_THREADPOOL_EXHAUSTED_ERROR`（协议头 Status=100）并附线程池状态快照，让调用方立刻感知过载、触发容错或限流。
+
+  注意 Dubbo 默认 `fixed` 线程池（200 线程）的队列容量为 0（`SynchronousQueue`），这是刻意设计——无界队列会把过载伪装成不断增长的延迟，上游持续重试，最终把整条链路拖垮；
+
+  正确做法是快速失败 + 调用方降级，而不是加大队列。
+
+- 【L4】连接风暴场景下的 connection 策略：
+
+  大规模集群滚动发布或网络抖动恢复时会瞬间产生大量 connected/disconnected 事件，若与请求消息共用业务线程池，建连事件可能挤占请求处理能力；
+
+  connection 策略把连接事件隔离到独立线程池，适合实例数多、发布频繁的场景。
+
+- 【L4】消费端老模型的问题本质是"同步等待 + 独立回调线程池"双重线程占用，网关类高并发场景下线程数爆炸；ThreadlessExecutor 通过"谁等待谁处理"消除了多余线程池，
+  具体问题讨论参见 [Need a limited Threadpool in consumer side #2013](https://github.com/apache/dubbo/issues/2013)。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "IO 线程上可以做业务逻辑" → direct 模式下业务直接跑在 IO 线程上，一旦阻塞会影响同 EventLoop 上所有连接，只适合轻量逻辑。
 - ❌ "消费端也需要大线程池" → 2.7.5+ 的消费端复用业务线程处理响应，不再需要独立消费线程池，盲目配大反而浪费。
@@ -1498,17 +1581,26 @@ Dubbo 调用链路中几乎所有核心节点都被定义为扩展点，从三�
 
 ::: details
 
-【L3】Dubbo SPI 的 IOC 通过 setter 注入实现：实例化扩展时检查 setter 方法，若参数是其它扩展点类型则自动从 ExtensionLoader 获取并注入。
+- 【L3】Dubbo SPI 的 IOC 通过 setter 注入实现：
 
-【L4】IOC 的注入来源不止其它 SPI：`ExtensionFactory` 本身就是扩展点，`SpiExtensionFactory` 负责注入其它扩展点实例，Spring 集成提供的 `SpringExtensionFactory` 负责把 Spring Bean 注入 Dubbo 扩展，`AdaptiveExtensionFactory` 在运行时自适应地在两者间委派——这就是"自定义 Filter 里为什么能直接拿到 Service/Mapper 等 Spring Bean"的答案。
+  实例化扩展时检查 setter 方法，若参数是其它扩展点类型则自动从 ExtensionLoader 获取并注入。
 
-【L3】扩展点的生效路径是"规则先落配置中心，实例监听变更后热加载"，因此改变流量走向无需重启应用，这也是灰度发布、流量隔离能力的技术基础。
+- 【L4】IOC 的注入来源不止其它 SPI
 
-【L4】Dubbo 3.x 中 Filter 体系演进为 ClusterFilter（集群层）与 Filter（协议层）两类扩展点，集群层拦截发生在重试/选址之外，协议层拦截发生在每次真实调用上。
+  `ExtensionFactory` 本身就是扩展点，`SpiExtensionFactory` 负责注入其它扩展点实例，
+  Spring 集成提供的 `SpringExtensionFactory` 负责把 Spring Bean 注入 Dubbo 扩展，`AdaptiveExtensionFactory` 在运行时自适应地在两者间委派——
+  这就是"自定义 Filter 里为什么能直接拿到 Service/Mapper 等 Spring Bean"的答案。
 
-【L4】跨文件分工：本题是 SPI 机制的权威深侧版本；Dubbo SPI 与 JDK SPI 在「自研框架 vs 用开源」决策论证中的角色，见《RPC 面试》『如何设计一个 RPC 框架？』与《组件与框架设计》RPC 框架题。
+- 【L3】扩展点的生效路径是"规则先落配置中心，实例监听变更后热加载"，因此改变流量走向无需重启应用，这也是灰度发布、流量隔离能力的技术基础。
+
+- 【L4】Dubbo 3.x 中 Filter 体系演进为 ClusterFilter（集群层）与 Filter（协议层）两类扩展点，集群层拦截发生在重试/选址之外，协议层拦截发生在每次真实调用上。
+
+- 【L4】跨文件分工：
+
+  本题是 SPI 机制的权威深侧版本；Dubbo SPI 与 JDK SPI 在「自研框架 vs 用开源」决策论证中的角色，见《RPC 面试》『如何设计一个 RPC 框架？』与《组件与框架设计》RPC 框架题。
 
 > 📚 延伸阅读：
+
 >
 > - [Dubbo SPI 概述](https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/reference-manual/spi/overview/)
 > - [Dubbo 官方文档之扩展适配](https://cn.dubbo.apache.org/zh-cn/overview/what/core-features/extensibility/)
@@ -1518,8 +1610,6 @@ Dubbo 调用链路中几乎所有核心节点都被定义为扩展点，从三�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Dubbo SPI 就是 Java SPI 换了个目录" → 除目录不同外，核心增强是按需加载、IOC、AOP（Wrapper）、@Adaptive/@Activate 等，能力远超 Java SPI。
 - ❌ "@Adaptive 是在启动时选定实现" → 恰恰相反，它把选择推迟到每次方法调用的运行时，依据当时的 URL 参数动态决定。
@@ -1741,21 +1831,28 @@ seata:
 
 ::: details
 
-【L3】Seata 通过 Dubbo Filter 在调用链上传播 XID，分支事务由数据源代理拦截 SQL 自动生成 undo log，因此 Dubbo 集成 Seata 对业务代码几乎零侵入。
+- 【L3】Seata 通过 Dubbo Filter 在调用链上传播 XID，分支事务由数据源代理拦截 SQL 自动生成 undo log，因此 Dubbo 集成 Seata 对业务代码几乎零侵入。
 
-【L3】事务消息除了两阶段提交还有**回查机制**：若 MQ 长时间未收到半事务消息的 commit/rollback（如生产者宕机），会周期性回调 `checkLocalTransaction` 查询本地事务状态，决定消息投递还是丢弃——回查逻辑必须基于持久化的业务状态判断，不能依赖内存变量。
+- 【L3】事务消息除了两阶段提交还有**回查机制**
 
-【L4】TCC 的空回滚、防悬挂、幂等是三大必答题：Cancel 可能在 Try 之前到达（空回滚）、超时重试可能导致 Confirm/Cancel 重复执行（幂等）、迟到的一阶段请求可能覆盖已回滚状态（防悬挂），均需用事务记录表兑现。
+  若 MQ 长时间未收到半事务消息的 commit/rollback（如生产者宕机），会周期性回调 `checkLocalTransaction` 查询本地事务状态，
+  决定消息投递还是丢弃——回查逻辑必须基于持久化的业务状态判断，不能依赖内存变量。
 
-【L4】AT 模式的全局锁是吞吐的隐形天花板：分支事务提交前须先拿到对应行的全局锁，热点行更新（如爆款商品扣库存）会让大量请求在同一行上排队甚至回滚重试，吞吐急剧退化——热点场景应改用 TCC 或在业务侧做请求合并/分桶。AT vs TCC 的资金场景选型（一致性强度 vs 侵入性 vs 性能）与 Seata 三阶段细节，权威版本见《分布式协同面试》。
+- 【L4】TCC 的空回滚、防悬挂、幂等是三大必答题：
+
+  Cancel 可能在 Try 之前到达（空回滚）、超时重试可能导致 Confirm/Cancel 重复执行（幂等）、迟到的一阶段请求可能覆盖已回滚状态（防悬挂），均需用事务记录表兑现。
+
+- 【L4】AT 模式的全局锁是吞吐的隐形天花板：
+
+  分支事务提交前须先拿到对应行的全局锁，热点行更新（如爆款商品扣库存）会让大量请求在同一行上排队甚至回滚重试，吞吐急剧退化——热点场景应改用 TCC 或在业务侧做请求合并/分桶。
+
+  AT vs TCC 的资金场景选型（一致性强度 vs 侵入性 vs 性能）与 Seata 三阶段细节，权威版本见《分布式协同面试》。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Dubbo 自带分布式事务能力" → Dubbo 只提供调用与治理，事务需靠 Seata/MQ 等外部方案，Dubbo 的角色是传播事务上下文（如 XID）。
 - ❌ "用了 Seata 就不用管幂等了" → 全局事务失败重试、分支回滚重试都要求接口幂等，幂等是事务方案生效的前提而非替代品。

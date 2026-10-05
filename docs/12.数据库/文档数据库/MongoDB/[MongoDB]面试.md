@@ -59,8 +59,6 @@ MongoDB 是面向文档的开源 NoSQL 数据库，用 C++ 编写，以 BSON 文
 
 ::: details
 
-常见误区：
-
 - ❌ "MongoDB 是无模式（schemaless）的，所以不用做数据建模" → 准确口径是 **schema-flexible**（模式灵活，写入时不强制校验结构）。业务语义上的模式依然存在，且**文档建模的重要性高于关系型建模**：关系型建模失误还能靠 JOIN、视图、加索引补救，文档模型失误（该内嵌的做成了引用、分片键选了低基数或单调递增字段）会直接导致跨分片广播查询与聚合管道层数爆炸，返工往往要重写全量数据。
 - ❌ "MongoDB 是 NoSQL，所以不支持事务、也不保证一致性" → 4.0+ 已支持多文档 ACID；但一致性不是「默认最强」，而是由 Read Concern / Write Concern 组合决定，需要按业务显式选型。
 - ❌ "无模式意味着比关系型更省设计成本" → 省下的是 DDL 变更流程成本，付出的是建模决策前置的压力：分片键一旦选定，后期 resharding 代价极高。
@@ -148,8 +146,6 @@ MongoDB vs.RDBM：
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "RDBMS 只能垂直扩展，MongoDB 才能水平扩展" → 分库分表（ShardingSphere 等）与分布式数据库（TiDB / OceanBase）早已让关系型水平扩展成为主流方案。二者真正的差异是「数据库原生支持」与「需要中间件/换产品」。
 - ❌ "MongoDB 无模式，所以建模更省事" → 模式灵活省掉的是 DDL 变更流程，不是建模工作；内嵌 vs 引用、分片键选择这些决策的失误代价高于关系型建模失误。
@@ -248,8 +244,6 @@ BSON（Binary JSON）是 JSON 的二进制编码格式，是 MongoDB 存储和�
 
 ::: details
 
-常见误区：
-
 - ❌ "BSON 是二进制格式，所以比 JSON 更省空间" → 恰恰相反，BSON 因为长度前缀与类型字节，体积通常**大于**等价 JSON 文本；它换来的是遍历速度与类型保真。
 - ❌ "BSON 快是因为二进制不需要解析" → 快在**能跳过**：长度前缀让引擎不必解析就能定位到下一个字段，而不是「免解析」。
 - ❌ "金额用 Double 存就行" → BSON 的 Double 是 IEEE 754 浮点，与 Java `double` 同样丢精度；金额必须用 **Decimal128**（3.4+）或以分为单位的 Int64，口径与 MySQL 侧「金额不要用 FLOAT/DOUBLE」一致。
@@ -307,8 +301,6 @@ WiredTiger 的集合数据存在 **B+ 树**上，主键的顺序直接决定写�
 
 ::: details
 
-常见误区：
-
 - ❌ "ObjectId 的 5 字节随机值是机器标识" → 3.4 起已改为进程级随机值；只有 3.4 之前才是「3 字节机器标识 + 2 字节进程号」。
 - ❌ "用 UUID 做 `_id` 更规范、跨系统更通用" → 随机 UUID 会破坏 B+ 树的写入局部性，大集合下写放大与 cache miss 明显上升；确实需要全局唯一标识时用 ObjectId，或采用有序 UUID（如 UUIDv7）降低随机性。
 - ❌ "`_id` 上的索引可以删掉换成别的" → `_id` 索引由系统强制创建且不可删除；副本集还依赖 `_id` 做幂等回放。
@@ -361,10 +353,23 @@ MongoDB 支持四类数据类型：基本类型（String/Integer/Boolean/Double/
 
 ::: details
 
-- 【L3】**类型选择直接决定索引成本**：数组字段会自动展开成**多键索引**（multikey index），一个含 N 个元素的数组文档产生 N 个索引项，写放大严重；且多键索引**不能作为分片键**，两个多键字段也无法组成复合索引。因此「数组别做长」是文档建模铁律，元素数量建议控制在百级以内。
+- 【L3】**类型选择直接决定索引成本**
+
+  数组字段会自动展开成**多键索引**（multikey index），一个含 N 个元素的数组文档产生 N 个索引项，写放大严重；且多键索引**不能作为分片键**，
+  两个多键字段也无法组成复合索引。因此「数组别做长」是文档建模铁律，元素数量建议控制在百级以内。
+
 - 【L3】**Date 是 UTC 毫秒时间戳**（BSON Date），本身不带时区。跨时区业务必须统一按 UTC 落库、在展示层换算——口径与 MySQL 侧 `TIMESTAMP` / `DATETIME` 的时区取舍一致。
-- 【L4】**Decimal128 遵循 IEEE 754-2008 decimal128**：34 位有效数字，指数范围 -6143 至 +6176，是唯一能在数据库侧做精确十进制运算的类型。金额严禁用 Double（二进制浮点，`0.1 + 0.2 ≠ 0.3`），这与「MySQL 金额不要用 FLOAT/DOUBLE」是同一条工程纪律。
-- 【L4】**类型混淆是「模式灵活」最典型的生产事故**：查询 `{ age: 30 }` 时，Int32 / Int64 / Double / Decimal128 之间会做跨类型数值比较，但如果历史数据里混进了字符串 `"30"`，这条查询就会静默漏数据，且索引照常生效、`explain` 看不出异常。治理手段是用 `$type` 做全量数据体检，并在写入侧加 `$jsonSchema` 校验。
+
+- 【L4】**Decimal128 遵循 IEEE 754-2008 decimal128**
+
+  34 位有效数字，指数范围 -6143 至 +6176，是唯一能在数据库侧做精确十进制运算的类型。
+
+  金额严禁用 Double（二进制浮点，`0.1 + 0.2 ≠ 0.3`），这与「MySQL 金额不要用 FLOAT/DOUBLE」是同一条工程纪律。
+
+- 【L4】**类型混淆是「模式灵活」最典型的生产事故**
+
+  查询 `{ age: 30 }` 时，Int32 / Int64 / Double / Decimal128 之间会做跨类型数值比较，但如果历史数据里混进了字符串 `"30"`，
+  这条查询就会静默漏数据，且索引照常生效、`explain` 看不出异常。治理手段是用 `$type` 做全量数据体检，并在写入侧加 `$jsonSchema` 校验。
 
 :::
 
@@ -403,19 +408,37 @@ MongoDB 分页有两种方式：`skip()+limit()` 简单但深页性能差；基�
 
 ::: details
 
-- 【L3】**`skip(N)` 的真实代价是「扫描并丢弃前 N 条」**：服务端仍然走完整的索引定位 + 文档取回流程，只是把结果扔掉，所以耗时随页码**线性劣化**，与 MySQL 的 `LIMIT N, M` 深分页同源。
-- 【L3】**无索引排序会撞内存墙**：`sort()` 若无法被索引覆盖，会退化为阻塞式内存排序，超过 `internalQueryMaxBlockingSortMemoryUsageBytes`（早期默认 **32 MB**，4.4 起提升至 **100 MB**）直接报错 `Sort exceeded memory limit`。这才是「大结果集排序必须加索引」的真实原因，不是「加了索引更快」这么含糊。分页场景里 `sort + skip + limit` 三件套必须有对应的复合索引（按 **ESR 规则**：等值 → 排序 → 范围）才能走索引排序。
-- 【L3】**游标分页必须带 tie-breaker**：排序字段有重复值时会漏数据或重复数据，正解是排序键补上唯一的 `_id`，游标条件写成 `{ $or: [{ time: { $gt: t } }, { time: t, _id: { $gt: id } }] }`，或直接用复合排序 `{ time: -1, _id: -1 }` 配合对应复合索引。
-- 【L4】**分片集群下 `skip/limit` 代价被放大**：mongos 无法预知数据分布，必须让**每个分片都返回 `skip + limit` 条**，再由 mongos 归并后丢弃。100 个分片翻到第 1000 页，实际网络传输量是单机的百倍——这是分片集群里深分页比单机更致命的原因，也是「分页接口必须改游标式」的硬约束。
-- 【L4】**深分页的产品级解法**：限制最大可翻页数（搜索引擎普遍只允许翻到 1 万条）、改用「加载更多」流式交互、或把可翻页的分析型查询下沉到 Elasticsearch / 数仓（`search_after`、SQL 窗口函数），MongoDB 只承担游标式读取。
+- 【L3】**`skip(N)` 的真实代价是「扫描并丢弃前 N 条」**
+
+  服务端仍然走完整的索引定位 + 文档取回流程，只是把结果扔掉，所以耗时随页码**线性劣化**，与 MySQL 的 `LIMIT N, M` 深分页同源。
+
+- 【L3】**无索引排序会撞内存墙**
+
+  `sort()` 若无法被索引覆盖，会退化为阻塞式内存排序，超过 `internalQueryMaxBlockingSortMemoryUsageBytes`（早期默认 **32 MB**，
+  4.4 起提升至 **100 MB**）直接报错 `Sort exceeded memory limit`。这才是「大结果集排序必须加索引」的真实原因，不是「加了索引更快」这么含糊。
+
+  分页场景里 `sort + skip + limit` 三件套必须有对应的复合索引（按 **ESR 规则**：等值 → 排序 → 范围）才能走索引排序。
+
+- 【L3】**游标分页必须带 tie-breaker**
+
+  排序字段有重复值时会漏数据或重复数据，正解是排序键补上唯一的 `_id`，
+  游标条件写成 `{ $or: [{ time: { $gt: t } }, { time: t, _id: { $gt: id } }] }`，或直接用复合排序 `{ time: -1, _id: -1 }` 配合对应复合索引。
+
+- 【L4】**分片集群下 `skip/limit` 代价被放大**
+
+  mongos 无法预知数据分布，必须让**每个分片都返回 `skip + limit` 条**，再由 mongos 归并后丢弃。100 个分片翻到第 1000 页，
+  实际网络传输量是单机的百倍——这是分片集群里深分页比单机更致命的原因，也是「分页接口必须改游标式」的硬约束。
+
+- 【L4】**深分页的产品级解法**
+
+  限制最大可翻页数（搜索引擎普遍只允许翻到 1 万条）、改用「加载更多」流式交互、或把可翻页的分析型查询下沉到 Elasticsearch / 数仓（`search_after`、SQL 窗口函数），
+  MongoDB 只承担游标式读取。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "游标分页快是因为跳过了扫描" → 快在**用索引直接定位起点**（`_id > lastId` 是一次 B+ 树 seek），而不是「跳过」；`skip` 无论如何都要扫。
 - ❌ "加了 `limit` 就不会慢" → `limit` 只限制返回条数，`sort` 无索引时仍要对全量候选集做阻塞排序，照样会撞阻塞排序内存上限。
@@ -528,8 +551,6 @@ GridFS 是 MongoDB 存储超过 16 MB 文档上限的大文件的规范方案，
 
 ::: details
 
-常见误区：
-
 - ❌ "大文件就该用 GridFS 存" → GridFS **不适合当对象存储用**。它无法水平扩展（`fs.chunks` 的分片键是 `files_id`，同一个文件的所有块必然落在同一分片），且大文件读写会**挤占业务查询的 IO、内存与 WiredTiger cache**，还会让副本集初始同步与备份体积暴涨。云上正解是 **OSS / S3 + URL 与元数据入库**。
 - ❌ "默认块大小是 256 KB" → 是 **255 KB**。这个「不凑整」的取值是为了让块加上 BSON 头部开销后仍稳稳落在 16 MB 文档上限之内。
 - ❌ "GridFS 能对文件内容做检索" → 只能按 `fs.files` 的元数据字段过滤，`data` 是不可查询的二进制；要按内容检索需另建体系。
@@ -575,25 +596,41 @@ db.articles.find({ $text: { $search: 'mongodb tutorial' } })
 
 ::: details
 
-- 【L3】**文本索引做了什么**：对字段值做「分词 → 词干化（stemming）→ 去停用词（stop word）」后建倒排结构。默认语言为 English，可通过 `default_language` 或文档级 `language` 字段切换；`$search` 支持 `-词` 取反与 `"..."` 短语匹配，`createIndex` 时可用 `weights` 选项给字段配固定权重。
+- 【L3】**文本索引做了什么**
+
+  对字段值做「分词 → 词干化（stemming）→ 去停用词（stop word）」后建倒排结构。默认语言为 English，
+  可通过 `default_language` 或文档级 `language` 字段切换；`$search` 支持 `-词` 取反与 `"..."` 短语匹配，`createIndex` 时可用 `weights` 选项给字段配固定权重。
+
 - 【L3】**能力边界**：
+
   - 不支持自定义分词器，**中文没有内置分词**——`default_language: "none"` 下整句中文会被当成一个 token，实际搜不到；
+
   - 不支持相关性调优：没有 BM25 参数、没有 function_score、没有同义词与拼写纠错，字段权重只能在建索引时写死；
+
   - 不支持高亮、模糊匹配、近邻查询，也不支持在搜索结果上做聚合分析；
+
   - `$text` 阶段与其他过滤条件的组合能力弱，先 `$text` 再过滤会显著放大扫描量。
-- 【L4】**生产正解：MongoDB + 搜索引擎双链路**，三种同步方式的取舍：
+
+- 【L4】**生产正解
+
+  MongoDB + 搜索引擎双链路**，三种同步方式的取舍：
+
   - 应用双写：实现最简单，但一致性靠业务代码保证，失败补偿要自己写，容易出现「DB 有、ES 没有」；
+
   - **Change Streams（CDC）订阅 oplog 同步**：解耦、可重放、失败可用 resume token 续传，是主流做法；代价是有秒级延迟，业务侧需容忍最终一致；
+
   - Atlas Search：托管在 MongoDB 内部的 Lucene 索引，运维成本最低，但绑定 Atlas 且能力弱于自建 Elasticsearch。
-- 【L4】**选型论证口径**：不要答「ES 更强所以用 ES」。准确的说法是 MongoDB 的 `$text` 只解决「有没有」，搜索引擎解决「准不准、能不能调、能不能分析」——一旦产品要求搜索转化率、需要运营干预排序权重、需要中文分词与搜索日志聚合，`$text` 就不该进入候选集。
+
+- 【L4】**选型论证口径**
+
+  不要答「ES 更强所以用 ES」。准确的说法是 MongoDB 的 `$text` 只解决「有没有」，搜索引擎解决「准不准、能不能调、能不能分析」——一旦产品要求搜索转化率、需要运营干预排序权重、
+  需要中文分词与搜索日志聚合，`$text` 就不该进入候选集。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "建了 text 索引就能搜中文" → 默认英文分词器对中文无效，必须写入前用 IK / jieba 预分词到检索专用字段，或改用 Elasticsearch / Atlas Search。
 - ❌ "`$regex` 模糊匹配可以当全文检索用" → 未锚定的正则走不了索引，是全集合扫描，数据量上来必然拖垮实例。
@@ -740,10 +777,17 @@ db.orders.aggregate([
 
 ::: details
 
-- 【L3】**阶段顺序即性能**：`$match` 与 `$project` 必须尽量前置。`$match` 放在管道开头才能命中索引（放在 `$project` / `$unwind` / `$lookup` 之后就丧失了索引可用性，只能全量扫描后再过滤）；`$project` 前置则能让后续阶段处理更小的文档，显著降低内存与 CPU 开销。
-- 【L3】**索引可用性的硬规则**：只有位于管道**最前面**的 `$match` 与紧随其后的 `$sort` 才能用上索引；`$sort` 之后若紧跟 `$limit`，MongoDB 会做 top-k 优化，把阻塞排序变成有界堆排序——所以 `sort + limit` 要成对写、中间不要插入别的阶段。
-- 【L3】**`allowDiskUse: true` 是兜底不是优化**：单阶段内存上限 100 MB，超限报 `Exceeded memory limit`。开启落盘虽能跑通，但会引入磁盘 IO 与 BSON 序列化开销，属**性能悬崖**；正解是先减少进入该阶段的文档量与字段量。
-- 【L4】**`$lookup` 的两种写法性能差一个数量级**：简单的 `localField / foreignField` 形式在大集合上容易退化，必须用 `let` + `pipeline` 子管道形式，把过滤条件下推进被连接集合，才能在被连接集合上命中索引：
+- 【L3】**阶段顺序即性能**：`$match` 与 `$project` 必须尽量前置。`$match` 放在管道开头才能命中索引（放在 `$project` / `$unwind` / `$lookup` 之后就丧失了索引可用性，
+  只能全量扫描后再过滤）；`$project` 前置则能让后续阶段处理更小的文档，显著降低内存与 CPU 开销。
+
+- 【L3】**索引可用性的硬规则**：只有位于管道**最前面**的 `$match` 与紧随其后的 `$sort` 才能用上索引；`$sort` 之后若紧跟 `$limit`，MongoDB 会做 top-k 优化，
+  把阻塞排序变成有界堆排序——所以 `sort + limit` 要成对写、中间不要插入别的阶段。
+
+- 【L3】**`allowDiskUse: true` 是兜底不是优化**：单阶段内存上限 100 MB，超限报 `Exceeded memory limit`。开启落盘虽能跑通，但会引入磁盘 IO 与 BSON 序列化开销，
+  属**性能悬崖**；正解是先减少进入该阶段的文档量与字段量。
+
+- 【L4】**`$lookup` 的两种写法性能差一个数量级**：简单的 `localField / foreignField` 形式在大集合上容易退化，必须用 `let` + `pipeline` 子管道形式，
+  把过滤条件下推进被连接集合，才能在被连接集合上命中索引：
 
 ```javascript
 db.orders.aggregate([
@@ -763,9 +807,14 @@ db.orders.aggregate([
 
 子管道里的 `$match` + `$project` 让被连接侧只回传必要字段，避免把整个 `users` 文档拖进内存。
 
-- 【L4】**用 `explain("executionStats")` 定位低效阶段**：逐阶段看 `docsExamined` / `nReturned` 的比值，比值接近 1 是健康的，远大于 1 说明该阶段在「扫很多、出很少」，需要把过滤前置或补索引；同时看每个阶段的 `executionTimeMillis` 找出耗时集中点。
-- 【L4】**`$facet` 的代价**：它在单个管道内并行执行多个子管道，一次查询拿到多维统计（分类分布、价格区间、评分分布），很方便；但 `$facet` **无法使用索引**，且每个分支的输入都是上游的全量结果，内存开销是分支数倍乘。分支多或数据量大时应拆成多次独立聚合，或改走离线预计算。
-- 【L4】**分片集群上的管道额外约束**：能在分片内并行执行的阶段（`$match` / `$project` / `$group` 按分片键分组）由 mongos 下推，不能并行的阶段（`$sort` 全局排序、`$group` 按非分片键、`$lookup`）需要把数据汇聚到 mongos 归并，是分布式聚合的性能瓶颈点。
+- 【L4】**用 `explain("executionStats")` 定位低效阶段**：逐阶段看 `docsExamined` / `nReturned` 的比值，比值接近 1 是健康的，远大于 1 说明该阶段在「扫很多、出很少」，
+  需要把过滤前置或补索引；同时看每个阶段的 `executionTimeMillis` 找出耗时集中点。
+
+- 【L4】**`$facet` 的代价**：它在单个管道内并行执行多个子管道，一次查询拿到多维统计（分类分布、价格区间、评分分布），很方便；但 `$facet` **无法使用索引**，且每个分支的输入都是上游的全量结果，
+  内存开销是分支数倍乘。分支多或数据量大时应拆成多次独立聚合，或改走离线预计算。
+
+- 【L4】**分片集群上的管道额外约束**：能在分片内并行执行的阶段（`$match` / `$project` / `$group` 按分片键分组）由 mongos 下推，
+  不能并行的阶段（`$sort` 全局排序、`$group` 按非分片键、`$lookup`）需要把数据汇聚到 mongos 归并，是分布式聚合的性能瓶颈点。
 
 > 📚 延伸阅读：[MongoDB 官方文档之聚合](https://www.mongodb.com/zh-cn/docs/manual/aggregation/)
 
@@ -816,10 +865,17 @@ MongoDB 聚合管道的阶段与 SQL 聚合函数一一对应：`$match`=WHERE�
 
 上面的映射表只是「翻译对照」，真正的差异在下面几点：
 
-- 【L3】**执行模型不同**：SQL 由优化器基于统计信息重排 JOIN 顺序、选择访问路径；聚合管道的阶段顺序由开发者写死，优化器只做有限的阶段合并与移动（把 `$match` 前移、把 `$sort` + `$limit` 合成 top-k）。**聚合管道的性能因此高度依赖开发者写阶段的顺序**，而 SQL 的性能高度依赖优化器与统计信息是否新鲜。
-- 【L3】**关联能力不对等**：`$lookup` 只是 LEFT OUTER JOIN，且默认把匹配结果作为**数组内嵌**进左表文档（SQL 是笛卡尔展开成行）。要还原成「一行一条」必须额外 `$unwind`，而 `$unwind` 会让文档数暴涨、内存压力陡升。RIGHT / FULL OUTER JOIN、递归 CTE 均无直接对应物。
-- 【L3】**分片语义不同**：SQL 分库分表后跨库 JOIN 基本要靠中间件或应用层拼装；MongoDB 分片集群里 `$lookup` 由 mongos 做「分片内并行 + 归并」，但被连接集合若不共享分片键，仍需跨分片取数，代价与分库分表的跨库 JOIN 同源。
-- 【L4】**选型口径**：报表 / BI 类重关联分析仍应下沉到数仓或 SQL 引擎；聚合管道的定位是「在文档模型内完成实体自包含的聚合」。一旦管道里出现两三个以上 `$lookup`，通常说明**建模时该内嵌的做成了引用**，正确处置是回头改文档模型，而不是继续堆管道阶段。
+- 【L3】**执行模型不同**：SQL 由优化器基于统计信息重排 JOIN 顺序、选择访问路径；聚合管道的阶段顺序由开发者写死，优化器只做有限的阶段合并与移动（把 `$match` 前移、
+  把 `$sort` + `$limit` 合成 top-k）。**聚合管道的性能因此高度依赖开发者写阶段的顺序**，而 SQL 的性能高度依赖优化器与统计信息是否新鲜。
+
+- 【L3】**关联能力不对等**：`$lookup` 只是 LEFT OUTER JOIN，且默认把匹配结果作为**数组内嵌**进左表文档（SQL 是笛卡尔展开成行）。要还原成「一行一条」必须额外 `$unwind`，
+  而 `$unwind` 会让文档数暴涨、内存压力陡升。RIGHT / FULL OUTER JOIN、递归 CTE 均无直接对应物。
+
+- 【L3】**分片语义不同**：SQL 分库分表后跨库 JOIN 基本要靠中间件或应用层拼装；MongoDB 分片集群里 `$lookup` 由 mongos 做「分片内并行 + 归并」，但被连接集合若不共享分片键，仍需跨分片取数，
+  代价与分库分表的跨库 JOIN 同源。
+
+- 【L4】**选型口径**：报表 / BI 类重关联分析仍应下沉到数仓或 SQL 引擎；聚合管道的定位是「在文档模型内完成实体自包含的聚合」。一旦管道里出现两三个以上 `$lookup`，通常说明**建模时该内嵌的做成了引用**，
+  正确处置是回头改文档模型，而不是继续堆管道阶段。
 
 :::
 
@@ -852,9 +908,22 @@ Map-Reduce 是 MongoDB 早期的分治聚合范式，通过 map 函数分发键�
 
 ::: details
 
-- 【L3】**为什么弃用 Map-Reduce？** → 三重劣势：① 走 JavaScript 引擎，每次调用都有引擎执行与 BSON ↔ JS 对象转换开销；② **在 mongod 单机执行，无法像聚合管道那样把阶段下推到各分片并行**；③ 优化器无法对其做阶段合并、索引下推等内部优化。聚合管道以原生 C++ 执行、操作符更丰富，性能显著更优。
-- 【L3】**迁移建议**：`emit(key, value)` + reduce 求和 → `$group` + `$sum`；一个文档 emit 多个 key → 前置 `$unwind` 或改用 `$facet` 多分支；finalize 函数 → 末尾 `$project` / `$addFields`。
-- 【L4】**面试口径**：答「用 Map-Reduce 做复杂聚合」是**过时口径**，会直接暴露版本认知停留在 3.x。正确表述是「Map-Reduce 自 5.0 起已废弃，复杂聚合一律走聚合管道；只有在维护遗留系统时才会遇到它，且应当排期迁移」。
+- 【L3】**为什么弃用 Map-Reduce？**
+
+  → 三重劣势：① 走 JavaScript 引擎，每次调用都有引擎执行与 BSON ↔ JS 对象转换开销；② **在 mongod 单机执行，无法像聚合管道那样把阶段下推到各分片并行**；③ 优化器无法对其做阶段合并、索引下推等内部优化。
+
+  聚合管道以原生 C++ 执行、操作符更丰富，性能显著更优。
+
+- 【L3】**迁移建议**
+
+  `emit(key, value)` + reduce 求和 → `$group` + `$sum`；一个文档 emit 多个 key → 前置 `$unwind` 或改用 `$facet` 多分支；
+  finalize 函数 → 末尾 `$project` / `$addFields`。
+
+- 【L4】**面试口径**
+
+  答「用 Map-Reduce 做复杂聚合」是**过时口径**，会直接暴露版本认知停留在 3.x。
+
+  正确表述是「Map-Reduce 自 5.0 起已废弃，复杂聚合一律走聚合管道；只有在维护遗留系统时才会遇到它，且应当排期迁移」。
 
 > 📚 延伸阅读：[MongoDB 官方文档之聚合管道](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/)
 
@@ -922,8 +991,6 @@ graph TB
 
 ::: details
 
-常见误区：
-
 - ❌ "集合无模式，所以同一集合里放什么都行" → 准确口径是 **schema-flexible**：不强制校验不等于业务上没有模式。同一集合混放异构文档会让索引选择性崩塌（大量文档缺失索引字段）、聚合管道被迫写满 `$ifNull` 兜底，查询与建模成本反而高于关系型。
 - ❌ "MongoDB 一个库就是一个文件" → WiredTiger 下是**一个集合 / 一个索引各对应一个 `.wt` 文件**，因此集合数量过多（数万级）会导致文件句柄与目录元数据膨胀、checkpoint 变慢。这正是「不要按租户逐个建集合」的物理原因。
 - ❌ "用 `system.namespaces` / `system.indexes` 查元数据" → 前者是 MMAPv1 遗留、WiredTiger 下不存在，后者自 4.0 起弃用；现代版本用 `db.getCollectionInfos()` 与 `db.collection.getIndexes()`。
@@ -974,11 +1041,29 @@ MongoDB 采用可插拔存储引擎架构。当前生产可用的主要是两种
 
 ::: details
 
-- 【L3】**WiredTiger vs MMAPv1 的并发模型差异**：MMAPv1 是集合级锁，写同一集合的操作互斥；MongoDB **4.0 起把写锁粒度降到文档级**，配合 WiredTiger 自身的 **MVCC**（多版本，读写不互斥）实现文档级并发。这是 4.0 最重要的性能改进之一，写并发能力提升数量级——注意「文档级锁」是 4.0 的分水岭，不是 WiredTiger 一上线就有的。
-- 【L3】**WiredTiger 的内存与持久化配套**：`wiredTigerCacheSizeGB` 默认 = `(RAM − 1 GB) / 2`（不小于 256 MB）；持久化靠 **journal（WAL）先写 + checkpoint**（默认每 60 秒、或 journal 累积达 2 GB 时触发一次）。cache 中缓存的是**解压后**的页，所以开压缩省的是磁盘而不是内存。
+- 【L3】**WiredTiger vs MMAPv1 的并发模型差异**
+
+  MMAPv1 是集合级锁，写同一集合的操作互斥；MongoDB **4.0 起把写锁粒度降到文档级**，
+  配合 WiredTiger 自身的 **MVCC**（多版本，读写不互斥）实现文档级并发。这是 4.0 最重要的性能改进之一，写并发能力提升数量级——注意「文档级锁」是 4.0 的分水岭，不是 WiredTiger 一上线就有的。
+
+- 【L3】**WiredTiger 的内存与持久化配套**
+
+  `wiredTigerCacheSizeGB` 默认 = `(RAM − 1 GB) / 2`（不小于 256 MB）；
+  持久化靠 **journal（WAL）先写 + checkpoint**（默认每 60 秒、或 journal 累积达 2 GB 时触发一次）。cache 中缓存的是**解压后**的页，所以开压缩省的是磁盘而不是内存。
+
 - 【L3】**In-Memory 引擎**适用于对延迟极度敏感、且数据可由上游重建的场景（实时报价、临时计算结果），但它不持久化业务数据（仅写少量日志），必须配合副本集保证可用性，且占用的是独立配置的内存而非 WT cache。
-- 【L4】**引擎选型的真实决策点**：绝大多数场景没有选择余地，WiredTiger 是唯一生产默认。真正需要判断的是「从 MMAPv1 迁到 WiredTiger」——迁移必须走 `mongodump` / `mongorestore`，或副本集滚动换引擎（`--storageEngine wiredTiger` 要求空数据目录）；迁移期间磁盘要能同时容纳两份数据，且 WiredTiger 的 cache 会占掉 `(RAM − 1 GB) / 2`，需要重新核算与 OS page cache 的内存分配。
-- 【L4】**长事务会撑大 WT 的历史版本**：MVCC 靠保留旧版本实现读写不互斥，长事务会让 oldest_timestamp 无法推进，历史版本堆积导致磁盘暴涨——与 MySQL 长事务撑大 undo 表空间同理。观测指标是 `serverStatus().wiredTiger.concurrentTransactions` 与 oldest_timestamp 的滞留时长。
+
+- 【L4】**引擎选型的真实决策点**
+
+  绝大多数场景没有选择余地，WiredTiger 是唯一生产默认。真正需要判断的是「从 MMAPv1 迁到 WiredTiger」——
+  迁移必须走 `mongodump` / `mongorestore`，或副本集滚动换引擎（`--storageEngine wiredTiger` 要求空数据目录）；迁移期间磁盘要能同时容纳两份数据，
+  且 WiredTiger 的 cache 会占掉 `(RAM − 1 GB) / 2`，需要重新核算与 OS page cache 的内存分配。
+
+- 【L4】**长事务会撑大 WT 的历史版本**
+
+  MVCC 靠保留旧版本实现读写不互斥，长事务会让 oldest_timestamp 无法推进，历史版本堆积导致磁盘暴涨——与 MySQL 长事务撑大 undo 表空间同理。
+
+  观测指标是 `serverStatus().wiredTiger.concurrentTransactions` 与 oldest_timestamp 的滞留时长。
 
 :::
 
@@ -1024,10 +1109,21 @@ WiredTiger 引擎支持三种块压缩算法：**Snappy**（默认，速度优�
 
 ::: details
 
-- 【L3】**压缩省的是磁盘，不是内存**：WiredTiger cache（默认 `(RAM − 1 GB) / 2`）缓存的是**解压后**的页，所以开压缩不会缓解 cache 压力。它的真实收益是磁盘容量、备份体积，以及**单位 IO 能读进更多逻辑数据**——一个物理块解压后可能是数倍的逻辑数据，等于放大了有效 IO 带宽。
-- 【L3】**压缩的代价是 CPU 与尾延迟**：解压发生在每次 cache miss 读页时，压缩发生在页被逐出/写盘时。CPU 已吃紧的实例换用 zlib 会直接抬高 P99；zstd 因为级别可调，是更可控的折中。
-- 【L4】**选型口径**：默认 snappy 不用动；只有当「磁盘与备份成本已成为主要开销」且 CPU 有富余时才切 zstd（级别 1-3 通常足够），并且必须压测验证；zlib 在新集群上基本没有再选的理由。
-- 【L4】**观测方式**：`db.collection.stats()` 里 `size`（未压缩逻辑大小）与 `storageSize`（磁盘占用）之比就是该集合的实际压缩收益；`serverStatus().wiredTiger.block-manager` 与 `concurrentTransactions` 用于判断是否已被 CPU 或并发卡住。
+- 【L3】**压缩省的是磁盘，不是内存**：WiredTiger cache（默认 `(RAM − 1 GB) / 2`）缓存的是**解压后**的页，所以开压缩不会缓解 cache 压力。它的真实收益是磁盘容量、备份体积，
+  以及**单位 IO 能读进更多逻辑数据**——一个物理块解压后可能是数倍的逻辑数据，等于放大了有效 IO 带宽。
+
+- 【L3】**压缩的代价是 CPU 与尾延迟**
+
+  解压发生在每次 cache miss 读页时，压缩发生在页被逐出/写盘时。CPU 已吃紧的实例换用 zlib 会直接抬高 P99；zstd 因为级别可调，是更可控的折中。
+
+- 【L4】**选型口径**
+
+  默认 snappy 不用动；只有当「磁盘与备份成本已成为主要开销」且 CPU 有富余时才切 zstd（级别 1-3 通常足够），并且必须压测验证；zlib 在新集群上基本没有再选的理由。
+
+- 【L4】**观测方式**
+
+  `db.collection.stats()` 里 `size`（未压缩逻辑大小）与 `storageSize`（磁盘占用）之比就是该集合的实际压缩收益；
+  `serverStatus().wiredTiger.block-manager` 与 `concurrentTransactions` 用于判断是否已被 CPU 或并发卡住。
 
 :::
 
@@ -1081,13 +1177,32 @@ WiredTiger 引擎支持三种块压缩算法：**Snappy**（默认，速度优�
 
 ::: details
 
-- 【L3】**为什么 MongoDB 选 B+ 树而非 LSM**：MongoDB 的主负载是「按 `_id` 或索引点查整个文档 + 中小范围扫描」，属**读敏感**型；B+ 树读放大低、路径可预测，正好对上。LSM 的优势在写吞吐，代价是读放大与 compaction 抖动，更适合日志、时序等写多读少的场景。
-- 【L3】**MongoDB 用什么弥补 B+ 树的写路径短板**：三件套——① **journal（WAL）顺序写**，把随机写转成顺序写并保证崩溃可恢复；② **checkpoint** 周期性把内存脏页批量刷盘（默认 60 秒，或 journal 累积达 2 GB），刷盘时是批量顺序 IO；③ **文档级并发控制 + MVCC**（4.0 起），写不阻塞读、读不阻塞写，锁竞争从集合级降到文档级。所以「B+ 树写放大高」在 MongoDB 里被 WAL + checkpoint + MVCC 大幅摊薄。
+- 【L3】**为什么 MongoDB 选 B+ 树而非 LSM**
+
+  MongoDB 的主负载是「按 `_id` 或索引点查整个文档 + 中小范围扫描」，属**读敏感**型；B+ 树读放大低、路径可预测，正好对上。LSM 的优势在写吞吐，
+  代价是读放大与 compaction 抖动，更适合日志、时序等写多读少的场景。
+
+- 【L3】**MongoDB 用什么弥补 B+ 树的写路径短板**
+
+  三件套——① **journal（WAL）顺序写**，把随机写转成顺序写并保证崩溃可恢复；② **checkpoint** 周期性把内存脏页批量刷盘（默认 60 秒，
+  或 journal 累积达 2 GB），刷盘时是批量顺序 IO；③ **文档级并发控制 + MVCC**（4.0 起），写不阻塞读、读不阻塞写，锁竞争从集合级降到文档级。
+
+  所以「B+ 树写放大高」在 MongoDB 里被 WAL + checkpoint + MVCC 大幅摊薄。
+
 - 【L4】**这个差异的后果**（P8 要能推演）：
-  - 选 B+ 树 → **读延迟稳定**（点查 IO 次数可预测），但大文档更新与页分裂会带来随机写，`_id` 必须趋势递增（这正是 ObjectId 前 4 字节放时间戳的设计动机），UUID 主键会显著恶化写局部性与 cache 命中率；
+
+  - 选 B+ 树 → **读延迟稳定**（点查 IO 次数可预测），但大文档更新与页分裂会带来随机写，`_id` 必须趋势递增（这正是 ObjectId 前 4 字节放时间戳的设计动机），
+    UUID 主键会显著恶化写局部性与 cache 命中率；
+
   - 选 LSM → 写吞吐高、压缩友好，但**读延迟会随 compaction 与层数抖动**，且需要布隆过滤器与大量调参（level 数、target file size、write buffer），运维复杂度高一个量级；
-  - 结论口径：MongoDB 面向在线业务的文档读写、InnoDB 面向关系型事务读写，二者都选 B+ 树；HBase / Cassandra 面向海量追加写与扫描，所以选 LSM。**数据结构的选择由读写比与延迟 SLA 决定，不是先进与否的问题。**
-- 【L4】**列存在文档数据库里为什么没用武之地**：WiredTiger 支持列族，但文档模型一次读取要拿回整个文档的全部字段，列存「只读少数列」的优势发挥不出来；真正的分析型需求通常下沉到 Atlas Data Federation 或数仓，而不是改存储布局。
+
+  - 结论口径：MongoDB 面向在线业务的文档读写、InnoDB 面向关系型事务读写，二者都选 B+ 树；HBase / Cassandra 面向海量追加写与扫描，所以选 LSM。**数据结构的选择由读写比与延迟 SLA 决定，
+    不是先进与否的问题。**
+
+- 【L4】**列存在文档数据库里为什么没用武之地**
+
+  WiredTiger 支持列族，但文档模型一次读取要拿回整个文档的全部字段，列存「只读少数列」的优势发挥不出来；
+  真正的分析型需求通常下沉到 Atlas Data Federation 或数仓，而不是改存储布局。
 
 > 📚 延伸阅读：[MongoDB 使用的是 B+ 树，不是 B 树](https://zhuanlan.zhihu.com/p/519658576)
 
@@ -1128,9 +1243,16 @@ WiredTiger 通过三大机制保证持久性：Cache（内存缓存）+ Checkpoi
 ::: details
 
 - 【L3】Cache 大小建议只占内存 50% 左右，剩余留给 OS 文件系统缓存与连接开销，cache 过大反而增加 eviction/GC 压力。
-- 【L3】Checkpoint 期间不会阻塞写入：基于 MVCC 获取一致性快照，与并发写入互不阻塞。
+
+- 【L3】Checkpoint 期间不会阻塞写入
+
+  基于 MVCC 获取一致性快照，与并发写入互不阻塞。
+
 - 【L3】Checkpoint 完成后，早于该 checkpoint 的 journal 不再参与恢复，会随日志文件滚动回收；崩溃恢复时长与需重放的 journal 量大致成正比——checkpoint 间隔越大，写入吞吐越好但恢复越慢。
-- 【L4】`journalCompressor` 与关闭 journal 的取舍：单节点关闭 journal（`journal.enabled: false`）可提升吞吐但宕机丢数据，副本集场景也不建议关闭。
+
+- 【L4】`journalCompressor` 与关闭 journal 的取舍
+
+  单节点关闭 journal（`journal.enabled: false`）可提升吞吐但宕机丢数据，副本集场景也不建议关闭。
 
 :::
 
@@ -1138,7 +1260,8 @@ WiredTiger 通过三大机制保证持久性：Cache（内存缓存）+ Checkpoi
 
 ::: details
 
-某金融系统 MongoDB 集群（64GB 内存），WT cache 配置 30GB，journal 开启 + Snappy 压缩。某次服务器掉电后重启，通过最后一个 checkpoint（宕机前 40 秒创建）重放 journal，所有已提交事务完整恢复，零数据丢失。对比测试中关闭 journal 的场景，同样掉电后丢失了约 200 条未刷盘的写入。
+某金融系统 MongoDB 集群（64GB 内存），WT cache 配置 30GB，journal 开启 + Snappy 压缩。某次服务器掉电后重启，通过最后一个 checkpoint（宕机前 40 秒创建）重放 journal，
+所有已提交事务完整恢复，零数据丢失。对比测试中关闭 journal 的场景，同样掉电后丢失了约 200 条未刷盘的写入。
 
 :::
 
@@ -1155,8 +1278,6 @@ WiredTiger 通过三大机制保证持久性：Cache（内存缓存）+ Checkpoi
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “Checkpoint 会阻塞所有写入” → Checkpoint 基于 MVCC 快照，与写入并发执行，互不阻塞
 - ❌ “Cache 越大越好” → Cache 过大导致 eviction 压力和 GC 开销增加，官方建议 50% 内存
@@ -1256,11 +1377,26 @@ graph TB
 
 ::: details
 
-- 【L3】**多键索引限制**：复合索引不能包含多个数组字段（笛卡尔积导致索引爆炸）；数组查询需用 `$elemMatch` 约束同元素匹配。
-- 【L3】**通配符索引**：索引体积大、查询性能低，仅适合字段名不可枚举的场景，慎用。
-- 【L3】**TTL 索引**：后台线程约每 60 秒扫描过期文档并删除，删除非实时；大规模集中过期可考虑按日期分集合替代。
-- 【L3】**索引属性 vs 类型**：unique、sparse（跳过字段缺失的文档）、partial（只索引满足过滤条件的文档）是索引选项/属性而非独立类型；sparse 常与 unique 搭配避免字段缺失导致唯一约束报错，partial 可显著缩小索引体积。
-- 【L4】**索引写放大**：每个索引在写入时需同步维护，先用 `$indexStats` 识别未使用索引再清理。
+- 【L3】**多键索引限制**
+
+  复合索引不能包含多个数组字段（笛卡尔积导致索引爆炸）；数组查询需用 `$elemMatch` 约束同元素匹配。
+
+- 【L3】**通配符索引**
+
+  索引体积大、查询性能低，仅适合字段名不可枚举的场景，慎用。
+
+- 【L3】**TTL 索引**
+
+  后台线程约每 60 秒扫描过期文档并删除，删除非实时；大规模集中过期可考虑按日期分集合替代。
+
+- 【L3】**索引属性 vs 类型**
+
+  unique、sparse（跳过字段缺失的文档）、partial（只索引满足过滤条件的文档）是索引选项/属性而非独立类型；sparse 常与 unique 搭配避免字段缺失导致唯一约束报错，
+  partial 可显著缩小索引体积。
+
+- 【L4】**索引写放大**
+
+  每个索引在写入时需同步维护，先用 `$indexStats` 识别未使用索引再清理。
 
 :::
 
@@ -1328,7 +1464,9 @@ db.s2.find().sort({ score: 1, userid: -1 }) // 字段顺序不对
 
 ::: details
 
-- 【L3】**ESR 索引设计规则**：Equality（等值条件）→ Sort（排序字段）→ Range（范围条件），比最左前缀更具操作性，同样适用于 MySQL 复合索引设计。
+- 【L3】**ESR 索引设计规则**
+
+  Equality（等值条件）→ Sort（排序字段）→ Range（范围条件），比最左前缀更具操作性，同样适用于 MySQL 复合索引设计。
 
 :::
 
@@ -1377,6 +1515,7 @@ db.users.find({ gender: 'M' }, { user_name: 1, _id: 0 })
 ::: details
 
 - 【L3】explain 中 `indexOnly: true` 表示查询被索引覆盖；`totalDocsExamined: 0` 表示未回表。
+
 - 【L3】覆盖索引对复合索引最有效；单字段索引通常无法覆盖（因为还需返回其他字段）。
 
 :::
@@ -1429,9 +1568,18 @@ try {
 
 ::: details
 
-- 【L3】**事务有运行时长上限**：默认 `transactionLifetimeLimitSeconds` 为 60 秒，超时事务会被后台清理中止，长事务必须主动拆分。
-- 【L3】**应用侧必须实现两类重试**：捕获 `TransientTransactionError` 时重试整个事务；捕获 `UnknownTransactionCommitResult` 时仅重试 commit，均配合指数退避——这是官方给定的事务可重试错误模型，不处理会在网络抖动下丢事务结果。
-- 【L4】**分片集群事务是两阶段提交**：由事务协调者驱动 prepare/commit，提交时延与失败面都大于副本集事务，建模时应尽量避免跨分片事务。
+- 【L3】**事务有运行时长上限**
+
+  默认 `transactionLifetimeLimitSeconds` 为 60 秒，超时事务会被后台清理中止，长事务必须主动拆分。
+
+- 【L3】**应用侧必须实现两类重试**
+
+  捕获 `TransientTransactionError` 时重试整个事务；捕获 `UnknownTransactionCommitResult` 时仅重试 commit，均配合指数退避——
+  这是官方给定的事务可重试错误模型，不处理会在网络抖动下丢事务结果。
+
+- 【L4】**分片集群事务是两阶段提交**
+
+  由事务协调者驱动 prepare/commit，提交时延与失败面都大于副本集事务，建模时应尽量避免跨分片事务。
 
 :::
 
@@ -1481,7 +1629,9 @@ graph TB
 ::: details
 
 - 【L3】事务中创建索引必须在同一事务中新建的空集合上创建，不能在已有集合上创建。
+
 - 【L3】分片集合不能用 `distinct()` 命令，需用聚合管道 `$group`+`$addToSet` 替代。
+
 - 【L4】事务中信息命令（如 `hello`、`buildInfo`）允许使用，但不能是事务的第一个操作。
 
 :::
@@ -1544,9 +1694,19 @@ graph TB
 
 ::: details
 
-- 【L3】**oplog 窗口**：oplog 是固定大小的 capped collection，容量决定了从节点能容忍多长时间的落后。宕机超过 oplog 窗口需全量 initial sync（代价高）。写入量大的集群应调大 oplog 或设置 `oplogMinRetentionHours`（4.4+）。
-- 【L3】**选举耗时**：心跳间隔默认 2 秒，`electionTimeoutMillis` 默认 10 秒，故障到新主选出通常 12 秒以上。
-- 【L4】**未提交写入会被回滚**：默认 `w:1` 只代表主节点写成功，若主节点在同步到多数派前宕机，这部分写入会被回滚（回滚数据写入 rollback 目录，上限约 300MB）。金融/账务场景必须用 `w:majority`。
+- 【L3】**oplog 窗口**
+
+  oplog 是固定大小的 capped collection，容量决定了从节点能容忍多长时间的落后。宕机超过 oplog 窗口需全量 initial sync（代价高）。
+
+  写入量大的集群应调大 oplog 或设置 `oplogMinRetentionHours`（4.4+）。
+
+- 【L3】**选举耗时**
+
+  心跳间隔默认 2 秒，`electionTimeoutMillis` 默认 10 秒，故障到新主选出通常 12 秒以上。
+
+- 【L4】**未提交写入会被回滚**
+
+  默认 `w:1` 只代表主节点写成功，若主节点在同步到多数派前宕机，这部分写入会被回滚（回滚数据写入 rollback 目录，上限约 300MB）。金融/账务场景必须用 `w:majority`。
 
 :::
 
@@ -1656,7 +1816,10 @@ graph TB
 
 ::: details
 
-- 【L3】**分片键近乎不可变**：文档的分片键字段值不能更新，`refineCollectionShardKey` 只支持为片键追加细化字段。5.0+ 提供 `reshardCollection` 在线重分片更换片键，但该能力仅 Enterprise Advanced / Atlas 提供，且迁移期间资源开销大；Community 版更换片键仍需 dump/restore 或双写重建。因此**片键必须在上线前充分评估并做好预分片**。
+- 【L3】**分片键近乎不可变**
+
+  文档的分片键字段值不能更新，`refineCollectionShardKey` 只支持为片键追加细化字段。5.0+ 提供 `reshardCollection` 在线重分片更换片键，
+  但该能力仅 Enterprise Advanced / Atlas 提供，且迁移期间资源开销大；Community 版更换片键仍需 dump/restore 或双写重建。因此**片键必须在上线前充分评估并做好预分片**。
 
 :::
 
@@ -1776,7 +1939,10 @@ graph TB
 
 ::: details
 
-- 【L3】**Balancer 演进**：6.0 前的均衡只按各分片 Chunk 数量差判断，文档大小不均时分片实际数据量可能严重失衡；6.0+ 改为按**数据量**判断并支持按集合并行均衡，还引入了超大 Chunk 的自动碎片整理（defragmentation）。
+- 【L3】**Balancer 演进**
+
+  6.0 前的均衡只按各分片 Chunk 数量差判断，文档大小不均时分片实际数据量可能严重失衡；6.0+ 改为按**数据量**判断并支持按集合并行均衡，
+  还引入了超大 Chunk 的自动碎片整理（defragmentation）。
 
 :::
 
@@ -1833,9 +1999,18 @@ db.collection.insertOne(
 
 ::: details
 
-- 【L3】**MongoDB 没有真正的“双主同时写”**：网络分区时少数派侧 Primary 会在 `electionTimeoutMillis`（默认 10s）内自动 step down；step down 前以 w:1 确认的写入可能被回滚——脑裂的真实代价是这个「回滚窗口」，`w: majority` 才是防脑裂数据丢失的根本手段。
-- 【L3】**Arbiter 部署陷阱**：2 数据节点 + 1 Arbiter 的组合，任一数据节点故障后剩余方无法凑齐多数派，整个副本集不可写；生产环境应优先 3 数据节点而非用 Arbiter 省资源。
-- 【L4】**Dry election**：3.5.5 起 Secondary 发起真实选举前先做一轮 dry election 确认自己能胜出，避免无效选举把现有 Primary 拉下台，抑制网络抖动引发的「选举风暴」。
+- 【L3】**MongoDB 没有真正的“双主同时写”**
+
+  网络分区时少数派侧 Primary 会在 `electionTimeoutMillis`（默认 10s）内自动 step down；
+  step down 前以 w:1 确认的写入可能被回滚——脑裂的真实代价是这个「回滚窗口」，`w: majority` 才是防脑裂数据丢失的根本手段。
+
+- 【L3】**Arbiter 部署陷阱**
+
+  2 数据节点 + 1 Arbiter 的组合，任一数据节点故障后剩余方无法凑齐多数派，整个副本集不可写；生产环境应优先 3 数据节点而非用 Arbiter 省资源。
+
+- 【L4】**Dry election**
+
+  3.5.5 起 Secondary 发起真实选举前先做一轮 dry election 确认自己能胜出，避免无效选举把现有 Primary 拉下台，抑制网络抖动引发的「选举风暴」。
 
 :::
 
@@ -1884,8 +2059,15 @@ Read/Write Concern 是 MongoDB 一致性与可用性权衡的核心手段。Writ
 
 ::: details
 
-- 【L3】**金融级组合**：`w: majority` + `readConcern: majority` 是标准组合；若用 w:1 写 + local 读，可能出现“读到的数据消失”：读到尚未多数派确认的写入，主节点随后宕机，该写入被回滚。
-- 【L3】**readConcern majority 依赖 writeConcern majority**：只有以多数派持久化的数据才能在 majority 读级别可见。
+- 【L3】**金融级组合**
+
+  `w: majority` + `readConcern: majority` 是标准组合；若用 w:1 写 + local 读，可能出现“读到的数据消失”：读到尚未多数派确认的写入，主节点随后宕机，
+  该写入被回滚。
+
+- 【L3】**readConcern majority 依赖 writeConcern majority**
+
+  只有以多数派持久化的数据才能在 majority 读级别可见。
+
 - 【L4】MongoDB 4.0+ 多文档事务要求 readConcern majority；基于 WiredTiger 的文档级锁 + MVCC（majority 读基于 stable timestamp）实现快照隔离。
 
 :::
@@ -1894,15 +2076,14 @@ Read/Write Concern 是 MongoDB 一致性与可用性权衡的核心手段。Writ
 
 ::: details
 
-某支付系统 MongoDB 副本集（3 节点），写入使用 w:1，某次主节点宕机后，约 50 笔已确认的支付记录未同步到多数派，选举新主后被回滚。切换为 `w: majority` + `readConcern: majority` 后，同样场景下零数据丢失，但写入延迟从 2ms 升至 8ms（需等待多数派确认）。
+某支付系统 MongoDB 副本集（3 节点），写入使用 w:1，某次主节点宕机后，约 50 笔已确认的支付记录未同步到多数派，选举新主后被回滚。切换为 `w: majority` + `readConcern: majority` 后，
+同样场景下零数据丢失，但写入延迟从 2ms 升至 8ms（需等待多数派确认）。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “w:1 就足够安全” → w:1 只代表主节点写成功，主节点宕机且未同步到多数派的写入会被回滚
 - ❌ “readConcern local 和 majority 没区别” → local 可能读到未多数派确认的数据，majority 保证永不回滚
@@ -1966,8 +2147,16 @@ const filteredStream = db.collection('orders').watch(pipeline)
 ::: details
 
 - 【L3】Change Streams 要求副本集部署（因为依赖 oplog），单节点不可用。
-- 【L3】**update 事件默认不含变更后全文**：只返回 `updateDescription` 增量字段；配置 `fullDocument: 'updateLookup'` 会在读取事件时回查当前最新文档，可能已被后续变更覆盖，消费端必须幂等并做好版本校验。
-- 【L3】**只返回多数派确认的写入**：Change Streams 基于 majority 读语义，未提交或未复制到多数派的写入不可见；分片集群下还提供集群级的事件全序保证。
+
+- 【L3】**update 事件默认不含变更后全文**
+
+  只返回 `updateDescription` 增量字段；配置 `fullDocument: 'updateLookup'` 会在读取事件时回查当前最新文档，可能已被后续变更覆盖，
+  消费端必须幂等并做好版本校验。
+
+- 【L3】**只返回多数派确认的写入**
+
+  Change Streams 基于 majority 读语义，未提交或未复制到多数派的写入不可见；分片集群下还提供集群级的事件全序保证。
+
 - 【L4】Resume Token 就是每个变更事件文档的 `_id` 字段，可在 `watch({ resumeAfter: token })` 中指定从特定位置恢复；token 单调递增，但其内部结构应视为不透明。
 
 :::
@@ -2004,8 +2193,6 @@ const filteredStream = db.collection('orders').watch(pipeline)
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “Change Streams 和直接读 oplog 一样” → Change Streams 提供更高级的 API（包括 Resume Token、聚合管道过滤），且只返回变更事件而非原始 oplog
 - ❌ “Change Streams 可以在单节点使用” → 必须部署副本集，因为底层依赖 oplog
@@ -2090,9 +2277,17 @@ db.orders.insertOne({
 
 ::: details
 
-- 【L3】**更新模式对建模的影响**：WiredTiger 中文档增长超出原存储空间时需重新分配并搬迁，频繁“增长型更新”造成存储碎片与性能下降。
-- 【L3】**应对手段**：嵌入数组用 `$push` + `$slice` 限制长度；时序类增长数据用桶模式，天然避免文档增长。
-- 【L4】**16MB 硬约束**：实践中单文档超过数 MB 就该考虑拆分（网络传输、索引、更新代价都会放大）。
+- 【L3】**更新模式对建模的影响**
+
+  WiredTiger 中文档增长超出原存储空间时需重新分配并搬迁，频繁“增长型更新”造成存储碎片与性能下降。
+
+- 【L3】**应对手段**
+
+  嵌入数组用 `$push` + `$slice` 限制长度；时序类增长数据用桶模式，天然避免文档增长。
+
+- 【L4】**16MB 硬约束**
+
+  实践中单文档超过数 MB 就该考虑拆分（网络传输、索引、更新代价都会放大）。
 
 :::
 
@@ -2128,8 +2323,6 @@ db.orders.insertOne({
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “什么都应该嵌入” → 数组无限增长的嵌入会导致文档超过 16MB 或更新性能下降，需用子集模式或引用
 - ❌ “引用模式和关系型数据库一样” → MongoDB 没有 JOIN，引用需要应用层多次查询或聚合管道 `$lookup`
@@ -2209,10 +2402,22 @@ storage:
 
 ::: details
 
-- 【L3】**索引设计 ESR 规则**：Equality → Sort → Range，见本文档「复合索引中字段的顺序有影响吗？」。
-- 【L3】**工作集大小**：工作集（活跃数据）应能完全放入 WiredTiger cache，否则频繁磁盘 I/O 导致性能下降。
-- 【L4】**连接池优化**：MongoDB 驱动连接池默认最大值 100，高并发场景调大连接池并配合服务端 `maxIncomingConnections`。
-- 【L3】**读写分离分流**：`readPreference: secondary` 可分担读流量，但代价是可能读到旧数据，且 Secondary 同时承担 oplog 回放压力，需监控复制延迟后再分流。
+- 【L3】**索引设计 ESR 规则**
+
+  Equality → Sort → Range，见本文档「复合索引中字段的顺序有影响吗？」。
+
+- 【L3】**工作集大小**
+
+  工作集（活跃数据）应能完全放入 WiredTiger cache，否则频繁磁盘 I/O 导致性能下降。
+
+- 【L4】**连接池优化**
+
+  MongoDB 驱动连接池默认最大值 100，高并发场景调大连接池并配合服务端 `maxIncomingConnections`。
+
+- 【L3】**读写分离分流**
+
+  `readPreference: secondary` 可分担读流量，但代价是可能读到旧数据，且 Secondary 同时承担 oplog 回放压力，需监控复制延迟后再分流。
+
 - 【L4】**用 `db.currentOp()` 定位长查询与泄漏游标，`db.killOp()` 终止；配合每个操作的 `maxTimeMS` 上限，防止单个失控查询拖垮整个实例。**
 
 :::
@@ -2221,15 +2426,14 @@ storage:
 
 ::: details
 
-某订单系统慢查询频繁（平均 800ms），通过 explain 发现全集合扫描。添加复合索引 `{status:1, createdAt:-1}` 后查询降至 15ms。同时开启 profiler 记录慢查询，每周清理未使用索引（通过 `$indexStats` 识别），集合索引数从 12 个优化为 7 个，写入性能提升 20%。
+某订单系统慢查询频繁（平均 800ms），通过 explain 发现全集合扫描。添加复合索引 `{status:1, createdAt:-1}` 后查询降至 15ms。同时开启 profiler 记录慢查询，
+每周清理未使用索引（通过 `$indexStats` 识别），集合索引数从 12 个优化为 7 个，写入性能提升 20%。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ “索引越多越好” → 每个索引在写入时同步维护，过多索引严重影响写入性能
 - ❌ “explain 不需要在测试环境验证” → 生产环境 explain 也会消耗资源，应在测试环境验证后再应用到生产
@@ -2319,9 +2523,18 @@ MongoDB 分片集群生产环境五大典型故障：Balancer 与 DDL/长事务�
 
 ::: details
 
-- 【L3】**监控关键指标**：`sh.status()` 查看 Chunk 分布，`db.adminCommand({ balancerStatus: 1 })` 查看 Balancer 状态，`db.chunks.aggregate([{$group:{_id:"$shard",count:{$sum:1}}}])` 统计各 Shard Chunk 数量。
-- 【L4】**迁移失败排查**：查看 Config Server 日志中 `moveChunk` 相关错误，常见原因包括网络超时、目标 Shard 磁盘满、WiredTiger cache 不足。
-- 【L4】**生产 SOP**：每次迁移前备份 Config Server 数据，迁移后执行 `db.collection.validate()` 校验数据完整性。
+- 【L3】**监控关键指标**
+
+  `sh.status()` 查看 Chunk 分布，`db.adminCommand({ balancerStatus: 1 })` 查看 Balancer 状态，
+  `db.chunks.aggregate([{$group:{_id:"$shard",count:{$sum:1}}}])` 统计各 Shard Chunk 数量。
+
+- 【L4】**迁移失败排查**
+
+  查看 Config Server 日志中 `moveChunk` 相关错误，常见原因包括网络超时、目标 Shard 磁盘满、WiredTiger cache 不足。
+
+- 【L4】**生产 SOP**
+
+  每次迁移前备份 Config Server 数据，迁移后执行 `db.collection.validate()` 校验数据完整性。
 
 :::
 
@@ -2329,15 +2542,14 @@ MongoDB 分片集群生产环境五大典型故障：Balancer 与 DDL/长事务�
 
 ::: details
 
-某电商平台 MongoDB 分片集群（4 Shard，数据量 2TB），大促前批量导入商品数据后触发 Balancer 迁移风暴，网络带宽被打满，业务读写延迟从 5ms 飙升至 200ms。紧急处理：1）暂停 Balancer；2）手动预分片剩余数据；3）设置 Balancer 时间窗为凌晨 2-6 点。后续发现 3 个 Jumbo Chunk 导致数据倾斜，通过手动拆分恢复均衡。最终 Chunk 分布标准差从 35% 降至 5%。
+某电商平台 MongoDB 分片集群（4 Shard，数据量 2TB），大促前批量导入商品数据后触发 Balancer 迁移风暴，网络带宽被打满，业务读写延迟从 5ms 飙升至 200ms。紧急处理：1）暂停 Balancer；
+2）手动预分片剩余数据；3）设置 Balancer 时间窗为凌晨 2-6 点。后续发现 3 个 Jumbo Chunk 导致数据倾斜，通过手动拆分恢复均衡。最终 Chunk 分布标准差从 35% 降至 5%。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Balancer 一直开着更好" → Balancer 持续运行会与业务争抢资源，应设置低峰时间窗
 - ❌ "Chunk 自动分裂就够了" → 大批量导入前必须预分片，否则 Balancer 来不及迁移导致热点
@@ -2454,9 +2666,19 @@ MongoDB 分片集群生产环境五大典型故障：Balancer 与 DDL/长事务�
 
 ::: details
 
-- 【L3】**Pipeline 优化器**：MongoDB 会自动执行 Pipeline Optimizer，包括 Section 1（语义等价变换，如 `$match` 前移）和 Section 2（基于代价的优化，如合并相邻 `$match`）。但复杂管道仍建议手动优化。
-- 【L4】**`$facet` 多分支聚合**：一次查询返回多维度统计，但各分支独立执行，大数据量下注意内存限制，配合 `allowDiskUse` 使用。
-- 【L4】**分片集群聚合**：Mongos 会将聚合下推到各 Shard 执行（distributed aggregation），但 `$lookup` 的外部集合若未分片，它只完整存在于 Primary Shard，跨分片关联需回 Primary Shard 执行或在 Mongos 合并，难以完全并行，是分片聚合的常见瓶颈。
+- 【L3】**Pipeline 优化器**
+
+  MongoDB 会自动执行 Pipeline Optimizer，包括 Section 1（语义等价变换，如 `$match` 前移）和 Section 2（基于代价的优化，
+  如合并相邻 `$match`）。但复杂管道仍建议手动优化。
+
+- 【L4】**`$facet` 多分支聚合**
+
+  一次查询返回多维度统计，但各分支独立执行，大数据量下注意内存限制，配合 `allowDiskUse` 使用。
+
+- 【L4】**分片集群聚合**
+
+  Mongos 会将聚合下推到各 Shard 执行（distributed aggregation），但 `$lookup` 的外部集合若未分片，它只完整存在于 Primary Shard，
+  跨分片关联需回 Primary Shard 执行或在 Mongos 合并，难以完全并行，是分片聚合的常见瓶颈。
 
 :::
 
@@ -2464,15 +2686,17 @@ MongoDB 分片集群生产环境五大典型故障：Balancer 与 DDL/长事务�
 
 ::: details
 
-某日志分析系统 MongoDB 集合 5000 万条记录，聚合查询统计各错误类型 Top 10。初始管道无索引、无 allowDiskUse，执行时间 180 秒。优化后：1）添加 `{level:1, timestamp:-1}` 复合索引；2）`$match` 前置过滤 error 级别；3）开启 `allowDiskUse`；4）`batchSize` 从默认 101 调为 5000。最终执行时间降至 3 秒，性能提升 60 倍。
+某日志分析系统 MongoDB 集合 5000 万条记录，聚合查询统计各错误类型 Top 10。初始管道无索引、无 allowDiskUse，执行时间 180 秒。优化后：
+
+1）添加 `{level:1, timestamp:-1}` 复合索引；2）`$match` 前置过滤 error 级别；3）开启 `allowDiskUse`；4）`batchSize` 从默认 101 调为 5000。
+
+最终执行时间降至 3 秒，性能提升 60 倍。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "聚合管道自动优化，不需要手动调整阶段顺序" → 虽然 MongoDB 有 Pipeline Optimizer，但 `$lookup` 等复杂操作的优化有限，手动前置 `$match` 仍是关键
 - ❌ "allowDiskUse 开了就行，不需要关注内存" → allowDiskUse 会引入磁盘 I/O，应同时优化管道减少中间数据量
@@ -2567,9 +2791,18 @@ MongoDB 分片集群生产环境五大典型故障：Balancer 与 DDL/长事务�
 
 ::: details
 
-- 【L3】**在线迁移 vs 离线迁移**：在线迁移（上述方案）业务不停机，但迁移期间存在数据一致性风险；离线迁移需停机窗口，但数据一致性有保障。生产环境通常选在线迁移 + 双写验证。
-- 【L4】**回滚计划**：切换后如果 Mongos 或分片集群出现问题，可快速将应用连接切回原副本集。前提是原副本集数据未被删除，且迁移期间的增量数据通过 Change Streams 同步回原副本集。
-- 【L4】**分片键变更**：片键字段值不可更新，`refineCollectionShardKey` 只支持追加细化字段；5.0+ 提供 `reshardCollection` 在线重分片（仅 Enterprise Advanced / Atlas 可用，迁移期间资源开销大），Community 版分片键选错仍需 dump/restore 或双写重建。
+- 【L3】**在线迁移 vs 离线迁移**
+
+  在线迁移（上述方案）业务不停机，但迁移期间存在数据一致性风险；离线迁移需停机窗口，但数据一致性有保障。生产环境通常选在线迁移 + 双写验证。
+
+- 【L4】**回滚计划**
+
+  切换后如果 Mongos 或分片集群出现问题，可快速将应用连接切回原副本集。前提是原副本集数据未被删除，且迁移期间的增量数据通过 Change Streams 同步回原副本集。
+
+- 【L4】**分片键变更**
+
+  片键字段值不可更新，`refineCollectionShardKey` 只支持追加细化字段；
+  5.0+ 提供 `reshardCollection` 在线重分片（仅 Enterprise Advanced / Atlas 可用，迁移期间资源开销大），Community 版分片键选错仍需 dump/restore 或双写重建。
 
 :::
 
@@ -2577,15 +2810,16 @@ MongoDB 分片集群生产环境五大典型故障：Balancer 与 DDL/长事务�
 
 ::: details
 
-某 SaaS 平台 MongoDB 单副本集（3 节点，数据量 800GB），业务增长后单机存储和吞吐接近瓶颈。迁移方案：1）选择 tenantId 作为分片键（高基数、查询常带）；2）部署 4 Shard 分片集群，预分片 32 个 Chunk；3）将原副本集作为 Shard 0 加入；4）凌晨 2-6 点开启 Balancer 迁移，限速 50MB/s；5）迁移耗时 5 天，期间业务零停机；6）灰度切换：先切 10% 读流量到 Mongos 验证 1 天，再全量切换。回滚方案：保留原副本集 7 天，通过 Change Streams 同步增量数据。
+某 SaaS 平台 MongoDB 单副本集（3 节点，数据量 800GB），业务增长后单机存储和吞吐接近瓶颈。迁移方案：1）选择 tenantId 作为分片键（高基数、查询常带）；2）部署 4 Shard 分片集群，
+预分片 32 个 Chunk；3）将原副本集作为 Shard 0 加入；4）凌晨 2-6 点开启 Balancer 迁移，限速 50MB/s；5）迁移耗时 5 天，期间业务零停机；6）灰度切换：
+
+先切 10% 读流量到 Mongos 验证 1 天，再全量切换。回滚方案：保留原副本集 7 天，通过 Change Streams 同步增量数据。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "迁移前不需要预分片" → 不预分片会导致所有数据集中在原 Shard，Balancer 迁移时产生 Jumbo Chunk 和迁移风暴
 - ❌ "迁移可以一步到位" → 必须灰度切换，先验证读流量再切写流量，保留回滚能力

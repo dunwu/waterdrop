@@ -281,32 +281,70 @@ Spring 是基础框架，提供 IoC、AOP 等核心能力；Spring MVC 是 Sprin
 
 ::: details 方案权衡与失效边界（L3）
 
-- **单例（饿汉）vs 懒加载**：默认 singleton 在 `refresh()` 的 `finishBeanFactoryInitialization` 中一次性创建全部非懒加载单例，启动慢但运行期引用一致；`@Lazy` 推迟到首次 `getBean`，启动快却把依赖错误推迟到运行期暴露。无状态组件用默认单例，重量级且低频使用的 Bean 才考虑懒加载。
+- **单例（饿汉）vs 懒加载**：默认 singleton 在 `refresh()` 的 `finishBeanFactoryInitialization` 中一次性创建全部非懒加载单例，启动慢但运行期引用一致；
+  `@Lazy` 推迟到首次 `getBean`，启动快却把依赖错误推迟到运行期暴露。无状态组件用默认单例，重量级且低频使用的 Bean 才考虑懒加载。
+
 - **代理模式的两条路线**：JDK 动态代理基于接口、生成快；CGLIB 基于子类继承、调用快但生成慢约一个数量级。
-- **模板方法 vs 纯策略**：`JdbcTemplate` 用模板方法固定"获取连接 → 执行 → 异常转换 → 释放资源"骨架，用户只写 SQL 回调；若全用策略模式则调用方需自行编排资源释放，易漏关连接。框架选模板方法正是为了"零心智负担"。
+
+- **模板方法 vs 纯策略**：`JdbcTemplate` 用模板方法固定"获取连接 → 执行 → 异常转换 → 释放资源"骨架，用户只写 SQL 回调；若全用策略模式则调用方需自行编排资源释放，易漏关连接。
+
+  框架选模板方法正是为了"零心智负担"。
+
 - 【失效】代理模式：CGLIB 无法代理 `final` 类/`final` 方法、`static` 方法。
+
 - 【失效】单例模式：单例 Bean 内含可变成员变量即并发不安全，Spring 不保证线程安全。
+
 - 【失效】工厂模式：`@Configuration` 配置类若被当作 `@Component` 处理（Lite 模式），`@Bean` 方法互调返回的是新对象而非容器单例，单例语义被破坏。
-- 【L3】**量化对比**：JDK 动态代理生成耗时约 1~2ms，单次调用开销约 100~300ns；CGLIB 生成耗时约 10~20ms（约一个数量级），但调用开销仅约 50~100ns（SpringBoot 2.x+ 使用 CGLIB FastClass 优化）。典型应用有 50~100 个代理 Bean，首次启动代理创建总耗时约 0.5~2s。
-- 【L3】**启动耗时拆解**：以中等规模 SpringBoot 应用（200~500 Bean）为例，`refresh()` 总耗时约 5~15s，其中组件扫描约 1~3s、Bean 实例化与依赖注入约 3~10s、AOP 代理创建约 0.5~2s。大型项目（2000+ Bean）可达 30~90s。
+
+- 【L3】**量化对比**
+
+  JDK 动态代理生成耗时约 1~2ms，单次调用开销约 100~300ns；CGLIB 生成耗时约 10~20ms（约一个数量级），
+  但调用开销仅约 50~100ns（SpringBoot 2.x+ 使用 CGLIB FastClass 优化）。典型应用有 50~100 个代理 Bean，首次启动代理创建总耗时约 0.5~2s。
+
+- 【L3】**启动耗时拆解**
+
+  以中等规模 SpringBoot 应用（200~500 Bean）为例，`refresh()` 总耗时约 5~15s，其中组件扫描约 1~3s、Bean 实例化与依赖注入约 3~10s、
+  AOP 代理创建约 0.5~2s。大型项目（2000+ Bean）可达 30~90s。
 
 :::
 
 ::: details 拓展追问（L3/L4）
 
-- 【L3】`DefaultSingletonBeanRegistry` 的单例注册为何不直接整个流程加一把大锁？三级缓存本身用 `ConcurrentHashMap`，只有跨缓存升级（`getSingleton`）与注册（`addSingleton`）等临界区用 `synchronized(this.singletonObjects)` 保证原子性，锁粒度刻意做小，避免全局串行化拖慢并发 `getBean`。
-- 【L3】`AbstractApplicationContext#refresh()` 的模板方法骨架里，哪些步骤留给子类覆写？`refresh()` 固定 12 步骨架，子类主要覆写 `onRefresh()`（如 `ServletWebServerApplicationContext` 在此创建内嵌 Tomcat）与 `finishRefresh()` 等环节，正是"父类定流程、子类填差异"的标准用法。
-- 【L3】`BeanFactory` 与 `FactoryBean` 分别体现什么模式？`BeanFactory` 是工厂模式的顶层抽象（容器即工厂）；`FactoryBean` 是"把复杂对象创建过程模板化"的工厂，如 MyBatis 的 `SqlSessionFactoryBean`，`getObject()` 即核心步骤，前缀 `&` 可取工厂本身。
-- 【L3】**量化影响**：典型应用有 10~20 个 `BeanPostProcessor`（Spring 内置 + 业务自定义），每个 Bean 创建需依次经过全部 BPP，1000 个 Bean 约需 1~3s 纯 BPP 处理时间。CGLIB 代理类生成后会被 `ClassUtils` 缓存，同类代理不重复生成。
-- 【L4】场景题——多租户 SaaS 系统每租户独立 `DataSource` 且租户动态增长，Bean 层如何设计？`FactoryBean` 的 beanName 是静态的，无法随租户数扩展，不适合；推荐单例 `AbstractRoutingDataSource` + 租户路由（`determineCurrentLookupKey()` 从 `ThreadLocal` 取租户标识，目标库 Map 懒加载并加锁防重）；强隔离备选运行时经 `BeanDefinitionRegistryPostProcessor` 或 `DefaultListableBeanFactory#registerBeanDefinition` 动态注册每租户 `DataSource`。路由式实现简单、连接总量可控但隔离弱；每租户独立 Bean 隔离强但连接数线性增长，需配合租户淘汰策略。
+- 【L3】`DefaultSingletonBeanRegistry` 的单例注册为何不直接整个流程加一把大锁？
+
+  三级缓存本身用 `ConcurrentHashMap`，只有跨缓存升级（`getSingleton`）与注册（`addSingleton`）等临界区用 `synchronized(this.singletonObjects)` 保证原子性，
+  锁粒度刻意做小，避免全局串行化拖慢并发 `getBean`。
+
+- 【L3】`AbstractApplicationContext#refresh()` 的模板方法骨架里，哪些步骤留给子类覆写？
+
+  `refresh()` 固定 12 步骨架，子类主要覆写 `onRefresh()`（如 `ServletWebServerApplicationContext` 在此创建内嵌 Tomcat）与 `finishRefresh()` 等环节，
+  正是"父类定流程、子类填差异"的标准用法。
+
+- 【L3】`BeanFactory` 与 `FactoryBean` 分别体现什么模式？
+
+  `BeanFactory` 是工厂模式的顶层抽象（容器即工厂）；`FactoryBean` 是"把复杂对象创建过程模板化"的工厂，如 MyBatis 的 `SqlSessionFactoryBean`，
+  `getObject()` 即核心步骤，前缀 `&` 可取工厂本身。
+
+- 【L3】**量化影响**
+
+  典型应用有 10~20 个 `BeanPostProcessor`（Spring 内置 + 业务自定义），每个 Bean 创建需依次经过全部 BPP，
+  1000 个 Bean 约需 1~3s 纯 BPP 处理时间。CGLIB 代理类生成后会被 `ClassUtils` 缓存，同类代理不重复生成。
+
+- 【L4】场景题——多租户 SaaS 系统每租户独立 `DataSource` 且租户动态增长，Bean 层如何设计？
+
+  `FactoryBean` 的 beanName 是静态的，无法随租户数扩展，不适合；推荐单例 `AbstractRoutingDataSource` + 租户路由（`determineCurrentLookupKey()` 从 `ThreadLocal` 取租户标识，目标库 Map 懒加载并加锁防重）；强隔离备选运行时经 `BeanDefinitionRegistryPostProcessor` 或 `DefaultListableBeanFactory#registerBeanDefinition` 动态注册每租户 `DataSource`。路由式实现简单、连接总量可控但隔离弱；每租户独立 Bean 隔离强但连接数线性增长，需配合租户淘汰策略。
 
 :::
 
 ::: details 踩坑案例：Lite 模式破坏单例语义（L4）
 
 - **现象**：支付系统上线后，`SqlSessionFactory` 相关监控显示同一数据源连接数翻倍，偶发"连接池耗尽"告警。
+
 - **排查**：dump 堆内存发现容器中存在 2 个 `SqlSessionFactory` 实例；顺着引用链定位到一个配置类。
-- **根因**：团队把配置类从 `@Configuration` 改成了 `@Component`（为"提速启动"），类内另一个 `@Bean` 方法直接调用 `sqlSessionFactory()`。Lite 模式下这是普通方法调用，每次都 new 一个新工厂实例，两个工厂各自持有独立连接池。
+
+- **根因**：团队把配置类从 `@Configuration` 改成了 `@Component`（为"提速启动"），类内另一个 `@Bean` 方法直接调用 `sqlSessionFactory()`。Lite 模式下这是普通方法调用，
+  每次都 new 一个新工厂实例，两个工厂各自持有独立连接池。
+
 - **修复**：恢复 `@Configuration`（Full 模式），`@Bean` 方法调用被 CGLIB 拦截返回容器单例；代码规范明确禁止随意降级配置类注解。
 
 :::
@@ -357,8 +395,12 @@ Spring AOP 定义了 **5 种通知类型**，通过 `Advice` 接口实现，精�
 
 ::: details
 
-- 【L3】注解式切面中 5 种通知对应 `@Before`、`@AfterReturning`、`@AfterThrowing`、`@After`、`@Around`，由 `ReflectiveAspectJAdvisorFactory` 解析为 `AspectJMethodBeforeAdvice`、`AspectJAroundAdvice` 等通知对象，再统一适配为 AOP Alliance 的 `MethodInterceptor` 链执行。
+- 【L3】注解式切面中 5 种通知对应 `@Before`、`@AfterReturning`、`@AfterThrowing`、`@After`、`@Around`，
+  由 `ReflectiveAspectJAdvisorFactory` 解析为 `AspectJMethodBeforeAdvice`、`AspectJAroundAdvice` 等通知对象，
+  再统一适配为 AOP Alliance 的 `MethodInterceptor` 链执行。
+
 - 【L3】`@After` 与 `@AfterReturning` 的执行顺序在不同版本存在差异，若两者都有且依赖顺序，建议只用其一。
+
 - 【L4】通知织入后统一走拦截器链（`ReflectiveMethodInvocation#proceed` 递归推进），事务切面的 `TransactionInterceptor` 就是其中一环。
 
 :::
@@ -542,17 +584,35 @@ Bean 生命周期主线：实例化 → 提前暴露（三级缓存）→ 属性
 ::: details 失效场景（L3）
 
 - **构造器循环依赖**：步骤 1 尚未完成就要对方实例，三级缓存来不及介入，抛 `BeanCurrentlyInCreationException`。
+
 - **prototype Bean**：不进单例缓存、不执行销毁回调，`@PreDestroy` 失效。
+
 - **@Async Bean 参与循环依赖**：早期引用与最终代理不一致，Spring 5.x 直接拒绝启动（详见循环依赖一题）。
 
 :::
 
 ::: details 拓展追问（L3/L4）
 
-- 【L3】Aware 回调与 `@PostConstruct` 谁先执行？Aware 回调属于"初始化前注入容器信息"阶段，在 `BeanPostProcessor#postProcessBeforeInitialization` 之前执行；`@PostConstruct` 由 `CommonAnnotationBeanPostProcessor` 在前置处理阶段执行，所以 Aware 先于 `@PostConstruct`，顺序由 `AbstractAutowireCapableBeanFactory#initializeBean` 固定。
-- 【L3】`postProcessAfterInitialization` 返回一个全新对象，容器里存的到底是哪个？存的是返回值。AOP 正是利用这一点用代理对象替换原始 Bean；若后置处理器返回原对象则直接注册原对象，包装类增强都基于同一机制。
-- 【L3】**量化参数**：典型 SpringBoot 应用（200~500 Bean）启动时，每个 Bean 平均经过 10~15 个 `BeanPostProcessor`，单个 Bean 创建耗时约 0.5~5ms（含反射、注入、代理）。启动总耗时中，Bean 生命周期回调约占 30~50%，外部资源连接（数据库、缓存、MQ）占 40~60%。大型应用（2000+ Bean）启动可达 60~120s，其中代理创建和依赖注入各占约 20~30%。
-- 【L4】销毁回调在 `kill -9` 时会执行吗？不会。销毁回调只在容器正常 `close()`（如注册了 ShutdownHook 收到 SIGTERM）时触发，`kill -9` 直接终止 JVM，`@PreDestroy` 与 `destroy-method` 都不会执行。关键资源清理必须依赖外部机制（如连接池超时回收）兜底。
+- 【L3】Aware 回调与 `@PostConstruct` 谁先执行？
+
+  Aware 回调属于"初始化前注入容器信息"阶段，在 `BeanPostProcessor#postProcessBeforeInitialization` 之前执行；
+  `@PostConstruct` 由 `CommonAnnotationBeanPostProcessor` 在前置处理阶段执行，所以 Aware 先于 `@PostConstruct`，
+  顺序由 `AbstractAutowireCapableBeanFactory#initializeBean` 固定。
+
+- 【L3】`postProcessAfterInitialization` 返回一个全新对象，容器里存的到底是哪个？
+
+  存的是返回值。AOP 正是利用这一点用代理对象替换原始 Bean；若后置处理器返回原对象则直接注册原对象，包装类增强都基于同一机制。
+
+- 【L3】**量化参数**
+
+  典型 SpringBoot 应用（200~500 Bean）启动时，每个 Bean 平均经过 10~15 个 `BeanPostProcessor`，单个 Bean 创建耗时约 0.5~5ms（含反射、注入、
+  代理）。启动总耗时中，Bean 生命周期回调约占 30~50%，外部资源连接（数据库、缓存、MQ）占 40~60%。大型应用（2000+ Bean）启动可达 60~120s，其中代理创建和依赖注入各占约 20~30%。
+
+- 【L4】销毁回调在 `kill -9` 时会执行吗？
+
+  不会。销毁回调只在容器正常 `close()`（如注册了 ShutdownHook 收到 SIGTERM）时触发，`kill -9` 直接终止 JVM，`@PreDestroy` 与 `destroy-method` 都不会执行。
+
+  关键资源清理必须依赖外部机制（如连接池超时回收）兜底。
 
 :::
 
@@ -561,8 +621,12 @@ Bean 生命周期主线：实例化 → 提前暴露（三级缓存）→ 属性
 ::: details 对账服务发布超时：@PostConstruct 里同步预热全量缓存
 
 - **现象**：某对账服务滚动发布时新实例反复启动超时被 K8s 杀掉，流量持续压在老实例上告警。
+
 - **排查**：启动日志显示卡在某个 Bean 初始化；jstack 发现主线程阻塞在 `@PostConstruct` 方法内的全表查询。
-- **根因**：开发在 `@PostConstruct` 里同步预热全量缓存，数据量增长后慢查询耗时 10 分钟+，超过就绪探针 60s 超时；且初始化回调位于 `postProcessAfterInitialization` 之前，缓存未预热完整个容器无法就绪。
+
+- **根因**：开发在 `@PostConstruct` 里同步预热全量缓存，数据量增长后慢查询耗时 10 分钟+，超过就绪探针 60s 超时；且初始化回调位于 `postProcessAfterInitialization` 之前，
+  缓存未预热完整个容器无法就绪。
+
 - **修复**：预热逻辑改用 `ApplicationRunner` + 独立线程池异步执行，就绪探针改为检查"容器就绪"而非"缓存就绪"，缓存未热时接口降级走数据库直查。
 
 :::
@@ -570,8 +634,6 @@ Bean 生命周期主线：实例化 → 提前暴露（三级缓存）→ 属性
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Bean 创建时依赖就已注入" → 实例化（构造）与属性注入是分离的两步，三级缓存正是利用这个间隙提前暴露引用。
 - ❌ "prototype Bean 销毁时容器会调 @PreDestroy" → 容器只管创建 prototype，不管理其销毁，回调不会执行。
@@ -629,7 +691,9 @@ Spring 的单例 Bean 本身**并不保证线程安全**，其是否存在并发
 ::: details
 
 - 【L3】Controller/Service/DAO 默认单例却安全，是因为标准分层设计中它们不持有请求级状态，请求数据通过方法参数与局部变量传递（栈上隔离）。
-- 【L4】若确实需要"每请求一份状态"，优先用 request 作用域或 ThreadLocal（注意线程池场景的 remove 防脏读），而非 prototype 注入单例 Service（单例只会持有一份 prototype 引用，需配合作用域代理 `@Scope(proxyMode)`）。
+
+- 【L4】若确实需要"每请求一份状态"，优先用 request 作用域或 ThreadLocal（注意线程池场景的 remove 防脏读），而非 prototype 注入单例 Service（单例只会持有一份 prototype 引用，
+  需配合作用域代理 `@Scope(proxyMode)`）。
 
 :::
 
@@ -677,8 +741,18 @@ Spring 启动的核心是 IoC 容器的初始化，分为以下关键阶段：
 ::: details
 
 - 【L3】上述流程统一收口在 `AbstractApplicationContext#refresh()` 的 12 步模板方法中，`preInstantiateSingletons` 负责第 3 步的批量预实例化。
-- 【L3】启动耗时排查：Spring Framework 5.3 起提供 `ApplicationStartup` 启动观测 SPI，给 `SpringApplication` 挂上 `BufferingApplicationStartup` 即可环形缓冲各 `StartupStep`（Bean 创建、配置类解析等）的耗时；Spring Boot 2.4 起可通过 `/actuator/startup` 端点导出，定位启动慢的具体环节，替代"凭感觉加 @Lazy"的盲改。
-- 【L3】组件扫描提速：`spring-context-indexer` 在编译期生成 `META-INF/spring.components` 索引，运行期直接读索引替代类路径扫描；Spring 6 时代更进一步，用 AOT 在编译期完成 Bean 定义解析（见本文档「什么是 IoC？什么是依赖注入？什么是 Spring IoC？」的 AOT 条目）。
+
+- 【L3】启动耗时排查
+
+  Spring Framework 5.3 起提供 `ApplicationStartup` 启动观测 SPI，
+  给 `SpringApplication` 挂上 `BufferingApplicationStartup` 即可环形缓冲各 `StartupStep`（Bean 创建、配置类解析等）的耗时；
+  Spring Boot 2.4 起可通过 `/actuator/startup` 端点导出，定位启动慢的具体环节，替代"凭感觉加 @Lazy"的盲改。
+
+- 【L3】组件扫描提速
+
+  `spring-context-indexer` 在编译期生成 `META-INF/spring.components` 索引，运行期直接读索引替代类路径扫描；Spring 6 时代更进一步，
+  用 AOT 在编译期完成 Bean 定义解析（见本文档「什么是 IoC？什么是依赖注入？什么是 Spring IoC？」的 AOT 条目）。
+
 - 【L4】`ContextRefreshedEvent` 可能触发多次（父子容器各 refresh 一次），监听时可用 `event.getApplicationContext().getParent() == null` 过滤。
 
 :::
@@ -726,7 +800,9 @@ Spring 的自动装配，就是让容器根据某种规则自动把依赖注入�
 
 ::: details
 
-- 【L3】`@Autowired` 由 `AutowiredAnnotationBeanPostProcessor` 在 `populateBean` 阶段处理；`@Resource` 由 `CommonAnnotationBeanPostProcessor` 处理。
+- 【L3】`@Autowired` 由 `AutowiredAnnotationBeanPostProcessor` 在 `populateBean` 阶段处理；
+  `@Resource` 由 `CommonAnnotationBeanPostProcessor` 处理。
+
 - 【L3】byType 存在多个候选时 XML 直接报错，而注解方式还有 `@Qualifier`/`@Primary` 两级消歧手段，这是注解装配更灵活的原因之一。
 
 :::
@@ -797,30 +873,64 @@ Spring 官方建议：强制依赖使用构造器注入，可选依赖使用 Set
 
 ::: details 方案权衡与失效边界（L2/L3）
 
-- **BeanFactory vs ApplicationContext**：`BeanFactory` 是最小 IoC 容器，默认**懒加载**（首次 `getBean` 才创建）；`ApplicationContext` 在其上叠加事件发布（`ApplicationEventPublisher`）、国际化（`MessageSource`）、环境抽象（`Environment`）与 AOP 集成，且默认在 `refresh()` 中**预实例化**全部非懒加载单例，启动即暴露配置错误。生产应用一律用 `ApplicationContext`。
-- **构造器注入 vs setter vs 字段注入**：构造器注入遇循环依赖直接失败其实是"好事"——它把设计问题暴露在启动期，而 Setter/字段注入被三级缓存悄悄掩盖。方法注入还有一种特殊形态：`@Lookup` 注解方法，由 CGLIB 重写方法每次返回新 Bean，解决"单例依赖 prototype"每次拿新实例的问题。接口回调注入（Aware 系列）注入的是容器自身资源（BeanFactory、ApplicationContext），而非业务 Bean。
+- **BeanFactory vs ApplicationContext**：`BeanFactory` 是最小 IoC 容器，默认**懒加载**（首次 `getBean` 才创建）；
+  `ApplicationContext` 在其上叠加事件发布（`ApplicationEventPublisher`）、国际化（`MessageSource`）、环境抽象（`Environment`）与 AOP 集成，
+  且默认在 `refresh()` 中**预实例化**全部非懒加载单例，启动即暴露配置错误。生产应用一律用 `ApplicationContext`。
+
+- **构造器注入 vs setter vs 字段注入**：构造器注入遇循环依赖直接失败其实是"好事"——它把设计问题暴露在启动期，而 Setter/字段注入被三级缓存悄悄掩盖。方法注入还有一种特殊形态：`@Lookup` 注解方法，
+  由 CGLIB 重写方法每次返回新 Bean，解决"单例依赖 prototype"每次拿新实例的问题。接口回调注入（Aware 系列）注入的是容器自身资源（BeanFactory、ApplicationContext），而非业务 Bean。
+
 - 【失效】单例 Bean 不等于线程安全：容器只保证"唯一实例"，不保证状态安全。
+
 - 【失效】重复创建 `ApplicationContext`：容器不是轻量对象（扫描、实例化、代理创建全量执行），在请求路径里 new 容器会直接压垮内存与 GC。
+
 - 【失效】容器外 new 的对象不受管理：`@Autowired`、`@Transactional` 等全部失效。
-- 【L3】**量化参数**：典型中型 SpringBoot 应用包含 500~2000 个 `BeanDefinition`，`refresh()` 启动耗时约 5~15s；大型企业应用可达 3000~5000+ Bean，启动耗时 30~90s。单例 Bean 全部实例化后内存占用约 200MB~1GB（取决于对象大小和依赖深度）。
-- 【L3】**Spring Framework 6.0+ AOT**：Spring 6（2022）引入 AOT 编译支持，在编译期预生成 Bean 定义和代理代码，减少运行期反射开销，启动时间可缩短 30~50%，内存占用降低 20~30%。Spring Native / GraalVM 原生镜像可进一步将启动时间压缩到毫秒级。
+
+- 【L3】**量化参数**
+
+  典型中型 SpringBoot 应用包含 500~2000 个 `BeanDefinition`，`refresh()` 启动耗时约 5~15s；大型企业应用可达 3000~5000+ Bean，
+  启动耗时 30~90s。单例 Bean 全部实例化后内存占用约 200MB~1GB（取决于对象大小和依赖深度）。
+
+- 【L3】**Spring Framework 6.0+ AOT**
+
+  Spring 6（2022）引入 AOT 编译支持，在编译期预生成 Bean 定义和代理代码，减少运行期反射开销，启动时间可缩短 30~50%，
+  内存占用降低 20~30%。Spring Native / GraalVM 原生镜像可进一步将启动时间压缩到毫秒级。
 
 :::
 
 ::: details 拓展追问与场景题（L3/L4）
 
-- 【L3】为什么 Spring 内部全用 `BeanDefinition` 而不直接存 `Class` 对象？`Class` 只表达类型，无法承载作用域、懒加载、init/destroy、构造参数等元数据；`BeanDefinition` 是可被 `BeanFactoryPostProcessor` 修改的"图纸"，配置占位符替换、动态改作用域都发生在实例化之前，这正是"先注册后实例化"两阶段设计的价值。
-- 【L3】`getBean` 首次调用如何保证并发下只创建一个单例？`DefaultSingletonBeanRegistry#getSingleton` 先查一级缓存，miss 后对 beanName 加锁（`beforeSingletonCreation` 用 Set 标记创建中状态防重入），创建完成经 `afterSingletonCreation` + `addSingleton` 注册，双重检查保证唯一实例。
-- 【L3】`BeanFactory` 的能力是不是 `ApplicationContext` 的子集？是子集，`ApplicationContext` 继承 `ListableBeanFactory` 等接口拥有全部能力，还额外提供事件、资源访问、国际化、环境抽象，且预实例化能在启动期暴露配置错误；`BeanFactory` 的懒加载会把错误推迟到运行期首次调用，生产几乎不用。
-- 【L4】场景题——老项目 3000+ Bean 启动需 90s，想优化又不敢全量 `@Lazy`，如何决策？全量 `@Lazy` 会把依赖错误推迟到运行期，等于让生产流量当测试，不可取。渐进方案：① 埋点找出创建最慢的 Top 20 Bean；② 仅对重量级、低频 Bean 加 `@Lazy`；③ 外部连接改懒连接或异步预热；④ 拆分不常用模块。预实例化用启动时间换运行期确定性，懒加载反之；核心原则是把"启动失败"留在启动期暴露，把"启动耗时"移给非关键路径。
+- 【L3】为什么 Spring 内部全用 `BeanDefinition` 而不直接存 `Class` 对象？
+
+  `Class` 只表达类型，无法承载作用域、懒加载、init/destroy、构造参数等元数据；`BeanDefinition` 是可被 `BeanFactoryPostProcessor` 修改的"图纸"，配置占位符替换、
+  动态改作用域都发生在实例化之前，这正是"先注册后实例化"两阶段设计的价值。
+
+- 【L3】`getBean` 首次调用如何保证并发下只创建一个单例？
+
+  `DefaultSingletonBeanRegistry#getSingleton` 先查一级缓存，miss 后对 beanName 加锁（`beforeSingletonCreation` 用 Set 标记创建中状态防重入），
+  创建完成经 `afterSingletonCreation` + `addSingleton` 注册，双重检查保证唯一实例。
+
+- 【L3】`BeanFactory` 的能力是不是 `ApplicationContext` 的子集？
+
+  是子集，`ApplicationContext` 继承 `ListableBeanFactory` 等接口拥有全部能力，还额外提供事件、资源访问、国际化、环境抽象，且预实例化能在启动期暴露配置错误；
+  `BeanFactory` 的懒加载会把错误推迟到运行期首次调用，生产几乎不用。
+
+- 【L4】场景题——老项目 3000+ Bean 启动需 90s，想优化又不敢全量 `@Lazy`，如何决策？
+
+  全量 `@Lazy` 会把依赖错误推迟到运行期，等于让生产流量当测试，不可取。渐进方案：① 埋点找出创建最慢的 Top 20 Bean；② 仅对重量级、低频 Bean 加 `@Lazy`；③ 外部连接改懒连接或异步预热；④ 拆分不常用模块。
+
+  预实例化用启动时间换运行期确定性，懒加载反之；核心原则是把"启动失败"留在启动期暴露，把"启动耗时"移给非关键路径。
 
 :::
 
 ::: details 踩坑案例：请求路径里 new 容器导致 OOM（L4）
 
 - **现象**：某中间件 SDK 所在服务运行数小时后老年代暴涨、Full GC 频繁，最终 OOM。
+
 - **排查**：heap dump 中发现上千个 `ClassPathXmlApplicationContext` 实例存活，每个都持有一整套 CGLIB 代理类与连接池。
+
 - **根因**：SDK 把"new 一个容器获取 Bean"写在了请求处理方法里，每次调用都全量重建容器；容器未调用 `close()`，单例 Bean 持有的连接与缓存永远无法回收。
+
 - **修复**：容器创建移到应用启动阶段作为 static 单例，并注册 ShutdownHook 优雅关闭；确需"每次请求新对象"的场景改用 prototype 作用域。
 
 :::
@@ -870,7 +980,9 @@ Spring IoC 容器初始化分为四个核心阶段：
 
 ::: details
 
-- 【L3】四个阶段在 `AbstractApplicationContext#refresh()` 中分别对应 `prepareRefresh`/`obtainFreshBeanFactory`、`invokeBeanFactoryPostProcessors`、`finishBeanFactoryInitialization`（preInstantiateSingletons）与每 Bean 的 `initializeBean`。
+- 【L3】四个阶段在 `AbstractApplicationContext#refresh()` 中分别对应 `prepareRefresh`/`obtainFreshBeanFactory`、
+  `invokeBeanFactoryPostProcessors`、`finishBeanFactoryInitialization`（preInstantiateSingletons）与每 Bean 的 `initializeBean`。
+
 - 【L3】"先注册后实例化"的两阶段设计使 `BeanFactoryPostProcessor` 有机会在实例化前修改图纸（如占位符替换）。
 
 :::
@@ -910,6 +1022,7 @@ Spring IoC 容器初始化分为四个核心阶段：
 ::: details
 
 - 【L3】三级缓存 `singletonFactories` 存的正是 `ObjectFactory<?>`，只有发生循环依赖被引用时才调用工厂生成早期引用，无循环依赖时工厂从不执行。
+
 - 【L3】`@Scope(proxyMode = TARGET_CLASS)` 生成的作用域代理，底层通过 `ScopedProxyFactoryBean` + ObjectFactory 每次按当前作用域取真实实例。
 
 :::
@@ -951,8 +1064,13 @@ BeanFactory 是 Spring 基础 IoC 容器，提供配置框架与基本功能，�
 
 ::: details
 
-- 【L3】加载时机差异：`BeanFactory` 首次 `getBean` 才实例化；`ApplicationContext` 在 `refresh()` 的 `finishBeanFactoryInitialization` 预实例化全部非懒加载单例，能在启动期暴露配置错误。
-- 【L3】`ApplicationContext` 继承 `ListableBeanFactory`、`ApplicationEventPublisher`、`MessageSource`、`ResourceLoader`、`EnvironmentCapable` 等接口，能力是 BeanFactory 的超集。
+- 【L3】加载时机差异
+
+  `BeanFactory` 首次 `getBean` 才实例化；
+  `ApplicationContext` 在 `refresh()` 的 `finishBeanFactoryInitialization` 预实例化全部非懒加载单例，能在启动期暴露配置错误。
+
+- 【L3】`ApplicationContext` 继承 `ListableBeanFactory`、`ApplicationEventPublisher`、`MessageSource`、`ResourceLoader`、
+  `EnvironmentCapable` 等接口，能力是 BeanFactory 的超集。
 
 :::
 
@@ -1036,9 +1154,17 @@ BeanFactory 是 Spring 基础 IoC 容器（管所有 Bean）；FactoryBean 是�
 
 ::: details
 
-- 【L3】处理类不同：`@Autowired`/`@Inject` 由 `AutowiredAnnotationBeanPostProcessor` 处理，`@Resource` 由 `CommonAnnotationBeanPostProcessor` 处理。
-- 【L3】Spring 6 / SpringBoot 3 基线 JDK 17 后，上述标准注解包名由 `javax.*` 迁移为 `jakarta.*`（jakarta.annotation.Resource / jakarta.inject.Inject）。
-- 【L4】`@Resource` 先名后型的回退链路：name 属性 > 字段名 > 类型匹配，多候选且无名称线索时报歧义错误。
+- 【L3】处理类不同
+
+  `@Autowired`/`@Inject` 由 `AutowiredAnnotationBeanPostProcessor` 处理，
+  `@Resource` 由 `CommonAnnotationBeanPostProcessor` 处理。
+
+- 【L3】Spring 6 / SpringBoot 3 基线 JDK 17 后，
+  上述标准注解包名由 `javax.*` 迁移为 `jakarta.*`（jakarta.annotation.Resource / jakarta.inject.Inject）。
+
+- 【L4】`@Resource` 先名后型的回退链路
+
+  name 属性 > 字段名 > 类型匹配，多候选且无名称线索时报歧义错误。
 
 :::
 
@@ -1105,6 +1231,7 @@ public class ConfigB {
 ::: details
 
 - 【L3】SpringBoot 2.x+ 推荐在不需要 Bean 间依赖的配置类上使用 `@Configuration(proxyBeanMethods = false)`（Lite 模式），省去 CGLIB 代理提升启动速度。
+
 - 【L3】配置类被降级为 Lite 模式后，`@Bean` 方法互调返回新对象，单例语义被破坏，连接池/工厂类对象容易重复创建（见本文档「Spring 中用到了哪些设计模式？」的踩坑案例）。
 
 :::
@@ -1181,18 +1308,39 @@ graph TD
 ::: details 失效场景（三级缓存解决不了的情况）
 
 - **构造器循环依赖**：实例化 A 就要 B，B 实例化又要 A，三级缓存还没机会放入工厂，抛 `BeanCurrentlyInCreationException`。
+
 - **prototype 循环依赖**：prototype 不进任何缓存、不提前暴露，直接抛 `BeanCurrentlyInCreationException`。
-- **@Async Bean 循环依赖**：`AsyncAnnotationBeanPostProcessor` 的代理在初始化后才创建且不走 `getEarlyBeanReference` 提前暴露路径，注入的早期引用与最终代理不一致，Spring 5.x 启动直接报错。
+
+- **@Async Bean 循环依赖**：`AsyncAnnotationBeanPostProcessor` 的代理在初始化后才创建且不走 `getEarlyBeanReference` 提前暴露路径，注入的早期引用与最终代理不一致，
+  Spring 5.x 启动直接报错。
 
 :::
 
 ::: details 拓展追问（L3/L4）
 
-- 【L3】`getSingleton` 的两个重载分别做什么？`getSingleton(String)` 内部委托 `getSingleton(beanName, true)`，只查缓存；带 `ObjectFactory` 参数的重载在缓存 miss 时调用工厂创建 Bean，创建前后分别执行 `beforeSingletonCreation`/`afterSingletonCreation` 维护创建中标记，最终 `addSingleton` 注册。
-- 【L3】`addSingletonFactory` 的调用时机为什么必须在 `populateBean` 之前？它位于 `doCreateBean` 中实例化之后、属性注入之前；只有先暴露工厂，注入属性触发对方创建时，对方才能反向取到本 Bean 的早期引用；若放到注入之后，循环已死锁无解。
-- 【L4】prototype Bean 为什么无法解循环依赖？prototype 不注册进三级缓存、每次 `getBean` 都新建实例，反向依赖永远拿不到早期引用，创建链无限递归，Spring 检测到创建中标记重复后直接抛 `BeanCurrentlyInCreationException`。
-- 【L4】场景题——订单/库存/通知三个 Service 形成 A→B→C→A 三方循环，每次重构都可能启动失败，如何根治？应急：环中任一注入点加 `@Lazy` 先恢复启动。根因：三方相互引用说明模块边界错误；三级缓存只能救 setter/字段注入的两方循环。长期：把依赖方向梳理成单向分层，C→A 反向调用改事件发布（`ApplicationEventPublisher` 或 MQ），用 ArchUnit 在 CI 禁止包级循环依赖复发。
-- 【L4】Spring Boot 2.6 起默认禁止循环引用：`spring.main.allow-circular-references` 默认值改为 `false`，即便是三级缓存本可解决的 setter/字段注入循环依赖，也会在启动期直接抛 `BeanCurrentlyInCreationException` 拒绝启动。官方意图是倒逼开发者重构消除循环依赖、而非依赖容器兜底；老项目升级到 2.6+ 常在此翻车——临时可显式设 `allow-circular-references=true` 恢复旧行为，但根治仍是解耦（抽协调者、改事件驱动）。
+- 【L3】`getSingleton` 的两个重载分别做什么？
+
+  `getSingleton(String)` 内部委托 `getSingleton(beanName, true)`，只查缓存；带 `ObjectFactory` 参数的重载在缓存 miss 时调用工厂创建 Bean，
+  创建前后分别执行 `beforeSingletonCreation`/`afterSingletonCreation` 维护创建中标记，最终 `addSingleton` 注册。
+
+- 【L3】`addSingletonFactory` 的调用时机为什么必须在 `populateBean` 之前？
+
+  它位于 `doCreateBean` 中实例化之后、属性注入之前；只有先暴露工厂，注入属性触发对方创建时，对方才能反向取到本 Bean 的早期引用；若放到注入之后，循环已死锁无解。
+
+- 【L4】prototype Bean 为什么无法解循环依赖？
+
+  prototype 不注册进三级缓存、每次 `getBean` 都新建实例，反向依赖永远拿不到早期引用，创建链无限递归，Spring 检测到创建中标记重复后直接抛 `BeanCurrentlyInCreationException`。
+
+- 【L4】场景题——订单/库存/通知三个 Service 形成 A→B→C→A 三方循环，每次重构都可能启动失败，如何根治？
+
+  应急：环中任一注入点加 `@Lazy` 先恢复启动。根因：三方相互引用说明模块边界错误；三级缓存只能救 setter/字段注入的两方循环。长期：把依赖方向梳理成单向分层，
+  C→A 反向调用改事件发布（`ApplicationEventPublisher` 或 MQ），用 ArchUnit 在 CI 禁止包级循环依赖复发。
+
+- 【L4】Spring Boot 2.6 起默认禁止循环引用
+
+  `spring.main.allow-circular-references` 默认值改为 `false`，即便是三级缓存本可解决的 setter/字段注入循环依赖，
+  也会在启动期直接抛 `BeanCurrentlyInCreationException` 拒绝启动。官方意图是倒逼开发者重构消除循环依赖、而非依赖容器兜底；老项目升级到 2.6+ 常在此翻车——
+  临时可显式设 `allow-circular-references=true` 恢复旧行为，但根治仍是解耦（抽协调者、改事件驱动）。
 
 :::
 
@@ -1201,8 +1349,13 @@ graph TD
 ::: details @Async 叠加循环依赖导致启动失败
 
 - **现象**：某服务上线后启动失败，报错 `BeanCurrentlyInCreationException: Bean with name 'xxxService' has been injected into other beans in its raw version`。
+
 - **排查**：变更只有给某个方法加了 `@Async`；回滚该提交即恢复正常。
-- **根因**：`@Async` 代理由 `AsyncAnnotationBeanPostProcessor` 在初始化后置阶段创建，不走 `getEarlyBeanReference` 的提前暴露路径。该 Bean 与另一个 Bean 存在 setter 循环依赖，依赖方拿到的是早期原始引用，最终容器里的却是代理对象，一致性校验失败。
+
+- **根因**：`@Async` 代理由 `AsyncAnnotationBeanPostProcessor` 在初始化后置阶段创建，不走 `getEarlyBeanReference` 的提前暴露路径。
+
+  该 Bean 与另一个 Bean 存在 setter 循环依赖，依赖方拿到的是早期原始引用，最终容器里的却是代理对象，一致性校验失败。
+
 - **修复**：短期去掉 `@Async` 并把异步逻辑拆到无循环依赖的独立组件；长期消除循环依赖本身（改事件驱动）。
 
 :::
@@ -1210,8 +1363,6 @@ graph TD
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "三级缓存是为了保证单例唯一性" → 单例唯一性由创建中标记 + 双重检查保证；三级缓存的核心价值是代理的懒生成时机。
 - ❌ "所有循环依赖 Spring 都能解" → 构造器注入、prototype、@Async 代理三种场景无解，会直接启动失败。
@@ -1281,17 +1432,33 @@ graph TD
 ::: details 失效场景（即便有三级缓存也解决不了）
 
 - `@Async` 代理不走 `getEarlyBeanReference` 路径，早期引用与最终代理不一致，启动直接失败（案例见上一题）。
+
 - 构造器注入循环依赖：三级缓存来不及介入。
+
 - prototype 作用域：不进入任何缓存。
 
 :::
 
 ::: details 拓展追问（L3/L4）
 
-- 【L3】`getEarlyBeanReference` 如何保证代理只创建一次？`AbstractAutoProxyCreator` 用 `earlyProxyReferences`（ConcurrentHashMap 支撑的 Set）记录 beanName；后置处理阶段 `wrapIfNecessary` 发现该 Bean 已提前代理过，直接返回原对象不再二次包装。
-- 【L3】没有发生循环依赖的普通 Bean，三级缓存中的工厂会被执行吗？不会。工厂随 `addSingletonFactory` 放入，`registerSingleton` 时会从三级、二级缓存清理；`ObjectFactory#getObject` 只在被他人提前引用时触发，正常流程下工厂从未执行、直接丢弃，所以对无循环依赖的 Bean 几乎零成本。
-- 【L4】如果自己实现"二级缓存 + 懒代理标志"能替代三级缓存吗？功能上等价，但等于把"是否需要代理"的判断逻辑塞进缓存管理代码；Spring 用 `ObjectFactory` 把决策权内聚给工厂，扩展点（`SmartInstantiationAwareBeanPostProcessor`）可自由介入，这是框架设计对扩展性的取舍。
-- 【L4】场景题——同事提议"所有相互引用的 Service 都加 @Lazy 预防循环依赖"，如何评价？不推荐作为预防手段：`@Lazy` 掩盖的是设计问题，只是把问题从启动期推迟到运行期；正确做法是用 ArchUnit 在 CI 禁止包级循环，真出现循环时重构（抽协调者、改事件驱动），`@Lazy` 只作应急止血且登记技术债。
+- 【L3】`getEarlyBeanReference` 如何保证代理只创建一次？
+
+  `AbstractAutoProxyCreator` 用 `earlyProxyReferences`（ConcurrentHashMap 支撑的 Set）记录 beanName；
+  后置处理阶段 `wrapIfNecessary` 发现该 Bean 已提前代理过，直接返回原对象不再二次包装。
+
+- 【L3】没有发生循环依赖的普通 Bean，三级缓存中的工厂会被执行吗？
+
+  不会。工厂随 `addSingletonFactory` 放入，`registerSingleton` 时会从三级、二级缓存清理；`ObjectFactory#getObject` 只在被他人提前引用时触发，正常流程下工厂从未执行、
+  直接丢弃，所以对无循环依赖的 Bean 几乎零成本。
+
+- 【L4】如果自己实现"二级缓存 + 懒代理标志"能替代三级缓存吗？
+
+  功能上等价，但等于把"是否需要代理"的判断逻辑塞进缓存管理代码；Spring 用 `ObjectFactory` 把决策权内聚给工厂，扩展点（`SmartInstantiationAwareBeanPostProcessor`）可自由介入，
+  这是框架设计对扩展性的取舍。
+
+- 【L4】场景题——同事提议"所有相互引用的 Service 都加 @Lazy 预防循环依赖"，如何评价？
+
+  不推荐作为预防手段：`@Lazy` 掩盖的是设计问题，只是把问题从启动期推迟到运行期；正确做法是用 ArchUnit 在 CI 禁止包级循环，真出现循环时重构（抽协调者、改事件驱动），`@Lazy` 只作应急止血且登记技术债。
 
 :::
 
@@ -1300,8 +1467,13 @@ graph TD
 ::: details 启动期提前 getBean 触发循环依赖一致性检查失败
 
 - **现象**：某服务偶发启动失败，报 `BeanCurrentlyInCreationException`，重启后大概率自愈，难以复现。
-- **排查**：对比失败与成功的启动日志，发现失败时某个 Bean 的创建顺序异常靠前；进一步定位到一段"预热代码"在监听 `ContextRefreshedEvent` 之前就调用了 `ApplicationContext#getBean`。
-- **根因**：外部代码在启动线程外提前触发 `getBean`，此时目标 Bean 正处于循环依赖创建中（`singletonsCurrentlyInCreation` 标记已存在），`getSingleton` 一致性检查判定早期引用与最终对象冲突直接报错；启动顺序的线程竞争导致偶发。
+
+- **排查**：对比失败与成功的启动日志，发现失败时某个 Bean 的创建顺序异常靠前；
+  进一步定位到一段"预热代码"在监听 `ContextRefreshedEvent` 之前就调用了 `ApplicationContext#getBean`。
+
+- **根因**：外部代码在启动线程外提前触发 `getBean`，此时目标 Bean 正处于循环依赖创建中（`singletonsCurrentlyInCreation` 标记已存在），
+  `getSingleton` 一致性检查判定早期引用与最终对象冲突直接报错；启动顺序的线程竞争导致偶发。
+
 - **修复**：把预热逻辑从启动早期移到 `ApplicationRunner`（容器完全就绪后执行），并规定禁止在容器 refresh 完成前手动 `getBean`。
 
 :::
@@ -1309,8 +1481,6 @@ graph TD
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "三级缓存每一级都不可省略，因为单例唯一性靠它们" → 唯一性不靠缓存层级；三级的核心价值是代理懒生成，二级保证并发下早期引用唯一。
 - ❌ "没有 AOP 时二级缓存就够了" → 仅就功能而言成立，但 Spring 需要一套统一机制兼容有无代理两种情况，且要为扩展点保留介入能力。
@@ -1372,27 +1542,45 @@ AOP（面向切面编程）把与业务无关的公共功能（日志、事务�
 
 ::: details 方案权衡与失效边界（L2/L3）
 
-- **Spring AOP（运行时代理）vs AspectJ（编译时/加载时织入）**：Spring AOP 只能拦截 Spring Bean 的 public 方法，但零配置开箱即用；AspectJ 直接修改字节码，可拦截构造器、字段、private 方法且运行期更快，但需要额外编译器或 javaagent。95% 的业务横切（日志/事务/权限）用 Spring AOP 即可。
+- **Spring AOP（运行时代理）vs AspectJ（编译时/加载时织入）**：Spring AOP 只能拦截 Spring Bean 的 public 方法，但零配置开箱即用；AspectJ 直接修改字节码，可拦截构造器、字段、
+  private 方法且运行期更快，但需要额外编译器或 javaagent。95% 的业务横切（日志/事务/权限）用 Spring AOP 即可。
+
 - **注解式切面 vs XML 配置切面**：`@Aspect` + `@Around` 直观易维护，是现代项目标准；`<aop:config>` 适合对第三方类（无源码）统一增强。
+
 - 【失效】Spring AOP 默认只拦截 **public 实例方法**；`private`/`final`/`static` 方法与 `this` 自调用全部绕过代理。
+
 - 【失效】切点表达式不匹配时切面**静默不生效**，不报错不告警，是最隐蔽的坑。
 
 :::
 
 ::: details 拓展追问与场景题（L3/L4）
 
-- 【L3】为什么 Spring AOP 默认只拦截 public 方法？代理对象对外暴露的是接口/类的公共契约，`private` 方法无法被子类重写、`protected` 也不在代理调用路径上；要拦截非 public 只能换 AspectJ 字节码织入。
-- 【L3】切点表达式 `execution` 与 `within` 的区别？`execution` 按方法签名匹配（可精确到参数类型），`within` 只按类型/包匹配、粒度更粗。两者都在容器启动解析 Advisor 时评估绑定，运行时每次调用只判断已绑定的拦截器链，开销极小。
-- 【L3】连接点为什么只有方法执行一种，不能拦截字段赋值吗？Spring AOP 基于动态代理，代理能介入的只有"方法调用"这一入口；字段访问、构造器执行不经过代理，拦截它们需要 AspectJ 直接改字节码。
-- 【L4】场景题——订单服务要求所有金额变更操作必须记审计日志，但老代码大量 `this.xxx()` 自调用。自调用不经过代理，纯切面会漏记，属于合规风险。应急：把金额变更入口收敛到少数 public 方法，无法收敛的自调用手动埋点；长期：抽成独立 `AccountingService` Bean，所有调用方通过注入调用（必过代理）；`@EnableAspectJAutoProxy(exposeProxy = true)` + `AopContext.currentProxy()` 侵入性强不推荐作主方案。
+- 【L3】为什么 Spring AOP 默认只拦截 public 方法？
+
+  代理对象对外暴露的是接口/类的公共契约，`private` 方法无法被子类重写、`protected` 也不在代理调用路径上；要拦截非 public 只能换 AspectJ 字节码织入。
+
+- 【L3】切点表达式 `execution` 与 `within` 的区别？
+
+  `execution` 按方法签名匹配（可精确到参数类型），`within` 只按类型/包匹配、粒度更粗。两者都在容器启动解析 Advisor 时评估绑定，运行时每次调用只判断已绑定的拦截器链，开销极小。
+
+- 【L3】连接点为什么只有方法执行一种，不能拦截字段赋值吗？
+
+  Spring AOP 基于动态代理，代理能介入的只有"方法调用"这一入口；字段访问、构造器执行不经过代理，拦截它们需要 AspectJ 直接改字节码。
+
+- 【L4】场景题——订单服务要求所有金额变更操作必须记审计日志，但老代码大量 `this.xxx()` 自调用。自调用不经过代理，纯切面会漏记，属于合规风险。应急：把金额变更入口收敛到少数 public 方法，无法收敛的自调用手动埋点；
+  长期：抽成独立 `AccountingService` Bean，所有调用方通过注入调用（必过代理）；
+  `@EnableAspectJAutoProxy(exposeProxy = true)` + `AopContext.currentProxy()` 侵入性强不推荐作主方案。
 
 :::
 
 ::: details 踩坑案例：切点表达式单层包匹配导致静默失效（L3）
 
 - **现象**：新上线的接口耗时监控切面完全不生效，日志里一条记录都没有，而老接口的切面正常。
+
 - **排查**：切面类、`@EnableAspectJAutoProxy` 配置均无问题；用 Arthas 观察发现目标方法调用根本没经过代理类。
+
 - **根因**：切点表达式写成 `execution(* com.xx.service.*.*(..))`，而新接口放在了 `com.xx.service.impl` 子包，表达式只匹配单层包路径，切面静默失配。
+
 - **修复**：改为 `execution(* com.xx.service..*.*(..))` 匹配多层子包，并给监控切面加"启动时打印已绑定 Advisor 数量"的自检日志。
 
 :::
@@ -1474,25 +1662,46 @@ graph TD
 ::: details 失效场景（L3）
 
 - `final` 方法：CGLIB 子类无法重写，调用不经过拦截器，切面**静默失效**（不报错）。
+
 - JDK 代理下按实现类注入：代理只实现接口，注入具体类字段会抛 `BeanNotOfRequiredTypeException`/`ClassCastException`。
+
 - `static` 方法：不属于实例调用，两种代理都拦不到。
 
 :::
 
 ::: details 拓展追问与场景题（L3/L4）
 
-- 【L3】JDK 代理中 `InvocationHandler` 拿到的是什么？Spring 传入的是 `JdkDynamicAopProxy` 自身，`invoke` 内把调用封装为 `ReflectiveMethodInvocation`，按顺序递归执行拦截器链（事务、日志等 Advisor），链尾才反射调用目标方法——这就是"责任链 + 代理"的组合。
-- 【L3】为什么 SpringBoot 2.x 默认 `proxyTargetClass=true`？避免"按实现类注入"时 JDK 代理类型不匹配报错，同时统一代理行为减少环境差异；代价是启动时 CGLIB 生成代理类略慢，对绝大多数应用可忽略。
-- 【L3】`ObjenesisCglibAopProxy` 和普通 CGLIB 代理有什么区别？普通 CGLIB `newInstance` 会执行目标类构造器，若构造器有副作用（注册、写缓存）会被执行两次；Objenesis 通过 JVM 机制直接分配对象内存绕过构造器，Spring 默认使用它。
-- 【L4】场景题——给第三方 jar 包中无接口、不可改源码的类加耗时监控，如何选型？无接口排除 JDK；若类非 final，注册为 Bean 后用 CGLIB + `@Around`；若是 final 则 CGLIB 也不行，备选 javaagent（ByteBuddy/AspectJ 加载时织入）或自建包装类（委托模式）。生产上优先验证目标类是否 final，非 final 直接 CGLIB，否则评估 agent 成本。
+- 【L3】JDK 代理中 `InvocationHandler` 拿到的是什么？
+
+  Spring 传入的是 `JdkDynamicAopProxy` 自身，`invoke` 内把调用封装为 `ReflectiveMethodInvocation`，按顺序递归执行拦截器链（事务、日志等 Advisor），
+  链尾才反射调用目标方法——这就是"责任链 + 代理"的组合。
+
+- 【L3】为什么 SpringBoot 2.x 默认 `proxyTargetClass=true`？
+
+  避免"按实现类注入"时 JDK 代理类型不匹配报错，同时统一代理行为减少环境差异；代价是启动时 CGLIB 生成代理类略慢，对绝大多数应用可忽略。
+
+- 【L3】`ObjenesisCglibAopProxy` 和普通 CGLIB 代理有什么区别？
+
+  普通 CGLIB `newInstance` 会执行目标类构造器，若构造器有副作用（注册、写缓存）会被执行两次；Objenesis 通过 JVM 机制直接分配对象内存绕过构造器，Spring 默认使用它。
+
+- 【L4】场景题——给第三方 jar 包中无接口、不可改源码的类加耗时监控，如何选型？
+
+  无接口排除 JDK；若类非 final，注册为 Bean 后用 CGLIB + `@Around`；若是 final 则 CGLIB 也不行，
+  备选 javaagent（ByteBuddy/AspectJ 加载时织入）或自建包装类（委托模式）。生产上优先验证目标类是否 final，非 final 直接 CGLIB，否则评估 agent 成本。
 
 :::
 
 ::: details 踩坑案例：代理类型开关不一致导致 ClassCastException（L4）
 
-- **现象**：订单服务升级 SpringBoot 版本后灰度机器频繁报 `ClassCastException: com.xx.OrderService$$EnhancerBySpringCGLIB cannot be cast...`，未灰度机器正常。
-- **排查**：对比配置发现新版默认开启了 `proxy-target-class=true`（CGLIB），而部分老代码存在 `@Autowired private OrderServiceImpl orderService` 按实现类注入，同时 JDK/CGLIB 开关在多个模块配置不一致。
+- **现象**：
+
+  订单服务升级 SpringBoot 版本后灰度机器频繁报 `ClassCastException: com.xx.OrderService$$EnhancerBySpringCGLIB cannot be cast...`，未灰度机器正常。
+
+- **排查**：对比配置发现新版默认开启了 `proxy-target-class=true`（CGLIB），
+  而部分老代码存在 `@Autowired private OrderServiceImpl orderService` 按实现类注入，同时 JDK/CGLIB 开关在多个模块配置不一致。
+
 - **根因**：代理类型开关不一致导致部分实例是 JDK 代理（只实现接口），按实现类注入的字段拿到代理时类型不匹配；CGLIB 代理本身是 `OrderServiceImpl` 子类不会报错，混用才是事故根源。
+
 - **修复**：全应用统一 `spring.aop.proxy-target-class=true`（与 Boot 默认对齐），同时把所有按实现类注入改为按接口注入，并加代码规范检查。
 
 :::
@@ -1546,6 +1755,7 @@ Spring AOP 与 AspectJ 定位截然不同：
 ::: details
 
 - 【L3】Spring 的 `@Aspect` 注解与切点表达式语法借用了 AspectJ 的规范（spring-aspects 集成），但织入机制完全是自己的动态代理，两者不要混淆。
+
 - 【L4】AspectJ 的编译时织入（ajc 编译器）在构建期改字节码，运行期无代理开销；加载时织入（LTW）通过 javaagent 在类加载时转换，适合无法修改构建流程的场景。
 
 :::
@@ -1593,10 +1803,21 @@ Spring AOP 基于动态代理实现，失效的本质是**调用未经过代理�
 
 ::: details
 
-- 【L3】自调用三种解法的代价：注入自身（`@Autowired private OrderService self`）最简洁，依赖 Spring 4.3+ 自注入支持；`AopContext.currentProxy()` 需 `exposeProxy=true` 且代码耦合 AOP API；拆分到另一个 Bean 最干净但有重构成本。优先拆分，次选自注入。
+- 【L3】自调用三种解法的代价
+
+  注入自身（`@Autowired private OrderService self`）最简洁，依赖 Spring 4.3+ 自注入支持；
+  `AopContext.currentProxy()` 需 `exposeProxy=true` 且代码耦合 AOP API；拆分到另一个 Bean 最干净但有重构成本。优先拆分，次选自注入。
+
 - 【L3】同样的失效规律适用于 `@Transactional`、`@Async`、`@Cacheable` 等所有基于代理的注解（可参照本文档「Spring 事务在什么情况下会失效？」「@Async 什么时候会失效？」）。
-- 【L3】**AspectJ 织入是绕过"代理类失效"的根治方案**：编译期织入（ajc）或加载期织入（`-javaagent:aspectjweaver.jar` + `@EnableLoadTimeWeaving`）直接改字节码，自调用、private/final/static、非容器对象都能被拦截；Spring AOP 场景下若确需拦截自调用，`@EnableAspectJAutoProxy(exposeProxy = true)` + `AopContext.currentProxy()` 是不引入 AspectJ 的折中。
-- 【L3】`@Async` 与 `@Transactional` 叠加在同一方法时，两个切面都挂在同一条代理拦截链上、由 Order 决定先后；异步切面先把执行切到新线程，而事务上下文绑定在原线程 `ThreadLocal`，结果是事务不生效——这也是"AOP 生效了但语义失效"的典型形态。
+
+- 【L3】**AspectJ 织入是绕过"代理类失效"的根治方案**
+
+  编译期织入（ajc）或加载期织入（`-javaagent:aspectjweaver.jar` + `@EnableLoadTimeWeaving`）直接改字节码，
+  自调用、private/final/static、非容器对象都能被拦截；Spring AOP 场景下若确需拦截自调用，
+  `@EnableAspectJAutoProxy(exposeProxy = true)` + `AopContext.currentProxy()` 是不引入 AspectJ 的折中。
+
+- 【L3】`@Async` 与 `@Transactional` 叠加在同一方法时，两个切面都挂在同一条代理拦截链上、由 Order 决定先后；异步切面先把执行切到新线程，而事务上下文绑定在原线程 `ThreadLocal`，
+  结果是事务不生效——这也是"AOP 生效了但语义失效"的典型形态。
 
 :::
 
@@ -1647,10 +1868,26 @@ Spring 拦截链本质是将多个拦截器串联成链（职责链模式），�
 ::: details
 
 - 【L3】方法级的 AOP 拦截器链由 `ReflectiveMethodInvocation#proceed` 递归推进，事务、日志等 Advisor 按 `@Order`/优先级排序后链式执行。
-- 【L3】洋葱模型的实现细节：`ReflectiveMethodInvocation` 持有 `interceptorsAndDynamicMethodMatchers` 列表与 `currentInterceptorIndex` 游标，`proceed()` 每次先把游标 +1——未到链尾就调用下一个 `MethodInterceptor#invoke(this)`（把自己传下去），到达链尾才反射调用目标方法。`@Around` 中 `proceed()` 之前的代码按链前进顺序执行、之后的代码按链回退顺序执行，天然形成正确嵌套，这也是"环绕通知能包住其余通知"的原因。
-- 【L3】`ExposeInvocationInterceptor` 是链上默认的第一个拦截器（优先级 `Ordered.HIGHEST_PRECEDENCE`），把当前 `MethodInvocation` 存入 ThreadLocal，供 `ExposeInvocationInterceptor.currentInvocation()` 在切面或事务代码中免传参获取当前调用上下文（如目标方法上的注解）。
-- 【L3】拦截器链的构建方是 `ReflectiveAspectJAdvisorFactory#getInterceptorsAndDynamicInterceptionAdvice`：把每个 Advisor 的 Advice 适配为对应的 `MethodInterceptor`（`AspectJMethodBeforeAdvice`→`MethodBeforeAdviceInterceptor`、`AspectJAroundAdvice`→`AspectJAroundAdvice` 本身即拦截器等），再按顺序组成链。
-- 【L3】Filter 与 Interceptor 的选择：需要操作 HTTP 报文/静态资源用 Filter；需要拿到 Handler 信息、访问容器 Bean 用 Interceptor。
+
+- 【L3】洋葱模型的实现细节
+
+  `ReflectiveMethodInvocation` 持有 `interceptorsAndDynamicMethodMatchers` 列表与 `currentInterceptorIndex` 游标，
+  `proceed()` 每次先把游标 +1——未到链尾就调用下一个 `MethodInterceptor#invoke(this)`（把自己传下去），到达链尾才反射调用目标方法。
+
+  `@Around` 中 `proceed()` 之前的代码按链前进顺序执行、之后的代码按链回退顺序执行，天然形成正确嵌套，这也是"环绕通知能包住其余通知"的原因。
+
+- 【L3】`ExposeInvocationInterceptor` 是链上默认的第一个拦截器（优先级 `Ordered.HIGHEST_PRECEDENCE`），
+  把当前 `MethodInvocation` 存入 ThreadLocal，
+  供 `ExposeInvocationInterceptor.currentInvocation()` 在切面或事务代码中免传参获取当前调用上下文（如目标方法上的注解）。
+
+- 【L3】拦截器链的构建方是 `ReflectiveAspectJAdvisorFactory#getInterceptorsAndDynamicInterceptionAdvice`：
+
+  把每个 Advisor 的 Advice 适配为对应的 `MethodInterceptor`（`AspectJMethodBeforeAdvice`→`MethodBeforeAdviceInterceptor`、
+  `AspectJAroundAdvice`→`AspectJAroundAdvice` 本身即拦截器等），再按顺序组成链。
+
+- 【L3】Filter 与 Interceptor 的选择
+
+  需要操作 HTTP 报文/静态资源用 Filter；需要拿到 Handler 信息、访问容器 Bean 用 Interceptor。
 
 :::
 
@@ -1760,11 +1997,22 @@ public class MyEventPublisher {
 ::: details
 
 - 【L3】默认情况下事件是**同步**执行的，监听器在发布者的线程中运行；广播器 `SimpleApplicationEventMulticaster` 默认无线程池，配置其 `taskExecutor` 可全局异步。
+
 - 【L3】多个监听器之间**默认不保证执行顺序**（按注册/发现顺序），需要顺序时用 `Ordered`/`@Order` 显式声明；但业务逻辑依赖监听器之间的先后顺序本身是坏味道，有顺序依赖应改为显式编排。
+
 - 【L3】`@TransactionalEventListener` 支持在事务的特定阶段（如 `AFTER_COMMIT`）触发监听器，常用于事务提交后异步处理（发通知、刷新缓存），避免"事务回滚但消息已发"。
+
 - 【L4】同步监听器抛异常会回卷到发布者，事务内监听器异常可能导致发布方事务回滚，需自行 try-catch 或改异步。
-- 【L4】`@TransactionalEventListener(AFTER_COMMIT)` 的异常语义：事务已提交，监听器抛异常**不会回滚已提交的数据**（且默认场景下异常只被记录，不会传播给发布方）——失败补偿要靠重试表/MQ 自行兜底。
-- 【L4】`@Async` 事件的代价：线程切换后脱离发布者的线程上下文（事务绑定在 `TransactionSynchronizationManager` 的 ThreadLocal 上），监听器读不到原事务未提交的数据；且进程内事件不持久化，服务宕机则待处理事件直接丢失。事件与 MQ 的边界在此：事件是**进程内**解耦（同 JVM、随进程消失），跨进程、需持久化与重试保障的必须走 MQ。
+
+- 【L4】`@TransactionalEventListener(AFTER_COMMIT)` 的异常语义
+
+  事务已提交，监听器抛异常**不会回滚已提交的数据**（且默认场景下异常只被记录，不会传播给发布方）——
+  失败补偿要靠重试表/MQ 自行兜底。
+
+- 【L4】`@Async` 事件的代价
+
+  线程切换后脱离发布者的线程上下文（事务绑定在 `TransactionSynchronizationManager` 的 ThreadLocal 上），监听器读不到原事务未提交的数据；
+  且进程内事件不持久化，服务宕机则待处理事件直接丢失。事件与 MQ 的边界在此：事件是**进程内**解耦（同 JVM、随进程消失），跨进程、需持久化与重试保障的必须走 MQ。
 
 :::
 
@@ -1846,10 +2094,22 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 
 ::: details
 
-- 【L3】`BeanPostProcessor` 自身实例化早于普通 Bean：容器在 `registerBeanPostProcessors` 阶段就把它们创建出来，因此 BPP 不应依赖普通业务 Bean（会触发提前初始化、破坏代理顺序）。
-- 【L3】`PropertyPlaceholderConfigurer`/`PropertySourcesPlaceholderConfigurer` 就是经典的 BeanFactoryPostProcessor，在实例化前替换 `${}` 占位符。
-- 【L4】`InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation` 返回非 null 会短路标准实例化流程，AOP 对 Infrastructure 类 Bean 的短路优化就走这里。
-- 【L4】扩展点选型论证（做 starter/中间件时的决策）：注册普通 Bean 用自动配置类 `@Bean`；需按注解/扫描**动态注册定义**用 `ImportBeanDefinitionRegistrar`（如 `@MapperScan`）；需**修改既有定义**（占位符解密、属性覆盖）用 `BeanFactoryPostProcessor`；需**增强/代理每个实例**（埋点、通用切面）用 `BeanPostProcessor`；对象构造逻辑复杂需向容器隐藏创建细节用 `FactoryBean`。判据是介入时机（定义期 vs 实例期）与作用粒度（容器级 vs 单 Bean）。
+- 【L3】`BeanPostProcessor` 自身实例化早于普通 Bean
+
+  容器在 `registerBeanPostProcessors` 阶段就把它们创建出来，因此 BPP 不应依赖普通业务 Bean（会触发提前初始化、
+  破坏代理顺序）。
+
+- 【L3】`PropertyPlaceholderConfigurer`/`PropertySourcesPlaceholderConfigurer` 就是经典的 BeanFactoryPostProcessor，
+  在实例化前替换 `${}` 占位符。
+
+- 【L4】`InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation` 返回非 null 会短路标准实例化流程，
+  AOP 对 Infrastructure 类 Bean 的短路优化就走这里。
+
+- 【L4】扩展点选型论证（做 starter/中间件时的决策）
+
+  注册普通 Bean 用自动配置类 `@Bean`；
+  需按注解/扫描**动态注册定义**用 `ImportBeanDefinitionRegistrar`（如 `@MapperScan`）；需**修改既有定义**（占位符解密、属性覆盖）用 `BeanFactoryPostProcessor`；
+  需**增强/代理每个实例**（埋点、通用切面）用 `BeanPostProcessor`；对象构造逻辑复杂需向容器隐藏创建细节用 `FactoryBean`。判据是介入时机（定义期 vs 实例期）与作用粒度（容器级 vs 单 Bean）。
 
 :::
 
@@ -1858,8 +2118,11 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 ::: details 自定义 BeanPostProcessor 提前依赖业务 Bean 引发启动故障
 
 - **现象**：某服务接入自研配置加密组件后，部分 Bean 的 AOP 切面失效，且启动日志出现 Bean 提前创建告警，线上配置解密偶发空指针。
+
 - **排查**：断点发现自定义 `BeanPostProcessor` 在构造器里注入了业务 Service，导致该 Service 及其依赖链在所有 BPP 注册完成前就被创建。
+
 - **根因**：`registerBeanPostProcessors` 阶段创建 BPP 时连带初始化了它依赖的普通 Bean，这些 Bean 错过了后续 BPP（包括 AOP 代理创建器）的处理，代理缺失、依赖不完整。
+
 - **修复**：BPP 内部改为通过 `ObjectFactory`/`getBean` 延迟获取依赖（首次使用时才取），保证 BPP 自身无普通 Bean 依赖；代码规范明确"BPP 构造器禁止注入业务 Bean"。
 
 :::
@@ -1867,8 +2130,6 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "BeanFactoryPostProcessor 和 BeanPostProcessor 只是名字不同，都是处理 Bean 的" → 前者改图纸（BeanDefinition，实例化前）、后者改成品（实例，实例化后），作用对象与时机完全不同。
 - ❌ "在 BeanPostProcessor 里依赖普通 Bean 没问题" → 会触发该 Bean 提前实例化，错过后续处理器（包括 AOP 代理），是隐蔽的生产事故源。
@@ -1920,7 +2181,9 @@ BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry
 
 ::: details
 
-- 【L3】`PropertySourcesPlaceholderConfigurer`（占位符替换）是 BFPP 的典型；`AutowiredAnnotationBeanPostProcessor`（@Autowired 注入）与 `AbstractAutoProxyCreator`（AOP 代理）是 BPP 的典型。
+- 【L3】`PropertySourcesPlaceholderConfigurer`（占位符替换）是 BFPP 的典型；
+  `AutowiredAnnotationBeanPostProcessor`（@Autowired 注入）与 `AbstractAutoProxyCreator`（AOP 代理）是 BPP 的典型。
+
 - 【L3】子类 `BeanDefinitionRegistryPostProcessor` 比普通 BFPP 更早执行，能动态注册新定义（MyBatis 的 `MapperScannerConfigurer` 即由此扫描 Mapper）。
 
 :::
@@ -2008,7 +2271,10 @@ Spring DAO 异常体系要点：
 
 ::: details
 
-- 【L3】统一为 unchecked 异常的设计意图：数据访问异常大多是"不可恢复"的系统级错误，强制捕获只会产生大量空 catch；事务回滚默认只对 RuntimeException/Error 生效，与此设计呼应。
+- 【L3】统一为 unchecked 异常的设计意图
+
+  数据访问异常大多是"不可恢复"的系统级错误，强制捕获只会产生大量空 catch；事务回滚默认只对 RuntimeException/Error 生效，与此设计呼应。
+
 - 【L3】不同数据库对同一错误的错误码不同（如 MySQL 1062 为重复键），`SQLExceptionTranslator` 依赖 `sql-error-codes.xml` 或 SQLState 做方言适配。
 
 :::
@@ -2053,8 +2319,12 @@ Spring 事务定义的属性有：
 
 ::: details
 
-- 【L3】`PlatformTransactionManager` 是策略接口，`DataSourceTransactionManager`（JDBC/MyBatis）与 `JtaTransactionManager`（分布式）是两大实现，声明式与编程式底层都走它。
-- 【L3】Spring 事务管理的核心价值是"事务与具体实现解耦"：切换数据源/事务管理器基本不改业务代码。
+- 【L3】`PlatformTransactionManager` 是策略接口，
+  `DataSourceTransactionManager`（JDBC/MyBatis）与 `JtaTransactionManager`（分布式）是两大实现，声明式与编程式底层都走它。
+
+- 【L3】Spring 事务管理的核心价值是"事务与具体实现解耦"
+
+  切换数据源/事务管理器基本不改业务代码。
 
 :::
 
@@ -2191,14 +2461,40 @@ Spring 事务传播行为共 7 种，定义在 `Propagation` 枚举中。本题�
 
 ::: details 拓展追问（L3/L4）
 
-- 【L3】`REQUIRES_NEW` 的"挂起"在源码层到底挂起了什么？`AbstractPlatformTransactionManager#suspend` 调用 `TransactionSynchronizationManager` 解绑当前线程绑定的连接资源与同步器，封装进 `SuspendedResourcesHolder`；数据库连接并未归还连接池，只是从线程上下文摘除，所以外层连接仍被占用。
-- 【L3】`NESTED` 与 `REQUIRES_NEW` 在外层回滚时表现有何不同？NESTED 是外层事务的一部分，外层回滚时保存点内的修改一并回滚；REQUIRES_NEW 已独立提交，外层回滚不影响它。需要"主流程失败则附属操作也撤销"用 NESTED，需要"附属操作无论如何都要落库"用 REQUIRES_NEW。
-- 【L3】什么时候该用 `NOT_SUPPORTED` 而不是直接不开事务？当方法必然运行在某个事务上下文中（如被公共入口包裹），但内部是耗时的查询/外部调用，用 NOT_SUPPORTED 挂起外层事务可避免连接被长时间占用；若调用方本来就没事务，两者效果相同。判断标准是"是否会拖长外层事务"。
-- 【L3】`MANDATORY` 这种"报错型"传播行为有什么实际价值？它是防御性契约：工具方法声明"我必须在事务中被调用"，一旦被无事务上下文误调，第一次调用就快速失败，而不是静默执行导致数据不一致。适合底层资金/账务类方法。
-- 【L3】为什么"查询方法用 SUPPORTS"能减少事务开销？SUPPORTS 在无事务时以非事务方式执行，不会触发 `DataSourceTransactionManager#doBegin` 的获取连接、关 autoCommit 等开销；若用 REQUIRED 则每次查询都开一个空事务。高并发读接口上这个差异会累积成可观的连接占用。
-- 【L4】内层 REQUIRED 方法抛异常被外层 catch 住，为什么外层提交还会报 `UnexpectedRollbackException`？内层与外层共享同一物理事务，内层异常时 `AbstractPlatformTransactionManager#processRollback` 会把全局事务标记为 rollback-only；外层 catch 后尝试提交，发现标记已置位，只能回滚并抛异常。要避免就改用 REQUIRES_NEW 隔离，或内层不抛异常而是返回错误码。
-- 【L4】场景题——下单主流程（REQUIRED）中调"发放新人券"，要求发券失败不回滚订单、但订单回滚时已发的券必须撤销。方案：发券用 `REQUIRES_NEW` 保证自身失败不影响订单；同时在订单事务中注册 `TransactionSynchronization#afterCompletion`（或 `@TransactionalEventListener`），订单回滚时补偿撤销已发的券，券服务实现幂等撤销接口；更彻底的做法是把发券改为订单提交后异步消费（AFTER_COMMIT 触发），代价是引入消息可靠性（重试+幂等）问题。
-- 【L4】场景题——账户转账要求转账记录无论成败必须写入审计表（合规），但审计表偶发超时拖慢转账链路。应急：审计方法加 `timeout` + 失败降级写本地日志保主链路。长期：审计改 `REQUIRES_NEW` 独立提交；审计写失败不阻断转账，失败记录写本地补偿表（与转账同库同事务确保不丢），后台任务重试写入审计表。权衡：REQUIRES_NEW 多占一个连接需评估连接池容量；异步审计存在"转账成功、审计延迟可见"窗口，需与合规方确认。
+- 【L3】`REQUIRES_NEW` 的"挂起"在源码层到底挂起了什么？
+
+  `AbstractPlatformTransactionManager#suspend` 调用 `TransactionSynchronizationManager` 解绑当前线程绑定的连接资源与同步器，
+  封装进 `SuspendedResourcesHolder`；数据库连接并未归还连接池，只是从线程上下文摘除，所以外层连接仍被占用。
+
+- 【L3】`NESTED` 与 `REQUIRES_NEW` 在外层回滚时表现有何不同？
+
+  NESTED 是外层事务的一部分，外层回滚时保存点内的修改一并回滚；REQUIRES_NEW 已独立提交，外层回滚不影响它。需要"主流程失败则附属操作也撤销"用 NESTED，需要"附属操作无论如何都要落库"用 REQUIRES_NEW。
+
+- 【L3】什么时候该用 `NOT_SUPPORTED` 而不是直接不开事务？
+
+  当方法必然运行在某个事务上下文中（如被公共入口包裹），但内部是耗时的查询/外部调用，用 NOT_SUPPORTED 挂起外层事务可避免连接被长时间占用；若调用方本来就没事务，两者效果相同。判断标准是"是否会拖长外层事务"。
+
+- 【L3】`MANDATORY` 这种"报错型"传播行为有什么实际价值？
+
+  它是防御性契约：工具方法声明"我必须在事务中被调用"，一旦被无事务上下文误调，第一次调用就快速失败，而不是静默执行导致数据不一致。适合底层资金/账务类方法。
+
+- 【L3】为什么"查询方法用 SUPPORTS"能减少事务开销？
+
+  SUPPORTS 在无事务时以非事务方式执行，不会触发 `DataSourceTransactionManager#doBegin` 的获取连接、关 autoCommit 等开销；若用 REQUIRED 则每次查询都开一个空事务。
+
+  高并发读接口上这个差异会累积成可观的连接占用。
+
+- 【L4】内层 REQUIRED 方法抛异常被外层 catch 住，为什么外层提交还会报 `UnexpectedRollbackException`？
+
+  内层与外层共享同一物理事务，内层异常时 `AbstractPlatformTransactionManager#processRollback` 会把全局事务标记为 rollback-only；外层 catch 后尝试提交，发现标记已置位，
+  只能回滚并抛异常。要避免就改用 REQUIRES_NEW 隔离，或内层不抛异常而是返回错误码。
+
+- 【L4】场景题——下单主流程（REQUIRED）中调"发放新人券"，要求发券失败不回滚订单、但订单回滚时已发的券必须撤销。方案：发券用 `REQUIRES_NEW` 保证自身失败不影响订单；
+  同时在订单事务中注册 `TransactionSynchronization#afterCompletion`（或 `@TransactionalEventListener`），订单回滚时补偿撤销已发的券，券服务实现幂等撤销接口；
+  更彻底的做法是把发券改为订单提交后异步消费（AFTER_COMMIT 触发），代价是引入消息可靠性（重试+幂等）问题。
+
+- 【L4】场景题——账户转账要求转账记录无论成败必须写入审计表（合规），但审计表偶发超时拖慢转账链路。应急：审计方法加 `timeout` + 失败降级写本地日志保主链路。长期：审计改 `REQUIRES_NEW` 独立提交；
+  审计写失败不阻断转账，失败记录写本地补偿表（与转账同库同事务确保不丢），后台任务重试写入审计表。权衡：REQUIRES_NEW 多占一个连接需评估连接池容量；异步审计存在"转账成功、审计延迟可见"窗口，需与合规方确认。
 
 :::
 
@@ -2273,10 +2569,25 @@ Spring 事务失效的本质分两类：**调用未经过代理**（拦截器根
 
 ::: details 拓展追问（L3/L4）
 
-- 【L3】为什么默认只回滚 `RuntimeException`，这个设计合理吗？历史原因是 EJB 规范：unchecked 异常代表"系统错误应回滚"，checked 异常代表"业务可预期错误由调用方决策"。现代实践普遍认为这个默认值容易踩坑，所以多数团队直接约定 `rollbackFor = Exception.class`。
-- 【L3】自调用失效的三种解法各自代价是什么？注入自身（`@Autowired private OrderService self`）最简洁，依赖 Spring 4.3+ 支持自注入；`AopContext.currentProxy()` 需开 `exposeProxy=true` 且代码耦合 AOP API；拆分到另一个 Bean 最干净但有重构成本。优先拆分，次选自注入。
-- 【L4】多数据源下忘了指定 `transactionManager` 会怎样？默认使用 `@Primary` 标记的事务管理器，事务作用在错误的数据源上：目标库的写操作实际处于 autoCommit 状态逐条提交，回滚时毫无效果——这类失效不报错、不告警，只有对账才能发现，是资损高危区。
-- 【L4】场景题——下单方法内先写订单再调外部风控接口（耗时 1-5s，偶发超时），整个方法标了 `@Transactional`，高峰期连接池耗尽、下单大面积失败。应急：风控调用加超时上限（如 500ms）+ 降级放行，临时扩容连接池。根因：外部 HTTP 调用被包在事务内，事务持有连接与行锁的时间 = 风控耗时。长期：风控校验移到事务开启之前；或 `TransactionTemplate` 把事务范围缩小到纯数据库操作；给事务配 `timeout` 兜底。扩连接池只是掩盖问题，调用耗时不解决迟早再爆。
+- 【L3】为什么默认只回滚 `RuntimeException`，这个设计合理吗？
+
+  历史原因是 EJB 规范：unchecked 异常代表"系统错误应回滚"，checked 异常代表"业务可预期错误由调用方决策"。现代实践普遍认为这个默认值容易踩坑，
+  所以多数团队直接约定 `rollbackFor = Exception.class`。
+
+- 【L3】自调用失效的三种解法各自代价是什么？
+
+  注入自身（`@Autowired private OrderService self`）最简洁，依赖 Spring 4.3+ 支持自注入；
+  `AopContext.currentProxy()` 需开 `exposeProxy=true` 且代码耦合 AOP API；拆分到另一个 Bean 最干净但有重构成本。优先拆分，次选自注入。
+
+- 【L4】多数据源下忘了指定 `transactionManager` 会怎样？
+
+  默认使用 `@Primary` 标记的事务管理器，事务作用在错误的数据源上：目标库的写操作实际处于 autoCommit 状态逐条提交，回滚时毫无效果——这类失效不报错、不告警，只有对账才能发现，是资损高危区。
+
+- 【L4】场景题——下单方法内先写订单再调外部风控接口（耗时 1-5s，偶发超时），整个方法标了 `@Transactional`，高峰期连接池耗尽、下单大面积失败。应急：风控调用加超时上限（如 500ms）+ 降级放行，临时扩容连接池。
+
+  根因：外部 HTTP 调用被包在事务内，事务持有连接与行锁的时间 = 风控耗时。长期：风控校验移到事务开启之前；或 `TransactionTemplate` 把事务范围缩小到纯数据库操作；给事务配 `timeout` 兜底。
+
+  扩连接池只是掩盖问题，调用耗时不解决迟早再爆。
 
 :::
 
@@ -2366,10 +2677,25 @@ completeTransactionAfterThrowing(txInfo, ex);
 
 ::: details 拓展追问（L3/L4）
 
-- 【L3】`TransactionSynchronizationManager` 如何保证同一事务内多个 DAO 用同一个连接？它以数据源为 key，在 `ThreadLocal<Map<Object, Object>>` 中绑定 `ConnectionHolder`；MyBatis 的 `SpringManagedTransaction`、JdbcTemplate 的 `DataSourceUtils#getConnection` 都优先从它取连接，取到则复用——这是"事务内连接复用"的唯一通道。
-- 【L3】`@Transactional(readOnly = true)` 底层做了什么？`DataSourceTransactionManager#doBegin` 会调 `connection.setReadOnly(true)`，MySQL 驱动可借此路由到从库或跳过部分开销；但它只是"提示"，不强制拒绝写入，写操作误标 readOnly 不会报错，别拿它当防护。
-- 【L4】事务提交后才发 MQ，怎么实现？注册 `TransactionSynchronization#afterCommit` 回调，或用 `@TransactionalEventListener(phase = AFTER_COMMIT)`；若在事务内直接发，事务回滚时消息已发出，造成消息与数据不一致。
-- 【L4】场景题——一个方法要先写订单库、再写结算库（两个不同 DataSource），要求一致，单个 `@Transactional` 能否满足？不能：单个注解只能绑定一个 `PlatformTransactionManager`。方案对比：① JTA/XA 强一致但性能差、部分云数据库对 XA 支持不佳；② Seata AT 侵入小但需部署 TC 服务端；③ 本地消息表 + 定时重试实现最终一致性。互联网业务多数选 ③（最终一致性 + 幂等），仅账务级强一致场景评估 XA/Seata。
+- 【L3】`TransactionSynchronizationManager` 如何保证同一事务内多个 DAO 用同一个连接？
+
+  它以数据源为 key，在 `ThreadLocal<Map<Object, Object>>` 中绑定 `ConnectionHolder`；MyBatis 的 `SpringManagedTransaction`、
+  JdbcTemplate 的 `DataSourceUtils#getConnection` 都优先从它取连接，取到则复用——这是"事务内连接复用"的唯一通道。
+
+- 【L3】`@Transactional(readOnly = true)` 底层做了什么？
+
+  `DataSourceTransactionManager#doBegin` 会调 `connection.setReadOnly(true)`，MySQL 驱动可借此路由到从库或跳过部分开销；但它只是"提示"，不强制拒绝写入，
+  写操作误标 readOnly 不会报错，别拿它当防护。
+
+- 【L4】事务提交后才发 MQ，怎么实现？
+
+  注册 `TransactionSynchronization#afterCommit` 回调，或用 `@TransactionalEventListener(phase = AFTER_COMMIT)`；若在事务内直接发，
+  事务回滚时消息已发出，造成消息与数据不一致。
+
+- 【L4】场景题——一个方法要先写订单库、再写结算库（两个不同 DataSource），要求一致，单个 `@Transactional` 能否满足？
+
+  不能：单个注解只能绑定一个 `PlatformTransactionManager`。方案对比：① JTA/XA 强一致但性能差、部分云数据库对 XA 支持不佳；② Seata AT 侵入小但需部署 TC 服务端；
+  ③ 本地消息表 + 定时重试实现最终一致性。互联网业务多数选 ③（最终一致性 + 幂等），仅账务级强一致场景评估 XA/Seata。
 
 :::
 
@@ -2436,7 +2762,10 @@ try {
 
 ::: details
 
-- 【L3】**大事务治理是编程式事务的主战场**：声明式的事务边界 = 整个方法，方法内混入 RPC、发 MQ、循环批处理等慢操作时，连接与行锁被长期占用，高峰期直接打满连接池。治理三板斧：拆分（慢操作移出事务方法）、异步化（`AFTER_COMMIT` 后再做）、`TransactionTemplate` 收缩边界（只把纯数据库操作圈进事务）——第三种就是编程式在 P8 语境下的真实用途，而非"写法不同"这么简单。
+- 【L3】**大事务治理是编程式事务的主战场**
+
+  声明式的事务边界 = 整个方法，方法内混入 RPC、发 MQ、循环批处理等慢操作时，连接与行锁被长期占用，高峰期直接打满连接池。治理三板斧：拆分（慢操作移出事务方法）、
+  异步化（`AFTER_COMMIT` 后再做）、`TransactionTemplate` 收缩边界（只把纯数据库操作圈进事务）——第三种就是编程式在 P8 语境下的真实用途，而非"写法不同"这么简单。
 
 :::
 
@@ -2473,7 +2802,10 @@ JPA（Java Persistence API）是 ORM 规范，定义了一套标准接口和注�
 ::: details
 
 - 【L3】"规范 vs 实现"的解耦价值在企业中体现为可替换性（如切 EclipseLink），但实际项目一旦用了 Hibernate 特有 API 就锁死了实现，选型时要权衡。
-- 【L3】Spring Data JPA 在 JPA 之上再包一层：Repository 接口 + 方法名推导 SQL，进一步减少样板代码，但复杂查询仍需 @Query 或 Specification。
+
+- 【L3】Spring Data JPA 在 JPA 之上再包一层
+
+  Repository 接口 + 方法名推导 SQL，进一步减少样板代码，但复杂查询仍需 @Query 或 Specification。
 
 :::
 
@@ -2526,7 +2858,10 @@ Spring MVC 的引入使 Web 层关注点分离，代码简洁且易于维护。
 
 ::: details
 
-- 【L3】DispatcherServlet 是前端控制器（Front Controller）模式的典型应用：所有请求统一入口，避免每个 Servlet 各自处理公共逻辑。
+- 【L3】DispatcherServlet 是前端控制器（Front Controller）模式的典型应用
+
+  所有请求统一入口，避免每个 Servlet 各自处理公共逻辑。
+
 - 【L3】前后端分离时代，View 层退化为 JSON 序列化（@ResponseBody），但 MVC 的请求分发与参数绑定价值依旧。
 
 :::
@@ -2612,10 +2947,27 @@ graph TD
 
 ::: details 拓展追问与场景题（L3/L4）
 
-- 【L3】`DispatcherServlet` 为什么默认懒初始化？懒初始化把九大组件的创建推迟到首次请求，避免不用 Web 功能的应用白白付出启动成本；代价是第一个请求耗时长。生产通过 `spring.mvc.servlet.load-on-startup=1`（或 `web.xml` 的 load-on-startup）让容器启动时即完成 `onRefresh`。
-- 【L3】`@ResponseBody` 的序列化链路经过哪些类？`RequestResponseBodyMethodProcessor#handleReturnValue` 遍历已注册的 `HttpMessageConverter` 列表，按返回类型与 Accept 头选出可用转换器（通常是 `MappingJackson2HttpMessageConverter`），由其内部 ObjectMapper 写出 JSON；转换器列表顺序决定优先级。
-- 【L3】HandlerMapping 是启动时建路由还是每次请求匹配？`RequestMappingHandlerMapping#afterPropertiesSet` 在启动时扫描全部 `@Controller`，把 `@RequestMapping` 解析为 `RequestMappingInfo` 路由表缓存，运行时只做查表匹配，路由数量对请求延迟影响极小。
-- 【L4】场景题——接口上线后偶发 404（同版本内部分请求正常），排查思路？应急：开 DispatcherServlet TRACE 日志观察映射过程。逐层：① 网关路由/contextPath/尾斜杠归一化；② 启动日志确认 RequestMappingHandlerMapping 已注册该路由（Mapped "..."）；③ 拦截器 preHandle 返回 false 但误返 404 而非 401；④ @PathVariable 类型不匹配实际是 400/500 被全局异常处理器误映射为 404。长期：网关路由配置纳入 CI 校验，核心接口做 Contract Test，对 404 率设告警。
+- 【L3】`DispatcherServlet` 为什么默认懒初始化？
+
+  懒初始化把九大组件的创建推迟到首次请求，避免不用 Web 功能的应用白白付出启动成本；代价是第一个请求耗时长。
+
+  生产通过 `spring.mvc.servlet.load-on-startup=1`（或 `web.xml` 的 load-on-startup）让容器启动时即完成 `onRefresh`。
+
+- 【L3】`@ResponseBody` 的序列化链路经过哪些类？
+
+  `RequestResponseBodyMethodProcessor#handleReturnValue` 遍历已注册的 `HttpMessageConverter` 列表，
+  按返回类型与 Accept 头选出可用转换器（通常是 `MappingJackson2HttpMessageConverter`），由其内部 ObjectMapper 写出 JSON；转换器列表顺序决定优先级。
+
+- 【L3】HandlerMapping 是启动时建路由还是每次请求匹配？
+
+  `RequestMappingHandlerMapping#afterPropertiesSet` 在启动时扫描全部 `@Controller`，
+  把 `@RequestMapping` 解析为 `RequestMappingInfo` 路由表缓存，运行时只做查表匹配，路由数量对请求延迟影响极小。
+
+- 【L4】场景题——接口上线后偶发 404（同版本内部分请求正常），排查思路？
+
+  应急：开 DispatcherServlet TRACE 日志观察映射过程。逐层：① 网关路由/contextPath/尾斜杠归一化；
+  ② 启动日志确认 RequestMappingHandlerMapping 已注册该路由（Mapped "..."）；③ 拦截器 preHandle 返回 false 但误返 404 而非 401；
+  ④ @PathVariable 类型不匹配实际是 400/500 被全局异常处理器误映射为 404。长期：网关路由配置纳入 CI 校验，核心接口做 Contract Test，对 404 率设告警。
 
 :::
 
@@ -2663,8 +3015,12 @@ Spring MVC 的核心组件围绕 `DispatcherServlet` 展开工作：
 
 ::: details
 
-- 【L3】完整策略组件还包括 `HandlerExceptionResolver`（异常映射）、`LocaleResolver`（国际化）、`ThemeResolver`、`MultipartResolver`（文件上传）、`FlashMapManager`（重定向参数），共九大组件。
-- 【L3】HandlerAdapter 体现了适配器模式：同一套调用逻辑适配注解 Controller、HttpRequestHandler、Servlet 三种处理器形态。
+- 【L3】完整策略组件还包括 `HandlerExceptionResolver`（异常映射）、`LocaleResolver`（国际化）、`ThemeResolver`、`MultipartResolver`（文件上传）、
+  `FlashMapManager`（重定向参数），共九大组件。
+
+- 【L3】HandlerAdapter 体现了适配器模式
+
+  同一套调用逻辑适配注解 Controller、HttpRequestHandler、Servlet 三种处理器形态。
 
 :::
 
@@ -2747,7 +3103,11 @@ Controller 核心职责与工作方式：
 ::: details
 
 - 【L3】参数绑定由 `HandlerMethodArgumentResolver` 链完成，表单字段与 POJO 属性同名即自动绑定（无注解时默认行为），类型转换失败抛 `TypeMismatchException`（通常转 400）。
-- 【L3】`@ModelAttribute` 绑定对象与 `@RequestBody` 的区别：前者从表单字段逐个绑定（application/x-www-form-urlencoded），后者反序列化整个请求体（application/json）。
+
+- 【L3】`@ModelAttribute` 绑定对象与 `@RequestBody` 的区别
+
+  前者从表单字段逐个绑定（application/x-www-form-urlencoded），
+  后者反序列化整个请求体（application/json）。
 
 :::
 
@@ -2783,7 +3143,11 @@ Spring MVC 中的视图解析器（ViewResolver）用于将控制器返回的逻
 
 ::: details
 
-- 【L3】常见实现：`InternalResourceViewResolver`（JSP）、Thymeleaf 的 `ThymeleafViewResolver`、`ContentNegotiatingViewResolver`（按 Accept 头协商）。
+- 【L3】常见实现
+
+  `InternalResourceViewResolver`（JSP）、Thymeleaf 的 `ThymeleafViewResolver`、
+  `ContentNegotiatingViewResolver`（按 Accept 头协商）。
+
 - 【L3】前后端分离项目返回 JSON 时不走 ViewResolver，而是 @ResponseBody + HttpMessageConverter 直接写出，视图解析器链实际闲置。
 
 :::
@@ -2861,6 +3225,7 @@ public class WebConfig implements WebMvcConfigurer {
 ::: details
 
 - 【L3】`HandlerInterceptorAdapter` 在 Spring 5.3+ 已标记废弃（接口方法都有 default 实现，直接实现接口即可），Spring 6 中已移除。
+
 - 【L3】preHandle 返回 false 时，已执行过 preHandle 的拦截器仍会倒序执行 afterCompletion，资源清理不会丢。
 
 :::
@@ -2907,6 +3272,7 @@ Spring MVC 国际化基于 `LocaleResolver` 与 `MessageSource` 协作实现：
 ::: details
 
 - 【L3】默认 `AcceptHeaderLocaleResolver` 直接读请求头、不可切换；需要用户手动切语言时用 `LocaleChangeInterceptor` + Session/Cookie 解析器组合。
+
 - 【L3】MessageSource 也是 ApplicationContext 的能力之一（继承自接口），错误码提示、参数校验消息（ValidationMessages）都走它。
 
 :::
@@ -2950,8 +3316,12 @@ Spring MVC 通过 **HandlerExceptionResolver** 机制集中处理异常，将异
 
 ::: details
 
-- 【L3】处理链路由 `ExceptionHandlerExceptionResolver`（注解式）、`ResponseStatusExceptionResolver`、`DefaultHandlerExceptionResolver`（把 Spring 标准异常转 4xx/5xx，如 405/415）依次组成。
-- 【L3】前后端分离项目标准做法：`@RestControllerAdvice` 全局捕获并返回统一错误结构（错误码 + 消息），业务异常定义枚举码体系。
+- 【L3】处理链路由 `ExceptionHandlerExceptionResolver`（注解式）、`ResponseStatusExceptionResolver`、
+  `DefaultHandlerExceptionResolver`（把 Spring 标准异常转 4xx/5xx，如 405/415）依次组成。
+
+- 【L3】前后端分离项目标准做法
+
+  `@RestControllerAdvice` 全局捕获并返回统一错误结构（错误码 + 消息），业务异常定义枚举码体系。
 
 :::
 
@@ -2992,7 +3362,10 @@ Spring MVC 父子容器通过分层隔离实现 Bean 管理：
 
 ::: details
 
-- 【L3】经典坑：组件扫描配置错误把 Controller 扫进父容器（或 Service 扫进子容器），导致拦截器/AOP 切面对 Controller 不生效、事务不生效——因为代理在另一个容器里。
+- 【L3】经典坑
+
+  组件扫描配置错误把 Controller 扫进父容器（或 Service 扫进子容器），导致拦截器/AOP 切面对 Controller 不生效、事务不生效——因为代理在另一个容器里。
+
 - 【L3】SpringBoot 默认只有一个容器（不区分父子），简化了配置；父子容器主要是传统 web.xml 时代（ContextLoaderListener + DispatcherServlet）的架构。
 
 :::
@@ -3034,12 +3407,35 @@ Spring WebFlux 是 Spring 5 引入的响应式 Web 框架，基于 Reactor 实�
 
 ::: details
 
-- 【L3】响应式的收益在"全链路非阻塞"才体现：只要中间有一环阻塞（如 JDBC 驱动），事件循环线程被占住，性能优势荡然无存；数据库需配 R2DBC。
-- 【L3】事件循环线程模型：Reactor Netty 默认启动与 CPU 核数相当的少量 event loop 线程（`LoopResources.DEFAULT_IO_WORKER_COUNT`，下限 4），一个线程服务成千上万连接；因此**阻塞调用会污染 event loop**——不可避免的阻塞操作必须用 `publishOn(Schedulers.boundedElastic())` 切到弹性线程池隔离，否则该线程上所有连接一起卡死。
-- 【L3】背压（Backpressure）是 Mono/Flux 实现的 Reactive Streams 规范核心：消费方通过 `request(n)` 控制生产速率，防止慢消费者被快生产者压垮——这是 Servlet "一次读全量" 模型不具备的语义。
-- 【L3】选型经验：CPU 密集用 MVC，I/O 密集且团队能接受响应式心智模型才上 WebFlux；Spring Cloud Gateway 基于 WebFlux 是典型成功案例。
-- 【L4】WebFlux 不必然比 MVC 快：低并发或 CPU 密集场景下，操作符装配与异步调度开销反而使其慢于 MVC；收益只在高并发 IO 密集场景兑现（少量线程支撑海量连接，上下文切换与线程内存占用大幅下降）。拿"响应式=高性能"当普适结论是选型误判的常见根源。
-- 【L4】JDK 21 虚拟线程的替代性冲击：虚拟线程让 MVC 的"一请求一线程"模型获得接近非阻塞的吞吐（阻塞时自动让出载体线程），Spring Boot 3.2+ 配 `spring.threads.virtual.enabled=true` 即可启用，**无需把代码改写成响应式风格**。对多数业务系统，这直接削弱了 WebFlux 的选型理由；WebFlux 的剩余优势集中在背压语义、流式处理与函数式编排。选型结论：默认 MVC（+虚拟线程），网关、流式管道或全链路响应式团队才选 WebFlux。
+- 【L3】响应式的收益在"全链路非阻塞"才体现
+
+  只要中间有一环阻塞（如 JDBC 驱动），事件循环线程被占住，性能优势荡然无存；数据库需配 R2DBC。
+
+- 【L3】事件循环线程模型
+
+  Reactor Netty 默认启动与 CPU 核数相当的少量 event loop 线程（`LoopResources.DEFAULT_IO_WORKER_COUNT`，下限 4），一个线程服务成千上万连接；
+  因此**阻塞调用会污染 event loop**——不可避免的阻塞操作必须用 `publishOn(Schedulers.boundedElastic())` 切到弹性线程池隔离，否则该线程上所有连接一起卡死。
+
+- 【L3】背压（Backpressure）是 Mono/Flux 实现的 Reactive Streams 规范核心
+
+  消费方通过 `request(n)` 控制生产速率，防止慢消费者被快生产者压垮——
+  这是 Servlet "一次读全量" 模型不具备的语义。
+
+- 【L3】选型经验
+
+  CPU 密集用 MVC，I/O 密集且团队能接受响应式心智模型才上 WebFlux；Spring Cloud Gateway 基于 WebFlux 是典型成功案例。
+
+- 【L4】WebFlux 不必然比 MVC 快
+
+  低并发或 CPU 密集场景下，操作符装配与异步调度开销反而使其慢于 MVC；收益只在高并发 IO 密集场景兑现（少量线程支撑海量连接，上下文切换与线程内存占用大幅下降）。
+
+  拿"响应式=高性能"当普适结论是选型误判的常见根源。
+
+- 【L4】JDK 21 虚拟线程的替代性冲击
+
+  虚拟线程让 MVC 的"一请求一线程"模型获得接近非阻塞的吞吐（阻塞时自动让出载体线程），
+  Spring Boot 3.2+ 配 `spring.threads.virtual.enabled=true` 即可启用，**无需把代码改写成响应式风格**。对多数业务系统，这直接削弱了 WebFlux 的选型理由；
+  WebFlux 的剩余优势集中在背压语义、流式处理与函数式编排。选型结论：默认 MVC（+虚拟线程），网关、流式管道或全链路响应式团队才选 WebFlux。
 
 :::
 
@@ -3075,10 +3471,26 @@ RESTful 是一种基于 HTTP 协议的软件架构风格，核心思想是将一
 
 ::: details
 
-- 【L3】Spring MVC 落地 RESTful 的标配：`@RestController` + `@GetMapping/@PostMapping` + `@PathVariable`，异常用状态码语义（400/401/404/500）而非全部 200 + 错误字段。
-- 【L3】HTTP 方法的精确语义：`PUT` 幂等且是**全量替换**，`PATCH` 非幂等且只做部分更新（补丁格式有 `JSON Patch`（RFC 6902）与 `JSON Merge Patch`（RFC 7396）两种），`POST` 非幂等。`201 Created` 必须携带指向新资源的 `Location` 头；删除成功无返回体用 `204 No Content`；乐观锁冲突用 `409 Conflict`；语法正确但业务语义校验失败用 `422 Unprocessable Entity`（与 400 的参数格式错误区分）；限流用 `429 Too Many Requests` 且应带 `Retry-After` 头。
-- 【L4】REST 成熟度模型（Richardson）：Level 0 把 HTTP 当传输管道（单 URI + 全 POST）→ Level 1 资源化 URI → Level 2 正确使用 HTTP 动词与状态码 → Level 3 HATEOAS（响应里带链接驱动状态转移）。绝大多数所谓 RESTful API 实际只到 Level 2；Level 3 的 HATEOAS 在实践中收益低、客户端与服务端链接结构耦合重，通常不做——能给出这个选型判断，才是"理解 REST"与"背过 REST"的区别。
-- 【L4】业务错误不应用 HTTP 500 表达：500 会触发 SRE 告警与网关/客户端重试，业务性失败（余额不足、状态不允许）应映射为 4xx 或 200 + 统一业务码，HTTP 状态码只承载协议层语义。
+- 【L3】Spring MVC 落地 RESTful 的标配
+
+  `@RestController` + `@GetMapping/@PostMapping` + `@PathVariable`，
+  异常用状态码语义（400/401/404/500）而非全部 200 + 错误字段。
+
+- 【L3】HTTP 方法的精确语义
+
+  `PUT` 幂等且是**全量替换**，`PATCH` 非幂等且只做部分更新（补丁格式有 `JSON Patch`（RFC 6902）与 `JSON Merge Patch`（RFC 7396）两种），
+  `POST` 非幂等。`201 Created` 必须携带指向新资源的 `Location` 头；删除成功无返回体用 `204 No Content`；乐观锁冲突用 `409 Conflict`；
+  语法正确但业务语义校验失败用 `422 Unprocessable Entity`（与 400 的参数格式错误区分）；限流用 `429 Too Many Requests` 且应带 `Retry-After` 头。
+
+- 【L4】REST 成熟度模型（Richardson）：
+
+  Level 0 把 HTTP 当传输管道（单 URI + 全 POST）→ Level 1 资源化 URI → Level 2 正确使用 HTTP 动词与状态码 → Level 3 HATEOAS（响应里带链接驱动状态转移）。
+
+  绝大多数所谓 RESTful API 实际只到 Level 2；Level 3 的 HATEOAS 在实践中收益低、客户端与服务端链接结构耦合重，通常不做——能给出这个选型判断，才是"理解 REST"与"背过 REST"的区别。
+
+- 【L4】业务错误不应用 HTTP 500 表达
+
+  500 会触发 SRE 告警与网关/客户端重试，业务性失败（余额不足、状态不允许）应映射为 4xx 或 200 + 统一业务码，HTTP 状态码只承载协议层语义。
 
 :::
 
@@ -3380,8 +3792,12 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 ::: details
 
-- 【L3】SpEL 由 `SpelExpressionParser` 解析为 `Expression` 对象，配合 `StandardEvaluationContext` 求值；生产高频路径可用 `SimpleEvaluationContext` 限制能力面。
-- 【L4】SpEL 自 Spring 4.1 起提供编译器模式（`SpelCompilerMode.IMMEDIATE/MIXED`），可对重复求值的表达式编译为字节码提升性能，但仅支持部分操作；IMMEDIATE 模式遇到不支持的操作会直接抛异常，MIXED 模式则静默回退解释执行，生产开启前需评估表达式覆盖面。
+- 【L3】SpEL 由 `SpelExpressionParser` 解析为 `Expression` 对象，配合 `StandardEvaluationContext` 求值；
+  生产高频路径可用 `SimpleEvaluationContext` 限制能力面。
+
+- 【L4】SpEL 自 Spring 4.1 起提供编译器模式（`SpelCompilerMode.IMMEDIATE/MIXED`），可对重复求值的表达式编译为字节码提升性能，但仅支持部分操作；
+  IMMEDIATE 模式遇到不支持的操作会直接抛异常，MIXED 模式则静默回退解释执行，生产开启前需评估表达式覆盖面。
+
 - 【安全】不要把用户输入直接作为 SpEL 表达式求值，存在 SpEL 注入风险（历史上 Spring Cloud Function 曾因此出过漏洞）。
 
 :::
@@ -3484,6 +3900,7 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 ::: details
 
 - 【L3】绑定失败会抛 `HttpMessageNotReadableException`（400），可在 @ExceptionHandler 中统一兜底。
+
 - 【L4】大报文场景可换用流式读取或 `DataBuffer`，避免一次性反序列化占用内存。
 
 :::
@@ -3491,8 +3908,6 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "加了 @RequestBody 就能收到前端参数" → 前端以 `application/x-www-form-urlencoded` 提交而方法用 @RequestBody（只认 JSON 等已注册媒体类型）时抛 `HttpMediaTypeNotSupportedException`（415）；表单参数应直接用实体绑定或 @RequestParam 接收，@RequestBody 与 @RequestParam 一个读请求体一个读查询串，不能互相顶替。
 - ❌ "@RequestBody 什么请求都能用" → GET 携带请求体不被多数客户端/网关/代理支持，@RequestBody 只应用于确有请求体的方法（POST/PUT/PATCH）；且请求体流只能读取一次，一个方法最多只能有一个 @RequestBody 参数。
@@ -3595,7 +4010,12 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 ::: details
 
-- 【L3】全局异常处理要区分参数校验家族抛出的三种异常：`MethodArgumentNotValidException`（@RequestBody + @Valid 校验失败）、`BindException`（表单/查询参数对象绑定校验失败）、`ConstraintViolationException`（Service 方法级校验，由类上 @Validated + `MethodValidationPostProcessor` 触发）。三者的错误信息结构不同，@ExceptionHandler 必须分开写，只兜住一种会导致另两种直接漏成 500。
+- 【L3】全局异常处理要区分参数校验家族抛出的三种异常
+
+  `MethodArgumentNotValidException`（@RequestBody + @Valid 校验失败）、
+  `BindException`（表单/查询参数对象绑定校验失败）、`ConstraintViolationException`（Service 方法级校验，
+  由类上 @Validated + `MethodValidationPostProcessor` 触发）。三者的错误信息结构不同，@ExceptionHandler 必须分开写，只兜住一种会导致另两种直接漏成 500。
+
 - 【L4】兜底 `Exception` 处理器应记录日志并返回 500，而业务异常要映射为 4xx 或统一业务码，避免业务失败触发监控误告警与上游重试。
 
 :::
@@ -3760,7 +4180,9 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 ::: details
 
 - 【L3】条件注解在 `ConfigurationClassPostProcessor` 解析配置类阶段求值（`@ConditionalOnBean/@ConditionalOnMissingBean` 属于 REGISTER_BEAN 阶段，延迟到注册 BeanDefinition 时判断）；`OnClassCondition` 用 ASM 读取类字节码元数据而非真正加载类，避免依赖类缺失时抛 `NoClassDefFoundError`。
-- 【L4】`@ConditionalOnMissingBean` 的语义是「到此为止还没注册过」，对配置类的处理顺序极其敏感——自定义 starter 最常见的翻车点就是业务方的 Bean 在自动配置之后注册，导致 `OnMissingBean` 判定失败、容器里出现重复 Bean；需用 `@AutoConfigureBefore/@AutoConfigureAfter/@AutoConfigureOrder` 显式控制自动配置顺序。
+
+- 【L4】`@ConditionalOnMissingBean` 的语义是「到此为止还没注册过」，对配置类的处理顺序极其敏感——自定义 starter 最常见的翻车点就是业务方的 Bean 在自动配置之后注册，
+  导致 `OnMissingBean` 判定失败、容器里出现重复 Bean；需用 `@AutoConfigureBefore/@AutoConfigureAfter/@AutoConfigureOrder` 显式控制自动配置顺序。
 
 :::
 
@@ -3933,8 +4355,13 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 ::: details
 
-- 【L3】@Async 与 @Transactional 同时使用时，事务上下文绑定在提交任务的线程（事务存于 TransactionSynchronizationManager 的 ThreadLocal），异步线程无法继承，需在异步方法内自行声明事务。
-- 【L4】Spring Framework 6.1 起提供原生虚拟线程支持（JDK 21+）：`SimpleAsyncTaskExecutor` 可开启虚拟线程模式，另有 `VirtualThreadTaskExecutor`；高并发短任务可显著减少平台线程开销，对以 @Async 为代表的"每任务一线程"模型是结构性替代。
+- 【L3】@Async 与 @Transactional 同时使用时，事务上下文绑定在提交任务的线程（事务存于 TransactionSynchronizationManager 的 ThreadLocal），异步线程无法继承，
+  需在异步方法内自行声明事务。
+
+- 【L4】Spring Framework 6.1 起提供原生虚拟线程支持（JDK 21+）
+
+  `SimpleAsyncTaskExecutor` 可开启虚拟线程模式，另有 `VirtualThreadTaskExecutor`；
+  高并发短任务可显著减少平台线程开销，对以 @Async 为代表的"每任务一线程"模型是结构性替代。
 
 :::
 
@@ -3992,7 +4419,10 @@ SpEL 是 Spring 的表达式语言，运行时查询和操作对象图，语法�
 
 ::: details
 
-- 【L3】排查思路：先在异步方法内打印线程名，若仍是调用方线程则为代理失效；再看 `Thread.currentThread()` 上下文变量（如租户、TraceId）是否丢失。
+- 【L3】排查思路
+
+  先在异步方法内打印线程名，若仍是调用方线程则为代理失效；再看 `Thread.currentThread()` 上下文变量（如租户、TraceId）是否丢失。
+
 - 【L4】可结合 AOP 自定义切面统一包装异步任务的异常上报与链路追踪上下文传递。
 
 :::

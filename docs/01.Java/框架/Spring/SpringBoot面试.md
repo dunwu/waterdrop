@@ -313,10 +313,31 @@ graph TD
 
 ::: details
 
-- 【L3】源码定位：自动配置不是黑魔法，每一步都有明确的源码落点——① `AutoConfigurationImportSelector#selectImports` → `getAutoConfigurationEntry`：由 `ConfigurationClassParser` 在解析配置类阶段回调，返回候选配置类全限定名与排除项；② `AutoConfigurationImportSelector#getCandidateConfigurations`：Boot 2.x 通过 `SpringFactoriesLoader.loadFactoryNames` 读取候选类，3.x 改为 `ImportCandidates.load` 读取 `AutoConfiguration.imports` 文件；③ `AutoConfigurationImportFilter`（如 `OnClassCondition` 实现）做前置过滤，Boot 2.7 约有 144 个候选自动配置类，过滤后真正生效的通常不足 30 个，大幅减少无效类的解析开销；④ `ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry` 是真正解析所有 `@Configuration` 并注册 Bean 定义的入口。
-- 【L3】加载顺序如何确定？通过 `@AutoConfigureBefore`/`@AutoConfigureAfter` 及 `@AutoConfiguration` 的 `before/after` 属性，由 `AutoConfigurationSorter` 做拓扑排序（结果缓存在 `AutoConfigurationImportSelector` 中）。未声明顺序的类按类名字典序排列，因此一旦某自动配置依赖另一类的 Bean，必须显式声明顺序，否则换个依赖版本就可能失效。
-- 【L3】为什么用户自己 `@ComponentScan` 扫描的类上用 `@ConditionalOnBean` 不可靠？条件判断发生在 BeanDefinition 注册阶段，用户配置类之间的处理顺序没有保证，判断「是否存在」时目标 Bean 可能还没注册。只有自动配置类被统一放到最后处理，条件判断才完备，这也是官方文档限定这两个注解只用于自动配置场景的原因。
-- 【L3】生产上如何快速确认哪些自动配置生效了？启动加 `--debug`（或 `debug=true`），`ConditionEvaluationReportLoggingListener` 会打印完整的条件评估报告，列出每个类的 Positive/Negative 匹配及具体原因；运行时也可访问 `/actuator/conditions` 端点查看。这是排查「starter 为什么没生效」的第一工具。
+- 【L3】源码定位：自动配置不是黑魔法，每一步都有明确的源码落点——① `AutoConfigurationImportSelector#selectImports` → `getAutoConfigurationEntry`：
+
+  由 `ConfigurationClassParser` 在解析配置类阶段回调，返回候选配置类全限定名与排除项；② `AutoConfigurationImportSelector#getCandidateConfigurations`：
+
+  Boot 2.x 通过 `SpringFactoriesLoader.loadFactoryNames` 读取候选类，
+  3.x 改为 `ImportCandidates.load` 读取 `AutoConfiguration.imports` 文件；
+  ③ `AutoConfigurationImportFilter`（如 `OnClassCondition` 实现）做前置过滤，Boot 2.7 约有 144 个候选自动配置类，过滤后真正生效的通常不足 30 个，大幅减少无效类的解析开销；
+  ④ `ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry` 是真正解析所有 `@Configuration` 并注册 Bean 定义的入口。
+
+- 【L3】加载顺序如何确定？
+
+  通过 `@AutoConfigureBefore`/`@AutoConfigureAfter` 及 `@AutoConfiguration` 的 `before/after` 属性，
+  由 `AutoConfigurationSorter` 做拓扑排序（结果缓存在 `AutoConfigurationImportSelector` 中）。未声明顺序的类按类名字典序排列，因此一旦某自动配置依赖另一类的 Bean，
+  必须显式声明顺序，否则换个依赖版本就可能失效。
+
+- 【L3】为什么用户自己 `@ComponentScan` 扫描的类上用 `@ConditionalOnBean` 不可靠？
+
+  条件判断发生在 BeanDefinition 注册阶段，用户配置类之间的处理顺序没有保证，判断「是否存在」时目标 Bean 可能还没注册。只有自动配置类被统一放到最后处理，条件判断才完备，
+  这也是官方文档限定这两个注解只用于自动配置场景的原因。
+
+- 【L3】生产上如何快速确认哪些自动配置生效了？
+
+  启动加 `--debug`（或 `debug=true`），`ConditionEvaluationReportLoggingListener` 会打印完整的条件评估报告，列出每个类的 Positive/Negative 匹配及具体原因；
+  运行时也可访问 `/actuator/conditions` 端点查看。这是排查「starter 为什么没生效」的第一工具。
+
 - 【L4】方案权衡：
 
 | 方案                                                             | 语义                                    | 适用边界                                                                              |
@@ -325,9 +346,13 @@ graph TD
 | 无条件注册 + `spring.main.allow-bean-definition-overriding=true` | 同名 Bean 允许覆盖                      | Boot 2.1 起默认禁止覆盖，冲突直接抛 `BeanDefinitionOverrideException`，生产不推荐打开 |
 | `@Primary` 共存                                                  | 两个 Bean 共存，注入点优先选 `@Primary` | 需要保留自动配置 Bean 给其他逻辑兜底时                                                |
 
-另一个常见权衡：核心 Bean 写在自动配置类里，还是拆成独立 `@Configuration` 由自动配置类 `@Import` 进来？后者便于业务方关闭自动配置（`spring.autoconfigure.exclude`）后仍手动导入核心配置，灵活度更高。
+另一个常见权衡：核心 Bean 写在自动配置类里，
+还是拆成独立 `@Configuration` 由自动配置类 `@Import` 进来？后者便于业务方关闭自动配置（`spring.autoconfigure.exclude`）后仍手动导入核心配置，灵活度更高。
 
-- 【L4】失效场景：① **自动配置被静默接管**——用户定义了同类型 Bean，`@ConditionalOnMissingBean` 使 starter 不再生效，且没有任何日志提示，排查时先确认业务方是否自定义了同类型 Bean；② **条件注解误判**——`@ConditionalOnBean`/`@ConditionalOnMissingBean` 用在普通用户配置类上时注册顺序不可控，极易误判，官方只保证它们在自动配置类中可靠；③ **顺序依赖未声明**——自动配置类之间必须用 `@AutoConfigureBefore`/`@AutoConfigureAfter` 声明顺序，否则会随 jar 包顺序变化而间歇性失效；④ **Boot 3.x 注册文件失效**——starter 仍把自动配置类写在 `spring.factories` 里，升级后静默不生效。
+- 【L4】失效场景：① **自动配置被静默接管**——用户定义了同类型 Bean，`@ConditionalOnMissingBean` 使 starter 不再生效，且没有任何日志提示，排查时先确认业务方是否自定义了同类型 Bean；
+  ② **条件注解误判**——`@ConditionalOnBean`/`@ConditionalOnMissingBean` 用在普通用户配置类上时注册顺序不可控，极易误判，官方只保证它们在自动配置类中可靠；③ **顺序依赖未声明**——
+  自动配置类之间必须用 `@AutoConfigureBefore`/`@AutoConfigureAfter` 声明顺序，否则会随 jar 包顺序变化而间歇性失效；④ **Boot 3.x 注册文件失效**——
+  starter 仍把自动配置类写在 `spring.factories` 里，升级后静默不生效。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - Auto-configuration](https://docs.spring.io/spring-boot/reference/using/auto-configuration.html)
 
@@ -336,10 +361,13 @@ graph TD
 ::: details 踩坑案例：starter 升级引发 BeanDefinitionOverrideException
 
 > **现象**：公司统一短信 starter 从 1.2 升到 2.0，订单服务发布后立即启动失败，报 `BeanDefinitionOverrideException: Cannot register bean definition ... for bean 'smsTemplate'`，滚动发布全部卡住。
+
 >
 > **排查**：对比 2.0 源码，发现新增了一个不带任何条件的 `@Bean SmsTemplate`；而订单服务早年为定制重试参数自己定义过同名 `smsTemplate` Bean。Boot 2.1 之后 `spring.main.allow-bean-definition-overriding` 默认 `false`，同名直接启动失败。
+
 >
 > **根因**：starter 作者漏加 `@ConditionalOnMissingBean`，把「用户优先」的覆盖语义变成了同名冲突。
+
 >
 > **修复**：应急让业务方临时开 `allow-bean-definition-overriding=true` 恢复启动；长期方案 starter 2.1 给所有 `@Bean` 补齐 `@ConditionalOnMissingBean`，并在 CI 中引入「模拟用户自定义 Bean」的启动冒烟测试（基于 `ApplicationContextRunner`），防止回归。
 
@@ -391,9 +419,13 @@ Spring Boot 启动过程的几个核心步骤：
 
 ::: details
 
-- 【L3】Web 应用专用上下文 `AnnotationConfigServletWebServerApplicationContext` 重写了 `onRefresh()`，内部调用 `createWebServer()` 从 `ServletWebServerFactory`（默认 `TomcatServletWebServerFactory`）创建容器实例，容器启动早于非懒加载单例 Bean 的实例化完成。
+- 【L3】Web 应用专用上下文 `AnnotationConfigServletWebServerApplicationContext` 重写了 `onRefresh()`，
+  内部调用 `createWebServer()` 从 `ServletWebServerFactory`（默认 `TomcatServletWebServerFactory`）创建容器实例，容器启动早于非懒加载单例 Bean 的实例化完成。
+
 - 【L3】完整的六阶段启动流程（推断应用类型、准备环境、发布启动事件等）是本题的展开版，见本文档「SpringBoot 的启动流程是如何设计的？」。
-- 【L4】Reactive（WebFlux）应用推断为 REACTIVE 类型后，创建的是 `AnnotationConfigReactiveWebServerApplicationContext`，默认内嵌 Netty 而非 Tomcat。
+
+- 【L4】Reactive（WebFlux）应用推断为 REACTIVE 类型后，创建的是 `AnnotationConfigReactiveWebServerApplicationContext`，
+  默认内嵌 Netty 而非 Tomcat。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - SpringApplication](https://docs.spring.io/spring-boot/reference/features/spring-application.html)
 
@@ -489,8 +521,21 @@ graph TD
 
 ::: details
 
-- 【L3】源码定位：启动骨架都在 `SpringApplication#run`（main 方法进入静态 `SpringApplication.run(Class, String[])` → new SpringApplication + 实例方法 run）——① `SpringApplication#deduceWebApplicationType`：根据类路径推断 Servlet/Reactive/None，决定创建哪种上下文；② `getSpringFactoriesInstances`：从 `spring.factories` 加载 Initializer 和 Listener（Boot 3.x 只是把自动配置类清单挪到了 `AutoConfiguration.imports` 文件，Initializer/Listener 仍读 `spring.factories`）；③ `prepareEnvironment`：`ConfigDataEnvironmentPostProcessor` 完成配置文件解析，随后发布 `ApplicationEnvironmentPreparedEvent`；④ `prepareContext`：`applyInitializers` 执行所有 Initializer，发布 `ApplicationContextInitializedEvent` 与 `ApplicationPreparedEvent`，注册主类 BeanDefinition；⑤ `refreshContext` → `AbstractApplicationContext#refresh`：核心是 `ConfigurationClassPostProcessor` 解析 `@Configuration` 并触发自动配置，`ServletWebServerApplicationContext#onRefresh` → `createWebServer` 创建内嵌容器；⑥ `callRunners`：依次执行所有 Runner。
-- 【L3】整个流程通过 `SpringApplicationRunListener`（默认实现 `EventPublishingRunListener`）向外广播，它是启动事件发布的总枢纽：`starting → environmentPrepared → contextPrepared → contextLoaded → started → ready` 每一步回调都会转换为对应的 `ApplicationEvent`。
+- 【L3】源码定位：启动骨架都在 `SpringApplication#run`（main 方法进入静态 `SpringApplication.run(Class, String[])` →
+   new SpringApplication + 实例方法 run）——① `SpringApplication#deduceWebApplicationType`：根据类路径推断 Servlet/Reactive/None，
+  决定创建哪种上下文；② `getSpringFactoriesInstances`：
+
+  从 `spring.factories` 加载 Initializer 和 Listener（Boot 3.x 只是把自动配置类清单挪到了 `AutoConfiguration.imports` 文件，
+  Initializer/Listener 仍读 `spring.factories`）；③ `prepareEnvironment`：`ConfigDataEnvironmentPostProcessor` 完成配置文件解析，
+  随后发布 `ApplicationEnvironmentPreparedEvent`；④ `prepareContext`：`applyInitializers` 执行所有 Initializer，
+  发布 `ApplicationContextInitializedEvent` 与 `ApplicationPreparedEvent`，注册主类 BeanDefinition；⑤ `refreshContext` →
+   `AbstractApplicationContext#refresh`：核心是 `ConfigurationClassPostProcessor` 解析 `@Configuration` 并触发自动配置，
+  `ServletWebServerApplicationContext#onRefresh` → `createWebServer` 创建内嵌容器；⑥ `callRunners`：依次执行所有 Runner。
+
+- 【L3】整个流程通过 `SpringApplicationRunListener`（默认实现 `EventPublishingRunListener`）向外广播，它是启动事件发布的总枢纽：
+
+  `starting → environmentPrepared → contextPrepared → contextLoaded → started → ready` 每一步回调都会转换为对应的 `ApplicationEvent`。
+
 - 【L3】扩展点选型权衡：
 
 | 需求                                                   | 选择                                    | 边界与限制                                         |
@@ -500,11 +545,27 @@ graph TD
 | 启动完成后的业务初始化（预热、订阅注册）               | `ApplicationRunner`/`CommandLineRunner` | 抛异常会导致启动失败，非关键逻辑必须自己 try-catch |
 | 深度定制启动过程（监听每一步回调）                     | 自定义 `SpringApplicationRunListener`   | 重量级手段，需在 `spring.factories` 注册，一般不用 |
 
-典型权衡：缓存预热放 `@PostConstruct`（同步阻塞启动、启动即可用）还是放 `ApplicationReadyEvent` 异步执行（启动快、短时间缓存未命中）？核心接口依赖的预热建议同步 + 拉长 K8s 探针延迟，非核心预热一律异步。
+典型权衡：缓存预热放 `@PostConstruct`（同步阻塞启动、启动即可用）还是放 `ApplicationReadyEvent` 异步执行（启动快、短时间缓存未命中）？核心接口依赖的预热建议同步 + 拉长 K8s 探针延迟，
+非核心预热一律异步。
 
-- 【L4】`ApplicationRunner` 和 `CommandLineRunner` 本质区别是什么？唯一区别是入参：`ApplicationRunner` 收解析后的 `ApplicationArguments`，`CommandLineRunner` 收原始 `String[]`。二者由 `SpringApplication#callRunners` 在发布 `ApplicationReadyEvent` 后调用，抛异常会走 `handleRunFailure` 直接终止应用。这是有意设计：初始化失败等价于启动失败，避免应用带伤运行。
-- 【L4】`SpringApplicationRunListener` 和 `ApplicationListener` 是什么关系？前者是启动主流程的内嵌回调（`SpringApplication#run` 每一步直接调用它），能介入启动过程本身；`EventPublishingRunListener` 把这些回调翻译成 `ApplicationStartingEvent` 等事件再广播给后者。多这一层是为了把「流程控制点」和「事件消费者」解耦：框架用 RunListener 驱动流程，业务用 Listener 被动观察。
-- 【L4】启动慢时如何精确定位是哪个阶段慢？Boot 2.4+ 用 `application.setApplicationStartup(new BufferingApplicationStartup(2048))` 记录启动步骤，通过 `/actuator/startup` 端点或配合 Java Flight Recorder 查看各步骤时间线，可精确到具体 Bean 的实例化耗时；配合 `--debug` 启动报告确认自动配置解析开销。
+- 【L4】`ApplicationRunner` 和 `CommandLineRunner` 本质区别是什么？
+
+  唯一区别是入参：`ApplicationRunner` 收解析后的 `ApplicationArguments`，`CommandLineRunner` 收原始 `String[]`。
+
+  二者由 `SpringApplication#callRunners` 在发布 `ApplicationReadyEvent` 后调用，抛异常会走 `handleRunFailure` 直接终止应用。这是有意设计：初始化失败等价于启动失败，
+  避免应用带伤运行。
+
+- 【L4】`SpringApplicationRunListener` 和 `ApplicationListener` 是什么关系？
+
+  前者是启动主流程的内嵌回调（`SpringApplication#run` 每一步直接调用它），能介入启动过程本身；
+  `EventPublishingRunListener` 把这些回调翻译成 `ApplicationStartingEvent` 等事件再广播给后者。多这一层是为了把「流程控制点」和「事件消费者」解耦：
+
+  框架用 RunListener 驱动流程，业务用 Listener 被动观察。
+
+- 【L4】启动慢时如何精确定位是哪个阶段慢？
+
+  Boot 2.4+ 用 `application.setApplicationStartup(new BufferingApplicationStartup(2048))` 记录启动步骤，
+  通过 `/actuator/startup` 端点或配合 Java Flight Recorder 查看各步骤时间线，可精确到具体 Bean 的实例化耗时；配合 `--debug` 启动报告确认自动配置解析开销。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - SpringApplication](https://docs.spring.io/spring-boot/reference/features/spring-application.html)
 
@@ -517,27 +578,37 @@ graph TD
 **踩坑案例：同步监听器拖垮 K8s 发布**
 
 > **现象**：商品服务上 K8s 后反复 `CrashLoopBackOff`，日志显示启动耗时超 120 秒后被 liveness 探针杀掉，发布当晚高峰服务容量不足。
+
 >
 > **排查**：抓线程栈发现 main 线程卡在一个 `ApplicationReadyEvent` 监听器里，里面做全量商品缓存预热，同步逐条调 Redis 加载约 80 万个 SKU。
+
 >
 > **根因**：开发者把重活放进了同步监听器，误以为 Ready 事件后执行不影响启动；而启动未完成时 liveness 探针（initialDelaySeconds 仅 60 秒）提前杀容器，形成死循环。
+
 >
 > **修复**：预热改为提交到线程池异步执行，启动立即返回；同时把就绪状态改接 `/actuator/health/readiness`，预热完成后才通过 readiness 探针放量。修复后启动耗时从 120 秒降到 25 秒，预热在后台 3 分钟内完成。
 
 **场景题：订单服务启动 90 秒被探针杀掉，如何系统性排查优化？**
 
 - **应急处理**：先临时调大 liveness 探针的 `initialDelaySeconds` 和 `failureThreshold` 保住发布不被杀；降低滚动发布并发度，避免同时大量实例不可用。
-- **根因分析**：三步定位——① 开启 `BufferingApplicationStartup`，看 `/actuator/startup` 时间线，找出耗时最大的步骤（通常是某个具体 Bean 的 `spring.beans.instantiate`）；② 用 `--debug` 看条件评估报告，确认生效的自动配置类数量是否异常；③ 对卡住时刻抓线程栈，确认是否阻塞在远程连接上（配置中心、数据库连接池、Redis）。典型根因：`@PostConstruct` 里全量预热缓存、连接池初始化阻塞、`@ComponentScan` 扫了巨大的包。
-- **长期方案**：① `@PostConstruct` 里的非关键初始化移到 `ApplicationReadyEvent` 后异步执行；② 用 `spring.autoconfigure.exclude` 排除不需要的自动配置，`scanBasePackages` 收窄到具体业务包；③ 启动耗时纳入 CI 门禁：超过 60 秒构建失败，防止逐步劣化；④ 探针体系改接 readiness 分组（`/actuator/health/readiness`），启动完成 ≠ 可接流量，预热完成后再放量。
-- **权衡**：`spring.main.lazy-initialization=true` 全局懒加载能显著提速，但会把初始化错误推迟到运行时第一次请求（首请求变慢甚至报错），生产核心服务建议保持饿汉式启动、只优化具体耗时点。另外「启动快」与「启动即可用」是一对矛盾：同步预热启动慢但就绪即可用，异步预热启动快但有窗口期，需按业务容忍度选择。
+
+- **根因分析**：三步定位——① 开启 `BufferingApplicationStartup`，看 `/actuator/startup` 时间线，
+  找出耗时最大的步骤（通常是某个具体 Bean 的 `spring.beans.instantiate`）；② 用 `--debug` 看条件评估报告，确认生效的自动配置类数量是否异常；③ 对卡住时刻抓线程栈，
+  确认是否阻塞在远程连接上（配置中心、数据库连接池、Redis）。典型根因：`@PostConstruct` 里全量预热缓存、连接池初始化阻塞、`@ComponentScan` 扫了巨大的包。
+
+- **长期方案**：① `@PostConstruct` 里的非关键初始化移到 `ApplicationReadyEvent` 后异步执行；② 用 `spring.autoconfigure.exclude` 排除不需要的自动配置，
+  `scanBasePackages` 收窄到具体业务包；③ 启动耗时纳入 CI 门禁：超过 60 秒构建失败，防止逐步劣化；④ 探针体系改接 readiness 分组（`/actuator/health/readiness`），
+  启动完成 ≠ 可接流量，预热完成后再放量。
+
+- **权衡**：`spring.main.lazy-initialization=true` 全局懒加载能显著提速，但会把初始化错误推迟到运行时第一次请求（首请求变慢甚至报错），生产核心服务建议保持饿汉式启动、只优化具体耗时点。
+
+  另外「启动快」与「启动即可用」是一对矛盾：同步预热启动慢但就绪即可用，异步预热启动快但有窗口期，需按业务容忍度选择。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "`ApplicationReadyEvent` 是启动完成后触发，监听器里干重活不影响启动" → 启动事件默认同步广播，监听器里做全量预热、远程调用会直接拖长甚至卡死启动主线程。
 - ❌ "Runner 里的初始化失败没关系，应用照常运行" → `CommandLineRunner`/`ApplicationRunner` 抛出的未捕获异常会被 `handleRunFailure` 视为启动失败，非关键初始化必须自吞异常。
@@ -729,10 +800,28 @@ my-spring-boot-starter
 
 ::: details
 
-- 【L3】注册文件的版本演进：Boot 1.x ~ 2.6 用 `spring.factories`（key 为 `EnableAutoConfiguration`，`SpringFactoriesLoader` 加载）；2.7 过渡期两种文件同时支持、旧方式标记废弃；3.x 只读 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`（`ImportCandidates.load` 加载）。「starter 升级 Boot 3.x 后自动配置静默失效」多半是这一步没跟上。
-- 【L3】命名规范：官方 starter 命名是 `spring-boot-starter-xxx`，第三方/公司自定义 starter 应命名为 `xxx-spring-boot-starter`，避免与官方模块撞名。
-- 【L4】设计检查单：① 所有 `@Bean` 加 `@ConditionalOnMissingBean`（按类型而非按名称判断）；② Bean 命名带业务前缀（如 `xxRateLimiter`），配置属性统一 `xx.*` 前缀；③ 提供总开关 `@ConditionalOnProperty(matchIfMissing = true)`；④ Boot 2.7+ 用 `@AutoConfiguration` + `AutoConfiguration.imports` 注册，对顺序敏感的依赖声明 `@AutoConfigureAfter`；⑤ CI 增加覆盖测试：用 `ApplicationContextRunner` 模拟用户定义同类型 Bean，断言自动配置 Bean 不存在且启动无冲突。
-- 【L4】`@ConditionalOnMissingBean` 的代价是用户覆盖后 starter 失去对该 Bean 的控制（用户可能漏配关键属性），因此应把行为尽量做成 `@ConfigurationProperties` 可调参，缩小用户必须自定义 Bean 的场景。若某个 Bean 必须强制注册（基础设施型），应起独占名称并在文档中明示，冲突时给出明确的自定义错误信息，而不是让业务方看到晦涩的 `BeanDefinitionOverrideException`。
+- 【L3】注册文件的版本演进
+
+  Boot 1.x ~ 2.6 用 `spring.factories`（key 为 `EnableAutoConfiguration`，`SpringFactoriesLoader` 加载）；
+  2.7 过渡期两种文件同时支持、旧方式标记废弃；
+  3.x 只读 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`（`ImportCandidates.load` 加载）。
+
+  「starter 升级 Boot 3.x 后自动配置静默失效」多半是这一步没跟上。
+
+- 【L3】命名规范
+
+  官方 starter 命名是 `spring-boot-starter-xxx`，第三方/公司自定义 starter 应命名为 `xxx-spring-boot-starter`，避免与官方模块撞名。
+
+- 【L4】设计检查单
+
+  ① 所有 `@Bean` 加 `@ConditionalOnMissingBean`（按类型而非按名称判断）；② Bean 命名带业务前缀（如 `xxRateLimiter`），配置属性统一 `xx.*` 前缀；
+  ③ 提供总开关 `@ConditionalOnProperty(matchIfMissing = true)`；
+  ④ Boot 2.7+ 用 `@AutoConfiguration` + `AutoConfiguration.imports` 注册，对顺序敏感的依赖声明 `@AutoConfigureAfter`；⑤ CI 增加覆盖测试：
+
+  用 `ApplicationContextRunner` 模拟用户定义同类型 Bean，断言自动配置 Bean 不存在且启动无冲突。
+
+- 【L4】`@ConditionalOnMissingBean` 的代价是用户覆盖后 starter 失去对该 Bean 的控制（用户可能漏配关键属性），因此应把行为尽量做成 `@ConfigurationProperties` 可调参，
+  缩小用户必须自定义 Bean 的场景。若某个 Bean 必须强制注册（基础设施型），应起独占名称并在文档中明示，冲突时给出明确的自定义错误信息，而不是让业务方看到晦涩的 `BeanDefinitionOverrideException`。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - Creating Your Own Auto-configuration](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)
 
@@ -742,20 +831,29 @@ my-spring-boot-starter
 
 ::: details
 
-**场景**：你为公司写了一个自定义 starter，内部注册了一个名为 `rateLimiter` 的 Bean。某业务方自己也有一个叫 `rateLimiter` 的 Bean，引入你的 starter 后启动报 `BeanDefinitionOverrideException`，业务方在群里 @ 你。你如何设计 starter 避免这类问题？
+**场景**：你为公司写了一个自定义 starter，内部注册了一个名为 `rateLimiter` 的 Bean。某业务方自己也有一个叫 `rateLimiter` 的 Bean，
+引入你的 starter 后启动报 `BeanDefinitionOverrideException`，业务方在群里 @ 你。你如何设计 starter 避免这类问题？
 
 - **应急处理**：先让业务方加 `spring.main.allow-bean-definition-overriding=true` 恢复启动（或临时改业务方 Bean 名），同时回滚 starter 版本引用止损，再排查影响面。
-- **根因分析**：三处设计失误——① Bean 名过于通用，没有 starter 前缀，撞名概率高；② `@Bean` 未加 `@ConditionalOnMissingBean`，没有遵循「用户优先」；③ 发布前没有做过 Bean 冲突的冒烟测试。
-- **长期方案**：① 所有 `@Bean` 加 `@ConditionalOnMissingBean`，用户自定义 Bean 自动优先；② Bean 命名带业务前缀（如 `xxRateLimiter`），配置属性统一 `xx.ratelimit.*` 前缀，从源头降低撞名概率；③ 提供总开关 `xx.ratelimit.enabled`，业务方可一键关闭；④ 用 `@AutoConfiguration` + `AutoConfiguration.imports` 文件注册，对顺序敏感的依赖声明 `@AutoConfigureAfter`；⑤ CI 增加覆盖测试：用 `ApplicationContextRunner` 模拟用户定义同类型 Bean，断言自动配置 Bean 不存在且启动无冲突。
-- **权衡**：`@ConditionalOnMissingBean` 的代价是用户覆盖后 starter 失去对该 Bean 的控制，因此应把行为尽量做成 `@ConfigurationProperties` 可调参。若某个 Bean 必须强制注册（基础设施型），应起独占名称并在文档中明示，冲突时给出明确的自定义错误信息。
+
+- **根因分析**：三处设计失误——① Bean 名过于通用，没有 starter 前缀，撞名概率高；② `@Bean` 未加 `@ConditionalOnMissingBean`，没有遵循「用户优先」；
+  ③ 发布前没有做过 Bean 冲突的冒烟测试。
+
+- **长期方案**：① 所有 `@Bean` 加 `@ConditionalOnMissingBean`，用户自定义 Bean 自动优先；② Bean 命名带业务前缀（如 `xxRateLimiter`），
+  配置属性统一 `xx.ratelimit.*` 前缀，从源头降低撞名概率；③ 提供总开关 `xx.ratelimit.enabled`，业务方可一键关闭；
+  ④ 用 `@AutoConfiguration` + `AutoConfiguration.imports` 文件注册，对顺序敏感的依赖声明 `@AutoConfigureAfter`；⑤ CI 增加覆盖测试：
+
+  用 `ApplicationContextRunner` 模拟用户定义同类型 Bean，断言自动配置 Bean 不存在且启动无冲突。
+
+- **权衡**：`@ConditionalOnMissingBean` 的代价是用户覆盖后 starter 失去对该 Bean 的控制，因此应把行为尽量做成 `@ConfigurationProperties` 可调参。
+
+  若某个 Bean 必须强制注册（基础设施型），应起独占名称并在文档中明示，冲突时给出明确的自定义错误信息。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "starter 注册只写 `spring.factories` 就行" → Boot 3.x 不再读取其中的 `EnableAutoConfiguration` key，升级后自动配置静默失效；2.7 起应迁移到 `AutoConfiguration.imports` 文件。
 - ❌ "starter 里把所有依赖都打进去，用户就不用操心了" → starter 应只包含必需的依赖，Spring Boot 启动器通常由使用者引入或设为 provided/optional，否则极易引入版本冲突。
@@ -845,9 +943,24 @@ my-spring-boot-starter
 
 ::: details
 
-- 【L3】求值顺序与短路机制：自动配置候选类在进入解析前先经三个 `AutoConfigurationImportFilter`（`OnClassCondition`、`OnBeanCondition`、`OnWebApplicationCondition`）基于 ASM 元数据做快速过滤——不加载类字节码即可判定类级条件（如 `@ConditionalOnClass`、`@ConditionalOnWebApplication`），整类不满足直接短路跳过，不进入后续解析；进入解析的条件按「类级条件先于方法级条件」求值，任一条件不满足即短路。其中 `@ConditionalOnBean`/`@ConditionalOnMissingBean` 依赖 BeanDefinition 注册表的当前状态，必须最后求值——这也是自动配置类整体被排到用户配置之后处理的根本原因（见本文档「SpringBoot 是如何实现自动配置的？」）。
-- 【L3】条件评估时机有坑：`@ConditionalOnBean`/`@ConditionalOnMissingBean` 的判断依赖 BeanDefinition 的注册顺序，用在用户 `@ComponentScan` 扫到的普通配置类上时顺序不可控、极易误判；官方只保证它们在自动配置类（最后处理）中可靠。
-- 【L4】自定义条件：实现 `org.springframework.context.annotation.Condition` 接口（或继承 `SpringBootCondition`）即可定义任意判断逻辑，配合自定义组合注解（元注解标注 `@Conditional`）封装成团队内部的条件注解。
+- 【L3】求值顺序与短路机制
+
+  自动配置候选类在进入解析前先经三个 `AutoConfigurationImportFilter`（`OnClassCondition`、`OnBeanCondition`、
+  `OnWebApplicationCondition`）基于 ASM 元数据做快速过滤——不加载类字节码即可判定类级条件（如 `@ConditionalOnClass`、`@ConditionalOnWebApplication`），
+  整类不满足直接短路跳过，不进入后续解析；进入解析的条件按「类级条件先于方法级条件」求值，任一条件不满足即短路。
+
+  其中 `@ConditionalOnBean`/`@ConditionalOnMissingBean` 依赖 BeanDefinition 注册表的当前状态，必须最后求值——
+  这也是自动配置类整体被排到用户配置之后处理的根本原因（见本文档「SpringBoot 是如何实现自动配置的？」）。
+
+- 【L3】条件评估时机有坑
+
+  `@ConditionalOnBean`/`@ConditionalOnMissingBean` 的判断依赖 BeanDefinition 的注册顺序，
+  用在用户 `@ComponentScan` 扫到的普通配置类上时顺序不可控、极易误判；官方只保证它们在自动配置类（最后处理）中可靠。
+
+- 【L4】自定义条件
+
+  实现 `org.springframework.context.annotation.Condition` 接口（或继承 `SpringBootCondition`）即可定义任意判断逻辑，
+  配合自定义组合注解（元注解标注 `@Conditional`）封装成团队内部的条件注解。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - Condition Annotations](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)
 
@@ -933,7 +1046,11 @@ server:
 
 ::: details
 
-- 【L3】切换为何能自动生效？`ServletWebServerFactoryAutoConfiguration` 内部按 `@ConditionalOnClass` 分别探测 Tomcat/Jetty/Undertow 的类是否存在，类路径上有哪个容器的类就用对应的 `XxxServletWebServerFactory`，无需任何额外代码。
+- 【L3】切换为何能自动生效？
+
+  `ServletWebServerFactoryAutoConfiguration` 内部按 `@ConditionalOnClass` 分别探测 Tomcat/Jetty/Undertow 的类是否存在，
+  类路径上有哪个容器的类就用对应的 `XxxServletWebServerFactory`，无需任何额外代码。
+
 - 【L4】Reactive（WebFlux）应用的默认容器是 Netty（`NettyReactiveWebServerFactory`），也可切换为 Undertow/Tomcat 的 Reactive 实现。
 
 :::
@@ -979,8 +1096,15 @@ SpringBoot 内嵌 Tomcat 的核心机制是在应用启动时，通过 `WebServe
 
 ::: details
 
-- 【L3】定制容器参数：`server.*` 配置（如 `server.port`、`server.tomcat.threads.max`）由 `ServerProperties` 绑定，通过 `WebServerFactoryCustomizer` 机制应用到工厂；也可自己实现 `WebServerFactoryCustomizer<TomcatServletWebServerFactory>` 做更深层定制（如 Connector 参数）。
-- 【L4】时机细节：容器在 `onRefresh` 创建并启动，早于非懒加载单例 Bean 的实例化；但真正对外接受流量要等上下文完全刷新完毕，这也是 readiness 探针与启动完成需要分开判断的原因之一。
+- 【L3】定制容器参数
+
+  `server.*` 配置（如 `server.port`、`server.tomcat.threads.max`）由 `ServerProperties` 绑定，
+  通过 `WebServerFactoryCustomizer` 机制应用到工厂；
+  也可自己实现 `WebServerFactoryCustomizer<TomcatServletWebServerFactory>` 做更深层定制（如 Connector 参数）。
+
+- 【L4】时机细节
+
+  容器在 `onRefresh` 创建并启动，早于非懒加载单例 Bean 的实例化；但真正对外接受流量要等上下文完全刷新完毕，这也是 readiness 探针与启动完成需要分开判断的原因之一。
 
 :::
 
@@ -1038,8 +1162,14 @@ SpringBoot 支持多种配置来源，加载时按以下优先级从高到低覆
 
 ::: details
 
-- 【L3】同一位置同时存在 `application.properties` 和 `application.yml` 时，`.properties` 优先级更高（后加载覆盖先加载）；配置文件的实际解析由 `ConfigDataEnvironmentPostProcessor` 完成。
-- 【L3】Boot 2.4 起配置文件处理规则有变化：多文档文件的 profile 激活逻辑重设计，`spring.profiles.active` 不能再由 profile-specific 文件自身覆盖；2.4 以前的旧行为可用 `spring.config.use-legacy-processing=true` 回退。
+- 【L3】同一位置同时存在 `application.properties` 和 `application.yml` 时，`.properties` 优先级更高（后加载覆盖先加载）；
+  配置文件的实际解析由 `ConfigDataEnvironmentPostProcessor` 完成。
+
+- 【L3】Boot 2.4 起配置文件处理规则有变化
+
+  多文档文件的 profile 激活逻辑重设计，`spring.profiles.active` 不能再由 profile-specific 文件自身覆盖；
+  2.4 以前的旧行为可用 `spring.config.use-legacy-processing=true` 回退。
+
 - 【L4】接入配置中心（如 Nacos/Apollo）后，远程配置通常以高优先级 PropertySource 插入，可覆盖本地文件；但命令行参数仍可覆盖远程配置，这是运维紧急降级的保留通道。
 
 :::
@@ -1116,9 +1246,22 @@ public class MyComponent {
 
 ::: details
 
-- 【L3】`@ConfigurationProperties` 本身不是组件注解，Bean 需先被注册才生效：常见三种方式——类上加 `@Component` 被扫描、配置类上 `@EnableConfigurationProperties(XxxProperties.class)` 启用（starter 的标准做法，见本文档「如何自定义一个 starter 包？」）、Boot 2.2+ 主类上 `@ConfigurationPropertiesScan` 扫描。
-- 【L4】构造器绑定（Constructor Binding）：Boot 2.2+ 支持不可变配置——类不写 setter，用带参构造器接收绑定值，字段可声明为 `final`，配合 `@DefaultValue` 指定默认值，适合配置不可变的场景。
-- 【L4】动态刷新陷阱：`@Value` 占位符是一次性注入，配置中心改值后字段不会自动更新；Spring Cloud 的 `@RefreshScope` 靠「销毁并重建 Bean」实现刷新（刷新时清空缓存的 Bean，下次访问重新实例化），对有状态 Bean 与自建连接池/缓存具有破坏性（在途任务丢失、池重建抖动），使用前必须确认 Bean 无状态。`@ConfigurationProperties` Bean 则由 `ConfigurationPropertiesRebinder` 在 `EnvironmentChangeEvent` 时**原地重新绑定**，不销毁 Bean，是配置中心场景更安全的绑定方式。另一个隐蔽坑：启动时把 properties 对象的字段值拷贝进其他单例（或在构造器里取值缓存），重绑只更新 properties Bean 本身，拷贝出去的旧值不会跟着变——配置刷新「失效」多源于此。
+- 【L3】`@ConfigurationProperties` 本身不是组件注解，Bean 需先被注册才生效：常见三种方式——类上加 `@Component` 被扫描、
+  配置类上 `@EnableConfigurationProperties(XxxProperties.class)` 启用（starter 的标准做法，见本文档「如何自定义一个 starter 包？」）、
+  Boot 2.2+ 主类上 `@ConfigurationPropertiesScan` 扫描。
+
+- 【L4】构造器绑定（Constructor Binding）
+
+  Boot 2.2+ 支持不可变配置——类不写 setter，用带参构造器接收绑定值，字段可声明为 `final`，配合 `@DefaultValue` 指定默认值，
+  适合配置不可变的场景。
+
+- 【L4】动态刷新陷阱
+
+  `@Value` 占位符是一次性注入，配置中心改值后字段不会自动更新；Spring Cloud 的 `@RefreshScope` 靠「销毁并重建 Bean」实现刷新（刷新时清空缓存的 Bean，
+  下次访问重新实例化），对有状态 Bean 与自建连接池/缓存具有破坏性（在途任务丢失、池重建抖动），使用前必须确认 Bean 无状态。
+
+  `@ConfigurationProperties` Bean 则由 `ConfigurationPropertiesRebinder` 在 `EnvironmentChangeEvent` 时**原地重新绑定**，不销毁 Bean，
+  是配置中心场景更安全的绑定方式。另一个隐蔽坑：启动时把 properties 对象的字段值拷贝进其他单例（或在构造器里取值缓存），重绑只更新 properties Bean 本身，拷贝出去的旧值不会跟着变——配置刷新「失效」多源于此。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - Type-safe Configuration Properties](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties)
 
@@ -1191,10 +1334,26 @@ management:
 
 ::: details
 
-- 【L3】自定义端点：用 `@Endpoint(id = "xxx")` + `@ReadOperation`/`@WriteOperation` 定义；自定义健康检查实现 `HealthIndicator` 接口，把中间件连通性纳入 `/health`。
-- 【L3】端点暴露的安全边界（真实事故面）：`management.endpoints.web.exposure.include=*` 在生产是重大安全隐患——`/actuator/env` 未鉴权时泄漏配置键名与环境变量（新版本默认对敏感值掩码，但历史版本或错误配置 `show-values` 时曾泄漏明文凭据）；`/actuator/heapdump` 更危险：堆转储里含内存中的明文密码、密钥与用户数据，公网可直接下载等同于数据泄漏事故。治理手段：include 精确到最小集合、管理端独立端口（`management.server.port`）+ 网络 ACL 隔离、对外只留 health/info、配合 Spring Security 鉴权、`show-details` 用 `when-authorized`。
-- 【L4】`/metrics` 底层基于 Micrometer，可对接 Prometheus/Grafana，业务埋点用 `MeterRegistry` 注册 `Timer`/`Counter`（`Timer` 自带 P95/P99 分位）；`/actuator/conditions` 可查自动配置的条件评估报告（排查 starter 不生效的第一工具）；`/actuator/startup` 可查启动时间线（见本文档「SpringBoot 启动慢的原因有哪些？如何优化？」）。
-- 【L4】分布式追踪：Boot 3 起由 Micrometer Tracing（配合 Observation API）统一承担，Spring Cloud Sleuth 停止演进——升级 Boot 3 时追踪依赖需从 Sleuth 切换为 Micrometer Tracing + Bridge（Brave 或 OpenTelemetry）。
+- 【L3】自定义端点
+
+  用 `@Endpoint(id = "xxx")` + `@ReadOperation`/`@WriteOperation` 定义；自定义健康检查实现 `HealthIndicator` 接口，
+  把中间件连通性纳入 `/health`。
+
+- 【L3】端点暴露的安全边界（真实事故面）
+
+  `management.endpoints.web.exposure.include=*` 在生产是重大安全隐患——
+  `/actuator/env` 未鉴权时泄漏配置键名与环境变量（新版本默认对敏感值掩码，但历史版本或错误配置 `show-values` 时曾泄漏明文凭据）；`/actuator/heapdump` 更危险：堆转储里含内存中的明文密码、
+  密钥与用户数据，公网可直接下载等同于数据泄漏事故。治理手段：include 精确到最小集合、管理端独立端口（`management.server.port`）+ 网络 ACL 隔离、对外只留 health/info、
+  配合 Spring Security 鉴权、`show-details` 用 `when-authorized`。
+
+- 【L4】`/metrics` 底层基于 Micrometer，可对接 Prometheus/Grafana，
+  业务埋点用 `MeterRegistry` 注册 `Timer`/`Counter`（`Timer` 自带 P95/P99 分位）；
+  `/actuator/conditions` 可查自动配置的条件评估报告（排查 starter 不生效的第一工具）；`/actuator/startup` 可查启动时间线（见本文档「SpringBoot 启动慢的原因有哪些？如何优化？」）。
+
+- 【L4】分布式追踪
+
+  Boot 3 起由 Micrometer Tracing（配合 Observation API）统一承担，Spring Cloud Sleuth 停止演进——
+  升级 Boot 3 时追踪依赖需从 Sleuth 切换为 Micrometer Tracing + Bridge（Brave 或 OpenTelemetry）。
 
 :::
 
@@ -1331,8 +1490,17 @@ public class HttpConfig {
 
 ::: details
 
-- 【L3】自动配置注册文件变更（升级必检）：Boot 3.x 不再读取 `spring.factories` 中的 `EnableAutoConfiguration` key，自动配置类必须注册到 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`；自定义 starter 若没跟上会静默失效，详见本文档「SpringBoot 是如何实现自动配置的？」。
-- 【L4】Boot 3.2+ 支持虚拟线程：`spring.threads.virtual.enabled=true` 即可让 Tomcat 工作线程、任务执行器使用 JDK 21 虚拟线程；Boot 3.3+ 支持 JVM CDS（Class Data Sharing）归档加速启动；Boot 3.2+ 另提供实验性 CRaC（Coordinated Restore at Checkpoint）支持，是 Native Image 之外的另一条毫秒级启动路线（详见本文档「SpringBoot 3.x 如何支持 GraalVM Native Image？启动速度、内存占用与功能限制的量化评估。」）。
+- 【L3】自动配置注册文件变更（升级必检）
+
+  Boot 3.x 不再读取 `spring.factories` 中的 `EnableAutoConfiguration` key，
+  自动配置类必须注册到 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`；自定义 starter 若没跟上会静默失效，
+  详见本文档「SpringBoot 是如何实现自动配置的？」。
+
+- 【L4】Boot 3.2+ 支持虚拟线程
+
+  `spring.threads.virtual.enabled=true` 即可让 Tomcat 工作线程、任务执行器使用 JDK 21 虚拟线程；
+  Boot 3.3+ 支持 JVM CDS（Class Data Sharing）归档加速启动；Boot 3.2+ 另提供实验性 CRaC（Coordinated Restore at Checkpoint）支持，
+  是 Native Image 之外的另一条毫秒级启动路线（详见本文档「SpringBoot 3.x 如何支持 GraalVM Native Image？启动速度、内存占用与功能限制的量化评估。」）。
 
 > 📚 延伸阅读：[SpringBoot 3.0 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Release-Notes)
 
@@ -1388,9 +1556,18 @@ public class HttpConfig {
 
 ::: details
 
-- 【L3】精确定位耗时：Boot 2.4+ 开启 `BufferingApplicationStartup` 后通过 `/actuator/startup` 查看各步骤时间线，可精确到具体 Bean 的实例化耗时；配合 `--debug` 条件评估报告确认自动配置解析开销（定位方法论见本文档「SpringBoot 的启动流程是如何设计的？」的实战场景）。
-- 【L4】Boot 3.3+ 可配合 JVM CDS（Class Data Sharing）归档进一步压缩启动时间；Serverless/弹性扩缩容场景可评估 GraalVM Native Image（见本文档「SpringBoot 3.x 有哪些重要新特性？」），但要权衡反射受限与峰值性能下降。
-- 【L3】`spring-context-indexer`：加入该依赖后编译期生成候选组件索引（`META-INF/spring.components`），启动时免类路径扫描。局限：要求被扫描的依赖模块（含第三方 jar）都生成索引，一旦有模块缺索引会回退全量扫描、反而更慢；多数应用用 `scanBasePackages` 显式收窄已够。Boot 3 的 AOT 处理在构建期完成类似优化，indexer 的独立价值在减小。
+- 【L3】精确定位耗时
+
+  Boot 2.4+ 开启 `BufferingApplicationStartup` 后通过 `/actuator/startup` 查看各步骤时间线，可精确到具体 Bean 的实例化耗时；
+  配合 `--debug` 条件评估报告确认自动配置解析开销（定位方法论见本文档「SpringBoot 的启动流程是如何设计的？」的实战场景）。
+
+- 【L4】Boot 3.3+ 可配合 JVM CDS（Class Data Sharing）归档进一步压缩启动时间；
+  Serverless/弹性扩缩容场景可评估 GraalVM Native Image（见本文档「SpringBoot 3.x 有哪些重要新特性？」），但要权衡反射受限与峰值性能下降。
+
+- 【L3】`spring-context-indexer`
+
+  加入该依赖后编译期生成候选组件索引（`META-INF/spring.components`），启动时免类路径扫描。局限：要求被扫描的依赖模块（含第三方 jar）都生成索引，
+  一旦有模块缺索引会回退全量扫描、反而更慢；多数应用用 `scanBasePackages` 显式收窄已够。Boot 3 的 AOT 处理在构建期完成类似优化，indexer 的独立价值在减小。
 
 :::
 
@@ -1461,8 +1638,16 @@ jar 冲突本质是 Maven 版本仲裁问题：先用 `dependency:tree` 定位�
 
 ::: details
 
-- 【L3】Maven 仲裁规则：同一 artifact 多版本共存时，「最近优先」（路径最短者胜）；路径深度相同时按 pom 中声明顺序取先声明者。`dependency:tree -Dverbose` 会打印被仲裁掉的版本（omitted for conflict）。
-- 【L4】CI 预防：用 `maven-enforcer-plugin` 的 `dependencyConvergence` 规则强制同一 artifact 版本收敛，版本不一致直接构建失败，把冲突拦在合码阶段而非运行期 `NoClassDefFoundError`。
+- 【L3】Maven 仲裁规则
+
+  同一 artifact 多版本共存时，「最近优先」（路径最短者胜）；路径深度相同时按 pom 中声明顺序取先声明者。
+
+  `dependency:tree -Dverbose` 会打印被仲裁掉的版本（omitted for conflict）。
+
+- 【L4】CI 预防
+
+  用 `maven-enforcer-plugin` 的 `dependencyConvergence` 规则强制同一 artifact 版本收敛，版本不一致直接构建失败，
+  把冲突拦在合码阶段而非运行期 `NoClassDefFoundError`。
 
 :::
 
@@ -1523,9 +1708,27 @@ spring:
 
 ::: details
 
-- 【L3】实现机制：优雅停机由 SmartLifecycle 组件 `WebServerGracefulShutdownLifecycle` 驱动，它在容器关闭的最早阶段（最高 phase）触发 WebServer 的 `shutDownGracefully`，先拒新连接再等待存量请求，随后才轮到 Bean 销毁。
-- 【L4】K8s 配套细节：SIGTERM 与 endpoints 摘除是并发的，单靠优雅停机仍会有流量窗口，标准做法是 `preStop: sleep 5-10s` 等待负载均衡更新，再依赖 graceful shutdown 消化存量；健康检查改接 `/actuator/health/readiness`，见本文档「SpringBoot Actuator 是什么？有哪些核心端点？」。
-- 【L4】停机顺序与信号处理：SIGTERM → JVM Shutdown Hook → `ApplicationContext#close` → 发布 `ContextClosedEvent` → 按 phase **从高到低**停止 `SmartLifecycle`（`WebServerGracefulShutdownLifecycle` 处于高 phase，先停 Web 容器：拒新 + 等在途请求）→ 销毁单例 Bean（`@PreDestroy`/`DisposableBean`，按依赖逆序，连接池等基础设施最后关）。该顺序保证「先停流量入口、再关下游连接」。两个盲区：① MQ 消费者不在 Web 优雅停机覆盖范围内——Kafka/RocketMQ 的监听容器同样是 `SmartLifecycle`、会随 phase 停止，但「在途消息是否处理完」取决于其自身的优雅配置（如 Kafka 容器的 `shutdownTimeout`）；若消费逻辑依赖的下游连接先被销毁，会报错刷屏甚至丢消息，关闭顺序必须逐一核对；② 自建线程池与 `@Async` 任务默认不被等待，必须显式 `setWaitForTasksToCompleteOnShutdown(true)` + `setAwaitTerminationSeconds`。K8s 的 `terminationGracePeriodSeconds`（默认 30s）必须大于「preStop 时长 + `timeout-per-shutdown-phase`」，否则宽限期一到进程被 SIGKILL，前面的优雅逻辑全部作废。
+- 【L3】实现机制
+
+  优雅停机由 SmartLifecycle 组件 `WebServerGracefulShutdownLifecycle` 驱动，
+  它在容器关闭的最早阶段（最高 phase）触发 WebServer 的 `shutDownGracefully`，先拒新连接再等待存量请求，随后才轮到 Bean 销毁。
+
+- 【L4】K8s 配套细节
+
+  SIGTERM 与 endpoints 摘除是并发的，单靠优雅停机仍会有流量窗口，标准做法是 `preStop: sleep 5-10s` 等待负载均衡更新，
+  再依赖 graceful shutdown 消化存量；健康检查改接 `/actuator/health/readiness`，见本文档「SpringBoot Actuator 是什么？有哪些核心端点？」。
+
+- 【L4】停机顺序与信号处理
+
+  SIGTERM → JVM Shutdown Hook → `ApplicationContext#close` → 发布 `ContextClosedEvent` →
+   按 phase **从高到低**停止 `SmartLifecycle`（`WebServerGracefulShutdownLifecycle` 处于高 phase，先停 Web 容器：拒新 + 等在途请求）→
+   销毁单例 Bean（`@PreDestroy`/`DisposableBean`，按依赖逆序，连接池等基础设施最后关）。该顺序保证「先停流量入口、再关下游连接」。两个盲区：① MQ 消费者不在 Web 优雅停机覆盖范围内——
+  Kafka/RocketMQ 的监听容器同样是 `SmartLifecycle`、会随 phase 停止，但「在途消息是否处理完」取决于其自身的优雅配置（如 Kafka 容器的 `shutdownTimeout`）；
+  若消费逻辑依赖的下游连接先被销毁，会报错刷屏甚至丢消息，关闭顺序必须逐一核对；② 自建线程池与 `@Async` 任务默认不被等待，
+  必须显式 `setWaitForTasksToCompleteOnShutdown(true)` + `setAwaitTerminationSeconds`。
+
+  K8s 的 `terminationGracePeriodSeconds`（默认 30s）必须大于「preStop 时长 + `timeout-per-shutdown-phase`」，否则宽限期一到进程被 SIGKILL，
+  前面的优雅逻辑全部作废。
 
 :::
 
@@ -1628,8 +1831,13 @@ public class CustomContextInitializer
 
 ::: details
 
-- 【L3】`SpringFactoriesLoader` 在 Boot 3.x 重构为 `SpringFactoriesLoader.load()` + 缓存机制（`ArgumentResolver`），对同一 ClassLoader 只扫描一次并缓存结果，避免重复 IO。可通过 `SpringFactoriesLoader.forDefaultResourceLocation(classLoader)` 显式指定加载路径，用于测试隔离。
-- 【L3】`EnvironmentPostProcessor` 的执行顺序由 `@Order` 注解控制（默认 `Ordered.LOWEST_PRECEDENCE`），多个 PostProcessor 按 Order 值从小到大执行。典型应用：`ConfigDataEnvironmentPostProcessor`（加载配置文件）、`CloudFoundryVcapEnvironmentPostProcessor`（注入 CF 环境变量）。
+- 【L3】`SpringFactoriesLoader` 在 Boot 3.x 重构为 `SpringFactoriesLoader.load()` + 缓存机制（`ArgumentResolver`），
+  对同一 ClassLoader 只扫描一次并缓存结果，避免重复 IO。可通过 `SpringFactoriesLoader.forDefaultResourceLocation(classLoader)` 显式指定加载路径，用于测试隔离。
+
+- 【L3】`EnvironmentPostProcessor` 的执行顺序由 `@Order` 注解控制（默认 `Ordered.LOWEST_PRECEDENCE`），多个 PostProcessor 按 Order 值从小到大执行。
+
+  典型应用：`ConfigDataEnvironmentPostProcessor`（加载配置文件）、`CloudFoundryVcapEnvironmentPostProcessor`（注入 CF 环境变量）。
+
 - 【L4】扩展点选型权衡：
 
 | 需求                               | 选择                            | 边界与限制                                         |
@@ -1639,7 +1847,8 @@ public class CustomContextInitializer
 | 提前排除候选自动配置类（性能优化） | `AutoConfigurationImportFilter` | 只返回 pass/fail，不能修改候选类列表               |
 | 深度定制启动过程（每步回调）       | `SpringApplicationRunListener`  | 重量级手段，需在 `spring.factories` 注册，一般不用 |
 
-- 【L4】自定义 `@Conditional`：实现 `SpringBootCondition` 或 `AbstractNestedCondition`，可封装复杂条件逻辑（如「类路径存在 A 且不存在 B 且配置属性 C=true」），配合元注解对外暴露为团队内部的条件注解，实现条件判断的复用。
+- 【L4】自定义 `@Conditional`：实现 `SpringBootCondition` 或 `AbstractNestedCondition`，可封装复杂条件逻辑（如「类路径存在 A 且不存在 B 且配置属性 C=true」），
+  配合元注解对外暴露为团队内部的条件注解，实现条件判断的复用。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - Auto-configuration](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)
 
@@ -1648,10 +1857,13 @@ public class CustomContextInitializer
 ::: details 踩坑案例：starter 升级 Boot 3.x 后自动配置静默失效
 
 > **现象**：公司内部监控 starter 从 Boot 2.6 升级到 3.1 后，所有自动配置静默失效——告警组件没注册、指标采集没生效，但启动不报错。
+
 >
 > **排查**：`--debug` 启动查看条件评估报告，发现所有自动配置类根本没进入候选列表。检查 starter 的 `spring.factories`，自动配置类仍注册在 `EnableAutoConfiguration` key 下。
+
 >
 > **根因**：Boot 3.x 不再读取 `spring.factories` 中的 `EnableAutoConfiguration` key，自动配置类必须注册到 `AutoConfiguration.imports` 文件。
+
 >
 > **修复**：在 starter 中同时维护两套注册文件（通过 Maven profile 按 Boot 版本激活），并在 CI 中增加 Boot 2.x 和 3.x 双版本冒烟测试。
 
@@ -1758,10 +1970,29 @@ server:
 
 ::: details
 
-- 【L3】IO 模型本质差异：Tomcat 默认 NIO 模式但仍是 thread-per-connection（每个连接分配一个工作线程处理完整请求生命周期）；Undertow 的 XNIO 将 IO 操作和业务处理分离——IO 线程只做非阻塞读写（类似 Netty 的 Boss/Worker 模型），业务逻辑提交到 Worker 线程池；Jetty 的 async 模式通过 `Continuation` 机制释放工作线程，请求挂起时不占线程。
-- 【L3】Tomcat 三参数关系（`max-connections` / `threads.max` / `accept-count`）：`max-connections`（默认 8192）是 NIO Poller 可同时持有的 TCP 连接数——连接空闲等待时只占内存不占工作线程；`threads.max`（默认 200）是真正执行请求处理的工作线程数；`accept-count`（默认 100）是连接数打满后新连接进入的操作系统 backlog 队列长度，实际生效值为 `min(backlog, somaxconn)`（**全连接队列**，受 `net.core.somaxconn` 上限约束；勿与 `tcp_max_syn_backlog` 控制的半连接队列混淆）。三者构成「处理中 → 已连接等待 → 排队」的漏斗：短请求服务 `threads.max` 按「目标并发 × 平均 RT」估算即可，`max-connections` 可远大于 `threads.max`；两级都打满才会拒绝新连接（客户端表现为连接超时/拒绝）。
-- 【L3】虚拟线程兼容：Boot 3.2+ 开启 `spring.threads.virtual.enabled=true` 后，三种容器的工作线程均可替换为 JDK 21 虚拟线程，此时 thread-per-connection 模型的扩展性瓶颈被消除，Tomcat 在高连接数场景下性能差距缩小。
-- 【L4】切换容器的隐藏成本：① Tomcat 特有的 Valve/Realm 机制（如 `RemoteIpValve`、JDBCRealm）在其他容器需用等价实现替换；② Undertow 的 `DirectByteBuffer` 在频繁创建销毁场景可能导致堆外内存碎片，需监控 `java.nio` 的 `DirectBufferPool`；③ Jetty 的 `Continuation` 与 Servlet 3.1 异步 API 语义不完全等价，迁移时需回归测试。
+- 【L3】IO 模型本质差异
+
+  Tomcat 默认 NIO 模式但仍是 thread-per-connection（每个连接分配一个工作线程处理完整请求生命周期）；Undertow 的 XNIO 将 IO 操作和业务处理分离——
+  IO 线程只做非阻塞读写（类似 Netty 的 Boss/Worker 模型），业务逻辑提交到 Worker 线程池；Jetty 的 async 模式通过 `Continuation` 机制释放工作线程，请求挂起时不占线程。
+
+- 【L3】Tomcat 三参数关系（`max-connections` / `threads.max` / `accept-count`）：
+
+  `max-connections`（默认 8192）是 NIO Poller 可同时持有的 TCP 连接数——连接空闲等待时只占内存不占工作线程；`threads.max`（默认 200）是真正执行请求处理的工作线程数；
+  `accept-count`（默认 100）是连接数打满后新连接进入的操作系统 backlog 队列长度，实际生效值为 `min(backlog, somaxconn)`（**全连接队列**，
+  受 `net.core.somaxconn` 上限约束；勿与 `tcp_max_syn_backlog` 控制的半连接队列混淆）。三者构成「处理中 → 已连接等待 → 排队」的漏斗：
+
+  短请求服务 `threads.max` 按「目标并发 × 平均 RT」估算即可，`max-connections` 可远大于 `threads.max`；两级都打满才会拒绝新连接（客户端表现为连接超时/拒绝）。
+
+- 【L3】虚拟线程兼容
+
+  Boot 3.2+ 开启 `spring.threads.virtual.enabled=true` 后，三种容器的工作线程均可替换为 JDK 21 虚拟线程，
+  此时 thread-per-connection 模型的扩展性瓶颈被消除，Tomcat 在高连接数场景下性能差距缩小。
+
+- 【L4】切换容器的隐藏成本
+
+  ① Tomcat 特有的 Valve/Realm 机制（如 `RemoteIpValve`、JDBCRealm）在其他容器需用等价实现替换；
+  ② Undertow 的 `DirectByteBuffer` 在频繁创建销毁场景可能导致堆外内存碎片，需监控 `java.nio` 的 `DirectBufferPool`；
+  ③ Jetty 的 `Continuation` 与 Servlet 3.1 异步 API 语义不完全等价，迁移时需回归测试。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - Embedded Web Servers](https://docs.spring.io/spring-boot/reference/web/servlet.html#web.servlet.embedded-container)
 
@@ -1904,10 +2135,29 @@ lifecycle:
 
 ::: details
 
-- 【L3】Boot 2.3+ 内置 `AvailabilityState` 机制：`LivenessState` 和 `ReadinessState` 作为应用上下文级别的状态，通过 `ApplicationAvailability` 接口获取。`AvailabilityChangeEvent.publish(ctx, ReadinessState.REFUSING_TRAFFIC)` 可在代码中主动标记不可就绪（如缓存预热未完成）。
-- 【L3】`/actuator/health` 的 `Status` 枚举：`UP`、`DOWN`、`OUT_OF_SERVICE`、`UNKNOWN`，以及自定义状态。聚合健康状态取所有组件的最低状态——任一组件 DOWN 则整体 DOWN。可通过 `StatusAggregator`（Boot 2.2+，旧接口 `HealthAggregator` 已废弃移除）自定义聚合策略。
-- 【L4】探针设计的反模式：① 把下游依赖检查放进 liveness 探针 → 下游抖动导致所有实例被 K8s 重启（级联雪崩）；② readiness 探针不检查数据库连接 → 实例启动后立即接流量但 SQL 全部超时；③ 健康检查超时设置过短 → 跨机房网络抖动导致假阴性；④ 把弱依赖（可降级的非核心链路，如推荐、埋点上报）放进 readiness → 下游一抖动本服务整体被摘流，把局部故障放大成级联不可用——readiness 只应包含「缺了就无法服务请求」的强依赖，弱依赖健康只做告警不做摘流。正确做法：liveness 只查自身（ping），readiness 查关键强依赖，超时阈值设为 P99 延迟的 3 倍。
-- 【L4】生产级健康检查清单：① 自定义 `HealthIndicator` 覆盖所有关键中间件；② liveness 分组只含 `ping`，readiness 分组含全部依赖；③ `show-details` 生产设为 `when-authorized`（仅运维角色可见）；④ 探针端点独立端口（`management.server.port`）或路径前缀，与业务流量隔离；⑤ 健康检查指标接入 Prometheus（`health_status` 指标），配置 Grafana 面板和告警。
+- 【L3】Boot 2.3+ 内置 `AvailabilityState` 机制
+
+  `LivenessState` 和 `ReadinessState` 作为应用上下文级别的状态，
+  通过 `ApplicationAvailability` 接口获取。
+
+  `AvailabilityChangeEvent.publish(ctx, ReadinessState.REFUSING_TRAFFIC)` 可在代码中主动标记不可就绪（如缓存预热未完成）。
+
+- 【L3】`/actuator/health` 的 `Status` 枚举
+
+  `UP`、`DOWN`、`OUT_OF_SERVICE`、`UNKNOWN`，以及自定义状态。聚合健康状态取所有组件的最低状态——
+  任一组件 DOWN 则整体 DOWN。可通过 `StatusAggregator`（Boot 2.2+，旧接口 `HealthAggregator` 已废弃移除）自定义聚合策略。
+
+- 【L4】探针设计的反模式
+
+  ① 把下游依赖检查放进 liveness 探针 → 下游抖动导致所有实例被 K8s 重启（级联雪崩）；② readiness 探针不检查数据库连接 → 实例启动后立即接流量但 SQL 全部超时；
+  ③ 健康检查超时设置过短 → 跨机房网络抖动导致假阴性；④ 把弱依赖（可降级的非核心链路，如推荐、埋点上报）放进 readiness → 下游一抖动本服务整体被摘流，把局部故障放大成级联不可用——
+  readiness 只应包含「缺了就无法服务请求」的强依赖，弱依赖健康只做告警不做摘流。正确做法：liveness 只查自身（ping），readiness 查关键强依赖，超时阈值设为 P99 延迟的 3 倍。
+
+- 【L4】生产级健康检查清单
+
+  ① 自定义 `HealthIndicator` 覆盖所有关键中间件；② liveness 分组只含 `ping`，readiness 分组含全部依赖；
+  ③ `show-details` 生产设为 `when-authorized`（仅运维角色可见）；④ 探针端点独立端口（`management.server.port`）或路径前缀，与业务流量隔离；
+  ⑤ 健康检查指标接入 Prometheus（`health_status` 指标），配置 Grafana 面板和告警。
 
 > 📚 延伸阅读：[SpringBoot 官方文档 - Production-ready Features / Health](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html)
 
@@ -2063,10 +2313,25 @@ JWT 无法主动撤销，生产方案：① 短有效期（15 分钟）+ Refresh
 
 ::: details
 
-- 【L3】多租户支持：通过 `JwtDecoderFactory<ClientRegistration>` 为不同租户创建独立的 `JwtDecoder`（按 `iss` claim 路由），实现一个资源服务器同时服务多个授权服务器。
-- 【L3】自定义 `BearerTokenResolver`：默认从 `Authorization: Bearer xxx` 头提取令牌，可自定义从 Cookie、查询参数等位置提取，适配前端无法设置请求头的场景（如 WebSocket、SSE）。
-- 【L4】权限模型设计：JWT 的 `scope` claim 适合粗粒度权限（如 `read:orders`、`write:orders`），细粒度权限（如「只能查看自己的订单」）应在业务层通过资源归属判断，不要塞进 JWT（会导致令牌膨胀且无法动态变更）。
-- 【L4】安全加固清单：① 配置 CORS 白名单，禁止 `*` 通配；② CSRF 对 API 场景可关闭（`csrf(csrf -> csrf.disable())`），但浏览器表单场景必须保留；③ 设置 `Content-Security-Policy`、`X-Content-Type-Options` 等安全响应头；④ 令牌验证失败统一返回 RFC 6750 错误格式（`Bearer realm="...", error="..."`），不暴露内部信息。
+- 【L3】多租户支持
+
+  通过 `JwtDecoderFactory<ClientRegistration>` 为不同租户创建独立的 `JwtDecoder`（按 `iss` claim 路由），实现一个资源服务器同时服务多个授权服务器。
+
+- 【L3】自定义 `BearerTokenResolver`
+
+  默认从 `Authorization: Bearer xxx` 头提取令牌，可自定义从 Cookie、查询参数等位置提取，适配前端无法设置请求头的场景（如 WebSocket、
+  SSE）。
+
+- 【L4】权限模型设计
+
+  JWT 的 `scope` claim 适合粗粒度权限（如 `read:orders`、`write:orders`），细粒度权限（如「只能查看自己的订单」）应在业务层通过资源归属判断，
+  不要塞进 JWT（会导致令牌膨胀且无法动态变更）。
+
+- 【L4】安全加固清单
+
+  ① 配置 CORS 白名单，禁止 `*` 通配；② CSRF 对 API 场景可关闭（`csrf(csrf -> csrf.disable())`），但浏览器表单场景必须保留；
+  ③ 设置 `Content-Security-Policy`、`X-Content-Type-Options` 等安全响应头；
+  ④ 令牌验证失败统一返回 RFC 6750 错误格式（`Bearer realm="...", error="..."`），不暴露内部信息。
 
 > 📚 延伸阅读：[Spring Security OAuth2 Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server.html)
 
@@ -2075,10 +2340,13 @@ JWT 无法主动撤销，生产方案：① 短有效期（15 分钟）+ Refresh
 ::: details 踩坑案例：迁移期间同时支持 JWT 和 Opaque Token
 
 > **现象**：订单服务从自建授权中心迁移到 Spring Authorization Server，迁移期间需同时支持旧系统的 Opaque Token 和新系统的 JWT。
+
 >
 > **排查**：默认配置只支持一种模式，无法同时处理两种令牌格式。
+
 >
 > **根因**：`SecurityFilterChain` 的 `oauth2ResourceServer` 只能配置一种 `AuthenticationConverter`。
+
 >
 > **修复**：自定义 `BearerTokenResolver`，按令牌格式分发——包含 `.` 的按 JWT 本地验签，否则走 Opaque Token 内省。迁移完成后移除旧模式。
 
@@ -2244,10 +2512,26 @@ public class TrafficMirrorFilter implements GlobalFilter, Ordered {
 
 ::: details
 
-- 【L3】用户维度灰度：按用户 ID 取模（`userId % 100 < 10` 则路由到灰度），实现百分比灰度。Spring Cloud Gateway 的 `Weight` 谓词可按权重分流（如 `Weight=group1, 10` 表示 10% 流量到灰度）。
-- 【L3】灰度标记传播的边界：① 异步消息（MQ）场景需将灰度标记写入消息 Header，消费端按标记路由；② 定时任务无请求上下文，需通过配置中心或数据库标记灰度实例；③ 跨线程（`@Async`、线程池）需使用 `TaskDecorator` 传播 `RequestAttributes`。
-- 【L4】灰度发布的数据层挑战：① 新旧版本共享数据库时，Schema 变更必须向后兼容（只加不删、新旧字段共存）；② 灰度实例写入的数据在回滚时不能被正式版本误读（通过版本号字段或状态机隔离）；③ 缓存 key 加版本前缀（如 `v2:user:123`），避免新旧版本缓存互相污染。
-- 【L4】灰度发布治理平台：生产级灰度需要配套的治理平台——① 灰度规则管理（按用户/地域/百分比配置规则，实时推送到网关）；② 灰度流量监控（Grafana 面板展示灰度/正式实例的 QPS、延迟、错误率对比）；③ 一键回滚（灰度实例异常时秒级切回正式流量）。
+- 【L3】用户维度灰度
+
+  按用户 ID 取模（`userId % 100 < 10` 则路由到灰度），实现百分比灰度。
+
+  Spring Cloud Gateway 的 `Weight` 谓词可按权重分流（如 `Weight=group1, 10` 表示 10% 流量到灰度）。
+
+- 【L3】灰度标记传播的边界
+
+  ① 异步消息（MQ）场景需将灰度标记写入消息 Header，消费端按标记路由；② 定时任务无请求上下文，需通过配置中心或数据库标记灰度实例；③ 跨线程（`@Async`、
+  线程池）需使用 `TaskDecorator` 传播 `RequestAttributes`。
+
+- 【L4】灰度发布的数据层挑战
+
+  ① 新旧版本共享数据库时，Schema 变更必须向后兼容（只加不删、新旧字段共存）；② 灰度实例写入的数据在回滚时不能被正式版本误读（通过版本号字段或状态机隔离）；
+  ③ 缓存 key 加版本前缀（如 `v2:user:123`），避免新旧版本缓存互相污染。
+
+- 【L4】灰度发布治理平台
+
+  生产级灰度需要配套的治理平台——① 灰度规则管理（按用户/地域/百分比配置规则，实时推送到网关）；② 灰度流量监控（Grafana 面板展示灰度/正式实例的 QPS、延迟、错误率对比）；
+  ③ 一键回滚（灰度实例异常时秒级切回正式流量）。
 
 > 📚 延伸阅读：[Spring Cloud Gateway](https://docs.spring.io/spring-cloud-gateway/reference/)
 
@@ -2256,10 +2540,13 @@ public class TrafficMirrorFilter implements GlobalFilter, Ordered {
 ::: details 踩坑案例：灰度标记在 Feign 调用链中丢失
 
 > **现象**：订单服务灰度发布，网关层灰度路由正常，但订单服务调用支付服务时灰度标记丢失，流量打到正式实例，灰度环境无法完成完整下单流程验证。
+
 >
 > **排查**：Feign 拦截器未传播 `X-Gray-Version` 请求头，支付服务 LoadBalancer 找不到灰度实例，fallback 到正式实例。
+
 >
 > **根因**：灰度标记只在网关层生效，未在微服务调用链中传播。
+
 >
 > **修复**：① 添加 `GrayFeignInterceptor` 传播灰度标记；② LoadBalancer 增加 fallback 策略（无灰度实例时返回空列表而非 fallback 到正式实例，避免灰度流量泄漏到正式环境）；③ 引入 Service Mesh（如 Istio）的 Header 透传能力，减少手动传播的遗漏风险。
 
@@ -2394,7 +2681,10 @@ class OrderServiceIntegrationTest {
 
 ::: details
 
-生产案例：某电商订单服务在上线新版本后发现 OrderRepository 的批量插入 SQL 在 MySQL 8.0 下因 `max_allowed_packet` 限制导致批量写入失败，而开发环境使用的是 H2 内存数据库，单元测试全部通过——典型的"假绿真红"。根因是 Mock 测试和 H2 无法暴露 MySQL 特有的 SQL 方言差异与包大小限制。修复方案：引入 TestContainers 启动真实 MySQL 8.0 容器，将所有 Repository 层测试迁移至集成测试套件，同时在 CI 中启用 Container Reuse 将构建时间从 3 分钟控制在 90 秒内。上线后同类问题归零。教训：数据访问层必须用真实数据库测试，H2 只能覆盖最基础的 CRUD，SQL 方言、索引策略、事务隔离级别等差异只有真实中间件能暴露。
+生产案例：某电商订单服务在上线新版本后发现 OrderRepository 的批量插入 SQL 在 MySQL 8.0 下因 `max_allowed_packet` 限制导致批量写入失败，而开发环境使用的是 H2 内存数据库，
+单元测试全部通过——典型的"假绿真红"。根因是 Mock 测试和 H2 无法暴露 MySQL 特有的 SQL 方言差异与包大小限制。修复方案：引入 TestContainers 启动真实 MySQL 8.0 容器，
+将所有 Repository 层测试迁移至集成测试套件，同时在 CI 中启用 Container Reuse 将构建时间从 3 分钟控制在 90 秒内。上线后同类问题归零。教训：数据访问层必须用真实数据库测试，
+H2 只能覆盖最基础的 CRUD，SQL 方言、索引策略、事务隔离级别等差异只有真实中间件能暴露。
 
 :::
 
@@ -2402,11 +2692,21 @@ class OrderServiceIntegrationTest {
 
 ::: details
 
-- 【L3】TestContainers 与 Spring Boot 3.1+ 的原生集成：`@Container` 字段上标注 `@ServiceConnection`，即可按容器类型自动注入 URL/用户名/密码等连接属性，替代手写 `@DynamicPropertySource`；配合 `spring-boot-docker-compose` 模块还能在开发/测试期自动拉起本地依赖容器。Spring TestContext Framework 默认缓存 ApplicationContext（`spring.test.context.cache.maxSize` 控制上限），相同配置的测试类复用上下文，避免每个测试类都重新启动容器与应用。
-- 【L4】TestContainers 在微服务契约测试中的角色：结合 Pact / Spring Cloud Contract，TestContainers 可作为 Provider 侧的真实环境运行器——Consumer 定义契约 Mock，Provider 用 TestContainers 启动真实数据库验证契约实现，形成完整的消费者驱动契约测试闭环。
-- 【L4】大规模 TestContainers 的 CI 优化策略：① 使用 Testcontainers Cloud（官方远程 Docker 服务）将容器启动从 CI 节点卸载到云端；② 并行测试分片（Maven Failsafe `forkCount`）+ 每片独立容器；③ 镜像预拉取 + 本地 Registry 缓存，避免 CI 每次从 Docker Hub 拉取。
+- 【L3】TestContainers 与 Spring Boot 3.1+ 的原生集成：`@Container` 字段上标注 `@ServiceConnection`，即可按容器类型自动注入 URL/用户名/密码等连接属性，
+  替代手写 `@DynamicPropertySource`；配合 `spring-boot-docker-compose` 模块还能在开发/测试期自动拉起本地依赖容器。
 
-📚 延伸阅读：[TestContainers 官方文档 - Spring Boot 集成](https://www.testcontainers.org/guides/using-testcontainers-with-spring-boot/)
+  Spring TestContext Framework 默认缓存 ApplicationContext（`spring.test.context.cache.maxSize` 控制上限），相同配置的测试类复用上下文，
+  避免每个测试类都重新启动容器与应用。
+
+- 【L4】TestContainers 在微服务契约测试中的角色：结合 Pact / Spring Cloud Contract，TestContainers 可作为 Provider 侧的真实环境运行器——
+  Consumer 定义契约 Mock，Provider 用 TestContainers 启动真实数据库验证契约实现，形成完整的消费者驱动契约测试闭环。
+
+- 【L4】大规模 TestContainers 的 CI 优化策略：① 使用 Testcontainers Cloud（官方远程 Docker 服务）将容器启动从 CI 节点卸载到云端；
+  ② 并行测试分片（Maven Failsafe `forkCount`）+ 每片独立容器；③ 镜像预拉取 + 本地 Registry 缓存，避免 CI 每次从 Docker Hub 拉取。
+
+📚 延伸阅读：
+
+[TestContainers 官方文档 - Spring Boot 集成](https://www.testcontainers.org/guides/using-testcontainers-with-spring-boot/)
 
 :::
 
@@ -2532,7 +2832,12 @@ graph TD
 
 ::: details
 
-生产案例：某 SaaS 平台的报表导出服务基于 Spring Boot 3.2 + AWS Lambda，原 JVM 模式冷启动耗时 4.2s，用户高峰期 Lambda 频繁冷启动导致 P99 延迟飙升至 6s，用户投诉"导出太慢"。根因是 Lambda 按请求计费且无常驻实例，JVM 冷启动成为瓶颈。修复方案：引入 GraalVM Native Image 编译，启用 Spring AOT 处理，配置 `reflect-config.json` 注册 Jackson 序列化类和 JPA 实体，构建时间从 20s 增至 4 分钟（CI 缓存后降至 2 分钟）。上线后冷启动从 4.2s 降至 120ms，P99 延迟从 6s 降至 300ms，Lambda 月费用从 `$380` 降至 `$85`。教训：Native Image 的构建成本和兼容性适配是一次性投入，Serverless 场景的 ROI 在 2-3 个月内即可收回；但如果是长运行 Web 服务，不建议迁移。
+生产案例：某 SaaS 平台的报表导出服务基于 Spring Boot 3.2 + AWS Lambda，原 JVM 模式冷启动耗时 4.2s，用户高峰期 Lambda 频繁冷启动导致 P99 延迟飙升至 6s，用户投诉"导出太慢"。
+
+根因是 Lambda 按请求计费且无常驻实例，JVM 冷启动成为瓶颈。修复方案：引入 GraalVM Native Image 编译，启用 Spring AOT 处理，
+配置 `reflect-config.json` 注册 Jackson 序列化类和 JPA 实体，构建时间从 20s 增至 4 分钟（CI 缓存后降至 2 分钟）。上线后冷启动从 4.2s 降至 120ms，
+P99 延迟从 6s 降至 300ms，Lambda 月费用从 `$380` 降至 `$85`。教训：Native Image 的构建成本和兼容性适配是一次性投入，Serverless 场景的 ROI 在 2-3 个月内即可收回；
+但如果是长运行 Web 服务，不建议迁移。
 
 :::
 
@@ -2540,10 +2845,26 @@ graph TD
 
 ::: details
 
-- 【L3】Spring AOT 引擎的工作机制：Spring AOT 在编译期扫描所有 `@Configuration` 类，将 `@Bean` 方法转换为 `BeanDefinition` 的静态生成代码（`BeanFactoryInitializationAotProcessor`），消除运行时的类路径扫描和反射实例化。这意味着 `@ConditionalOnClass` 等条件注解在编译期就已求值，运行时不再动态判断。
-- 【L4】动态特性必须显式声明：Native 下反射、资源加载、动态代理都要在构建期登记——代码级用 `RuntimeHints`（实现 `RuntimeHintsRegistrar` 并以 `@ImportRuntimeHints` 挂载），Web 层 DTO/序列化目标类用 `@RegisterReflectionForBinding`，库作者用 `@Reflective` 系列注解声明自身触点。同时 `@Configuration(proxyBeanMethods = false)` 在 Native 下几乎是必需的：Native 不支持运行时字节码生成，`proxyBeanMethods=true` 所需的 CGLIB 配置类增强只能在构建期完成且动态注册场景受限——官方自动配置类全部默认 `proxyBeanMethods=false`，自定义配置类应照做。
-- 【L4】Native Image 与虚拟线程（Java 21）的互补关系：虚拟线程解决高并发下的线程资源问题（百万级线程），Native Image 解决冷启动问题——两者正交。Spring Boot 3.x 支持 Native Image + 虚拟线程组合，但需注意虚拟线程的 `Carrier Thread` 在 Native Image 中的栈大小限制。
-- 【L4】CRaC（Coordinated Restore at Checkpoint）vs Native Image：Azul 主导的 CRaC 方案通过 JVM 检查点/恢复实现毫秒级启动（无需重新编译为原生二进制），保留完整 JVM 特性（JIT、运行时字节码生成均可用）。对比 Native Image：CRaC 恢复约几十毫秒但需支持 CRaC 的 JDK 发行版，Native Image 启动约百毫秒但脱离 JVM。AWS Lambda 已支持 CRaC（SnapStart 底层即基于 CRaC），是 Serverless 冷启动优化的另一条路线。
+- 【L3】Spring AOT 引擎的工作机制：Spring AOT 在编译期扫描所有 `@Configuration` 类，
+  将 `@Bean` 方法转换为 `BeanDefinition` 的静态生成代码（`BeanFactoryInitializationAotProcessor`），消除运行时的类路径扫描和反射实例化。
+
+  这意味着 `@ConditionalOnClass` 等条件注解在编译期就已求值，运行时不再动态判断。
+
+- 【L4】动态特性必须显式声明：Native 下反射、资源加载、动态代理都要在构建期登记——
+  代码级用 `RuntimeHints`（实现 `RuntimeHintsRegistrar` 并以 `@ImportRuntimeHints` 挂载），
+  Web 层 DTO/序列化目标类用 `@RegisterReflectionForBinding`，库作者用 `@Reflective` 系列注解声明自身触点。
+
+  同时 `@Configuration(proxyBeanMethods = false)` 在 Native 下几乎是必需的：Native 不支持运行时字节码生成，
+  `proxyBeanMethods=true` 所需的 CGLIB 配置类增强只能在构建期完成且动态注册场景受限——官方自动配置类全部默认 `proxyBeanMethods=false`，自定义配置类应照做。
+
+- 【L4】Native Image 与虚拟线程（Java 21）的互补关系：虚拟线程解决高并发下的线程资源问题（百万级线程），Native Image 解决冷启动问题——两者正交。
+
+  Spring Boot 3.x 支持 Native Image + 虚拟线程组合，但需注意虚拟线程的 `Carrier Thread` 在 Native Image 中的栈大小限制。
+
+- 【L4】CRaC（Coordinated Restore at Checkpoint）vs Native Image：Azul 主导的 CRaC 方案通过 JVM 检查点/恢复实现毫秒级启动（无需重新编译为原生二进制），
+  保留完整 JVM 特性（JIT、运行时字节码生成均可用）。对比 Native Image：CRaC 恢复约几十毫秒但需支持 CRaC 的 JDK 发行版，Native Image 启动约百毫秒但脱离 JVM。
+
+  AWS Lambda 已支持 CRaC（SnapStart 底层即基于 CRaC），是 Serverless 冷启动优化的另一条路线。
 
 📚 延伸阅读：[Spring Boot GraalVM Native Image 官方文档](https://docs.spring.io/spring-boot/docs/current/reference/html/native-image.html)
 
@@ -2567,7 +2888,7 @@ graph TD
 
 - **Q：SpringBoot 的自动配置原理是什么？**
 
-  → Native Image 要求将自动配置从运行时反射转换为编译期静态代码生成，理解 `@ConditionalOnClass` 等条件注解的 AOT 处理机制是迁移的前提，见本文档「SpringBoot 的自动配置原理是什么？」。
+  → Native Image 要求将自动配置从运行时反射转换为编译期静态代码生成，理解 `@ConditionalOnClass` 等条件注解的 AOT 处理机制是迁移的前提，见本文档「SpringBoot 是如何实现自动配置的？」。
 
 ---
 
@@ -2676,7 +2997,13 @@ graph LR
 
 ::: details
 
-生产案例：某直播平台的消息推送服务原使用 Spring MVC（Tomcat 200 线程），在晚高峰 5 万长连接场景下频繁出现请求排队、P99 延迟飙升至 3s 以上。团队决定迁移至 WebFlux + Netty，利用 EventLoop 模型以 8 个线程承载 5 万 WebSocket 连接。迁移中遭遇三大陷阱：① 遗留的用户服务调用是 JDBC 阻塞的，在 WebFlux 中阻塞了 EventLoop 线程导致全局卡顿——修复方案是用 `subscribeOn(Schedulers.boundedElastic())` 隔离阻塞调用，后续迁移至 R2DBC；② Reactor 链中的异常堆栈完全碎片化，定位一个 NPE 花了 2 天——修复方案是全局启用 `Hooks.onOperatorDebug()` 并引入 `Context` 传播 traceId；③ `@Transactional` 在响应式链路中未按预期生效（响应式事务边界按订阅期而非方法调用期生效，自调用、返回非 Reactor 类型都会失效）——修复方案是改用编程式 `TransactionalOperator`。迁移后 P99 延迟从 3s 降至 50ms，内存从 2GB 降至 300MB。教训：WebFlux 的收益在高并发长连接场景显著，但团队必须投入时间掌握响应式思维，否则陷阱多于收益。
+生产案例：某直播平台的消息推送服务原使用 Spring MVC（Tomcat 200 线程），在晚高峰 5 万长连接场景下频繁出现请求排队、P99 延迟飙升至 3s 以上。团队决定迁移至 WebFlux + Netty，
+利用 EventLoop 模型以 8 个线程承载 5 万 WebSocket 连接。迁移中遭遇三大陷阱：① 遗留的用户服务调用是 JDBC 阻塞的，在 WebFlux 中阻塞了 EventLoop 线程导致全局卡顿——
+修复方案是用 `subscribeOn(Schedulers.boundedElastic())` 隔离阻塞调用，后续迁移至 R2DBC；② Reactor 链中的异常堆栈完全碎片化，定位一个 NPE 花了 2 天——
+修复方案是全局启用 `Hooks.onOperatorDebug()` 并引入 `Context` 传播 traceId；③ `@Transactional` 在响应式链路中未按预期生效（响应式事务边界按订阅期而非方法调用期生效，自调用、
+返回非 Reactor 类型都会失效）——修复方案是改用编程式 `TransactionalOperator`。迁移后 P99 延迟从 3s 降至 50ms，内存从 2GB 降至 300MB。教训：
+
+WebFlux 的收益在高并发长连接场景显著，但团队必须投入时间掌握响应式思维，否则陷阱多于收益。
 
 :::
 
@@ -2684,11 +3011,21 @@ graph LR
 
 ::: details
 
-- 【L3】Reactive Streams 规范与背压实现：Reactive Streams 四接口（`Publisher`、`Subscriber`、`Subscription`、`Processor`）自 Java 9 起以 `java.util.concurrent.Flow` 的形式进入 JDK；Reactor 的 `Flux`/`Mono` 实现的是 `org.reactivestreams` 接口（与 `Flow` 语义互通）。背压通过 `request(n)` 机制实现——下游向上游请求 n 个元素，上游不超过该数量发送，避免快速生产者压垮慢速消费者。
-- 【L4】WebFlux 的线程模型深度解析：Netty 的 EventLoop 线程负责 I/O 读写和回调执行，任何阻塞操作（JDBC、`Thread.sleep()`、文件同步读写）都会卡住 EventLoop，导致该线程上所有连接停滞。核心原则：**永远不要在 EventLoop 线程上执行阻塞代码**——用 `boundedElastic` 隔离或使用非阻塞替代方案（R2DBC、Netty FileSystem）。
-- 【L4】Spring Boot 3.2+ 虚拟线程对 WebFlux 的冲击：虚拟线程（Virtual Threads）让 Servlet 栈可以以极低成本创建百万级线程，阻塞 I/O 不再需要大量平台线程——这削弱了 WebFlux 在并发能力上的核心优势。Spring Boot 3.2 的 `spring.threads.virtual.enabled=true` 让 Servlet 栈获得接近 WebFlux 的并发能力，且保持同步编程模型的简洁。未来 WebFlux 的定位将更聚焦于流式处理和协议级场景（WebSocket、SSE），而非通用 Web 开发。
+- 【L3】Reactive Streams 规范与背压实现：Reactive Streams 四接口（`Publisher`、`Subscriber`、`Subscription`、
+  `Processor`）自 Java 9 起以 `java.util.concurrent.Flow` 的形式进入 JDK；
+  Reactor 的 `Flux`/`Mono` 实现的是 `org.reactivestreams` 接口（与 `Flow` 语义互通）。背压通过 `request(n)` 机制实现——下游向上游请求 n 个元素，上游不超过该数量发送，
+  避免快速生产者压垮慢速消费者。
 
-📚 延伸阅读：[Spring Framework - WebFlux 官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html)
+- 【L4】WebFlux 的线程模型深度解析：Netty 的 EventLoop 线程负责 I/O 读写和回调执行，任何阻塞操作（JDBC、`Thread.sleep()`、文件同步读写）都会卡住 EventLoop，
+  导致该线程上所有连接停滞。核心原则：**永远不要在 EventLoop 线程上执行阻塞代码**——用 `boundedElastic` 隔离或使用非阻塞替代方案（R2DBC、Netty FileSystem）。
+
+- 【L4】Spring Boot 3.2+ 虚拟线程对 WebFlux 的冲击：虚拟线程（Virtual Threads）让 Servlet 栈可以以极低成本创建百万级线程，阻塞 I/O 不再需要大量平台线程——
+  这削弱了 WebFlux 在并发能力上的核心优势。Spring Boot 3.2 的 `spring.threads.virtual.enabled=true` 让 Servlet 栈获得接近 WebFlux 的并发能力，
+  且保持同步编程模型的简洁。未来 WebFlux 的定位将更聚焦于流式处理和协议级场景（WebSocket、SSE），而非通用 Web 开发。
+
+📚 延伸阅读：
+
+[Spring Framework - WebFlux 官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html)
 
 :::
 
@@ -2706,7 +3043,7 @@ graph LR
 
 - **Q：SpringBoot 的自动配置原理是什么？**
 
-  → WebFlux 的自动配置（`WebFluxAutoConfiguration`）与 Servlet 栈（`WebMvcAutoConfiguration`）通过 `@ConditionalOnClass` 互斥——classpath 有 Netty 无 Servlet API 时自动切换到 WebFlux，理解自动配置的条件装配机制有助于排查"为什么我的应用没走 WebFlux"问题，见本文档「SpringBoot 的自动配置原理是什么？」。
+  → WebFlux 的自动配置（`WebFluxAutoConfiguration`）与 Servlet 栈（`WebMvcAutoConfiguration`）通过 `@ConditionalOnClass` 互斥——classpath 有 Netty 无 Servlet API 时自动切换到 WebFlux，理解自动配置的条件装配机制有助于排查"为什么我的应用没走 WebFlux"问题，见本文档「SpringBoot 是如何实现自动配置的？」。
 
 - **Q：SpringBoot 应用的生产级健康检查与就绪探针如何设计？**
 

@@ -358,12 +358,28 @@ NameNode 负责维护文件系统的命名空间，任何对文件系统命名�
 
 ::: details 扩展知识
 
-- 【L3】**机架感知与副本放置** - NameNode 通过机架感知（rack awareness）为每个 DataNode 维护机架拓扑信息。默认 3 副本的放置策略为：第一副本放客户端所在节点（远程客户端则随机选择），第二副本放另一机架的节点，第三副本放与第二副本同机架的不同节点。这一布局在**可靠性**（跨机架容灾）与**写入成本**（跨机架写只发生一次）之间做了折中；读路径则依据该拓扑优先返回距离客户端最近的副本，以降低延迟、节省带宽。
-- 【L3】**元数据内存化与架构权衡** - NameNode 将全部元数据（目录树、文件属性、Block 映射）常驻内存，量化估算约为**每个文件/目录/Block 对象 150 字节**，1 亿个对象约吃掉 15GB 堆内存——这直接决定了单 NameNode 可管理的文件数上限。由此衍生出两条演进路线：
+- 【L3】**机架感知与副本放置** - NameNode 通过机架感知（rack awareness）为每个 DataNode 维护机架拓扑信息。默认 3 副本的放置策略为：第一副本放客户端所在节点（远程客户端则随机选择），
+  第二副本放另一机架的节点，第三副本放与第二副本同机架的不同节点。这一布局在**可靠性**（跨机架容灾）与**写入成本**（跨机架写只发生一次）之间做了折中；读路径则依据该拓扑优先返回距离客户端最近的副本，以降低延迟、节省带宽。
+
+- 【L3】**元数据内存化与架构权衡** - NameNode 将全部元数据（目录树、文件属性、Block 映射）常驻内存，量化估算约为**每个文件/目录/Block 对象 150 字节**，1 亿个对象约吃掉 15GB 堆内存——
+  这直接决定了单 NameNode 可管理的文件数上限。由此衍生出两条演进路线：
+
   - **NameNode HA（主备）** - 解决的是可用性（Active 故障时 Standby 秒级接管），不解决元数据规模问题，适合文件数可控（亿级对象以内）的集群。
+
   - **HDFS Federation** - 多个 NameNode 分管不同命名空间、共享 DataNode，实现命名空间水平扩展，适合超大命名空间或多业务线隔离场景，代价是块池管理与挂载视图（RBF）的运维复杂度上升。
-- 【L4】**生产踩坑：元数据膨胀引发 GC 风暴** - 曾遇到 NameNode 频繁出现 20~30 秒的 Full GC，期间 DataNode 心跳积压，GC 结束后 NameNode 集中处理积压心跳，误判一批 DataNode 抖动并触发大规模块复制，网络带宽瞬间被打满，形成恶性循环。排查 GC 日志后定位根因：元数据对象数超 12 亿而堆内存仅 64GB。修复手段：扩堆 + 换用 G1 收集器 + 小文件归档治理，GC 停顿降到秒级以内。
-- 【L4】**实战场景：小文件元数据膨胀应急** - 场景：NameNode 堆内存从 60% 一路涨到 88%，每天增长约 1%，新接入埋点日志业务每 5 分钟落一批小文件、单日新增 3000 万个文件。先算账——按每对象约 150 字节，3000 万个文件加对应 Block 对象约需 9GB 堆内存/天；立即要求上游改按小时攒批写入（单文件从 5MB 提升到 500MB 级别），存量小文件用 HAR 或 SequenceFile 离线合并，必要时临时扩堆争取窗口期。长期方案：接入层强制攒批 + 最小文件大小准入；计算侧用 `CombineFileInputFormat` 合并输入；冷数据定期 HAR 归档；配置目录配额（`hdfs dfsadmin -setSpaceQuota`）防失控；上线小文件巡检自动合并作业。权衡：攒批牺牲时效性（5 分钟变小时级），若要求实时可见可改落 Kafka 再批量入湖。
+
+- 【L4】**生产踩坑
+
+  元数据膨胀引发 GC 风暴** - 曾遇到 NameNode 频繁出现 20~30 秒的 Full GC，期间 DataNode 心跳积压，GC 结束后 NameNode 集中处理积压心跳，
+  误判一批 DataNode 抖动并触发大规模块复制，网络带宽瞬间被打满，形成恶性循环。排查 GC 日志后定位根因：元数据对象数超 12 亿而堆内存仅 64GB。修复手段：扩堆 + 换用 G1 收集器 + 小文件归档治理，
+  GC 停顿降到秒级以内。
+
+- 【L4】**实战场景
+
+  小文件元数据膨胀应急** - 场景：NameNode 堆内存从 60% 一路涨到 88%，每天增长约 1%，新接入埋点日志业务每 5 分钟落一批小文件、单日新增 3000 万个文件。先算账——
+  按每对象约 150 字节，3000 万个文件加对应 Block 对象约需 9GB 堆内存/天；立即要求上游改按小时攒批写入（单文件从 5MB 提升到 500MB 级别），存量小文件用 HAR 或 SequenceFile 离线合并，
+  必要时临时扩堆争取窗口期。长期方案：接入层强制攒批 + 最小文件大小准入；计算侧用 `CombineFileInputFormat` 合并输入；冷数据定期 HAR 归档；
+  配置目录配额（`hdfs dfsadmin -setSpaceQuota`）防失控；上线小文件巡检自动合并作业。权衡：攒批牺牲时效性（5 分钟变小时级），若要求实时可见可改落 Kafka 再批量入湖。
 
 :::
 
@@ -411,9 +427,14 @@ HDFS 使用 NameNode 的好处主要体现在以下几个方面：
 
 ::: details 扩展知识
 
-- 【L3】**中心化的代价** - 全量元数据常驻 NameNode 内存，文件总数受限于 NameNode 内存规模；命名空间继续水平扩展需要 Federation，见本文档『什么是 HDFS Federation？』。
+- 【L3】**中心化的代价** - 全量元数据常驻 NameNode 内存，文件总数受限于 NameNode 内存规模；
+
+  命名空间继续水平扩展需要 Federation，见本文档『什么是 HDFS Federation？』。
+
 - 【L3】**与 DataNode 的分工** - NameNode 只管元数据路径，不经过数据流量；读写数据时客户端直连 DataNode，因此 NameNode 不会成为数据传输的带宽瓶颈，只可能成为元数据请求与内存的瓶颈。
-- 【L4】**单点治理** - 生产集群用 Active/Standby + QJM 解决 NameNode 自身可用性，把单点故障转化为自动切换，见本文档『HDFS 如何实现高可用？』。
+
+- 【L4】**单点治理** - 生产集群用 Active/Standby + QJM 解决 NameNode 自身可用性，把单点故障转化为自动切换，
+  见本文档『HDFS 如何实现高可用？』。
 
 :::
 
@@ -459,9 +480,13 @@ HDFS 采用文件分块（Block）进行存储管理，主要是基于以下几�
 
 ::: details 扩展知识
 
-- 【L3】**Block 是副本与恢复的基本单位** - 副本以块为单位管理，故障后的副本补齐、再均衡（balancer）都以块为粒度编排，见本文档『HDFS 的副本机制是怎样的？』。
+- 【L3】**Block 是副本与恢复的基本单位** - 副本以块为单位管理，故障后的副本补齐、再均衡（balancer）都以块为粒度编排，
+  见本文档『HDFS 的副本机制是怎样的？』。
+
 - 【L3】**块抽象屏蔽存储细节** - 分块后文件可以跨磁盘、跨节点存储，单个文件不再受单机磁盘容量限制，用户无需关心数据的物理位置。
-- 【L4】**小文件问题的根源不在块存储** - 小于 Block 的文件不会占满整块磁盘空间，但每个文件仍要在 NameNode 占用元数据对象，瓶颈在 NameNode 内存而非磁盘，见本文档『HDFS 大量小文件会带来什么问题？如何解决？』。
+
+- 【L4】**小文件问题的根源不在块存储** - 小于 Block 的文件不会占满整块磁盘空间，但每个文件仍要在 NameNode 占用元数据对象，瓶颈在 NameNode 内存而非磁盘，
+  见本文档『HDFS 大量小文件会带来什么问题？如何解决？』。
 
 :::
 
@@ -512,13 +537,30 @@ NameNode 和 SecondaryNameNode 的**联系**：
 ::: details 扩展知识
 
 - 【L3】**Checkpoint 触发时机与量化参数** - 由 `dfs.namenode.checkpoint.period`（默认 3600 秒）与 `dfs.namenode.checkpoint.txns`（默认 100 万条事务）两个条件任一满足即触发。这意味着极端情况下 SecondaryNameNode 上的 FsImage 落后主 NameNode 最近 1 小时的变更。
+
 - 【L3】**失效场景（为什么它不是热备）**
+
   - SecondaryNameNode 不接收任何写请求、不维护实时元数据状态，NameNode 宕机时它**无法接管服务**，只能用于辅助恢复元数据，且恢复期间集群不可用。
+
   - 它的 FsImage 仅反映最近一次 checkpoint 的状态，之后的 EditLog 增量仍在 NameNode 本地；若 NameNode 本地磁盘同时损坏，checkpoint 之后的元数据就会丢失。
+
   - 真正的热备是 **Standby NameNode + 共享编辑日志（QJM）** 的 HA 架构，秒级切换；HDFS 2.x 之后生产环境基本以 HA 取代 SecondaryNameNode。
-- 【L3】**SecondaryNameNode 的真实价值** - 缩短 NameNode 重启时间。没有 checkpoint，NameNode 重启需回放全量 EditLog，千万级事务的回放可达数十分钟；SecondaryNameNode 提前完成 FsImage 与 EditLog 的合并，NameNode 重启只需加载最近镜像加少量增量。
-- 【L4】**生产踩坑：checkpoint 监控缺失** - SecondaryNameNode 所在机器故障一周无人察觉（未配 checkpoint 监控），期间 EditLog 持续累积。后来 NameNode 升级重启，需回放 8000 万条事务，启动耗时近 1 小时，远超预期维护窗口。教训：必须为 checkpoint 间隔和 SecondaryNameNode 存活状态配置告警。
-- 【L4】**实战场景：NameNode 整机报废后的元数据恢复** - 老集群未配 HA，NameNode 所在机器整机报废（磁盘也损坏），只有 SecondaryNameNode。恢复步骤：在备用机器部署新 NameNode，把 SNN 上最近一次 checkpoint 的 FsImage 与 EditLog 拷过来，用 `hdfs namenode -importCheckpoint` 导入，启动进入安全模式，等 DataNode 心跳与块报告重建块位置映射，再用 `hdfs fsck` 校验缺块。损失边界：最后一次 checkpoint 之后的元数据变更（最长约 1 小时窗口）无法恢复；数据块还在 DataNode，但失去文件到块的映射。防复发：短期异地定时备份 FsImage/EditLog，中期上 HA（Standby + QJM）才是根本解法。
+
+- 【L3】**SecondaryNameNode 的真实价值** - 缩短 NameNode 重启时间。没有 checkpoint，NameNode 重启需回放全量 EditLog，千万级事务的回放可达数十分钟；
+  SecondaryNameNode 提前完成 FsImage 与 EditLog 的合并，NameNode 重启只需加载最近镜像加少量增量。
+
+- 【L4】**生产踩坑
+
+  checkpoint 监控缺失** - SecondaryNameNode 所在机器故障一周无人察觉（未配 checkpoint 监控），期间 EditLog 持续累积。后来 NameNode 升级重启，
+  需回放 8000 万条事务，启动耗时近 1 小时，远超预期维护窗口。教训：必须为 checkpoint 间隔和 SecondaryNameNode 存活状态配置告警。
+
+- 【L4】**实战场景
+
+  NameNode 整机报废后的元数据恢复** - 老集群未配 HA，NameNode 所在机器整机报废（磁盘也损坏），只有 SecondaryNameNode。恢复步骤：在备用机器部署新 NameNode，
+  把 SNN 上最近一次 checkpoint 的 FsImage 与 EditLog 拷过来，用 `hdfs namenode -importCheckpoint` 导入，启动进入安全模式，等 DataNode 心跳与块报告重建块位置映射，
+  再用 `hdfs fsck` 校验缺块。损失边界：最后一次 checkpoint 之后的元数据变更（最长约 1 小时窗口）无法恢复；数据块还在 DataNode，但失去文件到块的映射。防复发：
+
+  短期异地定时备份 FsImage/EditLog，中期上 HA（Standby + QJM）才是根本解法。
 
 :::
 
@@ -576,8 +618,12 @@ HDFS 中，`FsImage`和`EditLog`是两个关键的文件，用于存储和管理
 
 ::: details 扩展知识
 
-- 【L3】**EditLog 在 HA 中的容错** - HA 环境下 EditLog 通过 QJM 写入 JournalNode 集群（过半写入即成功），避免单点磁盘损坏导致元数据丢失，见本文档『HDFS 如何实现高可用？』。
-- 【L3】**checkpoint 的执行者与价值** - checkpoint 由 SecondaryNameNode 或 HA 中的 Standby NameNode 执行，把重启回放范围截断到最近一个 checkpoint 周期内，见本文档『NameNode 与 SecondaryNameNode 的区别与联系？』。
+- 【L3】**EditLog 在 HA 中的容错** - HA 环境下 EditLog 通过 QJM 写入 JournalNode 集群（过半写入即成功），避免单点磁盘损坏导致元数据丢失，
+  见本文档『HDFS 如何实现高可用？』。
+
+- 【L3】**checkpoint 的执行者与价值** - checkpoint 由 SecondaryNameNode 或 HA 中的 Standby NameNode 执行，把重启回放范围截断到最近一个 checkpoint 周期内，
+  见本文档『NameNode 与 SecondaryNameNode 的区别与联系？』。
+
 - 【L4】**元数据备份的本质** - 元数据容灾本质是「备份 FsImage + 保留 edits」，恢复时用备份镜像叠加增量重建命名空间；因此生产中两者都应定期异地备份。
 
 :::
@@ -653,9 +699,18 @@ HDFS 中，`FsImage`和`EditLog`是两个关键的文件，用于存储和管理
 
 注意：HAR 和 SequenceFile 是“减少对象数”，Federation 是“分摊对象数”，前者治本，后者扩容。
 
-- 【L3】**失效场景** - `CombineFileInputFormat` 只缓解 Map 任务数膨胀，不缓解 NameNode 内存压力——文件元数据一个不少；对仍在持续写入小文件的业务，一次性合并作业只是快照，很快又会劣化，必须从源头治理。
-- 【L4】**生产踩坑：小文件拖垮 ETL** - 某 ETL 作业从 40 分钟劣化到 5 小时。现象：Map 阶段耗时占比 95%，任务数从 2000 暴涨到 40 万。排查发现上游新业务按分钟级滚动生成日志文件，单文件仅几十 KB。根因：默认一个文件一个 split，调度器启动 40 万任务的开销远超计算本身。修复：接入层改按小时聚合写入 + 历史小文件 SequenceFile 合并 + `CombineFileInputFormat` 三管齐下，作业回到 45 分钟。
-- 【L4】**实战场景：小文件应急止血** - 场景：NameNode 内存使用率持续上涨到 90%，新接入日志业务单日 5000 万个平均 200KB 的小文件。应急：先算账——5000 万文件 + 对应 Block 约 1 亿对象 × 150 字节 ≈ 15GB 堆内存/天，协调上游把滚动周期从分钟级改为小时级，存量跑一轮 SequenceFile 合并并删除原文件，临时调大 NameNode 堆内存观察 GC。长期：接入层强制攒批 + 最小文件大小校验；存量目录设 `setSpaceQuota` 与文件数配额；建立小文件巡检与自动合并机制。权衡：合并作业安排低峰期；实时性要求高的链路改走 Kafka。
+- 【L3】**失效场景** - `CombineFileInputFormat` 只缓解 Map 任务数膨胀，不缓解 NameNode 内存压力——文件元数据一个不少；对仍在持续写入小文件的业务，一次性合并作业只是快照，很快又会劣化，
+  必须从源头治理。
+
+- 【L4】**生产踩坑：小文件拖垮 ETL** - 某 ETL 作业从 40 分钟劣化到 5 小时。现象：Map 阶段耗时占比 95%，任务数从 2000 暴涨到 40 万。排查发现上游新业务按分钟级滚动生成日志文件，单文件仅几十 KB。
+
+  根因：默认一个文件一个 split，调度器启动 40 万任务的开销远超计算本身。修复：接入层改按小时聚合写入 + 历史小文件 SequenceFile 合并 + `CombineFileInputFormat` 三管齐下，
+  作业回到 45 分钟。
+
+- 【L4】**实战场景：小文件应急止血** - 场景：NameNode 内存使用率持续上涨到 90%，新接入日志业务单日 5000 万个平均 200KB 的小文件。应急：先算账——
+  5000 万文件 + 对应 Block 约 1 亿对象 × 150 字节 ≈ 15GB 堆内存/天，协调上游把滚动周期从分钟级改为小时级，存量跑一轮 SequenceFile 合并并删除原文件，临时调大 NameNode 堆内存观察 GC。
+
+  长期：接入层强制攒批 + 最小文件大小校验；存量目录设 `setSpaceQuota` 与文件数配额；建立小文件巡检与自动合并机制。权衡：合并作业安排低峰期；实时性要求高的链路改走 Kafka。
 
 :::
 
@@ -692,7 +747,7 @@ HDFS Federation 用“多个 NameNode 分管多个命名空间、共享底层 Da
 | 指标              | 数值                                                 | 备注                                              |
 | :---------------- | :--------------------------------------------------- | :------------------------------------------------ |
 | 命名空间扩展上限  | 集群总容量 ≈ NN 数 × 单 NN 约 4 亿对象               | 3 个 NN 即可支撑 10 亿级文件，水平扩展            |
-| 典型生产规模      | 2~~4 个 NameNode，每个管理 1~~2 亿对象               | 按业务线/数据生命周期划分 Namespace Volume        |
+| 典型生产规模      | 2~4 个 NameNode，每个管理 1~2 亿对象               | 按业务线/数据生命周期划分 Namespace Volume        |
 | DataNode 注册开销 | 每个 DN 向所有 NN 注册；心跳 3s/次、块报告默认 6h/次 | DN 数不变，存储层零扩容，心跳流量按 NN 数线性增长 |
 | 故障影响面        | 单 NN 故障仅影响其命名空间的元数据操作               | 块池隔离，其他卷读写不受影响                      |
 | RBF 路由开销      | 单次元数据请求增加约 1~3ms（挂载表匹配）             | 客户端只连 Router，业务代码零改造                 |
@@ -722,9 +777,15 @@ HDFS Federation 用“多个 NameNode 分管多个命名空间、共享底层 Da
 
 ::: details 扩展知识
 
-- 【L3】**与 HA 的分工** - HA（主备）解决的是可用性，不解决元数据规模；Federation 解决命名空间扩展与业务隔离，两者可叠加——每个 Namespace Volume 内部仍可配自己的 HA。选型边界：文件数可控的集群优先 HA + 小文件治理；超大命名空间或多业务线隔离才需要 Federation。
+- 【L3】**与 HA 的分工** - HA（主备）解决的是可用性，不解决元数据规模；Federation 解决命名空间扩展与业务隔离，两者可叠加——每个 Namespace Volume 内部仍可配自己的 HA。选型边界：
+
+  文件数可控的集群优先 HA + 小文件治理；超大命名空间或多业务线隔离才需要 Federation。
+
 - 【L3】**代价与运维复杂度** - DataNode 需向所有 NameNode 注册并存储所有块池数据，块池管理与挂载视图（RBF）的运维复杂度上升；集群均衡、配额、权限策略都要按多命名空间重新规划。
-- 【L4】**与单点治理的关系** - Federation 分摊的是元数据对象数，并不提升单个小文件的读性能；若问题根源是小文件，优先做合并治理而不是盲目上 Federation，见本文档『HDFS 大量小文件会带来什么问题？如何解决？』。
+
+- 【L4】**与单点治理的关系** - Federation 分摊的是元数据对象数，并不提升单个小文件的读性能；
+
+  若问题根源是小文件，优先做合并治理而不是盲目上 Federation，见本文档『HDFS 大量小文件会带来什么问题？如何解决？』。
 
 :::
 
@@ -732,8 +793,15 @@ HDFS Federation 用“多个 NameNode 分管多个命名空间、共享底层 Da
 
 ::: details 实战场景
 
-- **场景：多业务线共用集群的隔离治理** - 现象：单集群承载多条业务线，某业务批量脚本创建海量文件，NameNode 请求队列积压，拖慢全部业务的元数据操作。处置：按业务线划分 Namespace Volume，故障与配额相互隔离，客户端通过 RBF 获得统一挂载视图。经验：隔离诉求（而非单纯容量）往往是上 Federation 的真实驱动力。
-- **场景：NameNode 内存瓶颈的分级应对** - 文件数持续增长、NameNode 内存与 GC 压力上升时，先做小文件治理压缩元数据对象数；仍不解决再规划 Federation；垂直扩容（加大内存）只作短期止血，超大堆的 Full GC 代价会随内存增长而恶化。
+- **场景：多业务线共用集群的隔离治理** - 现象：单集群承载多条业务线，某业务批量脚本创建海量文件，NameNode 请求队列积压，拖慢全部业务的元数据操作。
+
+  处置：按业务线划分 Namespace Volume，故障与配额相互隔离，客户端通过 RBF 获得统一挂载视图。
+
+  经验：隔离诉求（而非单纯容量）往往是上 Federation 的真实驱动力。
+
+- **场景：NameNode 内存瓶颈的分级应对** - 文件数持续增长、NameNode 内存与 GC 压力上升时，先做小文件治理压缩元数据对象数；
+
+  仍不解决再规划 Federation；垂直扩容（加大内存）只作短期止血，超大堆的 Full GC 代价会随内存增长而恶化。
 
 :::
 
@@ -817,10 +885,21 @@ YARN 有以下核心组件：
 
 ::: details 扩展知识
 
-- 【L3】**AM 分布式化（设计权衡）** - 把任务拆分、重试、状态监控从中心 RM 下放到每个应用自己的 AM，RM 只做纯资源分配，这是 YARN 相对 MRv1 JobTracker 的核心进步；代价是 AM 成为单个应用的单点，AM 挂掉该应用需整体重来，只能靠 `yarn.resourcemanager.am.max-attempts`（默认 2）有限重试兜底。
-- 【L3】**RM 单点（失效场景）** - 整个系统有且只有一个 ResourceManager 意味着它是集群级单点，生产环境必须配置 ResourceManager HA（Active/Standby + ZooKeeper 选举），见本文档『YARN 如何实现高可用？』。
-- 【L3】**Container 资源粒度（设计权衡）** - Container 最小分配粒度由 `yarn.scheduler.minimum-allocation-mb`（默认 1024MB）决定，申请值会向上对齐到该粒度的整数倍；粒度过粗造成内存碎片浪费，过细则调度开销上升。
-- 【L4】**生产踩坑：Container 频繁被杀** - 作业频繁因 Container “running beyond memory limits” 被杀，根因是资源申请未算上堆外内存与 YARN overhead；教训：资源申请必须与 JVM 参数联动核算。
+- 【L3】**AM 分布式化（设计权衡）** - 把任务拆分、重试、状态监控从中心 RM 下放到每个应用自己的 AM，RM 只做纯资源分配，这是 YARN 相对 MRv1 JobTracker 的核心进步；
+  代价是 AM 成为单个应用的单点，AM 挂掉该应用需整体重来，只能靠 `yarn.resourcemanager.am.max-attempts`（默认 2）有限重试兜底。
+
+- 【L3】**RM 单点（失效场景）** - 整个系统有且只有一个 ResourceManager 意味着它是集群级单点，
+  生产环境必须配置 ResourceManager HA（Active/Standby + ZooKeeper 选举），
+  见本文档『YARN 如何实现高可用？』。
+
+- 【L3】**Container 资源粒度（设计权衡）** - Container 最小分配粒度由 `yarn.scheduler.minimum-allocation-mb`（默认 1024MB）决定，申请值会向上对齐到该粒度的整数倍；
+  粒度过粗造成内存碎片浪费，过细则调度开销上升。
+
+- 【L4】**生产踩坑
+
+  Container 频繁被杀** - 作业频繁因 Container “running beyond memory limits” 被杀，根因是资源申请未算上堆外内存与 YARN overhead；教训：
+
+  资源申请必须与 JVM 参数联动核算。
 
 :::
 
@@ -942,12 +1021,31 @@ HDFS 写数据的源码流程：
 ::: details 扩展知识
 
 - 【L3】**packet 与 chunk** - 数据以 packet（默认 64KB）为单位进入 pipeline，每个 packet 由若干 chunk（512 字节数据 + 4 字节校验和）组成。
+
 - 【L3】**pipeline 构建** - DataStreamer 先向 NameNode 申请 DataNode 列表（按机架感知策略），构成 pipeline，数据在管道中逐跳转发，ack 沿管道反向回传。
-- 【L3】**写失败恢复语义** - pipeline 中某个 DataNode 故障时：客户端把它移出 pipeline，未确认的数据包重新入队；客户端向 NameNode 申请新节点补入 pipeline，满足最小副本数（`dfs.namenode.replication.min`，默认 1）后继续写入，文件关闭时再补齐全部副本。故障节点上未确认的块会被 NameNode 删除，不会出现部分可见的脏块。
+
+- 【L3】**写失败恢复语义** - pipeline 中某个 DataNode 故障时
+
+  客户端把它移出 pipeline，未确认的数据包重新入队；客户端向 NameNode 申请新节点补入 pipeline，
+  满足最小副本数（`dfs.namenode.replication.min`，默认 1）后继续写入，文件关闭时再补齐全部副本。故障节点上未确认的块会被 NameNode 删除，不会出现部分可见的脏块。
+
 - 【L3】**lease（租约）** - 文件打开时客户端持有写租约，HDFS 保证同一文件只有一个写入者；客户端宕机后租约超时（默认 1 小时），NameNode 会自动关闭文件并将已确认的块纳入命名空间，避免悬挂的写会话。
-- 【L3】**失效场景** - 若 pipeline 中靠后的节点故障，靠前节点已写入的数据以已收到的 ack 为准；若所有 DataNode 都写失败或 NameNode 拒绝分配新节点，写入直接抛异常，**客户端必须自己重试**，HDFS 不保证写操作自动幂等重放。
-- 【L4】**生产踩坑：慢盘拖垮 pipeline** - 某导入作业频繁报写超时，重试后文件块数对不上、下游校验失败。排查发现某台 DataNode 数据盘老化，写延迟从毫秒级劣化到秒级，拖慢整条 pipeline 的 ack 链路，客户端超时后不断重建管道。修复：配置慢盘检测（disk balancer / 磁盘健康检查）并替换故障节点后恢复。教训：pipeline 写入的性能取决于最慢的那个节点。
-- 【L4】**实战场景：DataNode 掉线时如何保证不丢数据** - 场景：Flume 实时写 HDFS，凌晨一台 DataNode 掉线、作业报写超时。不丢的语义边界：未收齐 ack 的 packet 会重发到新 pipeline，已确认的 packet 至少有一份完整副本；掉线节点上未完成的块由 NameNode 判定缺失并触发副本补齐；风险在 Flume 若按时间滚动且未正确 `hflush`，缓冲区数据可能随进程异常丢失。排查：看客户端日志 pipeline 重建记录、确认 NameNode 及时把该 DataNode 标记为 dead（心跳超时默认 10 分钟，可用 `dfs.namenode.heartbeat.recheck-interval` 调短）、检查欠复制告警。优化：合理 roll 策略与 `hflush` 周期、关键数据提高副本数、开启磁盘健康检查。权衡：`hflush` 频率越高可见性越好但吞吐下降、小文件风险上升；副本数提高以存储成本换安全，核心链路 3 副本起步。
+
+- 【L3】**失效场景** - 若 pipeline 中靠后的节点故障，靠前节点已写入的数据以已收到的 ack 为准；若所有 DataNode 都写失败或 NameNode 拒绝分配新节点，写入直接抛异常，**客户端必须自己重试**，
+  HDFS 不保证写操作自动幂等重放。
+
+- 【L4】**生产踩坑
+
+  慢盘拖垮 pipeline** - 某导入作业频繁报写超时，重试后文件块数对不上、下游校验失败。排查发现某台 DataNode 数据盘老化，写延迟从毫秒级劣化到秒级，拖慢整条 pipeline 的 ack 链路，
+  客户端超时后不断重建管道。修复：配置慢盘检测（disk balancer / 磁盘健康检查）并替换故障节点后恢复。教训：pipeline 写入的性能取决于最慢的那个节点。
+
+- 【L4】**实战场景
+
+  DataNode 掉线时如何保证不丢数据** - 场景：Flume 实时写 HDFS，凌晨一台 DataNode 掉线、作业报写超时。不丢的语义边界：未收齐 ack 的 packet 会重发到新 pipeline，
+  已确认的 packet 至少有一份完整副本；掉线节点上未完成的块由 NameNode 判定缺失并触发副本补齐；风险在 Flume 若按时间滚动且未正确 `hflush`，缓冲区数据可能随进程异常丢失。排查：
+
+  看客户端日志 pipeline 重建记录、确认 NameNode 及时把该 DataNode 标记为 dead（心跳超时默认 10 分钟，可用 `dfs.namenode.heartbeat.recheck-interval` 调短）、
+  检查欠复制告警。优化：合理 roll 策略与 `hflush` 周期、关键数据提高副本数、开启磁盘健康检查。权衡：`hflush` 频率越高可见性越好但吞吐下降、小文件风险上升；副本数提高以存储成本换安全，核心链路 3 副本起步。
 
 :::
 
@@ -1007,12 +1105,30 @@ HDFS 读数据的源码流程：
 ::: details 扩展知识
 
 - 【L3】**副本定位** - NameNode 返回每个块的全部副本位置，并按网络拓扑距离排序；客户端优先读本节点 > 同机架 > 跨机架的副本。
-- 【L3】**校验和失败处理** - 读取时每 512 字节验证一次校验和，不匹配则抛 ChecksumException，客户端向 NameNode 报告该副本损坏，并自动切换其他副本重读；NameNode 随后标记 corrupt 副本并触发重新复制替换。
-- 【L3】**短路读（short-circuit read）** - 客户端与 DataNode 同机时，可通过 `dfs.client.read.shortcircuit` 直接读本地块文件，绕过 DataNode 网络栈，显著降低本地读延迟，HBase 等低延迟场景依赖此特性。
-- 【L3】**hedged read** - 通过 `dfs.client.hedged.read.threshold.millis` 开启：第一个副本读超过阈值未返回时，并发读另一副本，谁先返回用谁，专治个别慢节点拖长尾。
+
+- 【L3】**校验和失败处理** - 读取时每 512 字节验证一次校验和，不匹配则抛 ChecksumException，客户端向 NameNode 报告该副本损坏，并自动切换其他副本重读；
+  NameNode 随后标记 corrupt 副本并触发重新复制替换。
+
+- 【L3】**短路读（short-circuit read）** - 客户端与 DataNode 同机时，可通过 `dfs.client.read.shortcircuit` 直接读本地块文件，绕过 DataNode 网络栈，
+  显著降低本地读延迟，HBase 等低延迟场景依赖此特性。
+
+- 【L3】**hedged read** - 通过 `dfs.client.hedged.read.threshold.millis` 开启
+
+  第一个副本读超过阈值未返回时，并发读另一副本，谁先返回用谁，专治个别慢节点拖长尾。
+
 - 【L3】**失效场景** - 若某个块的所有副本校验和都不匹配，说明数据真损坏，只能依赖外部备份恢复；若集群拓扑脚本配置错误，“最近副本”可能实际在远端机房，读流量大量跨机房，带宽被打满而排查方向往往被误导。
-- 【L4】**生产踩坑：机架感知失效导致跨机架读** - 机房搬迁后集群读带宽突然打满、作业普遍变慢，而写入正常。排查网络流量发现几乎所有读都跨机架进行。根因：机架感知拓扑脚本未随新机房更新，NameNode 对所有节点的距离判定失真，“就近读”全部退化。修复：更新拓扑脚本并验证后恢复。教训：集群拓扑变更后必须验证机架感知配置。
-- 【L4】**实战场景：P99 延迟飙升定位** - 场景：HBase 读 HDFS 的在线查询系统 P99 从 30ms 涨到 2 秒，磁盘/CPU 指标正常。均值正常 + P99 飙高是典型长尾特征：先看读请求是否集中在少数 DataNode，再查慢盘/GC/网络拥塞，验证机架感知。应急：开 hedged read 对冲长尾、疑似慢节点 decommission、`hdfs balancer` 均衡热点块；长期建立磁盘巡检、读延迟分位数告警与定期均衡。权衡：hedged read 用额外带宽换尾延迟，吞吐型作业更应优先做节点治理与数据均衡。
+
+- 【L4】**生产踩坑
+
+  机架感知失效导致跨机架读** - 机房搬迁后集群读带宽突然打满、作业普遍变慢，而写入正常。排查网络流量发现几乎所有读都跨机架进行。根因：机架感知拓扑脚本未随新机房更新，NameNode 对所有节点的距离判定失真，
+  “就近读”全部退化。修复：更新拓扑脚本并验证后恢复。教训：集群拓扑变更后必须验证机架感知配置。
+
+- 【L4】**实战场景
+
+  P99 延迟飙升定位** - 场景：HBase 读 HDFS 的在线查询系统 P99 从 30ms 涨到 2 秒，磁盘/CPU 指标正常。均值正常 + P99 飙高是典型长尾特征：
+
+  先看读请求是否集中在少数 DataNode，再查慢盘/GC/网络拥塞，验证机架感知。应急：开 hedged read 对冲长尾、疑似慢节点 decommission、`hdfs balancer` 均衡热点块；长期建立磁盘巡检、
+  读延迟分位数告警与定期均衡。权衡：hedged read 用额外带宽换尾延迟，吞吐型作业更应优先做节点治理与数据均衡。
 
 :::
 
@@ -1067,11 +1183,23 @@ MapReduce 编程模型中 `splitting` 和 `shuffing` 操作都是由框架实现
 ::: details 扩展知识
 
 - 【L3】**失效场景（MR 的适用边界）**
+
   - **DAG/多阶段作业** - 阶段间数据必须落盘 HDFS，多阶段作业的中间结果 IO 与副本开销成倍放大，性能远不如 Spark 等内存框架。
+
   - **迭代计算** - 每轮迭代都要完整经历落盘、再读取，机器学习训练类负载完全不适合。
+
   - **低延迟查询** - 作业启动、调度、Shuffle 建连开销固定存在，秒级响应的场景应交给 MPP 或 OLAP 引擎。
-- 【L4】**生产踩坑：小文件引发任务数爆炸** - 某统计作业平时 40 分钟，某天突然跑了 9 小时。排查发现实际计算只需 20 分钟，其余时间全耗在任务调度上——上游产出 40 万个几十 KB 的小文件，导致 40 万个 Map 任务，每个任务的启动与 Shuffle 建连都是固定开销。用 `CombineFileInputFormat` 合并输入、推动上游合并产出后，作业回到 25 分钟。教训：任务数不是越多越好，调度开销本身有成本。
-- 【L4】**实战场景：2TB 作业从 8 小时优化到 1 小时** - 输入侧：检查小文件导致的 Map 任务数爆炸（CombineFileInputFormat 合并）、split 与 Block 对齐保数据本地性、输入压缩（如 Snappy）；计算侧：启用 Combiner 本地聚合、用 Counter 查 Reduce 输入分布治倾斜、Shuffle 调优；输出侧：控制 Reduce 数避免海量小文件、输出压缩；资源侧：调大任务内存减少溢写、确认队列资源充足。权衡：Combiner 仅适用可结合聚合；加盐打散多一轮作业，轻度倾斜不值得；优先做收益最大的环节——通常倾斜治理与 Combiner 的收益远超参数微调。
+
+- 【L4】**生产踩坑
+
+  小文件引发任务数爆炸** - 某统计作业平时 40 分钟，某天突然跑了 9 小时。排查发现实际计算只需 20 分钟，其余时间全耗在任务调度上——上游产出 40 万个几十 KB 的小文件，
+  导致 40 万个 Map 任务，每个任务的启动与 Shuffle 建连都是固定开销。用 `CombineFileInputFormat` 合并输入、推动上游合并产出后，作业回到 25 分钟。教训：任务数不是越多越好，调度开销本身有成本。
+
+- 【L4】**实战场景
+
+  2TB 作业从 8 小时优化到 1 小时** - 输入侧：检查小文件导致的 Map 任务数爆炸（CombineFileInputFormat 合并）、split 与 Block 对齐保数据本地性、
+  输入压缩（如 Snappy）；计算侧：启用 Combiner 本地聚合、用 Counter 查 Reduce 输入分布治倾斜、Shuffle 调优；输出侧：控制 Reduce 数避免海量小文件、输出压缩；资源侧：调大任务内存减少溢写、
+  确认队列资源充足。权衡：Combiner 仅适用可结合聚合；加盐打散多一轮作业，轻度倾斜不值得；优先做收益最大的环节——通常倾斜治理与 Combiner 的收益远超参数微调。
 
 :::
 
@@ -1087,7 +1215,7 @@ MapReduce 编程模型中 `splitting` 和 `shuffing` 操作都是由框架实现
 
 - **Q：Reduce 任务数如何决定？太多或太少分别有什么问题？**
 
-  → 经验目标是让每个 Reduce 处理约 1~~2 个 HDFS 块大小（128~~256MB）的数据；太少则单任务数据量大、易内存溢出且并行度不足，太多则输出大量小文件、Shuffle 建连开销上升，还会拖垮 NameNode。
+  → 经验目标是让每个 Reduce 处理约 1~2 个 HDFS 块大小（128~256MB）的数据；太少则单任务数据量大、易内存溢出且并行度不足，太多则输出大量小文件、Shuffle 建连开销上升，还会拖垮 NameNode。
 
 ### 【中等】MapReduce Shuffle 阶段的排序与合并细节是怎样的？⭐⭐⭐⭐
 
@@ -1126,15 +1254,38 @@ Shuffle 是 Map 与 Reduce 之间的桥梁，**排序和合并贯穿 Map 端与 
 
 ::: details 扩展知识
 
-- 【L3】**为什么是环形缓冲区** - 记录数据从一端写入、索引从另一端写入，两者相向增长、相遇即触发溢写，避免普通缓冲区溢写时的整体拷贝与搬移；溢写时只对索引排序，因为排序的是元数据（key + 指针）而非记录本身，CPU 与内存开销大幅下降。
-- 【L3】**关键参数** - `mapreduce.task.io.sort.mb`（默认 100MB）控制缓冲区大小；`mapreduce.map.sort.spill.percent`（默认 0.8）控制溢写阈值；`io.sort.factor`（默认 10）控制归并路数；Reduce 端拉取并行度由 `mapreduce.reduce.shuffle.parallelcopies`（默认 5）控制。
+- 【L3】**为什么是环形缓冲区** - 记录数据从一端写入、索引从另一端写入，两者相向增长、相遇即触发溢写，避免普通缓冲区溢写时的整体拷贝与搬移；溢写时只对索引排序，因为排序的是元数据（key + 指针）而非记录本身，
+  CPU 与内存开销大幅下降。
+
+- 【L3】**关键参数** - `mapreduce.task.io.sort.mb`（默认 100MB）控制缓冲区大小；`mapreduce.map.sort.spill.percent`（默认 0.8）控制溢写阈值；
+  `io.sort.factor`（默认 10）控制归并路数；Reduce 端拉取并行度由 `mapreduce.reduce.shuffle.parallelcopies`（默认 5）控制。
+
 - 【L3】**中间归并** - 溢写文件数超过阈值时会分轮归并，避免最终归并路数过大导致磁盘随机 IO 爆炸。
+
 - 【L3】**失效场景**
+
   - 单条记录超过缓冲区剩余空间时，该记录直接落盘，绕过缓冲与 Combiner，性能急剧下降。
+
   - Combiner 对不可结合的聚合（如平均值）会产生错误结果，此时必须禁用或改写为可结合形式。
+
   - Reduce 端拉取阶段若内存不足，会出现 "Too many fetch failures"，任务反复重试甚至作业失败。
-- 【L4】**生产踩坑：Reduce 端拉取雪崩** - 某作业 Reduce 阶段大量报 "Too many fetch failures"，任务重试 4 次后作业失败。现象：Map 数高达 5 万个，每个 Reduce 需从 5 万个 Map 拉取数据。排查发现 Reduce 堆内存仅 1GB，拉取缓冲频繁落盘、归并队列积压导致 HTTP 拉取超时。修复：调大 Reduce 堆内存与 `mapreduce.reduce.shuffle.input.buffer.percent`、控制 Map 端输出压缩，故障消失。教训：Reduce 端内存要在拉取缓冲与归并缓冲之间合理分配，Map 数过多时要优先压源头。
-- 【L4】**实战场景：500GB Shuffle 量调优** - 场景：作业 Shuffle 数据量 500GB，Reduce 端频繁报 merge 失败、磁盘 IO 打满。诊断：先看 Counter 确认 Reduce 输入分布排除倾斜，再看 Map 溢写次数与 Reduce 落盘文件数定位瓶颈侧。Map 端：调大 `mapreduce.task.io.sort.mb` 减少溢写轮次、优化 Combiner、Map 输出压缩（Snappy）；Reduce 端：调大堆内存与拉取缓冲占比提高内存归并、控制 `io.sort.factor` 归并路数。根源治理：若是倾斜导致单分区过大，先打散再谈调参。权衡：内存给 Shuffle 多了留给业务逻辑的就少，Shuffle 优化的本质是在内存、磁盘、网络三者间做预算分配，必须按作业数据量实测。
+
+- 【L4】**生产踩坑
+
+  Reduce 端拉取雪崩** - 某作业 Reduce 阶段大量报 "Too many fetch failures"，任务重试 4 次后作业失败。现象：Map 数高达 5 万个，
+  每个 Reduce 需从 5 万个 Map 拉取数据。排查发现 Reduce 堆内存仅 1GB，拉取缓冲频繁落盘、归并队列积压导致 HTTP 拉取超时。修复：
+
+  调大 Reduce 堆内存与 `mapreduce.reduce.shuffle.input.buffer.percent`、控制 Map 端输出压缩，故障消失。教训：Reduce 端内存要在拉取缓冲与归并缓冲之间合理分配，
+  Map 数过多时要优先压源头。
+
+- 【L4】**实战场景
+
+  500GB Shuffle 量调优** - 场景：作业 Shuffle 数据量 500GB，Reduce 端频繁报 merge 失败、磁盘 IO 打满。诊断：
+
+  先看 Counter 确认 Reduce 输入分布排除倾斜，再看 Map 溢写次数与 Reduce 落盘文件数定位瓶颈侧。Map 端：调大 `mapreduce.task.io.sort.mb` 减少溢写轮次、优化 Combiner、
+  Map 输出压缩（Snappy）；Reduce 端：调大堆内存与拉取缓冲占比提高内存归并、控制 `io.sort.factor` 归并路数。根源治理：若是倾斜导致单分区过大，先打散再谈调参。权衡：
+
+  内存给 Shuffle 多了留给业务逻辑的就少，Shuffle 优化的本质是在内存、磁盘、网络三者间做预算分配，必须按作业数据量实测。
 
 :::
 
@@ -1189,8 +1340,13 @@ Shuffle 是 Map 与 Reduce 之间的桥梁，**排序和合并贯穿 Map 端与 
 
 ::: details 扩展知识
 
-- 【L3】**生效边界：慢节点 vs 数据倾斜** - 推测执行的备份任务跑在健康节点上，解决的是“节点慢”；而倾斜任务的慢来自数据量本身，备份任务要处理同样多的数据、同样慢，只会浪费一倍资源。判断技巧：若绝大多数任务很快、只剩个别长尾，先看是分散在不同节点（慢节点）还是输入数据量异常大（倾斜）。
-- 【L3】**资源代价与开关策略** - 备份任务占用额外 Container 与集群资源，资源紧张的集群可关闭；map 与 reduce 可分别通过 `mapreduce.map.speculative`、`mapreduce.reduce.speculative` 控制。
+- 【L3】**生效边界
+
+  慢节点 vs 数据倾斜** - 推测执行的备份任务跑在健康节点上，解决的是“节点慢”；而倾斜任务的慢来自数据量本身，备份任务要处理同样多的数据、同样慢，只会浪费一倍资源。判断技巧：若绝大多数任务很快、只剩个别长尾，
+  先看是分散在不同节点（慢节点）还是输入数据量异常大（倾斜）。
+
+- 【L3】**资源代价与开关策略** - 备份任务占用额外 Container 与集群资源，资源紧张的集群可关闭；map 与 reduce 可分别通过 `mapreduce.map.speculative`、
+  `mapreduce.reduce.speculative` 控制。
 
 :::
 
@@ -1256,9 +1412,13 @@ Shuffle 是 Map 与 Reduce 之间的桥梁，**排序和合并贯穿 Map 端与 
 ::: details 扩展知识
 
 - 【L3】**定位手段（量化）**
+
   - 作业 Web UI 看各 Reduce 进度与输入字节数，倾斜 Reduce 的输入通常是其他的数十倍。
+
   - 用自定义 Counter 输出 map 输出 key 分布的 Top N，直接定位热点 key。
+
   - 经验判断：若 99% 任务完成后最后一个跑数小时，基本可断定倾斜而非慢节点（慢节点用推测执行可缓解，倾斜不能）。
+
 - 【L3】**方案权衡**：
 
 | 手段                   | 适用边界                         | 代价                             |
@@ -1268,15 +1428,28 @@ Shuffle 是 Map 与 Reduce 之间的桥梁，**排序和合并贯穿 Map 端与 
 | **自定义 Partitioner** | 分区不均但 key 分布可控          | 需维护映射规则，业务变更要同步改 |
 | **Map 端 Join**        | 大表 Join 小表（小表能装进内存） | 小表过大时内存装不下即失效       |
 
-- 【L3】**失效场景** - 若倾斜来自业务语义本身（如全局汇总只有一个 key），加盐、调 Partitioner 都无效，必须改写计算逻辑（如分组合并）；Hive 层的 `mapjoin`、`skew join` 参数适用于 Hive 作业，属 SQL 层手段，归 Hive 专题讨论。
-  :::
+- 【L3】**失效场景** - 若倾斜来自业务语义本身（如全局汇总只有一个 key），加盐、调 Partitioner 都无效，必须改写计算逻辑（如分组合并）；Hive 层的 `mapjoin`、
+  `skew join` 参数适用于 Hive 作业，属 SQL 层手段，归 Hive 专题讨论。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details 实战场景
 
-- **案例：脏数据引发倾斜** - 一次订单统计作业，99% 的 Reduce 十分钟完成，最后一个跑了 6 小时。通过 Counter 定位到 null 和空串 user_id 占全部记录的 90%，全部落入同一分区。修复：空值单独过滤走独立统计逻辑 + 对剩余数据加随机前缀打散，作业从 6 小时降到 12 分钟。教训：脏数据是倾斜的第一大来源，先过滤再谈打散。
-- **场景：头部店铺热点治理** - 大促日终统计各店铺成交额，头部 1% 店铺贡献 60% 交易量，作业长尾 5 小时。先用 Counter 输出店铺维度记录数 Top N，确认是业务热点还是脏数据（空店铺 ID）；脏数据走过滤/单独统计，真实热点用两阶段聚合（店铺 ID 加随机前缀拆到多个 Reduce 局部求和，再去前缀全局汇总）。验证：对比各 Reduce 输入记录数分位数，P99 与中位数差距应缩到 3 倍以内。权衡：加盐多一轮作业与中间结果存储成本，轻度倾斜用过滤 + 调并行度即可，重度倾斜才值得上两阶段聚合。
+- **案例：脏数据引发倾斜** - 一次订单统计作业，99% 的 Reduce 十分钟完成，最后一个跑了 6 小时。通过 Counter 定位到 null 和空串 user_id 占全部记录的 90%，全部落入同一分区。
+
+  修复：空值单独过滤走独立统计逻辑 + 对剩余数据加随机前缀打散，作业从 6 小时降到 12 分钟。
+
+  教训：脏数据是倾斜的第一大来源，先过滤再谈打散。
+
+- **场景：头部店铺热点治理** - 大促日终统计各店铺成交额，头部 1% 店铺贡献 60% 交易量，作业长尾 5 小时。
+
+  先用 Counter 输出店铺维度记录数 Top N，确认是业务热点还是脏数据（空店铺 ID）；脏数据走过滤/单独统计，真实热点用两阶段聚合（店铺 ID 加随机前缀拆到多个 Reduce 局部求和，再去前缀全局汇总）。
+
+  验证：对比各 Reduce 输入记录数分位数，P99 与中位数差距应缩到 3 倍以内。
+
+  权衡：加盐多一轮作业与中间结果存储成本，轻度倾斜用过滤 + 调并行度即可，重度倾斜才值得上两阶段聚合。
 
 :::
 
@@ -1334,13 +1507,31 @@ YARN 任务提交五步：Client 向 RM 申请运行 AM → RM 通过 NM 分配�
 
 ::: details 扩展知识
 
-- 【L3】**资源请求协议** - AM 通过心跳携带资源请求（ResourceRequest：节点 + 资源规格 + 数量），RM 返回分配结果，属于异步协商模式；因此资源分配有秒级延迟，并非即时响应。
-- 【L3】**AM 失败处理** - AM 心跳超时后 RM 判定其失败，整个 Application 在剩余重试次数内重新调度（`yarn.resourcemanager.am.max-attempts` 默认 2），已运行的任务随 Container 回收，**任务级进度不保留**。
+- 【L3】**资源请求协议** - AM 通过心跳携带资源请求（ResourceRequest
+
+  节点 + 资源规格 + 数量），RM 返回分配结果，属于异步协商模式；因此资源分配有秒级延迟，并非即时响应。
+
+- 【L3】**AM 失败处理** - AM 心跳超时后 RM 判定其失败，整个 Application 在剩余重试次数内重新调度（`yarn.resourcemanager.am.max-attempts` 默认 2），
+  已运行的任务随 Container 回收，**任务级进度不保留**。
+
 - 【L3】**RM 故障** - 未配置 RM HA 时，RM 宕机导致所有应用无法提交、AM 无法续心跳，集群级停摆。
+
 - 【L3】**Container 超限** - 任务实际内存超过 Container 限额，NodeManager 会直接将其杀死，AM 收到失败通知后决定是否重试。
+
 - 【L3】**量化感受** - AM 向 RM 的心跳默认约 1 秒一次；AM Container 启动通常在数秒级；从提交到首个 map 任务跑起来的端到端耗时正常在 10~30 秒内，超过则需排查队列资源或 AM 启动失败。
-- 【L4】**生产踩坑：AM 内存不足引发整体重跑** - 某夜间批处理作业偶发整体失败重跑，损失数小时。现象：AM Container 反复被 NodeManager 以内存超限杀掉，耗尽 2 次重试机会。排查发现 AM 申请的 1.5GB 内存不足以覆盖堆 + 堆外开销，且发生在作业任务数最多、AM 内存峰值的时刻。修复：AM 内存调至 3GB 并统一“申请资源 > JVM 堆 + overhead”的配置规范后稳定。
-- 【L4】**实战场景：关键作业停在 ACCEPTED** - 场景：凌晨批处理高峰，关键报表作业提交后半小时没拿到 AM Container。排查：`yarn application -status` 确认状态，RM Web UI 看队列使用率与待分配，大概率队列被低优先级大作业占满或资源碎片化。应急：杀掉/降级占资源的低优先级作业，或临时移到空闲队列。长期：按业务线划分队列配最小保障容量、关键作业配优先级与可抢占属性、建立高峰容量规划与错峰调度。权衡：抢占保护高优先级但被抢方任务白跑，需配套准入控制与容量规划。
+
+- 【L4】**生产踩坑
+
+  AM 内存不足引发整体重跑** - 某夜间批处理作业偶发整体失败重跑，损失数小时。现象：AM Container 反复被 NodeManager 以内存超限杀掉，耗尽 2 次重试机会。
+
+  排查发现 AM 申请的 1.5GB 内存不足以覆盖堆 + 堆外开销，且发生在作业任务数最多、AM 内存峰值的时刻。修复：AM 内存调至 3GB 并统一“申请资源 > JVM 堆 + overhead”的配置规范后稳定。
+
+- 【L4】**实战场景
+
+  关键作业停在 ACCEPTED** - 场景：凌晨批处理高峰，关键报表作业提交后半小时没拿到 AM Container。排查：`yarn application -status` 确认状态，
+  RM Web UI 看队列使用率与待分配，大概率队列被低优先级大作业占满或资源碎片化。应急：杀掉/降级占资源的低优先级作业，或临时移到空闲队列。长期：按业务线划分队列配最小保障容量、关键作业配优先级与可抢占属性、建立高峰容量规划与错峰调度。
+
+  权衡：抢占保护高优先级但被抢方任务白跑，需配套准入控制与容量规划。
 
 :::
 
@@ -1394,12 +1585,28 @@ YARN 提供三种资源调度器，通过 `yarn.resourcemanager.scheduler.class`
 ::: details 扩展知识
 
 - 【L3】**失效场景与选型边界**
+
   - **FIFO** - 一个长时间的大作业就能让后面所有小作业无限期排队（队头阻塞），多租户环境基本不可用。
+
   - **Capacity** - 借用资源的归还不是即时的：需等借用方任务自然结束才能收回，紧急时只能依赖抢占；队列划分过细则资源碎片化，过粗则隔离失效。
+
   - **Fair** - 抢占会直接杀掉被抢方的 Container，长任务被抢后白跑，频繁抢占会造成集群吞吐抖动；抢占需配置延迟与最小保障，防止弱势队列被反复抢成饿死。
-- 【L3】**量化示例** - 典型生产配置——root 下划分 etl（50%）、adhoc（20%）、realtime（30%）三个队列，队列内 `maximum-capacity` 限制弹性上限；Fair Scheduler 用 `yarn.scheduler.fair.preemption.cluster-utilization-threshold`（默认 0.8）控制抢占触发水位。
-- 【L4】**生产踩坑：队列规划缺失** - 集群把所有作业都扔在默认的 root.default 队列，某晚批处理大作业把队列打满，次日凌晨实时报表链路排队超 1 小时。现象：实时任务 ACCEPTED 堆积。排查发现队列规划缺失 + FIFO 语义下大作业阻塞小作业。修复：拆分 etl/adhoc/realtime 队列、配容量保底与弹性借用、实时队列设高优先级 + 可抢占，延迟恢复到分钟级。教训：队列规划是 YARN 治理的第一课，比任何参数调优都重要。
-- 【L4】**实战场景：白天查询 + 夜间 ETL 调度设计** - 场景：白天交互式查询要求分钟级响应，夜间 ETL 要求最大吞吐。架构：Capacity/Fair 多队列 + 抢占（如 interactive 30%、etl 50%、adhoc 20%，均允许弹性借用）；白天 interactive 高优先级、可抢占 etl 超额 Container；夜间 etl 借用 interactive 空闲资源拉满吞吐。护栏：为抢占配延迟与队列最小保障防饿死，对单作业设资源上限防独占。权衡：保障越强夜间利用率越低，需基于监控数据持续调整队列比例。
+
+- 【L3】**量化示例** - 典型生产配置——root 下划分 etl（50%）、adhoc（20%）、realtime（30%）三个队列，队列内 `maximum-capacity` 限制弹性上限；
+  Fair Scheduler 用 `yarn.scheduler.fair.preemption.cluster-utilization-threshold`（默认 0.8）控制抢占触发水位。
+
+- 【L4】**生产踩坑
+
+  队列规划缺失** - 集群把所有作业都扔在默认的 root.default 队列，某晚批处理大作业把队列打满，次日凌晨实时报表链路排队超 1 小时。现象：实时任务 ACCEPTED 堆积。
+
+  排查发现队列规划缺失 + FIFO 语义下大作业阻塞小作业。修复：拆分 etl/adhoc/realtime 队列、配容量保底与弹性借用、实时队列设高优先级 + 可抢占，延迟恢复到分钟级。教训：队列规划是 YARN 治理的第一课，
+  比任何参数调优都重要。
+
+- 【L4】**实战场景
+
+  白天查询 + 夜间 ETL 调度设计** - 场景：白天交互式查询要求分钟级响应，夜间 ETL 要求最大吞吐。架构：Capacity/Fair 多队列 + 抢占（如 interactive 30%、etl 50%、
+  adhoc 20%，均允许弹性借用）；白天 interactive 高优先级、可抢占 etl 超额 Container；夜间 etl 借用 interactive 空闲资源拉满吞吐。护栏：为抢占配延迟与队列最小保障防饿死，
+  对单作业设资源上限防独占。权衡：保障越强夜间利用率越低，需基于监控数据持续调整队列比例。
 
 :::
 
@@ -1492,7 +1699,9 @@ HDFS 默认的副本数为 3，此时 HDFS 的副本分布策略是：
 ::: details 扩展知识
 
 - 【L3】**机架感知的取舍** - 副本跨机架存放能防止整机架失效、读时可利用多机架带宽，但写需要跨机架传输、代价上升；默认 3 副本「本机架两份 + 跨机架一份」正是可靠性与写成本的平衡点。
+
 - 【L3】**副本存放约束** - 每节点最多一份、每机架最多两份、同等条件优先选空闲节点，这些约束共同避免副本集中在同一故障域，并在存储水位失衡时自动迁移数据。
+
 - 【L4】**大规模欠复制的恢复代价** - 多节点同时故障后副本补齐集中爆发，会占用大量网络带宽；生产中可对复制带宽限流，避免冲击在线读写业务。
 
 :::
@@ -1543,9 +1752,17 @@ HDFS 的数据一致性主要依赖以下机制来保证：
 
 ::: details 扩展知识
 
-- 【L3】**写入可见性边界** - 数据可见性以已确认的写入为准：pipeline 中所有 DataNode ack 后数据包才算成功；未完成 ack 的数据不对外可见且会重发，完整语义见本文档『HDFS 的写数据流程是怎样的？』。
+- 【L3】**写入可见性边界** - 数据可见性以已确认的写入为准
+
+  pipeline 中所有 DataNode ack 后数据包才算成功；
+
+  未完成 ack 的数据不对外可见且会重发，完整语义见本文档『HDFS 的写数据流程是怎样的？』。
+
 - 【L3】**校验和失败的修复闭环** - 读时校验失败 → 客户端报告 corrupt 并切换其他副本重读 → NameNode 标记损坏副本并触发重新复制替换，形成「检测—隔离—替换」闭环。
-- 【L4】**设计哲学：用不可换一致** - 一次写入、仅追加、不支持随机修改的模型让并发控制极大简化，这是 HDFS 能在大规模场景兼顾高吞吐与一致性的前提。
+
+- 【L4】**设计哲学
+
+  用不可换一致** - 一次写入、仅追加、不支持随机修改的模型让并发控制极大简化，这是 HDFS 能在大规模场景兼顾高吞吐与一致性的前提。
 
 :::
 
@@ -1601,7 +1818,9 @@ HDFS 常见故障及检测方法：
 ::: details 扩展知识
 
 - 【L3】**三类检测手段的分工** - 心跳解决「节点是否存活」、ACK 解决「链路是否可用」、校验和解决「数据是否正确」，三者分别覆盖节点、通信、数据三层故障，互为补充。
+
 - 【L3】**坏盘主动上报的价值** - DataNode 检测到本机磁盘损坏后主动上报其上所有 BlockID，不必等读取时才暴露问题，NameNode 可立即调度副本补齐，缩短数据欠复制窗口。
+
 - 【L4】**监控建议** - 生产中应对 DataNode 心跳丢失数、欠复制块数、损坏块数设置告警，在故障演变成业务可见问题之前介入。
 
 :::
@@ -1654,8 +1873,12 @@ HDFS 常见故障及检测方法：
 
 ::: details 扩展知识
 
-- 【L3】**跳过写与最小副本数的关系** - 写时跳过故障节点后，只要满足最小副本数即可继续写入，剩余副本在文件关闭时补齐；完整恢复语义见本文档『HDFS 的写数据流程是怎样的？』。
+- 【L3】**跳过写与最小副本数的关系** - 写时跳过故障节点后，只要满足最小副本数即可继续写入，剩余副本在文件关闭时补齐；
+
+  完整恢复语义见本文档『HDFS 的写数据流程是怎样的？』。
+
 - 【L3】**读的降级与失效边界** - 读故障切换的前提是至少还有一个副本可用；全部副本失效时块不可读，只能靠副本策略与机架感知提前预防，或依赖外部备份恢复。
+
 - 【L4】**客户端的重试责任** - HDFS 不保证写操作自动幂等重放，写异常场景下客户端需自行重试并校验结果，避免重复写入或数据缺失。
 
 :::
@@ -1703,7 +1926,9 @@ NameNode 会立即查找该 DataNode 上存储的数据块有哪些，以及这�
 ::: details 扩展知识
 
 - 【L3】**宕机判定后的恢复链路** - 判定宕机 → 定位其上欠复制块 → 调度健康 DataNode 复制补齐；补齐期间数据仍可读（依赖剩余副本），新写入不再路由到该节点。
+
 - 【L3】**多余副本的清理** - DataNode 携旧副本重新上线后，NameNode 对比块报告，保留有效副本、调度清理多余副本，保证副本数不超配置、不多占存储。
+
 - 【L4】**大规模故障的处置顺序** - 多节点同时故障时欠复制块暴增，应优先补齐低于最小副本数的块（不可再丢的高风险块），其余按带宽窗口渐进补齐。
 
 :::
@@ -1762,9 +1987,18 @@ Standby NameNode 在检查点定期将内存中的元数据保存到 FsImage 文
 
 ::: details 扩展知识
 
-- 【L3】**利用 QJM 实现元数据高可用** - QJM（Quorum Journal Manager）基于 Paxos 算法：只要保证 Quorum（法定人数）数量的操作成功，就认为这是一次最终成功的操作。QJM 共享存储系统：部署奇数（2N+1）个 JournalNode 负责存储 edits 编辑日志；写 edits 时只要超过半数（N+1）的 JournalNode 返回成功，就代表本次写入成功；最多可容忍 N 个 JournalNode 宕机。
-- 【L3】**Active 节点选举** - 利用 ZooKeeper 实现 Active 节点选举，切换流程详见本文档『NameNode 如何实现主备切换？』。
-- 【L4】**故障处理的优先级** - 无 HA 的集群 NameNode 故障只能靠重启并回放 edits 恢复，停机时间与元数据规模正相关；生产集群应优先部署 HA，把「故障处理」转化为「自动切换」，详见本文档『HDFS 如何实现高可用？』。
+- 【L3】**利用 QJM 实现元数据高可用** - QJM（Quorum Journal Manager）基于 Paxos 算法
+
+  只要保证 Quorum（法定人数）数量的操作成功，就认为这是一次最终成功的操作。QJM 共享存储系统：
+
+  部署奇数（2N+1）个 JournalNode 负责存储 edits 编辑日志；写 edits 时只要超过半数（N+1）的 JournalNode 返回成功，就代表本次写入成功；最多可容忍 N 个 JournalNode 宕机。
+
+- 【L3】**Active 节点选举** - 利用 ZooKeeper 实现 Active 节点选举，
+  切换流程详见本文档『NameNode 如何实现主备切换？』。
+
+- 【L4】**故障处理的优先级** - 无 HA 的集群 NameNode 故障只能靠重启并回放 edits 恢复，停机时间与元数据规模正相关；
+
+  生产集群应优先部署 HA，把「故障处理」转化为「自动切换」，详见本文档『HDFS 如何实现高可用？』。
 
 :::
 
@@ -1865,10 +2099,16 @@ HDFS 高可用架构主要由以下组件所构成：
 
 ::: details 扩展知识
 
-- 【L3】**Standby 如何快速接管** - Standby 平时通过 JournalNode 持续追平 EditLog，并周期性做 checkpoint 生成 FsImage；切换时只需回放剩余少量 edits，才能做到快速接管；若 Standby 长期落后，切换时间会显著拉长甚至拒绝切换。
+- 【L3】**Standby 如何快速接管** - Standby 平时通过 JournalNode 持续追平 EditLog，并周期性做 checkpoint 生成 FsImage；切换时只需回放剩余少量 edits，才能做到快速接管；
+  若 Standby 长期落后，切换时间会显著拉长甚至拒绝切换。
+
 - 【L3】**DataNode 双向上报** - DataNode 同时向主备两个 NameNode 上报块位置，使 Standby 无需冷启动重建块映射，切换后立即掌握数据分布。
+
 - 【L4】**QJM 与 NFS 的选型** - QJM 基于多 JournalNode 过半写，无额外单点；NFS 依赖外部共享存储设备，存在单点与运维依赖；生产一般选 QJM。
-- 【L4】**与 Federation 的关系** - HA 解决可用性，不解决元数据规模；超大命名空间可叠加 Federation，每个命名空间内部各自配置 HA，见本文档『什么是 HDFS Federation？』。
+
+- 【L4】**与 Federation 的关系** - HA 解决可用性，不解决元数据规模；
+
+  超大命名空间可叠加 Federation，每个命名空间内部各自配置 HA，见本文档『什么是 HDFS Federation？』。
 
 :::
 
@@ -1876,7 +2116,13 @@ HDFS 高可用架构主要由以下组件所构成：
 
 ::: details 实战场景
 
-- **场景：Active NameNode 所在节点宕机的自动切换** - 现象：Active NameNode 进程所在机器整体宕机，ZooKeeper 会话超时后 ZKFC 触发选举，Standby 确认 edits 追平后升为 Active，客户端短暂重试后恢复；期间 DataNode 上的块数据不受影响，只是元数据操作短暂阻塞。经验：切换耗时主要取决于 Standby 的元数据追赶进度，日常必须监控 checkpoint 与 Standby 同步健康度。
+- **场景：Active NameNode 所在节点宕机的自动切换** - 现象：Active NameNode 进程所在机器整体宕机，ZooKeeper 会话超时后 ZKFC 触发选举，
+  Standby 确认 edits 追平后升为 Active，客户端短暂重试后恢复；
+
+  期间 DataNode 上的块数据不受影响，只是元数据操作短暂阻塞。
+
+  经验：切换耗时主要取决于 Standby 的元数据追赶进度，日常必须监控 checkpoint 与 Standby 同步健康度。
+
 - **场景：计划内手动切换演练** - 集群升级或迁移前，先手动把 Active 转为 Standby、再把目标节点转为 Active，避免非预期故障触发切换；同时验证 fencing 配置有效，这是上线 HA 后的必做演练。
 
 :::
@@ -1946,9 +2192,13 @@ NameNode 在选举成功后，会在 zk 上创建了一个 `/hadoop-ha/${dfs.nam
 
 ::: details 扩展知识
 
-- 【L3】**六段链路的职责分工** - HealthMonitor 只负责探测，ZKFC 负责决策与编排，ActiveStandbyElector 只负责选举，状态翻转最终靠 HAServiceProtocol RPC 完成；各环节职责单一，便于独立测试与替换。
+- 【L3】**六段链路的职责分工** - HealthMonitor 只负责探测，ZKFC 负责决策与编排，ActiveStandbyElector 只负责选举，状态翻转最终靠 HAServiceProtocol RPC 完成；
+  各环节职责单一，便于独立测试与替换。
+
 - 【L3】**与 Kafka Controller 选举的相似性** - 抢锁 + Watcher 监听 NodeDeleted 的实现与 Kafka Controller 选举一致，是基于 ZooKeeper 选主的经典模式。
-- 【L4】**切换失败的常见根因** - ZooKeeper 会话抖动、备节点元数据未同步完成、fencing 执行失败都会导致切换中止或延迟，见本文档『如何应对 HDFS 脑裂问题？』。
+
+- 【L4】**切换失败的常见根因** - ZooKeeper 会话抖动、备节点元数据未同步完成、fencing 执行失败都会导致切换中止或延迟，
+  见本文档『如何应对 HDFS 脑裂问题？』。
 
 :::
 
@@ -2015,8 +2265,14 @@ Hadoop 目前主要提供两种隔离措施，通常会选择第一种：sshfenc
 
 ::: details 扩展知识
 
-- 【L3】**NameNode 选举机制与 Kafka Controller 的对照** - NameNode 选举的实现机制与 Kafka 的 Controller 类似：Kafka 给 Broker 发送的请求中都会携带 controller epoch 信息，如果 Broker 发现当前请求的 epoch 小于缓存中的值，就证明这是来自旧 Controller 的请求，就会拒绝这个请求；但异常情况下（Broker 先收到旧 Controller 的请求）并没有完美方案，新 Controller 选出后会向全局所有 Broker 发送 metadata 请求收敛 epoch，出现问题的概率非常小，且即使出现由于 Kafka 的高可靠架构影响也很有限。
+- 【L3】**NameNode 选举机制与 Kafka Controller 的对照** - NameNode 选举的实现机制与 Kafka 的 Controller 类似：
+
+  Kafka 给 Broker 发送的请求中都会携带 controller epoch 信息，如果 Broker 发现当前请求的 epoch 小于缓存中的值，就证明这是来自旧 Controller 的请求，就会拒绝这个请求；
+  但异常情况下（Broker 先收到旧 Controller 的请求）并没有完美方案，新 Controller 选出后会向全局所有 Broker 发送 metadata 请求收敛 epoch，出现问题的概率非常小，
+  且即使出现由于 Kafka 的高可靠架构影响也很有限。
+
 - 【L3】**epoch 通用做法** - 通过标识每次选举的版本号，并以最新版本选举结果为准，是分布式选举避免脑裂的常见做法。在其他分布式系统中，epoch 可能会被称为 term、version 等。
+
 - 【L4】**假死根因治理** - GC 假死是触发脑裂场景的典型诱因，生产上应监控 NameNode GC 时长并优化堆配置，从源头减少误切换。
 
 :::
@@ -2060,6 +2316,7 @@ YARN ResourceManager 的高可用与 HDFS NameNode 的高可用类似，但是 R
 ::: details 扩展知识
 
 - 【L3】**与 HDFS HA 的对比** - HDFS 需要 QJM 这类共享编辑日志来同步海量元数据；RM 维护的是调度状态而非全量文件元数据，体量小，直接以 ZooKeeper 作为状态存储与选举协调器，架构更轻量。
+
 - 【L4】**切换期间的作业影响** - RM 切换时正在运行的 Container 状态需要重建，部分任务可能重跑；上层框架（如 MapReduce AM 重试机制）可吸收这种抖动，生产中应把 RM HA 纳入集群基线配置。
 
 :::
@@ -2126,17 +2383,23 @@ Kerberos 通过"票据 + 密钥"实现双向身份认证——客户端证明"�
 
 ::: details
 
-- 【L3】Kerberos 与 LDAP 的分工：Kerberos 负责认证（你是谁），LDAP/Sentry 负责授权（你能做什么）。生产环境通常 Kerberos + Ranger 组合。
-- 【L3】跨 Realm 信任：多集群场景下配置 Cross-Realm Trust，允许一个 Realm 的票据在另一个 Realm 使用。
-- 【L4】KDC 高可用：主 KDC + 从 KDC 方案，数据库通过 `kprop` 同步。从 KDC 在主 KDC 故障时接管认证请求。
+- 【L3】Kerberos 与 LDAP 的分工
+
+  Kerberos 负责认证（你是谁），LDAP/Sentry 负责授权（你能做什么）。生产环境通常 Kerberos + Ranger 组合。
+
+- 【L3】跨 Realm 信任
+
+  多集群场景下配置 Cross-Realm Trust，允许一个 Realm 的票据在另一个 Realm 使用。
+
+- 【L4】KDC 高可用
+
+  主 KDC + 从 KDC 方案，数据库通过 `kprop` 同步。从 KDC 在主 KDC 故障时接管认证请求。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "配了 Kerberos 就安全了" → Kerberos 只管认证，不管授权。还需配合 HDFS 权限 / Ranger 策略做细粒度访问控制。
 - ❌ "keytab 分发不重要" → keytab 泄露 = 身份被盗用。必须严格文件权限（600）+ 定期轮换 + 审计访问日志。

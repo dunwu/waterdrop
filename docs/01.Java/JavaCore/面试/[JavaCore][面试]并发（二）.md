@@ -72,19 +72,23 @@ Java 锁按七大维度划分：公平性、获取方式、可重入性、共享
 
 ::: details
 
-- 【L3】`synchronized` 锁升级路径：无锁 → 偏向锁 → 轻量级锁（CAS 自旋）→ 重量级锁（OS 互斥），只能升级不能降级；注意版本演进——JDK 15 起（JEP 374）默认禁用偏向锁，JDK 18 彻底移除，谈偏向锁必须标注版本。
+- 【L3】`synchronized` 锁升级路径
+
+  无锁 → 偏向锁 → 轻量级锁（CAS 自旋）→ 重量级锁（OS 互斥），只能升级不能降级；注意版本演进——JDK 15 起（JEP 374）默认禁用偏向锁，JDK 18 彻底移除，
+  谈偏向锁必须标注版本。
+
 - 【L4】适应性自旋是 JVM 根据历史自旋成功率动态决定是否自旋的优化，与 AQS「先 CAS 抢锁、失败再 park」、LongAdder「先 base、竞争再 Cell」同属「先走廉价路径、昂贵路径兜底」的自适应设计思想。
-  :::
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "自旋锁一定比阻塞锁快" → 自旋只在临界区极短、竞争极低时划算，等待时间长时自旋纯烧 CPU，AQS 因此选择 park 阻塞。
 - ❌ "共享锁（读锁）之间完全不互斥，可以随便用" → 读锁与写锁互斥，写多场景下读锁照样排队，反而增加开销。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -134,19 +138,26 @@ Java 锁按七大维度划分：公平性、获取方式、可重入性、共享
 
 ::: details
 
-- 【L3】数据库两种锁的落地：悲观锁即 `SELECT ... FOR UPDATE` 行级排他锁；乐观锁靠 version 字段实现——`UPDATE t SET v=v+1, version=version+1 WHERE id=? AND version=old`，影响行数为 0 即冲突重试。
-- 【L4】乐观锁的隐形成本是重试风暴：竞争率升高后 CAS 失败率指数上升，CPU 空转比阻塞更贵；数据库 MVCC 本质是「版本链 + Read View」的多版本乐观读，读写互不阻塞，是乐观思想的工程化演进。
-  :::
+- 【L3】数据库两种锁的落地
+
+  悲观锁即 `SELECT ... FOR UPDATE` 行级排他锁；乐观锁靠 version 字段实现——
+
+  `UPDATE t SET v=v+1, version=version+1 WHERE id=? AND version=old`，影响行数为 0 即冲突重试。
+
+- 【L4】乐观锁的隐形成本是重试风暴
+
+  竞争率升高后 CAS 失败率指数上升，CPU 空转比阻塞更贵；数据库 MVCC 本质是「版本链 + Read View」的多版本乐观读，读写互不阻塞，是乐观思想的工程化演进。
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "乐观锁不加锁，一定比悲观锁快" → 高写竞争下乐观锁反复失败重试，CPU 空转，吞吐可能低于悲观锁。
 - ❌ "乐观锁也能保证强一致" → 乐观锁不阻塞并发写，只做事后检测，冲突时靠重试收敛，属于最终一致。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -196,19 +207,23 @@ Java 锁按七大维度划分：公平性、获取方式、可重入性、共享
 
 ::: details
 
-- 【L3】源码上公平/非公平只差一处：`FairSync.tryAcquire` 在 CAS 前调用 `hasQueuedPredecessors()`，队列有前序等待者就放弃抢锁去排队；`NonfairSync` 不检查直接 CAS，一个方法区分两种策略。
+- 【L3】源码上公平/非公平只差一处
+
+  `FairSync.tryAcquire` 在 CAS 前调用 `hasQueuedPredecessors()`，队列有前序等待者就放弃抢锁去排队；`NonfairSync` 不检查直接 CAS，
+  一个方法区分两种策略。
+
 - 【L4】非公平锁高并发下吞吐量可提升约 10%~30%，本质是省掉「park 当前线程 → unpark 队首线程」的上下文切换，让刚释放锁或刚到达的线程趁 CPU 缓存热时直接接管锁，代价是等待延迟方差变大。
-  :::
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "非公平锁就是随机分配锁" → 非公平只体现在「新来线程插队抢一次」，抢失败后依然进 FIFO 队列排队，并非随机。
 - ❌ "公平锁一定响应更快" → 公平锁保证顺序但不保证低延迟，持锁线程执行慢时所有等待者照样等。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -283,7 +298,8 @@ graph TD
 
 ::: details
 
-- 【L3】**head 是 dummy node（哨兵节点）**：head 不保存有效线程（`node.thread == null`），使 `acquireQueued` 的自旋条件统一为「前驱是 head 就再试一次 `tryAcquire`」，无需对队首特判：
+- 【L3】**head 是 dummy node（哨兵节点）**：head 不保存有效线程（`node.thread == null`），
+  使 `acquireQueued` 的自旋条件统一为「前驱是 head 就再试一次 `tryAcquire`」，无需对队首特判：
 
   ```java
   final boolean acquireQueued(final Node node, int arg) {
@@ -305,11 +321,31 @@ graph TD
   关键设计：只有 head 的后继才允许抢锁，把「全队 CAS 竞争」收敛为「至多一个线程在抢」，避免惊群。
 
 - 【L3】**`hasQueuedPredecessors()` 是公平锁的核心**：`FairSync.tryAcquire` 在 CAS 前调用它检查队列是否有等待者；`NonfairSync` 不检查直接 CAS。
-- 【L3】**`SIGNAL` 的责任转移**：线程 park 前把前驱 `waitStatus` 置为 `SIGNAL`（「我睡了，释放锁时记得叫醒我」）；`CANCELLED` 节点（如 `tryLock` 超时）在遍历中被跳过并清理。
-- 【L3】**park/unpark 与 Linux futex**：`LockSupport.park()/unpark()` 底层经 HotSpot `Unsafe_Park` 落到 Linux `futex(FUTEX_WAIT/FUTEX_WAKE)`。每线程持有一个 `permit` 标志：`unpark(t)` 置 1（多次不累积），`park()` 为 1 则立即返回并清零、为 0 则阻塞——因此 unpark 可以先于 park 调用。
-- 【L4】**CLH vs MCS：AQS 为什么选 CLH 变体？** 纯 CLH 在前驱节点上远程自旋（浪费 CPU）且是隐式单向链表（无法支持取消与条件队列）；MCS 本地自旋、天然适合阻塞。AQS = CLH 的 FIFO 队列结构 + MCS 的「前驱唤醒后继」阻塞思想 + 显式双向链表改造（`prev`/`next` 支撑节点取消与条件队列转移）。
-- 【L4】**state 语义一览（区分「背过」与「真懂」的探针）**：同一套 AQS 骨架，子类只需定义 state 语义——`ReentrantLock`：state=重入次数（独占）；`Semaphore`：state=剩余许可数（共享）；`CountDownLatch`：state=倒计数，归零后不可复用（共享）；`ReentrantReadWriteLock`：state 高 16 位=读锁累计计数、低 16 位=写锁重入数。注意 `CyclicBarrier` 是例外——它并不继承 AQS，而是组合 `ReentrantLock` + `Condition` 实现屏障，且带 generation（代）机制可循环复用。
-- 【L4】**JDK 版本演进**：JDK 9+ AQS 底层从 `Unsafe` 切换到 `VarHandle`；JDK 17 对 AQS 做了大重构——同步队列节点拆分为 `ExclusiveNode`/`SharedNode`/`ConditionNode` 子类，原 `waitStatus` int 状态字段被 `negative` 等新编码取代，面试背源码需注明 JDK 版本，否则新旧实现对不上。
+
+- 【L3】**`SIGNAL` 的责任转移**：线程 park 前把前驱 `waitStatus` 置为 `SIGNAL`（「我睡了，释放锁时记得叫醒我」）；
+  `CANCELLED` 节点（如 `tryLock` 超时）在遍历中被跳过并清理。
+
+- 【L3】**park/unpark 与 Linux futex**：
+
+  `LockSupport.park()/unpark()` 底层经 HotSpot `Unsafe_Park` 落到 Linux `futex(FUTEX_WAIT/FUTEX_WAKE)`。每线程持有一个 `permit` 标志：
+
+  `unpark(t)` 置 1（多次不累积），`park()` 为 1 则立即返回并清零、为 0 则阻塞——因此 unpark 可以先于 park 调用。
+
+- 【L4】**CLH vs MCS：AQS 为什么选 CLH 变体？**
+
+  纯 CLH 在前驱节点上远程自旋（浪费 CPU）且是隐式单向链表（无法支持取消与条件队列）；MCS 本地自旋、天然适合阻塞。
+
+  AQS = CLH 的 FIFO 队列结构 + MCS 的「前驱唤醒后继」阻塞思想 + 显式双向链表改造（`prev`/`next` 支撑节点取消与条件队列转移）。
+
+- 【L4】**state 语义一览（区分「背过」与「真懂」的探针）**：同一套 AQS 骨架，子类只需定义 state 语义——`ReentrantLock`：state=重入次数（独占）；`Semaphore`：
+
+  state=剩余许可数（共享）；`CountDownLatch`：state=倒计数，归零后不可复用（共享）；`ReentrantReadWriteLock`：state 高 16 位=读锁累计计数、低 16 位=写锁重入数。
+
+  注意 `CyclicBarrier` 是例外——它并不继承 AQS，而是组合 `ReentrantLock` + `Condition` 实现屏障，且带 generation（代）机制可循环复用。
+
+- 【L4】**JDK 版本演进**：JDK 9+ AQS 底层从 `Unsafe` 切换到 `VarHandle`；JDK 17 对 AQS 做了大重构——
+  同步队列节点拆分为 `ExclusiveNode`/`SharedNode`/`ConditionNode` 子类，原 `waitStatus` int 状态字段被 `negative` 等新编码取代，面试背源码需注明 JDK 版本，
+  否则新旧实现对不上。
 
 > 📚 延伸阅读：[从 ReentrantLock 的实现看 AQS 的原理及应用](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html)
 
@@ -319,19 +355,22 @@ graph TD
 
 ::: details
 
-某电商大促网关限流：基于 AQS 共享模式自研令牌桶同步器，`state` 存令牌数，请求线程 `tryAcquireShared(1)` 原子扣减，令牌不足时入队 park，定时线程 `releaseShared(n)` 批量补充并唤醒队首。单机 16C32G 压测稳定处理 12 万 QPS，锁相关开销占请求耗时 < 1%，比「全局 synchronized 计数」方案吞吐提升约 4 倍。同一套机制用 `Condition` 实现延迟任务时间轮的精准唤醒，调度误差从百毫秒级降到毫秒级。
+某电商大促网关限流：基于 AQS 共享模式自研令牌桶同步器，`state` 存令牌数，请求线程 `tryAcquireShared(1)` 原子扣减，令牌不足时入队 park，
+定时线程 `releaseShared(n)` 批量补充并唤醒队首。单机 16C32G 压测稳定处理 12 万 QPS，锁相关开销占请求耗时 < 1%，比「全局 synchronized 计数」方案吞吐提升约 4 倍。
+
+同一套机制用 `Condition` 实现延迟任务时间轮的精准唤醒，调度误差从百毫秒级降到毫秒级。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "AQS 队列中所有线程都在自旋抢锁" → 只有 head 的后继节点允许 `tryAcquire`，其余节点直接 park 挂起。
 - ❌ "AQS 用的就是原始 CLH 队列" → 是 CLH 变体：显式双向链表 + park 阻塞替代自旋，并支持共享模式与条件队列。
 - ❌ "park 后一定由前驱精确唤醒，不会丢" → `unparkSuccessor` 并非从 head.next 向后遍历：它先检查 head.next，仅当该节点为 null 或已 CANCELLED（waitStatus>0）时，才从 tail **向前**兜底扫描第一个 waitStatus≤0 的节点唤醒（因 next 指针入队后补写、可能短暂不一致）。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -434,18 +473,41 @@ public void test () throw Exception {
 
 ::: details
 
-- 【L3】synchronized 的 monitor 机制：字节码层面用 monitorenter/monitorexit 指令（异常路径会有额外的 monitorexit 保证释放），对应 ObjectMonitor 维护 EntryList/WaitSet；锁升级路径为偏向锁→轻量级锁（CAS）→重量级锁（OS 互斥）。
-- 【L3】ReentrantLock 的所有能力都是 AQS 的映射：公平性→`hasQueuedPredecessors()`，可中断→`acquireInterruptibly()`，超时→`tryLock(long, TimeUnit)` 内部支持中断的限时获取，多条件→多个 `ConditionObject` 各自维护条件队列。
+- 【L3】synchronized 的 monitor 机制
+
+  字节码层面用 monitorenter/monitorexit 指令（异常路径会有额外的 monitorexit 保证释放），
+  对应 ObjectMonitor 维护 EntryList/WaitSet；锁升级路径为偏向锁→轻量级锁（CAS）→重量级锁（OS 互斥）。
+
+- 【L3】ReentrantLock 的所有能力都是 AQS 的映射
+
+  公平性→`hasQueuedPredecessors()`，可中断→`acquireInterruptibly()`，
+  超时→`tryLock(long, TimeUnit)` 内部支持中断的限时获取，多条件→多个 `ConditionObject` 各自维护条件队列。
+
 - 【L4】JIT 对 synchronized 还有锁消除（逃逸分析证明无逃逸则去锁）与锁粗化（相邻同锁合并）优化；而 ReentrantLock 的能力边界（可尝试、可放弃）使其能做死锁预防：多资源按序 tryLock，失败则回退重试。
-- 【L4】**性能对比要按 JDK 版本重估**：「JDK 6 后两者性能接近」的论据部分依赖偏向锁在单线程反复加锁场景的收益；JDK 15 起偏向锁默认禁用并废弃（JEP 374），synchronized 只剩轻量级锁 + 适应性自旋等优化，「偏向锁让 synchronized 近零开销」的说法已不成立。低竞争下两者仍基本打平，选型应先看功能需求（可中断/超时/公平/多 Condition）而非微基准。
-- 【L4】**虚拟线程时代的新选型维度**：JDK 21（JEP 444）起，虚拟线程在 `synchronized` 块内执行阻塞操作会把载体线程钉住（pinning），高并发阻塞路径吞吐骤降，JDK 24 之前虚拟线程上的阻塞型代码应优先 `ReentrantLock`；JDK 24（JEP 491，Synchronize Virtual Threads without Pinning）才消除该限制。读多写少场景还有第三选项 `StampedLock`（乐观读不加锁），见本文档「StampedLock 的实现原理是什么？」。
-  :::
+
+- 【L4】**性能对比要按 JDK 版本重估**
+
+  「JDK 6 后两者性能接近」的论据部分依赖偏向锁在单线程反复加锁场景的收益；JDK 15 起偏向锁默认禁用并废弃（JEP 374），
+  synchronized 只剩轻量级锁 + 适应性自旋等优化，「偏向锁让 synchronized 近零开销」的说法已不成立。低竞争下两者仍基本打平，选型应先看功能需求（可中断/超时/公平/多 Condition）而非微基准。
+
+- 【L4】**虚拟线程时代的新选型维度**
+
+  JDK 21（JEP 444）起，虚拟线程在 `synchronized` 块内执行阻塞操作会把载体线程钉住（pinning），高并发阻塞路径吞吐骤降，
+  JDK 24 之前虚拟线程上的阻塞型代码应优先 `ReentrantLock`；JDK 24（JEP 491，Synchronize Virtual Threads without Pinning）才消除该限制。
+
+  读多写少场景还有第三选项 `StampedLock`（乐观读不加锁），见本文档「StampedLock 的实现原理是什么？」。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
 
-订单服务的锁选型与排查链路：接口 P99 偶发飙升至秒级，`jstack <pid>` 见大量线程处于 `BLOCKED (on object monitor)`，`waiting to lock <0x...d20>` 指向同一 monitor，再定位到持有 `- locked <0x...d20>` 的线程，发现其临界区内藏着一次平均约 800ms 的下游 RPC 调用——synchronized 不支持超时与放弃，等待线程全部堆积放大延迟。改造两步：① 锁粒度从全局对象改为按 orderId 取分段锁；② 换 `ReentrantLock.tryLock(200, MILLISECONDS)`，超时走补偿查询而非死等。堆积消除后 P99 回落至超时阈值内。结论（决策维度）：临界区含 RPC/IO 时必须用支持超时、可中断的显式锁；synchronized 只适合纯内存短临界区；需要多路等待协调（生产者-消费者）时 Condition 是 synchronized 无法替代的。
+订单服务的锁选型与排查链路：接口 P99 偶发飙升至秒级，`jstack <pid>` 见大量线程处于 `BLOCKED (on object monitor)`，
+`waiting to lock <0x...d20>` 指向同一 monitor，再定位到持有 `- locked <0x...d20>` 的线程，
+发现其临界区内藏着一次平均约 800ms 的下游 RPC 调用——synchronized 不支持超时与放弃，等待线程全部堆积放大延迟。改造两步：① 锁粒度从全局对象改为按 orderId 取分段锁；
+② 换 `ReentrantLock.tryLock(200, MILLISECONDS)`，超时走补偿查询而非死等。堆积消除后 P99 回落至超时阈值内。结论（决策维度）：临界区含 RPC/IO 时必须用支持超时、可中断的显式锁；
+synchronized 只适合纯内存短临界区；需要多路等待协调（生产者-消费者）时 Condition 是 synchronized 无法替代的。
 
 :::
 
@@ -453,11 +515,10 @@ public void test () throw Exception {
 
 ::: details
 
-常见误区：
-
 - ❌ "ReentrantLock 比 synchronized 快得多，无脑选它" → JDK 6 后性能接近，无高级需求时 synchronized 更简洁且不会忘解锁。
 - ❌ "ReentrantLock 异常时会自动释放锁" → 不会，异常路径若未在 finally 中 `unlock()`，锁永久被持有，后续线程全部阻塞。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -537,8 +598,12 @@ graph TD
 
 ::: details
 
-- 【L3】非公平与公平的源码差异：`NonfairSync.lock()` 直接 `compareAndSetState(0, 1)`，成功即设 owner；失败才走 `acquire(1)`。`FairSync.tryAcquire` 在 CAS 前先判断 `!hasQueuedPredecessors()`，队列有等待者就放弃抢占。
+- 【L3】非公平与公平的源码差异：`NonfairSync.lock()` 直接 `compareAndSetState(0, 1)`，成功即设 owner；失败才走 `acquire(1)`。
+
+  `FairSync.tryAcquire` 在 CAS 前先判断 `!hasQueuedPredecessors()`，队列有等待者就放弃抢占。
+
 - 【L3】`unlock()` 内部 `sync.release(1)`：只有 `tryRelease` 返回 true（state 归零）才调 `unparkSuccessor`，重入锁的中间层释放不会唤醒任何线程。
+
 - 【L4】**跨语言对比：C++ std::mutex vs Java ReentrantLock**：
 
 | 维度                | C++ `std::mutex`                                          | Java `ReentrantLock`                             |
@@ -551,26 +616,35 @@ graph TD
 | **底层实现**        | Linux：`futex`（低竞争用户态 CAS，高竞争内核阻塞）        | 同样基于 futex（通过 `park`/`unpark`）           |
 | **recursive_mutex** | 需显式使用 `std::recursive_mutex`（独立类型）             | 默认即可重入（同类型）                           |
 
-C++ 是「积木式组合」：mutex 只管互斥、condition_variable 只管等待-通知、unique_lock 管 RAII 生命周期，松耦合换灵活性；Java 是「一体化工具」：`newCondition()` 绑定锁实例避免用错 mutex，`await()` 原子完成「释放锁→入条件队列→park」，牺牲灵活性换开箱即用的正确性。C++ 把 `recursive_mutex` 独立成类型说明可重入被认为有代价（常暗示设计问题），Java 默认可重入则是实用主义。
+C++ 是「积木式组合」：mutex 只管互斥、condition_variable 只管等待-通知、unique_lock 管 RAII 生命周期，松耦合换灵活性；Java 是「一体化工具」：
+
+`newCondition()` 绑定锁实例避免用错 mutex，`await()` 原子完成「释放锁→入条件队列→park」，牺牲灵活性换开箱即用的正确性。
+
+C++ 把 `recursive_mutex` 独立成类型说明可重入被认为有代价（常暗示设计问题），Java 默认可重入则是实用主义。
+
 :::
 
 #### 🏭 实战场景
 
 ::: details
 
-支付核心服务的幂等处理：24 台 8C16G 实例，每笔订单以 orderId 分段取 ReentrantLock（非公平）做幂等互斥，临界区仅查库+改状态（P99 < 8ms）。用 `tryLock(500, MILLISECONDS)` 替代 `lock()`：重复支付请求 500ms 拿不到锁直接返回「处理中」，彻底消除了此前因慢查询导致的锁堆积雪崩（改造前高峰期线程池阻塞数 > 200，改造后为 0）。对账任务队列则改用公平锁保证按提交顺序执行，避免大单长期饥饿。
+支付核心服务的幂等处理：24 台 8C16G 实例，每笔订单以 orderId 分段取 ReentrantLock（非公平）做幂等互斥，临界区仅查库+改状态（P99 < 8ms）。
+
+用 `tryLock(500, MILLISECONDS)` 替代 `lock()`：重复支付请求 500ms 拿不到锁直接返回「处理中」，彻底消除了此前因慢查询导致的锁堆积雪崩（改造前高峰期线程池阻塞数 > 200，改造后为 0）。
+
+对账任务队列则改用公平锁保证按提交顺序执行，避免大单长期饥饿。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "重入锁每次 lock 都要 CAS" → 重入时当前线程已持有锁，直接 state+1，无 CAS 竞争。
 - ❌ "任意线程都可以 unlock" → 语法上允许调用，但非持有者 unlock 会抛 `IllegalMonitorStateException`。
 - ❌ "unlock 一定会唤醒等待线程" → 重入锁 state 未减到 0 时不会唤醒，只有完全释放才 `unparkSuccessor`。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -629,27 +703,38 @@ try {
 
 ::: details
 
-- 【L3】读锁重入计数的存储：总读次数在高 16 位，每线程自己的重入次数存在 `HoldCounter`（线程局部）中；`firstReader` 记录第一个获取读锁的线程及其计数，`cachedHoldCounter` 缓存最后一个获取读锁线程的计数器，两者都是为了减少 ThreadLocal 查找开销。
+- 【L3】读锁重入计数的存储
+
+  总读次数在高 16 位，每线程自己的重入次数存在 `HoldCounter`（线程局部）中；`firstReader` 记录第一个获取读锁的线程及其计数，
+  `cachedHoldCounter` 缓存最后一个获取读锁线程的计数器，两者都是为了减少 ThreadLocal 查找开销。
+
 - 【L3】公平模式下读/写锁获取都会先检查 `hasQueuedPredecessors()`，防止写线程长期饥饿；非公平模式下写锁饥饿仍可能发生。
-- 【L4】读写锁的局限：读锁持有期间写锁必须等待，读线程很多时写线程延迟大（写饥饿）；JDK 8 的 `StampedLock` 用乐观读解决此问题，见本文档「StampedLock 的实现原理是什么？」。
-  :::
+
+- 【L4】读写锁的局限
+
+  读锁持有期间写锁必须等待，读线程很多时写线程延迟大（写饥饿）；JDK 8 的 `StampedLock` 用乐观读解决此问题，见本文档「StampedLock 的实现原理是什么？」。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
 
-配置中心客户端本地缓存：集群 200 台实例，每实例 32 个工作线程读配置（读 QPS 合计 ~5 万/s），配置变更写 QPS < 1/s，典型读多写少。用 `ReentrantReadWriteLock` 保护内存字典后，读线程互不阻塞，配置拉取 P99 从 synchronized 方案的 3.1ms 降至 0.4ms；变更时写锁内重建字典并锁降级后再对外可见，避免读到半更新状态。后因读端仍有锁开销迁移到 `CopyOnWriteArrayList`/`volatile` 引用替换方案。
+配置中心客户端本地缓存：集群 200 台实例，每实例 32 个工作线程读配置（读 QPS 合计 ~5 万/s），配置变更写 QPS < 1/s，典型读多写少。用 `ReentrantReadWriteLock` 保护内存字典后，
+读线程互不阻塞，配置拉取 P99 从 synchronized 方案的 3.1ms 降至 0.4ms；变更时写锁内重建字典并锁降级后再对外可见，避免读到半更新状态。
+
+后因读端仍有锁开销迁移到 `CopyOnWriteArrayList`/`volatile` 引用替换方案。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "读锁可以升级为写锁" → 不支持！持读锁申请写锁会永久阻塞（读写互斥），只能先释放读锁或一开始就持写锁再降级。
 - ❌ "读锁之间完全不互斥，没有任何开销" → 读锁获取仍需 CAS 竞争同一个 state，高并发读下 CAS 失败重试也有开销，极端读热点可考虑 StampedLock 乐观读。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -715,7 +800,10 @@ try {
 
 ::: details
 
-- 【L3】为什么乐观读不加锁也安全？读的是局部变量副本，真正的安全保证在 `validate`：写锁获取会使版本号变化，只要期间无写，读到的副本就是一致的；有写则重读，属于「先做后验」的乐观控制。
+- 【L3】为什么乐观读不加锁也安全？
+
+  读的是局部变量副本，真正的安全保证在 `validate`：写锁获取会使版本号变化，只要期间无写，读到的副本就是一致的；有写则重读，属于「先做后验」的乐观控制。
+
 - 【L4】与 `ReentrantReadWriteLock` 对比：
 
 | 特性         | `StampedLock`        | `ReentrantReadWriteLock` |
@@ -727,17 +815,17 @@ try {
 | **条件变量** | 不支持               | 支持                     |
 
 代价：不可重入、不支持 Condition、API 更易错（忘传 stamp、误用升级），选型需权衡。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "StampedLock 可以替代所有读写锁" → 它不可重入、无条件变量、仅非公平，误在递归/嵌套场景使用会直接死锁。
 - ❌ "乐观读 validate 通过就一定没问题" → 读数据时必须拷贝到局部变量再 validate，直接读共享字段可能拿到被写线程改了一半的中间状态（long/double 非 volatile 非原子）。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -814,20 +902,26 @@ Condition notEmpty = lock.newCondition();  // 队列非空条件
 
 ::: details
 
-- 【L3】`await()` 用 `fullyRelease` 释放锁：无论重入多少次一次性全部释放，避免重入层级残留；若释放失败会抛 `IllegalMonitorStateException` 并把节点置为 CANCELLED。
+- 【L3】`await()` 用 `fullyRelease` 释放锁
+
+  无论重入多少次一次性全部释放，避免重入层级残留；若释放失败会抛 `IllegalMonitorStateException` 并把节点置为 CANCELLED。
+
 - 【L3】`signal()` 只能在持锁状态下调用（否则抛异常）；转移到同步队列后节点 waitStatus 从 CONDITION 逐步归零，被唤醒线程在 `acquireQueued` 中重新抢锁。
-- 【L4】`ArrayBlockingQueue` 正是双 Condition（notEmpty/notFull）的典范：生产只唤醒消费者、消费只唤醒生产者，避免了 notifyAll 的无关唤醒风暴。
-  :::
+
+- 【L4】`ArrayBlockingQueue` 正是双 Condition（notEmpty/notFull）的典范
+
+  生产只唤醒消费者、消费只唤醒生产者，避免了 notifyAll 的无关唤醒风暴。
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "signal 后线程立即继续执行" → signal 只是把节点移回同步队列，线程还要重新竞争锁，拿不到锁照样等。
 - ❌ "await 可以像 wait 一样不持锁调用" → await/signal 都必须在持有对应 Lock 时调用，否则抛 `IllegalMonitorStateException`。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -889,20 +983,25 @@ node.prev = null;
 
 ::: details
 
-- 【L3】入队顺序细节：先 `node.prev = pred` 再 CAS tail，最后才 `pred.next = node`，因此从 tail 沿 prev 向前遍历总是完整可达，而从 head 向后遍历 next 可能短暂断裂——这是 `unparkSuccessor` 失败时从 tail 向前兜底扫描的根本原因。
+- 【L3】入队顺序细节
+
+  先 `node.prev = pred` 再 CAS tail，最后才 `pred.next = node`，因此从 tail 沿 prev 向前遍历总是完整可达，
+  而从 head 向后遍历 next 可能短暂断裂——这是 `unparkSuccessor` 失败时从 tail 向前兜底扫描的根本原因。
+
 - 【L3】`setHead` 后旧 head 的 thread 与 prev 被置 null 帮助 GC，head 始终是 dummy 哨兵节点。
+
 - 【L4】原始 CLH 适合 NUMA 架构下的短临界区自旋锁（只读前驱变量，缓存迁移少）；AQS 面向的是锁持有时间不可控的通用场景，阻塞是必然选择。设计差异本质是「自旋锁 vs 阻塞锁」的适用域差异。
-  :::
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "AQS 队列就是教科书上的 CLH 自旋锁" → AQS 不自旋等待，park 阻塞 + 双向链表 + 共享模式都是对原始 CLH 的改造。
 - ❌ "队列节点的 next 指针随时可靠" → next 是入队后补写的，短暂为 null 属正常，不能依赖它做存在性判断。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -977,8 +1076,13 @@ atomicInt.incrementAndGet();  // CAS 实现原子自增
 
 ::: details
 
-- 【L3】`getAndAddInt` 的实现是 `do { v = getIntVolatile; } while (!compareAndSwapInt(...))` 的自旋循环，失败重试直到成功，高竞争下自旋开销就是 LongAdder 要解决的问题（见本文档「LongAdder 的原理是什么？为什么高并发下比 AtomicLong 快？」）。
-- 【L3】**CAS + volatile 组合是 Java 侧乐观锁的标准实现范式**：volatile 负责可见性与禁止重排，CAS 自旋负责「读-改-写」的原子性，二者互补缺一不可——Atomic 类的 `volatile int value` + `compareAndSet` 正是这个组合。业务层等价做法：把多字段状态封装成不可变对象放进 `AtomicReference`，整体 CAS 转换（失败重读重试），等效于数据库 version 字段乐观锁；竞争率高到重试风暴时应评估退回阻塞锁或分段（LongAdder）。
+- 【L3】`getAndAddInt` 的实现是 `do { v = getIntVolatile; } while (!compareAndSwapInt(...))` 的自旋循环，失败重试直到成功，
+  高竞争下自旋开销就是 LongAdder 要解决的问题（见本文档「LongAdder 的原理是什么？为什么高并发下比 AtomicLong 快？」）。
+
+- 【L3】**CAS + volatile 组合是 Java 侧乐观锁的标准实现范式**：volatile 负责可见性与禁止重排，CAS 自旋负责「读-改-写」的原子性，二者互补缺一不可——
+  Atomic 类的 `volatile int value` + `compareAndSet` 正是这个组合。业务层等价做法：把多字段状态封装成不可变对象放进 `AtomicReference`，整体 CAS 转换（失败重读重试），
+  等效于数据库 version 字段乐观锁；竞争率高到重试风暴时应评估退回阻塞锁或分段（LongAdder）。
+
 - 【L4】**x86 CMPXCHG + LOCK 前缀的微架构行为**：CMPXCHG 语义为比较 EAX 与内存操作数，相等则写入源操作数并置 ZF，否则把内存值载入 EAX：
 
   ```asm
@@ -988,7 +1092,10 @@ atomicInt.incrementAndGet();  // CAS 实现原子自增
   ELSE:           ZF = 0; EAX = TEMP
   ```
 
-  CMPXCHG 本身不是原子的，多核下靠 LOCK 前缀保证：①现代 CPU（P6 后）通过 MESI 协议**锁缓存行**（断言 #LOCK 信号，期间其他核该行处于 Invalid）；②操作数跨缓存行等非对齐情况回退**锁总线**，代价极高（~100 cycles+ vs ~20-40 cycles）；③LOCK 隐式充当全量内存屏障，禁止 StoreLoad 重排——这是 CAS 提供 volatile 级可见性的硬件根源。执行时先发 RFO（Read-For-Ownership）拿到缓存行独占权（E→M），完成后其他核访问该地址 Cache Miss 重新拉取。
+  CMPXCHG 本身不是原子的，多核下靠 LOCK 前缀保证：①现代 CPU（P6 后）通过 MESI 协议**锁缓存行**（断言 #LOCK 信号，期间其他核该行处于 Invalid）；②操作数跨缓存行等非对齐情况回退**锁总线**，
+  代价极高（~100 cycles+ vs ~20-40 cycles）；③LOCK 隐式充当全量内存屏障，禁止 StoreLoad 重排——这是 CAS 提供 volatile 级可见性的硬件根源。
+
+  执行时先发 RFO（Read-For-Ownership）拿到缓存行独占权（E→M），完成后其他核访问该地址 Cache Miss 重新拉取。
 
 - 【L4】**x86 vs ARM 的 CAS 实现差异**：
 
@@ -1000,18 +1107,19 @@ atomicInt.incrementAndGet();  // CAS 实现原子自增
 | **限制**       | 操作数必须对齐，跨缓存行退化为总线锁         | `LDREX/STREX` 之间不能有复杂操作（通常几十条指令内），否则硬件监视器可能超时 |
 | **Java 适配**  | `Unsafe::compareAndSwapInt` → `lock cmpxchg` | `Unsafe::compareAndSwapInt` → `ldrex/strex` 循环（LL/SC 循环）               |
 
-ARM 无单指令 CAS，HotSpot 用 LL/SC 循环模拟：`LDREX` 加载并标记地址 → 比较 → `STREX` 条件存储，返回 0 成功、非 0 表示 Exclusive Monitor 检测到地址被修改（其他核写入、中断、上下文切换都可能清除 Monitor），需重试整个序列。
+ARM 无单指令 CAS，HotSpot 用 LL/SC 循环模拟：`LDREX` 加载并标记地址 → 比较 → `STREX` 条件存储，返回 0 成功、非 0 表示 Exclusive Monitor 检测到地址被修改（其他核写入、
+中断、上下文切换都可能清除 Monitor），需重试整个序列。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "LOCK 前缀就是锁总线" → 现代 CPU 默认锁缓存行（Cache Lock），只有非对齐等特殊情况才回退锁总线。
 - ❌ "用了 CAS 就绝对安全" → CAS 只保证单变量原子，复合操作（如同时改 i 和 j）仍非原子，且有 ABA 与自旋开销问题。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1076,8 +1184,12 @@ CAS 有三大经典问题：ABA 问题（用版本号解决）、自旋开销（
 ::: details
 
 - 【L3】ABA 分两层：**值 ABA**（基本类型 A→B→A，用 `AtomicStampedReference` 的版本号解决）和**指针 ABA**（节点被释放后地址复用，CAS 成功但逻辑已错），后者需要延迟回收机制。
-- 【L3】自旋开销的定量直觉：竞争线程数超过 CPU 核数后，CAS 失败率急剧上升，缓存行乒乓使单次 CAS 耗时从 ~20 cycles 涨到数百 cycles；`LongAdder` 用 base+Cell 分段把竞争分散到不同缓存行。
-- 【L4】**跨语言视角：C++ lock-free 结构的指针 ABA**：lock-free 栈的 `pop` 中，线程 A 读到 head 后挂起，线程 B 弹出并 delete 了该节点，新 push 的节点恰好分配到同一地址，A 恢复后 CAS(head, 旧地址, 旧next) 竟然成功——节点丢失 + 内存泄漏。C++ 解法是 hazard pointer 或 epoch-based reclamation（延迟释放直到无人持有指针）：
+
+- 【L3】自旋开销的定量直觉：竞争线程数超过 CPU 核数后，CAS 失败率急剧上升，缓存行乒乓使单次 CAS 耗时从 ~20 cycles 涨到数百 cycles；
+  `LongAdder` 用 base+Cell 分段把竞争分散到不同缓存行。
+
+- 【L4】**跨语言视角：C++ lock-free 结构的指针 ABA**：lock-free 栈的 `pop` 中，线程 A 读到 head 后挂起，线程 B 弹出并 delete 了该节点，新 push 的节点恰好分配到同一地址，
+  A 恢复后 CAS(head, 旧地址, 旧next) 竟然成功——节点丢失 + 内存泄漏。C++ 解法是 hazard pointer 或 epoch-based reclamation（延迟释放直到无人持有指针）：
 
 | 维度                | Java `AtomicStampedReference`              | C++ 延迟回收/引用计数                |
 | :------------------ | :----------------------------------------- | :----------------------------------- |
@@ -1091,11 +1203,10 @@ CAS 有三大经典问题：ABA 问题（用版本号解决）、自旋开销（
 
 ::: details
 
-常见误区：
-
 - ❌ "ABA 只影响计数器这类小数值场景" → 无锁链表/栈等引用结构中 ABA 会造成节点丢失等严重错误，危害远大于计数器。
 - ❌ "CAS 失败率低，不用管自旋" → 竞争率与失败率是非线性关系，线程数超核数后失败率飙升，需要退让或分段。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1165,27 +1276,42 @@ graph TD
 
 ::: details
 
-- 【L3】**伪共享与 @Contended**：缓存行一般 64B，两个逻辑无关的变量落在同一行时，一方写入会使另一方失效。Cell 用 `@sun.misc.Contended`（需 `-XX:-RestrictContended`）在字段两侧加 padding，使每个 Cell 独占缓存行；Cell 数组长度限制为 CPU 核数的 2 的幂内，避免无谓内存开销。
-- 【L3】线程定位 Cell 用 `threadLocalRandomProbe`（线程私有 hash），冲突时由 `longAccumulate` rehash；cells 的创建/扩容用 `cellsBusy` 标志（CAS 自旋锁）保护，只有一个线程能执行扩容。
-- 【L4】与 AtomicLong 的本质差异是「写分散 + 读集中」：写路径从全局单点竞争变为最多核数个竞争点，读路径（sum）才付出遍历代价——适合写多读少的统计；反之读多写少且要求实时精确时 AtomicLong 更合适。同类思想还有 ConcurrentHashMap 的 size 统计（baseCount + CounterCell）。
-  :::
+- 【L3】**伪共享与 @Contended**
+
+  缓存行一般 64B，两个逻辑无关的变量落在同一行时，一方写入会使另一方失效。
+
+  Cell 用 `@sun.misc.Contended`（需 `-XX:-RestrictContended`）在字段两侧加 padding，使每个 Cell 独占缓存行；Cell 数组长度限制为 CPU 核数的 2 的幂内，
+  避免无谓内存开销。
+
+- 【L3】线程定位 Cell 用 `threadLocalRandomProbe`（线程私有 hash），冲突时由 `longAccumulate` rehash；
+  cells 的创建/扩容用 `cellsBusy` 标志（CAS 自旋锁）保护，只有一个线程能执行扩容。
+
+- 【L4】与 AtomicLong 的本质差异是「写分散 + 读集中」
+
+  写路径从全局单点竞争变为最多核数个竞争点，读路径（sum）才付出遍历代价——适合写多读少的统计；反之读多写少且要求实时精确时 AtomicLong 更合适。
+
+  同类思想还有 ConcurrentHashMap 的 size 统计（baseCount + CounterCell）。
+
+:::
 
 #### 🏭 实战场景
 
 ::: details
 
-API 网关 QPS 监控：4 台 32 核实例，每实例 200+ 工作线程每请求对接口计数器 +1。原 AtomicLong 方案在 10 万 QPS 时监控线程观察到计数器线程 CAS 自旋占单核 CPU 约 15%，P99 延迟多出 ~2ms；换 LongAdder 后竞争分散到 32 个 Cell，自旋开销几乎消失，同样压力下 P99 回落，监控线程每秒一次 sum 汇总上报。注意 sum 是弱一致快照，若用于计费类精确计数必须换 AtomicLong。
+API 网关 QPS 监控：4 台 32 核实例，每实例 200+ 工作线程每请求对接口计数器 +1。原 AtomicLong 方案在 10 万 QPS 时监控线程观察到计数器线程 CAS 自旋占单核 CPU 约 15%，
+P99 延迟多出 ~2ms；换 LongAdder 后竞争分散到 32 个 Cell，自旋开销几乎消失，同样压力下 P99 回落，监控线程每秒一次 sum 汇总上报。注意 sum 是弱一致快照，
+若用于计费类精确计数必须换 AtomicLong。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "LongAdder 是 AtomicLong 的替代品" → 两者定位不同：LongAdder 的 sum() 非原子，不能用于序列号、唯一 ID 等需要精确值的场景。
 - ❌ "Cell 越多越快" → cells 最大不超过 CPU 核数，再多也没有更多并行度，反而浪费内存与汇总开销。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1234,9 +1360,16 @@ API 网关 QPS 监控：4 台 32 核实例，每实例 200+ 工作线程每请�
 
 ::: details
 
-- 【L3】字段更新器的约束：目标字段必须 `volatile` 且非 private（子类访问需 protected/public），通过反射获取字段 offset 后走 Unsafe CAS；适合给存量类的热点字段加原子能力而不改类型。
-- 【L4】JDK 9+ 提供 `VarHandle` 作为 Unsafe 的安全替代：Atomic 类底层已从 Unsafe 切换到 VarHandle，支持普通字段的原子更新、弱一致访问（getOpaque/acquire 等更细粒度内存序），是未来手写无锁代码的推荐 API。
-  :::
+- 【L3】字段更新器的约束
+
+  目标字段必须 `volatile` 且非 private（子类访问需 protected/public），通过反射获取字段 offset 后走 Unsafe CAS；适合给存量类的热点字段加原子能力而不改类型。
+
+- 【L4】JDK 9+ 提供 `VarHandle` 作为 Unsafe 的安全替代
+
+  Atomic 类底层已从 Unsafe 切换到 VarHandle，支持普通字段的原子更新、
+  弱一致访问（getOpaque/acquire 等更细粒度内存序），是未来手写无锁代码的推荐 API。
+
+:::
 
 #### 🔀 发散问题
 
@@ -1289,7 +1422,7 @@ ThreadLocal 基于线程封闭思想：不解决共享，而是避免共享—�
       ThreadLocal.withInitial(() -> dataSource.getConnection());
   ```
 
-  :::
+:::
 
 ::: details 避免参数透传与线程安全工具
 
@@ -1327,19 +1460,26 @@ String formattedDate = dateFormatHolder.get().format(new Date());
 
 ::: details
 
-- 【L3】线程封闭的三种形态：栈封闭（局部变量天然线程安全）、ThreadLocal 封闭、不可变对象（无共享可变状态）；Spring 的 `@Transactional` 连接绑定、Servlet 容器把 request 对象放进线程上下文都是 ThreadLocal 的规模化应用。
-- 【L4】ThreadLocal 的局限催生了三代演进：跨线程继承→ `InheritableThreadLocal`；线程池复用传递→阿里 `TransmittableThreadLocal`；虚拟线程时代→ JDK 21+ `ScopedValue`，见本文档相关题目。
-  :::
+- 【L3】线程封闭的三种形态
+
+  栈封闭（局部变量天然线程安全）、ThreadLocal 封闭、不可变对象（无共享可变状态）；Spring 的 `@Transactional` 连接绑定、
+  Servlet 容器把 request 对象放进线程上下文都是 ThreadLocal 的规模化应用。
+
+- 【L4】ThreadLocal 的局限催生了三代演进
+
+  跨线程继承→ `InheritableThreadLocal`；线程池复用传递→阿里 `TransmittableThreadLocal`；
+  虚拟线程时代→ JDK 21+ `ScopedValue`，见本文档相关题目。
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "ThreadLocal 是用来解决线程共享变量冲突的" → 它是「避免共享」而非「安全共享」，把共享问题转化为隔离问题。
 - ❌ "ThreadLocal 里的值只有一份，被所有线程共享" → 每个线程持有独立副本，存在各自 Thread 对象的 ThreadLocalMap 中，见本文档「`ThreadLocal` 的原理是什么？」。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1413,8 +1553,15 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 
 ::: details
 
-- 【L3】为什么用线性探测而非链地址法？ThreadLocalMap 通常容量小、每线程私有无并发，开放寻址缓存局部性好；配合斐波那契散列使冲突极少，探测代价可控。
-- 【L3】为什么 key 是弱引用而 value 不是？若 key 强引用，ThreadLocal 对象本身会随线程存活而无法回收；弱引用 key 至少让 ThreadLocal 实例可回收并触发顺路清理，value 强引用则是为了在 key 被回收后仍能通过探测找到并清理 stale entry。
+- 【L3】为什么用线性探测而非链地址法？
+
+  ThreadLocalMap 通常容量小、每线程私有无并发，开放寻址缓存局部性好；配合斐波那契散列使冲突极少，探测代价可控。
+
+- 【L3】为什么 key 是弱引用而 value 不是？
+
+  若 key 强引用，ThreadLocal 对象本身会随线程存活而无法回收；弱引用 key 至少让 ThreadLocal 实例可回收并触发顺路清理，
+  value 强引用则是为了在 key 被回收后仍能通过探测找到并清理 stale entry。
+
 - 【L4】**跨语言视角：Go context.Context 替代 ThreadLocal 的设计哲学**：Go 刻意不提供 goroutine-local storage，用 `context.Context` 显式传递请求级上下文：
 
 | 维度              | Java `ThreadLocal`                           | Go `context.Context`                                      |
@@ -1424,18 +1571,20 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 | **内存管理**      | 线程池场景需手动 `remove()` 防泄漏           | GC 自动回收（ctx 随请求结束释放）                         |
 | **超时/取消**     | 无内置传播（需自行实现）                     | `context.WithTimeout`/`WithCancel` 沿调用链自动传播       |
 
-Go 不提供 goroutine-local 的原因：goroutine 轻量（~2KB 栈）且会在 OS 线程间迁移（work-stealing），局部存储无法随协程迁移；「显式优于隐式」使依赖链一目了然。权衡：ThreadLocal 是「用空间换方便」，代价是内存管理复杂度；context 是「用签名换清晰」，代价是函数签名污染，但天然免疫泄漏。
+Go 不提供 goroutine-local 的原因：goroutine 轻量（~2KB 栈）且会在 OS 线程间迁移（work-stealing），局部存储无法随协程迁移；「显式优于隐式」使依赖链一目了然。权衡：
+
+ThreadLocal 是「用空间换方便」，代价是内存管理复杂度；context 是「用签名换清晰」，代价是函数签名污染，但天然免疫泄漏。
+
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "ThreadLocalMap 是以线程为 key 的大 Map" → 相反，Map 属于线程（Thread.threadLocals），ThreadLocal 实例才是 key。
 - ❌ "弱引用 key 能自动防止内存泄漏" → 只能让 ThreadLocal 实例被回收，value 仍被强引用链拽住，必须 remove。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1538,21 +1687,32 @@ tl.remove();
 
 ::: details
 
-- 【L3】JDK 的「顺路清理」机制：`set()` 探测中遇到 stale entry 触发 `replaceStaleEntry`，`get()` 未命中触发 `expungeStaleEntry`，能清理部分僵尸值；但它们依赖后续对 Map 的访问，线程池空闲线程长期不访问时完全失效。
-- 【L3】泄漏与脏读是同一根源的两个后果：未 remove 不仅泄漏内存，线程复用时下一个任务还会读到上一个任务的残留值（脏读），在用户上下文场景会造成串数据事故。
-- 【L4】排查手段：jmap -histo 观察大对象、MAT Dominator Tree 找 `ThreadLocalMap$Entry` 的 GC Root 链路（通常是 ThreadPoolExecutor.workers 中的 Worker.thread）；规范化的团队会在统一任务包装器/过滤器中强制 remove。
-  :::
+- 【L3】JDK 的「顺路清理」机制
+
+  `set()` 探测中遇到 stale entry 触发 `replaceStaleEntry`，`get()` 未命中触发 `expungeStaleEntry`，能清理部分僵尸值；
+  但它们依赖后续对 Map 的访问，线程池空闲线程长期不访问时完全失效。
+
+- 【L3】泄漏与脏读是同一根源的两个后果
+
+  未 remove 不仅泄漏内存，线程复用时下一个任务还会读到上一个任务的残留值（脏读），在用户上下文场景会造成串数据事故。
+
+- 【L4】排查手段
+
+  jmap -histo 观察大对象、
+  MAT Dominator Tree 找 `ThreadLocalMap$Entry` 的 GC Root 链路（通常是 ThreadPoolExecutor.workers 中的 Worker.thread）；
+  规范化的团队会在统一任务包装器/过滤器中强制 remove。
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "依赖 GC 就能自动回收 ThreadLocal 的值" → GC 仅回收弱引用 Key，无法回收强引用的 Value，必须手动 remove。
 - ❌ "线程池只初始化一次 ThreadLocal 就不会泄漏" → 每次任务执行完都要 remove，仅初始化不能阻止残留。
 - ❌ "ThreadLocal 静态化会泄漏" → 静态化本身不泄漏，泄漏根源是未 remove + 线程复用；但静态实例失去强引用的时机更晚，更依赖 remove。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1623,18 +1783,21 @@ new Thread(() -> {
 ::: details
 
 - 【L3】重写 `childValue(T parentValue)` 可定制子线程继承的值（如防御性拷贝），这是比默认浅拷贝更安全的用法。
-- 【L4】继承模型的三代演进：InheritableThreadLocal 只解决「新建子线程」场景；线程池复用导致继承失效，阿里 TTL 用任务提交时快照解决；虚拟线程时代 ScopedValue + 结构化并发把继承变成语言级能力。
-  :::
+
+- 【L4】继承模型的三代演进
+
+  InheritableThreadLocal 只解决「新建子线程」场景；线程池复用导致继承失效，阿里 TTL 用任务提交时快照解决；虚拟线程时代 ScopedValue + 结构化并发把继承变成语言级能力。
+
+:::
 
 #### ⚠️ 常见误区
 
 ::: details
 
-常见误区：
-
 - ❌ "InheritableThreadLocal 在线程池中也能正确传递" → 线程只在首次创建时拷贝，池中复用线程拿到的是创建者（往往不是提交者）的值，必须用 TTL。
 - ❌ "继承的是值的引用，父子线程同步更新" → 拷贝后各自独立，父线程后续修改对子线程不可见；若值是可变对象，则共享同一对象需自行加锁。
-  :::
+
+:::
 
 #### 🔀 发散问题
 
@@ -1694,8 +1857,15 @@ executor.submit(TtlRunnable.get(() -> {
 
 ::: details
 
-- 【L3】capture-replay-restore 的幂等性设计：replay 返回 backup 快照，restore 严格按 backup 回滚，保证即使任务抛异常也不污染池中线程；未包装的裸 Runnable 不会被处理，漏包装是接入时最常见的坑。
-- 【L4】三种跨线程方案对比：手动传参（显式但侵入）、InheritableThreadLocal（仅新建线程）、TTL（线程池完备但需包装/Agent）；虚拟线程 + ScopedValue 则是语言级新答案，见并发（一）「虚拟线程环境下 ThreadLocal 有什么问题？ScopedValue 如何解决？」。
+- 【L3】capture-replay-restore 的幂等性设计
+
+  replay 返回 backup 快照，restore 严格按 backup 回滚，保证即使任务抛异常也不污染池中线程；未包装的裸 Runnable 不会被处理，
+  漏包装是接入时最常见的坑。
+
+- 【L4】三种跨线程方案对比
+
+  手动传参（显式但侵入）、InheritableThreadLocal（仅新建线程）、TTL（线程池完备但需包装/Agent）；虚拟线程 + ScopedValue 则是语言级新答案，
+  见并发（一）「虚拟线程环境下 ThreadLocal 有什么问题？ScopedValue 如何解决？」。
 
 > 📚 延伸阅读：[alibaba/transmittable-thread-local](https://github.com/alibaba/transmittable-thread-local)
 
@@ -1705,11 +1875,10 @@ executor.submit(TtlRunnable.get(() -> {
 
 ::: details
 
-常见误区：
-
 - ❌ "用了 InheritableThreadLocal 就等于 TTL" → ITL 只在创建线程时拷贝一次，线程池复用场景完全失效，这正是 TTL 要解决的空白。
 - ❌ "TTL 自动解决一切，不用 remove" → TTL 仍基于 ThreadLocal 存储，任务结束仍应 remove；只是 restore 机制降低了污染风险。
-  :::
+
+:::
 
 #### 🔀 发散问题
 

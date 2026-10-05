@@ -166,7 +166,10 @@ MyBatis Plus 主要提供了以下能力：
 
 ::: details
 
-- 【L3】三者并非互斥：同一项目中可 JPA 管领域模型、MyBatis-Plus 管复杂报表查询，按模块划分持久层技术
+- 【L3】三者并非互斥
+
+  同一项目中可 JPA 管领域模型、MyBatis-Plus 管复杂报表查询，按模块划分持久层技术
+
 - 【L4】JPA 的 N+1 问题需用 `@EntityGraph`/`JOIN FETCH` 治理；MyBatis 侧对应嵌套查询的 N+1，用嵌套结果 JOIN 规避
 
 > 📚 延伸阅读：[MyBatis-Plus 官方文档](https://baomidou.com/)
@@ -237,11 +240,29 @@ MyBatis 中 `#{}` 与 `${}` 核心区别：
 
 ::: details
 
-- 【L3】源码定位（解析期就分道扬镳）：`#{}` 由 `XMLScriptBuilder` 解析 SQL 文本时，经 `ParameterExpression` / `SqlSourceBuilder` 改写为 JDBC 的 `?` 占位符，并生成 `ParameterMapping`；执行期 `DefaultParameterHandler#setParameters` 遍历 `ParameterMapping`，经 `TypeHandler#setParameter` 绑定到 `PreparedStatement`，SQL 模板与参数彻底分离
-- 【L3】`${}` 由 `TextSqlNode` 在解析期做 `GenericTokenParser` 文本替换，参数值原样拼入 SQL 字符串，由 `DynamicSqlSource` 在每次执行时动态生成 `BoundSql`，不存在预编译
-- 【L4】`${}` 白名单并非绝对安全：白名单要保持完备且集中维护，从数据库元数据动态生成白名单时要防止元数据被污染；`LIKE '%${kw}%'` 这类半值半拼接写法仍然危险
-- 【L4】`#{}` 不能当免检金牌：预编译把 SQL 模板与参数分离，能防绝大多数注入；但存储过程调用、某些驱动对特殊语句（如 `CALL`）的处理、以及多语句连接参数（如 MySQL `allowMultiQueries=true`）仍可能引入风险
-- 【L4】占位符的位置边界决定了 `${}` 的存在理由：`?` 只能出现在"值"的位置，表名、列名、`ORDER BY`/`GROUP BY` 字段属于语法结构位置，预编译占位符无法覆盖；`LIMIT ?` 在 MySQL 驱动下可以预编译绑定，但并非所有数据库/驱动组合都支持，跨库迁移时分页参数需实测验证。因此结构性参数"必须 `${}` + 白名单"是真实的防御决策点，而非"一律 `#{}`"这么简单
+- 【L3】源码定位（解析期就分道扬镳）
+
+  `#{}` 由 `XMLScriptBuilder` 解析 SQL 文本时，
+  经 `ParameterExpression` / `SqlSourceBuilder` 改写为 JDBC 的 `?` 占位符，并生成 `ParameterMapping`；
+  执行期 `DefaultParameterHandler#setParameters` 遍历 `ParameterMapping`，经 `TypeHandler#setParameter` 绑定到 `PreparedStatement`，
+  SQL 模板与参数彻底分离
+
+- 【L3】`${}` 由 `TextSqlNode` 在解析期做 `GenericTokenParser` 文本替换，参数值原样拼入 SQL 字符串，由 `DynamicSqlSource` 在每次执行时动态生成 `BoundSql`，
+  不存在预编译
+
+- 【L4】`${}` 白名单并非绝对安全
+
+  白名单要保持完备且集中维护，从数据库元数据动态生成白名单时要防止元数据被污染；`LIKE '%${kw}%'` 这类半值半拼接写法仍然危险
+
+- 【L4】`#{}` 不能当免检金牌
+
+  预编译把 SQL 模板与参数分离，能防绝大多数注入；但存储过程调用、某些驱动对特殊语句（如 `CALL`）的处理、
+  以及多语句连接参数（如 MySQL `allowMultiQueries=true`）仍可能引入风险
+
+- 【L4】占位符的位置边界决定了 `${}` 的存在理由
+
+  `?` 只能出现在"值"的位置，表名、列名、`ORDER BY`/`GROUP BY` 字段属于语法结构位置，预编译占位符无法覆盖；
+  `LIMIT ?` 在 MySQL 驱动下可以预编译绑定，但并非所有数据库/驱动组合都支持，跨库迁移时分页参数需实测验证。因此结构性参数"必须 `${}` + 白名单"是真实的防御决策点，而非"一律 `#{}`"这么简单
 
 > 📚 延伸阅读：[MyBatis 官方文档 - 动态 SQL](https://mybatis.org/mybatis-3/zh/dynamic-sql.html)
 
@@ -251,15 +272,17 @@ MyBatis 中 `#{}` 与 `${}` 核心区别：
 
 ::: details
 
-某后台管理系统列表接口疑似 SQL 注入，慢日志中出现 `UNION SELECT` 痕迹，但开发坚称全部用了 `#{}`。应急：先对该接口限流并开启数据库审计日志，抓取完整 SQL 与来源 IP，确认攻击面；必要时临时下线该查询入口。定位：打开 MyBatis 日志（`logImpl=STDOUT_LOGGING`）或拦截器打印 `BoundSql#getSql()`，对比告警 SQL 与模板，很快定位到动态排序参数 `ORDER BY ${sortField}`——为支持前端自定义排序使用了 `${}` 且直接透传，未做白名单；全局搜索 `${` 还可能发现 `LIMIT ${size}` 等同类写法。长期：排序字段、分页大小在 Java 层用枚举/常量校验后才允许进入 SQL；建立 SQL 静态扫描规则，`${}` 一律在代码评审中标红；预发环境挂 SQL 注入扫描用例回归。权衡：白名单牺牲了一点"任意字段可排序"的灵活性，换来注入面归零；若确有运营自定义字段诉求，应把可排序字段做成配置化白名单而非透传。
+某后台管理系统列表接口疑似 SQL 注入，慢日志中出现 `UNION SELECT` 痕迹，但开发坚称全部用了 `#{}`。应急：先对该接口限流并开启数据库审计日志，抓取完整 SQL 与来源 IP，确认攻击面；必要时临时下线该查询入口。
+
+定位：打开 MyBatis 日志（`logImpl=STDOUT_LOGGING`）或拦截器打印 `BoundSql#getSql()`，对比告警 SQL 与模板，很快定位到动态排序参数 `ORDER BY ${sortField}`——
+为支持前端自定义排序使用了 `${}` 且直接透传，未做白名单；全局搜索 `${` 还可能发现 `LIMIT ${size}` 等同类写法。长期：排序字段、分页大小在 Java 层用枚举/常量校验后才允许进入 SQL；
+建立 SQL 静态扫描规则，`${}` 一律在代码评审中标红；预发环境挂 SQL 注入扫描用例回归。权衡：白名单牺牲了一点"任意字段可排序"的灵活性，换来注入面归零；若确有运营自定义字段诉求，应把可排序字段做成配置化白名单而非透传。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "LIKE 模糊查询必须用 `${}`" → 错误。一律用 `#{}`：写法为 `LIKE CONCAT('%', #{keyword}, '%')`，或用 `<bind name="kw" value="'%' + keyword + '%'"/>` 后 `LIKE #{kw}`；直接 `LIKE '%${keyword}%'` 是高频注入点
 - ❌ "`${}` 做了非空校验就安全了" → 错误。非空校验与注入防御无关，结构性位置必须做枚举白名单校验
@@ -324,8 +347,14 @@ MyBatis 通过 `<resultMap>` 中的 `<association>`（一对一）和 `<collecti
 
 ::: details
 
-- 【L3】N+1 的量化与治理：主查询返回 N 行，嵌套查询会对每行再触发一次子查询，共产生 1+N 条 SQL；`fetchType="lazy"` 只是把触发时机延后，循环列表访问属性时仍是 N 次查询。治理选项：改用嵌套结果（一条 JOIN 一次取回）、或收集关联键后用 `IN` 批量查询子对象再在内存组装——MyBatis 没有 Hibernate `@BatchSize` 那样的内建批量懒加载
-- 【L4】嵌套结果 JOIN 在一对多多层嵌套下行数呈乘积式膨胀，宽表 + 大集合场景需评估返回行数与网络传输量；`collection` 必须指定 `ofType`、`association` 指定 `javaType`，嵌套层级深时缺失类型声明会导致映射推断失败
+- 【L3】N+1 的量化与治理
+
+  主查询返回 N 行，嵌套查询会对每行再触发一次子查询，共产生 1+N 条 SQL；`fetchType="lazy"` 只是把触发时机延后，循环列表访问属性时仍是 N 次查询。治理选项：
+
+  改用嵌套结果（一条 JOIN 一次取回）、或收集关联键后用 `IN` 批量查询子对象再在内存组装——MyBatis 没有 Hibernate `@BatchSize` 那样的内建批量懒加载
+
+- 【L4】嵌套结果 JOIN 在一对多多层嵌套下行数呈乘积式膨胀，宽表 + 大集合场景需评估返回行数与网络传输量；`collection` 必须指定 `ofType`、`association` 指定 `javaType`，
+  嵌套层级深时缺失类型声明会导致映射推断失败
 
 :::
 
@@ -408,7 +437,10 @@ MyBatis 针对性地进行了以下改进：
 ::: details
 
 - 【L3】JDBC 的 `PreparedStatement` 复用、连接池、批量提交等手工优化，在 MyBatis 中分别对应 ReuseExecutor、DataSource、BatchExecutor 等机制
-- 【L4】但 MyBatis 并未完全屏蔽 JDBC：批量插入若不配 `rewriteBatchedStatements`，底层仍退化为逐条发送
+
+- 【L4】但 MyBatis 并未完全屏蔽 JDBC
+
+  批量插入若不配 `rewriteBatchedStatements`，底层仍退化为逐条发送
 
 > 📚 延伸阅读：[MyBatis 官方文档](https://mybatis.org/mybatis-3/zh/index.html)
 
@@ -461,6 +493,7 @@ MyBatis 提供三种 Executor 执行器，通过 `defaultExecutorType` 配置：
 ::: details
 
 - 【L3】`CachingExecutor` 不是第四种执行器，而是装饰器：`cacheEnabled=true` 且 Mapper 配置了缓存时，`Configuration#newExecutor` 用它包装具体 Executor
+
 - 【L4】BatchExecutor 攒批后需显式 `flushStatements()` 才会真正提交；MySQL 下还需 `rewriteBatchedStatements=true` 驱动才会把批量改写为多值插入
 
 :::
@@ -517,7 +550,10 @@ public class JsonTypeHandler extends BaseTypeHandler<JsonObject> {
 ::: details
 
 - 【L3】TypeHandler 注册在 `TypeHandlerRegistry`，解析期即按 javaType + jdbcType 组合建立映射；resultMap 中可用 `typeHandler` 属性为单列指定
-- 【L4】枚举转换是高频定制点：`EnumTypeHandler` 存 name、`EnumOrdinalTypeHandler` 存序号，生产更常用自定义 Handler 存业务编码
+
+- 【L4】枚举转换是高频定制点
+
+  `EnumTypeHandler` 存 name、`EnumOrdinalTypeHandler` 存序号，生产更常用自定义 Handler 存业务编码
 
 :::
 
@@ -559,8 +595,12 @@ MySQL JDBC 驱动默认把 `addBatch()` 的每条 INSERT 单独发送，批处�
 
 ::: details
 
-- 【L3】驱动改写有体积边界：改写后的多值 INSERT 是一条大 SQL，受 MySQL `max_allowed_packet` 限制，批量大小要与之匹配，否则报错或回退
+- 【L3】驱动改写有体积边界
+
+  改写后的多值 INSERT 是一条大 SQL，受 MySQL `max_allowed_packet` 限制，批量大小要与之匹配，否则报错或回退
+
 - 【L3】驱动对批量 update 的优化主要是客户端攒包发送，而非改写为多值语句，因此收益远小于 insert 场景
+
 - 【L4】PostgreSQL 驱动的 `reWriteBatchedInserts` 是对等参数，不同驱动的批量优化参数不通用，迁移数据库时需逐一确认
 
 :::
@@ -569,15 +609,17 @@ MySQL JDBC 驱动默认把 `addBatch()` 的每条 INSERT 单独发送，批处�
 
 ::: details
 
-某订单履约服务每日需同步约 50 万条物流轨迹。最初用 MyBatis-Plus `saveBatch(list, 1000)` 入库，实测耗时约 40 分钟——抓包发现驱动仍逐条发送 INSERT。在 JDBC URL 追加 `rewriteBatchedStatements=true` 后，同样的数据量降至约 3 分钟，数据库侧 `Com_insert` 次数从 50 万降为约 500 次，网络往返减少两个数量级。同时把单批大小从 1000 调整为 500，避免单条改写后的 SQL 逼近 `max_allowed_packet`。
+某订单履约服务每日需同步约 50 万条物流轨迹。最初用 MyBatis-Plus `saveBatch(list, 1000)` 入库，实测耗时约 40 分钟——抓包发现驱动仍逐条发送 INSERT。
+
+在 JDBC URL 追加 `rewriteBatchedStatements=true` 后，同样的数据量降至约 3 分钟，数据库侧 `Com_insert` 次数从 50 万降为约 500 次，网络往返减少两个数量级。
+
+同时把单批大小从 1000 调整为 500，避免单条改写后的 SQL 逼近 `max_allowed_packet`。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "这是 MyBatis 的配置" → 错误。它是 MySQL JDBC 驱动的 URL 参数，与 MyBatis 无关，PostgreSQL 等其他驱动不识别
 - ❌ "用了 `<foreach>` 拼多值还需要它" → 不需要。foreach 已在应用层拼好多值 INSERT，该参数只作用于 JDBC `addBatch` 路径
@@ -634,9 +676,18 @@ MySQL JDBC 驱动默认把 `addBatch()` 的每条 INSERT 单独发送，批处�
 
 ::: details
 
-- 【L3】foreach 拼接与 BatchExecutor 的取舍：foreach 是单条大 SQL，失败即整批回滚；BatchExecutor 逐条 addBatch，配合事务可实现分批提交、失败定位更细
-- 【L4】主键回填代价：`useGeneratedKeys=true` 时驱动需逐条取回生成主键，开启 rewrite 后收益仍明显，但无需回填时关闭可再提速
-- 【L4】主键生成方式直接决定批量写入吞吐：随机 UUID 作 InnoDB 聚簇索引主键会导致 B+ 树随机位置插入、频繁页分裂与页碎片，写放大严重；雪花 ID 趋势递增，插入集中在最右页顺序追加，批量写入性能明显更优——大批量导入前应先评估主键的有序性
+- 【L3】foreach 拼接与 BatchExecutor 的取舍
+
+  foreach 是单条大 SQL，失败即整批回滚；BatchExecutor 逐条 addBatch，配合事务可实现分批提交、失败定位更细
+
+- 【L4】主键回填代价
+
+  `useGeneratedKeys=true` 时驱动需逐条取回生成主键，开启 rewrite 后收益仍明显，但无需回填时关闭可再提速
+
+- 【L4】主键生成方式直接决定批量写入吞吐
+
+  随机 UUID 作 InnoDB 聚簇索引主键会导致 B+ 树随机位置插入、频繁页分裂与页碎片，写放大严重；雪花 ID 趋势递增，插入集中在最右页顺序追加，批量写入性能明显更优——
+  大批量导入前应先评估主键的有序性
 
 > 📚 延伸阅读：[MyBatis-Plus 官方文档 - 批量操作](https://baomidou.com/)
 
@@ -697,10 +748,24 @@ PageInfo<User> pageInfo = new PageInfo<>(users);  // 包含总数、页码等信
 
 ::: details
 
-- 【L3】PageHelper 对 count 查询做了优化尝试：自动去掉 ORDER BY、简化 SQL 生成计数语句；复杂 SQL 可通过 `countColumn`/手写 countSql 接管
-- 【L4】ThreadLocal 残留是经典事故：startPage 后若中间分支提前 return，分页参数会被下一次查询"继承"，规范做法是紧跟查询或 try-finally 中调用 `PageHelper.clearPage()`
-- 【L4】线程池/异步场景的串页与丢失：分页参数绑定在调用线程的 ThreadLocal 上。若 `startPage` 在主线程执行而查询被提交到异步线程/线程池中运行，分页参数不会跨线程传递，查询退化为全量拉取，大表可直接把应用打 OOM；反向场景是线程池线程复用，把上一个任务残留的分页参数"继承"给另一个业务查询，造成串页（返回数据莫名只有一小页）。跨线程分页必须在实际执行查询的线程内重新 `startPage`
-- 【L4】大结果集的流式读取：MyBatis 默认把整个结果集物化为内存 `List`，百万行级导出/对账应改用 `ResultHandler` 逐行处理或 `Cursor` 游标迭代，并配合驱动侧流式参数（MySQL 为 `fetchSize=Integer.MIN_VALUE`，或 `useCursorFetch=true` + 正数 fetchSize）才能真正逐批取数；游标消费期间 SqlSession 必须保持打开
+- 【L3】PageHelper 对 count 查询做了优化尝试
+
+  自动去掉 ORDER BY、简化 SQL 生成计数语句；复杂 SQL 可通过 `countColumn`/手写 countSql 接管
+
+- 【L4】ThreadLocal 残留是经典事故
+
+  startPage 后若中间分支提前 return，分页参数会被下一次查询"继承"，规范做法是紧跟查询或 try-finally 中调用 `PageHelper.clearPage()`
+
+- 【L4】线程池/异步场景的串页与丢失
+
+  分页参数绑定在调用线程的 ThreadLocal 上。若 `startPage` 在主线程执行而查询被提交到异步线程/线程池中运行，分页参数不会跨线程传递，查询退化为全量拉取，
+  大表可直接把应用打 OOM；反向场景是线程池线程复用，把上一个任务残留的分页参数"继承"给另一个业务查询，造成串页（返回数据莫名只有一小页）。跨线程分页必须在实际执行查询的线程内重新 `startPage`
+
+- 【L4】大结果集的流式读取
+
+  MyBatis 默认把整个结果集物化为内存 `List`，百万行级导出/对账应改用 `ResultHandler` 逐行处理或 `Cursor` 游标迭代，
+  并配合驱动侧流式参数（MySQL 为 `fetchSize=Integer.MIN_VALUE`，或 `useCursorFetch=true` + 正数 fetchSize）才能真正逐批取数；
+  游标消费期间 SqlSession 必须保持打开
 
 :::
 
@@ -760,6 +825,7 @@ public interface UserMapper {
 ::: details
 
 - 【L3】注解方式支持 `@SelectProvider` 等 Provider 注解，用 Java 方法动态生成 SQL，可视为注解版的动态 SQL，但可读性与可维护性弱于 XML
+
 - 【L4】动态 SQL 标签（`<script>` 内）也能写进注解，但换行与转义处理繁琐，团队规范通常只允许单行简单语句用注解
 
 :::
@@ -908,8 +974,13 @@ UserMapper mapper = session.getMapper(UserMapper.class);
 
 ::: details
 
-- 【L3】`Configuration` 是真正的配置中枢：Factory 持有它，所有 MappedStatement、别名、插件都注册在其中
-- 【L4】把 SqlSession 做成单例或类成员是典型事故源：并发下非线程安全 + 连接不释放，生产一律交给 Spring（SqlSessionTemplate）托管
+- 【L3】`Configuration` 是真正的配置中枢
+
+  Factory 持有它，所有 MappedStatement、别名、插件都注册在其中
+
+- 【L4】把 SqlSession 做成单例或类成员是典型事故源
+
+  并发下非线程安全 + 连接不释放，生产一律交给 Spring（SqlSessionTemplate）托管
 
 > 📚 延伸阅读：[《MyBatis 技术内幕》—— 徐郡明](https://book.douban.com/subject/30356096/)
 
@@ -965,7 +1036,10 @@ SqlSession → Executor → StatementHandler → ParameterHandler → (DB) → R
 ::: details
 
 - 【L3】StatementHandler 由 `RoutingStatementHandler` 按语句类型路由到 Simple/Prepared/Callable 三种实现
-- 【L4】慢 SQL 监控应拦 `StatementHandler` 而非 `Executor`：缓存命中时 Executor 直接返回，统计不到真实 JDBC 耗时
+
+- 【L4】慢 SQL 监控应拦 `StatementHandler` 而非 `Executor`
+
+  缓存命中时 Executor 直接返回，统计不到真实 JDBC 耗时
 
 :::
 
@@ -1040,9 +1114,19 @@ graph TD
 
 ::: details
 
-- 【L3】Mapper 接口没有实现类为何能执行 SQL：启动时 SQL 以"类名.方法名"注册为 `MappedStatement`；调用时 `MapperProxy`（JDK 动态代理）拦截方法，经 `MapperMethod` 按方法名找到对应语句，再委托 `DefaultSqlSession` 执行——这也是 Mapper 接口不支持重载的原因，绑定键里没有参数签名
-- 【L3】插件（Interceptor）在哪一步生效：在 `Configuration` 创建四大组件时通过 `InterceptorChain#pluginAll` 逐层包装 JDK 代理，拦截点在组件方法调用处；配置列表中后声明的插件先包装，位于代理链外层、先执行 `intercept`
-- 【L4】`selectOne` 内部就是调 `selectList` 再判断结果集大小：0 条返回 null，1 条返回该对象，多条抛 `TooManyResultsException`；它并不会让数据库少查数据，限制只在 Java 层
+- 【L3】Mapper 接口没有实现类为何能执行 SQL
+
+  启动时 SQL 以"类名.方法名"注册为 `MappedStatement`；调用时 `MapperProxy`（JDK 动态代理）拦截方法，
+  经 `MapperMethod` 按方法名找到对应语句，再委托 `DefaultSqlSession` 执行——这也是 Mapper 接口不支持重载的原因，绑定键里没有参数签名
+
+- 【L3】插件（Interceptor）在哪一步生效
+
+  在 `Configuration` 创建四大组件时通过 `InterceptorChain#pluginAll` 逐层包装 JDK 代理，拦截点在组件方法调用处；
+  配置列表中后声明的插件先包装，位于代理链外层、先执行 `intercept`
+
+- 【L4】`selectOne` 内部就是调 `selectList` 再判断结果集大小
+
+  0 条返回 null，1 条返回该对象，多条抛 `TooManyResultsException`；它并不会让数据库少查数据，限制只在 Java 层
 
 > 📚 延伸阅读：[MyBatis 官方文档 - 入门](https://mybatis.org/mybatis-3/zh/index.html)
 
@@ -1052,15 +1136,18 @@ graph TD
 
 ::: details
 
-线上某核心接口突然变慢，DBA 确认数据库负载正常、SQL 执行时间也未恶化，但应用侧 RT 翻了 5 倍，怀疑问题出在 MyBatis 执行链路上。应急：先摘掉异常节点观察是否单机问题，同时 dump 应用线程栈和 GC 日志，排除线程阻塞与 Full GC。定位：线程栈若大量停在 `ResultSetHandler#handleResultSets`，说明结果集映射成了瓶颈——通常是某次上线把列表查询的 `SELECT *` 带出了大 JSON 字段，或 ResultMap 嵌套延迟加载退化成 N+1；若栈停在 `Executor#query` 前的插件链，则是某个拦截器（如新加的脱敏/审计插件）逐行反射处理拖慢了链路；配合 `BoundSql` 日志确认最终 SQL 与预期一致。长期：列表查询显式列出字段、禁止 `SELECT *`；慢查询插件同时统计 JDBC 耗时与映射耗时，区分"库慢"还是"映射慢"。权衡：显式列字段牺牲少量"表结构变更自动生效"的便利，换来 RT 稳定可预测；监控拦截器本身有性能开销，应支持开关并按环境差异化配置。
+线上某核心接口突然变慢，DBA 确认数据库负载正常、SQL 执行时间也未恶化，但应用侧 RT 翻了 5 倍，怀疑问题出在 MyBatis 执行链路上。应急：先摘掉异常节点观察是否单机问题，同时 dump 应用线程栈和 GC 日志，
+排除线程阻塞与 Full GC。定位：线程栈若大量停在 `ResultSetHandler#handleResultSets`，说明结果集映射成了瓶颈——通常是某次上线把列表查询的 `SELECT *` 带出了大 JSON 字段，
+或 ResultMap 嵌套延迟加载退化成 N+1；若栈停在 `Executor#query` 前的插件链，则是某个拦截器（如新加的脱敏/审计插件）逐行反射处理拖慢了链路；配合 `BoundSql` 日志确认最终 SQL 与预期一致。长期：
+
+列表查询显式列出字段、禁止 `SELECT *`；慢查询插件同时统计 JDBC 耗时与映射耗时，区分"库慢"还是"映射慢"。权衡：显式列字段牺牲少量"表结构变更自动生效"的便利，换来 RT 稳定可预测；监控拦截器本身有性能开销，
+应支持开关并按环境差异化配置。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "监控查询耗时拦 Executor 就行" → 错误。缓存命中时 `Executor#query` 直接返回不进数据库，均值会被稀释，真实耗时应拦 `StatementHandler`，见上方踩坑案例
 - ❌ "Spring 集成下和裸 MyBatis 流程完全一样" → 错误。`SqlSessionTemplate` 每次调用都走完整 open → execute → close（事务内复用绑定会话），一级缓存行为随之变化
@@ -1145,7 +1232,10 @@ MyBatis 的架构分为四层，各层职责明确，通过接口解耦：
 
 ::: details
 
-- 【L3】接口层与核心处理层的边界在 `SqlSession`：它只做门面转发，真正执行全部下沉到 Executor 体系
+- 【L3】接口层与核心处理层的边界在 `SqlSession`
+
+  它只做门面转发，真正执行全部下沉到 Executor 体系
+
 - 【L4】扩展层能横切四大组件而无需改源码，是"对扩展开放、对修改关闭"在框架设计中的典型落地；PageHelper、慢 SQL 监控、数据脱敏均基于此实现
 
 > 📚 延伸阅读：[《MyBatis 技术内幕》—— 徐郡明](https://book.douban.com/subject/30356096/)
@@ -1156,15 +1246,16 @@ MyBatis 的架构分为四层，各层职责明确，通过接口解耦：
 
 ::: details
 
-某支付中台重构持久层时以该四层架构为评审基线：接口层统一收口到 MyBatis-Spring 托管的 Mapper Bean，禁止业务代码直接持有 SqlSession；核心处理层引入自定义拦截器实现全链路 SQL 审计（拦 StatementHandler 拿真实 SQL 与耗时）；基础支撑层把连接池从内置 Pooled 切换为 Druid 并接入监控；扩展层插件通过配置开关按环境启停。改造后 SQL 审计覆盖率 100%，慢 SQL 定位时间从小时级降到分钟级。
+某支付中台重构持久层时以该四层架构为评审基线：接口层统一收口到 MyBatis-Spring 托管的 Mapper Bean，禁止业务代码直接持有 SqlSession；
+核心处理层引入自定义拦截器实现全链路 SQL 审计（拦 StatementHandler 拿真实 SQL 与耗时）；基础支撑层把连接池从内置 Pooled 切换为 Druid 并接入监控；扩展层插件通过配置开关按环境启停。
+
+改造后 SQL 审计覆盖率 100%，慢 SQL 定位时间从小时级降到分钟级。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "MyBatis 分层所以性能不如全自动 ORM" → 错误。分层带来的是解耦而非性能损耗，MyBatis 手写 SQL 反而便于极致调优
 - ❌ "插件可以随意加" → 错误。每个拦截器都是代理层，叠加过多会放大每次 SQL 调用的开销，且拦截点选择错误会导致监控失真
@@ -1220,6 +1311,7 @@ public Object invoke(Object proxy, Method method, Object[] args) {
 ::: details
 
 - 【L3】`MapperRegistry` 维护接口到 `MapperProxyFactory` 的映射，`MapperProxy` 内部还会把 Method → `MapperMethod` 缓存进 Map，避免每次调用重复解析
+
 - 【L4】MyBatis 3.5+ 引入 `@Flush`、默认方法（default method）支持等，default 方法调用不走 MappedStatement 而是直接反射执行
 
 :::
@@ -1293,9 +1385,18 @@ MyBatis 动态 SQL 用于根据业务条件动态生成 SQL 语句，避免拼�
 ::: details
 
 - 【L3】含动态标签的语句解析为 `DynamicSqlSource`，每次执行重新求值生成 `BoundSql`；纯静态语句则是 `RawSqlSource`，解析期即定型
-- 【L3】OGNL 数字 0 判等陷阱：`<if test="status != null and status != ''">` 当 `status` 为数字类型且值为 `0` 时，OGNL 会把 `''` 转换为数值 `0.0` 参与比较，条件被判为 false，查询条件被静默吞掉（"状态=0"的筛选永远不生效）。数字字段只判 `!= null`，`!= ''` 只用于字符串字段
-- 【L3】`<foreach>` 空集合会拼出 `IN ()` 直接 SQL 语法错误，Java 层必须在进入 SQL 前拦截空集合；`<where>` 只负责去掉标签体开头的多余 `AND`/`OR`，与 `<choose>` 组合时每个 `<when>` 分支内容仍需自带合法前缀，不能依赖 `<where>` 兜底分支内部逻辑
-- 【L4】OGNL 表达式能力强大但需克制：test 中写复杂逻辑会让 SQL 难以维护，复杂判断应收敛到 Java 层传布尔值
+
+- 【L3】OGNL 数字 0 判等陷阱
+
+  `<if test="status != null and status != ''">` 当 `status` 为数字类型且值为 `0` 时，
+  OGNL 会把 `''` 转换为数值 `0.0` 参与比较，条件被判为 false，查询条件被静默吞掉（"状态=0"的筛选永远不生效）。数字字段只判 `!= null`，`!= ''` 只用于字符串字段
+
+- 【L3】`<foreach>` 空集合会拼出 `IN ()` 直接 SQL 语法错误，Java 层必须在进入 SQL 前拦截空集合；`<where>` 只负责去掉标签体开头的多余 `AND`/`OR`，
+  与 `<choose>` 组合时每个 `<when>` 分支内容仍需自带合法前缀，不能依赖 `<where>` 兜底分支内部逻辑
+
+- 【L4】OGNL 表达式能力强大但需克制
+
+  test 中写复杂逻辑会让 SQL 难以维护，复杂判断应收敛到 Java 层传布尔值
 
 > 📚 延伸阅读：[MyBatis 官方文档 - 动态 SQL](https://mybatis.org/mybatis-3/zh/dynamic-sql.html)
 
@@ -1350,9 +1451,18 @@ MyBatis 延迟加载通过**动态代理**实现按需查询，核心流程如�
 
 ::: details
 
-- 【L3】单个关联可通过 `fetchType` 属性覆盖全局配置：`fetchType="lazy"`/`fetchType="eager"` 优先级高于 `lazyLoadingEnabled`
-- 【L3】N+1 治理选项：延迟加载只是把 N+1 变为"按需触发"，列表场景逐行调用 getter 仍会产生 N 次子查询；确定需要子对象时应改用嵌套结果（一条 JOIN 一次加载），或收集关联键后用 `IN` 批量查询再内存组装，而非依赖代理逐条触发
-- 【L4】序列化/跨会话传递延迟代理对象是高频事故：代理持有 SqlSession 引用，脱离原会话后触发 getter 即报错，DTO 转换应在会话内完成
+- 【L3】单个关联可通过 `fetchType` 属性覆盖全局配置
+
+  `fetchType="lazy"`/`fetchType="eager"` 优先级高于 `lazyLoadingEnabled`
+
+- 【L3】N+1 治理选项
+
+  延迟加载只是把 N+1 变为"按需触发"，列表场景逐行调用 getter 仍会产生 N 次子查询；确定需要子对象时应改用嵌套结果（一条 JOIN 一次加载），或收集关联键后用 `IN` 批量查询再内存组装，
+  而非依赖代理逐条触发
+
+- 【L4】序列化/跨会话传递延迟代理对象是高频事故
+
+  代理持有 SqlSession 引用，脱离原会话后触发 getter 即报错，DTO 转换应在会话内完成
 
 :::
 
@@ -1445,9 +1555,18 @@ graph TD
 
 ::: details
 
-- 【L3】一级缓存为什么用裸 HashMap 就够，二级缓存却要包 `SynchronizedCache`：一级缓存只在单个 SqlSession 内使用，而 SqlSession 非线程安全、不被并发访问，无需同步；二级缓存跨 SqlSession 共享，多线程读写 HashMap 必须加同步包装
-- 【L3】参数相同但顺序不同的两次查询 CacheKey 不相等：CacheKey 按参数在 `?` 占位符中出现的顺序参与 hashCode 计算（乘数 37 滚动），`WHERE a=1 AND b=2` 与 `WHERE a=2 AND b=1` 是两个不同的 key
-- 【L4】`TransactionalCache` 不在查询结束时立即写二级缓存：若立即写入，同一事务内后续 rollback 或再次修改后读到的中间态数据会被其他会话看到；延迟到 commit 时刷入、rollback 时丢弃，用两阶段提交思路把脏数据挡在二级缓存之外
+- 【L3】一级缓存为什么用裸 HashMap 就够，二级缓存却要包 `SynchronizedCache`：一级缓存只在单个 SqlSession 内使用，而 SqlSession 非线程安全、不被并发访问，无需同步；
+  二级缓存跨 SqlSession 共享，多线程读写 HashMap 必须加同步包装
+
+- 【L3】参数相同但顺序不同的两次查询 CacheKey 不相等
+
+  CacheKey 按参数在 `?` 占位符中出现的顺序参与 hashCode 计算（乘数 37 滚动），
+  `WHERE a=1 AND b=2` 与 `WHERE a=2 AND b=1` 是两个不同的 key
+
+- 【L4】`TransactionalCache` 不在查询结束时立即写二级缓存
+
+  若立即写入，同一事务内后续 rollback 或再次修改后读到的中间态数据会被其他会话看到；延迟到 commit 时刷入、rollback 时丢弃，
+  用两阶段提交思路把脏数据挡在二级缓存之外
 
 > 📚 延伸阅读：[MyBatis 官方文档 - 缓存](https://mybatis.org/mybatis-3/zh/sqlmap-xml.html#cache)
 
@@ -1457,15 +1576,16 @@ graph TD
 
 ::: details
 
-某列表接口 QPS 高达 5000，数据库即将打满，有同学提议开启 MyBatis 二级缓存解决。评估：二级缓存只在单 JVM 内生效且按 namespace 粒度失效——集群部署时各节点命中率不一致；任何一次 insert/update/delete 都会清空整个 namespace 的缓存，写多读少时命中率极低；参数组合基数高时 `PerpetualCache` 还有内存失控风险。方案：改用 Redis 做业务缓存，按业务主键设置 key、TTL 与容量上限，写操作后主动删除或延迟双删；对确属"近乎只读、单服务独占"的字典类数据，才考虑保留二级缓存并配置 LRU 容量上限。权衡：Redis 引入额外组件与一致性维护成本，但换来集群一致、容量可控、失效粒度精确到 key；二级缓存"零成本"只是表象，其失效粒度粗和集群不共享的缺陷在高 QPS 场景会被放大。
+某列表接口 QPS 高达 5000，数据库即将打满，有同学提议开启 MyBatis 二级缓存解决。评估：二级缓存只在单 JVM 内生效且按 namespace 粒度失效——集群部署时各节点命中率不一致；
+任何一次 insert/update/delete 都会清空整个 namespace 的缓存，写多读少时命中率极低；参数组合基数高时 `PerpetualCache` 还有内存失控风险。方案：改用 Redis 做业务缓存，
+按业务主键设置 key、TTL 与容量上限，写操作后主动删除或延迟双删；对确属"近乎只读、单服务独占"的字典类数据，才考虑保留二级缓存并配置 LRU 容量上限。权衡：Redis 引入额外组件与一致性维护成本，但换来集群一致、容量可控、
+失效粒度精确到 key；二级缓存"零成本"只是表象，其失效粒度粗和集群不共享的缺陷在高 QPS 场景会被放大。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "一级缓存可以通过配置关闭" → 错误。一级缓存默认开启且无法关闭，只能通过 `localCacheScope=STATEMENT` 把作用域收窄到语句级
 - ❌ "二级缓存集群内各节点共享" → 错误。它是 JVM 进程内缓存，节点间不共享也不互通失效
@@ -1542,9 +1662,18 @@ graph TD
 
 ::: details
 
-- 【L3】Spring 集成下一级缓存命中条件：同一事务内的连续查询——`SqlSessionTemplate` 会复用与当前 Spring 事务绑定的 SqlSession，事务内相同 statement 与参数的重复查询能命中；事务外每次调用都是新会话，缓存随会话关闭即销毁
-- 【L3】`useCache="false"` 与 `flushCache="true"` 的行为区别：前者只是本次 select 跳过二级缓存读取（一级缓存仍生效），后者是执行前同时清空一级与二级缓存
-- 【L4】集群部署下二级缓存不能替代 Redis：它是 JVM 进程内缓存，节点间不共享也不互通失效，且没有 TTL、没有容量治理；二级缓存最多用于单实例的字典类只读数据
+- 【L3】Spring 集成下一级缓存命中条件
+
+  同一事务内的连续查询——`SqlSessionTemplate` 会复用与当前 Spring 事务绑定的 SqlSession，事务内相同 statement 与参数的重复查询能命中；
+  事务外每次调用都是新会话，缓存随会话关闭即销毁
+
+- 【L3】`useCache="false"` 与 `flushCache="true"` 的行为区别
+
+  前者只是本次 select 跳过二级缓存读取（一级缓存仍生效），后者是执行前同时清空一级与二级缓存
+
+- 【L4】集群部署下二级缓存不能替代 Redis
+
+  它是 JVM 进程内缓存，节点间不共享也不互通失效，且没有 TTL、没有容量治理；二级缓存最多用于单实例的字典类只读数据
 
 > 📚 延伸阅读：[MyBatis 官方文档 - 缓存](https://mybatis.org/mybatis-3/zh/sqlmap-xml.html#cache)
 
@@ -1554,15 +1683,19 @@ graph TD
 
 ::: details
 
-运营后台列表页偶发展示已被删除的数据，用户点进去却提示"不存在"，排查发现与 MyBatis 缓存有关。应急：先确认影响面——若仅部分节点偶发，基本可断定与本地缓存（一级/二级）有关；必要时重启应用或下线疑似节点快速止血。定位：查看该 Mapper 是否开启 `<cache/>`：若开启，删除操作若来自其他服务或另一个 namespace，不会清空本服务二级缓存，列表页就会读到缓存中的已删除数据；若未开启二级缓存，则检查是否存在长生命周期的 SqlSession 被手工复用，一级缓存未随更新清空也会产生同样现象；可打开缓存日志（`LoggingCache`）观察 hit/miss 与清空时机。长期：关闭二级缓存（`cacheEnabled=false`），删除类操作改为业务层 Redis 缓存 + 写后删除；确保所有写路径收敛到同一服务或统一失效入口。权衡：关闭后列表查询全部打到数据库，需配合 SQL 优化或 Redis 兜底；换来的是脏读面归零和多节点行为一致，对展示正确性敏感的后台类系统这是正确取舍。
+运营后台列表页偶发展示已被删除的数据，用户点进去却提示"不存在"，排查发现与 MyBatis 缓存有关。应急：先确认影响面——若仅部分节点偶发，基本可断定与本地缓存（一级/二级）有关；必要时重启应用或下线疑似节点快速止血。定位：
+
+查看该 Mapper 是否开启 `<cache/>`：若开启，删除操作若来自其他服务或另一个 namespace，不会清空本服务二级缓存，列表页就会读到缓存中的已删除数据；若未开启二级缓存，
+则检查是否存在长生命周期的 SqlSession 被手工复用，一级缓存未随更新清空也会产生同样现象；可打开缓存日志（`LoggingCache`）观察 hit/miss 与清空时机。长期：
+
+关闭二级缓存（`cacheEnabled=false`），删除类操作改为业务层 Redis 缓存 + 写后删除；确保所有写路径收敛到同一服务或统一失效入口。权衡：关闭后列表查询全部打到数据库，需配合 SQL 优化或 Redis 兜底；
+换来的是脏读面归零和多节点行为一致，对展示正确性敏感的后台类系统这是正确取舍。
 
 :::
 
 #### ⚠️ 常见误区
 
 ::: details
-
-常见误区：
 
 - ❌ "Spring 项目里一级缓存能显著减压数据库" → 错误。无事务时每次 mapper 调用都是新会话，命中率接近 0，只有事务内连续查询才命中
 - ❌ "事务内命中一级缓存是无害的优化" → 错误。其他事务在此期间提交的变更本事务读不到，长事务 + 一级缓存是基于旧值校验/写库事故的高发组合，见「失效边界」
@@ -1642,10 +1775,25 @@ public class SlowSqlPlugin implements Interceptor {
 ::: details
 
 - 【L3】插件在 `Configuration` 创建四大组件时由 `InterceptorChain#pluginAll` 逐层包装；配置列表中后声明的插件先包装，位于代理链外层、先执行 `intercept`
-- 【L4】拦截点选型直接决定监控准确性：拦 Executor 拿不到缓存命中时的真实情况，慢 SQL 监控应拦 StatementHandler，见本文档「MyBatis 的执行流程是怎样的？」的踩坑案例
-- 【L4】代理层数的性能代价：每个插件为目标组件叠加一层 JDK 动态代理，N 个插件意味着高频方法每次调用要穿过 N 层反射转发；拦截 `Executor#query` 这类每条 SQL 必经的方法时代价被放大，插件数量应做减法，`@Signature` 只声明必需的方法签名
-- 【L4】慢 SQL 治理闭环的落地：自定义拦截器拦 `StatementHandler` 输出最终 SQL 与真实耗时；p6spy 以 DataSource 代理方式捕获带参数的真实 SQL（无需改 MyBatis）；两者与 MySQL 慢查询日志、`EXPLAIN` 分析联动，形成"发现 → 定位 → 治理 → 回归"的闭环，而不是只在开发期靠 STDOUT 日志肉眼看
-- 【L4】ShardingSphere-JDBC 的侵入点与 MyBatis 插件不同：它包装在 `DataSource` 层，SQL 解析/改写/路由发生在 MyBatis 之下，MyBatis 与 Mapper 写法完全无感；但 MyBatis 动态 SQL 拼出的复杂语句（子查询、多表 UPDATE、数据库自定义函数）其解析器支持有限，分库分表改造时需对存量 SQL 做回归验证
+
+- 【L4】拦截点选型直接决定监控准确性
+
+  拦 Executor 拿不到缓存命中时的真实情况，慢 SQL 监控应拦 StatementHandler，见本文档「MyBatis 的执行流程是怎样的？」的踩坑案例
+
+- 【L4】代理层数的性能代价
+
+  每个插件为目标组件叠加一层 JDK 动态代理，N 个插件意味着高频方法每次调用要穿过 N 层反射转发；拦截 `Executor#query` 这类每条 SQL 必经的方法时代价被放大，插件数量应做减法，
+  `@Signature` 只声明必需的方法签名
+
+- 【L4】慢 SQL 治理闭环的落地
+
+  自定义拦截器拦 `StatementHandler` 输出最终 SQL 与真实耗时；p6spy 以 DataSource 代理方式捕获带参数的真实 SQL（无需改 MyBatis）；
+  两者与 MySQL 慢查询日志、`EXPLAIN` 分析联动，形成"发现 → 定位 → 治理 → 回归"的闭环，而不是只在开发期靠 STDOUT 日志肉眼看
+
+- 【L4】ShardingSphere-JDBC 的侵入点与 MyBatis 插件不同
+
+  它包装在 `DataSource` 层，SQL 解析/改写/路由发生在 MyBatis 之下，MyBatis 与 Mapper 写法完全无感；
+  但 MyBatis 动态 SQL 拼出的复杂语句（子查询、多表 UPDATE、数据库自定义函数）其解析器支持有限，分库分表改造时需对存量 SQL 做回归验证
 
 > 📚 延伸阅读：[MyBatis 官方文档 - 插件](https://mybatis.org/mybatis-3/zh/configuration.html#plugins)
 
@@ -1708,10 +1856,22 @@ public class MyBatisConfig {
 
 ::: details
 
-- 【L3】事务内复用会话的机制：`SqlSessionUtils#getSqlSession` 通过 `TransactionSynchronizationManager` 把会话与当前 Spring 事务绑定，同事务多次调用共享同一会话，一级缓存因此才能在事务内命中
-- 【L3】SqlSessionTemplate 线程安全的本质：它自身无状态、不持有固定 SqlSession；所有方法经 JDK 动态代理转发给内部 `SqlSessionInterceptor`，后者每次调用时获取与当前 Spring 事务绑定的会话（无事务则新建），方法返回后按需提交/关闭会话——因此单例注入多线程共享是安全的，而原生 `DefaultSqlSession` 绝不能这样用
+- 【L3】事务内复用会话的机制
+
+  `SqlSessionUtils#getSqlSession` 通过 `TransactionSynchronizationManager` 把会话与当前 Spring 事务绑定，
+  同事务多次调用共享同一会话，一级缓存因此才能在事务内命中
+
+- 【L3】SqlSessionTemplate 线程安全的本质
+
+  它自身无状态、不持有固定 SqlSession；所有方法经 JDK 动态代理转发给内部 `SqlSessionInterceptor`，
+  后者每次调用时获取与当前 Spring 事务绑定的会话（无事务则新建），方法返回后按需提交/关闭会话——因此单例注入多线程共享是安全的，而原生 `DefaultSqlSession` 绝不能这样用
+
 - 【L4】无事务时每次调用都是完整的 open → execute → close，这也是"Spring 下一级缓存近乎失效"的根源
-- 【L4】`@Transactional` 失效会连带传导到持久层：自调用、非 public 方法、异常被吞导致事务不生效时，每次 Mapper 调用都退化为独立会话、独立连接且自动提交，一级缓存全部失效、多次写操作不再具备原子性；反之，在 Service/Mapper 调用处 catch 住数据访问异常而不上抛，Spring 感知不到异常则事务不回滚，已执行的写操作被提交，产生部分提交的不一致数据
+
+- 【L4】`@Transactional` 失效会连带传导到持久层
+
+  自调用、非 public 方法、异常被吞导致事务不生效时，每次 Mapper 调用都退化为独立会话、独立连接且自动提交，一级缓存全部失效、多次写操作不再具备原子性；反之，
+  在 Service/Mapper 调用处 catch 住数据访问异常而不上抛，Spring 感知不到异常则事务不回滚，已执行的写操作被提交，产生部分提交的不一致数据
 
 > 📚 延伸阅读：[MyBatis-Spring 官方文档](https://mybatis.org/spring/zh/index.html)
 
@@ -1756,7 +1916,9 @@ public class MyBatisConfig {
 
 ::: details
 
-- 【L3】`@Mapper` 依赖 mybatis-spring-boot-autoconfigure 中的自动配置处理器逐个识别；`@MapperScan` 由 `MapperScannerRegistrar`（ImportBeanDefinitionRegistrar）在容器启动早期批量注册 BeanDefinition，不遗漏不依赖自动配置顺序
+- 【L3】`@Mapper` 依赖 mybatis-spring-boot-autoconfigure 中的自动配置处理器逐个识别；
+  `@MapperScan` 由 `MapperScannerRegistrar`（ImportBeanDefinitionRegistrar）在容器启动早期批量注册 BeanDefinition，不遗漏不依赖自动配置顺序
+
 - 【L4】`@MapperScan` 支持 `annotationClass`/`markerInterface` 过滤，多模块项目中可避免误扫第三方包中的接口
 
 :::
