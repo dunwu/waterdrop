@@ -263,17 +263,17 @@ A2：MQA 所有头共享一组 KV，GQA 分组共享。GQA 在推理效率（KV 
 A1：看数据隐私要求、定制需求（微调）、延迟要求、成本预算。数据敏感 + 需微调 → 开源；快速验证 + 无定制 → 闭源 API。
 
 **Q2：MoE 模型的负载均衡问题如何解决？**
-A2：通过辅助损失函数（Auxiliary Loss）惩罚不均衡的 Expert 分配，确保所有 Expert 被均匀使用。
+A2：通过辅助损失函数惩罚不均衡的 Expert 分配，确保所有 Expert 被均匀使用。
 
 ---
 
-### 【简单】什么是 Tokenizer？BPE、WordPiece、SentencePiece 有什么区别？⭐⭐⭐
+### 【简单】Tokenizer 是什么？BPE、WordPiece、SentencePiece 有什么区别？⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：LLM / Tokenizer
 
 #### 💎 关键结论
 
-> **"Tokenizer 将文本切分为模型可处理的最小单元（token）；BPE/WordPiece/SentencePiece 都是子词（Subword）分词算法，在词表大小与 OOV 问题之间取得平衡。"**
+> **"Tokenizer 将文本切分为模型可处理的最小单元（token）；BPE/WordPiece/SentencePiece 都是子词分词算法，在词表大小与 OOV 问题之间取得平衡。"**
 
 #### ⚡ 记忆卡片
 
@@ -378,8 +378,8 @@ A2：会。Tokenizer 的压缩率（字符数/token 数）直接影响模型的�
 
 **训练基础设施**
 
-- **数据并行（Data Parallelism）**：每张 GPU 处理不同数据，梯度同步（AllReduce）
-- **模型并行（Model Parallelism）**：
+- **数据并行**：每张 GPU 处理不同数据，梯度同步（AllReduce）
+- **模型并行**：
   - **Tensor Parallelism**：单层内部矩阵运算拆分到多 GPU
   - **Pipeline Parallelism**：不同层分配到不同 GPU
 - **ZeRO 优化**：分片存储 Optimizer States、Gradients、Parameters
@@ -404,7 +404,7 @@ A2：会。Tokenizer 的压缩率（字符数/token 数）直接影响模型的�
 
 **【L4】训练中的工程挑战**
 
-- 梯度裁剪（Gradient Clipping）防止梯度爆炸
+- 梯度裁剪防止梯度爆炸
 - 学习率 Warmup + Cosine Decay
 - 训练中断恢复（Checkpoint + 数据位点记录）
 - Loss Spike 处理：跳过异常 batch 或回滚 checkpoint
@@ -417,7 +417,7 @@ A2：会。Tokenizer 的压缩率（字符数/token 数）直接影响模型的�
 
 - **误区 1**：预训练只关心数据量 → 数据质量和多样性同样重要，1T 低质数据不如 100B 高质量数据
 - **误区 2**：模型越大效果一定越好 → 需匹配训练数据量（Chinchilla 定律）
-- **误区 3**：预训练一次就够了 → 持续预训练（Continual Pre-training）是补充知识的重要手段
+- **误区 3**：预训练一次就够了 → 持续预训练是补充知识的重要手段
 
 :::
 
@@ -431,7 +431,7 @@ A2：评测数据泄漏到训练集中，导致评测分数虚高。常用检测
 
 ---
 
-### 【困难】什么是 LLM 的对齐（Alignment）？SFT、RLHF、DPO 各自解决什么问题？⭐⭐⭐⭐⭐
+### 【困难】LLM 的对齐（Alignment）是什么？SFT、RLHF、DPO 各自解决什么问题？⭐⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：15 min ｜ 🏷 标签：LLM / 对齐
 
@@ -550,7 +550,7 @@ A3：可以，但可能部分丢失对齐效果。最佳实践是在对齐后使
 
 ## 微调（Fine-tuning）
 
-### 【中等】什么是大模型微调（Fine-tuning）？全量微调和参数高效微调（PEFT）有什么区别？⭐⭐⭐⭐
+### 【中等】大模型微调（Fine-tuning）是什么？全量微调和参数高效微调（PEFT）有什么区别？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：LLM / 微调
 
@@ -605,7 +605,7 @@ A3：可以，但可能部分丢失对齐效果。最佳实践是在对齐后使
 
 **【L3】DoRA（Weight-Decomposed Low-Rank Adaptation）**
 
-- 将权重分解为幅度（magnitude）和方向（direction）
+- 将权重分解为幅度和方向
 - 仅对方向部分做 LoRA 微调，幅度单独学习
 - 比 LoRA 更接近全量微调效果
 
@@ -747,7 +747,7 @@ A2：理论上可以，但效果不可预测。实践中推荐为每个任务单
 
 ---
 
-### 【简单】什么是 QLoRA？它和 LoRA 有什么区别？⭐⭐⭐⭐
+### 【简单】QLoRA 是什么？它和 LoRA 有什么区别？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：LLM / QLoRA
 
@@ -871,7 +871,7 @@ A2：不能。QLoRA 的核心是冻结量化基础模型 + 训练 LoRA 适配器
 | 10K-100K         | 边际收益递减     | 复杂领域知识注入   |
 | > 100K           | 接近饱和         | 大规模知识更新     |
 
-**数据飞轮（Data Flywheel）**
+**数据飞轮**
 
 ```
 线上服务 → 收集用户反馈 → 标注高质量数据 → 微调模型 → 部署上线 → 继续收集
@@ -916,7 +916,7 @@ A2：人工抽检 + 自动化指标（格式合规率、长度分布、重复率
 
 ---
 
-### 【困难】什么是灾难性遗忘（Catastrophic Forgetting）？微调中如何避免？⭐⭐⭐⭐
+### 【困难】灾难性遗忘（Catastrophic Forgetting）是什么？微调中如何避免？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：LLM / 微调
 
@@ -942,7 +942,7 @@ A2：人工抽检 + 自动化指标（格式合规率、长度分布、重复率
 
 | 策略               | 原理                     | 效果                 |
 | ------------------ | ------------------------ | -------------------- |
-| 数据回放（Replay） | 混合 10-30% 的通用数据   | 最直接有效           |
+| 数据回放           | 混合 10-30% 的通用数据   | 最直接有效           |
 | LoRA / PEFT        | 冻结主干，只更新少量参数 | 天然减少遗忘         |
 | 渐进式解冻         | 从顶层开始逐层解冻       | 保护底层通用表示     |
 | EWC                | 对重要参数施加约束       | 理论优雅但计算开销大 |
@@ -969,7 +969,7 @@ A2：人工抽检 + 自动化指标（格式合规率、长度分布、重复率
 - L_total = L_new + (λ/2) · Σ Fᵢ · (θᵢ - θᵢ_original)²
 - 缺点：需计算 Fisher 信息，大模型开销大
 
-**【L3】渐进式解冻（Gradual Unfreezing）**
+**【L3】渐进式解冻**
 
 - 初始只解冻最顶层（LM Head + 最后几层 Transformer）
 - 每隔 N 步解冻更多层
@@ -1025,7 +1025,7 @@ A2：每个阶段都混合通用数据；使用 LoRA 的增量叠加；定期用
 
 ---
 
-### 【困难】什么是 Direct Preference Optimization（DPO）？它相比 RLHF 有什么优势和局限？⭐⭐⭐⭐
+### 【困难】Direct Preference Optimization（DPO）是什么？它相比 RLHF 有什么优势和局限？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：LLM / DPO
 
@@ -1118,7 +1118,7 @@ A2：差距太小（难以区分）→ 模型学不到有意义的偏好；差�
 
 ## 推理优化
 
-### 【困难】什么是 KV Cache？它在 LLM 推理中起什么作用？⭐⭐⭐⭐⭐
+### 【困难】KV Cache 是什么？它在 LLM 推理中起什么作用？⭐⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：LLM / 推理优化
 
@@ -1312,7 +1312,7 @@ A2：根据显存预算：显存充足用 INT8；消费级 GPU 用 INT4 (Q4_K_M)
 
 ---
 
-### 【困难】什么是推测性解码（Speculative Decoding）？它如何加速推理？⭐⭐⭐⭐
+### 【困难】推测性解码（Speculative Decoding）是什么？它如何加速推理？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：LLM / 推理优化
 
@@ -1368,7 +1368,7 @@ A2：根据显存预算：显存充足用 INT8；消费级 GPU 用 INT4 (Q4_K_M)
 **【L3】Self-Speculative Decoding**
 
 - 不需要单独的 draft model
-- 利用 target model 的早期退出（early exit）层作为 draft
+- 利用 target model 的早期退出层作为 draft
 - 或使用 target model 的量化版本作为 draft
 - 避免维护两个模型的额外开销
 
@@ -1499,7 +1499,7 @@ A2：vLLM 使用 PagedAttention 管理 KV Cache（分页存储），配合迭代
 
 ---
 
-### 【简单】什么是模型蒸馏（Knowledge Distillation）？它在 LLM 场景下如何应用？⭐⭐⭐⭐
+### 【简单】模型蒸馏（Knowledge Distillation）是什么？它在 LLM 场景下如何应用？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2 ｜ ⏱ 建议用时：8 min ｜ 🏷 标签：LLM / 蒸馏
 
@@ -1627,7 +1627,7 @@ A2：数据蒸馏本质上是一种特殊的微调——训练数据来自 Teach
    - Online Softmax：流式更新最大值和归一化因子
    - 每处理一个块就更新结果，最终得到精确的 softmax 输出
 
-3. **重计算（Recomputation）**
+3. **重计算**
    - 反向传播时不存储注意力矩阵
    - 而是重新计算需要的块
    - 用计算换内存
@@ -1987,7 +1987,7 @@ A2：使用 LLM-as-Judge 评估语义等价性；或构建"关键要点清单"�
 
 ---
 
-### 【困难】什么是 LLM-as-Judge？它的可靠性和局限性是什么？⭐⭐⭐⭐
+### 【困难】LLM-as-Judge 是什么？它的可靠性和局限性是什么？⭐⭐⭐⭐
 
 > 🎯 目标等级：L3-L4 ｜ ⏱ 建议用时：12 min ｜ 🏷 标签：LLM / 评估
 
@@ -2046,7 +2046,7 @@ A2：使用 LLM-as-Judge 评估语义等价性；或构建"关键要点清单"�
 
 **【L3】提升 LLM-as-Judge 可靠性的方法**
 
-- 详细的评分标准（Rubric）：明确每个分数段的定义
+- 详细的评分标准：明确每个分数段的定义
 - Few-shot 示例：提供参考评估案例
 - 多维度评估：分别评估不同维度而非整体打分
 - 多 Judge 投票：使用多个 LLM 做 Judge 取共识
@@ -2082,11 +2082,11 @@ A2：使用 LLM-as-Judge 评估语义等价性；或构建"关键要点清单"�
 A1：选择能力强于被评估模型的 LLM。评估 GPT-3.5 级别用 GPT-4；评估 GPT-4 级别需要更强模型或人工评估。
 
 **Q2：LLM-as-Judge 的 prompt 如何设计？**
-A2：明确评估维度和评分标准（rubric）；提供 few-shot 示例；要求输出推理过程（chain-of-thought）；避免引导性措辞。
+A2：明确评估维度和评分标准；提供 few-shot 示例；要求输出推理过程（chain-of-thought）；避免引导性措辞。
 
 ---
 
-### 【中等】什么是 LLM 基准测试（Benchmark）？MMLU、HumanEval、MT-Bench 分别评估什么？⭐⭐⭐⭐
+### 【中等】LLM 基准测试（Benchmark）是什么？MMLU、HumanEval、MT-Bench 分别评估什么？⭐⭐⭐⭐
 
 > 🎯 目标等级：L2-L3 ｜ ⏱ 建议用时：10 min ｜ 🏷 标签：LLM / 评估
 
